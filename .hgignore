@@ -1,0 +1,12 @@
+workspace/\.metadata
+questd/\.cache
+questd/\.classpath
+questd/\.gitignore
+questd/\.project
+questd/\.settings
+questd/\.target
+questd/bin/*
+questd/logs/*
+questd/target/*
+questd/project/target
+questd/project/project/target
