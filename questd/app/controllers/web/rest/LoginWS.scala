@@ -3,27 +3,25 @@ package controllers.web.rest
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
-
 import controllers.domain._
-import controllers.domain.apiresult._
+import controllers.domain.jsonhelpers.AuthAPI._
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import controllers.domain.OkApiResult
+
+
 
 object LoginWS extends Controller {
 
-  implicit val rds = (
-    (__ \ 'name).read[String] and
-    (__ \ 'pass).read[String]) tupled
-
   def login = Action.async(parse.json) { implicit request =>
     {
-      request.body.validate[(String, String)].map {
-        case (name, pass) => {
-          Future { AuthAPI.login(name, pass) }.map {
+
+      request.body.validate[AuthAPI.LoginParams].map {
+        case (params) => {
+          Future { AuthAPI.login(params) }.map {
             _ match {
               case OkApiResult(body) => body match {
-                case Some(map) => Ok(Json.toJson(map))
+                case Some(result: AuthAPI.LoginResult) => Ok(Json.toJson(result))
                 case None => Ok
               }
               case _ => InternalServerError
@@ -36,12 +34,35 @@ object LoginWS extends Controller {
     }
   }
 
-  
-  def register = Action { request =>
+  // TODO: http://www.playframework.com/documentation/2.1.2/ScalaJsonCombinators
+  def register = Action.async(parse.json) { implicit request =>
     {
-      request.body.asJson match {
-        case Some(text) => Ok(text)
-        case None => BadRequest
+      
+
+      //      implicit val creatureReads = (
+      //        (__ \ "name").read[String] ~
+      //        (__ \ "isDead").read[Boolean] ~
+      //        (__ \ "weight").read[Float])(Creature)
+
+//      implicit val creatureWrites = (
+//        (__ \ "name").write[String] and
+//        (__ \ "isDead").write[Boolean] and
+//        (__ \ "weight").write[Float])(unlift(Creature.unapply))
+
+      request.body.validate[AuthAPI.RegisterParams].map {
+        case (params) => {
+          Future { AuthAPI.register(params) }.map {
+            _ match {
+              case OkApiResult(body) => body match {
+                case Some(result: AuthAPI.RegisterResult) => Ok(Json.toJson(result))
+                case None => Ok
+              }
+              case _ => InternalServerError
+            }
+          }
+        }
+      }.recoverTotal {
+        e => Future { BadRequest("Detected error:" + JsError.toFlatJson(e)) }
       }
     }
   }

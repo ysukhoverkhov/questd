@@ -1,14 +1,19 @@
 package controllers.domain
 
-import apiresult._
-import scala.concurrent._
-import ExecutionContext.Implicits.global
-
 object AuthAPI {
-
-  // TODO change execution context
-  def login(name: String, pass: String): ApiResult = {
-      OkApiResult(Some (Map ("name" -> name, "password" -> pass)))
-  }
   
+  case class LoginParams(name: String, pass: String)
+  case class LoginResult(name: String, pass: String)
+
+  def login(params: LoginParams): ApiResult[LoginResult] = {
+      OkApiResult(Some (LoginResult(params.name, params.pass)))
+  }
+
+  case class RegisterParams(name: String, pass: String)
+  case class RegisterResult(name: String, pass: String)
+
+  def register(params: RegisterParams): ApiResult[RegisterResult] = {
+      OkApiResult(Some (RegisterResult(params.name, params.pass)))
+  }
+
 }
