@@ -6,7 +6,11 @@
 GET     /                           controllers.web.rest.Application.index
 
 # Test client
-GET     /testclient                 controllers.web.testclient.Client.login
+GET     /testclient                 controllers.web.testclient.Client.index
+GET     /testclient/login           controllers.web.testclient.Client.login
+GET     /testclient/main            controllers.web.testclient.Client.main
+
+POST	/testclient/loginTarget		controllers.web.testclient.Client.loginTarget
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

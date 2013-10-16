@@ -1,0 +1,14 @@
+@(loginCredentialsForm: Form[controllers.web.testclient.Client.LoginCredentials])
+
+@main("Title") {
+
+    <h2>super duper login screen</h2>
+
+    @helper.form(action = controllers.web.testclient.routes.Client.loginTarget()) {
+      @helper.inputText(loginCredentialsForm("name"))
+      @helper.inputPassword(loginCredentialsForm("pass"))
+      
+      <input type="submit" value="Create">
+    }
+
+}
