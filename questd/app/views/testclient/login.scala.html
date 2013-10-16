@@ -1,14 +1,35 @@
-@(loginCredentialsForm: Form[controllers.web.testclient.Client.LoginCredentials])
+@(loginCredentialsForm:    Form[controllers.web.testclient.Client.LoginCredentials],
+  registerCredentialsForm: Form[controllers.web.testclient.Client.RegisterCredentials])
 
-@main("Title") {
+@import helper._
 
-    <h2>super duper login screen</h2>
+@main("super duper login screen") {
 
-    @helper.form(action = controllers.web.testclient.routes.Client.loginTarget()) {
-      @helper.inputText(loginCredentialsForm("name"))
-      @helper.inputPassword(loginCredentialsForm("pass"))
+    <h2>Login</h2>
+    
+    @form(action = controllers.web.testclient.routes.Client.loginTarget()) {
+      @inputText(loginCredentialsForm("name"))
+      @inputPassword(loginCredentialsForm("pass"))
       
-      <input type="submit" value="Create">
+      <input type="submit" value="Login">
+    }
+
+    <h2>Register</h2>
+
+	@if(registerCredentialsForm.hasGlobalErrors) {
+	    <ul>
+	    @registerCredentialsForm.globalErrors.foreach { error =>
+	        <li>error.message</li>
+	    }
+	    </ul>
+	}
+    @form(action = controllers.web.testclient.routes.Client.registerTarget()) {
+      @inputText(registerCredentialsForm("name"))
+      @inputPassword(registerCredentialsForm("pass1"))
+      @inputPassword(registerCredentialsForm("pass2"))
+      
+      <input type="submit" value="Register">
     }
 
 }
+
