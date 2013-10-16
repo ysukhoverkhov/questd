@@ -6,8 +6,8 @@
 GET     /                           	controllers.web.rest.Application.index
 
 # WS Auth
-POST	/rest/login						controllers.web.rest.LoginAPI.login
-POST	/rest/register					controllers.web.rest.LoginAPI.register
+POST	/rest/login						controllers.web.rest.LoginWS.login
+POST	/rest/register					controllers.web.rest.LoginWS.register
 
 
 # Test client auth

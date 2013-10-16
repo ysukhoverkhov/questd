@@ -6,7 +6,9 @@ import play.api.mvc._
 object Application extends Controller {
 
   def index = Action {
-    Redirect("http://google.com/")
+    NotFound("Not found")
+    //Redirect("http://google.com/")
+    
     //    Ok("This is our super index. it should redirect somewhere.")
   }
 

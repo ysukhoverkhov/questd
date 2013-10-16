@@ -51,7 +51,7 @@ object Client extends Controller {
           "name" -> loginCreds.name,
           "pass" -> loginCreds.pass)
 
-        WS.url(controllers.web.rest.routes.LoginAPI.login.absoluteURL(false))
+        WS.url(controllers.web.rest.routes.LoginWS.login.absoluteURL(false))
           .post(data)
           .map(result => {
             Ok(result.body)
@@ -73,7 +73,7 @@ object Client extends Controller {
           "name" -> registerCreds.name,
           "pass" -> registerCreds.pass1)
 
-        WS.url(controllers.web.rest.routes.LoginAPI.register.absoluteURL(false))
+        WS.url(controllers.web.rest.routes.LoginWS.register.absoluteURL(false))
           .post(data)
           .map(result => {
             Ok(result.body)
