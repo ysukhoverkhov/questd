@@ -4,7 +4,7 @@ object DAOs {
 
   abstract class DAO[T] {
     def create(t: T): Unit
-    def read(t: T): T
+    def read(t: T): Option[T]
     def update(t: T): Unit
     def delete(t: T): Unit
     def all: List[T]

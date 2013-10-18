@@ -8,9 +8,13 @@ private[store] object DAOs {
   object AnormUserDAO extends UserDAO {
 
     def create(t: User): Unit = {}
-    def read(t: User): User = { null }
+    
+    def read(t: User): Option[User] = { None }
+    
     def update(t: User): Unit = {}
+    
     def delete(t: User): Unit = {}
+    
     def all: List[User] = List()
 
   }

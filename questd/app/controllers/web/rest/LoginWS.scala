@@ -34,21 +34,8 @@ object LoginWS extends Controller {
     }
   }
 
-  // TODO: http://www.playframework.com/documentation/2.1.2/ScalaJsonCombinators
   def register = Action.async(parse.json) { implicit request =>
     {
-      
-
-      //      implicit val creatureReads = (
-      //        (__ \ "name").read[String] ~
-      //        (__ \ "isDead").read[Boolean] ~
-      //        (__ \ "weight").read[Float])(Creature)
-
-//      implicit val creatureWrites = (
-//        (__ \ "name").write[String] and
-//        (__ \ "isDead").write[Boolean] and
-//        (__ \ "weight").write[Float])(unlift(Creature.unapply))
-
       request.body.validate[AuthAPI.RegisterParams].map {
         case (params) => {
           Future { AuthAPI.register(params) }.map {
