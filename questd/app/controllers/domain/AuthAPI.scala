@@ -3,7 +3,6 @@ package controllers.domain
 import models.domain.profile._
 import models.domain.user._
 import models.store.store._
-import models.domain.auth._
 
 object AuthAPI {
 
@@ -25,11 +24,11 @@ object AuthAPI {
       case None => {
         OkApiResult(Some(LoginResult(LoginResultCode.Failed, "")))
       }
-      case Some(user) => {
-        if (user.password == loginAttempt.password) {
+      case Some(userFromDB) => {
+        if (userFromDB.password == loginAttempt.password) {
           val uuid = java.util.UUID.randomUUID().toString()
           
-          // TODO store session in database.
+          Store.user.update(userFromDB.replaceSessionID(uuid))
           
           OkApiResult(Some(LoginResult(LoginResultCode.Login, uuid)))
         } else {

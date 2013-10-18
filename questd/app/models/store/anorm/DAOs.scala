@@ -14,12 +14,20 @@ private[store] object DAOs {
    */
   import models.domain.user._
 
-  case class UserDB(id: Long, name: String, pass: String)
+  case class UserDB(id: Long, name: String, pass: String, session: String)
   val user = {
     get[Long]("id") ~
       get[String]("name") ~
-      get[String]("pass") map {
-        case id ~ name ~ pass => UserDB(id, name, pass)
+      get[String]("pass") ~ 
+      get[Option[String]]("session") map {
+        case id ~ name ~ pass ~ session => UserDB(
+            id,
+            name,
+            pass,
+            session match {
+              case None => SessionID.default.toString
+              case Some(id) => id
+            } )
       }
   }
 
@@ -36,18 +44,21 @@ private[store] object DAOs {
         (SQL("select * from user").on(
           'id -> t.id.toString).as(user *) foldLeft (None: Option[User])) { (rv, u) =>
             rv match {
-              case None => Option(User(u.id.toString, u.name, u.pass))
+              case None => Option(User(u.id.toString, u.name, u.pass, u.session))
               case Some(_) => rv
             }
 
           }
       }
 
-    def update(t: User): Unit = {}
-//      DB.withConnection { implicit c =>
-//        SQL("delete from user where id = {id}").on(
-//          'id -> t.id.toString.toLong).executeUpdate()
-//      }
+    def update(t: User): Unit = 
+      DB.withConnection { implicit c =>
+        SQL("update user set name = {name}, pass = {pass}, session = {session} where id = {id}").on(
+          'id -> t.id.toString.toLong,
+          'name -> t.username,
+          'pass -> t.password,
+          'session -> t.session.toString).executeUpdate()
+      }
 
     def delete(t: User): Unit =
       DB.withConnection { implicit c =>
