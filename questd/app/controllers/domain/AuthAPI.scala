@@ -19,7 +19,24 @@ object AuthAPI {
   case class LoginResult(result: LoginResultCode.Value, session: SessionID) 
 
   def login(params: LoginParams): ApiResult[LoginResult] = {
-    OkApiResult(Some(LoginResult(LoginResultCode.Login, "This is the session number")))
+    
+    val loginAttempt = User(params.name, params.pass)
+    Store.user.read(loginAttempt) match {
+      case None => {
+        OkApiResult(Some(LoginResult(LoginResultCode.Failed, "")))
+      }
+      case Some(user) => {
+        if (user.password == loginAttempt.password) {
+          val uuid = java.util.UUID.randomUUID().toString()
+          
+          // TODO store session in database.
+          
+          OkApiResult(Some(LoginResult(LoginResultCode.Login, uuid)))
+        } else {
+          OkApiResult(Some(LoginResult(LoginResultCode.Failed, "")))
+        } 
+      }
+    }
   }
 
   /*
