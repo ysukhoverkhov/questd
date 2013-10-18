@@ -1,13 +1,16 @@
-package models.store.anorm
+package models.store.anorm.dao
 
 import anorm._
 import anorm.SqlParser._
 import play.api.db._
 import play.api.Play.current
-
 import models.store.DAOs._
+import models.domain.user.SessionID
+import models.domain.user.User
+import models.domain.user.stringToSessionID
+import models.domain.user.stringToUserID
 
-private[store] object DAOs {
+private[anorm] object user {
 
   /*
    * User
