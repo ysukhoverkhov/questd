@@ -22,6 +22,11 @@ object user {
     val profile: Profile)
     
   object User {
+    
+    def apply(id: UserID, username: String, password: String): User = {
+      User(id, username, password, Profile.default)
+    }
+
     def apply(username: String, password: String): User = {
       User(UserID.default, username, password, Profile.default)
     }
