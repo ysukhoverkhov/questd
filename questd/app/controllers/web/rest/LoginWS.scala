@@ -21,8 +21,10 @@ object LoginWS extends Controller {
           Future { AuthAPI.login(params) }.map {
             _ match {
               case OkApiResult(body) => body match {
-                case Some(result: AuthAPI.LoginResult) => Ok(Json.toJson(result))
-                case None => Ok
+                case Some(result: AuthAPI.LoginResult) => 
+                  Ok(Json.toJson(result))
+                    .withSession("sessionid" -> result.session.toString)
+                case None => InternalServerError
               }
               case _ => InternalServerError
             }
