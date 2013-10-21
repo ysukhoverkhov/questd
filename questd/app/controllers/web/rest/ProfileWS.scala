@@ -12,9 +12,9 @@ import controllers.web.rest.security._
 
 object ProfileWS extends Controller with SecurityWS {
 
-  def getName = isAuthenticatedAsync { username => implicit request =>
+  def getName = Authenticated.async { implicit request =>
     Future {
-      Ok(username) 
+      Ok(request.user.username) 
     }
   }
 

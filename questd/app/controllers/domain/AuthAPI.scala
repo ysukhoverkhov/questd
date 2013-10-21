@@ -65,6 +65,21 @@ object AuthAPI {
       }
     }
   }
+  
+  /*
+   * User for session
+   */
+  case class UserParams(userID: UserID)
+
+  object UserResultCode extends Enumeration {
+    val Ok = Value(1)
+    val SessionNotFound = Value(2)
+  }
+  case class UserResult(result: UserResultCode.Value, user: User) 
+
+  def user(params: UserParams): ApiResult[UserResult] = {
+    OkApiResult(Some(UserResult(UserResultCode.Ok, User("trul", "tralaikin"))))
+  }
 
 }
 
