@@ -53,8 +53,11 @@ object Client extends Controller {
 
         WS.url(controllers.web.rest.routes.LoginWS.login.absoluteURL(false))
           .post(data)
-          .map(result => {
-            Ok(result.body)
+          .map(result => { result.header("Set-Cookie") match {
+            case Some(c: String) => Ok(result.body).withHeaders("Set-Cookie" -> c)
+            case _ => InternalServerError
+          }
+            
         })
       }
     )

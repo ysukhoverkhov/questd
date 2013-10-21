@@ -1,17 +1,17 @@
 package controllers.web.rest
 
+import scala.concurrent.Future
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.domain._
 import controllers.domain.jsonhelpers.AuthAPI._
-import scala.concurrent.Future
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import controllers.domain.OkApiResult
+import controllers.web.rest.security._
 
 
 
-object LoginWS extends Controller {
+object LoginWS extends Controller with SecurityWS {
 
   def login = Action.async(parse.json) { implicit request =>
     {
@@ -22,10 +22,13 @@ object LoginWS extends Controller {
             _ match {
               case OkApiResult(body) => body match {
                 case Some(result: AuthAPI.LoginResult) => 
-                  Ok(Json.toJson(result))
-                    .withSession("sessionid" -> result.session.toString)
+                  storeAuthInfoInResult(
+                      Ok(Json.toJson(result)),
+                      result)
+
                 case None => InternalServerError
               }
+              
               case _ => InternalServerError
             }
           }
