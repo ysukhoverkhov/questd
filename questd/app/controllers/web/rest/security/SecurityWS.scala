@@ -9,6 +9,7 @@ import controllers.domain._
 import scala.concurrent._
 import scala.concurrent.duration._
 import models.domain.user._
+import controllers.domain._
 
 trait SecurityWS extends Controller {
 
@@ -26,19 +27,33 @@ trait SecurityWS extends Controller {
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
       request.session.get(SessionIdKey) match { 
         
-        case Some(userid: String) => {
+        case Some(sessionid: String) => {
           Future {
           
-            // Accessing api to auth user.
-            // TODO implement db auth here.
+            val params = AuthAPI.UserParams(sessionid)
             
+            AuthAPI.user(params) match {
+              case OkApiResult(body) => body match {
+                case Some(result: AuthAPI.UserResult) =>  result.user
+                case None => InternalServerError
+              }
+              
+              case NotAuthorisedApiResult(body) => {
+                Unauthorized
+              }
+              
+              case InternalErrorApiResult(body) => {
+                InternalServerError
+              }
+            }
           
-            User(userid + "peputkin in the object", "")
-          
-          }.map {newUsername =>
-            Await.result(
-                block(new AuthenticatedRequest(newUsername, request)),
-                0 nanos)	
+          }.map {newUser => newUser match {
+              case user: User => 
+	            Await.result(
+	              block(new AuthenticatedRequest(user, request)),
+	              0 nanos)
+              case er: Status => er  
+            }
           }
         }
 

@@ -54,6 +54,18 @@ private[anorm] object user {
           }
       }
 
+    def read(sessid: SessionID): Option[User] =
+      DB.withConnection { implicit c =>
+        (SQL("select * from user").on(
+          'id -> sessid.toString).as(user *) foldLeft (None: Option[User])) { (rv, u) =>
+            rv match {
+              case None => Option(User(u.id.toString, u.name, u.pass, u.session))
+              case Some(_) => rv
+            }
+
+          }
+      }
+
     def update(t: User): Unit = 
       DB.withConnection { implicit c =>
         SQL("update user set name = {name}, pass = {pass}, session = {session} where id = {id}").on(
