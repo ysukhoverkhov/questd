@@ -1,101 +1,91 @@
 package controllers.web.rest
 
+import com.restfb._
+import com.restfb.types._
+import com.restfb.exception._
+
 import scala.concurrent.Future
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.domain._
-import controllers.domain.jsonhelpers.AuthAPI._
 import controllers.web.rest.security._
 
+// EXAMPLE
+/*
+  /*
+   * LoginParams
+   */
+  implicit val loginParamReads = (
+    (__ \ 'name).read[String] and
+    (__ \ 'pass).read[String])(LoginParams)
 
+  /*
+     * LoginResult
+     */
+  implicit val loginResultWrites = new Writes[LoginResult] {
+    def writes(c: LoginResult): JsValue = {
+      Json.obj(
+        "result" -> c.result.id,
+        "session" -> c.session.toString)
+    }
+  }
+*/
 
 object LoginWS extends Controller with SecurityWS {
 
-  def login = Action.async(parse.json) { implicit request =>
-    {
+  /* *****
+   * Login FB section
+   * *****/
 
-      request.body.validate[AuthAPI.LoginParams].map {
-        case (params) => {
-          Future { AuthAPI.login(params) }.map {
-            _ match {
-              case OkApiResult(body) => body match {
-                case Some(result: AuthAPI.LoginResult) => 
-                  storeAuthInfoInResult(
-                      Ok(Json.toJson(result)),
-                      result)
-
-                case None => InternalServerError
-              }
-              
-              case _ => InternalServerError
-            }
-          }
-        }
-      }.recoverTotal {
-        e => Future { BadRequest("Detected error:" + JsError.toFlatJson(e)) }
-      }
-    }
-  }
-
-  def register = Action.async(parse.json) { implicit request =>
-    {
-      request.body.validate[AuthAPI.RegisterParams].map {
-        case (params) => {
-          Future { AuthAPI.register(params) }.map {
-            _ match {
-              case OkApiResult(body) => body match {
-                case Some(result: AuthAPI.RegisterResult) => Ok(Json.toJson(result))
-                case None => Ok
-              }
-              case _ => InternalServerError
-            }
-          }
-        }
-      }.recoverTotal {
-        e => Future { BadRequest("Detected error:" + JsError.toFlatJson(e)) }
-      }
-    }
-  }
-
+  // TODO: Implement tripple try here for fb requests here to compensate network failures.
+  // TODO: Auto Log InternalServerError
   def loginfb = Action.async(parse.json) { implicit request =>
     {
-     
-      import com.restfb._
-      import com.restfb.types._
-      
-      val facebookClient = new DefaultFacebookClient("CAACEdEose0cBACZCR6dkO3mVUEAfHaBTnrZBijw5kxzg1brBRv7Th3sMqZAmxelj7gUE4CxppJZCeUt0VMmE9K5nRDSAhm2BR7PNspRVtZCP2NsN8ZCFTJUS3rTZBL0ZAb6NyMrCsXzAvNJWhtui4rBa1XkX4HTX5f4ZD");
-      val user = facebookClient.fetchObject("me", classOf[User]);
-      
-      Future.successful{
-        Ok(user.getEmail())
-      }
-      //new com.restfb.types.User
-      
-/*
-      request.body.validate[AuthAPI.LoginParams].map {
-        case (params) => {
-          Future { AuthAPI.login(params) }.map {
-            _ match {
-              case OkApiResult(body) => body match {
-                case Some(result: AuthAPI.LoginResult) => 
-                  storeAuthInfoInResult(
-                      Ok(Json.toJson(result)),
-                      result)
+      request.body.validate[Map[String, String]].map {
+        case params => {
+          params.head match {
+            case ("token", token: String) => {
+              Future {
+                try {
+                  val facebookClient = new DefaultFacebookClient(token);
+                  Option(facebookClient.fetchObject("me", classOf[User]));
+                } catch {
+                  case ex: FacebookOAuthException => {
+                    Logger.debug("Facebook auth failed")
+                    None
+                  }
+                }
+              } map { rv =>
+                rv match {
+                  case Some(user: User) => {
+                    val params = AuthAPI.LoginFBParams(user.getId())
 
-                case None => InternalServerError
+                    AuthAPI.loginfb(params) match {
+                      case OkApiResult(Some(loginResult: AuthAPI.LoginFBResult)) => Ok(loginResult.session.toString)
+                      case OkApiResult(None) => InternalServerError
+                      case InternalErrorApiResult(_) => InternalServerError
+                    }
+
+                  }
+                  case None => Unauthorized("Facebook session expired")
+                }
               }
-              
-              case _ => InternalServerError
             }
+
+            case badRequest => Future.successful { BadRequest("Detected error:" + badRequest.toString + " is not valid request") }
           }
+
         }
+
       }.recoverTotal {
-        e => Future { BadRequest("Detected error:" + JsError.toFlatJson(e)) }
-      }*/
+        e => Future.successful { BadRequest("Detected error:" + JsError.toFlatJson(e)) }
+      }
+
     }
   }
-  
+
 }
 

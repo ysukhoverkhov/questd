@@ -13,6 +13,7 @@ object DAOs {
   import models.domain.user._
   abstract class UserDAO extends DAO[User] {
     def read(sessionid: SessionID): Option[User]
+    def readByFBid(fbid: String): Option[User]
   }
 
 }

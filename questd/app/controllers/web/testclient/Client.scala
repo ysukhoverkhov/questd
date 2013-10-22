@@ -17,7 +17,8 @@ object Client extends Controller {
   def index = Action {
     Redirect(routes.Client.loginfb)
   }
-
+  
+  /*
   /*
    * Form definitions
    */
@@ -26,79 +27,15 @@ object Client extends Controller {
     mapping(
       "name" -> nonEmptyText,
       "pass" -> nonEmptyText)(LoginCredentials.apply)(LoginCredentials.unapply))
-
-  case class RegisterCredentials(name: String, pass1: String, pass2: String)
-  val registerCredentialsForm = Form(
-    mapping(
-      "name" -> nonEmptyText,
-      "pass1" -> nonEmptyText,
-      "pass2" -> nonEmptyText)(RegisterCredentials.apply)(RegisterCredentials.unapply) verifying ("Passwords are not the same", (x) => x.pass1 == x.pass2))
+*/
 
   case class FBCredentials(token: String)
   val fbCredentialsForm = Form(
     mapping(
       "token" -> nonEmptyText)(FBCredentials.apply)(FBCredentials.unapply))
 
-  def login = Action {
-    Ok(views.html.testclient.login(loginCredentialsForm, registerCredentialsForm))
-  }
-
   def loginfb = Action {
     Ok(views.html.testclient.loginfb(fbCredentialsForm))
-  }
-
-  /*
-   * Login
-   */
-  def loginTarget = Action.async { implicit request =>
-    loginCredentialsForm.bindFromRequest.fold(
-
-      formWithErrors => {
-        scala.concurrent.Future {
-          BadRequest(views.html.testclient.login(formWithErrors, registerCredentialsForm))
-        }
-      },
-
-      loginCreds => {
-        val data = Json.obj(
-          "name" -> loginCreds.name,
-          "pass" -> loginCreds.pass)
-
-        WS.url(controllers.web.rest.routes.LoginWS.login.absoluteURL(false))
-          .post(data)
-          .map(result => {
-            result.header("Set-Cookie") match {
-              case Some(c: String) => Ok(result.body).withHeaders("Set-Cookie" -> c)
-              case _ => InternalServerError
-            }
-
-          })
-      })
-  }
-
-  /*
-   * Register
-   */
-  def registerTarget = Action.async { implicit request =>
-    registerCredentialsForm.bindFromRequest.fold(
-      formWithErrors => {
-        scala.concurrent.Future {
-          BadRequest(views.html.testclient.login(loginCredentialsForm, formWithErrors))
-        }
-      },
-
-      registerCreds => {
-        val data = Json.obj(
-          "name" -> registerCreds.name,
-          "pass" -> registerCreds.pass1)
-
-        WS.url(controllers.web.rest.routes.LoginWS.register.absoluteURL(false))
-          .post(data)
-          .map(result => {
-            Ok(result.body)
-          })
-      })
-
   }
 
   /**
@@ -121,8 +58,8 @@ object Client extends Controller {
           .post(data)
           .map(result => {
             result.header("Set-Cookie") match {
-              case Some(c: String) => Ok(result.body).withHeaders("Set-Cookie" -> c)
-              case _ => Ok(result.body)
+              case Some(c: String) => Ok(result.body + "<br>" + result.status.toString).withHeaders("Set-Cookie" -> c)
+              case _ => Ok(result.body + "<br>" + result.status.toString)
             }
 
           })

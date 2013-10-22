@@ -6,9 +6,7 @@
 GET     /                           	controllers.web.rest.Application.index
 
 # WS Auth
-POST	/rest/login						controllers.web.rest.LoginWS.login
 POST	/rest/loginfb					controllers.web.rest.LoginWS.loginfb
-POST	/rest/register					controllers.web.rest.LoginWS.register
 
 #this is temp one, remove it later.
 POST	/rest/getname					controllers.web.rest.ProfileWS.getName
@@ -16,12 +14,9 @@ POST	/rest/getname					controllers.web.rest.ProfileWS.getName
 
 # Test client auth
 GET     /testclient                 	controllers.web.testclient.Client.index
-GET     /testclient/login           	controllers.web.testclient.Client.login
 GET     /testclient/loginfb           	controllers.web.testclient.Client.loginfb
 
-POST	/testclient/loginTarget			controllers.web.testclient.Client.loginTarget
 POST	/testclient/loginfbTarget		controllers.web.testclient.Client.loginfbTarget
-POST	/testclient/registerTarget		controllers.web.testclient.Client.registerTarget
 
 # Test client main app
 GET     /testclient/main            	controllers.web.testclient.App.main

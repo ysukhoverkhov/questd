@@ -1,5 +1,7 @@
 package models.store.anorm.dao
 
+import scala.language.postfixOps
+
 import anorm._
 import anorm.SqlParser._
 import play.api.db._
@@ -17,16 +19,16 @@ private[anorm] object user {
    */
   import models.domain.user._
 
-  case class UserDB(id: Long, name: String, pass: String, session: String)
+  case class UserDB(id: Long, name: String, fbid: String, session: String)
   val user = {
     get[Long]("id") ~
       get[String]("name") ~
-      get[String]("pass") ~ 
+      get[String]("fbid") ~ 
       get[Option[String]]("session") map {
-        case id ~ name ~ pass ~ session => UserDB(
+        case id ~ name ~ fbid ~ session => UserDB(
             id,
             name,
-            pass,
+            fbid,
             session match {
               case None => SessionID.default.toString
               case Some(id) => id
@@ -38,8 +40,8 @@ private[anorm] object user {
 
     def create(t: User): Unit =
       DB.withConnection { implicit c =>
-        SQL("insert into user (name, pass) values ({name}, {pass})").on(
-          'name -> t.username, 'pass -> t.password).executeUpdate()
+        SQL("insert into user (name, fbid) values ({name}, {fbid})").on(
+          'name -> t.username, 'fbid -> t.fbid).executeUpdate()
       }
 
     def read(t: User): Option[User] =
@@ -47,7 +49,7 @@ private[anorm] object user {
         (SQL("select * from user").on(
           'id -> t.id.toString).as(user *) foldLeft (None: Option[User])) { (rv, u) =>
             rv match {
-              case None => Option(User(u.id.toString, u.name, u.pass, u.session))
+              case None => Option(User(u.id.toString, u.name, u.fbid, u.session))
               case Some(_) => rv
             }
 
@@ -59,19 +61,30 @@ private[anorm] object user {
         (SQL("select * from user").on(
           'id -> sessid.toString).as(user *) foldLeft (None: Option[User])) { (rv, u) =>
             rv match {
-              case None => Option(User(u.id.toString, u.name, u.pass, u.session))
+              case None => Option(User(u.id.toString, u.name, u.fbid, u.session))
               case Some(_) => rv
             }
 
           }
       }
 
+    def readByFBid(fbid: String): Option[User] =
+      DB.withConnection { implicit c =>
+        (SQL("select * from user").on(
+          'fbid -> fbid).as(user *) foldLeft (None: Option[User])) { (rv, u) =>
+            rv match {
+              case None => Option(User(u.id.toString, u.name, u.fbid, u.session))
+              case Some(_) => rv
+            }
+          }
+      }
+    
     def update(t: User): Unit = 
       DB.withConnection { implicit c =>
-        SQL("update user set name = {name}, pass = {pass}, session = {session} where id = {id}").on(
+        SQL("update user set name = {name}, fbid = {fbid}, session = {session} where id = {id}").on(
           'id -> t.id.toString.toLong,
           'name -> t.username,
-          'pass -> t.password,
+          'fbid -> t.fbid,
           'session -> t.session.toString).executeUpdate()
       }
 
@@ -84,7 +97,7 @@ private[anorm] object user {
     def all: List[User] =
       DB.withConnection { implicit c =>
         SQL("select * from user").as(user *) map { u =>
-          User(u.id.toString, u.name, u.pass)
+          User(u.id.toString, u.name, u.fbid, u.session)
         }
       }
 

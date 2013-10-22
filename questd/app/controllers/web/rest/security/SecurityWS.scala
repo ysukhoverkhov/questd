@@ -1,22 +1,23 @@
 package controllers.web.rest.security
 
-import scala.concurrent.Future
+import scala.language.postfixOps
+import scala.concurrent._
+import scala.concurrent.duration._
+
 import play.api._
 import play.api.mvc._
 import play.api.mvc.Security._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.domain._
-import scala.concurrent._
-import scala.concurrent.duration._
-import models.domain.user._
 import controllers.domain._
+import models.domain.user._
 
 trait SecurityWS extends Controller {
 
   private val SessionIdKey = "sessionid"
 
   // Store Auth Info
-  def storeAuthInfoInResult(result: SimpleResult, loginResult: AuthAPI.LoginResult) = {
+  def storeAuthInfoInResult(result: SimpleResult, loginResult: AuthAPI.LoginFBResult) = {
     result.withSession(SessionIdKey -> loginResult.session.toString)
   }
 
