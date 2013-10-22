@@ -1,6 +1,5 @@
 package controllers.web.testclient
 
-
 import play.api._
 import play.api.mvc._
 
@@ -13,13 +12,15 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.Future
 
-
 object Client extends Controller {
 
   def index = Action {
-    Redirect(routes.Client.login)
+    Redirect(routes.Client.loginfb)
   }
 
+  /*
+   * Form definitions
+   */
   case class LoginCredentials(name: String, pass: String)
   val loginCredentialsForm = Form(
     mapping(
@@ -33,19 +34,31 @@ object Client extends Controller {
       "pass1" -> nonEmptyText,
       "pass2" -> nonEmptyText)(RegisterCredentials.apply)(RegisterCredentials.unapply) verifying ("Passwords are not the same", (x) => x.pass1 == x.pass2))
 
+  case class FBCredentials(token: String)
+  val fbCredentialsForm = Form(
+    mapping(
+      "token" -> nonEmptyText)(FBCredentials.apply)(FBCredentials.unapply))
+
   def login = Action {
     Ok(views.html.testclient.login(loginCredentialsForm, registerCredentialsForm))
   }
 
+  def loginfb = Action {
+    Ok(views.html.testclient.loginfb(fbCredentialsForm))
+  }
+
+  /*
+   * Login
+   */
   def loginTarget = Action.async { implicit request =>
     loginCredentialsForm.bindFromRequest.fold(
-        
+
       formWithErrors => {
         scala.concurrent.Future {
-        	BadRequest(views.html.testclient.login(formWithErrors, registerCredentialsForm))
+          BadRequest(views.html.testclient.login(formWithErrors, registerCredentialsForm))
         }
       },
-      
+
       loginCreds => {
         val data = Json.obj(
           "name" -> loginCreds.name,
@@ -53,16 +66,19 @@ object Client extends Controller {
 
         WS.url(controllers.web.rest.routes.LoginWS.login.absoluteURL(false))
           .post(data)
-          .map(result => { result.header("Set-Cookie") match {
-            case Some(c: String) => Ok(result.body).withHeaders("Set-Cookie" -> c)
-            case _ => InternalServerError
-          }
-            
-        })
-      }
-    )
+          .map(result => {
+            result.header("Set-Cookie") match {
+              case Some(c: String) => Ok(result.body).withHeaders("Set-Cookie" -> c)
+              case _ => InternalServerError
+            }
+
+          })
+      })
   }
 
+  /*
+   * Register
+   */
   def registerTarget = Action.async { implicit request =>
     registerCredentialsForm.bindFromRequest.fold(
       formWithErrors => {
@@ -80,10 +96,37 @@ object Client extends Controller {
           .post(data)
           .map(result => {
             Ok(result.body)
-        })
-      }
-     )
+          })
+      })
 
+  }
+
+  /**
+   * Login facebook
+   */
+  def loginfbTarget = Action.async { implicit request =>
+    fbCredentialsForm.bindFromRequest.fold(
+
+      formWithErrors => {
+        scala.concurrent.Future {
+          BadRequest(views.html.testclient.loginfb(formWithErrors))
+        }
+      },
+
+      loginCreds => {
+        val data = Json.obj(
+          "token" -> loginCreds.token)
+
+        WS.url(controllers.web.rest.routes.LoginWS.loginfb.absoluteURL(false))
+          .post(data)
+          .map(result => {
+            result.header("Set-Cookie") match {
+              case Some(c: String) => Ok(result.body).withHeaders("Set-Cookie" -> c)
+              case _ => Ok(result.body)
+            }
+
+          })
+      })
   }
 
 }

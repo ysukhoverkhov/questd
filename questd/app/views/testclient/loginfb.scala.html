@@ -1,0 +1,15 @@
+@(fbCredentialsForm:    Form[controllers.web.testclient.Client.FBCredentials])
+
+@import helper._
+
+@main("FB login screen") {
+
+    <h2>Login FB</h2>
+    
+    @form(action = controllers.web.testclient.routes.Client.loginfbTarget()) {
+      @inputText(fbCredentialsForm("token"))
+      
+      <input type="submit" value="Login">
+    }
+}
+
