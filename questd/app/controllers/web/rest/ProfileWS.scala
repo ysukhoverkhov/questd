@@ -13,7 +13,7 @@ object ProfileWS extends Controller with SecurityWS {
 
   def getName = Authenticated.async { implicit request =>
     Future {
-      Ok(request.user.username) 
+      Ok("FBID - " + request.user.fbid) 
     }
   }
 

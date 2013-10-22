@@ -64,9 +64,9 @@ object LoginWS extends Controller with SecurityWS {
                     val params = AuthAPI.LoginFBParams(user.getId())
 
                     AuthAPI.loginfb(params) match {
-                      case OkApiResult(Some(loginResult: AuthAPI.LoginFBResult)) => Ok(loginResult.session.toString)
-                      case OkApiResult(None) => InternalServerError
-                      case InternalErrorApiResult(_) => InternalServerError
+                      case OkApiResult(Some(loginResult: AuthAPI.LoginFBResult)) => 
+                        storeAuthInfoInResult(Ok(loginResult.session.toString), loginResult)
+                      case _ => InternalServerError
                     }
 
                   }

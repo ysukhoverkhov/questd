@@ -31,7 +31,7 @@ object AuthAPI {
           case Some(user) => {
 
             // TODO: fill profile from fb here.
-        	
+
             Logger.debug("New user with FB " + user.id)
 
             login(user)
