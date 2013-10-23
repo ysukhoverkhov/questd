@@ -16,8 +16,9 @@ import se.radley.plugin.salat._
 import models.store.mongo.SalatContext._
 import play.Logger
 import com.mongodb.CommandResult
+import com.mongodb.DBObject
 
-// TODO: rewrite with this https://github.com/novus/salat/wiki/SalatWithPlay2
+// TODO: write test case for me.
 
 private[mongo] case class UserDB(
   userid: Option[String] = None,
@@ -69,32 +70,41 @@ private[mongo] object user {
       }
       
     }
+    
+    private def makeQueryObject(user: UserDB): DBObject = {
+      // TODO replace it with custom object to map converter what makes unlifting 
 
-    private def find(dbo: DBObject): Option[User] = {
-      findOne(dbo) match {
+      val js = toCompactJson(user)
+      val dbo = com.mongodb.util.JSON.parse(js).asInstanceOf[DBObject]
+      
+      dbo
+    }
+
+    private def find(user: UserDB): Option[User] = {
+      findOne(makeQueryObject(user)) match {
         case None => None
         case Some(o) => Some(o)
       }
     }
 
     def read(u: User): Option[User] = {
-      find(MongoDBObject("userid" -> u.id.toString))
+      find(UserDB(Some(u.id.toString), None, None))
     }
 
     def readBySessionID(sessid: SessionID): Option[User] = {
-      find(MongoDBObject("session" -> sessid.toString))
+      find(UserDB(None, None, Some(sessid.toString)))
     }
 
     def readByFBid(fbid: String): Option[User] = {
-      find(MongoDBObject("fbid" -> fbid))
+      find(UserDB(None, Some(fbid), None))
     }
 
     def update(u: User): Unit = {
       
       Logger.debug("Updating user in database " + u.toString)
       
-      val q = MongoDBObject("userid" -> u.id.toString)
-      val dbo = grater[UserDB].asDBObject(u)
+      val q = makeQueryObject(UserDB(Some(u.id.toString), None, None))
+      val dbo = toDBObject(u)
       val wr = dao.update(q, dbo, false, false)
       
       if (!wr.getLastError().ok) {
@@ -106,7 +116,7 @@ private[mongo] object user {
     }
 
     def delete(u: User): Unit = {
-      val wr = remove(MongoDBObject("userid" -> u.id.toString))
+      val wr = remove(makeQueryObject(UserDB(Some(u.id.toString), None, None)))
 
       // TODO deal with wr
     }
