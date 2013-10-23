@@ -13,7 +13,7 @@ import models.domain.user.stringToSessionID
 import models.domain.user.stringToUserID
 
 private[anorm] object user {
-
+/*
   /*
    * User
    */
@@ -102,6 +102,6 @@ private[anorm] object user {
       }
 
   }
-
+*/
 }
 

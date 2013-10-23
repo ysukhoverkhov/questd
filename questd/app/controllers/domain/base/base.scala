@@ -5,6 +5,7 @@ import models.domain.user.UserID
   
 private[domain] object base {
 
+  // TODO: check is ti used.
   abstract class AuthorizedAPIRequestParams {
     val sessionId: SessionID
     val userId: UserID

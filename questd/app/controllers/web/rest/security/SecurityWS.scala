@@ -58,7 +58,10 @@ trait SecurityWS extends Controller {
           }
         }
 
-        case None => Future.successful(Unauthorized)
+        case None => {
+          Logger.debug("Session not found in cookie, returning Unauthorized")
+          Future.successful(Unauthorized)
+        }
       }
     }
   }

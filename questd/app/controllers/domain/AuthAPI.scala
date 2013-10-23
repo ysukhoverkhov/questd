@@ -24,15 +24,24 @@ object AuthAPI {
 
     Store.user.readByFBid(params.fbid) match {
       case None => {
-        val newUser = User(params.fbid)
+
+        Logger.debug("No user with FB id found, creating new one " + params.fbid)
+
+        val newUUID = java.util.UUID.randomUUID().toString()
+        val newUser = User(newUUID, params.fbid)
         Store.user.create(newUser)
         Store.user.readByFBid(params.fbid) match {
-          case None => InternalErrorApiResult(None)
+
+          case None => {
+            Logger.error("Unable to find user just created in DB with fbid " + params.fbid)
+            InternalErrorApiResult(None)
+          }
+
           case Some(user) => {
 
             // TODO: fill profile from fb here.
 
-            Logger.debug("New user with FB " + user.id)
+            Logger.debug("New user with FB created " + user)
 
             login(user)
           }
@@ -40,7 +49,7 @@ object AuthAPI {
 
       }
       case Some(user) => {
-        Logger.debug("User login with FB " + user.id)
+        Logger.debug("User login with FB " + user)
         login(user)
       }
     }
@@ -55,7 +64,7 @@ object AuthAPI {
 
   def user(params: UserParams): ApiResult[UserResult] = {
 
-    Store.user.read(params.sessionID) match {
+    Store.user.readBySessionID(params.sessionID) match {
       case None => NotAuthorisedApiResult(None)
 
       case Some(user: User) => OkApiResult(
