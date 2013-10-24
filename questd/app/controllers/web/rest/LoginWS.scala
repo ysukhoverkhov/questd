@@ -40,7 +40,7 @@ object LoginWS extends Controller with SecurityWS {
    * Login FB section
    * *****/
 
-  // TODO: Implement tripple try here for fb requests here to compensate network failures.
+  // TODO CRITICAL Implement tripple try here for fb requests here to compensate network failures.
   // TODO: Auto Log InternalServerError
   def loginfb = Action.async(parse.json) { implicit request =>
     {

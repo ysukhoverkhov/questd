@@ -5,6 +5,8 @@ import models.domain.user._
 import models.store._
 import play.Logger
 
+import helpers._
+
 object AuthAPI {
 
   /**
@@ -14,22 +16,11 @@ object AuthAPI {
   case class LoginFBResult(session: SessionID)
 
 
-  def withDBExcepionHandling[T <: ApiResult[_]](f: => T): T = {
 
-    f
-  //  def withDbExcepionHandling(_) = {
-//    _
-  }
-  
-//  } catch {
-//    case ex: StoreException => {
-//      Logger.error("DB error during login", ex)
-//      InternalErrorApiResult(None)
-//    }
-//  }
-  
-  // TODO CRITICAL make WithDBExceptionHandling
-  def loginfb(params: LoginFBParams): ApiResult[LoginFBResult] = try {
+  /**
+   * Login with FB. Or create new one if it doesn't exists.
+   */
+  def loginfb(params: LoginFBParams): ApiResult[LoginFBResult] = handleDbException {
 
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString()
@@ -58,7 +49,7 @@ object AuthAPI {
 
           case Some(user) => {
 
-            // TODO: fill profile from fb here.
+            // TODO IMPLEMENT fill profile from fb here.
 
             Logger.debug("New user with FB created " + user)
 
@@ -73,16 +64,6 @@ object AuthAPI {
       }
     }
 
-  } catch {
-    case ex: StoreException => {
-      Logger.error("DB error during login", ex)
-      InternalErrorApiResult(None)
-    }
-    
-    case ex: Throwable => {
-      Logger.error("Exceptionally inexpected exception", ex)
-      InternalErrorApiResult(None)
-    }
   }
 
   /**
@@ -104,7 +85,7 @@ object AuthAPI {
       Logger.error("DB error during login", ex)
       InternalErrorApiResult(None)
     }
-    
+
     case ex: Throwable => {
       Logger.error("Exceptionally inexpected exception", ex)
       InternalErrorApiResult(None)
