@@ -1,24 +1,25 @@
 package models.store.mongo.dao
 
+import java.util.Date
 import scala.language.postfixOps
 import scala.language.implicitConversions
+import play.Logger
 import play.api.db._
-import play.api.Play.current
-import models.store.DAOs._
-import models.domain.user._
-import play.api.Play.current
-import java.util.Date
+import play.api.Play._
+
+import se.radley.plugin.salat._
 import com.novus.salat._
 import com.novus.salat.annotations._
 import com.novus.salat.dao._
 import com.mongodb.casbah.Imports._
-import se.radley.plugin.salat._
-import models.store.mongo.SalatContext._
-import play.Logger
 import com.mongodb.CommandResult
 import com.mongodb.DBObject
 
-// TODO: write test case for me.
+import models.store.mongo.SalatContext._
+import models.store.DAOs._
+import models.domain.user._
+import models.store._
+
 
 /**
  * This class is representing user form the database.
@@ -71,7 +72,7 @@ private[mongo] object user {
      * Makes DBObject for query
      */
     private def makeQueryObject(user: UserDB): DBObject = {
-      // TODO replace it with custom object to map converter what makes unlifting 
+      // TODO OPTIMIZATION replace it with custom object to map converter what makes unlifting 
 
       val js = toCompactJson(user)
       val dbo = com.mongodb.util.JSON.parse(js).asInstanceOf[DBObject]
@@ -97,11 +98,10 @@ private[mongo] object user {
       
       val wr = save(u)
       if (!wr.getLastError().ok) {
-        // TODO throw exception here
-        Logger.error("Unable to save user to db " + wr.toString())
-      } else {
-        Logger.debug("User saved to db successfuly " + u.toString)
+        throw new StoreException(wr.getLastError().getErrorMessage())
       }
+
+      Logger.debug("User saved to db successfuly " + u.toString)
       
     }
     
@@ -138,11 +138,10 @@ private[mongo] object user {
       val wr = dao.update(q, dbo, false, false)
       
       if (!wr.getLastError().ok) {
-        // TODO throw exception here and remove logging. Login should be done only in place of exception handling.
-        Logger.error("Unable to update user to db " + wr.toString())
-      } else {
-        Logger.debug("User update in db successfuly " + u.toString)
+        throw new StoreException(wr.getLastError().getErrorMessage())
       }
+
+      Logger.debug("User update in db successfuly " + u.toString)
     }
 
     /**
@@ -151,14 +150,15 @@ private[mongo] object user {
     def delete(u: User): Unit = {
       val wr = remove(makeQueryObject(UserDB(Some(u.id.toString), None, None)))
 
-      // TODO deal with wr
+      if (!wr.getLastError().ok)
+        throw new StoreException(wr.getLastError().getErrorMessage())
     }
 
     /**
      * All objects
      */
     def all: List[User] = {
-      // TODO this will be very slow and will fetch everything.
+      // TODO OPTIMIZATION this will be very slow and will fetch everything.
       List() ++ find(MongoDBObject()) map { u => dbToDomain(u) }
     }
   }

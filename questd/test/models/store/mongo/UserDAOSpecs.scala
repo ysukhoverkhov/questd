@@ -12,6 +12,7 @@ import models.domain.user._
 import play.Logger
 
 //@RunWith(classOf[JUnitRunner])
+// TODo add tests for inadequate driver behaviour.
 class UserDAOSpecs extends Specification {
 
   def inMemoryMongoDatabase(name: String = "default"): Map[String, String] = {
