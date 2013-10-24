@@ -35,6 +35,10 @@ object user {
     
   object User {
 
+    def apply(id: UserID): User = {
+      User(id, None, None, Profile.default)
+    }
+
     def apply(id: UserID, fbid: String): User = {
       User(id, Some(fbid), None, Profile.default)
     }
