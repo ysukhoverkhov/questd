@@ -3,7 +3,7 @@ package models.store
 import models.store.anorm._
 import models.store.mongo._
 
-object store {
+private[store] object store {
 
   abstract class Store {
     protected[store] val db: Database
