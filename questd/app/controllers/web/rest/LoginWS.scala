@@ -1,9 +1,5 @@
 package controllers.web.rest
 
-import com.restfb._
-import com.restfb.types._
-import com.restfb.exception._
-
 import scala.concurrent.Future
 import play.api._
 import play.api.mvc._
@@ -12,6 +8,11 @@ import play.api.libs.functional.syntax._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.domain._
 import controllers.web.rest.security._
+import controllers.web.rest.helpers._
+import controllers.helpers.facebook._
+import scala.annotation.varargs
+
+import com.restfb.exception._
 
 // EXAMPLE
 /*
@@ -34,14 +35,20 @@ import controllers.web.rest.security._
   }
 */
 
-object LoginWS extends Controller with SecurityWS {
 
-  /* *****
-   * Login FB section
-   * *****/
+// TODO CRITICAL Write tests for WS with mock API.
+object LoginWS extends QuestController with SecurityWS {
+  
 
-  // TODO CRITICAL Implement tripple try here for fb requests here to compensate network failures.
-  // TODO: Auto Log InternalServerError
+  /**
+   * Logins with Facebook or create new user if it not exists
+   * 
+   * HTTP statuses:
+   * 200 - Logged in
+   * 401 - Session expired or other problems with facebook login.
+   * 500 - Internal error.
+   * 503 - Unable to connect to facebook to check status.
+   */
   def loginfb = Action.async(parse.json) { implicit request =>
     {
       request.body.validate[Map[String, String]].map {
@@ -50,27 +57,31 @@ object LoginWS extends Controller with SecurityWS {
             case ("token", token: String) => {
               Future {
                 try {
-                  val facebookClient = new DefaultFacebookClient(token);
-                  Option(facebookClient.fetchObject("me", classOf[User]));
+                  (Option(FacebookClient(token).fetchObject("me", classOf[UserFB])), None)
                 } catch {
                   case ex: FacebookOAuthException => {
                     Logger.debug("Facebook auth failed")
-                    None
+                    (None, Some(Unauthorized("Facebook session expired")))
+                  }
+                  case ex: FacebookNetworkException => {
+                    Logger.debug("Unable to connect to facebook")
+                    (None, Some(ServiceUnavailable("Unable to connect to Facebook")))
                   }
                 }
               } map { rv =>
                 rv match {
-                  case Some(user: User) => {
+                  case (Some(user: UserFB), _) => {
                     val params = AuthAPI.LoginFBParams(user.getId())
 
                     AuthAPI.loginfb(params) match {
-                      case OkApiResult(Some(loginResult: AuthAPI.LoginFBResult)) => 
+                      case OkApiResult(Some(loginResult: AuthAPI.LoginFBResult)) =>
                         storeAuthInfoInResult(Ok(loginResult.session.toString), loginResult)
-                      case _ => InternalServerError
+                      case _ => ServerError
                     }
 
                   }
-                  case None => Unauthorized("Facebook session expired")
+                  case (None, Some(r: SimpleResult)) => r 
+                  case (None, None) => ServerError
                 }
               }
             }

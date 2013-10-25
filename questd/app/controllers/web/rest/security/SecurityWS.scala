@@ -3,7 +3,6 @@ package controllers.web.rest.security
 import scala.language.postfixOps
 import scala.concurrent._
 import scala.concurrent.duration._
-
 import play.api._
 import play.api.mvc._
 import play.api.mvc.Security._
@@ -11,8 +10,9 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.domain._
 import controllers.domain._
 import models.domain.user._
+import controllers.web.rest.helpers.InternalErrorLogger
 
-trait SecurityWS extends Controller {
+trait SecurityWS extends InternalErrorLogger {
 
   private val SessionIdKey = "sessionid"
 
@@ -36,7 +36,7 @@ trait SecurityWS extends Controller {
             AuthAPI.user(params) match {
               case OkApiResult(body) => body match {
                 case Some(result: AuthAPI.UserResult) =>  result.user
-                case None => InternalServerError
+                case None => ServerError
               }
               
               case NotAuthorisedApiResult(body) => {
@@ -44,7 +44,7 @@ trait SecurityWS extends Controller {
               }
               
               case InternalErrorApiResult(body) => {
-                InternalServerError
+                ServerError
               }
             }
           

@@ -57,8 +57,8 @@ object Client extends Controller {
         WS.url(controllers.web.rest.routes.LoginWS.loginfb.absoluteURL(false))
           .post(data)
           .map(result => {
-            result.header("Set-Cookie") match {
-              case Some(c: String) => Ok(result.body + "<br>" + result.status.toString).withHeaders("Set-Cookie" -> c)
+            result.header(SET_COOKIE) match {
+              case Some(c: String) => Ok(result.body + "<br>" + result.status.toString).withHeaders(SET_COOKIE -> c)
               case _ => Ok(result.body + "<br>" + result.status.toString)
             }
 

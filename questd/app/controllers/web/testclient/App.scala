@@ -11,13 +11,13 @@ object App extends Controller {
 
   def main = Action.async { implicit request =>
 
-    val cook = request.headers.get("Cookie") match {
+    val cook = request.headers.get(COOKIE) match {
       case None => ""
       case Some(c: String) => c
     }
     
     WS.url(controllers.web.rest.routes.ProfileWS.getName.absoluteURL(false))
-      .withHeaders("Cookie" -> cook)
+      .withHeaders(COOKIE -> cook)
       .post("")
       .map(result => {
         result.status match {

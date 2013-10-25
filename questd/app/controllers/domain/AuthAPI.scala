@@ -7,6 +7,7 @@ import play.Logger
 
 import helpers._
 
+// TODO CRITICAL Write tests for API with mock database.
 object AuthAPI {
 
   /**
