@@ -16,6 +16,7 @@ import com.mongodb.CommandResult
 import com.mongodb.DBObject
 
 import models.store.mongo.SalatContext._
+import models.store.mongo.helpers._
 import models.store.DAOs._
 import models.domain.user._
 import models.store._
@@ -72,7 +73,7 @@ private[mongo] object user {
      * Makes DBObject for query
      */
     private def makeQueryObject(user: UserDB): DBObject = {
-      // TODO OPTIMIZATION replace it with custom object to map converter what makes unlifting 
+      // TODO OPTIMIZATION replace it with custom object to map converter what makes unlifting and removes "None" from the map completelly.
 
       val js = toCompactJson(user)
       val dbo = com.mongodb.util.JSON.parse(js).asInstanceOf[DBObject]
@@ -93,43 +94,42 @@ private[mongo] object user {
     /**
      * Create
      */
-    def createUser(u: User): Unit = {
+    def createUser(u: User): Unit = wrapMongoException {
       Logger.debug("Creating user in database " + u.toString)
       
       val wr = save(u)
       if (!wr.getLastError().ok) {
-        throw new StoreException(wr.getLastError().getErrorMessage())
+        throw new DatabaseException(wr.getLastError().getErrorMessage())
       }
 
       Logger.debug("User saved to db successfuly " + u.toString)
-      
     }
         
     /**
      * Read by userid
      */
-    def readUserByID(u: User): Option[User] = {
+    def readUserByID(u: User): Option[User] = wrapMongoException {
       find(UserDB(Some(u.id.toString), None, None))
     }
 
     /**
      * Read
      */
-    def readUserBySessionID(sessid: SessionID): Option[User] = {
+    def readUserBySessionID(sessid: SessionID): Option[User] = wrapMongoException {
       find(UserDB(None, None, Some(sessid.toString)))
     }
 
     /**
      * Read
      */
-    def readUserByFBid(fbid: String): Option[User] = {
+    def readUserByFBid(fbid: String): Option[User] = wrapMongoException {
       find(UserDB(None, Some(fbid), None))
     }
 
     /**
      * Update by userid.
      */
-    def updateUser(u: User): Unit = {
+    def updateUser(u: User): Unit = wrapMongoException {
      
       Logger.debug("Updating user in database " + u.toString)
       
@@ -138,7 +138,7 @@ private[mongo] object user {
       val wr = dao.update(q, dbo, false, false)
       
       if (!wr.getLastError().ok) {
-        throw new StoreException(wr.getLastError().getErrorMessage())
+        throw new DatabaseException(wr.getLastError().getErrorMessage())
       }
 
       Logger.debug("User update in db successfuly " + u.toString)
@@ -147,20 +147,29 @@ private[mongo] object user {
     /**
      * Delete by userid
      */
-    def deleteUser(u: User): Unit = {
+    def deleteUser(u: User): Unit = wrapMongoException {
       val wr = remove(makeQueryObject(UserDB(Some(u.id.toString), None, None)))
 
       if (!wr.getLastError().ok)
-        throw new StoreException(wr.getLastError().getErrorMessage())
+        throw new DatabaseException(wr.getLastError().getErrorMessage())
     }
 
     /**
      * All objects
      */
-    def allUsers: List[User] = {
+    def allUsers: List[User] = wrapMongoException {
       // TODO OPTIMIZATION this will be very slow and will fetch everything.
       List() ++ find(MongoDBObject()) map { u => dbToDomain(u) }
     }
+  }
+  
+  /**
+   * Test version of dao what fails al the time
+   */
+  trait MongoUserDAOForTest extends MongoUserDAO {
+    override val dao = new SalatDAO[UserDB, ObjectId](collection = MongoConnection("localhost", 55555)("test_db")("test_coll")) {}
+    
+    
   }
 
 }

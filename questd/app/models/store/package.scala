@@ -3,6 +3,6 @@ package models
 
 package object store {
   
-  type StoreException = models.store.exceptions.StoreException 
+  type DatabaseException = models.store.exceptions.DatabaseException 
     
 }

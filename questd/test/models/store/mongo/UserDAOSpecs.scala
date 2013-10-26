@@ -11,11 +11,10 @@ import models.store._
 import models.domain.user._
 import play.Logger
 
-
 //@RunWith(classOf[JUnitRunner])
 // TODO CRITICAL add tests for inadequate driver behaviour.
-class UserDAOSpecs extends Specification with MongoDatabaseComponent {
-  
+class UserDAOSpecs extends Specification
+  with MongoDatabaseComponent {
 
   def testMongoDatabase(name: String = "default"): Map[String, String] = {
     val dbname: String = "questdb-test"
@@ -24,13 +23,11 @@ class UserDAOSpecs extends Specification with MongoDatabaseComponent {
   }
   val appWithTestDatabase = FakeApplication(additionalConfiguration = testMongoDatabase())
 
-  
   /*
    * Initializing components. It's lazy to let app start first and bring up db driver.
    */
-  lazy val db = new MongoDatabase 
+  lazy val db = new MongoDatabase
 
-  
   "Mongo User DAO" should {
     "Create new User in DB and find it by userid" in new WithApplication(appWithTestDatabase) {
       val userid = "lalala"
@@ -109,7 +106,42 @@ class UserDAOSpecs extends Specification with MongoDatabaseComponent {
       all must haveSize(0)
     }
 
+    "Delete user what do not exists" in new WithApplication(appWithTestDatabase) {
+      db.deleteUser(User("Id of user who never existed in the database"))
+
+    }
+
+    """Return "None" in search for not existing user""" in new WithApplication(appWithTestDatabase) {
+      val u = db.readUserBySessionID("Another id of another neveer existign user")
+      u must beNone
+    }
+
   }
 
+}
+
+/**
+ * Spec with another component setup for testing 
+ */
+class UserDAOFailSpecs extends Specification
+  with MongoDatabaseForTestComponent {
+
+  def testMongoDatabase(name: String = "default"): Map[String, String] = {
+    val dbname: String = "questdb-test"
+    Map(
+      ("mongodb." + name + ".db" -> dbname))
+  }
+  val appWithTestDatabase = FakeApplication(additionalConfiguration = testMongoDatabase())
+
+  /*
+   * Initializing components. It's lazy to let app start first and bring up db driver.
+   */
+  lazy val db = new MongoDatabaseForTest
+
+  "Mongo User DAO" should {
+    "Throw StoreException in case of underlaying error" in new WithApplication(appWithTestDatabase) {
+      db.createUser(User("tutumc")) must throwA[DatabaseException] 
+    }
+  }
 }
 
