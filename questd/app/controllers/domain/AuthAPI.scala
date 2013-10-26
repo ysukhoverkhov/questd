@@ -7,7 +7,9 @@ import play.Logger
 
 import helpers._
 
-// TODO CRITICAL Write tests for API with mock database.
+// TODO CRITICAL Write tests for API with mock database - Implement mock implementation of db and paremetrize it with mock daos.
+// http://etorreborre.github.io/specs2/guide/org.specs2.guide.Matchers.html
+// TODO CRITICAL Rewrite everything with Cake pattern: http://jonasboner.com/2008/10/06/real-world-scala-dependency-injection-di/
 object AuthAPI {
 
   /**
