@@ -63,7 +63,7 @@ private[mongo] object user {
   /**
    * DOA for User objects
    */
-  object MongoUserDAO extends UserDAO with ModelCompanion[UserDB, ObjectId] {
+  trait MongoUserDAO extends UserDAO with ModelCompanion[UserDB, ObjectId] {
 
     val dao = new SalatDAO[UserDB, ObjectId](collection = mongoCollection("users")) {}
 
@@ -93,7 +93,7 @@ private[mongo] object user {
     /**
      * Create
      */
-    def create(u: User): Unit = {
+    def createUser(u: User): Unit = {
       Logger.debug("Creating user in database " + u.toString)
       
       val wr = save(u)
@@ -104,33 +104,33 @@ private[mongo] object user {
       Logger.debug("User saved to db successfuly " + u.toString)
       
     }
-    
+        
     /**
      * Read by userid
      */
-    def read(u: User): Option[User] = {
+    def readUserByID(u: User): Option[User] = {
       find(UserDB(Some(u.id.toString), None, None))
     }
 
     /**
      * Read
      */
-    def readBySessionID(sessid: SessionID): Option[User] = {
+    def readUserBySessionID(sessid: SessionID): Option[User] = {
       find(UserDB(None, None, Some(sessid.toString)))
     }
 
     /**
      * Read
      */
-    def readByFBid(fbid: String): Option[User] = {
+    def readUserByFBid(fbid: String): Option[User] = {
       find(UserDB(None, Some(fbid), None))
     }
 
     /**
      * Update by userid.
      */
-    def update(u: User): Unit = {
-      
+    def updateUser(u: User): Unit = {
+     
       Logger.debug("Updating user in database " + u.toString)
       
       val q = makeQueryObject(UserDB(Some(u.id.toString), None, None))
@@ -147,7 +147,7 @@ private[mongo] object user {
     /**
      * Delete by userid
      */
-    def delete(u: User): Unit = {
+    def deleteUser(u: User): Unit = {
       val wr = remove(makeQueryObject(UserDB(Some(u.id.toString), None, None)))
 
       if (!wr.getLastError().ok)
@@ -157,7 +157,7 @@ private[mongo] object user {
     /**
      * All objects
      */
-    def all: List[User] = {
+    def allUsers: List[User] = {
       // TODO OPTIMIZATION this will be very slow and will fetch everything.
       List() ++ find(MongoDBObject()) map { u => dbToDomain(u) }
     }

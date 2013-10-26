@@ -24,7 +24,7 @@ object AuthAPI {
    * Login with FB. Or create new one if it doesn't exists.
    */
   def loginfb(params: LoginFBParams): ApiResult[LoginFBResult] = handleDbException {
-
+/*
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString()
       Store.user.update(user.replaceSessionID(uuid))
@@ -66,6 +66,8 @@ object AuthAPI {
         login(user)
       }
     }
+*/
+          OkApiResult(None)
 
   }
 
@@ -76,23 +78,24 @@ object AuthAPI {
   case class UserResult(user: User)
 
   def user(params: UserParams): ApiResult[UserResult] = try {
-
-    Store.user.readBySessionID(params.sessionID) match {
-      case None => NotAuthorisedApiResult(None)
-
-      case Some(user: User) => OkApiResult(
-        Some(UserResult(user)))
-    }
-  } catch {
-    case ex: StoreException => {
-      Logger.error("DB error during login", ex)
-      InternalErrorApiResult(None)
-    }
-
-    case ex: Throwable => {
-      Logger.error("Exceptionally inexpected exception", ex)
-      InternalErrorApiResult(None)
-    }
+          OkApiResult(None)
+//
+//    Store.user.readBySessionID(params.sessionID) match {
+//      case None => NotAuthorisedApiResult(None)
+//
+//      case Some(user: User) => OkApiResult(
+//        Some(UserResult(user)))
+//    }
+//  } catch {
+//    case ex: StoreException => {
+//      Logger.error("DB error during login", ex)
+//      InternalErrorApiResult(None)
+//    }
+//
+//    case ex: Throwable => {
+//      Logger.error("Exceptionally inexpected exception", ex)
+//      InternalErrorApiResult(None)
+//    }
   }
 
 }

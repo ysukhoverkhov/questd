@@ -4,13 +4,11 @@ import models.store._
 import models.store.DAOs._
 import dao.user._
 
-private[store] class MongoDatabase extends Database {
+private[store] trait MongoDatabaseComponent extends DatabaseComponent {
 
-  def user: UserDAO = MongoUserDAO
+  class MongoDatabase extends Database with MongoUserDAO
+  
 
   
 }
-
-private[store] object MongoDatabase extends MongoDatabase
-
 
