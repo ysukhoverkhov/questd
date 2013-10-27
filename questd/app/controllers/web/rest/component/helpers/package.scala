@@ -1,6 +1,5 @@
-package controllers.web.rest
 
-package object helpers {
+package controllers.web.rest.component.helpers {
   
   trait QuestController extends InternalErrorLogger 
 
