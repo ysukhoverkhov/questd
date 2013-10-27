@@ -9,7 +9,6 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.domain._
 import controllers.web.rest.security._
 import controllers.web.rest.helpers._
-import controllers.helpers.facebook._
 import scala.annotation.varargs
 
 import com.restfb.exception._
@@ -50,7 +49,9 @@ object LoginWS extends QuestController with SecurityWS {
    * 503 - Unable to connect to facebook to check status.
    */
   def loginfb = Action.async(parse.json) { implicit request =>
-    {
+    Future.successful(Ok(""))
+
+    /*
       request.body.validate[Map[String, String]].map {
         case params => {
           params.head match {
@@ -96,6 +97,8 @@ object LoginWS extends QuestController with SecurityWS {
       }
 
     }
+    * 
+    */
   }
 
 }

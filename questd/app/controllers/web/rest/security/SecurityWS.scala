@@ -17,16 +17,17 @@ trait SecurityWS extends InternalErrorLogger {
   private val SessionIdKey = "sessionid"
 
   // Store Auth Info
-  def storeAuthInfoInResult(result: SimpleResult, loginResult: AuthAPI.LoginFBResult) = {
-    result.withSession(SessionIdKey -> loginResult.session.toString)
-  }
+//  def storeAuthInfoInResult(result: SimpleResult, loginResult: AuthAPI.LoginFBResult) = {
+//    result.withSession(SessionIdKey -> loginResult.session.toString)
+//  }
 
   // Configure Authorized check 
   class AuthenticatedRequest[A](val user: User, request: Request[A]) extends WrappedRequest[A](request)
 
   object Authenticated extends ActionBuilder[AuthenticatedRequest] {
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
-      request.session.get(SessionIdKey) match { 
+      Future.successful(Unauthorized)
+ /*     request.session.get(SessionIdKey) match { 
         
         case Some(sessionid: String) => {
           Future {
@@ -62,8 +63,11 @@ trait SecurityWS extends InternalErrorLogger {
           Logger.debug("Session not found in cookie, returning Unauthorized")
           Future.successful(Unauthorized)
         }
-      }
+      }*/
     }
+     
+    
   }
+    
 
 }

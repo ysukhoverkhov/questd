@@ -1,10 +1,11 @@
-package controllers.helpers.facebook
+package controllers.domain.libs.facebook
 
 import com.restfb._
 import com.restfb.exception._
 import play.Logger
+import com.restfb._
 
-class FacebookClientRepeater(val client: FacebookClient) {
+private[facebook] class FacebookClientRepeater(val client: FacebookClient) {
 
   /**
    * Fetches object repeating call three times
