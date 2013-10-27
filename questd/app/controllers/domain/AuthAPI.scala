@@ -20,7 +20,6 @@ private [domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI =>
   /**
    * Login with FB. Or create new one if it doesn't exists.
    */
-// TODO CRITICAL Write tests for exceptions in db
   def loginfb(params: LoginFBParams): ApiResult[LoginFBResult] = handleDbException {
 
     def login(user: User) = {
@@ -71,7 +70,6 @@ private [domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI =>
   /**
    * User for session
    */
-// TODO CRITICAL Write tests for this API call
   def user(params: UserParams): ApiResult[UserResult] = handleDbException {
 
     db.readUserBySessionID(params.sessionID) match {
