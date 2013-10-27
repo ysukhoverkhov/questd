@@ -7,21 +7,20 @@ import play.Logger
 import helpers._
 
 
-// TODO CRITICAL Write tests for API with mock database - Implement mock implementation of db and paremetrize it with mock daos.
-// http://etorreborre.github.io/specs2/guide/org.specs2.guide.Matchers.html
+case class LoginFBParams(fbid: String)
+case class LoginFBResult(session: SessionID)
+
+case class UserParams(sessionID: SessionID)
+case class UserResult(user: User)
+
+
 private [domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI => 
-
-  /**
-   * Login with FB. It performs registration as well if the user is logging in for the first time.
-   */
-  case class LoginFBParams(fbid: String)
-  case class LoginFBResult(session: SessionID)
-
 
 
   /**
    * Login with FB. Or create new one if it doesn't exists.
    */
+// TODO CRITICAL Write tests for exceptions in db
   def loginfb(params: LoginFBParams): ApiResult[LoginFBResult] = handleDbException {
 
     def login(user: User) = {
@@ -33,6 +32,8 @@ private [domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI =>
 
       OkApiResult(Some(LoginFBResult(uuid)))
     }
+
+    Logger.debug("Searching for user in database for login with fbid " + params.fbid)
 
     db.readUserByFBid(params.fbid) match {
       case None => {
@@ -61,7 +62,7 @@ private [domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI =>
 
       }
       case Some(user) => {
-        Logger.debug("User login with FB " + user)
+        Logger.debug("Existing user login with FB " + user)
         login(user)
       }
     }
@@ -70,9 +71,7 @@ private [domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI =>
   /**
    * User for session
    */
-  case class UserParams(sessionID: SessionID)
-  case class UserResult(user: User)
-
+// TODO CRITICAL Write tests for this API call
   def user(params: UserParams): ApiResult[UserResult] = handleDbException {
 
     db.readUserBySessionID(params.sessionID) match {
