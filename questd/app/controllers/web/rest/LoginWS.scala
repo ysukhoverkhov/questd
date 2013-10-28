@@ -28,8 +28,6 @@ import controllers.componentregistry.ComponentRegistrySingleton
   }
 */
 
-
-// TODO CRITICAL Write tests for WS with mock API. It's better to do with external ws call. read play docs on testing WS
 object LoginWS extends Controller {
   
   val wsimpl: WSComponent#WS = ComponentRegistrySingleton.ws
