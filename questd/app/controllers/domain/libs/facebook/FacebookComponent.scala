@@ -11,7 +11,7 @@ trait FacebookComponent {
     val FacebookClient = (x: String) => new FacebookClientRepeater(new DefaultFacebookClient(x))
     implicit def repeaterToClient(r: FacebookClientRepeater): FacebookClient = r.client
 
-    def fetchObject[T](token:String)(obj: String, objectType: Class[T], parameters: Parameter*): T = {
+    def fetchObject[T](token:String, obj: String, objectType: Class[T], parameters: Parameter*): T = {
       FacebookClient(token).fetchObject(obj, objectType, parameters: _*)
     }
     

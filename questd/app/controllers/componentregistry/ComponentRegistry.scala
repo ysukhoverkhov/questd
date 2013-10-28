@@ -12,7 +12,7 @@ trait ComponentRegistry
   with MongoDatabaseComponent
   with DomainAPIComponent {
 
-  val db = new MongoDatabase
+  val db: Database = new MongoDatabase
   val api = new DomainAPI
   val fb = new Facebook
   val ws = new WS

@@ -14,8 +14,6 @@ import controllers.domain._
 
 trait SecurityWSImpl extends InternalErrorLogger { this: WSComponent#WS =>
 
-  private val SessionIdKey = "sessionid"
-
   // Store Auth Info
   def storeAuthInfoInResult(result: SimpleResult, loginResult: LoginFBResult) = {
     result.withSession(SessionIdKey -> loginResult.session.toString)

@@ -32,7 +32,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: WSComponen
             case ("token", token: String) => {
               Future {
                 try {
-                  (Option(fb.fetchObject(token)("me", classOf[UserFB])), None)
+                  (Option(fb.fetchObject(token, "me", classOf[UserFB])), None)
                 } catch {
                   case ex: FacebookOAuthException => {
                     Logger.debug("Facebook auth failed")
@@ -51,6 +51,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: WSComponen
                     api.loginfb(params) match {
                       case OkApiResult(Some(loginResult: LoginFBResult)) =>
                         storeAuthInfoInResult(Ok(loginResult.session.toString), loginResult)
+                        
                       case _ => ServerError
                     }
 
