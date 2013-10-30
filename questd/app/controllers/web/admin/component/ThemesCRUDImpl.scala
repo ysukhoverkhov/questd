@@ -10,27 +10,52 @@ import models.domain.theme._
 import controllers.domain.OkApiResult
 import controllers.domain.AllThemesResult
 
+case class ThemeForm(text: String, comment: String)
+
 trait ThemesCRUDImpl extends Controller { this: AdminComponent#Admin =>
 
-  def themes = Action { implicit request =>
-    
-    api.allThemes match {
+  val newThemeForm = Form(
+    mapping(
+      "text" -> nonEmptyText,
+      "comment" -> nonEmptyText)(ThemeForm.apply)(ThemeForm.unapply))
+
       
-      case OkApiResult(Some(a: AllThemesResult)) => Ok(views.html.admin.themes(Menu(request), a.themes))
+  def themes = Action { implicit request =>
+
+    api.allThemes match {
+
+      case OkApiResult(Some(a: AllThemesResult)) => Ok(
+        views.html.admin.themes(Menu(request),
+          a.themes,
+          newThemeForm))
 
       case _ => Ok("Internal server error - themes not received.")
     }
 
-//    List(Theme("id", "Theme", "this is a very long descripion of the theme. yeah. indeed."),
-//        Theme("id2", "Theme2", "22222 his is a very long descripion of the theme. yeah. indeed."))
   }
-  
+
   def deleteThemeCB = TODO
-  
-  def createThemeCB = TODO
-  
+
+  def createThemeCB = Action { implicit request =>  
+    newThemeForm.bindFromRequest.fold(
+
+      formWithErrors => {
+          BadRequest(views.html.admin.themes(
+              Menu(request),
+              List(),
+              formWithErrors))
+      },
+      
+      themeForm => {
+        val theme = Theme(ThemeID.default, themeForm.text, themeForm.comment)
+        api.createTheme(theme)
+        
+        Redirect(controllers.web.admin.routes.ThemesCRUD.themes)
+      })
+  }
+
   def editTheme = TODO
-  
+
   def editThemeCB = TODO
 
 }

@@ -17,7 +17,12 @@ object theme {
   case class Theme(
     val id: ThemeID,
     val text: String,
-    val comment: String)
+    val comment: String) {
+    
+    def replaceID(newID: ThemeID) = {
+      Theme(newID, text, comment)
+    }
+  }
     
 }
 

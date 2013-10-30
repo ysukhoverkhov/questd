@@ -1,9 +1,15 @@
-@(menuItems: Map[String, String], themes: List[models.domain.theme.Theme])
+@(menuItems: Map[String, String], themes: List[models.domain.theme.Theme], newThemeForm: Form[controllers.web.admin.component.ThemeForm])
+
+@import helper._
 
 @main("Themes")(menuItems) {
 
 	<p>
-		<a href="#">create</a>
+		@form(action = controllers.web.admin.routes.ThemesCRUD.createThemeCB()) {
+			@inputText(newThemeForm("text"))
+			@inputText(newThemeForm("comment"))
+			<input type="submit" value="Create">
+   		}
 	</p>
 	
 	<p>
