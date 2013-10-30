@@ -13,7 +13,7 @@ POST	/rest/getname					controllers.web.rest.ProfileWS.getName
 
 # Admin
 GET		/admin							controllers.web.admin.AdminApp.index
-GET		/themes							controllers.web.admin.AdminApp.themes
+GET		/themes							controllers.web.admin.ThemesCRUD.themes
 
 # Test client auth
 GET     /testclient                 	controllers.web.testclient.Client.index

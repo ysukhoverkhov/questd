@@ -30,9 +30,9 @@ import controllers.componentregistry.ComponentRegistrySingleton
 
 object LoginWS extends Controller {
   
-  val wsimpl: WSComponent#WS = ComponentRegistrySingleton.ws
+  val ws: WSComponent#WS = ComponentRegistrySingleton.ws
 
-  def loginfb = wsimpl.loginfb
+  def loginfb = ws.loginfb
 
 }
 

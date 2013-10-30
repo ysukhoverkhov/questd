@@ -1,5 +1,24 @@
-@(menuItems: Map[String, String], themes: String)
+@(menuItems: Map[String, String], themes: List[models.domain.theme.Theme])
 
 @main("Themes")(menuItems) {
-	@themes
+
+	<p>
+		<a href="#">create</a>
+	</p>
+	
+	<p>
+	<table border="1">
+		@for(t <- themes) {
+	    	<tr>
+	    		<td>@t.id.toString</td>
+	    		<td>@t.text</td>
+	    		<td>@t.comment</td>
+				<td><a href="#">edit</a></td>
+				<td><a href="#">delete</a></td>
+	    	</tr>
+	    }
+	</table>
+	</p>
+	
 }
+
