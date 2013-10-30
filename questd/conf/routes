@@ -11,6 +11,9 @@ POST	/rest/loginfb					controllers.web.rest.LoginWS.loginfb
 #this is temp one, remove it later.
 POST	/rest/getname					controllers.web.rest.ProfileWS.getName
 
+# Admin
+GET		/admin							controllers.web.admin.AdminApp.index
+GET		/themes							controllers.web.admin.AdminApp.themes
 
 # Test client auth
 GET     /testclient                 	controllers.web.testclient.Client.index
