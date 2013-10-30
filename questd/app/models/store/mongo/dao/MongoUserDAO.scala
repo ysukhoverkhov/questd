@@ -17,10 +17,10 @@ import com.mongodb.DBObject
 
 import models.store.mongo.SalatContext._
 import models.store.mongo.helpers._
-import models.store.DAOs._
-import models.domain.user._
+import models.store.dao._
 import models.store._
 
+import models.domain.user._
 
 /**
  * This class is representing user form the database.
@@ -33,7 +33,7 @@ private[mongo] case class UserDB(
 private[mongo] object user {
 
   /**
-   * Conversion from domain object  to db object 
+   * Conversion from domain object  to db object
    */
   implicit def domainToDB(dom: User): UserDB = {
     val sess = dom.session match {
@@ -45,7 +45,7 @@ private[mongo] object user {
   }
 
   /**
-   * Conversion from db object to domain object 
+   * Conversion from db object to domain object
    */
   implicit def dbToDomain(db: UserDB): User = {
     val ses = db.session match {
@@ -55,31 +55,20 @@ private[mongo] object user {
     val uid: UserID = db.userid match {
       case None => UserID.default
       case Some(s) => s
-    } 
+    }
 
     User(uid, db.fbid, ses)
   }
 
-
   /**
    * DOA for User objects
    */
-  trait MongoUserDAO extends UserDAO with ModelCompanion[UserDB, ObjectId] {
+  trait MongoUserDAO
+    extends UserDAO
+    with ModelCompanion[UserDB, ObjectId]
+    with BaseDao[UserDB] {
 
     val dao = new SalatDAO[UserDB, ObjectId](collection = mongoCollection("users")) {}
-
-
-    /**
-     * Makes DBObject for query
-     */
-    private def makeQueryObject(user: UserDB): DBObject = {
-      // TODO OPTIMIZATION replace it with custom object to map converter what makes unlifting and removes "None" from the map completelly.
-
-      val js = toCompactJson(user)
-      val dbo = com.mongodb.util.JSON.parse(js).asInstanceOf[DBObject]
-      
-      dbo
-    }
 
     /**
      * Searches for object by query object.
@@ -94,17 +83,8 @@ private[mongo] object user {
     /**
      * Create
      */
-    def createUser(u: User): Unit = wrapMongoException {
-      Logger.debug("Creating user in database " + u.toString)
-      
-      val wr = save(u)
-      if (!wr.getLastError().ok) {
-        throw new DatabaseException(wr.getLastError().getErrorMessage())
-      }
-
-      Logger.debug("User saved to db successfuly " + u.toString)
-    }
-        
+    def createUser(u: User): Unit = create(u)
+    
     /**
      * Read by userid
      */
@@ -130,13 +110,13 @@ private[mongo] object user {
      * Update by userid.
      */
     def updateUser(u: User): Unit = wrapMongoException {
-     
+
       Logger.debug("Updating user in database " + u.toString)
-      
+
       val q = makeQueryObject(UserDB(Some(u.id.toString), None, None))
       val dbo = toDBObject(u)
       val wr = dao.update(q, dbo, false, false)
-      
+
       if (!wr.getLastError().ok) {
         throw new DatabaseException(wr.getLastError().getErrorMessage())
       }
@@ -157,19 +137,16 @@ private[mongo] object user {
     /**
      * All objects
      */
-    def allUsers: List[User] = wrapMongoException {
-      // TODO OPTIMIZATION this will be very slow and will fetch everything.
-      List() ++ find(MongoDBObject()) map { u => dbToDomain(u) }
-    }
+    def allUsers: List[User] = all map { u => dbToDomain(u) }
+
   }
-  
+
   /**
    * Test version of dao what fails al the time
    */
   trait MongoUserDAOForTest extends MongoUserDAO {
     override val dao = new SalatDAO[UserDB, ObjectId](collection = MongoConnection("localhost", 55555)("test_db")("test_coll")) {}
-    
-    
+
   }
 
 }

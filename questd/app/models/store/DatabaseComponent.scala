@@ -1,15 +1,17 @@
 package models.store
 
-import DAOs._
+import models.store.dao._
 
 /**
  * Main component for the database.
  */
 trait DatabaseComponent {
- 
+
   val db: Database
-  
-  trait Database extends UserDAO
-  
+
+  trait Database
+    extends UserDAO
+    with ThemeDAO
+
 }
 
