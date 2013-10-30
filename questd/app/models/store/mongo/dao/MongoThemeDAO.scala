@@ -49,10 +49,10 @@ private[mongo] object theme {
   /**
    * DOA for Theme objects
    */
-  trait MongoThemeDAO
+  class MongoThemeDAO
     extends ThemeDAO
     with ModelCompanion[ThemeDB, ObjectId]
-    with BaseDao[ThemeDB] {
+    with BaseDAO[ThemeDB] {
 
     val dao = new SalatDAO[ThemeDB, ObjectId](collection = mongoCollection("themes")) {}
 

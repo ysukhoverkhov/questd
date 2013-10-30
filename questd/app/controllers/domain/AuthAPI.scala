@@ -24,7 +24,7 @@ private [domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI =>
 
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString()
-      db.updateUser(user.replaceSessionID(uuid))
+      db.user.updateUser(user.replaceSessionID(uuid))
 
       val a = List(1, 2)
       a.foreach(print)
@@ -34,15 +34,15 @@ private [domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI =>
 
     Logger.debug("Searching for user in database for login with fbid " + params.fbid)
 
-    db.readUserByFBid(params.fbid) match {
+    db.user.readUserByFBid(params.fbid) match {
       case None => {
 
         Logger.debug("No user with FB id found, creating new one " + params.fbid)
 
         val newUUID = java.util.UUID.randomUUID().toString()
         val newUser = User(newUUID, params.fbid)
-        db.createUser(newUser)
-        db.readUserByFBid(params.fbid) match {
+        db.user.createUser(newUser)
+        db.user.readUserByFBid(params.fbid) match {
 
           case None => {
             Logger.error("Unable to find user just created in DB with fbid " + params.fbid)
@@ -72,7 +72,7 @@ private [domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI =>
    */
   def user(params: UserParams): ApiResult[UserResult] = handleDbException {
 
-    db.readUserBySessionID(params.sessionID) match {
+    db.user.readUserBySessionID(params.sessionID) match {
       case None => NotAuthorisedApiResult(None)
 
       case Some(user: User) => OkApiResult(

@@ -4,16 +4,15 @@ import org.specs2.mutable._
 import org.specs2.runner._
 import org.specs2.mock.Mockito
 import org.junit.runner._
-
 import play.Logger
 import play.api.test._
 import play.api.test.Helpers._
-
 import controllers.domain._
 import models.store._
 import models.domain.user._
 import models.store.mongo._
 import models.domain.profile._
+import models.store.dao.UserDAO
 
 
 class AuthAPISpecs extends Specification
@@ -24,52 +23,59 @@ class AuthAPISpecs extends Specification
   isolated
 
   val db = mock[Database]
+  val user = mock[UserDAO]
+  
   val api = new DomainAPI
 
+  object context extends org.specs2.mutable.Before {
+    def before =  db.user returns user
+  }
+
+  
   "Auth API" should {
 
-    "Register user with new FB id" in {
+    "Register user with new FB id" in context {
 
       val fbid = "fbid"
-
-      db.readUserByFBid(anyString) returns None thenReturns Some(User("", Some(fbid), None, Profile()))
+        
+      db.user.readUserByFBid(anyString) returns None thenReturns Some(User("", Some(fbid), None, Profile()))
       //    db.createUser(newUser)
       //    db.readUserByFBid(fbid) returns 
       //    db.updateUser(user.replaceSessionID(uuid))
 
       val rv = api.loginfb(LoginFBParams(fbid))
 
-      there was one(db).readUserByFBid(fbid) andThen 
-        one(db).createUser(any[User]) andThen
-        one(db).readUserByFBid(fbid) andThen
-        one(db).updateUser(any[User])
+      there was one(user).readUserByFBid(fbid) andThen 
+        one(user).createUser(any[User]) andThen
+        one(user).readUserByFBid(fbid) andThen
+        one(user).updateUser(any[User])
 
       rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
       rv.body must beSome[LoginFBResult]
     }
 
-    "Login existing user with new FB id" in {
+    "Login existing user with new FB id" in context {
 
       val fbid = "fbid"
 
-      db.readUserByFBid(anyString) returns Some(User("", Some(fbid), None, Profile()))
+      db.user.readUserByFBid(anyString) returns Some(User("", Some(fbid), None, Profile()))
       //    db.updateUser(user.replaceSessionID(uuid))
 
       val rv = api.loginfb(LoginFBParams(fbid))
 
-      there was one(db).readUserByFBid(fbid) andThen one(db).createUser(any[User])
+      there was one(user).readUserByFBid(fbid) andThen one(user).createUser(any[User])
 
       rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
       rv.body must beSome[LoginFBResult]
     }
 
-    "Behaves well with DB exception" in {
+    "Behaves well with DB exception" in context {
 
-      db.readUserByFBid(anyString) throws new DatabaseException("Test exception")
+      db.user.readUserByFBid(anyString) throws new DatabaseException("Test exception")
 
       val rv = api.loginfb(LoginFBParams("any id"))
 
-      there was one(db).readUserByFBid(anyString)
+      there was one(user).readUserByFBid(anyString)
 
       rv must beAnInstanceOf[InternalErrorApiResult[LoginFBResult]]
       rv.body must beNone
@@ -78,11 +84,11 @@ class AuthAPISpecs extends Specification
     //    case class UserParams(sessionID: SessionID)
     //case class UserResult(user: User)
 
-    "Return logged in user" in {
+    "Return logged in user" in context {
 
       val sesid = "session id"
 
-      db.readUserBySessionID(SessionID(sesid)) returns Some(User("", None, Some(SessionID(sesid))))
+      db.user.readUserBySessionID(SessionID(sesid)) returns Some(User("", None, Some(SessionID(sesid))))
 
       val rv = api.user(UserParams(sesid))
 
@@ -92,10 +98,10 @@ class AuthAPISpecs extends Specification
 
     }
 
-    "Do not return none existing user" in {
+    "Do not return none existing user" in context {
       val sesid = "session id"
 
-      db.readUserBySessionID(SessionID(sesid)) returns None
+      db.user.readUserBySessionID(SessionID(sesid)) returns None
 
       val rv = api.user(UserParams(sesid))
 

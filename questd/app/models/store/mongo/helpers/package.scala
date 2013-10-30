@@ -11,7 +11,7 @@ package object helpers {
   /**
    * Various helper mix ins.
    */
-  trait BaseDao[T] { this: ModelCompanion[T, ObjectId] =>
+  trait BaseDAO[T <: AnyRef] { this: ModelCompanion[T, ObjectId] =>
     
     /**
      * Makes DBObject for query

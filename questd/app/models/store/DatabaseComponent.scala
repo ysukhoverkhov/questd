@@ -9,9 +9,10 @@ trait DatabaseComponent {
 
   val db: Database
 
-  trait Database
-    extends UserDAO
-    with ThemeDAO
+  trait Database {
+    val user: UserDAO
+    val theme: ThemeDAO 
+  }
 
 }
 

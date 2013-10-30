@@ -2,7 +2,7 @@ package models.store.dao
 
 import models.domain.user._
 
-private[store] trait UserDAO {
+trait UserDAO {
 
   def createUser(u: User): Unit
   def readUserByID(u: User): Option[User]

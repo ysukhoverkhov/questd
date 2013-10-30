@@ -7,11 +7,10 @@ import dao.theme._
 
 trait MongoDatabaseComponent extends DatabaseComponent {
 
-  class MongoDatabase
-    extends Database
-    with MongoUserDAO
-    with MongoThemeDAO {
-    
+  class MongoDatabase extends Database {
+
+    val user = new MongoUserDAO
+    val theme = new MongoThemeDAO
   }
 
 }

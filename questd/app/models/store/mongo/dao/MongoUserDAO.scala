@@ -63,10 +63,10 @@ private[mongo] object user {
   /**
    * DOA for User objects
    */
-  trait MongoUserDAO
+  class MongoUserDAO
     extends UserDAO
     with ModelCompanion[UserDB, ObjectId]
-    with BaseDao[UserDB] {
+    with BaseDAO[UserDB] {
 
     val dao = new SalatDAO[UserDB, ObjectId](collection = mongoCollection("users")) {}
 
@@ -144,7 +144,7 @@ private[mongo] object user {
   /**
    * Test version of dao what fails al the time
    */
-  trait MongoUserDAOForTest extends MongoUserDAO {
+  class MongoUserDAOForTest extends MongoUserDAO {
     override val dao = new SalatDAO[UserDB, ObjectId](collection = MongoConnection("localhost", 55555)("test_db")("test_coll")) {}
 
   }
