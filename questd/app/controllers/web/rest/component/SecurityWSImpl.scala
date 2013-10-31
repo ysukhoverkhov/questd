@@ -50,12 +50,9 @@ trait SecurityWSImpl extends InternalErrorLogger { this: WSComponent#WS =>
               }
             }
           
-          }.map {newUser => newUser match {
-              case user: User => 
-	            Await.result(
-	              block(new AuthenticatedRequest(user, request)),
-	              0 nanos)
-              case er: Status => er  
+          }.flatMap {newUser => newUser match {
+              case user: User => block(new AuthenticatedRequest(user, request))
+              case er: Status => Future.successful(er)  
             }
           }
         }
