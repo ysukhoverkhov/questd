@@ -18,11 +18,18 @@ object theme {
     val id: ThemeID,
     val text: String,
     val comment: String) {
-    
+
     def replaceID(newID: ThemeID) = {
       Theme(newID, text, comment)
     }
   }
-    
+
+  object Theme {
+    def apply(id: ThemeID): Theme = {
+      Theme(id, "", "")
+    }
+
+  }
+
 }
 

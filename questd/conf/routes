@@ -14,8 +14,10 @@ POST	/rest/getname					controllers.web.rest.ProfileWS.getName
 # Admin
 GET		/admin							controllers.web.admin.AdminApp.index
 
-GET		/themes							controllers.web.admin.ThemesCRUD.themes
+GET		/themes							controllers.web.admin.ThemesCRUD.themes(id = "")
+GET		/themes/:id						controllers.web.admin.ThemesCRUD.themes(id)
 POST	/createTheme					controllers.web.admin.ThemesCRUD.createThemeCB
+GET		/deleteTheme/:id				controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
 
 
 # Test client auth

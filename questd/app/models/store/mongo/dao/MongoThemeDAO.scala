@@ -75,7 +75,7 @@ private[mongo] object theme {
      * Read by id
      */
     def readThemeByID(u: Theme): Option[Theme] = wrapMongoException {
-      findOne(MongoDBObject("id" -> u.id)) match {
+      findOne(MongoDBObject("id" -> u.id.toString)) match {
         case None => None
         case Some(o) => Some(o)
       }
@@ -86,7 +86,7 @@ private[mongo] object theme {
      */
     def updateTheme(u: Theme): Unit = wrapMongoException {
 
-      val q = MongoDBObject("id" -> u.id)
+      val q = MongoDBObject("id" -> u.id.toString)
       val dbo = toDBObject(u)
       val wr = update(q, dbo, false, false)
 
@@ -100,7 +100,7 @@ private[mongo] object theme {
      */
 
     def deleteTheme(u: Theme): Unit = wrapMongoException {
-      val wr = remove(MongoDBObject("id" -> u.id))
+      val wr = remove(MongoDBObject("id" -> u.id.toString))
 
       if (!wr.getLastError().ok)
         throw new DatabaseException(wr.getLastError().getErrorMessage())

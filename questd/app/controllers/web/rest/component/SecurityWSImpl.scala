@@ -44,6 +44,10 @@ trait SecurityWSImpl extends InternalErrorLogger { this: WSComponent#WS =>
               case InternalErrorApiResult(body) => {
                 ServerError
               }
+
+              case _ => {
+                ServerError
+              }
             }
           
           }.map {newUser => newUser match {
