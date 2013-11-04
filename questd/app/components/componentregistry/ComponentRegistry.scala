@@ -1,4 +1,4 @@
-package controllers.componentregistry
+package components.componentregistry
 
 import controllers.web.rest.component.WSComponent
 import controllers.domain.libs.facebook.FacebookComponent

@@ -1,5 +1,5 @@
 import play.api._
-import controllers.componentregistry.ComponentRegistrySingleton
+import components.componentregistry.ComponentRegistrySingleton
 
 object Global extends GlobalSettings {
 

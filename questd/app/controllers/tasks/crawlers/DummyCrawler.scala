@@ -4,7 +4,7 @@ import akka.actor.Actor
 import akka.actor.Props
 import play.Logger
 import helpers.akka.EasyRestartActor
-import controllers.tasks.DoTask
+import controllers.tasks.messages.DoTask
 
 
 object DummyCrawler {

@@ -2,18 +2,15 @@ package controllers.tasks
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
-
 import akka.actor._
 import akka.actor.ActorDSL._
 import akka.actor.ActorSystem
-
 import us.theatr.akka.quartz._
-
 import play.Logger
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
-
 import helpers.akka.EasyRestartActor
+import controllers.tasks.messages.DoTask
 
 object TasksDispatcher {
   def props = Props[TasksDispatcher]
@@ -31,7 +28,6 @@ class TasksDispatcher extends EasyRestartActor {
     def schedule(path: String, cron: String) {
       quartzActor ! AddCronSchedule(self, cron, WakeCrawlerUp(context.actorSelection(path)))
     }
-
     
     schedule("akka://application/user/DummyCrawler", "0/5 * * * * ?")
 

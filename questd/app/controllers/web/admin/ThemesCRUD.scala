@@ -4,7 +4,7 @@ import play.api._
 import play.api.mvc._
 
 import controllers.web.admin.component.AdminComponent
-import controllers.componentregistry.ComponentRegistrySingleton
+import components.componentregistry.ComponentRegistrySingleton
 
 object ThemesCRUD extends Controller {
 
