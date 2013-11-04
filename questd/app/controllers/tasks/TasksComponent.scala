@@ -9,22 +9,23 @@ import components.ConfigHolder
 import models.domain.config._
 
 trait TasksComponent {
-  
+
   val tasks: Tasks
-  
+
   class Tasks extends ConfigHolder {
-    
+
     // ConfigHolder implementation
     val configSectionName = "Tasks"
-    val defaultConfiguration = ConfigSection(configSectionName, Map())
-
+    val defaultConfiguration = ConfigSection(
+      configSectionName,
+      Map(("akka://application/user/DummyCrawler", "0/10 * * * * ?")))
 
     // Dummy task for debug
     val dummyCrawler = Akka.system.actorOf(DummyCrawler.props, name = DummyCrawler.name)
-    
+
     // Creating main tasks dispatcher.
-    val dispetcher = Akka.system.actorOf(TasksDispatcher.props, name = TasksDispatcher.name)
-    
+    val dispetcher = Akka.system.actorOf(TasksDispatcher.props(config), name = TasksDispatcher.name)
+
   }
 
 }

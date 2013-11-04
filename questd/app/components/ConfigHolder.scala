@@ -9,8 +9,11 @@ trait ConfigHolder {
   
   def defaultConfiguration: ConfigSection
   
-  val configuration: ConfigSection = {
+  def config: ConfigSection = {
     // TODO IMPLEMENT read me from database. If no db config found store it there.
+    
+    // TODO IMPLEMENT read it not from db, but from api what will cache it
+    // save to API as well.
     
     defaultConfiguration
     

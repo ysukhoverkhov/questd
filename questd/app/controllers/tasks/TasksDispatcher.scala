@@ -11,13 +11,14 @@ import play.api.libs.concurrent.Akka
 import play.api.Play.current
 import helpers.akka.EasyRestartActor
 import controllers.tasks.messages.DoTask
+import models.domain.config._
 
 object TasksDispatcher {
-  def props = Props[TasksDispatcher]
+  def props(config: ConfigSection) = Props(classOf[TasksDispatcher], config) 
   def name = "TasksDispatcher"
 }
 
-class TasksDispatcher extends EasyRestartActor {
+class TasksDispatcher(config: ConfigSection) extends EasyRestartActor {
 
   case class WakeCrawlerUp(crawler: ActorSelection)
 
@@ -29,11 +30,7 @@ class TasksDispatcher extends EasyRestartActor {
       quartzActor ! AddCronSchedule(self, cron, WakeCrawlerUp(context.actorSelection(path)))
     }
     
-    schedule("akka://application/user/DummyCrawler", "0/5 * * * * ?")
-
-    // TODO list all active tasks in admin page.
-
-    // TODO IMPLEMENT read configuration and create them
+    config.values.foreach(c => schedule(c._1, c._2))
   }
 
   def receive = {
