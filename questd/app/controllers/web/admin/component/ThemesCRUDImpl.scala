@@ -10,6 +10,7 @@ import play.api.libs.json._
 import models.domain.theme._
 
 import controllers.domain._
+import controllers.domain.admin._
 
 case class ThemeForm(id: String, text: String, comment: String)
 

@@ -7,7 +7,10 @@ import org.junit.runner._
 import play.Logger
 import play.api.test._
 import play.api.test.Helpers._
+
 import controllers.domain._
+import controllers.domain.user._
+
 import models.store._
 import models.domain.user._
 import models.store.mongo._

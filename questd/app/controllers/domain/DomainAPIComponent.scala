@@ -1,13 +1,17 @@
 package controllers.domain
 
 import models.store._
+import components._
+import controllers.domain.user._
+import controllers.domain.admin._
 
 trait DomainAPIComponent { component: DatabaseComponent =>
 
   val api: DomainAPI
 
   class DomainAPI
-    extends AuthAPI
+    extends DBAccessor 
+    with AuthAPI
     with ProfileAPI
     with ThemesAdminAPI {
 

@@ -1,10 +1,13 @@
-package controllers.domain
+package controllers.domain.user
 
 import models.domain.profile._
 import models.domain.user._
 import models.store._
 import play.Logger
 import helpers._
+import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain._
+import components._
 
 
 case class LoginFBParams(fbid: String)
@@ -14,7 +17,7 @@ case class UserParams(sessionID: SessionID)
 case class UserResult(user: User)
 
 
-private [domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI => 
+private [domain] trait AuthAPI { this: DBAccessor => 
 
 
   /**

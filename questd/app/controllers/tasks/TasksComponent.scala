@@ -18,7 +18,7 @@ trait TasksComponent {
     val configSectionName = "Tasks"
     val defaultConfiguration = ConfigSection(
       configSectionName,
-      Map(("akka://application/user/DummyCrawler", "0/10 * * * * ?")))
+      Map(("akka://application/user/DummyCrawler", "0 0/1 * * * ?")))
 
     // Dummy task for debug
     val dummyCrawler = Akka.system.actorOf(DummyCrawler.props, name = DummyCrawler.name)

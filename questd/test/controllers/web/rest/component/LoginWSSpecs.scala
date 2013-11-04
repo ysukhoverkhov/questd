@@ -8,8 +8,9 @@ import play.Logger
 import play.api.test._
 import play.api.test.Helpers._
 import play.api.libs.json._
-import controllers.componentregistry._
+import components.componentregistry._
 import controllers.domain._
+import controllers.domain.user._
 import controllers.domain.libs.facebook._
 import controllers.web.rest.component._
 import models.store._

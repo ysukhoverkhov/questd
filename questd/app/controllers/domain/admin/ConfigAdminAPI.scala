@@ -1,29 +1,32 @@
-package controllers.domain
+package controllers.domain.admin
+
+import play.Logger
 
 import models.store._
-import play.Logger
-import helpers._
-
 import models.domain.theme._
 
+import controllers.domain._
 
-case class AllThemesResult(themes: List[Theme])
-
-case class CreateThemeRequest(theme: Theme)
-case class CreateThemeResult()
-
-case class UpdateThemeRequest(theme: Theme)
-case class UpdateThemeResult()
-
-case class DeleteThemeRequest(id: ThemeID)
-case class DeleteThemeResult()
-
-case class GetThemeRequest(id: ThemeID)
-case class GetThemeResult(theme: Theme)
+import components._
 
 
-private [domain] trait ThemesAdminAPI { this: DomainAPIComponent#DomainAPI => 
+//case class AllThemesResult(themes: List[Theme])
+//
+//case class CreateThemeRequest(theme: Theme)
+//case class CreateThemeResult()
+//
+//case class UpdateThemeRequest(theme: Theme)
+//case class UpdateThemeResult()
+//
+//case class DeleteThemeRequest(id: ThemeID)
+//case class DeleteThemeResult()
+//
+//case class GetThemeRequest(id: ThemeID)
+//case class GetThemeResult(theme: Theme)
 
+
+private [domain] trait ConfigAdminAPI { this: DBAccessor => 
+/*
 
   /**
    * List all themes
@@ -83,7 +86,7 @@ private [domain] trait ThemesAdminAPI { this: DomainAPIComponent#DomainAPI =>
     
     OkApiResult(Some(DeleteThemeResult()))
   }
-
+*/
 }
 
 

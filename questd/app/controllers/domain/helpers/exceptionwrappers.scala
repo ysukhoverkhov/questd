@@ -1,9 +1,10 @@
-package controllers.domain
+package controllers.domain.helpers
 
 import models.store._
 import play.Logger
+import controllers.domain._
 
-package object helpers {
+object exceptionwrappers {
   
   /**
    * Wrapper for handling unknown exceptions.
