@@ -22,40 +22,17 @@ object TasksDispatcher {
 
 class TasksDispatcher extends EasyRestartActor {
 
+  case class WakeCrawlerUp(crawler: ActorSelection)
+
   override def preStart(): Unit = {
 
     val quartzActor = context.actorOf(Props[QuartzActor])
 
     def schedule(path: String, cron: String) {
-
-      actor(new Act {
-
-        def identfySheduledWithRetry = {
-          context.actorSelection(path) ! Identify("1")
-
-          implicit val dispatcher = Akka.system.dispatcher
-          Akka.system.scheduler.scheduleOnce(10 seconds, self, "OneMoreTimePlease")
-        }
-
-        whenStarting {
-          identfySheduledWithRetry
-        }
-
-        become {
-          case ActorIdentity("1", Some(a: ActorRef)) => {
-            quartzActor ! AddCronSchedule(a, cron, DoTask)
-            become {
-              case "OneMoreTimePlease" => context.stop(self)
-            }
-          }
-
-          case "OneMoreTimePlease" => identfySheduledWithRetry
-
-          case _ => Logger.error("Error initializing actor - unable to start scheduler.")
-        }
-      })
+      quartzActor ! AddCronSchedule(self, cron, WakeCrawlerUp(context.actorSelection(path)))
     }
 
+    
     schedule("akka://application/user/DummyCrawler", "0/5 * * * * ?")
 
     // TODO list all active tasks in admin page.
@@ -64,8 +41,10 @@ class TasksDispatcher extends EasyRestartActor {
   }
 
   def receive = {
-    case "test" => Logger.info("asd1 -")
-    case _ => Logger.info("asd")
+
+    case WakeCrawlerUp(c) => c ! DoTask
+
+    case _ => Logger.error("Unexpected message received")
   }
 }
 
