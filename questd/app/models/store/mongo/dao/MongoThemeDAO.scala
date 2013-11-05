@@ -57,16 +57,6 @@ private[mongo] object theme {
     val dao = new SalatDAO[ThemeDB, ObjectId](collection = mongoCollection("themes")) {}
 
     /**
-     * Searches for object by query object.
-     */
-    private def find(user: ThemeDB): Option[Theme] = {
-      findOne(makeQueryObject(user)) match {
-        case None => None
-        case Some(o) => Some(o)
-      }
-    }
-
-    /**
      * Create
      */
     def createTheme(u: Theme): Unit = create(u)

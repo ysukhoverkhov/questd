@@ -71,16 +71,6 @@ private[mongo] object user {
     val dao = new SalatDAO[UserDB, ObjectId](collection = mongoCollection("users")) {}
 
     /**
-     * Searches for object by query object.
-     */
-    private def find(user: UserDB): Option[User] = {
-      findOne(makeQueryObject(user)) match {
-        case None => None
-        case Some(o) => Some(o)
-      }
-    }
-
-    /**
      * Create
      */
     def createUser(u: User): Unit = create(u)
@@ -89,37 +79,28 @@ private[mongo] object user {
      * Read by userid
      */
     def readUserByID(u: User): Option[User] = wrapMongoException {
-      find(UserDB(Some(u.id.toString), None, None))
+      read(UserDB(Some(u.id.toString), None, None))
     }
 
     /**
-     * Read
+     * Read by session id
      */
     def readUserBySessionID(sessid: SessionID): Option[User] = wrapMongoException {
-      find(UserDB(None, None, Some(sessid.toString)))
+      read(UserDB(None, None, Some(sessid.toString)))
     }
 
     /**
-     * Read
+     * Read by fb id
      */
     def readUserByFBid(fbid: String): Option[User] = wrapMongoException {
-      find(UserDB(None, Some(fbid), None))
+      read(UserDB(None, Some(fbid), None))
     }
 
     /**
      * Update by userid.
      */
     def updateUser(u: User): Unit = wrapMongoException {
-
-      Logger.debug("Updating user in database " + u.toString)
-
-      val q = makeQueryObject(UserDB(Some(u.id.toString), None, None))
-      val dbo = toDBObject(u)
-      val wr = dao.update(q, dbo, false, false)
-
-      if (!wr.getLastError().ok) {
-        throw new DatabaseException(wr.getLastError().getErrorMessage())
-      }
+      update(UserDB(Some(u.id.toString), None, None), u)
 
       Logger.debug("User update in db successfuly " + u.toString)
     }
@@ -127,13 +108,8 @@ private[mongo] object user {
     /**
      * Delete by userid
      */
-    def deleteUser(u: User): Unit = wrapMongoException {
-      val wr = remove(makeQueryObject(UserDB(Some(u.id.toString), None, None)))
-
-      if (!wr.getLastError().ok)
-        throw new DatabaseException(wr.getLastError().getErrorMessage())
-    }
-
+    def deleteUser(u: User): Unit = delete(UserDB(Some(u.id.toString), None, None))
+    
     /**
      * All objects
      */
