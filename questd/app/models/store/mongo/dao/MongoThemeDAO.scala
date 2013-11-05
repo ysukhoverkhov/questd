@@ -26,24 +26,28 @@ import models.domain.theme._
  * This class is representing user form the database.
  */
 private[mongo] case class ThemeDB(
-  id: String,
-  text: String,
-  comment: String)
+  id: Option[String],
+  text: Option[String],
+  comment: Option[String])
 
 private[mongo] object theme {
 
+  
   /**
    * Conversion from domain object  to db object
    */
   implicit def domainToDB(dom: Theme): ThemeDB = {
-    ThemeDB(dom.id.toString, dom.text, dom.comment)
+    ThemeDB(Some(dom.id.toString), Some(dom.text), Some(dom.comment))
   }
 
   /**
    * Conversion from db object to domain object
    */
   implicit def dbToDomain(db: ThemeDB): Theme = {
-    Theme(db.id, db.text, db.comment)
+    Theme(
+        unlift(db.id), 
+        unlift(db.text), 
+        unlift(db.comment))
   }
   
   /**

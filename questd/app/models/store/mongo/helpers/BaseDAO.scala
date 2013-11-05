@@ -6,8 +6,11 @@ import com.mongodb.casbah.Imports._
 
 import models.store.exceptions.DatabaseException
 
+// TODO rename me to base mongo dao
 trait BaseDAO[T <: AnyRef] { this: ModelCompanion[T, ObjectId] =>
 
+  
+  
   /**
    * Create
    */
@@ -21,7 +24,7 @@ trait BaseDAO[T <: AnyRef] { this: ModelCompanion[T, ObjectId] =>
   /**
    * Searches for object by query object.
    */
-  def read[R](o: T)(implicit view: T => R): Option[R] = {
+  def read[R](o: T)(implicit view: T => R): Option[R] = wrapMongoException {
     findOne(toDBObject(o)) match {
       case None => None
       case Some(r) => Some(view(r))

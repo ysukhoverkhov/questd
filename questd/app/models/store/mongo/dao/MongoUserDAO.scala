@@ -78,29 +78,27 @@ private[mongo] object user {
     /**
      * Read by userid
      */
-    def readUserByID(u: User): Option[User] = wrapMongoException {
-      read(UserDB(Some(u.id.toString), None, None))
-    }
+    def readUserByID(u: User): Option[User] = read(UserDB(Some(u.id.toString)))
 
     /**
      * Read by session id
      */
-    def readUserBySessionID(sessid: SessionID): Option[User] = wrapMongoException {
+    def readUserBySessionID(sessid: SessionID): Option[User] = {
       read(UserDB(None, None, Some(sessid.toString)))
     }
 
     /**
      * Read by fb id
      */
-    def readUserByFBid(fbid: String): Option[User] = wrapMongoException {
+    def readUserByFBid(fbid: String): Option[User] = {
       read(UserDB(None, Some(fbid), None))
     }
 
     /**
      * Update by userid.
      */
-    def updateUser(u: User): Unit = wrapMongoException {
-      update(UserDB(Some(u.id.toString), None, None), u)
+    def updateUser(u: User): Unit = {
+      update(UserDB(Some(u.id.toString)), u)
 
       Logger.debug("User update in db successfuly " + u.toString)
     }
@@ -108,7 +106,7 @@ private[mongo] object user {
     /**
      * Delete by userid
      */
-    def deleteUser(u: User): Unit = delete(UserDB(Some(u.id.toString), None, None))
+    def deleteUser(u: User): Unit = delete(UserDB(Some(u.id.toString)))
     
     /**
      * All objects
