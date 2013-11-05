@@ -27,8 +27,8 @@ import models.domain.theme._
  */
 private[mongo] case class ThemeDB(
   id: Option[String],
-  text: Option[String],
-  comment: Option[String])
+  text: Option[String] = None,
+  comment: Option[String] = None)
 
 private[mongo] object theme {
 
@@ -68,37 +68,17 @@ private[mongo] object theme {
     /**
      * Read by id
      */
-    def readThemeByID(u: Theme): Option[Theme] = wrapMongoException {
-      findOne(MongoDBObject("id" -> u.id.toString)) match {
-        case None => None
-        case Some(o) => Some(o)
-      }
-    }
+    def readThemeByID(t: Theme): Option[Theme] = read(ThemeDB(Some(t.id.toString)))
 
     /**
-     * Update by userid.
+     * Update by id.
      */
-    def updateTheme(u: Theme): Unit = wrapMongoException {
-
-      val q = MongoDBObject("id" -> u.id.toString)
-      val dbo = toDBObject(u)
-      val wr = update(q, dbo, false, false)
-
-      if (!wr.getLastError().ok) {
-        throw new DatabaseException(wr.getLastError().getErrorMessage())
-      }
-    }
+    def updateTheme(u: Theme): Unit = update(ThemeDB(Some(u.id.toString)), u)
 
     /**
-     * Delete by userid
+     * Delete by id
      */
-
-    def deleteTheme(u: Theme): Unit = wrapMongoException {
-      val wr = remove(MongoDBObject("id" -> u.id.toString))
-
-      if (!wr.getLastError().ok)
-        throw new DatabaseException(wr.getLastError().getErrorMessage())
-    }
+    def deleteTheme(u: Theme): Unit = delete(ThemeDB(Some(u.id.toString)))
 
     /**
      * All objects
