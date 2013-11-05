@@ -1,6 +1,5 @@
 package models.store.mongo.dao
 
-import java.util.Date
 import scala.language.postfixOps
 import scala.language.implicitConversions
 import play.Logger
@@ -30,12 +29,20 @@ private[mongo] case class UserDB(
   fbid: Option[String] = None,
   session: Option[String] = None)
 
-private[mongo] object user {
+/**
+ * DOA for User objects
+ */
+private[mongo] class MongoUserDAO
+  extends UserDAO
+  with ModelCompanion[UserDB, ObjectId]
+  with BaseMongoDAO[UserDB] {
+
+  val dao = new SalatDAO[UserDB, ObjectId](collection = mongoCollection("users")) {}
 
   /**
    * Conversion from domain object  to db object
    */
-  implicit def domainToDB(dom: User): UserDB = {
+  protected implicit def domainToDB(dom: User): UserDB = {
     val sess = dom.session match {
       case None => None
       case Some(v) => Some(v.toString)
@@ -47,7 +54,7 @@ private[mongo] object user {
   /**
    * Conversion from db object to domain object
    */
-  implicit def dbToDomain(db: UserDB): User = {
+  protected implicit def dbToDomain(db: UserDB): User = {
     val ses = db.session match {
       case None => None
       case Some(s) => Some(SessionID(s))
@@ -61,67 +68,56 @@ private[mongo] object user {
   }
 
   /**
-   * DOA for User objects
+   * Create
    */
-  class MongoUserDAO
-    extends UserDAO
-    with ModelCompanion[UserDB, ObjectId]
-    with BaseDAO[UserDB] {
+  def createUser(u: User): Unit = create(u)
 
-    val dao = new SalatDAO[UserDB, ObjectId](collection = mongoCollection("users")) {}
+  /**
+   * Read by userid
+   */
+  def readUserByID(u: User): Option[User] = read(UserDB(Some(u.id.toString)))
 
-    /**
-     * Create
-     */
-    def createUser(u: User): Unit = create(u)
-    
-    /**
-     * Read by userid
-     */
-    def readUserByID(u: User): Option[User] = read(UserDB(Some(u.id.toString)))
-
-    /**
-     * Read by session id
-     */
-    def readUserBySessionID(sessid: SessionID): Option[User] = {
-      read(UserDB(None, None, Some(sessid.toString)))
-    }
-
-    /**
-     * Read by fb id
-     */
-    def readUserByFBid(fbid: String): Option[User] = {
-      read(UserDB(None, Some(fbid), None))
-    }
-
-    /**
-     * Update by userid.
-     */
-    def updateUser(u: User): Unit = {
-      update(UserDB(Some(u.id.toString)), u)
-
-      Logger.debug("User update in db successfuly " + u.toString)
-    }
-
-    /**
-     * Delete by userid
-     */
-    def deleteUser(u: User): Unit = delete(UserDB(Some(u.id.toString)))
-    
-    /**
-     * All objects
-     */
-    def allUsers: List[User] = all map { u => dbToDomain(u) }
-
+  /**
+   * Read by session id
+   */
+  def readUserBySessionID(sessid: SessionID): Option[User] = {
+    read(UserDB(None, None, Some(sessid.toString)))
   }
 
   /**
-   * Test version of dao what fails al the time
+   * Read by fb id
    */
-  class MongoUserDAOForTest extends MongoUserDAO {
-    override val dao = new SalatDAO[UserDB, ObjectId](collection = MongoConnection("localhost", 55555)("test_db")("test_coll")) {}
-
+  def readUserByFBid(fbid: String): Option[User] = {
+    read(UserDB(None, Some(fbid), None))
   }
 
+  /**
+   * Update by userid.
+   */
+  def updateUser(u: User): Unit = {
+    update(UserDB(Some(u.id.toString)), u)
+
+    Logger.debug("User update in db successfuly " + u.toString)
+  }
+
+  /**
+   * Delete by userid
+   */
+  def deleteUser(u: User): Unit = delete(UserDB(Some(u.id.toString)))
+
+  /**
+   * All objects
+   */
+  def allUsers: List[User] = all map { u => dbToDomain(u) }
+
 }
+
+/**
+ * Test version of dao what fails al the time
+ */
+class MongoUserDAOForTest extends MongoUserDAO {
+  override val dao = new SalatDAO[UserDB, ObjectId](collection = MongoConnection("localhost", 55555)("test_db")("test_coll")) {}
+
+}
+
 

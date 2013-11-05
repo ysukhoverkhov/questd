@@ -9,7 +9,7 @@ object config {
       Configuration(sections.updated(newSection.name, newSection))
     }
     
-    def apply(name: String) = {
+    def apply(name: String): Option[ConfigSection] = {
       sections.get(name)
     }
   }

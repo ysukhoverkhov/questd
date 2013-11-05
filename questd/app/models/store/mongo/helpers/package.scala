@@ -5,10 +5,12 @@ import models.store.exceptions.DatabaseException
 
 package object helpers {
 
-  private[mongo] def unlift(o: Option[String]): String = {
+  private[mongo] def unlift(o: Option[String]): String = unlift(o, "")
+
+  private[mongo] def unlift[T](o: Option[T], default: T): T = {
     o match {
       case Some(v) => v
-      case _ => ""
+      case _ => default
     }
   }
 

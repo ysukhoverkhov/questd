@@ -6,16 +6,14 @@ import com.mongodb.casbah.Imports._
 
 import models.store.exceptions.DatabaseException
 
-// TODO rename me to base mongo dao
-trait BaseDAO[T <: AnyRef] { this: ModelCompanion[T, ObjectId] =>
-
-  
+trait BaseMongoDAO[T <: AnyRef] { this: ModelCompanion[T, ObjectId] =>
   
   /**
    * Create
    */
   def create(o: T): Unit = wrapMongoException {
     val wr = save(o)
+    
     if (!wr.getLastError().ok) {
       throw new DatabaseException(wr.getLastError().getErrorMessage())
     }
@@ -34,8 +32,15 @@ trait BaseDAO[T <: AnyRef] { this: ModelCompanion[T, ObjectId] =>
   /**
    * Update object with new object
    */
-  def update(q: T, u: T): Unit = wrapMongoException {
-    val wr = update(toDBObject(q), toDBObject(u), false, false)
+  def update(q: T, u: T): Unit = updateInt(q, u, false)
+
+  /**
+   * Update object with new object
+   */
+  def upsert(q: T, u: T): Unit = updateInt(q, u, true)
+  
+  private def updateInt(q: T, u: T, upsert: Boolean): Unit = wrapMongoException {
+    val wr = update(toDBObject(q), toDBObject(u), upsert, false)
 
     if (!wr.getLastError().ok) {
       throw new DatabaseException(wr.getLastError().getErrorMessage())

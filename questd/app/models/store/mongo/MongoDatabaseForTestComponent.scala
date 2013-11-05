@@ -2,8 +2,7 @@ package models.store.mongo
 
 import models.store._
 import models.store.dao._
-import dao.user._
-import models.store.mongo._
+import models.store.mongo.dao._
 
 private[store] trait MongoDatabaseForTestComponent extends MongoDatabaseComponent {
 

@@ -1,6 +1,5 @@
 package models.store.mongo.dao
 
-import java.util.Date
 import scala.language.postfixOps
 import scala.language.implicitConversions
 import play.Logger
@@ -30,63 +29,57 @@ private[mongo] case class ThemeDB(
   text: Option[String] = None,
   comment: Option[String] = None)
 
-private[mongo] object theme {
+/**
+ * DOA for Theme objects
+ */
+private[mongo] class MongoThemeDAO
+  extends ThemeDAO
+  with ModelCompanion[ThemeDB, ObjectId]
+  with BaseMongoDAO[ThemeDB] {
 
-  
+  val dao = new SalatDAO[ThemeDB, ObjectId](collection = mongoCollection("themes")) {}
+
   /**
    * Conversion from domain object  to db object
    */
-  implicit def domainToDB(dom: Theme): ThemeDB = {
+  protected implicit def domainToDB(dom: Theme): ThemeDB = {
     ThemeDB(Some(dom.id.toString), Some(dom.text), Some(dom.comment))
   }
 
   /**
    * Conversion from db object to domain object
    */
-  implicit def dbToDomain(db: ThemeDB): Theme = {
+  protected implicit def dbToDomain(db: ThemeDB): Theme = {
     Theme(
-        unlift(db.id), 
-        unlift(db.text), 
-        unlift(db.comment))
+      unlift(db.id),
+      unlift(db.text),
+      unlift(db.comment))
   }
-  
+
   /**
-   * DOA for Theme objects
+   * Create
    */
-  class MongoThemeDAO
-    extends ThemeDAO
-    with ModelCompanion[ThemeDB, ObjectId]
-    with BaseDAO[ThemeDB] {
+  def createTheme(u: Theme): Unit = create(u)
 
-    val dao = new SalatDAO[ThemeDB, ObjectId](collection = mongoCollection("themes")) {}
+  /**
+   * Read by id
+   */
+  def readThemeByID(t: Theme): Option[Theme] = read(ThemeDB(Some(t.id.toString)))
 
-    /**
-     * Create
-     */
-    def createTheme(u: Theme): Unit = create(u)
+  /**
+   * Update by id.
+   */
+  def updateTheme(u: Theme): Unit = update(ThemeDB(Some(u.id.toString)), u)
 
-    /**
-     * Read by id
-     */
-    def readThemeByID(t: Theme): Option[Theme] = read(ThemeDB(Some(t.id.toString)))
+  /**
+   * Delete by id
+   */
+  def deleteTheme(u: Theme): Unit = delete(ThemeDB(Some(u.id.toString)))
 
-    /**
-     * Update by id.
-     */
-    def updateTheme(u: Theme): Unit = update(ThemeDB(Some(u.id.toString)), u)
-
-    /**
-     * Delete by id
-     */
-    def deleteTheme(u: Theme): Unit = delete(ThemeDB(Some(u.id.toString)))
-
-    /**
-     * All objects
-     */
-    def allThemes: List[Theme] = all map { u => dbToDomain(u) }
-    
-  }
-
+  /**
+   * All objects
+   */
+  def allThemes: List[Theme] = all map { u => dbToDomain(u) }
 
 }
 
