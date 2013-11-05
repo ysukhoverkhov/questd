@@ -11,6 +11,7 @@ trait WSComponent { component: DomainAPIComponent with FacebookComponent =>
     extends LoginWSImpl
     with ProfileWSImpl {
 
+    // TODO IMPLEMENT! introduce accessors here.
     val fb = component.fb
     val api = component.api
 

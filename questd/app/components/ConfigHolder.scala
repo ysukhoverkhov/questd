@@ -1,8 +1,10 @@
 package components
 
 import models.domain.config._
+import controllers.domain._
+import controllers.domain.admin._
 
-trait ConfigHolder {
+trait ConfigHolder { this: APIAccessor =>
   
   // Name of config section we use to store our configuration.
   def configSectionName: String
@@ -10,13 +12,13 @@ trait ConfigHolder {
   def defaultConfiguration: ConfigSection
   
   def config: ConfigSection = {
-    // TODO IMPLEMENT read me from database. If no db config found store it there.
-    
-    // TODO IMPLEMENT read it not from db, but from api what will cache it
-    // save to API as well.
-    
-    defaultConfiguration
-    
+    api.getConfigSection(GetConfigSectionRequest(configSectionName)) match {
+      case OkApiResult(Some(GetConfigSectionResult(Some(c: ConfigSection)))) => c
+      case _ => {
+        api.setConfigSection(SetConfigSectionRequest(defaultConfiguration))
+        defaultConfiguration
+      }
+    } 
   }
   
 }

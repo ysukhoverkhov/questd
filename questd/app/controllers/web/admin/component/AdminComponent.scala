@@ -12,6 +12,7 @@ trait AdminComponent { component: DomainAPIComponent =>
     extends AdminAppImpl
     with ThemesCRUDImpl {
 
+    // TODO IMPLEMENT! Introduce accessors here.
     val api = component.api
 
   }

@@ -10,10 +10,11 @@ trait DomainAPIComponent { component: DatabaseComponent =>
   val api: DomainAPI
 
   class DomainAPI
-    extends DBAccessor 
+    extends DBAccessor
     with AuthAPI
     with ProfileAPI
-    with ThemesAdminAPI {
+    with ThemesAdminAPI 
+    with ConfigAdminAPI {
 
     // db for out traits
     val db = component.db

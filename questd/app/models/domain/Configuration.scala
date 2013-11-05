@@ -3,7 +3,16 @@ package models.domain
 object config {
 
   case class Configuration(
-    val sections: Map[String, ConfigSection])
+    private val sections: Map[String, ConfigSection]) {
+    
+    def replaceSection(newSection: ConfigSection) = {
+      Configuration(sections.updated(newSection.name, newSection))
+    }
+    
+    def apply(name: String) = {
+      sections.get(name)
+    }
+  }
 
   case class ConfigSection(
     val name: String,

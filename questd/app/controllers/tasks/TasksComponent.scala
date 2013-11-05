@@ -7,12 +7,18 @@ import play.api.Play.current
 import controllers.tasks.crawlers._
 import components.ConfigHolder
 import models.domain.config._
+import components.APIAccessor
+import controllers.domain.DomainAPIComponent
 
-trait TasksComponent {
+trait TasksComponent { component: DomainAPIComponent =>
 
   val tasks: Tasks
 
-  class Tasks extends ConfigHolder {
+  class Tasks
+    extends APIAccessor
+    with ConfigHolder {
+
+    val api = component.api
 
     // ConfigHolder implementation
     val configSectionName = "Tasks"

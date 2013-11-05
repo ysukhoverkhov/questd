@@ -4,29 +4,66 @@ import play.Logger
 
 import models.store._
 import models.domain.theme._
+import models.domain.config._
 
 import controllers.domain._
+import controllers.domain.helpers.exceptionwrappers._
 
 import components._
 
 
+case class GetConfigSectionRequest(name: String)
+case class GetConfigSectionResult(section: Option[ConfigSection])
+
+case class SetConfigSectionRequest(section: ConfigSection) 
+case class SetConfigSectionResult() 
+
 //case class AllThemesResult(themes: List[Theme])
 //
-//case class CreateThemeRequest(theme: Theme)
-//case class CreateThemeResult()
-//
-//case class UpdateThemeRequest(theme: Theme)
-//case class UpdateThemeResult()
-//
-//case class DeleteThemeRequest(id: ThemeID)
-//case class DeleteThemeResult()
-//
-//case class GetThemeRequest(id: ThemeID)
-//case class GetThemeResult(theme: Theme)
 
 
 private [domain] trait ConfigAdminAPI { this: DBAccessor => 
-/*
+
+  @volatile var config: Configuration = null
+  
+  private def readConfigFromDB(): Unit = {
+    
+    // TODO implement me (remove the if).
+    if (config == null)
+    config = Configuration(Map())
+    
+    Logger.error("reading " + config.toString)
+  }
+  
+  private def storeConfigInDB(newConfig: Configuration): Unit = {
+    
+    // TODO implement me. (do not modify local variable, just store new values in db.)
+    config = newConfig
+
+    Logger.error("saving " + config.toString)
+
+    readConfigFromDB()
+  }
+  
+  /**
+   * Get config section by its name.
+   */
+  def getConfigSection(request: GetConfigSectionRequest): ApiResult[GetConfigSectionResult] = handleDbException {
+    
+    if (config == null)
+      readConfigFromDB()
+    
+    OkApiResult(Some(GetConfigSectionResult(config(request.name))))
+  }
+
+  def setConfigSection(request: SetConfigSectionRequest) = handleDbException {
+    val newConfig = config.replaceSection(request.section)
+    storeConfigInDB(newConfig)
+    
+    OkApiResult(Some(SetConfigSectionResult))
+  }
+  
+  /*
 
   /**
    * List all themes
@@ -37,55 +74,6 @@ private [domain] trait ConfigAdminAPI { this: DBAccessor =>
     OkApiResult(Some(AllThemesResult(db.theme.allThemes)))
   }
 
-  /**
-   * Create new theme
-   */
-  def createTheme(request: CreateThemeRequest): ApiResult[CreateThemeResult] = handleDbException {
-    Logger.debug("Admin request for create new theme.")
-
-    val newID = java.util.UUID.randomUUID().toString()
-    
-    db.theme.createTheme(request.theme.replaceID(newID))
-    
-    OkApiResult(Some(CreateThemeResult()))
-  }
-
-  /**
-   * Update new theme
-   */
-  def updateTheme(request: UpdateThemeRequest): ApiResult[UpdateThemeResult] = handleDbException {
-    Logger.debug("Admin request for update a theme " + request.theme.id)
-
-    db.theme.updateTheme(request.theme)
-    
-    OkApiResult(Some(UpdateThemeResult()))
-  }
-
-
-  /**
-   * Get a theme
-   */
-  def getTheme(request: GetThemeRequest): ApiResult[GetThemeResult] = handleDbException {
-    Logger.debug("Admin request for create new theme.")
-
-    db.theme.readThemeByID(Theme(request.id)) match {
-      case Some(r) => OkApiResult(Some(GetThemeResult(r)))
-      case None => NotFoundApiResult(None)
-    }
-    
-  }
-
-  
-  /**
-   * Delete theme.
-   */
-  def deleteTheme(request: DeleteThemeRequest): ApiResult[DeleteThemeResult] = handleDbException {
-    Logger.debug("Admin request for delete theme " + request.id.toString)
-
-    db.theme.deleteTheme(Theme(request.id))
-    
-    OkApiResult(Some(DeleteThemeResult()))
-  }
 */
 }
 
