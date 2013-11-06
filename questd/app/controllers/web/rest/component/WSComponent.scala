@@ -2,6 +2,7 @@ package controllers.web.rest.component
 
 import controllers.domain.libs.facebook.FacebookComponent
 import controllers.domain.DomainAPIComponent
+import components._
 
 trait WSComponent { component: DomainAPIComponent with FacebookComponent =>
 
@@ -9,9 +10,10 @@ trait WSComponent { component: DomainAPIComponent with FacebookComponent =>
 
   class WS
     extends LoginWSImpl
-    with ProfileWSImpl {
+    with ProfileWSImpl 
+    with FBAccessor
+    with APIAccessor {
 
-    // TODO IMPLEMENT! introduce accessors here.
     val fb = component.fb
     val api = component.api
 

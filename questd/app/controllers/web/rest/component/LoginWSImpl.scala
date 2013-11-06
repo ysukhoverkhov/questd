@@ -11,9 +11,10 @@ import controllers.domain.user._
 import controllers.web.rest.component.helpers._
 import controllers.domain.libs.facebook.UserFB
 import com.restfb.exception._
+import components._
 
 
-trait LoginWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor with APIAccessor =>
 
   
   /**

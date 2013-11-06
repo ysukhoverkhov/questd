@@ -7,13 +7,13 @@ import play.api._
 import play.api.mvc._
 import play.api.mvc.Security._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
 import models.domain.user._
 import controllers.web.rest.component.helpers._
 import controllers.domain._
 import controllers.domain.user._
+import components._
 
-trait SecurityWSImpl extends InternalErrorLogger { this: WSComponent#WS =>
+trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
 
   // Store Auth Info
   def storeAuthInfoInResult(result: SimpleResult, loginResult: LoginFBResult) = {

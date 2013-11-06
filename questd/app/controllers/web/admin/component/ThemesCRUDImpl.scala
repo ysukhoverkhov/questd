@@ -6,15 +6,14 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.ws._
 import play.api.libs.json._
-
 import models.domain.theme._
-
 import controllers.domain._
 import controllers.domain.admin._
+import components._
 
 case class ThemeForm(id: String, text: String, comment: String)
 
-trait ThemesCRUDImpl extends Controller { this: AdminComponent#Admin =>
+trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
 
   val newThemeForm = Form(
     mapping(

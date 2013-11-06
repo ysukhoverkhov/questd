@@ -2,6 +2,7 @@ package controllers.web.admin.component
 
 import controllers.domain.libs.facebook.FacebookComponent
 import controllers.domain.DomainAPIComponent
+import components._
 
 
 trait AdminComponent { component: DomainAPIComponent =>
@@ -10,9 +11,9 @@ trait AdminComponent { component: DomainAPIComponent =>
 
   class Admin
     extends AdminAppImpl
-    with ThemesCRUDImpl {
+    with ThemesCRUDImpl 
+    with APIAccessor {
 
-    // TODO IMPLEMENT! Introduce accessors here.
     val api = component.api
 
   }
