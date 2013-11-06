@@ -6,13 +6,12 @@ import play.api.mvc._
 import controllers.web.admin.component.AdminComponent
 import components.componentregistry.ComponentRegistrySingleton
 
-object ThemesCRUD extends Controller {
+object Config extends Controller {
 
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
-  def themes(id: String) = admin.themes(id)
-  def deleteThemeCB(id: String) = admin.deleteThemeCB(id)
-  def createThemeCB = admin.createThemeCB
+  def config(sectionName: String) = admin.config(sectionName)
+  def configUpdate(sectionName: String) = admin.configUpdate(sectionName)
 
 }
 

@@ -3,34 +3,38 @@
 # ~~~~
 
 # Home page
-GET     /                           	controllers.web.rest.Application.index
+GET     /                           		controllers.web.rest.Application.index
 
 # WS Auth
-POST	/rest/loginfb					controllers.web.rest.LoginWS.loginfb
+POST	/rest/loginfb						controllers.web.rest.LoginWS.loginfb
 
 #this is temp one, remove it later.
-POST	/rest/getname					controllers.web.rest.ProfileWS.getName
+POST	/rest/getname						controllers.web.rest.ProfileWS.getName
 
 # Admin
-GET		/admin							controllers.web.admin.AdminApp.index
+GET		/admin								controllers.web.admin.AdminApp.index
 
-GET		/themes							controllers.web.admin.ThemesCRUD.themes(id = "")
-GET		/themes/:id						controllers.web.admin.ThemesCRUD.themes(id)
-POST	/createTheme					controllers.web.admin.ThemesCRUD.createThemeCB
-GET		/deleteTheme/:id				controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
+GET		/admin/themes						controllers.web.admin.ThemesCRUD.themes(id = "")
+GET		/admin/themes/byid/:id				controllers.web.admin.ThemesCRUD.themes(id)
+POST	/admin/themes/createTheme			controllers.web.admin.ThemesCRUD.createThemeCB
+GET		/admin/themes/deleteTheme/:id		controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
+
+GET		/admin/config						controllers.web.admin.Config.config(name = "")
+GET		/admin/config/byname/:name			controllers.web.admin.Config.config(name)
+POST	/admin/config/configUpdate/:name	controllers.web.admin.Config.configUpdate(name)
 
 
 # Test client auth
-GET     /testclient                 	controllers.web.testclient.Client.index
-GET     /testclient/loginfb           	controllers.web.testclient.Client.loginfb
+GET     /testclient                 		controllers.web.testclient.Client.index
+GET     /testclient/loginfb           		controllers.web.testclient.Client.loginfb
 
-POST	/testclient/loginfbTarget		controllers.web.testclient.Client.loginfbTarget
+POST	/testclient/loginfbTarget			controllers.web.testclient.Client.loginfbTarget
 
 # Test client main app
-GET     /testclient/main            	controllers.web.testclient.App.main
+GET     /testclient/main            		controllers.web.testclient.App.main
 
 
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /assets/*file               		controllers.Assets.at(path="/public", file)

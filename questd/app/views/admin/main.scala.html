@@ -1,4 +1,4 @@
-@(title: String)(menuItems: Map[String, String])(content: Html)
+@(title: String)(menuItems: Map[String, String], leftMenuItems: Map[String, String])(content: Html)
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -24,33 +24,25 @@
             </ul>
         </div>
         
-        <!--div id="leftmenu">
-
-        	<div id="leftmenu_top"></div>
-
-			<div id="leftmenu_main">    
-                
-                <h3>Links</h3>
-                        
-                <ul>
-                    <li><a href="#">SEO</a></li>
-                    <li><a href="#">PHP</a></li>
-                    <li><a href="#">Ajax</a></li>
-                    <li><a href="#">jQuery</a></li>
-                    <li><a href="#">Web design</a></li>
-                    <li><a href="#">Web Programming</a></li>
-                    <li><a href="#">Content Creation</a></li>
-                    <li><a href="#">Internet Marketing</a></li>
-                    <li><a href="#">XHTML Templates</a></li>
-                </ul>
-			</div>
-                
-                
-            <div id="leftmenu_bottom"></div>
-        </div-->
-        
-        
-        
+        @if(leftMenuItems.size > 0) {
+	        <div id="leftmenu">
+	
+	        	<div id="leftmenu_top"></div>
+	
+				<div id="leftmenu_main">    
+	                
+	                <h3>Submenu</h3>
+	                        
+	                <ul>
+                       	@for((name, url) <- leftMenuItems) {
+                        	<li><a href="@url">@name</a></li>
+		            	}
+	                </ul>
+				</div>
+	                
+	            <div id="leftmenu_bottom"></div>
+	        </div>
+        }
         
 		<div id="content">
         

@@ -11,42 +11,45 @@ import controllers.domain.helpers.exceptionwrappers._
 
 import components._
 
-
 case class GetConfigSectionRequest(name: String)
 case class GetConfigSectionResult(section: Option[ConfigSection])
 
-case class SetConfigSectionRequest(section: ConfigSection) 
-case class SetConfigSectionResult() 
+case class SetConfigSectionRequest(section: ConfigSection)
+case class SetConfigSectionResult()
 
+case class GetConfigurationRequest()
+case class GetConfigurationResult(config: Configuration)
 
-private [domain] trait ConfigAdminAPI { this: DBAccessor => 
+private[domain] trait ConfigAdminAPI { this: DBAccessor =>
 
   @volatile var config: Configuration = null
-  
-  private def readConfigFromDB(): Unit = {
-    config = db.config.readConfig
-    
-    Logger.error("reading " + config.toString)
-  }
-  
+
   private def storeConfigInDB(section: ConfigSection): Unit = {
-
     db.config.upsertSection(section)
-    
-    Logger.error("saving " + config.toString)
 
-    readConfigFromDB()
+    config = db.config.readConfig
   }
   
+  private def checkInit(): Unit = {
+    if (config == null)
+      config = db.config.readConfig
+  }
+
   /**
    * Get config section by its name.
    */
   def getConfigSection(request: GetConfigSectionRequest): ApiResult[GetConfigSectionResult] = handleDbException {
-    
-    if (config == null)
-      readConfigFromDB()
-    
+    checkInit()
+
     OkApiResult(Some(GetConfigSectionResult(config(request.name))))
+  }
+
+  /**
+   * Get entire configuration.
+   */
+  def getConfiguration(request: GetConfigurationRequest): ApiResult[GetConfigurationResult] = handleDbException {
+    checkInit()
+    OkApiResult(Some(GetConfigurationResult(config)))
   }
 
   /**
@@ -54,22 +57,10 @@ private [domain] trait ConfigAdminAPI { this: DBAccessor =>
    */
   def setConfigSection(request: SetConfigSectionRequest) = handleDbException {
     storeConfigInDB(request.section)
-    
+
     OkApiResult(Some(SetConfigSectionResult))
   }
-  
-  /*
 
-  /**
-   * List all themes
-   */
-  def allThemes: ApiResult[AllThemesResult] = handleDbException {
-    Logger.debug("Admin request for all themes.")
-
-    OkApiResult(Some(AllThemesResult(db.theme.allThemes)))
-  }
-
-*/
 }
 
 

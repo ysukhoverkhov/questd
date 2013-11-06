@@ -3,7 +3,7 @@
 @import helper._
 <!-- @inputText(newThemeForm("id")) -->
 
-@main("Themes")(menuItems) {
+@main("Themes")(menuItems, Map()) {
 
 	<p>
 		@form(action = controllers.web.admin.routes.ThemesCRUD.createThemeCB()) {
