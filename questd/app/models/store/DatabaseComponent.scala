@@ -12,6 +12,7 @@ trait DatabaseComponent {
   trait Database {
     val user: UserDAO
     val theme: ThemeDAO 
+    val config: ConfigDAO
   }
 
 }

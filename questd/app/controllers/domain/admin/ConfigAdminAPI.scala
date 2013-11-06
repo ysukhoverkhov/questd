@@ -18,28 +18,21 @@ case class GetConfigSectionResult(section: Option[ConfigSection])
 case class SetConfigSectionRequest(section: ConfigSection) 
 case class SetConfigSectionResult() 
 
-//case class AllThemesResult(themes: List[Theme])
-//
-
 
 private [domain] trait ConfigAdminAPI { this: DBAccessor => 
 
   @volatile var config: Configuration = null
   
   private def readConfigFromDB(): Unit = {
-    
-    // TODO implement me (remove the if).
-    if (config == null)
-    config = Configuration(Map())
+    config = db.config.readConfig
     
     Logger.error("reading " + config.toString)
   }
   
-  private def storeConfigInDB(newConfig: Configuration): Unit = {
-    
-    // TODO implement me. (do not modify local variable, just store new values in db.)
-    config = newConfig
+  private def storeConfigInDB(section: ConfigSection): Unit = {
 
+    db.config.upsertSection(section)
+    
     Logger.error("saving " + config.toString)
 
     readConfigFromDB()
@@ -56,9 +49,11 @@ private [domain] trait ConfigAdminAPI { this: DBAccessor =>
     OkApiResult(Some(GetConfigSectionResult(config(request.name))))
   }
 
+  /**
+   * Update config section
+   */
   def setConfigSection(request: SetConfigSectionRequest) = handleDbException {
-    val newConfig = config.replaceSection(request.section)
-    storeConfigInDB(newConfig)
+    storeConfigInDB(request.section)
     
     OkApiResult(Some(SetConfigSectionResult))
   }
