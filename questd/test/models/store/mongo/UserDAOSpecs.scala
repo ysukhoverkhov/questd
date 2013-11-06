@@ -20,7 +20,7 @@ class UserDAOSpecs extends Specification
     "Create new User in DB and find it by userid" in new WithApplication(appWithTestDatabase) {
       val userid = "lalala"
       db.user.createUser(User(userid))
-      val u = db.user.readUserByID(User(userid))
+      val u = db.user.readUserByID(userid)
       u must beSome.which((u: User) => u.id.toString == userid)
     }
 
@@ -56,7 +56,7 @@ class UserDAOSpecs extends Specification
 
       val newsessid = "very new session id"
       db.user.updateUser(u1unlifted.replaceSessionID(newsessid))
-      val u2 = db.user.readUserByID(u1unlifted)
+      val u2 = db.user.readUserByID(u1unlifted.id)
 
       u1 must beSome.which((u: User) => u.id.toString == id) and
         beSome.which((u: User) => u.fbid == None) and
@@ -70,9 +70,9 @@ class UserDAOSpecs extends Specification
       val userid = "id to test delete"
 
       db.user.createUser(User(userid))
-      db.user.readUserByID(User(userid))
-      db.user.deleteUser(User(userid))
-      val u = db.user.readUserByID(User(userid))
+      db.user.readUserByID(userid)
+      db.user.deleteUser(userid)
+      val u = db.user.readUserByID(userid)
 
       u must beNone
     }
@@ -87,7 +87,7 @@ class UserDAOSpecs extends Specification
     }
 
     "One more check for listing and deleting everything" in new WithApplication(appWithTestDatabase) {
-      db.user.allUsers.foreach(db.user.deleteUser(_))
+      db.user.allUsers.foreach((u: User) => db.user.deleteUser(u.id))
 
       val all = db.user.allUsers
 
@@ -95,7 +95,7 @@ class UserDAOSpecs extends Specification
     }
 
     "Delete user what do not exists" in new WithApplication(appWithTestDatabase) {
-      db.user.deleteUser(User("Id of user who never existed in the database"))
+      db.user.deleteUser("Id of user who never existed in the database")
 
     }
 
@@ -106,5 +106,30 @@ class UserDAOSpecs extends Specification
 
   }
 
+}
+
+/**
+ * Spec with another component setup for testing 
+ */
+class UserDAOFailSpecs extends Specification
+  with MongoDatabaseForTestComponent {
+
+  def testMongoDatabase(name: String = "default"): Map[String, String] = {
+    val dbname: String = "questdb-test"
+    Map(
+      ("mongodb." + name + ".db" -> dbname))
+  }
+  val appWithTestDatabase = FakeApplication(additionalConfiguration = testMongoDatabase())
+
+  /*
+   * Initializing components. It's lazy to let app start first and bring up db driver.
+   */
+  lazy val db = new MongoDatabaseForTest
+
+  "Mongo User DAO" should {
+    "Throw StoreException in case of underlaying error" in new WithApplication(appWithTestDatabase) {
+      db.user.createUser(User("tutumc")) must throwA[DatabaseException] 
+    }
+  }
 }
 

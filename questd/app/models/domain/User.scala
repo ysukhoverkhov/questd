@@ -7,7 +7,8 @@ import models.domain.profile._
 
 object user {
 
-  implicit def stringToUserID(stringId: String): UserID = { UserID(stringId) }
+  implicit def string2UserID(stringId: String): UserID = UserID(stringId)
+  implicit def UserID2String(id: UserID): String = id.toString
 
   case class UserID(id: String) extends BaseID[String]
   object UserID {

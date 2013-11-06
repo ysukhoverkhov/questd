@@ -35,9 +35,10 @@ private[mongo] case class ThemeDB(
 private[mongo] class MongoThemeDAO
   extends ThemeDAO
   with ModelCompanion[ThemeDB, ObjectId]
-  with BaseMongoDAO[ThemeDB] {
+  with BaseMongoDAO[ThemeDB, String] {
 
   val dao = new SalatDAO[ThemeDB, ObjectId](collection = mongoCollection("themes")) {}
+  protected final val keyFieldName = "id"
 
   /**
    * Conversion from domain object  to db object
@@ -59,22 +60,22 @@ private[mongo] class MongoThemeDAO
   /**
    * Create
    */
-  def createTheme(u: Theme): Unit = create(u)
+  def createTheme(o: Theme): Unit = create(o)
 
   /**
    * Read by id
    */
-  def readThemeByID(t: Theme): Option[Theme] = read(ThemeDB(Some(t.id.toString)))
+  def readThemeByID(key: ThemeID): Option[Theme] = read(key)
 
   /**
    * Update by id.
    */
-  def updateTheme(u: Theme): Unit = update(ThemeDB(Some(u.id.toString)), u)
+  def updateTheme(u: Theme): Unit = update(u.id, u)
 
   /**
    * Delete by id
    */
-  def deleteTheme(u: Theme): Unit = delete(ThemeDB(Some(u.id.toString)))
+    def deleteTheme(key: ThemeID): Unit = delete(key)
 
   /**
    * All objects

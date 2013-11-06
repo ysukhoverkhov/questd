@@ -66,7 +66,7 @@ private [domain] trait ThemesAdminAPI { this: DBAccessor =>
   def getTheme(request: GetThemeRequest): ApiResult[GetThemeResult] = handleDbException {
     Logger.debug("Admin request for create new theme.")
 
-    db.theme.readThemeByID(Theme(request.id)) match {
+    db.theme.readThemeByID(request.id) match {
       case Some(r) => OkApiResult(Some(GetThemeResult(r)))
       case None => NotFoundApiResult(None)
     }
@@ -80,7 +80,7 @@ private [domain] trait ThemesAdminAPI { this: DBAccessor =>
   def deleteTheme(request: DeleteThemeRequest): ApiResult[DeleteThemeResult] = handleDbException {
     Logger.debug("Admin request for delete theme " + request.id.toString)
 
-    db.theme.deleteTheme(Theme(request.id))
+    db.theme.deleteTheme(request.id)
     
     OkApiResult(Some(DeleteThemeResult()))
   }

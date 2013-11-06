@@ -35,9 +35,10 @@ private[mongo] case class UserDB(
 private[mongo] class MongoUserDAO
   extends UserDAO
   with ModelCompanion[UserDB, ObjectId]
-  with BaseMongoDAO[UserDB] {
+  with BaseMongoDAO[UserDB, String] {
 
   val dao = new SalatDAO[UserDB, ObjectId](collection = mongoCollection("users")) {}
+  protected final val keyFieldName = "userid"
 
   /**
    * Conversion from domain object  to db object
@@ -75,27 +76,27 @@ private[mongo] class MongoUserDAO
   /**
    * Read by userid
    */
-  def readUserByID(u: User): Option[User] = read(UserDB(Some(u.id.toString)))
+  def readUserByID(key: UserID): Option[User] = read(key)
 
   /**
    * Read by session id
    */
   def readUserBySessionID(sessid: SessionID): Option[User] = {
-    read(UserDB(None, None, Some(sessid.toString)))
+    readByExample(UserDB(None, None, Some(sessid.toString)))
   }
 
   /**
    * Read by fb id
    */
   def readUserByFBid(fbid: String): Option[User] = {
-    read(UserDB(None, Some(fbid), None))
+    readByExample(UserDB(None, Some(fbid), None))
   }
 
   /**
    * Update by userid.
    */
   def updateUser(u: User): Unit = {
-    update(UserDB(Some(u.id.toString)), u)
+    update(u.id, u)
 
     Logger.debug("User update in db successfuly " + u.toString)
   }
@@ -103,7 +104,7 @@ private[mongo] class MongoUserDAO
   /**
    * Delete by userid
    */
-  def deleteUser(u: User): Unit = delete(UserDB(Some(u.id.toString)))
+  def deleteUser(key: UserID): Unit = delete(key)
 
   /**
    * All objects

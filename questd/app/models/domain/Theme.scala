@@ -7,7 +7,8 @@ import models.domain.profile._
 
 object theme {
 
-  implicit def stringToID(stringId: String): ThemeID = { ThemeID(stringId) }
+  implicit def string2ID(stringId: String): ThemeID = ThemeID(stringId)
+  implicit def ID2String(id: ThemeID): String = id.toString
 
   case class ThemeID(id: String) extends BaseID[String]
   object ThemeID {

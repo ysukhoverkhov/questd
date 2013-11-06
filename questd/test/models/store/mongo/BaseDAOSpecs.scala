@@ -17,3 +17,4 @@ trait BaseDAOSpecs { this: MongoDatabaseComponent =>
   lazy val db = new MongoDatabase
 
 }
+
