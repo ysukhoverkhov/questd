@@ -13,11 +13,15 @@ import controllers.domain._
 import controllers.domain.user._
 import components._
 
-trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
+object SecurityWSImpl {
+  val SessionIdKey = "sessionid"
+}
 
+trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
+  
   // Store Auth Info
   def storeAuthInfoInResult(result: SimpleResult, loginResult: LoginFBResult) = {
-    result.withSession(SessionIdKey -> loginResult.session.toString)
+    result.withSession(SecurityWSImpl.SessionIdKey -> loginResult.session.toString)
   }
 
   // Configure Authorized check 
@@ -25,7 +29,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
 
   object Authenticated extends ActionBuilder[AuthenticatedRequest] {
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
-      request.session.get(SessionIdKey) match { 
+      request.session.get(SecurityWSImpl.SessionIdKey) match { 
         
         case Some(sessionid: String) => {
           Future {
