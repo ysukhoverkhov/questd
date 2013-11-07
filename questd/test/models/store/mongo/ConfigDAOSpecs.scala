@@ -9,7 +9,7 @@ import play.api.test._
 import play.api.test.Helpers._
 import play.Logger
 import models.store._
-import models.domain._
+import models.domain.admin._
 import com.mongodb.casbah.commons.MongoDBObject
 
 //@RunWith(classOf[JUnitRunner])

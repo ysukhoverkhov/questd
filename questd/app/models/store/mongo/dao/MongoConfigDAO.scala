@@ -18,6 +18,7 @@ import models.store.mongo.helpers._
 import models.store.dao._
 import models.store._
 import models.domain._
+import models.domain.admin._
 import com.mongodb.casbah.commons.MongoDBObject
 
 /**

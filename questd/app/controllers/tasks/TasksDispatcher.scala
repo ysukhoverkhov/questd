@@ -12,6 +12,7 @@ import play.api.Play.current
 import helpers.akka.EasyRestartActor
 import controllers.tasks.messages.DoTask
 import models.domain._
+import models.domain.admin._
 
 object TasksDispatcher {
   def props(config: ConfigSection) = Props(classOf[TasksDispatcher], config) 

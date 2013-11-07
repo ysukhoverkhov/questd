@@ -1,4 +1,4 @@
-package models.domain
+package models.domain.admin
 
 case class Configuration(
   private val _sections: Map[String, ConfigSection]) {

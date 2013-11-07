@@ -8,7 +8,7 @@ import play.api.libs.ws._
 import play.api.libs.json._
 import components.APIAccessor
 import controllers.domain._
-import models.domain._
+import models.domain.admin._
 import controllers.domain.admin._
 
 trait ConfigImpl extends Controller { this: APIAccessor =>

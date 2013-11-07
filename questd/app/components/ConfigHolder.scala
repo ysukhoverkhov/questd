@@ -1,6 +1,6 @@
 package components
 
-import models.domain._
+import models.domain.admin._
 import controllers.domain._
 import controllers.domain.admin._
 

@@ -5,10 +5,10 @@ import play.Logger
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
 import controllers.tasks.crawlers._
-import components.ConfigHolder
-import models.domain._
-import components.APIAccessor
 import controllers.domain.DomainAPIComponent
+import components._
+import models.domain._
+import models.domain.admin._
 
 trait TasksComponent { component: DomainAPIComponent =>
 
