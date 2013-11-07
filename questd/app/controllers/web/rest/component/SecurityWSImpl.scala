@@ -7,7 +7,7 @@ import play.api._
 import play.api.mvc._
 import play.api.mvc.Security._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import models.domain.user._
+import models.domain._
 import controllers.web.rest.component.helpers._
 import controllers.domain._
 import controllers.domain.user._

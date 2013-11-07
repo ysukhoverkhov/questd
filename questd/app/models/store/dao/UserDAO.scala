@@ -1,6 +1,6 @@
 package models.store.dao
 
-import models.domain.user._
+import models.domain._
 
 trait UserDAO {
 

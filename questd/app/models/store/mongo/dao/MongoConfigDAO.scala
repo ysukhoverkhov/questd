@@ -17,7 +17,7 @@ import models.store.mongo.SalatContext._
 import models.store.mongo.helpers._
 import models.store.dao._
 import models.store._
-import models.domain.config._
+import models.domain._
 import com.mongodb.casbah.commons.MongoDBObject
 
 /**

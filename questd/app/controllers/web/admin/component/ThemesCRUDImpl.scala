@@ -6,7 +6,8 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.ws._
 import play.api.libs.json._
-import models.domain.theme._
+
+import models.domain._
 import controllers.domain._
 import controllers.domain.admin._
 import components._

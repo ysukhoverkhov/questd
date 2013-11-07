@@ -6,7 +6,7 @@ import play.api.libs.concurrent.Akka
 import play.api.Play.current
 import controllers.tasks.crawlers._
 import components.ConfigHolder
-import models.domain.config._
+import models.domain._
 import components.APIAccessor
 import controllers.domain.DomainAPIComponent
 

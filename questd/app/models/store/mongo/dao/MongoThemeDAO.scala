@@ -19,7 +19,7 @@ import models.store.mongo.helpers._
 import models.store.dao._
 import models.store._
 
-import models.domain.theme._
+import models.domain._
 
 /**
  * This class is representing user form the database.

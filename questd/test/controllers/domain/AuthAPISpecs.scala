@@ -12,9 +12,8 @@ import controllers.domain._
 import controllers.domain.user._
 
 import models.store._
-import models.domain.user._
+import models.domain._
 import models.store.mongo._
-import models.domain.profile._
 import models.store.dao.UserDAO
 
 

@@ -14,9 +14,8 @@ import controllers.domain.user._
 import controllers.domain.libs.facebook._
 import controllers.web.rest.component._
 import models.store._
-import models.domain.user._
+import models.domain._
 import models.store.mongo._
-import models.domain.profile._
 import com.restfb.exception.FacebookOAuthException
 import com.restfb.exception.FacebookNetworkException
 

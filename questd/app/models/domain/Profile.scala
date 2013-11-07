@@ -1,12 +1,8 @@
 package models.domain
 
-object profile {
-  
-  case class Profile()
+case class Profile()
 
-  object Profile {
-    val default = Profile()
-  }
-  
+object Profile {
+  val default = Profile()
 }
 

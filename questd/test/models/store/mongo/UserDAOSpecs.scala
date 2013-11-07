@@ -8,7 +8,7 @@ import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
 import models.store._
-import models.domain.user._
+import models.domain._
 import play.Logger
 
 //@RunWith(classOf[JUnitRunner])

@@ -1,6 +1,6 @@
 package models.store.dao
 
-import models.domain.theme._
+import models.domain._
 
 private[store] trait ThemeDAO {
 

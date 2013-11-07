@@ -1,36 +1,27 @@
 package models.domain
 
-import scala.language.implicitConversions
-
 import models.domain.base._
-import models.domain.profile._
 
-object theme {
+case class ThemeID(id: String) extends BaseID[String]
+object ThemeID {
+  val default = ThemeID("")
+}
 
-  implicit def string2ID(stringId: String): ThemeID = ThemeID(stringId)
-  implicit def ID2String(id: ThemeID): String = id.toString
+case class Theme(
+  val id: ThemeID,
+  val text: String,
+  val comment: String) {
 
-  case class ThemeID(id: String) extends BaseID[String]
-  object ThemeID {
-    val default = ThemeID("")
+  def replaceID(newID: ThemeID) = {
+    Theme(newID, text, comment)
   }
+}
 
-  case class Theme(
-    val id: ThemeID,
-    val text: String,
-    val comment: String) {
-
-    def replaceID(newID: ThemeID) = {
-      Theme(newID, text, comment)
-    }
-  }
-
-  object Theme {
-    def apply(id: ThemeID): Theme = {
-      Theme(id, "", "")
-    }
-
+object Theme {
+  def apply(id: ThemeID): Theme = {
+    Theme(id, "", "")
   }
 
 }
+
 

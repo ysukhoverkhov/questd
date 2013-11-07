@@ -9,20 +9,27 @@ import controllers.domain._
 import components._
 
 
-case class LoginFBParams(fbid: String)
-case class LoginFBResult(session: SessionID)
+case class GetNextQuestPurchaseCostRequest()
+case class GetNextQuestPurchaseCostResult()
 
-case class UserParams(sessionID: SessionID)
-case class UserResult(user: User)
+case class PurchaseQuestThemeRequest()
+case class PurchaseQuestThemeResult()
+
+//case class LoginFBParams(fbid: String)
+//case class LoginFBResult(session: SessionID)
+//
+//case class UserParams(sessionID: SessionID)
+//case class UserResult(user: User)
 
 
-private [domain] trait AuthAPI { this: DBAccessor => 
+private [domain] trait ProposeQuestAPI { this: DBAccessor => 
 
-
+/*
   /**
-   * Login with FB. Or create new one if it doesn't exists.
+   * Purchase quest theme. Check for all conditions are meat.
+   * Returns purchased quest theme.
    */
-  def loginfb(params: LoginFBParams): ApiResult[LoginFBResult] = handleDbException {
+  def purchaseQuestTheme(params: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
 
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString()
@@ -81,7 +88,7 @@ private [domain] trait AuthAPI { this: DBAccessor =>
         Some(UserResult(user)))
     }
   }
-
+*/
 }
 
 
