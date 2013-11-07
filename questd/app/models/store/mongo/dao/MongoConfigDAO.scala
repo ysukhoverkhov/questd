@@ -24,6 +24,7 @@ import com.mongodb.casbah.commons.MongoDBObject
 /**
  * This class is representing user form the database.
  */
+// TODO REFACTOR: remove me
 private[mongo] case class ConfigSectionDB(
   name: Option[String],
   values: Map[String, String] = Map())
@@ -34,7 +35,7 @@ private[mongo] case class ConfigSectionDB(
 private[mongo] class MongoConfigDAO
   extends ConfigDAO
   with ModelCompanion[ConfigSectionDB, ObjectId]
-  with BaseMongoDAO[ConfigSectionDB, String] {
+  with BaseMongoDAO[ConfigSectionDB] {
 
   val dao = new SalatDAO[ConfigSectionDB, ObjectId](collection = mongoCollection("configs")) {}
   final protected val keyFieldName = "name"

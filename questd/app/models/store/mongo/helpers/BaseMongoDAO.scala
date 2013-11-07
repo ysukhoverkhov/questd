@@ -8,12 +8,16 @@ import play.Logger
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
 
-trait BaseMongoDAO[T <: AnyRef, K <: AnyRef] { this: ModelCompanion[T, ObjectId] =>
+trait BaseMongoDAO[T <: AnyRef] { this: ModelCompanion[T, ObjectId] =>
 
   protected def keyFieldName: String
 
-  private def makeKeyDbObject(key: K): DBObject = {
+  private def makeKeyDbObject(key: String): DBObject = {
     MongoDBObject(keyFieldName -> key)
+  }
+
+  private def makeKeyDbObject(fieldName: String, key: String): DBObject = {
+    MongoDBObject(fieldName -> key)
   }
 
   /**
@@ -30,7 +34,7 @@ trait BaseMongoDAO[T <: AnyRef, K <: AnyRef] { this: ModelCompanion[T, ObjectId]
   /**
    * Searches for object by query object.
    */
-  def read[R](key: K)(implicit view: T => R): Option[R] = wrapMongoException {
+  def read[R](key: String)(implicit view: T => R): Option[R] = wrapMongoException {
     findOne(makeKeyDbObject(key)) match {
       case None => None
       case Some(r) => Some(view(r))
@@ -40,8 +44,8 @@ trait BaseMongoDAO[T <: AnyRef, K <: AnyRef] { this: ModelCompanion[T, ObjectId]
   /**
    * Searches for object by query object.
    */
-  def readByExample[R](q: T)(implicit view: T => R): Option[R] = wrapMongoException {
-    findOne(toDBObject(q)) match {
+  def readByExample[R](fieldName: String, key: String)(implicit view: T => R): Option[R] = wrapMongoException {
+    findOne(makeKeyDbObject(fieldName, key)) match {
       case None => None
       case Some(r) => Some(view(r))
     }
@@ -50,14 +54,14 @@ trait BaseMongoDAO[T <: AnyRef, K <: AnyRef] { this: ModelCompanion[T, ObjectId]
   /**
    * Update object with new object
    */
-  def update(key: K, u: T): Unit = updateInt(key, u, false)
+  def update(key: String, u: T): Unit = updateInt(key, u, false)
 
   /**
    * Update object with new object
    */
-  def upsert(key: K, u: T): Unit = updateInt(key, u, true)
+  def upsert(key: String, u: T): Unit = updateInt(key, u, true)
 
-  private def updateInt(key: K, u: T, upsert: Boolean): Unit = wrapMongoException {
+  private def updateInt(key: String, u: T, upsert: Boolean): Unit = wrapMongoException {
     val wr = update(makeKeyDbObject(key), toDBObject(u), upsert, false)
 
     if (!wr.getLastError().ok) {
@@ -68,7 +72,7 @@ trait BaseMongoDAO[T <: AnyRef, K <: AnyRef] { this: ModelCompanion[T, ObjectId]
   /**
    * Delete object
    */
-  def delete(key: K): Unit = wrapMongoException {
+  def delete(key: String): Unit = wrapMongoException {
     val wr = remove(makeKeyDbObject(key))
 
     if (!wr.getLastError().ok) {

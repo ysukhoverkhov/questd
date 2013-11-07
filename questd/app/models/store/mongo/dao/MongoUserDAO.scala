@@ -22,51 +22,16 @@ import models.store._
 import models.domain._
 
 /**
- * This class is representing user form the database.
- */
-private[mongo] case class UserDB(
-  userid: Option[String] = None,
-  fbid: Option[String] = None,
-  session: Option[String] = None)
-
-/**
  * DOA for User objects
  */
 private[mongo] class MongoUserDAO
   extends UserDAO
-  with ModelCompanion[UserDB, ObjectId]
-  with BaseMongoDAO[UserDB, String] {
+  with ModelCompanion[User, ObjectId]
+  with BaseMongoDAO[User] {
 
-  val dao = new SalatDAO[UserDB, ObjectId](collection = mongoCollection("users")) {}
-  protected final val keyFieldName = "userid"
+  val dao = new SalatDAO[User, ObjectId](collection = mongoCollection("users")) {}
+  protected final val keyFieldName = "id.id"
 
-  /**
-   * Conversion from domain object  to db object
-   */
-  protected implicit def domainToDB(dom: User): UserDB = {
-    val sess = dom.session match {
-      case None => None
-      case Some(v) => Some(v.toString)
-    }
-
-    UserDB(Some(dom.id.toString()), dom.fbid, sess)
-  }
-
-  /**
-   * Conversion from db object to domain object
-   */
-  protected implicit def dbToDomain(db: UserDB): User = {
-    val ses = db.session match {
-      case None => None
-      case Some(s) => Some(SessionID(s))
-    }
-    val uid: UserID = db.userid match {
-      case None => UserID.default
-      case Some(s) => s
-    }
-
-    User(uid, db.fbid, ses)
-  }
 
   /**
    * Create
@@ -82,14 +47,14 @@ private[mongo] class MongoUserDAO
    * Read by session id
    */
   def readUserBySessionID(sessid: SessionID): Option[User] = {
-    readByExample(UserDB(None, None, Some(sessid.toString)))
+    readByExample("session.id", sessid)
   }
 
   /**
    * Read by fb id
    */
   def readUserByFBid(fbid: String): Option[User] = {
-    readByExample(UserDB(None, Some(fbid), None))
+    readByExample("fbid", fbid)
   }
 
   /**
@@ -109,7 +74,7 @@ private[mongo] class MongoUserDAO
   /**
    * All objects
    */
-  def allUsers: List[User] = all map { u => dbToDomain(u) }
+  def allUsers: List[User] = all 
 
 }
 
@@ -117,7 +82,7 @@ private[mongo] class MongoUserDAO
  * Test version of dao what fails al the time
  */
 class MongoUserDAOForTest extends MongoUserDAO {
-  override val dao = new SalatDAO[UserDB, ObjectId](collection = MongoConnection("localhost", 55555)("test_db")("test_coll")) {}
+  override val dao = new SalatDAO[User, ObjectId](collection = MongoConnection("localhost", 55555)("test_db")("test_coll")) {}
 
 }
 

@@ -24,6 +24,7 @@ import models.domain._
 /**
  * This class is representing user form the database.
  */
+// TODO REFACTOR: remove me
 private[mongo] case class ThemeDB(
   id: Option[String],
   text: Option[String] = None,
@@ -35,7 +36,7 @@ private[mongo] case class ThemeDB(
 private[mongo] class MongoThemeDAO
   extends ThemeDAO
   with ModelCompanion[ThemeDB, ObjectId]
-  with BaseMongoDAO[ThemeDB, String] {
+  with BaseMongoDAO[ThemeDB] {
 
   val dao = new SalatDAO[ThemeDB, ObjectId](collection = mongoCollection("themes")) {}
   protected final val keyFieldName = "id"
