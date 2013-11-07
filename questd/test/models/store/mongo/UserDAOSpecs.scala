@@ -27,7 +27,7 @@ class UserDAOSpecs extends Specification
     "Find user by FB id" in new WithApplication(appWithTestDatabase) {
       val fbid = "idid"
       val testsess = "session name"
-      db.user.createUser(User(testsess, fbid))
+      db.user.createUser(User(testsess, Some(fbid)))
       val u = db.user.readUserByFBid(fbid)
       u must beSome.which((u: User) => u.id.toString == testsess) and
         beSome.which((u: User) => u.fbid == fbid)

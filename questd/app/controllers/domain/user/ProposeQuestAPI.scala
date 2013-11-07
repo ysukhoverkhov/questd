@@ -9,73 +9,79 @@ import controllers.domain._
 import components._
 
 
-case class GetNextQuestPurchaseCostRequest()
-case class GetNextQuestPurchaseCostResult()
+case class GetQuestThemePurchaseCostRequest()
+case class GetQuestThemePurchaseCostResult(cost: Cost)
 
 case class PurchaseQuestThemeRequest()
 case class PurchaseQuestThemeResult()
 
-//case class LoginFBParams(fbid: String)
-//case class LoginFBResult(session: SessionID)
-//
-//case class UserParams(sessionID: SessionID)
-//case class UserResult(user: User)
+case class GetPurchasedQuestThemeRequest()
+case class GetPurchasedQuestThemeResult()
 
 
 private [domain] trait ProposeQuestAPI { this: DBAccessor => 
 
-/*
+
+  def getGetQuestThemePurchaseCost(request: GetQuestThemePurchaseCostRequest): ApiResult[GetQuestThemePurchaseCostResult] = handleDbException{
+    OkApiResult(Some(GetQuestThemePurchaseCostResult(Cost(0, 0, 0))))
+  }
+
+  def getPurchasedQuestTheme(request: GetPurchasedQuestThemeRequest): ApiResult[GetPurchasedQuestThemeRequest] = handleDbException{
+    OkApiResult(Some(GetPurchasedQuestThemeRequest()))
+  }
+
   /**
    * Purchase quest theme. Check for all conditions are meat.
    * Returns purchased quest theme.
    */
   def purchaseQuestTheme(params: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
 
-    def login(user: User) = {
-      val uuid = java.util.UUID.randomUUID().toString()
-      db.user.updateUser(user.replaceSessionID(uuid))
-
-      val a = List(1, 2)
-      a.foreach(print)
-
-      OkApiResult(Some(LoginFBResult(uuid)))
-    }
-
-    Logger.debug("Searching for user in database for login with fbid " + params.fbid)
-
-    db.user.readUserByFBid(params.fbid) match {
-      case None => {
-
-        Logger.debug("No user with FB id found, creating new one " + params.fbid)
-
-        val newUUID = java.util.UUID.randomUUID().toString()
-        val newUser = User(newUUID, params.fbid)
-        db.user.createUser(newUser)
-        db.user.readUserByFBid(params.fbid) match {
-
-          case None => {
-            Logger.error("Unable to find user just created in DB with fbid " + params.fbid)
-            InternalErrorApiResult(None)
-          }
-
-          case Some(user) => {
-
-            // TODO IMPLEMENT fill profile from fb here.
-
-            Logger.debug("New user with FB created " + user)
-
-            login(user)
-          }
-        }
-
-      }
-      case Some(user) => {
-        Logger.debug("Existing user login with FB " + user)
-        login(user)
-      }
-    }
+    OkApiResult(Some(PurchaseQuestThemeResult()))
+//    def login(user: User) = {
+//      val uuid = java.util.UUID.randomUUID().toString()
+//      db.user.updateUser(user.replaceSessionID(uuid))
+//
+//      val a = List(1, 2)
+//      a.foreach(print)
+//
+//      OkApiResult(Some(LoginFBResult(uuid)))
+//    }
+//
+//    Logger.debug("Searching for user in database for login with fbid " + params.fbid)
+//
+//    db.user.readUserByFBid(params.fbid) match {
+//      case None => {
+//
+//        Logger.debug("No user with FB id found, creating new one " + params.fbid)
+//
+//        val newUUID = java.util.UUID.randomUUID().toString()
+//        val newUser = User(newUUID, params.fbid)
+//        db.user.createUser(newUser)
+//        db.user.readUserByFBid(params.fbid) match {
+//
+//          case None => {
+//            Logger.error("Unable to find user just created in DB with fbid " + params.fbid)
+//            InternalErrorApiResult(None)
+//          }
+//
+//          case Some(user) => {
+//
+//            // TODO IMPLEMENT fill profile from fb here.
+//
+//            Logger.debug("New user with FB created " + user)
+//
+//            login(user)
+//          }
+//        }
+//
+//      }
+//      case Some(user) => {
+//        Logger.debug("Existing user login with FB " + user)
+//        login(user)
+//      }
+//    }
   }
-
+/*
   /**
    * User for session
    */
