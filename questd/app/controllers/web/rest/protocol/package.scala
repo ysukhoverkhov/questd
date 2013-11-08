@@ -2,8 +2,9 @@ package controllers.web.rest
 
 import play.api.libs.json._
 
-object protocol {
-  
+package object protocol {
+
+   
   /*
    * Payload in case of 401 error.
    */
@@ -35,6 +36,4 @@ object protocol {
     def writes(c: WSLoginFBResult): JsValue = Json.obj("sessionid" -> c.sessionid)
   }
   
-  
 }
-
