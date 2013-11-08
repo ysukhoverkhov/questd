@@ -1,6 +1,8 @@
+package controllers.web.rest.component
 
-package controllers.web.rest.component.helpers {
+package object helpers {
   
   trait QuestController extends InternalErrorLogger 
 
+  val Json = helpers._Json
 }

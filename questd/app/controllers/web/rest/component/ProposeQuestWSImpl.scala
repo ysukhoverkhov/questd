@@ -2,15 +2,14 @@ package controllers.web.rest.component
 
 import play.api._
 import play.api.mvc._
-import play.api.libs.json._
-import play.api.libs.json.Json._
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.domain.user._
 import controllers.domain._
-import controllers.web.rest.component.helpers.QuestController
+import controllers.web.rest.component.helpers._
 import controllers.web.rest.component._
 import controllers.web.rest.protocol._
+
 
 
 trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
@@ -19,10 +18,11 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl { this: WSC
     Future {
       api.getQuestThemeCost(GetQuestThemeCostRequest(request.user)) match {
         case OkApiResult(Some(r)) => {
-          Ok(toJson(r))
+          Ok(Json.write(r))
         }
 
-        case NotAuthorisedApiResult(_) => Unauthorized(toJson(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken)))
+        case NotAuthorisedApiResult(_) => Unauthorized(
+            Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken)))
 
         case _ => ServerError
       }
