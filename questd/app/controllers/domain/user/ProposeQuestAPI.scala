@@ -1,5 +1,7 @@
 package controllers.domain.user
 
+// TODO update to play 2.2.1
+
 import models.domain._
 import models.store._
 import play.Logger
@@ -8,95 +10,72 @@ import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 import components._
 import logic._
+import ProfileModificationResult._
 
 case class GetQuestThemePurchaseCostRequest(user: User)
-case class GetQuestThemePurchaseCostResult(cost: Cost)
+case class GetQuestThemePurchaseCostResult(allowed: ProfileModificationResult, cost: Cost = Cost(0, 0, 0))
 
-case class PurchaseQuestThemeRequest()
-case class PurchaseQuestThemeResult()
+case class PurchaseQuestThemeRequest(user: User)
+case class PurchaseQuestThemeResult(allowed: ProfileModificationResult, theme: Option[Theme] = None)
 
-case class GetPurchasedQuestThemeRequest()
-case class GetPurchasedQuestThemeResult()
+case class GetPurchasedQuestThemeRequest(user: User)
+case class GetPurchasedQuestThemeResult(theme: Option[Theme])
 
-private [domain] trait ProposeQuestAPI { this: DBAccessor => 
+// TODO IMPLEMENT store in profile all allowed actions so all of them will be requested with single call.
 
+private[domain] trait ProposeQuestAPI { this: DBAccessor =>
+
+  /**
+   * Get cost of next quest purchase.
+   */
   def getGetQuestThemePurchaseCost(request: GetQuestThemePurchaseCostRequest): ApiResult[GetQuestThemePurchaseCostResult] = handleDbException {
     import request._
-    
-    if (user.canPurchaseQuestProposals)
-      OkApiResult(Some(GetQuestThemePurchaseCostResult(user.costOfPurchasingQuestProposal)))
-    else
-      OkApiResult(Some(GetQuestThemePurchaseCostResult(Cost(0, 0, 0))))
+
+    user.canPurchaseQuestProposals match {
+      case OK => OkApiResult(Some(GetQuestThemePurchaseCostResult(OK, user.costOfPurchasingQuestProposal)))
+      case a => OkApiResult(Some(GetQuestThemePurchaseCostResult(a)))
+    }
   }
 
-  def getPurchasedQuestTheme(request: GetPurchasedQuestThemeRequest): ApiResult[GetPurchasedQuestThemeRequest] = handleDbException {
-    OkApiResult(Some(GetPurchasedQuestThemeRequest()))
+  /**
+   * Return currently purchased quest theme.
+   */
+  def getPurchasedQuestTheme(request: GetPurchasedQuestThemeRequest): ApiResult[GetPurchasedQuestThemeResult] = handleDbException {
+    import request._
+
+    OkApiResult(Some(GetPurchasedQuestThemeResult(user.questProposalContext.purchasedTheme)))
   }
 
   /**
    * Purchase quest theme. Check for all conditions are meat.
    * Returns purchased quest theme.
    */
-  def purchaseQuestTheme(params: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
+  def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
+    import request._
 
-    OkApiResult(Some(PurchaseQuestThemeResult()))
-//    def login(user: User) = {
-//      val uuid = java.util.UUID.randomUUID().toString()
-//      db.user.updateUser(user.replaceSessionID(uuid))
-//
-//      val a = List(1, 2)
-//      a.foreach(print)
-//
-//      OkApiResult(Some(LoginFBResult(uuid)))
-//    }
-//
-//    Logger.debug("Searching for user in database for login with fbid " + params.fbid)
-//
-//    db.user.readUserByFBid(params.fbid) match {
-//      case None => {
-//
-//        Logger.debug("No user with FB id found, creating new one " + params.fbid)
-//
-//        val newUUID = java.util.UUID.randomUUID().toString()
-//        val newUser = User(newUUID, params.fbid)
-//        db.user.createUser(newUser)
-//        db.user.readUserByFBid(params.fbid) match {
-//
-//          case None => {
-//            Logger.error("Unable to find user just created in DB with fbid " + params.fbid)
-//            InternalErrorApiResult(None)
-//          }
-//
-//          case Some(user) => {
-//
-//
-//            Logger.debug("New user with FB created " + user)
-//
-//            login(user)
-//          }
-//        }
-//
-//      }
-//      case Some(user) => {
-//        Logger.debug("Existing user login with FB " + user)
-//        login(user)
-//      }
-//    }
-  }
-/*
-  /**
-   * User for session
-   */
-  def user(params: UserParams): ApiResult[UserResult] = handleDbException {
+    user.canPurchaseQuestProposals match {
+      case OK => {
 
-    db.user.readUserBySessionID(params.sessionID) match {
-      case None => NotAuthorisedApiResult(None)
+        val t = user.getRandomThemeForQuestProposal
+        val themeCost = user.costOfPurchasingQuestProposal
 
-      case Some(user: User) => OkApiResult(
-        Some(UserResult(user)))
+        {
+          // TODO store money here.
+          db.user.updateUser {
+            user.copy(questProposalContext = user.questProposalContext.copy(
+              numberOfPurchasedThemes = user.questProposalContext.numberOfPurchasedThemes + 1,
+              purchasedTheme = Some(t)))
+
+          }
+        }
+
+        OkApiResult(Some(PurchaseQuestThemeResult(OK, Some(t))))
+
+      }
+      case a => OkApiResult(Some(PurchaseQuestThemeResult(a)))
     }
   }
-*/
+
 }
 
 
