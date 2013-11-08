@@ -1,7 +1,7 @@
 package logic
 
 import models.domain._
-import controllers.domain.user.ProfileModificationResult._
+import controllers.domain.user.protocol.ProfileModificationResult._
 import models.domain.Theme
 
 // TODO think how to pass db here.

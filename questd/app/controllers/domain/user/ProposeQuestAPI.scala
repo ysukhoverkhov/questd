@@ -10,30 +10,31 @@ import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 import components._
 import logic._
-import ProfileModificationResult._
+import protocol.ProfileModificationResult._
 
-case class GetQuestThemePurchaseCostRequest(user: User)
-case class GetQuestThemePurchaseCostResult(allowed: ProfileModificationResult, cost: Cost = Cost(0, 0, 0))
-
-case class PurchaseQuestThemeRequest(user: User)
-case class PurchaseQuestThemeResult(allowed: ProfileModificationResult, theme: Option[Theme] = None)
+case class GetQuestThemeCostRequest(user: User)
+case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Cost = Cost(0, 0, 0))
 
 case class GetPurchasedQuestThemeRequest(user: User)
 case class GetPurchasedQuestThemeResult(theme: Option[Theme])
 
-// TODO IMPLEMENT store in profile all allowed actions so all of them will be requested with single call.
+case class PurchaseQuestThemeRequest(user: User)
+case class PurchaseQuestThemeResult(allowed: ProfileModificationResult, theme: Option[Theme] = None)
+
+
+// TODO IMPLEMENT store in profile all allowed actions so all of them will be requested with single call to profile.
 
 private[domain] trait ProposeQuestAPI { this: DBAccessor =>
 
   /**
    * Get cost of next quest purchase.
    */
-  def getGetQuestThemePurchaseCost(request: GetQuestThemePurchaseCostRequest): ApiResult[GetQuestThemePurchaseCostResult] = handleDbException {
+  def getQuestThemeCost(request: GetQuestThemeCostRequest): ApiResult[GetQuestThemeCostResult] = handleDbException {
     import request._
 
     user.canPurchaseQuestProposals match {
-      case OK => OkApiResult(Some(GetQuestThemePurchaseCostResult(OK, user.costOfPurchasingQuestProposal)))
-      case a => OkApiResult(Some(GetQuestThemePurchaseCostResult(a)))
+      case OK => OkApiResult(Some(GetQuestThemeCostResult(OK, user.costOfPurchasingQuestProposal)))
+      case a => OkApiResult(Some(GetQuestThemeCostResult(a)))
     }
   }
 

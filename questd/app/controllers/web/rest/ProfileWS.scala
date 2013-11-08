@@ -2,16 +2,12 @@ package controllers.web.rest
 
 import play.api._
 import play.api.mvc._
-
-import controllers.web.rest.component.WSComponent
-import components.componentregistry.ComponentRegistrySingleton
+import controllers.web.rest.component.helpers.AccessToWSInstance
 
 
-object ProfileWS extends Controller {
+object ProfileWS extends Controller with AccessToWSInstance {
 
-  val wsimpl: WSComponent#WS = ComponentRegistrySingleton.ws
-
-  def getName = wsimpl.getName
+  def getName = ws.getName
 
 }
 

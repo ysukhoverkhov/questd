@@ -10,7 +10,8 @@ trait WSComponent { component: DomainAPIComponent with FacebookComponent =>
 
   class WS
     extends LoginWSImpl
-    with ProfileWSImpl 
+    with ProfileWSImpl
+    with ProposeQuestWSImpl
     with FBAccessor
     with APIAccessor {
 
