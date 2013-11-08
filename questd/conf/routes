@@ -5,13 +5,18 @@
 # Home page
 GET     /                           		controllers.web.rest.Application.index
 
+#######################
+# WS
+#######################
 # WS Auth
 POST	/rest/loginfb						controllers.web.rest.LoginWS.loginfb
 
-#this is temp one, remove it later.
+#TODO this is temp one, remove it later.
 POST	/rest/getname						controllers.web.rest.ProfileWS.getName
 
+#######################
 # Admin
+#######################
 GET		/admin								controllers.web.admin.AdminApp.index
 
 GET		/admin/themes						controllers.web.admin.ThemesCRUD.themes(id = "")
@@ -24,13 +29,14 @@ GET		/admin/config/byname/:name			controllers.web.admin.Config.config(name)
 POST	/admin/config/configUpdate/:name	controllers.web.admin.Config.configUpdate(name)
 
 
-# Test client auth
+#######################
+# Test client
+#######################
 GET     /testclient                 		controllers.web.testclient.Client.index
 GET     /testclient/loginfb           		controllers.web.testclient.Client.loginfb
 
 POST	/testclient/loginfbTarget			controllers.web.testclient.Client.loginfbTarget
 
-# Test client main app
 GET     /testclient/main            		controllers.web.testclient.App.main
 
 
