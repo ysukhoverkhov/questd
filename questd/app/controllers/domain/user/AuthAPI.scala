@@ -9,10 +9,10 @@ import controllers.domain._
 import components._
 
 
-case class LoginFBParams(fbid: String)
+case class LoginFBRequest(fbid: String)
 case class LoginFBResult(session: SessionID)
 
-case class UserParams(sessionID: SessionID)
+case class UserRequest(sessionID: SessionID)
 case class UserResult(user: User)
 
 
@@ -22,7 +22,7 @@ private [domain] trait AuthAPI { this: DBAccessor =>
   /**
    * Login with FB. Or create new one if it doesn't exists.
    */
-  def loginfb(params: LoginFBParams): ApiResult[LoginFBResult] = handleDbException {
+  def loginfb(params: LoginFBRequest): ApiResult[LoginFBResult] = handleDbException {
 
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString()
@@ -72,7 +72,7 @@ private [domain] trait AuthAPI { this: DBAccessor =>
   /**
    * User for session
    */
-  def user(params: UserParams): ApiResult[UserResult] = handleDbException {
+  def user(params: UserRequest): ApiResult[UserResult] = handleDbException {
 
     db.user.readUserBySessionID(params.sessionID) match {
       case None => NotAuthorisedApiResult(None)

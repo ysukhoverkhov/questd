@@ -4,6 +4,7 @@ import scala.concurrent.Future
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
+import play.api.libs.json.Json._
 import play.api.libs.functional.syntax._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.domain._
@@ -13,6 +14,7 @@ import controllers.domain.libs.facebook.UserFB
 import com.restfb.exception._
 import components._
 
+import controllers.web.rest.protocol._
 
 trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor with APIAccessor =>
 
@@ -28,7 +30,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
    */
   def loginfb = Action.async(parse.json) { implicit request =>
 
-      request.body.validate[Map[String, String]].map {
+      request.body.validate[WSLoginFBRequest].map {
         case params => {
           params.head match {
             case ("token", token: String) => {
@@ -38,7 +40,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
                 } catch {
                   case ex: FacebookOAuthException => {
                     Logger.debug("Facebook auth failed")
-                    (None, Some(Unauthorized("Facebook session expired")))
+                    (None, Some(Unauthorized(toJson(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken)))))
                   }
                   case ex: FacebookNetworkException => {
                     Logger.debug("Unable to connect to facebook")
@@ -48,11 +50,11 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
               } map { rv =>
                 rv match {
                   case (Some(user: UserFB), _) => {
-                    val params = LoginFBParams(user.getId())
+                    val params = LoginFBRequest(user.getId())
 
                     api.loginfb(params) match {
                       case OkApiResult(Some(loginResult: LoginFBResult)) =>
-                        storeAuthInfoInResult(Ok(loginResult.session.toString), loginResult)
+                        storeAuthInfoInResult(Ok(toJson(WSLoginFBResult(loginResult.session.toString))), loginResult)
                         
                       case _ => ServerError
                     }

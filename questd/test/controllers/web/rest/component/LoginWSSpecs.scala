@@ -44,7 +44,7 @@ class LoginWSSpecs extends Specification
       
       user.getId() returns fbid
       fb.fetchObject(facebookToken, "me", classOf[UserFB]) returns user
-      api.loginfb(LoginFBParams(fbid)) returns OkApiResult(Some(LoginFBResult(sessid)))
+      api.loginfb(LoginFBRequest(fbid)) returns OkApiResult(Some(LoginFBResult(sessid)))
 
       val data = Json.obj(
         "token" -> facebookToken)

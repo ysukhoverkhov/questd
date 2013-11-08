@@ -58,7 +58,7 @@ object Client extends Controller {
           .post(data)
           .map(result => {
             result.header(SET_COOKIE) match {
-              case Some(c: String) => Ok(result.body + "<br>" + result.status.toString).withHeaders(SET_COOKIE -> c)
+              case Some(c: String) => Ok(result.body + " " + result.status.toString).withHeaders(SET_COOKIE -> c)
               case _ => Ok(result.body + "<br>" + result.status.toString)
             }
 

@@ -7,9 +7,9 @@ import helpers._
 import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 import components._
+import logic._
 
-
-case class GetQuestThemePurchaseCostRequest()
+case class GetQuestThemePurchaseCostRequest(user: User)
 case class GetQuestThemePurchaseCostResult(cost: Cost)
 
 case class PurchaseQuestThemeRequest()
@@ -18,15 +18,18 @@ case class PurchaseQuestThemeResult()
 case class GetPurchasedQuestThemeRequest()
 case class GetPurchasedQuestThemeResult()
 
-
 private [domain] trait ProposeQuestAPI { this: DBAccessor => 
 
-
-  def getGetQuestThemePurchaseCost(request: GetQuestThemePurchaseCostRequest): ApiResult[GetQuestThemePurchaseCostResult] = handleDbException{
-    OkApiResult(Some(GetQuestThemePurchaseCostResult(Cost(0, 0, 0))))
+  def getGetQuestThemePurchaseCost(request: GetQuestThemePurchaseCostRequest): ApiResult[GetQuestThemePurchaseCostResult] = handleDbException {
+    import request._
+    
+    if (user.canPurchaseQuestProposals)
+      OkApiResult(Some(GetQuestThemePurchaseCostResult(user.costOfPurchasingQuestProposal)))
+    else
+      OkApiResult(Some(GetQuestThemePurchaseCostResult(Cost(0, 0, 0))))
   }
 
-  def getPurchasedQuestTheme(request: GetPurchasedQuestThemeRequest): ApiResult[GetPurchasedQuestThemeRequest] = handleDbException{
+  def getPurchasedQuestTheme(request: GetPurchasedQuestThemeRequest): ApiResult[GetPurchasedQuestThemeRequest] = handleDbException {
     OkApiResult(Some(GetPurchasedQuestThemeRequest()))
   }
 
@@ -66,7 +69,6 @@ private [domain] trait ProposeQuestAPI { this: DBAccessor =>
 //
 //          case Some(user) => {
 //
-//            // TODO IMPLEMENT fill profile from fb here.
 //
 //            Logger.debug("New user with FB created " + user)
 //

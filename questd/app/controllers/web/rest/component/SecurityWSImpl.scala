@@ -7,13 +7,17 @@ import play.api._
 import play.api.mvc._
 import play.api.mvc.Security._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.json.Json._
+
 import models.domain._
 import controllers.web.rest.component.helpers._
 import controllers.domain._
 import controllers.domain.user._
 import components._
+import controllers.web.rest.protocol._
 
 object SecurityWSImpl {
+  // Constant for session name in cookie
   val SessionIdKey = "sessionid"
 }
 
@@ -34,7 +38,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
         case Some(sessionid: String) => {
           Future {
           
-            val params = UserParams(sessionid)
+            val params = UserRequest(sessionid)
             
             api.user(params) match {
               case OkApiResult(body) => body match {
@@ -43,7 +47,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
               }
               
               case NotAuthorisedApiResult(body) => {
-                Unauthorized
+                Unauthorized(toJson(WSUnauthorisedResult(UnauthorisedReason.SessionNotFound)))
               }
               
               case InternalErrorApiResult(body) => {

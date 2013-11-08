@@ -45,7 +45,7 @@ class AuthAPISpecs extends Specification
       //    db.readUserByFBid(fbid) returns 
       //    db.updateUser(user.replaceSessionID(uuid))
 
-      val rv = api.loginfb(LoginFBParams(fbid))
+      val rv = api.loginfb(LoginFBRequest(fbid))
 
       there was one(user).readUserByFBid(fbid) andThen 
         one(user).createUser(any[User]) andThen
@@ -63,7 +63,7 @@ class AuthAPISpecs extends Specification
       db.user.readUserByFBid(anyString) returns Some(User("", Some(fbid), None, Profile()))
       //    db.updateUser(user.replaceSessionID(uuid))
 
-      val rv = api.loginfb(LoginFBParams(fbid))
+      val rv = api.loginfb(LoginFBRequest(fbid))
 
       there was one(user).readUserByFBid(fbid) andThen one(user).createUser(any[User])
 
@@ -75,7 +75,7 @@ class AuthAPISpecs extends Specification
 
       db.user.readUserByFBid(anyString) throws new DatabaseException("Test exception")
 
-      val rv = api.loginfb(LoginFBParams("any id"))
+      val rv = api.loginfb(LoginFBRequest("any id"))
 
       there was one(user).readUserByFBid(anyString)
 
@@ -92,7 +92,7 @@ class AuthAPISpecs extends Specification
 
       db.user.readUserBySessionID(SessionID(sesid)) returns Some(User("", None, Some(SessionID(sesid))))
 
-      val rv = api.user(UserParams(sesid))
+      val rv = api.user(UserRequest(sesid))
 
       rv must beAnInstanceOf[OkApiResult[UserResult]]
       rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
@@ -105,7 +105,7 @@ class AuthAPISpecs extends Specification
 
       db.user.readUserBySessionID(SessionID(sesid)) returns None
 
-      val rv = api.user(UserParams(sesid))
+      val rv = api.user(UserRequest(sesid))
 
       rv must beAnInstanceOf[NotAuthorisedApiResult[UserResult]]
       rv.body must beNone
