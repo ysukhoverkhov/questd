@@ -1,8 +1,10 @@
 package controllers.web.rest
 
 import play.api.libs.json._
-import controllers.domain.user._
 import play.Logger
+
+import controllers.domain.user._
+import models.domain.Profile
 
 package object protocol {
 
@@ -42,6 +44,13 @@ package object protocol {
    */
   case class WSLoginFBResult(sessionid: String)
 
+  
+  /**
+   * Get profile response
+   */
+  type WSProfileResult = Profile
+  
+  
   /**
    * Get Quest theme cost result
    */

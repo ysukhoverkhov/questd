@@ -16,7 +16,7 @@ object App extends Controller {
       case Some(c: String) => c
     }
     
-    WS.url(controllers.web.rest.routes.ProfileWS.getName.absoluteURL(false))
+    WS.url(controllers.web.rest.routes.ProfileWS.getProfile.absoluteURL(false))
       .withHeaders(COOKIE -> cook)
       .post("")
       .map(result => {

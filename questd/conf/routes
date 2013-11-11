@@ -11,14 +11,13 @@ GET     /                           		controllers.web.rest.Application.index
 # WS Auth
 POST	/rest/loginfb						controllers.web.rest.LoginWS.loginfb
 
-# Generating quests // TODO make POST here everywhere.
+# Generating quests 
 POST	/rest/getQuestThemeCost				controllers.web.rest.ProposeQuestWS.getQuestThemeCost
 POST	/rest/getPurchasedQuestTheme		controllers.web.rest.ProposeQuestWS.getPurchasedQuestTheme
 POST	/rest/purchaseQuestTheme			controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
 
-
-#TODO this is temp one, remove it later.
-POST	/rest/getname						controllers.web.rest.ProfileWS.getName
+# Requesting profile
+POST	/rest/getProfile					controllers.web.rest.ProfileWS.getProfile
 
 #######################
 # Admin

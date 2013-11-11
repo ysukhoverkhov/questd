@@ -2,19 +2,16 @@ package controllers.web.rest.component
 
 import play.api._
 import play.api.mvc._
-import play.api.libs.json._
-import controllers.domain._
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import controllers.domain.OkApiResult
-import controllers.web.rest.component.helpers.QuestController
-import controllers.web.rest.component._
+import controllers.web.rest.component.helpers._
+import controllers.web.rest.protocol._
 
 trait ProfileWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
 
-  def getName = Authenticated.async { implicit request =>
+  def getProfile = Authenticated.async { implicit request =>
     Future {
-      Ok("FBID - " + request.user.auth.fbid) 
+      Ok(Json.write[WSProfileResult](request.user.profile)).as(JSON) 
     }
   }
 

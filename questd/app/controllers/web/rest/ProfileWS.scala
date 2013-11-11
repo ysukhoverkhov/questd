@@ -7,7 +7,7 @@ import controllers.web.rest.component.helpers.AccessToWSInstance
 
 object ProfileWS extends Controller with AccessToWSInstance {
 
-  def getName = ws.getName
+  def getProfile = ws.getProfile
 
 }
 
