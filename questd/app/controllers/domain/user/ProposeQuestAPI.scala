@@ -11,7 +11,7 @@ import logic._
 import protocol.ProfileModificationResult._
 
 case class GetQuestThemeCostRequest(user: User)
-case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Cost = Cost(0, 0, 0))
+case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
 
 case class GetPurchasedQuestThemeRequest(user: User)
 case class GetPurchasedQuestThemeResult(theme: Option[Theme])

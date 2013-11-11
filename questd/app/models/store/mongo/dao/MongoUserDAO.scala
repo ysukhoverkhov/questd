@@ -47,14 +47,14 @@ private[mongo] class MongoUserDAO
    * Read by session id
    */
   def readUserBySessionID(sessid: SessionID): Option[User] = {
-    readByExample("session.id", sessid)
+    readByExample("auth.session.id", sessid)
   }
 
   /**
    * Read by fb id
    */
   def readUserByFBid(fbid: String): Option[User] = {
-    readByExample("fbid", fbid)
+    readByExample("auth.fbid", fbid)
   }
 
   /**

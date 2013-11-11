@@ -26,7 +26,9 @@ private [domain] trait AuthAPI { this: DBAccessor =>
 
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString()
-      db.user.updateUser(user.replaceSessionID(uuid))
+      val newUser = user.copy(auth = user.auth.copy(session = Some(uuid)))
+      
+      db.user.updateUser(newUser)
 
       val a = List(1, 2)
       a.foreach(print)
@@ -42,7 +44,7 @@ private [domain] trait AuthAPI { this: DBAccessor =>
         Logger.debug("No user with FB id found, creating new one " + params.fbid)
 
         val newUUID = java.util.UUID.randomUUID().toString()
-        val newUser = User(newUUID, Some(params.fbid))
+        val newUser = User(newUUID, AuthInfo(fbid = Some(params.fbid)))
         db.user.createUser(newUser)
         db.user.readUserByFBid(params.fbid) match {
 

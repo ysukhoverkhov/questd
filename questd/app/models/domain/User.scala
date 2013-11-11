@@ -14,21 +14,11 @@ object SessionID {
   val default = SessionID("")
 }
 
-// TODO IMPLEMENT: wrap app auth elated things into Auth field.
+
 case class User(
-  val id: UserID,
-  val fbid: Option[String] = None,
-  val session: Option[SessionID] = None,
-  val profile: Profile = Profile(),
-  val questProposalContext: QuestProposalConext = QuestProposalConext()) {
-
-  def replaceSessionID(newID: SessionID) = {
-    User(id, fbid, Some(newID), profile, questProposalContext)
-  }
+  id: UserID,
+  auth: AuthInfo = AuthInfo(),
+  profile: Profile = Profile(Assets(0, 0, 0)),
+  questProposalContext: QuestProposalConext = QuestProposalConext()) {
 }
-
-object User {
-
-} 
-
 

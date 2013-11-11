@@ -27,27 +27,27 @@ class UserDAOSpecs extends Specification
     "Find user by FB id" in new WithApplication(appWithTestDatabase) {
       val fbid = "idid"
       val testsess = "session name"
-      db.user.createUser(User(testsess, Some(fbid)))
+      db.user.createUser(User(testsess, AuthInfo(fbid = Some(fbid))))
       val u = db.user.readUserByFBid(fbid)
       u must beSome.which((u: User) => u.id.toString == testsess) and
-        beSome.which((u: User) => u.fbid == fbid)
+        beSome.which((u: User) => u.auth.fbid == fbid)
     }
 
     "Find user by session id" in new WithApplication(appWithTestDatabase) {
       val sessid = "idid"
       val testsess = "session name"
-      db.user.createUser(User(testsess, None, Some(sessid)))
+      db.user.createUser(User(testsess, AuthInfo(session = Some(sessid))))
       val u = db.user.readUserBySessionID(sessid)
       u must beSome.which((u: User) => u.id.toString == testsess) and
-        beSome.which((u: User) => u.fbid == None) and
-        beSome.which((u: User) => u.session == Some(SessionID(sessid)))
+        beSome.which((u: User) => u.auth.fbid == None) and
+        beSome.which((u: User) => u.auth.session == Some(SessionID(sessid)))
     }
 
     "Update user in DB" in new WithApplication(appWithTestDatabase) {
       val sessid = "old session id"
       val id = "id for test of update"
 
-      db.user.createUser(User(id, None, Some(sessid)))
+      db.user.createUser(User(id, AuthInfo(session = Some(sessid))))
       val u1 = db.user.readUserBySessionID(sessid)
       val u1unlifted = u1 match {
         case Some(z) => z
@@ -55,15 +55,15 @@ class UserDAOSpecs extends Specification
       }
 
       val newsessid = "very new session id"
-      db.user.updateUser(u1unlifted.replaceSessionID(newsessid))
+      db.user.updateUser(u1unlifted.copy(auth = u1unlifted.auth.copy(session = Some(newsessid))))
       val u2 = db.user.readUserByID(u1unlifted.id)
 
       u1 must beSome.which((u: User) => u.id.toString == id) and
-        beSome.which((u: User) => u.fbid == None) and
-        beSome.which((u: User) => u.session == Some(SessionID(sessid)))
+        beSome.which((u: User) => u.auth.fbid == None) and
+        beSome.which((u: User) => u.auth.session == Some(SessionID(sessid)))
       u2 must beSome.which((u: User) => u.id.toString == id) and
-        beSome.which((u: User) => u.fbid == None) and
-        beSome.which((u: User) => u.session == Some(SessionID(newsessid)))
+        beSome.which((u: User) => u.auth.fbid == None) and
+        beSome.which((u: User) => u.auth.session == Some(SessionID(newsessid)))
     }
 
     "Delete user in DB" in new WithApplication(appWithTestDatabase) {

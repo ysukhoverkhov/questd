@@ -40,7 +40,7 @@ class AuthAPISpecs extends Specification
 
       val fbid = "fbid"
         
-      db.user.readUserByFBid(anyString) returns None thenReturns Some(User("", Some(fbid), None, Profile()))
+      db.user.readUserByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(fbid = Some(fbid))))
       //    db.createUser(newUser)
       //    db.readUserByFBid(fbid) returns 
       //    db.updateUser(user.replaceSessionID(uuid))
@@ -60,7 +60,7 @@ class AuthAPISpecs extends Specification
 
       val fbid = "fbid"
 
-      db.user.readUserByFBid(anyString) returns Some(User("", Some(fbid), None, Profile()))
+      db.user.readUserByFBid(anyString) returns Some(User("", AuthInfo(fbid = Some(fbid))))
       //    db.updateUser(user.replaceSessionID(uuid))
 
       val rv = api.loginfb(LoginFBRequest(fbid))
@@ -90,13 +90,13 @@ class AuthAPISpecs extends Specification
 
       val sesid = "session id"
 
-      db.user.readUserBySessionID(SessionID(sesid)) returns Some(User("", None, Some(SessionID(sesid))))
+      db.user.readUserBySessionID(SessionID(sesid)) returns Some(User("", AuthInfo(session = Some(SessionID(sesid)))))
 
       val rv = api.user(UserRequest(sesid))
 
       rv must beAnInstanceOf[OkApiResult[UserResult]]
       rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
-        u.user.session == Some(SessionID(sesid)))
+        u.user.auth.session == Some(SessionID(sesid)))
 
     }
 

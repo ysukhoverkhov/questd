@@ -22,7 +22,7 @@ object SecurityWSImpl {
 }
 
 trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
-  
+
   // Store Auth Info
   def storeAuthInfoInResult(result: SimpleResult, loginResult: LoginFBResult) = {
     result.withSession(SecurityWSImpl.SessionIdKey -> loginResult.session.toString)
@@ -33,24 +33,24 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
 
   object Authenticated extends ActionBuilder[AuthenticatedRequest] {
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
-      request.session.get(SecurityWSImpl.SessionIdKey) match { 
-        
+      request.session.get(SecurityWSImpl.SessionIdKey) match {
+
         case Some(sessionid: String) => {
           Future {
-          
+
             val params = UserRequest(sessionid)
-            
+
             api.user(params) match {
               case OkApiResult(body) => body match {
-                case Some(result: UserResult) =>  result.user
+                case Some(result: UserResult) => result.user
                 case None => ServerError
               }
-              
+
               case NotAuthorisedApiResult(body) => {
                 Unauthorized(
-                    Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)
+                  Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)
               }
-              
+
               case InternalErrorApiResult(body) => {
                 ServerError
               }
@@ -59,10 +59,12 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
                 ServerError
               }
             }
-          
-          }.flatMap {newUser => newUser match {
+
+          }.flatMap { newUser =>
+            newUser match {
               case user: User => block(new AuthenticatedRequest(user, request))
-              case er: Status => Future.successful(er)  
+              case er: Status => Future.successful(er)
+              case er: SimpleResult => Future.successful(er)
             }
           }
         }
@@ -73,9 +75,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
         }
       }
     }
-     
-    
+
   }
-    
 
 }

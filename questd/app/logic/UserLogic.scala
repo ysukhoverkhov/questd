@@ -16,7 +16,7 @@ class UserLogic (val user: User) {
   }
   
   // TODO implement me.
-  def costOfPurchasingQuestProposal = Cost(10, 0, 0)
+  def costOfPurchasingQuestProposal = Assets(10, 0, 0)
   
   def getRandomThemeForQuestProposal = Theme("", "This is", "Test theme")
 }

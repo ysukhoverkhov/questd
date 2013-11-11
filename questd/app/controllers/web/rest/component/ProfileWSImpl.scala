@@ -14,7 +14,7 @@ trait ProfileWSImpl extends QuestController with SecurityWSImpl { this: WSCompon
 
   def getName = Authenticated.async { implicit request =>
     Future {
-      Ok("FBID - " + request.user.fbid) 
+      Ok("FBID - " + request.user.auth.fbid) 
     }
   }
 
