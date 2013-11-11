@@ -30,7 +30,7 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl { this: WSC
 
   def writeBodyInResponse[T <: AnyRef](body: Option[T]): SimpleResult = {
     body match {
-      case Some(r) => Ok(Json.write(r)).as(JSON)
+      case Some(r) => Ok(Json.write[T](r)).as(JSON)
       case _ => ServerError
     }
   }
@@ -39,16 +39,15 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl { this: WSC
 
   
   
-  
-  def getQuestThemeCost = wrapApiCallReturnBody { user =>
+  def getQuestThemeCost = wrapApiCallReturnBody[WSGetQuestThemeCostResult] { user =>
     api.getQuestThemeCost(GetQuestThemeCostRequest(user))
   }
 
-  def getPurchasedQuestTheme = wrapApiCallReturnBody { user =>
+  def getPurchasedQuestTheme = wrapApiCallReturnBody[WSGetPurchasedQuestThemeResult] { user =>
     api.getPurchasedQuestTheme(GetPurchasedQuestThemeRequest(user))
   }
 
-  def purchaseQuestTheme = wrapApiCallReturnBody { user =>
+  def purchaseQuestTheme = wrapApiCallReturnBody[WSPurchaseQuestThemeResult] { user =>
     api.purchaseQuestTheme(PurchaseQuestThemeRequest(user))
   }
 

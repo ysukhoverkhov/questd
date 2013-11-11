@@ -19,7 +19,6 @@ case class GetPurchasedQuestThemeResult(theme: Option[Theme])
 case class PurchaseQuestThemeRequest(user: User)
 case class PurchaseQuestThemeResult(allowed: ProfileModificationResult, theme: Option[Theme] = None)
 
-
 // TODO IMPLEMENT store in profile all allowed actions so all of them will be requested with single call to profile.
 
 private[domain] trait ProposeQuestAPI { this: DBAccessor =>
@@ -59,12 +58,13 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
         val themeCost = user.costOfPurchasingQuestProposal
 
         {
-          // TODO store money here.
           db.user.updateUser {
-            user.copy(questProposalContext = user.questProposalContext.copy(
-              numberOfPurchasedThemes = user.questProposalContext.numberOfPurchasedThemes + 1,
-              purchasedTheme = Some(t)))
-
+            user.copy(
+              questProposalContext = user.questProposalContext.copy(
+                numberOfPurchasedThemes = user.questProposalContext.numberOfPurchasedThemes + 1,
+                purchasedTheme = Some(t)),
+              profile = user.profile.copy(
+                  assets = user.profile.assets - themeCost))
           }
         }
 
