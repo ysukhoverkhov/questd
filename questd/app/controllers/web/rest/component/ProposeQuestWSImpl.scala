@@ -9,7 +9,7 @@ import controllers.domain._
 import controllers.web.rest.component.helpers._
 import controllers.web.rest.component._
 import controllers.web.rest.protocol._
-import models.domain.User
+import models.domain._
 
 trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
 
@@ -37,6 +37,9 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl { this: WSC
 
   def wrapApiCallReturnBody[T <: AnyRef](apiCall: User => ApiResult[T]) = wrapApiCall(apiCall)(writeBodyInResponse)
 
+  
+  
+  
   def getQuestThemeCost = wrapApiCallReturnBody { user =>
     api.getQuestThemeCost(GetQuestThemeCostRequest(user))
   }

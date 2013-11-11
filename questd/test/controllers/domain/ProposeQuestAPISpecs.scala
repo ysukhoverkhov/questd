@@ -16,8 +16,6 @@ import models.domain._
 import models.store.mongo._
 import models.store.dao.UserDAO
 
-// TODO Update eclipse.
-
 // TODO implement me when logic will be implemented.
 class ProposeQuestAPISpecs extends Specification
   with DatabaseComponent

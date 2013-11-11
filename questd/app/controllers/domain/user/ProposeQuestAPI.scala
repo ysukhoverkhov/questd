@@ -1,7 +1,5 @@
 package controllers.domain.user
 
-// TODO update to play 2.2.1
-
 import models.domain._
 import models.store._
 import play.Logger

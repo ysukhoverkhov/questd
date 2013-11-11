@@ -21,47 +21,24 @@ import models.domain._
 import models.domain.admin._
 import com.mongodb.casbah.commons.MongoDBObject
 
-/**
- * This class is representing user form the database.
- */
-// TODO REFACTOR: remove me
-private[mongo] case class ConfigSectionDB(
-  name: Option[String],
-  values: Map[String, String] = Map())
 
 /**
  * DOA for Config objects
  */
 private[mongo] class MongoConfigDAO
   extends ConfigDAO
-  with ModelCompanion[ConfigSectionDB, ObjectId]
-  with BaseMongoDAO[ConfigSectionDB] {
+  with ModelCompanion[ConfigSection, ObjectId]
+  with BaseMongoDAO[ConfigSection] {
 
-  val dao = new SalatDAO[ConfigSectionDB, ObjectId](collection = mongoCollection("configs")) {}
+  val dao = new SalatDAO[ConfigSection, ObjectId](collection = mongoCollection("configs")) {}
   final protected val keyFieldName = "name"
-
-  /**
-   * Conversion from domain object  to db object
-   */
-  protected implicit def domainToDB(dom: ConfigSection): ConfigSectionDB = {
-    ConfigSectionDB(Some(dom.name), dom.values)
-  }
-
-  /**
-   * Conversion from db object to domain object
-   */
-  protected implicit def dbToDomain(db: ConfigSectionDB): ConfigSection = {
-    ConfigSection(
-      unlift(db.name),
-      db.values)
-  }
 
   def upsertSection(o: ConfigSection): Unit = upsert(o.name, o)
 
   def deleteSection(name: String): Unit = delete(name)
 
   def readConfig: Configuration = {
-    val a: List[ConfigSection] = all map (o => dbToDomain(o) )
+    val a: List[ConfigSection] = all
 
     Configuration(
       a.foldLeft[Map[String, ConfigSection]](Map()) { (m, v) => m + (v.name -> v) })

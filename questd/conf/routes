@@ -12,7 +12,7 @@ GET     /                           		controllers.web.rest.Application.index
 POST	/rest/loginfb						controllers.web.rest.LoginWS.loginfb
 
 # Generating quests // TODO make POST here everywhere.
-GET	/rest/getQuestThemeCost				controllers.web.rest.ProposeQuestWS.getQuestThemeCost
+POST	/rest/getQuestThemeCost				controllers.web.rest.ProposeQuestWS.getQuestThemeCost
 POST	/rest/getPurchasedQuestTheme		controllers.web.rest.ProposeQuestWS.getPurchasedQuestTheme
 POST	/rest/purchaseQuestTheme			controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
 
