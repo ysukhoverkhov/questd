@@ -58,7 +58,7 @@ class LoginWSSpecs extends Specification
       val r = ws.loginfb()(fakeRequest)
 
       status(r) must equalTo(OK)
-//      contentType(r) must beSome("application/json")
+      contentType(r) must beSome("application/json")
       contentAsString(r) must contain(sessid)
       session(r).get(controllers.web.rest.component.SecurityWSImpl.SessionIdKey) must beSome
     }

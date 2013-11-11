@@ -46,5 +46,16 @@ package object protocol {
    * Get Quest theme cost result
    */
   type WSGetQuestThemeCostResult = GetQuestThemeCostResult
+  
+  /**
+   * Get purchased quest result.
+   */
+  type WSGetPurchasedQuestThemeResult = GetPurchasedQuestThemeResult
+
+  /**
+   * Result for purchase quest.
+   */
+  type WSPurchaseQuestThemeResult = PurchaseQuestThemeResult
+
 
 }

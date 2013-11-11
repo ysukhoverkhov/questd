@@ -48,7 +48,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
               
               case NotAuthorisedApiResult(body) => {
                 Unauthorized(
-                    Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken)))
+                    Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)
               }
               
               case InternalErrorApiResult(body) => {

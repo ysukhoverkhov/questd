@@ -41,7 +41,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
                     Logger.debug("Facebook auth failed")
                     (None, Some(Unauthorized(
                         Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))
-                        )/*.as(JSON)*/))
+                        ).as(JSON)))
                   }
                   case ex: FacebookNetworkException => {
                     Logger.debug("Unable to connect to facebook")
@@ -55,7 +55,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
 
                     api.loginfb(params) match {
                       case OkApiResult(Some(loginResult: LoginFBResult)) =>
-                        storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session.toString))), loginResult)
+                        storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session.toString))).as(JSON), loginResult)
                         
                       case _ => ServerError
                     }
