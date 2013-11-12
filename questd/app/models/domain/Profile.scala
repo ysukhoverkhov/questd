@@ -1,30 +1,30 @@
 package models.domain
 
+import logic.constants
+
 /**
  * This can be given to client as is, thus contains only public information.
  */
 case class Profile(
-    level: Int = 1,
-    assets: Assets = Assets(0, 0, 0),
-    rights: Rights = Rights())
-
+  level: Int = 1,
+  assets: Assets = Assets(0, 0, 0),
+  rights: Rights = Rights())
 
 /**
  * What does user can do an what level.
  */
 case class Rights(
-    voteQuestResults: Int = 1,
-    submitPhotoResults: Int = 3,
-    submitVideoResults: Int = 4,
-    report: Int = 5,
-    inviteFriends: Int = 6,
-    addToShortList: Int = 8,
-    voteQuestProposals: Int = 10,
-    submitPhotoQuests: Int = 12,
-    submitVideoQuests: Int = 13,
-    voteReviews: Int = 14,
-    submitReviewsForResults: Int = 16,
-    submitReviewsForProposals: Int = 18,
-    giveRewards: Int = 20
-    )
+  voteQuestResults: Int = constants.voteQuestResults,
+  submitPhotoResults: Int = constants.submitPhotoResults,
+  submitVideoResults: Int = constants.submitVideoResults,
+  report: Int = constants.report,
+  inviteFriends: Int = constants.inviteFriends,
+  addToShortList: Int = constants.addToShortList,
+  voteQuestProposals: Int = constants.voteQuestProposals,
+  submitPhotoQuests: Int = constants.submitPhotoQuests,
+  submitVideoQuests: Int = constants.submitVideoQuests,
+  voteReviews: Int = constants.voteReviews,
+  submitReviewsForResults: Int = constants.submitReviewsForResults,
+  submitReviewsForProposals: Int = constants.submitReviewsForProposals,
+  giveRewards: Int = constants.giveRewards)
     

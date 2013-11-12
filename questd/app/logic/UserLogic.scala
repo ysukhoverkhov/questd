@@ -6,6 +6,8 @@ import models.domain.Theme
 import components.componentregistry.ComponentRegistrySingleton
 import scala.util.Random
 
+import functions._
+
 // This should not go to DB directly since API may have cache layer.
 class UserLogic(val user: User) {
 
@@ -23,8 +25,17 @@ class UserLogic(val user: User) {
       OK
   }
 
-  // TODO implement me.
-  def costOfPurchasingQuestProposal = Assets(coins = 10)
+  /**
+   * Tells cost of next theme purchase
+   */
+  def costOfPurchasingQuestProposal = {
+    if (user.questProposalContext.numberOfPurchasedThemes < 4) {
+      val c = costToSkipProposal(user.profile.level, user.questProposalContext.numberOfPurchasedThemes + 1)
+      Assets(coins = c)
+    } else {
+      Assets(money = 1)
+    }
+  }
 
   /**
    * Select theme for the user.

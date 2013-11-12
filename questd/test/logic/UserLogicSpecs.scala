@@ -34,6 +34,8 @@ class UserLogicSpecs extends Specification
 
       u.canPurchaseQuestProposals must beEqualTo(OK)
     }
+    
+    
 
   }
 
