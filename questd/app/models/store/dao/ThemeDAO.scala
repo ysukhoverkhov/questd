@@ -8,7 +8,7 @@ private[store] trait ThemeDAO {
   def readThemeByID(key: ThemeID): Option[Theme]
   def updateTheme(o: Theme): Unit
   def deleteTheme(key: ThemeID): Unit
-  def allThemes: List[Theme]
+  def allThemes: Iterator[Theme]
 
 }
 

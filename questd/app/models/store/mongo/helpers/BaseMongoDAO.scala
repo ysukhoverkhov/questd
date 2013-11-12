@@ -83,9 +83,8 @@ trait BaseMongoDAO[T <: AnyRef] { this: ModelCompanion[T, ObjectId] =>
   /**
    * All objects
    */
-  def all: List[T] = wrapMongoException {
-    // TODO OPTIMIZATION this will be very slow and will fetch everything.
-    List() ++ find(MongoDBObject())
+  def all: Iterator[T] = wrapMongoException {
+    find(MongoDBObject())
   }
 
 }

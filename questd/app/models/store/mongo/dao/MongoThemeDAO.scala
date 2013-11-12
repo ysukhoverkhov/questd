@@ -55,7 +55,7 @@ private[mongo] class MongoThemeDAO
   /**
    * All objects
    */
-  def allThemes: List[Theme] = all
+  def allThemes: Iterator[Theme] = all
 
 }
 

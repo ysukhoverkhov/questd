@@ -74,7 +74,7 @@ private[mongo] class MongoUserDAO
   /**
    * All objects
    */
-  def allUsers: List[User] = all 
+  def allUsers: Iterator[User] = all 
 
 }
 

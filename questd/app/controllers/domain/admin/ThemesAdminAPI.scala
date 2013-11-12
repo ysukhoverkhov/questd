@@ -32,7 +32,7 @@ private [domain] trait ThemesAdminAPI { this: DBAccessor =>
   def allThemes: ApiResult[AllThemesResult] = handleDbException {
     Logger.debug("Admin request for all themes.")
 
-    OkApiResult(Some(AllThemesResult(db.theme.allThemes)))
+    OkApiResult(Some(AllThemesResult(List() ++ db.theme.allThemes)))
   }
 
   /**

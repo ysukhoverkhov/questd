@@ -89,7 +89,7 @@ class UserDAOSpecs extends Specification
     "One more check for listing and deleting everything" in new WithApplication(appWithTestDatabase) {
       db.user.allUsers.foreach((u: User) => db.user.deleteUser(u.id))
 
-      val all = db.user.allUsers
+      val all = List() ++ db.user.allUsers
 
       all must haveSize(0)
     }

@@ -6,9 +6,10 @@ import models.domain.Theme
 import components.componentregistry.ComponentRegistrySingleton
 import scala.util.Random
 
+// This should not go to DB directly since API may have cache layer.
 class UserLogic(val user: User) {
 
-  lazy val db = ComponentRegistrySingleton.db
+  lazy val api = ComponentRegistrySingleton.api
 
   /**
    * Check is the user can purchase quest proposals.
@@ -29,7 +30,7 @@ class UserLogic(val user: User) {
    * Select theme for the user.
    */
   def getRandomThemeForQuestProposal = {
-    val themes = db.theme.allThemes
+    val themes = api.allThemes.body.get.themes
 
     val rand = new Random(System.currentTimeMillis())
     val random_index = rand.nextInt(themes.length)

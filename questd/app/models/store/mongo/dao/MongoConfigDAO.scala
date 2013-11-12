@@ -38,7 +38,7 @@ private[mongo] class MongoConfigDAO
   def deleteSection(name: String): Unit = delete(name)
 
   def readConfig: Configuration = {
-    val a: List[ConfigSection] = all
+    val a: List[ConfigSection] = List() ++ all
 
     Configuration(
       a.foldLeft[Map[String, ConfigSection]](Map()) { (m, v) => m + (v.name -> v) })

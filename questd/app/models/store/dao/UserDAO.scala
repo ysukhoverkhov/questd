@@ -10,7 +10,7 @@ trait UserDAO {
   def readUserByFBid(fbid: String): Option[User]
   def updateUser(u: User): Unit
   def deleteUser(key: UserID): Unit
-  def allUsers: List[User]
+  def allUsers: Iterator[User]
 
 }
 
