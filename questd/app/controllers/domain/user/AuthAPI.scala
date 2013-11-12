@@ -55,7 +55,7 @@ private [domain] trait AuthAPI { this: DBAccessor =>
 
           case Some(user) => {
 
-            // TODO IMPLEMENT fill profile from fb here.
+            // IMPLEMENT fill profile from fb here.
 
             Logger.debug("New user with FB created " + user)
 

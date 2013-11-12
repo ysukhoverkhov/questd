@@ -5,7 +5,6 @@ object ProfileModificationResult extends Enumeration {
 
   val OK = Value(0, "0")
   val LevelTooLow = Value(1, "1")
-  val NotEnoughCoins = Value(2, "2")
-  val NotEnoughMoney = Value(3, "3")
+  val NotEnoughAssets = Value(2, "2")
 }
 
