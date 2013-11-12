@@ -1,9 +1,17 @@
 package logic
 
+import internal.gainratingfunctions._
+import internal.spendcoinsfunctions._
+
+
 object functions {
 
   import constants._
 
+  /*************
+   * Proposing quests.
+   *************/
+  
   /**
    * Number of themes skips for coins.
    */
@@ -16,27 +24,6 @@ object functions {
     val proposalPeriodAtMaxLevel = 2
 
     proposalPeriodAtMaxLevel * ratingForSubmitProposal(level) * math.pow(maxLevel.toDouble / level, 3)
-  }
-
-  /**
-   * How much coins per day player should spend on shuffling
-   */
-  // TODO implement me
-  private def coinsShuffleTheme(level: Int): Double = 200
-  
-  /**
-   * How much rating per day we should receive from submitting proposals.
-   */
-  private def ratingForSubmitProposal(level: Int) = {
-    val k = 504.47957
-    val d = 7.83618
-    val b = -1702.1146
-    val y = -9.08269
-    
-    if (level < submitPhotoQuests)
-      0
-    else
-      megaf(level, k, d, b, y)
   }
 
   /**
@@ -61,11 +48,4 @@ object functions {
   }
   
   
-  
-  
-  
-  /**
-   * Our super mega function what rules all curves
-   */
-  private def megaf(level: Int, k: Double, d: Double, b: Double, y: Double) = k * math.exp((level - 1) / d) + y * level + b
 }

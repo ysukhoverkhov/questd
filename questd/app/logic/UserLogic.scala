@@ -15,6 +15,7 @@ class UserLogic(val user: User) {
 
   /**
    * Check is the user can purchase quest proposals.
+   * TODO add check for required amount of time to pass since last quest proposal. and do not forget to write test about it.
    */
   def canPurchaseQuestProposals = {
     if (user.profile.rights.submitPhotoQuests > user.profile.level)
