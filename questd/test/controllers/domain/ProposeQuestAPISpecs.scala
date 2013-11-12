@@ -7,27 +7,22 @@ import org.junit.runner._
 import play.Logger
 import play.api.test._
 import play.api.test.Helpers._
-
 import controllers.domain._
 import controllers.domain.user._
-
 import models.store._
 import models.domain._
 import models.store.mongo._
 import models.store.dao.UserDAO
+import components.componentregistry.ComponentRegistry
 
-// TODO implement me when logic will be implemented.
 class ProposeQuestAPISpecs extends Specification
-  with DatabaseComponent
-  with DomainAPIComponent
+  with ComponentRegistry
   with Mockito {
 
   isolated
 
-  val db = mock[Database]
+  override lazy val db = mock[Database]
   val user = mock[UserDAO]
-  
-  val api = new DomainAPI
 
   object context extends org.specs2.mutable.Before {
     def before =  db.user returns user
