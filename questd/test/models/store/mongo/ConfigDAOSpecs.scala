@@ -13,7 +13,7 @@ import models.domain.admin._
 import com.mongodb.casbah.commons.MongoDBObject
 
 //@RunWith(classOf[JUnitRunner])
-class ConfiDAOSpecs extends Specification
+class ConfigDAOSpecs extends Specification
   with MongoDatabaseComponent
   with BaseDAOSpecs {
 

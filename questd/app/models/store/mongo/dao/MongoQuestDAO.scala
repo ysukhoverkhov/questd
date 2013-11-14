@@ -22,6 +22,9 @@ import models.store._
 import models.domain._
 
 
+// TODO: make base DAO with common elments.
+// TODO: make base mongo dao to implement base dao.
+
 /**
  * DOA for Config objects
  */
@@ -38,7 +41,6 @@ private[mongo] class MongoQuestDAO
   def updateQuest(o: Quest): Unit = update(o.id, o)
   def deleteQuest(key: QuestID): Unit = delete(key)
   def allQuests: Iterator[Quest] = all
-
 
 }
 
