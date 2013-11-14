@@ -1,16 +1,26 @@
 package models.store.mongo.helpers
 
-import com.novus.salat.dao.ModelCompanion
-import com.mongodb.DBObject
-import com.mongodb.casbah.Imports._
-import models.store.exceptions.DatabaseException
 import play.Logger
-import com.mongodb.casbah.commons.MongoDBObject
+import play.api.Play.current
+
 import org.bson.types.ObjectId
 
-trait BaseMongoDAO[T <: AnyRef] { this: ModelCompanion[T, ObjectId] =>
+import com.novus.salat._
+import com.novus.salat.annotations._
+import com.novus.salat.dao._
+import se.radley.plugin.salat._
 
-  protected def keyFieldName: String
+import com.mongodb._
+import com.mongodb.casbah.Imports._
+import com.mongodb.casbah.commons.MongoDBObject
+
+import models.store.mongo.SalatContext._
+import models.store.exceptions.DatabaseException
+
+abstract class BaseMongoDAO[T <: AnyRef: Manifest](collectionName: String, keyFieldName: String)
+  extends ModelCompanion[T, ObjectId] {
+
+  val dao = new SalatDAO[T, ObjectId](collection = mongoCollection(collectionName)) {}
 
   private def makeKeyDbObject(key: String): DBObject = {
     MongoDBObject(keyFieldName -> key)
