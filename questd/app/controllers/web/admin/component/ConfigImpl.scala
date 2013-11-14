@@ -16,7 +16,7 @@ trait ConfigImpl extends Controller { this: APIAccessor =>
   def leftMenu(implicit request: RequestHeader): Map[String, String] = {
     api.getConfiguration(GetConfigurationRequest()) match {
       case OkApiResult(Some(GetConfigurationResult(r))) => r.sections.foldLeft[Map[String, String]](Map()) {
-        (c, v) => c + (v.name -> controllers.web.admin.routes.Config.config(v.name).absoluteURL(false))
+        (c, v) => c + (v.id -> controllers.web.admin.routes.Config.config(v.id).absoluteURL(false))
       }
       case _ => Map()
     }

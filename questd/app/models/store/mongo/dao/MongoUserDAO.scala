@@ -11,52 +11,22 @@ import play.Logger
  * DOA for User objects
  */
 private[mongo] class MongoUserDAO
-  extends BaseMongoDAO[User](collectionName = "users", keyFieldName = "id.id")
+  extends BaseMongoDAO[User](collectionName = "users")
   with UserDAO {
-
-
-  /**
-   * Create
-   */
-  def createUser(u: User): Unit = create(u)
-
-  /**
-   * Read by userid
-   */
-  def readUserByID(key: UserID): Option[User] = read(key)
 
   /**
    * Read by session id
    */
-  def readUserBySessionID(sessid: SessionID): Option[User] = {
-    readByExample("auth.session.id", sessid)
+  def readBySessionID(sessid: String): Option[User] = {
+    readByExample("auth.session", sessid)
   }
 
   /**
    * Read by fb id
    */
-  def readUserByFBid(fbid: String): Option[User] = {
+  def readByFBid(fbid: String): Option[User] = {
     readByExample("auth.fbid", fbid)
   }
-
-  /**
-   * Update by userid.
-   */
-  def updateUser(u: User): Unit = {
-    update(u.id, u)
-
-    Logger.debug("User update in db successfuly " + u.toString)
-  }
-
-  /**
-   * Delete by userid
-   */
-  def deleteUser(key: UserID): Unit = delete(key)
-
-  /**
-   * All objects
-   */
-  def allUsers: Iterator[User] = all 
 
 }
 

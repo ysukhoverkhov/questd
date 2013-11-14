@@ -12,7 +12,7 @@ import models.domain._
  * DOA for Theme objects
  */
 private[mongo] class MongoThemeDAO
-  extends BaseMongoDAO[Theme](collectionName = "themes", keyFieldName = "id.id")
+  extends BaseMongoDAO[Theme](collectionName = "themes")
   with ThemeDAO {
 
   /**
@@ -23,7 +23,7 @@ private[mongo] class MongoThemeDAO
   /**
    * Read by id
    */
-  def readThemeByID(key: ThemeID): Option[Theme] = read(key)
+  def readThemeByID(key: String): Option[Theme] = readByID(key)
 
   /**
    * Update by id.
@@ -33,7 +33,7 @@ private[mongo] class MongoThemeDAO
   /**
    * Delete by id
    */
-  def deleteTheme(key: ThemeID): Unit = delete(key)
+  def deleteTheme(key: String): Unit = delete(key)
 
   /**
    * All objects

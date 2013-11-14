@@ -2,14 +2,8 @@ package models.domain
 
 import scala.language.implicitConversions
 
-import models.domain.base._
-
-case class UserID(id: String = "") extends BaseID[String]
-case class SessionID(id: String = "") extends BaseID[String]
-
-case class User(
-  id: UserID,
+case class User (
+  id: String,
   auth: AuthInfo = AuthInfo(),
-  profile: Profile = Profile()) {
-}
+  profile: Profile = Profile()) extends ID
 

@@ -40,17 +40,17 @@ class AuthAPISpecs extends Specification
 
       val fbid = "fbid"
         
-      db.user.readUserByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(fbid = Some(fbid))))
+      db.user.readByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(fbid = Some(fbid))))
       //    db.createUser(newUser)
       //    db.readUserByFBid(fbid) returns 
       //    db.updateUser(user.replaceSessionID(uuid))
 
       val rv = api.loginfb(LoginFBRequest(fbid))
 
-      there was one(user).readUserByFBid(fbid) andThen 
-        one(user).createUser(any[User]) andThen
-        one(user).readUserByFBid(fbid) andThen
-        one(user).updateUser(any[User])
+      there was one(user).readByFBid(fbid) andThen 
+        one(user).create(any[User]) andThen
+        one(user).readByFBid(fbid) andThen
+        one(user).update(any[User])
 
       rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
       rv.body must beSome[LoginFBResult]
@@ -60,12 +60,12 @@ class AuthAPISpecs extends Specification
 
       val fbid = "fbid"
 
-      db.user.readUserByFBid(anyString) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+      db.user.readByFBid(anyString) returns Some(User("", AuthInfo(fbid = Some(fbid))))
       //    db.updateUser(user.replaceSessionID(uuid))
 
       val rv = api.loginfb(LoginFBRequest(fbid))
 
-      there was one(user).readUserByFBid(fbid) andThen one(user).createUser(any[User])
+      there was one(user).readByFBid(fbid) andThen one(user).create(any[User])
 
       rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
       rv.body must beSome[LoginFBResult]
@@ -73,11 +73,11 @@ class AuthAPISpecs extends Specification
 
     "Behaves well with DB exception" in context {
 
-      db.user.readUserByFBid(anyString) throws new DatabaseException("Test exception")
+      db.user.readByFBid(anyString) throws new DatabaseException("Test exception")
 
       val rv = api.loginfb(LoginFBRequest("any id"))
 
-      there was one(user).readUserByFBid(anyString)
+      there was one(user).readByFBid(anyString)
 
       rv must beAnInstanceOf[InternalErrorApiResult[LoginFBResult]]
       rv.body must beNone
@@ -90,20 +90,20 @@ class AuthAPISpecs extends Specification
 
       val sesid = "session id"
 
-      db.user.readUserBySessionID(SessionID(sesid)) returns Some(User("", AuthInfo(session = Some(SessionID(sesid)))))
+      db.user.readBySessionID(sesid) returns Some(User("", AuthInfo(session = Some(sesid))))
 
       val rv = api.user(UserRequest(sesid))
 
       rv must beAnInstanceOf[OkApiResult[UserResult]]
       rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
-        u.user.auth.session == Some(SessionID(sesid)))
+        u.user.auth.session == Some(sesid))
 
     }
 
     "Do not return none existing user" in context {
       val sesid = "session id"
 
-      db.user.readUserBySessionID(SessionID(sesid)) returns None
+      db.user.readBySessionID(sesid) returns None
 
       val rv = api.user(UserRequest(sesid))
 

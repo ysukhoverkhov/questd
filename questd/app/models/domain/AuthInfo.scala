@@ -1,6 +1,6 @@
 package models.domain
 
 case class AuthInfo(
-  session: Option[SessionID] = None,
+  session: Option[String] = None,
   fbid: Option[String] = None)
 

@@ -10,18 +10,14 @@ import models.domain.admin._
  * DOA for Config objects
  */
 private[mongo] class MongoConfigDAO
-  extends BaseMongoDAO[ConfigSection](collectionName = "configs", keyFieldName = "name")
+  extends BaseMongoDAO[ConfigSection](collectionName = "configs")
   with ConfigDAO {
-
-  def upsertSection(o: ConfigSection): Unit = upsert(o.name, o)
-
-  def deleteSection(name: String): Unit = delete(name)
 
   def readConfig: Configuration = {
     val a: List[ConfigSection] = List() ++ all
 
     Configuration(
-      a.foldLeft[Map[String, ConfigSection]](Map()) { (m, v) => m + (v.name -> v) })
+      a.foldLeft[Map[String, ConfigSection]](Map()) { (m, v) => m + (v.id -> v) })
   }
 
 }

@@ -24,7 +24,7 @@ private[domain] trait ConfigAdminAPI { this: DBAccessor =>
   @volatile var config: Configuration = null
 
   private def storeConfigInDB(section: ConfigSection): Unit = {
-    db.config.upsertSection(section)
+    db.config.upsert(section)
 
     config = db.config.readConfig
   }

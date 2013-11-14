@@ -19,7 +19,7 @@ class QuestDAOSpecs extends Specification
   with BaseDAOSpecs {
 
   private[this] def clearDB() = {
-    for (i <- db.quest.allQuests)
+    for (i <- db.quest.all)
       db.quest.delete(i.id)
   }
 
@@ -29,27 +29,27 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.createQuest(Quest(id))
-      val q = db.quest.readQuestByID(id)
+      db.quest.create(Quest(id))
+      val q = db.quest.readByID(id)
 
       q must beSome[Quest]
-      q.get.id must beEqualTo(QuestID(id))
+      q.get.id must beEqualTo(id)
     }
 
     "Update quest" in new WithApplication(appWithTestDatabase) {
       clearDB()
       val id = "ididiid"
 
-      db.quest.createQuest(Quest(id))
-      val q = db.quest.readQuestByID(id)
+      db.quest.create(Quest(id))
+      val q = db.quest.readByID(id)
       q.get.info.content.reference must beEqualTo("")
 
       db.quest.updateQuest(q.get.copy(info = QuestInfo(ContentReference(1, "2", "3"))))
       
-      val q2 = db.quest.readQuestByID(id)
+      val q2 = db.quest.readByID(id)
       
       q2 must beSome[Quest]
-      q2.get.id must beEqualTo(QuestID(id))
+      q2.get.id must beEqualTo(id)
       q2.get.info.content.reference must beEqualTo("3")
     }
 
@@ -58,14 +58,14 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.createQuest(Quest(id))
-      val q = db.quest.readQuestByID(id)
+      db.quest.create(Quest(id))
+      val q = db.quest.readByID(id)
 
       q must beSome[Quest]
-      q.get.id must beEqualTo(QuestID(id))
+      q.get.id must beEqualTo(id)
       
-      db.quest.deleteQuest(id)
-      db.quest.readQuestByID(id) must beNone
+      db.quest.delete(id)
+      db.quest.readByID(id) must beNone
     }
 
   }

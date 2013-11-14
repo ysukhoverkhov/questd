@@ -78,7 +78,7 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
       themeForm => {
 
         if (themeForm.id == "") {
-          val theme = Theme(ThemeID.default, themeForm.text, themeForm.comment)
+          val theme = Theme("", themeForm.text, themeForm.comment)
           api.createTheme(CreateThemeRequest(theme))
         } else {
           

@@ -10,9 +10,9 @@ import components._
 
 
 case class LoginFBRequest(fbid: String)
-case class LoginFBResult(session: SessionID)
+case class LoginFBResult(session: String)
 
-case class UserRequest(sessionID: SessionID)
+case class UserRequest(sessionID: String)
 case class UserResult(user: User)
 
 
@@ -28,7 +28,7 @@ private [domain] trait AuthAPI { this: DBAccessor =>
       val uuid = java.util.UUID.randomUUID().toString()
       val newUser = user.copy(auth = user.auth.copy(session = Some(uuid)))
       
-      db.user.updateUser(newUser)
+      db.user.update(newUser)
 
       val a = List(1, 2)
       a.foreach(print)
@@ -38,15 +38,15 @@ private [domain] trait AuthAPI { this: DBAccessor =>
 
     Logger.debug("Searching for user in database for login with fbid " + params.fbid)
 
-    db.user.readUserByFBid(params.fbid) match {
+    db.user.readByFBid(params.fbid) match {
       case None => {
 
         Logger.debug("No user with FB id found, creating new one " + params.fbid)
 
         val newUUID = java.util.UUID.randomUUID().toString()
         val newUser = User(newUUID, AuthInfo(fbid = Some(params.fbid)))
-        db.user.createUser(newUser)
-        db.user.readUserByFBid(params.fbid) match {
+        db.user.create(newUser)
+        db.user.readByFBid(params.fbid) match {
 
           case None => {
             Logger.error("Unable to find user just created in DB with fbid " + params.fbid)
@@ -76,7 +76,7 @@ private [domain] trait AuthAPI { this: DBAccessor =>
    */
   def user(params: UserRequest): ApiResult[UserResult] = handleDbException {
 
-    db.user.readUserBySessionID(params.sessionID) match {
+    db.user.readBySessionID(params.sessionID) match {
       case None => NotAuthorisedApiResult(None)
 
       case Some(user: User) => OkApiResult(

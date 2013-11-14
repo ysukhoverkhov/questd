@@ -47,7 +47,7 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
         val themeCost = user.costOfPurchasingQuestProposal
 
         {
-          db.user.updateUser {
+          db.user.update {
             user.copy(
               profile = user.profile.copy(
                 assets = user.profile.assets - themeCost,
@@ -74,7 +74,7 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
       case None => OkApiResult(Some(TakeQuestThemeResult(InvalidState, None)))
       case Some(pt) => {
 
-        db.user.updateUser {
+        db.user.update {
           user.copy(
             profile = user.profile.copy(
               questProposalContext = user.profile.questProposalContext.copy(
@@ -106,7 +106,7 @@ case class ProposeQuestResult(allowed: ProfileModificationResult)
     user.canProposeQuest match {
       case OK => {
         
-        db.user.updateUser {
+        db.user.update {
           user.copy(
             profile = user.profile.copy(
               questProposalContext = user.profile.questProposalContext.copy(

@@ -1,10 +1,12 @@
 package models.domain.admin
 
+import _root_.models.domain.ID
+
 case class Configuration(
   private val _sections: Map[String, ConfigSection]) {
 
   def replaceSection(newSection: ConfigSection) = {
-    Configuration(_sections.updated(newSection.name, newSection))
+    Configuration(_sections.updated(newSection.id, newSection))
   }
 
   def apply(name: String): Option[ConfigSection] = {
@@ -15,6 +17,6 @@ case class Configuration(
 }
 
 case class ConfigSection(
-  val name: String,
-  val values: Map[String, String])
+  val id: String,
+  val values: Map[String, String]) extends ID
 
