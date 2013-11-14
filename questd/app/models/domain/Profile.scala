@@ -7,8 +7,10 @@ import logic.constants
  */
 case class Profile(
   level: Int = 1,
+  bio: Bio = Bio(),
   assets: Assets = Assets(0, 0, 0),
-  rights: Rights = Rights())
+  rights: Rights = Rights(),
+  questProposalContext: QuestProposalConext = QuestProposalConext())
 
 /**
  * What does user can do an what level.

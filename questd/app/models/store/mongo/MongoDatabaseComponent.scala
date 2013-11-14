@@ -4,7 +4,6 @@ import models.store._
 import models.store.dao._
 import dao._
 
-
 trait MongoDatabaseComponent extends DatabaseComponent {
 
   class MongoDatabase extends Database {

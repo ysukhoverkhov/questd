@@ -7,8 +7,8 @@ import controllers.web.rest.component.helpers.AccessToWSInstance
 object ProposeQuestWS extends Controller with AccessToWSInstance {
   
   def getQuestThemeCost = ws.getQuestThemeCost
-  def getPurchasedQuestTheme = ws.getPurchasedQuestTheme
   def purchaseQuestTheme = ws.purchaseQuestTheme
+  def takeQuestTheme = ws.takeQuestTheme
 
 }
 

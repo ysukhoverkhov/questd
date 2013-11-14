@@ -1,7 +1,10 @@
 package models.domain
 
-case class QuestProposalConext (
-    val purchasedTheme: Option[Theme] = None,
-    val selectedTheme: Option[Theme] = None,
-    val numberOfPurchasedThemes: Int = 0)
+import java.util.Date
+
+case class QuestProposalConext(
+  purchasedTheme: Option[Theme] = None,
+  takenTheme: Option[Theme] = None,
+  numberOfPurchasedThemes: Int = 0,
+  questProposalCooldown: Date = new Date(0))
     

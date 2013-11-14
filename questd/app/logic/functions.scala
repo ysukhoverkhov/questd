@@ -8,9 +8,9 @@ object functions {
 
   import constants._
 
-  /*************
+  /**************************
    * Proposing quests.
-   *************/
+   **************************/
   
   /**
    * Number of themes skips for coins.
@@ -20,16 +20,16 @@ object functions {
   /**
    * Rating to give user for successful (approved) proposal at a level.
    */
-  def ratingForProposalAtLevel(level: Int) = {
+  def ratingForProposalAtLevel(level: Int): Int = {
     val proposalPeriodAtMaxLevel = 2
 
-    proposalPeriodAtMaxLevel * ratingForSubmitProposal(level) * math.pow(maxLevel.toDouble / level, 3)
+    (proposalPeriodAtMaxLevel * ratingForSubmitProposal(level) * math.pow(maxLevel.toDouble / level, 3)).toInt
   }
 
   /**
    * Period in days to give players a task to make quest.
    */
-  def questProposalPeriod(level: Int) = math.round(ratingForProposalAtLevel(level) / ratingForSubmitProposal(level))
+  def questProposalPeriod(level: Int): Int = math.round(ratingForProposalAtLevel(level).toFloat / ratingForSubmitProposal(level).toFloat)
 
   /**
    * Cost to skip a single proposal

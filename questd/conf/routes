@@ -13,8 +13,8 @@ POST	/rest/loginfb						controllers.web.rest.LoginWS.loginfb
 
 # Generating quests 
 POST	/rest/getQuestThemeCost				controllers.web.rest.ProposeQuestWS.getQuestThemeCost
-POST	/rest/getPurchasedQuestTheme		controllers.web.rest.ProposeQuestWS.getPurchasedQuestTheme
 POST	/rest/purchaseQuestTheme			controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
+POST	/rest/takeQuestTheme				controllers.web.rest.ProposeQuestWS.takeQuestTheme
 
 # Requesting profile
 POST	/rest/getProfile					controllers.web.rest.ProfileWS.getProfile

@@ -20,4 +20,7 @@ object constants {
   val giveRewards: Int = 20
 
   
+  
+  val flipHour = 5
+  
 }

@@ -32,7 +32,6 @@ private[mongo] class MongoUserDAO
   val dao = new SalatDAO[User, ObjectId](collection = mongoCollection("users")) {}
   protected final val keyFieldName = "id.id"
 
-
   /**
    * Create
    */

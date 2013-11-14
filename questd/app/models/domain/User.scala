@@ -18,7 +18,6 @@ object SessionID {
 case class User(
   id: UserID,
   auth: AuthInfo = AuthInfo(),
-  profile: Profile = Profile(),
-  questProposalContext: QuestProposalConext = QuestProposalConext()) {
+  profile: Profile = Profile()) {
 }
 
