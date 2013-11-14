@@ -12,6 +12,7 @@ trait MongoDatabaseComponent extends DatabaseComponent {
     val config = new MongoConfigDAO
 
     val user = new MongoUserDAO
+    val quest = new MongoQuestDAO
   }
 
 }

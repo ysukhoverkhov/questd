@@ -13,6 +13,7 @@ trait DatabaseComponent {
     val user: UserDAO
     val theme: ThemeDAO 
     val config: ConfigDAO
+    val quest: QuestDAO
   }
 
 }

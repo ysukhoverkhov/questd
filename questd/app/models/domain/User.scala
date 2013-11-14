@@ -4,16 +4,8 @@ import scala.language.implicitConversions
 
 import models.domain.base._
 
-case class UserID(id: String) extends BaseID[String]
-object UserID {
-  val default = UserID("")
-}
-
-case class SessionID(id: String) extends BaseID[String]
-object SessionID {
-  val default = SessionID("")
-}
-
+case class UserID(id: String = "") extends BaseID[String]
+case class SessionID(id: String = "") extends BaseID[String]
 
 case class User(
   id: UserID,
