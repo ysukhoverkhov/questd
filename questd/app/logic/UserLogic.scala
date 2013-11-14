@@ -27,6 +27,21 @@ class UserLogic(val user: User) {
   }
 
   /**
+   * Is user can propose quest.
+   */
+  def canProposeQuest = {
+    if (user.profile.rights.submitPhotoQuests > user.profile.level)
+      LevelTooLow
+    else if (user.profile.questProposalContext.purchasedTheme == None)
+      InvalidState
+    else if (user.profile.questProposalContext.questProposalCooldown.after(new Date()))
+      CoolDown
+    else
+      OK
+  }
+  
+  
+  /**
    * Tells cost of next theme purchase
    */
   def costOfPurchasingQuestProposal = {

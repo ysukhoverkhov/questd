@@ -19,6 +19,9 @@ case class PurchaseQuestThemeResult(allowed: ProfileModificationResult, theme: O
 case class TakeQuestThemeRequest(user: User)
 case class TakeQuestThemeResult(allowed: ProfileModificationResult, theme: Option[Theme] = None)
 
+case class ProposeQuestRequest(user: User, quest: QuestInfo)
+case class ProposeQuestResult(allowed: ProfileModificationResult)
+
 private[domain] trait ProposeQuestAPI { this: DBAccessor =>
 
   /**
@@ -85,6 +88,53 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
       }
     }
   }
+
+  // TODO report bad request if request is malformed json.
+  // TODO implement giving theme up.
+  // TODO implement crawler to discard outdated theme.
+  // TODO implement theme resolution cooldown (add to disdoc how much it should take to resolve a theme).
+  
+  case class ProposeQuestRequest(user: User, quest: QuestInfo)
+case class ProposeQuestResult(allowed: ProfileModificationResult)
+
+  /**
+   * Takes currently purchased theme to make a quest with it.
+   */
+  def proposeQuest(request: ProposeQuestRequest): ApiResult[ProposeQuestResult] = handleDbException {
+    import request._
+    
+    user.canProposeQuest match {
+      case OK => {
+        
+        db.user.updateUser {
+          user.copy(
+            profile = user.profile.copy(
+              questProposalContext = user.profile.questProposalContext.copy(
+                numberOfPurchasedThemes = 0,
+                purchasedTheme = None,
+                takenTheme = None)))
+        }
+        
+        // TODO add new quest here to DB
+        
+        
+        OkApiResult(Some(ProposeQuestResult(OK)))
+      }
+      case (a: ProfileModificationResult) => OkApiResult(Some(ProposeQuestResult(a)))
+    }
+/*
+    user.profile.questProposalContext.purchasedTheme match {
+      case None => OkApiResult(Some(TakeQuestThemeResult(InvalidState, None)))
+      case Some(pt) => {
+
+
+        OkApiResult(Some(TakeQuestThemeResult(OK, Some(pt))))
+      }
+    }
+    * 
+    */
+  }
+
 
 }
 
