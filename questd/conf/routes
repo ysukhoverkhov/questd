@@ -8,16 +8,18 @@ GET     /                           		controllers.web.rest.Application.index
 #######################
 # WS
 #######################
-# WS Auth
+# Auth
 POST	/rest/loginfb						controllers.web.rest.LoginWS.loginfb
+
+# Requesting profile
+POST	/rest/getProfile					controllers.web.rest.ProfileWS.getProfile
 
 # Generating quests 
 POST	/rest/getQuestThemeCost				controllers.web.rest.ProposeQuestWS.getQuestThemeCost
 POST	/rest/purchaseQuestTheme			controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
 POST	/rest/takeQuestTheme				controllers.web.rest.ProposeQuestWS.takeQuestTheme
+POST	/rest/proposeQuest					controllers.web.rest.ProposeQuestWS.proposeQuest
 
-# Requesting profile
-POST	/rest/getProfile					controllers.web.rest.ProfileWS.getProfile
 
 #######################
 # Admin

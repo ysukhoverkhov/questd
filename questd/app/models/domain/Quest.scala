@@ -2,5 +2,5 @@ package models.domain
 
 
 case class Quest(
-  id: String,
-  info: QuestInfo = QuestInfo()) extends ID
+  id: String = ID.generateUUID(),
+  info: QuestInfo) extends ID

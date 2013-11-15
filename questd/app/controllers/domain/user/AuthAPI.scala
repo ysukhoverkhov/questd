@@ -43,8 +43,7 @@ private [domain] trait AuthAPI { this: DBAccessor =>
 
         Logger.debug("No user with FB id found, creating new one " + params.fbid)
 
-        val newUUID = java.util.UUID.randomUUID().toString()
-        val newUser = User(newUUID, AuthInfo(fbid = Some(params.fbid)))
+        val newUser = User(auth = AuthInfo(fbid = Some(params.fbid)))
         db.user.create(newUser)
         db.user.readByFBid(params.fbid) match {
 

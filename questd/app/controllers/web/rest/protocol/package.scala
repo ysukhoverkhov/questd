@@ -66,4 +66,15 @@ package object protocol {
    */
   type WSTakeQuestThemeResult = TakeQuestThemeResult
 
+  
+  
+  /**
+   * 
+   */
+  type WSProposeQuestRequest = ProposeQuestRequest
+  
+  /**
+   * 
+   */
+  type WSProposeQuestResult = ProposeQuestResult
 }

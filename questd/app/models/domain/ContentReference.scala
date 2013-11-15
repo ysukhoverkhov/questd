@@ -9,7 +9,7 @@ object ContentType extends Enumeration {
 
 
 case class ContentReference(
-  contentType: Int = ContentType.Photo.id, // This is int to make it serializable to DB.
+  contentType: Int, // This is int to make it serializable to DB.
   storage: String = "",
   reference: String = "")
 

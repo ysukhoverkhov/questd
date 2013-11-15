@@ -41,9 +41,7 @@ private [domain] trait ThemesAdminAPI { this: DBAccessor =>
   def createTheme(request: CreateThemeRequest): ApiResult[CreateThemeResult] = handleDbException {
     Logger.debug("Admin request for create new theme.")
 
-    val newID = java.util.UUID.randomUUID().toString()
-    
-    db.theme.create(request.theme.copy(id = newID))
+    db.theme.create(request.theme)
     
     OkApiResult(Some(CreateThemeResult()))
   }

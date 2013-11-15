@@ -9,9 +9,9 @@ import play.api.test._
 import play.api.test.Helpers._
 import play.Logger
 import com.mongodb.casbah.commons.MongoDBObject
-
 import models.store._
 import models.domain._
+
 
 //@RunWith(classOf[JUnitRunner])
 class QuestDAOSpecs extends Specification
@@ -29,7 +29,7 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.create(Quest(id))
+      db.quest.create(Quest(id, QuestInfo(ContentReference(1))))
       val q = db.quest.readByID(id)
 
       q must beSome[Quest]
@@ -40,7 +40,7 @@ class QuestDAOSpecs extends Specification
       clearDB()
       val id = "ididiid"
 
-      db.quest.create(Quest(id))
+      db.quest.create(Quest(id, QuestInfo(ContentReference(1))))
       val q = db.quest.readByID(id)
       q.get.info.content.reference must beEqualTo("")
 
@@ -58,7 +58,7 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.create(Quest(id))
+      db.quest.create(Quest(id, QuestInfo(ContentReference(1))))
       val q = db.quest.readByID(id)
 
       q must beSome[Quest]
