@@ -42,6 +42,8 @@ class UserLogic(val user: User) {
       LevelTooLow
     else if (user.profile.questProposalContext.takenTheme == None)
       InvalidState
+    else if (!(user.profile.assets canAfford costOfProposingQuest))
+      NotEnoughAssets
     else
       OK
   }
@@ -57,6 +59,13 @@ class UserLogic(val user: User) {
       Assets(money = 1)
     }
   }
+  
+  /**
+   * Cost of proposing quest.
+   */
+  def costOfProposingQuest = {
+    Assets(coins = costToProposeQuest(user.profile.level))
+  }
 
   /**
    * Select theme for the user to take.
@@ -69,6 +78,9 @@ class UserLogic(val user: User) {
     themes(random_index)
   }
   
+  /**
+   * 
+   */
   def getCooldownForTakeTheme: Date = {
     import com.github.nscala_time.time.Imports._
     import org.joda.time.DateTime

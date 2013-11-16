@@ -68,6 +68,8 @@ package object protocol {
 
   
   
+  type WSGetQuestProposeCostResult = GetQuestProposeCostResult
+  
   /**
    * 
    */

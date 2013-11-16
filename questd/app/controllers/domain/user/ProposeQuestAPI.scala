@@ -19,6 +19,9 @@ case class PurchaseQuestThemeResult(allowed: ProfileModificationResult, theme: O
 case class TakeQuestThemeRequest(user: User)
 case class TakeQuestThemeResult(allowed: ProfileModificationResult, theme: Option[Theme] = None)
 
+case class GetQuestProposeCostRequest(user: User)
+case class GetQuestProposeCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
+
 case class ProposeQuestRequest(user: User, quest: QuestInfo)
 case class ProposeQuestResult(allowed: ProfileModificationResult)
 
@@ -89,10 +92,18 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
     }
   }
 
+  /**
+   * Get cost of proposing quest.
+   */
+  def getQuestProposeCost(request: GetQuestProposeCostRequest): ApiResult[GetQuestProposeCostResult] = handleDbException {
+    import request._
+
+    OkApiResult(Some(GetQuestProposeCostResult(OK, user.costOfProposingQuest)))
+  }
+
   // TODO implement giving theme up.
   // TODO implement crawler to discard outdated theme.
   // TODO implement theme resolution countdown (add to disdoc how much it should take to resolve a theme).
-  // TODO Get money from player for taking quest.
 
   /**
    * Takes currently purchased theme to make a quest with it.
@@ -111,7 +122,8 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
               questProposalContext = user.profile.questProposalContext.copy(
                 numberOfPurchasedThemes = 0,
                 purchasedTheme = None,
-                takenTheme = None)))
+                takenTheme = None),
+              assets = user.profile.assets - user.costOfProposingQuest))
         }
 
         OkApiResult(Some(ProposeQuestResult(OK)))

@@ -44,7 +44,14 @@ object functions {
       coinsShuffleTheme(level) / (1 to numberOfThemesSkipsForCoins).map(x => costToSkipProposalInt(level, x, 1)).sum
     }
     
-    math.round(costToSkipProposalInt(level, skipNumber, kf(level))).toInt
+    math.round(costToSkipProposalInt(level, skipNumber, kf(level)) * questProposalPeriod(level)).toInt
+  }
+  
+  /**
+   * Cost to propose a single quest.
+   */
+  def costToProposeQuest(level: Int): Int = {
+    math.round(coinProposeQuest(level)  * questProposalPeriod(level)).toInt
   }
   
   

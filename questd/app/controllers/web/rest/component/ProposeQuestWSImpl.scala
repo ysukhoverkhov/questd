@@ -24,6 +24,11 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl with Common
     api.takeQuestTheme(TakeQuestThemeRequest(r.user))
   }
 
+  
+  def getQuestProposeCost = wrapApiCallReturnBody[WSGetQuestProposeCostResult] { r =>
+    api.getQuestProposeCost(GetQuestProposeCostRequest(r.user))
+  }
+  
   def proposeQuest = wrapApiCallReturnBody[WSProposeQuestResult] { r =>
     r.body.asText.fold {
       throw new org.json4s.ParserUtil$ParseException("Empty request", null)

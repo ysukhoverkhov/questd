@@ -19,6 +19,7 @@ POST	/rest/getQuestThemeCost				controllers.web.rest.ProposeQuestWS.getQuestThem
 POST	/rest/purchaseQuestTheme			controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
 POST	/rest/takeQuestTheme				controllers.web.rest.ProposeQuestWS.takeQuestTheme
 POST	/rest/proposeQuest					controllers.web.rest.ProposeQuestWS.proposeQuest
+POST	/rest/getQuestProposeCost			controllers.web.rest.ProposeQuestWS.getQuestProposeCost
 
 
 #######################

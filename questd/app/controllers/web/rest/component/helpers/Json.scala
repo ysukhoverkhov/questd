@@ -27,7 +27,6 @@ object _Json {
   
   def write[A <: AnyRef](a: A): String = swrite(a)
   
-  // TODO: MappingException
   def read[A <: AnyRef : Manifest](json: String): A = {
     parse(json).extract[A]
   }
