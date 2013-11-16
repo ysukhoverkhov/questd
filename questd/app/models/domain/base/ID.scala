@@ -1,4 +1,4 @@
-package models.domain
+package models.domain.base
 
 trait ID {
   val id: String

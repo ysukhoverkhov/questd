@@ -3,6 +3,7 @@ package logic
 import java.util.Date
 import scala.util.Random
 import models.domain._
+import models.domain.ContentType._
 import controllers.domain.user.protocol.ProfileModificationResult._
 import components.componentregistry.ComponentRegistrySingleton
 import functions._
@@ -22,24 +23,28 @@ class UserLogic(val user: User) {
       NotEnoughAssets
     else if (user.profile.questProposalContext.questProposalCooldown.after(new Date()))
       CoolDown
+    else if (user.profile.questProposalContext.takenTheme != None)
+      InvalidState
     else
       OK
   }
 
   /**
-   * Is user can propose quest.
+   * Is user can propose quest of given type.
    */
-  def canProposeQuest = {
-    if (user.profile.rights.submitPhotoQuests > user.profile.level)
+  def canProposeQuest(conentType: ContentType) = {
+    val level = conentType match {
+      case Photo => user.profile.rights.submitPhotoQuests
+      case Video => user.profile.rights.submitVideoQuests
+    }
+    
+    if (level > user.profile.level)
       LevelTooLow
-    else if (user.profile.questProposalContext.purchasedTheme == None)
+    else if (user.profile.questProposalContext.takenTheme == None)
       InvalidState
-    else if (user.profile.questProposalContext.questProposalCooldown.after(new Date()))
-      CoolDown
     else
       OK
   }
-  
   
   /**
    * Tells cost of next theme purchase

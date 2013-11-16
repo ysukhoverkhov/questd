@@ -12,7 +12,7 @@ import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.commons.MongoDBObject
 import models.store.mongo.SalatContext._
 import models.store.exceptions.DatabaseException
-import models.domain.ID
+import models.domain.base.ID
 
 abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
   extends ModelCompanion[T, ObjectId] {

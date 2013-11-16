@@ -1,6 +1,6 @@
 package models.domain.admin
 
-import _root_.models.domain.ID
+import models.domain.base.ID
 
 case class Configuration(
   private val _sections: Map[String, ConfigSection]) {

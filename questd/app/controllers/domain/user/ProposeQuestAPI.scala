@@ -91,7 +91,8 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
 
   // TODO implement giving theme up.
   // TODO implement crawler to discard outdated theme.
-  // TODO implement theme resolution cooldown (add to disdoc how much it should take to resolve a theme).
+  // TODO implement theme resolution countdown (add to disdoc how much it should take to resolve a theme).
+  // TODO Get money from player for taking quest.
 
   /**
    * Takes currently purchased theme to make a quest with it.
@@ -99,7 +100,7 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
   def proposeQuest(request: ProposeQuestRequest): ApiResult[ProposeQuestResult] = handleDbException {
     import request._
 
-    user.canProposeQuest match {
+    user.canProposeQuest(ContentType.apply(quest.content.contentType)) match {
       case OK => {
 
         db.quest.create(Quest(info = quest))
