@@ -37,5 +37,14 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl with Common
       api.proposeQuest(ProposeQuestRequest(r.user, v))
     }
   }
+  
+  
+  def giveUpQuestProposal = wrapApiCallReturnBody[WSGiveUpQuestProposalResult] { r =>
+    api.giveUpQuestProposal(GiveUpQuestProposalRequest(r.user))
+  }
+  
+  def getQuestProposalGiveUpCost = wrapApiCallReturnBody[WSGetQuestProposalGiveUpCostResult] { r =>
+    api.getQuestProposalGiveUpCost(GetQuestProposalGiveUpCostRequest(r.user))
+  }
 }
 

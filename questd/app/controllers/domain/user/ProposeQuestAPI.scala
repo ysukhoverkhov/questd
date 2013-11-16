@@ -25,6 +25,12 @@ case class GetQuestProposeCostResult(allowed: ProfileModificationResult, cost: A
 case class ProposeQuestRequest(user: User, quest: QuestInfo)
 case class ProposeQuestResult(allowed: ProfileModificationResult)
 
+case class GiveUpQuestProposalRequest(user: User)
+case class GiveUpQuestProposalResult(allowed: ProfileModificationResult)
+
+case class GetQuestProposalGiveUpCostRequest(user: User)
+case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
+
 private[domain] trait ProposeQuestAPI { this: DBAccessor =>
 
   /**
@@ -101,7 +107,6 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
     OkApiResult(Some(GetQuestProposeCostResult(OK, user.costOfProposingQuest)))
   }
 
-  // TODO implement giving theme up.
   // TODO implement crawler to discard outdated theme.
   // TODO implement theme resolution countdown (add to disdoc how much it should take to resolve a theme).
 
@@ -132,6 +137,43 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
     }
   }
 
+  /**
+   * Give up quest proposal for the user if he is going to make one.
+   */
+  def giveUpQuestProposal(request: GiveUpQuestProposalRequest): ApiResult[GiveUpQuestProposalResult] = handleDbException {
+    import request._
+
+    user.canGiveUpQuest match {
+      case OK => {
+        val newAssets = (user.profile.assets - user.costOfGivingUpQuestProposal) clamp
+
+        db.user.update {
+          user.copy(
+            profile = user.profile.copy(
+              questProposalContext = user.profile.questProposalContext.copy(
+                numberOfPurchasedThemes = 0,
+                purchasedTheme = None,
+                takenTheme = None),
+              assets = newAssets))
+        }
+
+        OkApiResult(Some(GiveUpQuestProposalResult(OK)))
+      }
+
+      case (a: ProfileModificationResult) => OkApiResult(Some(GiveUpQuestProposalResult(a)))
+    }
+  }
+
+  /**
+   * Get cost for giving up quest proposal.
+   */
+  def getQuestProposalGiveUpCost(request: GetQuestProposalGiveUpCostRequest): ApiResult[GetQuestProposalGiveUpCostResult] = handleDbException {
+    import request._
+
+    OkApiResult(Some(GetQuestProposalGiveUpCostResult(OK, user.costOfGivingUpQuestProposal)))
+  }
+
 }
+
 
 

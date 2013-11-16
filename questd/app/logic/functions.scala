@@ -54,5 +54,12 @@ object functions {
     math.round(coinProposeQuest(level)  * questProposalPeriod(level)).toInt
   }
   
+  /**
+   * Cost to give up quest proposal.
+   */
+  def ratingToGiveUpQuestProposal(level: Int): Int = {
+    math.round(ratingForSubmitProposal(level) * questProposalPeriod(level) * questProposalGiveUpPenalty).toInt
+  }
+  
   
 }

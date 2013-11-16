@@ -13,6 +13,8 @@ object ProposeQuestWS extends Controller with AccessToWSInstance {
   def getQuestProposeCost = ws.getQuestProposeCost
   def proposeQuest = ws.proposeQuest
 
-  
+  def giveUpQuestProposal = ws.giveUpQuestProposal
+  def getQuestProposalGiveUpCost = ws.getQuestProposalGiveUpCost
+
 }
 

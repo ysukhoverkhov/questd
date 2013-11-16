@@ -90,5 +90,23 @@ class UserLogic(val user: User) {
     val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
     (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate()
   }
+  
+  
+  /**
+   * Is user can give up quest.
+   */
+  def canGiveUpQuest = {
+    if (user.profile.questProposalContext.takenTheme == None)
+      InvalidState
+    else
+      OK
+  }
+
+  /**
+   * 
+   */
+  def costOfGivingUpQuestProposal = {
+    Assets(rating = ratingToGiveUpQuestProposal(user.profile.level))
+  }
 }
 

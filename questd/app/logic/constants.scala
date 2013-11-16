@@ -23,4 +23,5 @@ object constants {
   
   val flipHour = 5
   
+  val questProposalGiveUpPenalty = 2
 }

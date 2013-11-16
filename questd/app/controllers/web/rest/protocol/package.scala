@@ -79,4 +79,15 @@ package object protocol {
    * 
    */
   type WSProposeQuestResult = ProposeQuestResult
+  
+  /**
+   * 
+   */
+  type WSGiveUpQuestProposalResult = GiveUpQuestProposalResult
+
+  /**
+   * 
+   */
+  type WSGetQuestProposalGiveUpCostResult = GetQuestProposalGiveUpCostResult
+
 }
