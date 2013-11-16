@@ -89,7 +89,6 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
     }
   }
 
-  // TODO report bad request if request is malformed json.
   // TODO implement giving theme up.
   // TODO implement crawler to discard outdated theme.
   // TODO implement theme resolution cooldown (add to disdoc how much it should take to resolve a theme).
