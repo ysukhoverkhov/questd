@@ -107,9 +107,6 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
     OkApiResult(Some(GetQuestProposeCostResult(OK, user.costOfProposingQuest)))
   }
 
-  // TODO implement crawler to discard outdated theme.
-  // TODO implement theme resolution countdown (add to disdoc how much it should take to resolve a theme).
-
   /**
    * Takes currently purchased theme to make a quest with it.
    */
