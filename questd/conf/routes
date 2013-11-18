@@ -18,10 +18,11 @@ POST	/rest/getProfile					controllers.web.rest.ProfileWS.getProfile
 # Generating quests 
 POST	/rest/getQuestThemeCost				controllers.web.rest.ProposeQuestWS.getQuestThemeCost
 POST	/rest/purchaseQuestTheme			controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
+
+POST	/rest/getQuestThemeTakeCost			controllers.web.rest.ProposeQuestWS.getQuestThemeTakeCost
 POST	/rest/takeQuestTheme				controllers.web.rest.ProposeQuestWS.takeQuestTheme
 
 POST	/rest/proposeQuest					controllers.web.rest.ProposeQuestWS.proposeQuest
-POST	/rest/getQuestProposeCost			controllers.web.rest.ProposeQuestWS.getQuestProposeCost
 
 POST	/rest/giveUpQuestProposal			controllers.web.rest.ProposeQuestWS.giveUpQuestProposal
 POST	/rest/getQuestProposalGiveUpCost	controllers.web.rest.ProposeQuestWS.getQuestProposalGiveUpCost

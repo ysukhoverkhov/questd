@@ -68,7 +68,7 @@ package object protocol {
 
   
   
-  type WSGetQuestProposeCostResult = GetQuestProposeCostResult
+  type WSGetQuestThemeTakeCostResult = GetQuestThemeTakeCostResult
   
   /**
    * 

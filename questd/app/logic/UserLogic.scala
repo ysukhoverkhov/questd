@@ -32,6 +32,20 @@ class UserLogic(val user: User) {
   /**
    * Is user can propose quest of given type.
    */
+  def canTakeQuestTheme = {
+    if (user.profile.rights.submitPhotoQuests > user.profile.level)
+      LevelTooLow
+    else if (user.profile.questProposalContext.purchasedTheme == None)
+      InvalidState
+    else if (!(user.profile.assets canAfford costOfTakingQuestTheme))
+      NotEnoughAssets
+    else
+      OK
+  }
+
+  /**
+   * Is user can propose quest of given type.
+   */
   def canProposeQuest(conentType: ContentType) = {
     val level = conentType match {
       case Photo => user.profile.rights.submitPhotoQuests
@@ -42,8 +56,6 @@ class UserLogic(val user: User) {
       LevelTooLow
     else if (user.profile.questProposalContext.takenTheme == None)
       InvalidState
-    else if (!(user.profile.assets canAfford costOfProposingQuest))
-      NotEnoughAssets
     else
       OK
   }
@@ -63,7 +75,7 @@ class UserLogic(val user: User) {
   /**
    * Cost of proposing quest.
    */
-  def costOfProposingQuest = {
+  def costOfTakingQuestTheme = {
     Assets(coins = costToProposeQuest(user.profile.level))
   }
 

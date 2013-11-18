@@ -31,3 +31,4 @@ trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFu
   def getQuestGiveUpCost = TODO
 }
 
+// TODO skip already purchased quests and themes in crawler to start new sequence on next day.

@@ -20,14 +20,14 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl with Common
     api.purchaseQuestTheme(PurchaseQuestThemeRequest(r.user))
   }
 
+  def getQuestThemeTakeCost = wrapApiCallReturnBody[WSGetQuestThemeTakeCostResult] { r =>
+    api.getQuestThemeTakeCost(GetQuestThemeTakeCostRequest(r.user))
+  }
+
   def takeQuestTheme = wrapApiCallReturnBody[WSTakeQuestThemeResult] { r =>
     api.takeQuestTheme(TakeQuestThemeRequest(r.user))
   }
 
-  
-  def getQuestProposeCost = wrapApiCallReturnBody[WSGetQuestProposeCostResult] { r =>
-    api.getQuestProposeCost(GetQuestProposeCostRequest(r.user))
-  }
   
   def proposeQuest = wrapApiCallReturnBody[WSProposeQuestResult] { r =>
     r.body.asText.fold {
