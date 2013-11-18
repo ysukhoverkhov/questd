@@ -90,4 +90,14 @@ package object protocol {
    */
   type WSGetQuestProposalGiveUpCostResult = GetQuestProposalGiveUpCostResult
 
+  
+  /*********************
+   * Solving quests
+   *********************/
+  type WSGetQuestCostResult = GetQuestCostResult
+  
+  type WSPurchaseQuestResult = PurchaseQuestResult
+  
+  type WSTakeQuestResult = TakeQuestResult
+
 }

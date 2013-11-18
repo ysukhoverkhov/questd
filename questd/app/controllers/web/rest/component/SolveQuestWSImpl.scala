@@ -12,52 +12,22 @@ import org.json4s._
 
 trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
-  def getQuestCost = TODO
-  def purchaseQuest = TODO
-  def takeQuest = TODO
+  def getQuestCost = wrapApiCallReturnBody[WSGetQuestCostResult] { r =>
+    api.getQuestCost(GetQuestCostRequest(r.user))
+  }
+  
+  def purchaseQuest = wrapApiCallReturnBody[WSPurchaseQuestResult] { r =>
+    api.purchaseQuest(PurchaseQuestRequest(r.user))
+  }
+  
+  def takeQuest = wrapApiCallReturnBody[WSTakeQuestResult] { r =>
+    api.takeQuest(TakeQuestRequest(r.user))
+  }
 
   def proposeSolution = TODO
   def getSolutionProposeCost = TODO
 
   def giveUpQuest = TODO
   def getQuestGiveUpCost = TODO
-  
-/*
-  def getQuestThemeCost = wrapApiCallReturnBody[WSGetQuestThemeCostResult] { r =>
-    api.getQuestThemeCost(GetQuestThemeCostRequest(r.user))
-  }
-
-  def purchaseQuestTheme = wrapApiCallReturnBody[WSPurchaseQuestThemeResult] { r =>
-    api.purchaseQuestTheme(PurchaseQuestThemeRequest(r.user))
-  }
-
-  def takeQuestTheme = wrapApiCallReturnBody[WSTakeQuestThemeResult] { r =>
-    api.takeQuestTheme(TakeQuestThemeRequest(r.user))
-  }
-
-  
-  def getQuestProposeCost = wrapApiCallReturnBody[WSGetQuestProposeCostResult] { r =>
-    api.getQuestProposeCost(GetQuestProposeCostRequest(r.user))
-  }
-  
-  def proposeQuest = wrapApiCallReturnBody[WSProposeQuestResult] { r =>
-    r.body.asText.fold {
-      throw new org.json4s.ParserUtil$ParseException("Empty request", null)
-    } { x =>
-      val v = Json.read[QuestInfo](x)
-      api.proposeQuest(ProposeQuestRequest(r.user, v))
-    }
-  }
-  
-  
-  def giveUpQuestProposal = wrapApiCallReturnBody[WSGiveUpQuestProposalResult] { r =>
-    api.giveUpQuestProposal(GiveUpQuestProposalRequest(r.user))
-  }
-  
-  def getQuestProposalGiveUpCost = wrapApiCallReturnBody[WSGetQuestProposalGiveUpCostResult] { r =>
-    api.getQuestProposalGiveUpCost(GetQuestProposalGiveUpCostRequest(r.user))
-  }
-  * 
-  */
 }
 

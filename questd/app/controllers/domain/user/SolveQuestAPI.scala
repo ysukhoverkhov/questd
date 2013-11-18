@@ -10,15 +10,15 @@ import components._
 import logic._
 import protocol.ProfileModificationResult._
 
-case class GetQuestCostRequest(user: User)
-case class GetQuestCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
+case class GetQuestThemeCostRequest(user: User)
+case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
 
-case class PurchaseQuestRequest(user: User)
-case class PurchaseQuestResult(allowed: ProfileModificationResult, quest: Option[Quest] = None)
+case class PurchaseQuestThemeRequest(user: User)
+case class PurchaseQuestThemeResult(allowed: ProfileModificationResult, theme: Option[Theme] = None)
 
-case class TakeQuestRequest(user: User)
-case class TakeQuestResult(allowed: ProfileModificationResult, theme: Option[Quest] = None)
-/*
+case class TakeQuestThemeRequest(user: User)
+case class TakeQuestThemeResult(allowed: ProfileModificationResult, theme: Option[Theme] = None)
+
 case class GetQuestProposeCostRequest(user: User)
 case class GetQuestProposeCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
 
@@ -30,40 +30,9 @@ case class GiveUpQuestProposalResult(allowed: ProfileModificationResult)
 
 case class GetQuestProposalGiveUpCostRequest(user: User)
 case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
-*/
-private[domain] trait ProposeQuestAPI { this: DBAccessor =>
 
-  
-  def getQuestCost(request: GetQuestCostRequest): ApiResult[GetQuestCostResult] = handleDbException {
-    import request._
+private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
-    OkApiResult(Some(GetQuestCostResult(OK, Assets(1, 2, 3))))
-  }
-  
-  def purchaseQuest(request: PurchaseQuestRequest): ApiResult[PurchaseQuestResult] = handleDbException {
-    import request._
-
-    OkApiResult(Some(PurchaseQuestResult(OK)))
-  }
-  
-  def takeQuest(request: TakeQuestRequest): ApiResult[TakeQuestResult] = handleDbException {
-    import request._
-
-    OkApiResult(Some(TakeQuestResult(OK)))
-  }
-  
-  
-  /*
-
-  def proposeSolution = TODO
-  def getSolutionProposeCost = TODO
-
-  def giveUpQuest = TODO
-  def getQuestGiveUpCost = TODO
-  * 
-  */
-
-  /*
   /**
    * Get cost of next quest purchase.
    */
@@ -200,8 +169,6 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
 
     OkApiResult(Some(GetQuestProposalGiveUpCostResult(OK, user.costOfGivingUpQuestProposal)))
   }
-  * 
-  */
 
 }
 
