@@ -30,13 +30,14 @@ POST	/rest/getQuestProposalGiveUpCost	controllers.web.rest.ProposeQuestWS.getQue
 # Solve quest
 POST	/rest/getQuestCost					controllers.web.rest.SolveQuestWS.getQuestCost
 POST	/rest/purchaseQuest					controllers.web.rest.SolveQuestWS.purchaseQuest
+
+POST	/rest/getTakeQuestCost				controllers.web.rest.SolveQuestWS.getTakeQuestCost
 POST	/rest/takeQuest						controllers.web.rest.SolveQuestWS.takeQuest
 
 POST	/rest/proposeSolution				controllers.web.rest.SolveQuestWS.proposeSolution
-POST	/rest/getSolutionProposeCost		controllers.web.rest.SolveQuestWS.getSolutionProposeCost
 
-POST	/rest/giveUpQuest					controllers.web.rest.SolveQuestWS.giveUpQuest
 POST	/rest/getQuestGiveUpCost			controllers.web.rest.SolveQuestWS.getQuestGiveUpCost
+POST	/rest/giveUpQuest					controllers.web.rest.SolveQuestWS.giveUpQuest
 
 
 #######################

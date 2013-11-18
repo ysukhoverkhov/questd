@@ -18,11 +18,11 @@ case class PurchaseQuestResult(allowed: ProfileModificationResult, quest: Option
 
 case class TakeQuestRequest(user: User)
 case class TakeQuestResult(allowed: ProfileModificationResult, theme: Option[Quest] = None)
-/*
-case class GetQuestProposeCostRequest(user: User)
-case class GetQuestProposeCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
 
-case class ProposeQuestRequest(user: User, quest: QuestInfo)
+case class GetTakeQuestCostRequest(user: User)
+case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
+
+/*case class ProposeQuestRequest(user: User, quest: QuestInfo)
 case class ProposeQuestResult(allowed: ProfileModificationResult)
 
 case class GiveUpQuestProposalRequest(user: User)
@@ -45,6 +45,12 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
     import request._
 
     OkApiResult(Some(PurchaseQuestResult(OK)))
+  }
+  
+  def getTakeQuestCost(request: GetTakeQuestCostRequest): ApiResult[GetTakeQuestCostResult] = handleDbException {
+    import request._
+
+    OkApiResult(Some(GetTakeQuestCostResult(OK, Assets(1, 2, 3))))
   }
   
   def takeQuest(request: TakeQuestRequest): ApiResult[TakeQuestResult] = handleDbException {
