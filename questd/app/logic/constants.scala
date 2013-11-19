@@ -24,4 +24,14 @@ object constants {
   val flipHour = 5
   
   val questProposalGiveUpPenalty = 2
+
+  /**
+   * Number of themes skips for coins.
+   */
+  def numberOfThemesSkipsForCoins = 4
+  
+  /**
+   * Number of quests skip for coins.
+   */
+  val numberOfQuestsSkipsForCoins = 8
 }

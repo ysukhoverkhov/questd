@@ -39,7 +39,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
   def getQuestCost(request: GetQuestCostRequest): ApiResult[GetQuestCostResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetQuestCostResult(OK, Assets(1, 2, 3))))
+    OkApiResult(Some(GetQuestCostResult(OK, user.costOfPurchasingQuest)))
   }
   
   def purchaseQuest(request: PurchaseQuestRequest): ApiResult[PurchaseQuestResult] = handleDbException {

@@ -7,12 +7,17 @@ import models.domain.ContentType._
 import controllers.domain.user.protocol.ProfileModificationResult._
 import components.componentregistry.ComponentRegistrySingleton
 import functions._
+import constants._
 
 // This should not go to DB directly since API may have cache layer.
 class UserLogic(val user: User) {
 
   lazy val api = ComponentRegistrySingleton.api
 
+  /****************************
+   * Proposing quests.
+   ****************************/
+  
   /**
    * Check is the user can purchase quest proposals.
    */
@@ -64,7 +69,7 @@ class UserLogic(val user: User) {
    * Tells cost of next theme purchase
    */
   def costOfPurchasingQuestProposal = {
-    if (user.profile.questProposalContext.numberOfPurchasedThemes < 4) {
+    if (user.profile.questProposalContext.numberOfPurchasedThemes < numberOfThemesSkipsForCoins) {
       val c = costToSkipProposal(user.profile.level, user.profile.questProposalContext.numberOfPurchasedThemes + 1)
       Assets(coins = c)
     } else {
@@ -120,5 +125,29 @@ class UserLogic(val user: User) {
   def costOfGivingUpQuestProposal = {
     Assets(rating = ratingToGiveUpQuestProposal(user.profile.level))
   }
+  
+  
+  /************************************
+   * Solving quests
+   ************************************/
+  
+  /**
+   * Tells cost of next theme purchase
+   */
+  def costOfPurchasingQuest = {
+    if (user.profile.questContext.numberOfPurchasedQuests < numberOfQuestsSkipsForCoins) {
+      
+      val questDuration = user.profile.questContext.purchasedQuest match {
+        case Some(q) => q.duration
+        case _ => 1
+      }
+      
+      val c = costToSkipQuest(user.profile.level, user.profile.questProposalContext.numberOfPurchasedThemes + 1, questDuration)
+      Assets(coins = c)
+    } else {
+      Assets(money = 1)
+    }
+  }
+
 }
 

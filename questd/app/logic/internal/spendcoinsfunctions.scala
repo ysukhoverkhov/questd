@@ -3,7 +3,7 @@ package logic.internal
 import logic.constants._
 import basefunctions._
 
-private [logic] object spendcoinsfunctions {
+object spendcoinsfunctions {
  
   /**
    * How much coins per day player should spend on shuffling themes for quest proposals.
@@ -18,6 +18,26 @@ private [logic] object spendcoinsfunctions {
       0
     else
       megaf(level, k, d, b, y)
+  }
+
+  /**
+   * How much coin per day we should spend on skipping quests.
+   */
+  def coinShuffleQuest(level: Int): Double = {
+    val k = 87.556
+    val d = 6.396
+    val b = -20.037
+    val y = 1.387e-6
+    
+    def coinShuffleQuestInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
+      level match {
+        case _ if level < submitPhotoResults => 0
+        case _ if (level < inviteFriends) && (level >= submitPhotoResults) => megaf(level, k, d, b, y)
+        case _ => coinShuffleQuestInt(inviteFriends - 1, k, d, b, y) * 0.89 + megaf(level, k, d, b, y) * 0.11
+      }
+    }
+    
+    coinShuffleQuestInt(level, k, d, b, y)
   }
 
   /**
