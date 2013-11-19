@@ -102,4 +102,11 @@ package object protocol {
   
   type WSTakeQuestResult = TakeQuestResult
 
+  type WSProposeSolutionRequest = ProposeSolutionRequest
+  type WSProposeSolutionResult = ProposeSolutionResult
+  
+  type WSGetQuestGiveUpCostResult = GetQuestGiveUpCostResult
+  
+  type WSGiveUpQuestResult = GiveUpQuestResult
+
 }

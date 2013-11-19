@@ -22,15 +22,16 @@ case class TakeQuestResult(allowed: ProfileModificationResult, theme: Option[Que
 case class GetTakeQuestCostRequest(user: User)
 case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
 
-/*case class ProposeQuestRequest(user: User, quest: QuestInfo)
-case class ProposeQuestResult(allowed: ProfileModificationResult)
+case class ProposeSolutionRequest(user: User, solution: QuestSolution)
+case class ProposeSolutionResult(allowed: ProfileModificationResult)
 
-case class GiveUpQuestProposalRequest(user: User)
-case class GiveUpQuestProposalResult(allowed: ProfileModificationResult)
+case class GetQuestGiveUpCostRequest(user: User)
+case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
 
-case class GetQuestProposalGiveUpCostRequest(user: User)
-case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
-*/
+case class GiveUpQuestRequest(user: User)
+case class GiveUpQuestResult(allowed: ProfileModificationResult)
+
+
 
 private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
@@ -59,17 +60,27 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
     OkApiResult(Some(TakeQuestResult(OK)))
   }
   
+
+  def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
+    import request._
+
+    OkApiResult(Some(ProposeSolutionResult(OK)))
+  }
   
-  /*
+  
+  def getQuestGiveUpCost(request: GetQuestGiveUpCostRequest): ApiResult[GetQuestGiveUpCostResult] = handleDbException {
+    import request._
 
-  def proposeSolution = TODO
-  def getSolutionProposeCost = TODO
+    OkApiResult(Some(GetQuestGiveUpCostResult(OK, Assets(1, 2, 3))))
+  }
+  
+  def giveUpQuest(request: GiveUpQuestRequest): ApiResult[GiveUpQuestResult] = handleDbException {
+    import request._
 
-  def giveUpQuest = TODO
-  def getQuestGiveUpCost = TODO
-  * 
-  */
-
+    OkApiResult(Some(GiveUpQuestResult(OK)))
+  }
+  
+  
   /*
   /**
    * Get cost of next quest purchase.

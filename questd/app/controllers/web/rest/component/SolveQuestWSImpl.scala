@@ -28,10 +28,22 @@ trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFu
     api.takeQuest(TakeQuestRequest(r.user))
   }
 
-  def proposeSolution = TODO
+  def proposeSolution = wrapApiCallReturnBody[WSProposeSolutionResult] { r =>
+    r.body.asText.fold {
+      throw new org.json4s.ParserUtil$ParseException("Empty request", null)
+    } { x =>
+      val v = Json.read[QuestSolution](x)
+      api.proposeSolution(ProposeSolutionRequest(r.user, v))
+    }
+  }
 
-  def giveUpQuest = TODO
-  def getQuestGiveUpCost = TODO
+  def getQuestGiveUpCost = wrapApiCallReturnBody[WSGetQuestGiveUpCostResult] { r =>
+    api.getQuestGiveUpCost(GetQuestGiveUpCostRequest(r.user))
+  }
+  
+  def giveUpQuest = wrapApiCallReturnBody[WSGiveUpQuestResult] { r =>
+    api.giveUpQuest(GiveUpQuestRequest(r.user))
+  }
 }
 
-// TODO skip already purchased quests and themes in crawler to start new sequence on next day.
+// TODO reset to 0 already purchased quests and themes in crawler to start new sequence on next day.
