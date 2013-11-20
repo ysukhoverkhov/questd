@@ -14,10 +14,12 @@ class UserLogic(val user: User) {
 
   lazy val api = ComponentRegistrySingleton.api
 
-  /****************************
+  /**
+   * **************************
    * Proposing quests.
-   ****************************/
-  
+   * **************************
+   */
+
   /**
    * Check is the user can purchase quest proposals.
    */
@@ -56,7 +58,7 @@ class UserLogic(val user: User) {
       case Photo => user.profile.rights.submitPhotoQuests
       case Video => user.profile.rights.submitVideoQuests
     }
-    
+
     if (level > user.profile.level)
       LevelTooLow
     else if (user.profile.questProposalContext.takenTheme == None)
@@ -64,7 +66,7 @@ class UserLogic(val user: User) {
     else
       OK
   }
-  
+
   /**
    * Tells cost of next theme purchase
    */
@@ -76,7 +78,7 @@ class UserLogic(val user: User) {
       Assets(money = 1)
     }
   }
-  
+
   /**
    * Cost of proposing quest.
    */
@@ -94,21 +96,20 @@ class UserLogic(val user: User) {
     val random_index = rand.nextInt(themes.length)
     themes(random_index)
   }
-  
+
   /**
-   * 
+   *
    */
   def getCooldownForTakeTheme: Date = {
     import com.github.nscala_time.time.Imports._
     import org.joda.time.DateTime
-    
+
     val daysToSkipt = questProposalPeriod(user.profile.level)
-    
+
     val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
-    (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate()
+    (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate ()
   }
-  
-  
+
   /**
    * Is user can give up quest.
    */
@@ -120,19 +121,20 @@ class UserLogic(val user: User) {
   }
 
   /**
-   * 
+   *
    */
   def costOfGivingUpQuestProposal = {
     Assets(rating = ratingToGiveUpQuestProposal(user.profile.level))
   }
-  
-  
-  /************************************
-   * Solving quests
-   ************************************/
-  
+
   /**
-   * Check can the user purchase quest. 
+   * **********************************
+   * Solving quests
+   * **********************************
+   */
+
+  /**
+   * Check can the user purchase quest.
    * TODO uncomment the check.
    */
   def canPurchaseQuest = {
@@ -140,38 +142,52 @@ class UserLogic(val user: User) {
       LevelTooLow
     else if (!(user.profile.assets canAfford costOfPurchasingQuest))
       NotEnoughAssets
-//    else if (user.profile.questProposalContext.questProposalCooldown.after(new Date()))
-//      CoolDown
+    //    else if (user.profile.questProposalContext.questProposalCooldown.after(new Date()))
+    //      CoolDown
     else if (user.profile.questContext.takenQuest != None)
       InvalidState
     else
       OK
   }
-  
+
   /**
    * Tells cost of next theme purchase
    */
   def costOfPurchasingQuest = {
     if (user.profile.questContext.numberOfPurchasedQuests < numberOfQuestsSkipsForCoins) {
-      
+
       val questDuration = user.profile.questContext.purchasedQuest match {
         case Some(q) => q.duration
         case _ => 1
       }
-      
+
       val c = costToSkipQuest(user.profile.level, user.profile.questContext.numberOfPurchasedQuests + 1, questDuration)
       Assets(coins = c)
     } else {
       Assets(money = 1)
     }
   }
-  
+
   /**
    * Takes everything into account and returns possible quest to be solved by user.
+   * TODO implement me.
    */
   def getRandomQuestForSolution = {
     QuestInfo(ContentReference(0))
   }
 
+  /**
+   * Get cost of taking quest to resolve.
+   */
+  def costOfTakingQuest = {
+    val questDuration: Int =
+      if (user.profile.questContext.purchasedQuest == None)
+        0
+      else
+        user.profile.questContext.purchasedQuest.get.duration
+
+    Assets(coins = costToTakeQuestToSolve(user.profile.level, questDuration))
+
+  }
 }
 

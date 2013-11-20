@@ -69,10 +69,13 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
     }
   }
 
+  /**
+   * Get cost of taking quest to resolve.
+   */
   def getTakeQuestCost(request: GetTakeQuestCostRequest): ApiResult[GetTakeQuestCostResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetTakeQuestCostResult(OK, Assets(1, 2, 3))))
+    OkApiResult(Some(GetTakeQuestCostResult(OK, user.costOfTakingQuest)))
   }
 
   def takeQuest(request: TakeQuestRequest): ApiResult[TakeQuestResult] = handleDbException {

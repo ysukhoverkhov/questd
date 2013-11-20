@@ -83,4 +83,11 @@ object functions {
     math.round(costToSkipQuestInt(level, skipNumber, kf(level)) * currentQuestDuration).toInt
   }
   
+  /**
+   * How much coins does it takes to take quest for solving.
+   * TODO write test for me.
+   */
+  def costToTakeQuestToSolve(level: Int, questDuration: Int): Int = {
+    math.round(coinSelectQuest(level) * questDuration).toInt
+  }
 }
