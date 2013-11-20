@@ -111,9 +111,9 @@ class UserLogic(val user: User) {
   }
 
   /**
-   * Is user can give up quest.
+   * Is user can give up quest proposal.
    */
-  def canGiveUpQuest = {
+  def canGiveUpQuestProposal = {
     if (user.profile.questProposalContext.takenTheme == None)
       InvalidState
     else
@@ -177,6 +177,20 @@ class UserLogic(val user: User) {
   }
 
   /**
+   * Check are we able to take quest.
+   */
+  def canTakeQuest = {
+    if (user.profile.rights.submitPhotoResults > user.profile.level)
+      LevelTooLow
+    else if (user.profile.questContext.purchasedQuest == None)
+      InvalidState
+    else if (!(user.profile.assets canAfford costOfTakingQuest))
+      NotEnoughAssets
+    else
+      OK
+  }
+  
+  /**
    * Get cost of taking quest to resolve.
    */
   def costOfTakingQuest = {
@@ -187,7 +201,25 @@ class UserLogic(val user: User) {
         user.profile.questContext.purchasedQuest.get.duration
 
     Assets(coins = costToTakeQuestToSolve(user.profile.level, questDuration))
-
   }
+  
+  /**
+   * Is user can give up quest.
+   */
+  def canGiveUpQuest = {
+    if (user.profile.questContext.takenQuest == None)
+      InvalidState
+    else
+      OK
+  }
+  
+  /**
+   * How much it'll cost to give up quest.
+   */
+  def costOfGivingUpQuest = {
+    // TODO implement me.
+    Assets(0, 0, 1000)
+  }
+
 }
 

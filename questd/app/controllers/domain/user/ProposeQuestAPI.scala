@@ -143,7 +143,7 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
   def giveUpQuestProposal(request: GiveUpQuestProposalRequest): ApiResult[GiveUpQuestProposalResult] = handleDbException {
     import request._
 
-    user.canGiveUpQuest match {
+    user.canGiveUpQuestProposal match {
       case OK => {
         val newAssets = (user.profile.assets - user.costOfGivingUpQuestProposal).clamp
 

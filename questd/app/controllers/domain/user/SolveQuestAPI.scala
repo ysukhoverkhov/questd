@@ -17,7 +17,7 @@ case class PurchaseQuestRequest(user: User)
 case class PurchaseQuestResult(allowed: ProfileModificationResult, quest: Option[QuestInfo] = None)
 
 case class TakeQuestRequest(user: User)
-case class TakeQuestResult(allowed: ProfileModificationResult, theme: Option[Quest] = None)
+case class TakeQuestResult(allowed: ProfileModificationResult, theme: Option[QuestInfo] = None)
 
 case class GetTakeQuestCostRequest(user: User)
 case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
@@ -78,92 +78,84 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
     OkApiResult(Some(GetTakeQuestCostResult(OK, user.costOfTakingQuest)))
   }
 
+  /**
+   * Take quest to deal with.
+   * TODO implement cooldown here.
+   */
   def takeQuest(request: TakeQuestRequest): ApiResult[TakeQuestResult] = handleDbException {
     import request._
+    
+    user.canTakeQuest match {
 
-    OkApiResult(Some(TakeQuestResult(OK)))
-  }
-
-  def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
-    import request._
-
-    OkApiResult(Some(ProposeSolutionResult(OK)))
-  }
-
-  def getQuestGiveUpCost(request: GetQuestGiveUpCostRequest): ApiResult[GetQuestGiveUpCostResult] = handleDbException {
-    import request._
-
-    OkApiResult(Some(GetQuestGiveUpCostResult(OK, Assets(1, 2, 3))))
-  }
-
-  def giveUpQuest(request: GiveUpQuestRequest): ApiResult[GiveUpQuestResult] = handleDbException {
-    import request._
-
-    OkApiResult(Some(GiveUpQuestResult(OK)))
-  }
-
-  /*
-  def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
-    import request._
-
-    user.canPurchaseQuestProposals match {
       case OK => {
 
-        val t = user.getRandomThemeForQuestProposal
-        val themeCost = user.costOfPurchasingQuestProposal
-
-        {
-          db.user.update {
-            user.copy(
-              profile = user.profile.copy(
-                assets = user.profile.assets - themeCost,
-                questProposalContext = user.profile.questProposalContext.copy(
-                  numberOfPurchasedThemes = user.profile.questProposalContext.numberOfPurchasedThemes + 1,
-                  purchasedTheme = Some(t))))
-          }
-        }
-
-        OkApiResult(Some(PurchaseQuestThemeResult(OK, Some(t))))
-
-      }
-      case a => OkApiResult(Some(PurchaseQuestThemeResult(a)))
-    }
-  }
-
-  /**
-   * Takes currently purchased theme to make a quest with it.
-   */
-  def takeQuestTheme(request: TakeQuestThemeRequest): ApiResult[TakeQuestThemeResult] = handleDbException {
-    import request._
-
-    user.profile.questProposalContext.purchasedTheme match {
-      case None => OkApiResult(Some(TakeQuestThemeResult(InvalidState, None)))
-      case Some(pt) => {
+        val pq = user.profile.questContext.purchasedQuest
 
         db.user.update {
           user.copy(
             profile = user.profile.copy(
-              questProposalContext = user.profile.questProposalContext.copy(
-                numberOfPurchasedThemes = 0,
-                purchasedTheme = None,
-                takenTheme = Some(pt),
-                questProposalCooldown = user.getCooldownForTakeTheme)))
+              questContext = user.profile.questContext.copy(
+                numberOfPurchasedQuests = 0,
+                purchasedQuest = None,
+                takenQuest = pq/*,
+                questProposalCooldown = user.getCooldownForTakeTheme*/),
+              assets = user.profile.assets - user.costOfTakingQuest))
         }
 
-        OkApiResult(Some(TakeQuestThemeResult(OK, Some(pt))))
+        OkApiResult(Some(TakeQuestResult(OK, pq)))
       }
+
+      case (a: ProfileModificationResult) => OkApiResult(Some(TakeQuestResult(a)))
     }
   }
 
   /**
-   * Get cost of proposing quest.
+   * Propose solution for quest.
    */
-  def getQuestProposeCost(request: GetQuestProposeCostRequest): ApiResult[GetQuestProposeCostResult] = handleDbException {
+  def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetQuestProposeCostResult(OK, user.costOfProposingQuest)))
+// TODO implement me
+    OkApiResult(Some(ProposeSolutionResult(OK)))
   }
 
+  /**
+   * How much it'll take to give up quest.
+   */
+  def getQuestGiveUpCost(request: GetQuestGiveUpCostRequest): ApiResult[GetQuestGiveUpCostResult] = handleDbException {
+    import request._
+
+    OkApiResult(Some(GetQuestGiveUpCostResult(OK, user.costOfGivingUpQuest)))
+  }
+
+  /**
+   * Give up quest and do not deal with it anymore.
+   */
+  def giveUpQuest(request: GiveUpQuestRequest): ApiResult[GiveUpQuestResult] = handleDbException {
+    import request._
+
+    user.canGiveUpQuest match {
+      case OK => {
+        val newAssets = (user.profile.assets - user.costOfGivingUpQuest).clamp
+
+        db.user.update {
+          user.copy(
+            profile = user.profile.copy(
+              questContext = user.profile.questContext.copy(
+                numberOfPurchasedQuests = 0,
+                purchasedQuest = None,
+                takenQuest = None),
+              assets = newAssets))
+        }
+
+        OkApiResult(Some(GiveUpQuestResult(OK)))
+      }
+
+      case (a: ProfileModificationResult) => OkApiResult(Some(GiveUpQuestResult(a)))
+    }
+  }
+
+  /*
   /**
    * Takes currently purchased theme to make a quest with it.
    */
@@ -191,32 +183,6 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
     }
   }
 
-  /**
-   * Give up quest proposal for the user if he is going to make one.
-   */
-  def giveUpQuestProposal(request: GiveUpQuestProposalRequest): ApiResult[GiveUpQuestProposalResult] = handleDbException {
-    import request._
-
-    user.canGiveUpQuest match {
-      case OK => {
-        val newAssets = (user.profile.assets - user.costOfGivingUpQuestProposal).clamp
-
-        db.user.update {
-          user.copy(
-            profile = user.profile.copy(
-              questProposalContext = user.profile.questProposalContext.copy(
-                numberOfPurchasedThemes = 0,
-                purchasedTheme = None,
-                takenTheme = None),
-              assets = newAssets))
-        }
-
-        OkApiResult(Some(GiveUpQuestProposalResult(OK)))
-      }
-
-      case (a: ProfileModificationResult) => OkApiResult(Some(GiveUpQuestProposalResult(a)))
-    }
-  }
 
   /**
    * Get cost for giving up quest proposal.
