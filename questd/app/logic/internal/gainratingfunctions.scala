@@ -3,7 +3,7 @@ package logic.internal
 import logic.constants._
 import basefunctions._
 
-private [logic] object gainratingfunctions {
+object gainratingfunctions {
   
   /**
    * How much rating per day we should receive from submitting proposals.
@@ -20,4 +20,23 @@ private [logic] object gainratingfunctions {
       megaf(level, k, d, b, y)
   }
 
+  /**
+   * How much rating per day we should receive from submitting quests.
+   */
+  def ratingForSubmitResult(level: Int): Double = {
+    val k = 6881.2529
+    val d = 18.5365
+    val b = -5953.6977
+    val y = -322.5152
+    
+    def ratingForSubmitResultInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
+      level match {
+        case _ if level < submitPhotoResults => 0
+        case _ if (level < submitPhotoQuests) && (level >= submitPhotoResults) => megaf(level, k, d, b, y)
+        case _ => ratingForSubmitResultInt(submitPhotoQuests - 1, k, d, b, y) * 0.68 + megaf(level, k, d, b, y) * 0.32
+      }
+    }
+    
+    ratingForSubmitResultInt(level, k, d, b, y)
+  }
 }

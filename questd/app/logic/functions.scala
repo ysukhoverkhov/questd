@@ -83,4 +83,14 @@ object functions {
   def costToTakeQuestToSolve(level: Int, questDuration: Int): Int = {
     math.round(coinSelectQuest(level) * questDuration).toInt
   }
+  
+  /**
+   * How much in rating we will lose in case of giving quest up.
+   * TODO !test me.
+   */
+  def ratingToGiveUpQuest(level: Int, questDuration: Int): Int = {
+    math.round(ratingForSubmitResult(level) * questDuration).toInt
+  }
+  
+  
 }

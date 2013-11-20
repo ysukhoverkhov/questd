@@ -24,6 +24,7 @@ object constants {
   val flipHour = 5
   
   val questProposalGiveUpPenalty = 2
+  val questSolutionGiveUpPenalty = 2
 
   /**
    * Number of themes skips for coins.

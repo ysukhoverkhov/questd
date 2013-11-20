@@ -235,8 +235,12 @@ class UserLogic(val user: User) {
    * How much it'll cost to give up quest.
    */
   def costOfGivingUpQuest = {
-    // TODO implement me.
-    Assets(0, 0, 1000)
+    val duration = user.profile.questContext.takenQuest match {
+      case Some(QuestInfoWithID(_, i)) => i.duration
+      case None => 0
+    }
+    
+    Assets(rating = ratingToGiveUpQuest(user.profile.level, duration))
   }
 
 }
