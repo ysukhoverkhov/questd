@@ -120,7 +120,7 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
     user.canProposeQuest(ContentType.apply(quest.content.contentType)) match {
       case OK => {
 
-        db.quest.create(Quest(info = quest))
+        db.quest.create(Quest(info = quest, userID = user.id))
 
         db.user.update {
           user.copy(

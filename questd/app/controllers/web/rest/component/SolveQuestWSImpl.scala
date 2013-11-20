@@ -32,7 +32,7 @@ trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFu
     r.body.asText.fold {
       throw new org.json4s.ParserUtil$ParseException("Empty request", null)
     } { x =>
-      val v = Json.read[QuestSolution](x)
+      val v = Json.read[QuestSolutionInfo](x)
       api.proposeSolution(ProposeSolutionRequest(r.user, v))
     }
   }

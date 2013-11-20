@@ -157,7 +157,7 @@ class UserLogic(val user: User) {
     if (user.profile.questContext.numberOfPurchasedQuests < numberOfQuestsSkipsForCoins) {
 
       val questDuration = user.profile.questContext.purchasedQuest match {
-        case Some(q) => q.duration
+        case Some(QuestInfoWithID(_, q)) => q.duration
         case _ => 1
       }
 
@@ -172,8 +172,8 @@ class UserLogic(val user: User) {
    * Takes everything into account and returns possible quest to be solved by user.
    * TODO implement me.
    */
-  def getRandomQuestForSolution = {
-    QuestInfo(ContentReference(0))
+  def getRandomQuestForSolution: Quest = {
+    Quest(info = QuestInfo(ContentReference(0)), userID = "userID")
   }
 
   /**
@@ -198,7 +198,7 @@ class UserLogic(val user: User) {
       if (user.profile.questContext.purchasedQuest == None)
         0
       else
-        user.profile.questContext.purchasedQuest.get.duration
+        user.profile.questContext.purchasedQuest.get.obj.duration
 
     Assets(coins = costToTakeQuestToSolve(user.profile.level, questDuration))
   }

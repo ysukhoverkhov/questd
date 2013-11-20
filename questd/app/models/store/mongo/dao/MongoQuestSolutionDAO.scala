@@ -10,9 +10,9 @@ import models.domain._
 /**
  * DOA for Config objects
  */
-private[mongo] class MongoQuestDAO
-  extends BaseMongoDAO[Quest](collectionName = "quests")
-  with QuestDAO {
+private[mongo] class MongoQuestSolutionDAO
+  extends BaseMongoDAO[QuestSolution](collectionName = "solutions")
+  with QuestSolutionDAO {
 
 }
 

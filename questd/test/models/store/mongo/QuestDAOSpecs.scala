@@ -29,7 +29,7 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.create(Quest(id, QuestInfo(ContentReference(1))))
+      db.quest.create(Quest(id, "user id", QuestInfo(ContentReference(1))))
       val q = db.quest.readByID(id)
 
       q must beSome[Quest]
@@ -40,11 +40,11 @@ class QuestDAOSpecs extends Specification
       clearDB()
       val id = "ididiid"
 
-      db.quest.create(Quest(id, QuestInfo(ContentReference(1))))
+      db.quest.create(Quest(id, "user id", QuestInfo(ContentReference(1))))
       val q = db.quest.readByID(id)
       q.get.info.content.reference must beEqualTo("")
 
-      db.quest.updateQuest(q.get.copy(info = QuestInfo(ContentReference(1, "2", "3"))))
+      db.quest.update(q.get.copy(info = QuestInfo(ContentReference(1, "2", "3"))))
       
       val q2 = db.quest.readByID(id)
       
@@ -58,7 +58,7 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.create(Quest(id, QuestInfo(ContentReference(1))))
+      db.quest.create(Quest(id, "user id", QuestInfo(ContentReference(1))))
       val q = db.quest.readByID(id)
 
       q must beSome[Quest]

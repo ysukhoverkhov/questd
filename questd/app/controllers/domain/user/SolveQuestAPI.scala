@@ -22,7 +22,7 @@ case class TakeQuestResult(allowed: ProfileModificationResult, theme: Option[Que
 case class GetTakeQuestCostRequest(user: User)
 case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
 
-case class ProposeSolutionRequest(user: User, solution: QuestSolution)
+case class ProposeSolutionRequest(user: User, solution: QuestSolutionInfo)
 case class ProposeSolutionResult(allowed: ProfileModificationResult)
 
 case class GetQuestGiveUpCostRequest(user: User)
@@ -60,10 +60,10 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
               assets = user.profile.assets - questCost,
               questContext = user.profile.questContext.copy(
                 numberOfPurchasedQuests = user.profile.questContext.numberOfPurchasedQuests + 1,
-                purchasedQuest = Some(q))))
+                purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))))
         }
 
-        OkApiResult(Some(PurchaseQuestResult(OK, Some(q))))
+        OkApiResult(Some(PurchaseQuestResult(OK, Some(q.info))))
       }
       case a => OkApiResult(Some(PurchaseQuestResult(a)))
     }
@@ -102,7 +102,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
               assets = user.profile.assets - user.costOfTakingQuest))
         }
 
-        OkApiResult(Some(TakeQuestResult(OK, pq)))
+        OkApiResult(Some(TakeQuestResult(OK, Some(pq.get.obj))))
       }
 
       case (a: ProfileModificationResult) => OkApiResult(Some(TakeQuestResult(a)))
@@ -118,8 +118,11 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
     user.canResulveQuest(ContentType.apply(solution.content.contentType)) match {
       case OK => {
 
-        // TODO: add solution to db.
-        // db.quest.create(Quest(info = quest))
+        db.solution.create(
+          QuestSolution(
+            info = solution,
+            userID = user.id,
+            questID = user.profile.questContext.takenQuest.get.id))
 
         db.user.update {
           user.copy(
