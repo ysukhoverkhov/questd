@@ -83,7 +83,7 @@ class UserLogic(val user: User) {
    * Cost of proposing quest.
    */
   def costOfTakingQuestTheme = {
-    Assets(coins = costToProposeQuest(user.profile.level))
+    Assets(coins = costToTakeQuestTheme(user.profile.level))
   }
 
   /**

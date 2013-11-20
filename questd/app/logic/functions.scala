@@ -14,7 +14,6 @@ object functions {
   
   /**
    * Rating to give user for successful (approved) proposal at a level.
-   * // TODO write test for me.
    */
   def ratingForProposalAtLevel(level: Int): Int = {
     val proposalPeriodAtMaxLevel = 2
@@ -24,13 +23,11 @@ object functions {
 
   /**
    * Period in days to give players a task to make quest.
-   * // TODO write test for me.
    */
   def questProposalPeriod(level: Int): Int = math.round(ratingForProposalAtLevel(level).toFloat / ratingForSubmitProposal(level).toFloat)
 
   /**
    * Cost to skip a single proposal
-   * // TODO write test for me.
    */
   def costToSkipProposal(level: Int, skipNumber: Int): Int = {
     
@@ -47,15 +44,13 @@ object functions {
   
   /**
    * Cost to propose a single quest.
-   * // TODO write test for me.
    */
-  def costToProposeQuest(level: Int): Int = {
+  def costToTakeQuestTheme(level: Int): Int = {
     math.round(coinProposeQuest(level)  * questProposalPeriod(level)).toInt
   }
   
   /**
    * Cost to give up quest proposal.
-   * // TODO write test for me.
    */
   def ratingToGiveUpQuestProposal(level: Int): Int = {
     math.round(ratingForSubmitProposal(level) * questProposalPeriod(level) * questProposalGiveUpPenalty).toInt
@@ -68,7 +63,6 @@ object functions {
   
   /**
    * Cost to skip a single proposal
-   * // TODO write test for me.
    */
   def costToSkipQuest(level: Int, skipNumber: Int, currentQuestDuration: Int): Int = {
     
@@ -85,7 +79,6 @@ object functions {
   
   /**
    * How much coins does it takes to take quest for solving.
-   * TODO write test for me.
    */
   def costToTakeQuestToSolve(level: Int, questDuration: Int): Int = {
     math.round(coinSelectQuest(level) * questDuration).toInt

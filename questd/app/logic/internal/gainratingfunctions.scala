@@ -4,6 +4,7 @@ import logic.constants._
 import basefunctions._
 
 private [logic] object gainratingfunctions {
+  
   /**
    * How much rating per day we should receive from submitting proposals.
    */

@@ -7,7 +7,6 @@ object spendcoinsfunctions {
  
   /**
    * How much coins per day player should spend on shuffling themes for quest proposals.
-   * TODO test me.
    */
   def coinsShuffleTheme(level: Int): Double = {
     val k = 157.364
@@ -23,7 +22,6 @@ object spendcoinsfunctions {
 
   /**
    * How much coin per day we should spend on skipping quests.
-   * TODO test me.
    */
   def coinShuffleQuest(level: Int): Double = {
     val k = 87.556
@@ -44,7 +42,6 @@ object spendcoinsfunctions {
 
   /**
    * How much coins per day we should spend on proposing quests per day at level.
-   * TODO test me.
    */
   def coinProposeQuest(level: Int): Double = {
     val k = 81.696
@@ -60,7 +57,6 @@ object spendcoinsfunctions {
   
   /**
    * How much coins we should spend daily on selecting quests.
-   * TODO test me.
    */
   def coinSelectQuest(level: Int): Double = {
     val k = 129.677
@@ -72,7 +68,7 @@ object spendcoinsfunctions {
       level match {
         case _ if level < submitPhotoResults => 0
         case _ if (level < submitPhotoQuests) && (level >= submitPhotoResults) => megaf(level, k, d, b, y)
-        case _ => coinSelectQuestInt(inviteFriends - 1, k, d, b, y) * 0.63 + megaf(level, k, d, b, y) * 0.37
+        case _ => coinSelectQuestInt(submitPhotoQuests - 1, k, d, b, y) * 0.63 + megaf(level, k, d, b, y) * 0.37
       }
     }
     
