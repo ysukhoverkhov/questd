@@ -204,6 +204,24 @@ class UserLogic(val user: User) {
   }
   
   /**
+   * Is user can propose quest of given type.
+   */
+  def canResulveQuest(conentType: ContentType) = {
+    val level = conentType match {
+      case Photo => user.profile.rights.submitPhotoResults
+      case Video => user.profile.rights.submitVideoResults
+    }
+
+    if (level > user.profile.level)
+      LevelTooLow
+    else if (user.profile.questContext.takenQuest == None)
+      InvalidState
+    else
+      OK
+  }
+
+
+  /**
    * Is user can give up quest.
    */
   def canGiveUpQuest = {

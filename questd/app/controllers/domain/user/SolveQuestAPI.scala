@@ -84,7 +84,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
    */
   def takeQuest(request: TakeQuestRequest): ApiResult[TakeQuestResult] = handleDbException {
     import request._
-    
+
     user.canTakeQuest match {
 
       case OK => {
@@ -97,8 +97,8 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
               questContext = user.profile.questContext.copy(
                 numberOfPurchasedQuests = 0,
                 purchasedQuest = None,
-                takenQuest = pq/*,
-                questProposalCooldown = user.getCooldownForTakeTheme*/),
+                takenQuest = pq /*,
+                questProposalCooldown = user.getCooldownForTakeTheme*/ ),
               assets = user.profile.assets - user.costOfTakingQuest))
         }
 
@@ -115,8 +115,26 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
   def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
     import request._
 
-// TODO implement me
-    OkApiResult(Some(ProposeSolutionResult(OK)))
+    user.canResulveQuest(ContentType.apply(solution.content.contentType)) match {
+      case OK => {
+
+        // TODO: add solution to db.
+        // db.quest.create(Quest(info = quest))
+
+        db.user.update {
+          user.copy(
+            profile = user.profile.copy(
+              questContext = user.profile.questContext.copy(
+                numberOfPurchasedQuests = 0,
+                purchasedQuest = None,
+                takenQuest = None)))
+        }
+
+        OkApiResult(Some(ProposeSolutionResult(OK)))
+      }
+
+      case (a: ProfileModificationResult) => OkApiResult(Some(ProposeSolutionResult(a)))
+    }
   }
 
   /**
@@ -154,46 +172,6 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
       case (a: ProfileModificationResult) => OkApiResult(Some(GiveUpQuestResult(a)))
     }
   }
-
-  /*
-  /**
-   * Takes currently purchased theme to make a quest with it.
-   */
-  def proposeQuest(request: ProposeQuestRequest): ApiResult[ProposeQuestResult] = handleDbException {
-    import request._
-
-    user.canProposeQuest(ContentType.apply(quest.content.contentType)) match {
-      case OK => {
-
-        db.quest.create(Quest(info = quest))
-
-        db.user.update {
-          user.copy(
-            profile = user.profile.copy(
-              questProposalContext = user.profile.questProposalContext.copy(
-                numberOfPurchasedThemes = 0,
-                purchasedTheme = None,
-                takenTheme = None),
-              assets = user.profile.assets - user.costOfProposingQuest))
-        }
-
-        OkApiResult(Some(ProposeQuestResult(OK)))
-      }
-      case (a: ProfileModificationResult) => OkApiResult(Some(ProposeQuestResult(a)))
-    }
-  }
-
-
-  /**
-   * Get cost for giving up quest proposal.
-   */
-  def getQuestProposalGiveUpCost(request: GetQuestProposalGiveUpCostRequest): ApiResult[GetQuestProposalGiveUpCostResult] = handleDbException {
-    import request._
-
-    OkApiResult(Some(GetQuestProposalGiveUpCostResult(OK, user.costOfGivingUpQuestProposal)))
-  }
-  * 
-  */
 
 }
 
