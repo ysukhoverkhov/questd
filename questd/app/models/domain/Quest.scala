@@ -5,6 +5,6 @@ import models.domain.base.ID
 
 case class Quest(
   id: String = ID.generateUUID(),
-  info: QuestInfo,
+  info: QuestInfo
   // Duration in days
-  duration: Int = 1) extends ID
+  ) extends ID

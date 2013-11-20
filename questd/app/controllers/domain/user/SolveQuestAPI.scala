@@ -14,7 +14,7 @@ case class GetQuestCostRequest(user: User)
 case class GetQuestCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
 
 case class PurchaseQuestRequest(user: User)
-case class PurchaseQuestResult(allowed: ProfileModificationResult, quest: Option[Quest] = None)
+case class PurchaseQuestResult(allowed: ProfileModificationResult, quest: Option[QuestInfo] = None)
 
 case class TakeQuestRequest(user: User)
 case class TakeQuestResult(allowed: ProfileModificationResult, theme: Option[Quest] = None)
@@ -31,70 +31,75 @@ case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: As
 case class GiveUpQuestRequest(user: User)
 case class GiveUpQuestResult(allowed: ProfileModificationResult)
 
-
-
 private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
- 
+  /**
+   * Get cost of quest to shuffle.
+   */
   def getQuestCost(request: GetQuestCostRequest): ApiResult[GetQuestCostResult] = handleDbException {
     import request._
 
     OkApiResult(Some(GetQuestCostResult(OK, user.costOfPurchasingQuest)))
   }
-  
+
+  /**
+   * Purchase an option of quest to chose.
+   */
   def purchaseQuest(request: PurchaseQuestRequest): ApiResult[PurchaseQuestResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(PurchaseQuestResult(OK)))
+    user.canPurchaseQuest match {
+      case OK => {
+
+        val q = user.getRandomQuestForSolution
+        val questCost = user.costOfPurchasingQuest
+
+        db.user.update {
+          user.copy(
+            profile = user.profile.copy(
+              assets = user.profile.assets - questCost,
+              questContext = user.profile.questContext.copy(
+                numberOfPurchasedQuests = user.profile.questContext.numberOfPurchasedQuests + 1,
+                purchasedQuest = Some(q))))
+        }
+
+        OkApiResult(Some(PurchaseQuestResult(OK, Some(q))))
+      }
+      case a => OkApiResult(Some(PurchaseQuestResult(a)))
+    }
   }
-  
+
   def getTakeQuestCost(request: GetTakeQuestCostRequest): ApiResult[GetTakeQuestCostResult] = handleDbException {
     import request._
 
     OkApiResult(Some(GetTakeQuestCostResult(OK, Assets(1, 2, 3))))
   }
-  
+
   def takeQuest(request: TakeQuestRequest): ApiResult[TakeQuestResult] = handleDbException {
     import request._
 
     OkApiResult(Some(TakeQuestResult(OK)))
   }
-  
 
   def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
     import request._
 
     OkApiResult(Some(ProposeSolutionResult(OK)))
   }
-  
-  
+
   def getQuestGiveUpCost(request: GetQuestGiveUpCostRequest): ApiResult[GetQuestGiveUpCostResult] = handleDbException {
     import request._
 
     OkApiResult(Some(GetQuestGiveUpCostResult(OK, Assets(1, 2, 3))))
   }
-  
+
   def giveUpQuest(request: GiveUpQuestRequest): ApiResult[GiveUpQuestResult] = handleDbException {
     import request._
 
     OkApiResult(Some(GiveUpQuestResult(OK)))
   }
-  
-  
+
   /*
-  /**
-   * Get cost of next quest purchase.
-   */
-  def getQuestThemeCost(request: GetQuestThemeCostRequest): ApiResult[GetQuestThemeCostResult] = handleDbException {
-    import request._
-
-    OkApiResult(Some(GetQuestThemeCostResult(OK, user.costOfPurchasingQuestProposal)))
-  }
-
-  /**
-   * Purchase quest theme. Check for all conditions are meat.
-   * Returns purchased quest theme.
-   */
   def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
     import request._
 

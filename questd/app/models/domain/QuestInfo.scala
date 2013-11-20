@@ -1,4 +1,5 @@
 package models.domain
 
 case class QuestInfo(
-    content: ContentReference)
+    content: ContentReference,
+    duration: Int = 1)

@@ -35,3 +35,4 @@ object constants {
    */
   val numberOfQuestsSkipsForCoins = 8
 }
+

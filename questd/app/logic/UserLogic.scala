@@ -132,6 +132,23 @@ class UserLogic(val user: User) {
    ************************************/
   
   /**
+   * Check can the user purchase quest. 
+   * TODO uncomment the check.
+   */
+  def canPurchaseQuest = {
+    if (user.profile.rights.submitPhotoResults > user.profile.level)
+      LevelTooLow
+    else if (!(user.profile.assets canAfford costOfPurchasingQuest))
+      NotEnoughAssets
+//    else if (user.profile.questProposalContext.questProposalCooldown.after(new Date()))
+//      CoolDown
+    else if (user.profile.questContext.takenQuest != None)
+      InvalidState
+    else
+      OK
+  }
+  
+  /**
    * Tells cost of next theme purchase
    */
   def costOfPurchasingQuest = {
@@ -142,11 +159,18 @@ class UserLogic(val user: User) {
         case _ => 1
       }
       
-      val c = costToSkipQuest(user.profile.level, user.profile.questProposalContext.numberOfPurchasedThemes + 1, questDuration)
+      val c = costToSkipQuest(user.profile.level, user.profile.questContext.numberOfPurchasedQuests + 1, questDuration)
       Assets(coins = c)
     } else {
       Assets(money = 1)
     }
+  }
+  
+  /**
+   * Takes everything into account and returns possible quest to be solved by user.
+   */
+  def getRandomQuestForSolution = {
+    QuestInfo(ContentReference(0))
   }
 
 }
