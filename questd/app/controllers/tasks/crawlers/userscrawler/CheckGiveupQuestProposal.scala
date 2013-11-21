@@ -12,21 +12,15 @@ import java.util.Date
 
 object CheckGiveupQuestProposal {
   def props(api: DomainAPIComponent#DomainAPI) = {
-    Props(classOf[UsersHourlCrawler], api)
+    Props(classOf[CheckGiveupQuestProposal], api)
   }
   
   def name = "CheckGiveupQuestProposal"
 }
 
-class CheckGiveupQuestProposal(api: DomainAPIComponent#DomainAPI) extends EasyRestartActor {
+class CheckGiveupQuestProposal(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
 
-  def receive = {
-    case ProcessUser(user: User) => check(user)
-    
-    case a @ _ => Logger.error("Unknown event received: " + a.toString)
-  }
-
-  private def check(user: User) = {
+  protected def check(user: User) = {
     if ((user.profile.questProposalContext.takenTheme != None) 
       && (user.profile.questProposalContext.questProposalCooldown.before(new Date()))) {
       api.giveUpQuestProposal(GiveUpQuestProposalRequest(user))

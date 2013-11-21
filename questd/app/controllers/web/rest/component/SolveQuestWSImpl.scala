@@ -46,4 +46,3 @@ trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFu
   }
 }
 
-// TODO reset to 0 already purchased quests and themes in crawler to start new sequence on next day.

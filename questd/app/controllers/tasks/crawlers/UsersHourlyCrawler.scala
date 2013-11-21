@@ -23,7 +23,10 @@ object UsersHourlCrawler {
 
 class UsersHourlCrawler(api: DomainAPIComponent#DomainAPI) extends EasyRestartActor {
 
-  private val userActors = List(classOf[CheckGiveupQuestProposal])
+  private val userActors = List(
+      classOf[CheckGiveupQuestProposal],
+      classOf[CheckGiveupQuest],
+      classOf[ResetPurchasesAtNight])
 
   override def preStart(): Unit = {
     for (clazz <- userActors)

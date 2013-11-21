@@ -31,6 +31,9 @@ case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: As
 case class GiveUpQuestRequest(user: User)
 case class GiveUpQuestResult(allowed: ProfileModificationResult)
 
+case class ResetPurchasesRequest(user: User)
+case class ResetPurchasesResult()
+
 private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
   /**
@@ -175,6 +178,25 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
     }
   }
 
+  /**
+   * Reset all purchases (quests and themes) overnight.
+   */
+  def resetPurchases(request: ResetPurchasesRequest): ApiResult[ResetPurchasesResult] = handleDbException {
+    import request._
+
+    db.user.update {
+      user.copy(
+        profile = user.profile.copy(
+          questContext = user.profile.questContext.copy(
+            numberOfPurchasedQuests = 0),
+          questProposalContext = user.profile.questProposalContext.copy(
+            numberOfPurchasedThemes = 0)),
+        schedules = user.schedules.copy(
+          purchases = user.getResetPurchasesTimeout))
+    }
+
+    OkApiResult(Some(ResetPurchasesResult()))
+  }
 }
 
 

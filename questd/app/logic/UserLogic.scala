@@ -2,6 +2,10 @@ package logic
 
 import java.util.Date
 import scala.util.Random
+
+import com.github.nscala_time.time.Imports._
+import org.joda.time.DateTime
+
 import models.domain._
 import models.domain.ContentType._
 import controllers.domain.user.protocol.ProfileModificationResult._
@@ -148,7 +152,7 @@ class UserLogic(val user: User) {
     else
       OK
   }
-  
+
   /**
    * Tells cost of next theme purchase
    */
@@ -188,7 +192,7 @@ class UserLogic(val user: User) {
     else
       OK
   }
-  
+
   /**
    * Get cost of taking quest to resolve.
    */
@@ -201,7 +205,7 @@ class UserLogic(val user: User) {
 
     Assets(coins = costToTakeQuestToSolve(user.profile.level, questDuration))
   }
-  
+
   /**
    * Is user can propose quest of given type.
    */
@@ -219,7 +223,6 @@ class UserLogic(val user: User) {
       OK
   }
 
-
   /**
    * Is user can give up quest.
    */
@@ -229,7 +232,7 @@ class UserLogic(val user: User) {
     else
       OK
   }
-  
+
   /**
    * How much it'll cost to give up quest.
    */
@@ -238,22 +241,26 @@ class UserLogic(val user: User) {
       case Some(QuestInfoWithID(_, i)) => i.duration
       case None => 0
     }
-    
+
     Assets(rating = ratingToGiveUpQuest(user.profile.level, duration))
   }
-  
+
   /**
    * Cooldown for taking quest.
    */
   def getCooldownForTakeQuest(qi: QuestInfo) = {
-    import com.github.nscala_time.time.Imports._
-    import org.joda.time.DateTime
-
     val daysToSkipt = qi.duration
 
     val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
     (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate ()
   }
 
+  /**
+   * Cooldown for reseting purchases. Purchases should be reset in nearest 5am at user's time.
+   */
+  def getResetPurchasesTimeout = {
+    val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
+    (DateTime.now(tz) + 1.day).hour(constants.flipHour).minute(0).second(0) toDate ()
+  }
 }
 
