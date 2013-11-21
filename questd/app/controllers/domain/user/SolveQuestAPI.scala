@@ -188,6 +188,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
       user.copy(
         profile = user.profile.copy(
           questContext = user.profile.questContext.copy(
+            purchasedQuest = None,
             numberOfPurchasedQuests = 0),
           questProposalContext = user.profile.questProposalContext.copy(
             numberOfPurchasedThemes = 0)),
