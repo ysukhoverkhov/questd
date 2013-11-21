@@ -86,7 +86,6 @@ object functions {
   
   /**
    * How much in rating we will lose in case of giving quest up.
-   * TODO !test me.
    */
   def ratingToGiveUpQuest(level: Int, questDuration: Int): Int = {
     math.round(ratingForSubmitResult(level) * questDuration).toInt

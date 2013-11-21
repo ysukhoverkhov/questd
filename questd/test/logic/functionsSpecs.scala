@@ -59,6 +59,15 @@ class FunctionsSpecs extends Specification {
       costToTakeQuestToSolve(20, 1) must beEqualTo(1296)
     }
 
+    "ratingToGiveUpQuest" in {
+      
+      // TODO: look in mathcad for ratingForSubmitResult
+      
+      ratingToGiveUpQuest(3, 1) must beEqualTo(148)
+      ratingToGiveUpQuest(11, 1) must beEqualTo(590)
+      ratingToGiveUpQuest(12, 1) must beEqualTo(628)
+      ratingToGiveUpQuest(20, 1) must beEqualTo(1296)
+    }
 
     
   }

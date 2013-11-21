@@ -191,6 +191,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
             purchasedQuest = None,
             numberOfPurchasedQuests = 0),
           questProposalContext = user.profile.questProposalContext.copy(
+            purchasedTheme = None,
             numberOfPurchasedThemes = 0)),
         schedules = user.schedules.copy(
           purchases = user.getResetPurchasesTimeout))
