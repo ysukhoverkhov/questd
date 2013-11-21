@@ -135,21 +135,20 @@ class UserLogic(val user: User) {
 
   /**
    * Check can the user purchase quest.
-   * TODO uncomment the check.
    */
   def canPurchaseQuest = {
     if (user.profile.rights.submitPhotoResults > user.profile.level)
       LevelTooLow
     else if (!(user.profile.assets canAfford costOfPurchasingQuest))
       NotEnoughAssets
-    //    else if (user.profile.questProposalContext.questProposalCooldown.after(new Date()))
-    //      CoolDown
+    else if (user.profile.questContext.questCooldown.after(new Date()))
+      CoolDown
     else if (user.profile.questContext.takenQuest != None)
       InvalidState
     else
       OK
   }
-
+  
   /**
    * Tells cost of next theme purchase
    */
@@ -241,6 +240,19 @@ class UserLogic(val user: User) {
     }
     
     Assets(rating = ratingToGiveUpQuest(user.profile.level, duration))
+  }
+  
+  /**
+   * Cooldown for taking quest.
+   */
+  def getCooldownForTakeQuest(qi: QuestInfo) = {
+    import com.github.nscala_time.time.Imports._
+    import org.joda.time.DateTime
+
+    val daysToSkipt = qi.duration
+
+    val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
+    (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate ()
   }
 
 }

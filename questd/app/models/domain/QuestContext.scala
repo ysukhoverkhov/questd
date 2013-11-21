@@ -9,7 +9,7 @@ case class QuestInfoWithID (
 case class QuestContext(
   purchasedQuest: Option[QuestInfoWithID] = None,
   takenQuest: Option[QuestInfoWithID] = None,
-  numberOfPurchasedQuests: Int = 0
-  //questProposalCooldown: Date = new Date(0))
+  numberOfPurchasedQuests: Int = 0,
+  questCooldown: Date = new Date(0))
     
-)
+

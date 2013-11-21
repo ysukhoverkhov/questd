@@ -80,7 +80,6 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
   /**
    * Take quest to deal with.
-   * TODO implement cooldown here.
    */
   def takeQuest(request: TakeQuestRequest): ApiResult[TakeQuestResult] = handleDbException {
     import request._
@@ -97,8 +96,8 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
               questContext = user.profile.questContext.copy(
                 numberOfPurchasedQuests = 0,
                 purchasedQuest = None,
-                takenQuest = pq /*,
-                questProposalCooldown = user.getCooldownForTakeTheme*/ ),
+                takenQuest = pq,
+                questCooldown = user.getCooldownForTakeQuest(pq.get.obj)),
               assets = user.profile.assets - user.costOfTakingQuest))
         }
 
