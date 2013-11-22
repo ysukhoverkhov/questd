@@ -2,16 +2,15 @@ package logic
 
 import java.util.Date
 import scala.util.Random
-
 import com.github.nscala_time.time.Imports._
 import org.joda.time.DateTime
-
 import models.domain._
 import models.domain.ContentType._
 import controllers.domain.user.protocol.ProfileModificationResult._
 import components.componentregistry.ComponentRegistrySingleton
 import functions._
 import constants._
+import play.Logger
 
 // This should not go to DB directly since API may have cache layer.
 class UserLogic(val user: User) {
@@ -96,9 +95,14 @@ class UserLogic(val user: User) {
   def getRandomThemeForQuestProposal = {
     val themes = api.allThemes.body.get.themes
 
-    val rand = new Random(System.currentTimeMillis())
-    val random_index = rand.nextInt(themes.length)
-    themes(random_index)
+    if (themes.size > 0) {
+      val rand = new Random(System.currentTimeMillis())
+      val random_index = rand.nextInt(themes.length)
+      themes(random_index)
+    } else {
+      Logger.error("No themes in database, stub theme returned")
+      Theme()
+    }
   }
 
   /**
@@ -176,16 +180,15 @@ class UserLogic(val user: User) {
    * TODO implement me.
    */
   def getRandomQuestForSolution: Quest = {
-//    val quests = api.allQuests.body.get.quests
-//
-//    if (quests.length == 0) {
-      Quest(info = QuestInfo(ContentReference(0, "this", "is a stub quest since no quests are in db")), userID = "userID")
-//    } else {
-//      val rand = new Random(System.currentTimeMillis())
-//      val random_index = rand.nextInt(quests.length)
-//      quests(random_index)
-//    }
-
+    //    val quests = api.allQuests.body.get.quests
+    //
+    //    if (quests.length == 0) {
+    Quest(info = QuestInfo(ContentReference(0, "this", "is a stub quest since no quests are in db")), userID = "userID")
+    //    } else {
+    //      val rand = new Random(System.currentTimeMillis())
+    //      val random_index = rand.nextInt(quests.length)
+    //      quests(random_index)
+    //    }
   }
 
   /**
