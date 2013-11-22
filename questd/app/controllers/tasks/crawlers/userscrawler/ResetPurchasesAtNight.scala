@@ -23,7 +23,6 @@ class ResetPurchasesAtNight(api: DomainAPIComponent#DomainAPI) extends BaseUserC
   protected def check(user: User) = {
     if (user.schedules.purchases.before(new Date())) {
       api.resetPurchases(ResetPurchasesRequest(user))
-      // TODO test me overnight.
     }
   }
 

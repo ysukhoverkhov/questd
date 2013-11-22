@@ -17,6 +17,7 @@ trait DomainAPIComponent { component: DatabaseComponent =>
     with SolveQuestAPI
     
     with ThemesAdminAPI 
+    with QuestsAdminAPI
     with ConfigAdminAPI {
 
     // db for out traits
