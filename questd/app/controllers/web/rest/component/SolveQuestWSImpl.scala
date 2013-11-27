@@ -29,10 +29,10 @@ trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFu
   }
 
   def proposeSolution = wrapApiCallReturnBody[WSProposeSolutionResult] { r =>
-    r.body.asText.fold {
+    r.body.asJson.fold {
       throw new org.json4s.ParserUtil$ParseException("Empty request", null)
     } { x =>
-      val v = Json.read[QuestSolutionInfo](x)
+      val v = Json.read[QuestSolutionInfo](x.toString)
       api.proposeSolution(ProposeSolutionRequest(r.user, v))
     }
   }
