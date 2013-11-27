@@ -14,22 +14,22 @@ case class GetQuestCostRequest(user: User)
 case class GetQuestCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
 
 case class PurchaseQuestRequest(user: User)
-case class PurchaseQuestResult(allowed: ProfileModificationResult, quest: Option[QuestInfo] = None)
+case class PurchaseQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class TakeQuestRequest(user: User)
-case class TakeQuestResult(allowed: ProfileModificationResult, theme: Option[QuestInfo] = None)
+case class TakeQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetTakeQuestCostRequest(user: User)
 case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
 
 case class ProposeSolutionRequest(user: User, solution: QuestSolutionInfo)
-case class ProposeSolutionResult(allowed: ProfileModificationResult)
+case class ProposeSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetQuestGiveUpCostRequest(user: User)
 case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
 
 case class GiveUpQuestRequest(user: User)
-case class GiveUpQuestResult(allowed: ProfileModificationResult)
+case class GiveUpQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class ResetPurchasesRequest(user: User)
 case class ResetPurchasesResult()
@@ -57,16 +57,16 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
         val q = user.getRandomQuestForSolution
         val questCost = user.costOfPurchasingQuest
 
-        db.user.update {
-          user.copy(
-            profile = user.profile.copy(
-              assets = user.profile.assets - questCost,
-              questContext = user.profile.questContext.copy(
-                numberOfPurchasedQuests = user.profile.questContext.numberOfPurchasedQuests + 1,
-                purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))))
-        }
+        val u = user.copy(
+          profile = user.profile.copy(
+            assets = user.profile.assets - questCost,
+            questContext = user.profile.questContext.copy(
+              numberOfPurchasedQuests = user.profile.questContext.numberOfPurchasedQuests + 1,
+              purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))))
 
-        OkApiResult(Some(PurchaseQuestResult(OK, Some(q.info))))
+        db.user.update(u)
+
+        OkApiResult(Some(PurchaseQuestResult(OK, Some(u.profile))))
       }
       case a => OkApiResult(Some(PurchaseQuestResult(a)))
     }
@@ -93,18 +93,18 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
         val pq = user.profile.questContext.purchasedQuest
 
-        db.user.update {
-          user.copy(
-            profile = user.profile.copy(
-              questContext = user.profile.questContext.copy(
-                numberOfPurchasedQuests = 0,
-                purchasedQuest = None,
-                takenQuest = pq,
-                questCooldown = user.getCooldownForTakeQuest(pq.get.obj)),
-              assets = user.profile.assets - user.costOfTakingQuest))
-        }
+        val u = user.copy(
+          profile = user.profile.copy(
+            questContext = user.profile.questContext.copy(
+              numberOfPurchasedQuests = 0,
+              purchasedQuest = None,
+              takenQuest = pq,
+              questCooldown = user.getCooldownForTakeQuest(pq.get.obj)),
+            assets = user.profile.assets - user.costOfTakingQuest))
 
-        OkApiResult(Some(TakeQuestResult(OK, Some(pq.get.obj))))
+        db.user.update(u)
+
+        OkApiResult(Some(TakeQuestResult(OK, Some(u.profile))))
       }
 
       case (a: ProfileModificationResult) => OkApiResult(Some(TakeQuestResult(a)))
@@ -126,16 +126,16 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
             userID = user.id,
             questID = user.profile.questContext.takenQuest.get.id))
 
-        db.user.update {
-          user.copy(
-            profile = user.profile.copy(
-              questContext = user.profile.questContext.copy(
-                numberOfPurchasedQuests = 0,
-                purchasedQuest = None,
-                takenQuest = None)))
-        }
+        val u = user.copy(
+          profile = user.profile.copy(
+            questContext = user.profile.questContext.copy(
+              numberOfPurchasedQuests = 0,
+              purchasedQuest = None,
+              takenQuest = None)))
 
-        OkApiResult(Some(ProposeSolutionResult(OK)))
+        db.user.update(u)
+
+        OkApiResult(Some(ProposeSolutionResult(OK, Some(u.profile))))
       }
 
       case (a: ProfileModificationResult) => OkApiResult(Some(ProposeSolutionResult(a)))
@@ -161,17 +161,17 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
       case OK => {
         val newAssets = (user.profile.assets - user.costOfGivingUpQuest).clamp
 
-        db.user.update {
-          user.copy(
-            profile = user.profile.copy(
-              questContext = user.profile.questContext.copy(
-                numberOfPurchasedQuests = 0,
-                purchasedQuest = None,
-                takenQuest = None),
-              assets = newAssets))
-        }
+        val u = user.copy(
+          profile = user.profile.copy(
+            questContext = user.profile.questContext.copy(
+              numberOfPurchasedQuests = 0,
+              purchasedQuest = None,
+              takenQuest = None),
+            assets = newAssets))
 
-        OkApiResult(Some(GiveUpQuestResult(OK)))
+        db.user.update(u)
+
+        OkApiResult(Some(GiveUpQuestResult(OK, Some(u.profile))))
       }
 
       case (a: ProfileModificationResult) => OkApiResult(Some(GiveUpQuestResult(a)))
