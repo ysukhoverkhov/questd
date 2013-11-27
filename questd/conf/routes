@@ -39,6 +39,11 @@ POST	/rest/proposeSolution				controllers.web.rest.SolveQuestWS.proposeSolution
 POST	/rest/getQuestGiveUpCost			controllers.web.rest.SolveQuestWS.getQuestGiveUpCost
 POST	/rest/giveUpQuest					controllers.web.rest.SolveQuestWS.giveUpQuest
 
+# Vote quest
+POST	/rest/getQuestToVote				controllers.web.rest.VoteQuestWS.getQuestToVote
+POST	/rest/voteQuest						controllers.web.rest.VoteQuestWS.voteQuest
+
+
 
 #######################
 # Admin
