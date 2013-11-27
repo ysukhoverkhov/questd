@@ -54,6 +54,26 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
     user.canPurchaseQuest match {
       case OK => {
 
+        // Updating quest info.
+        if ((user.profile.questContext.purchasedQuest != None) && (user.stats.questsReviewedPast > 0)) {
+          val quest = db.quest.readByID(user.profile.questContext.purchasedQuest.get.id)
+
+          quest match {
+            case None => {
+              Logger.error("Quest by id not found n purchaseQuest")
+              InternalErrorApiResult(None)
+            }
+
+            case Some(q) => {
+              val nq = q.copy(
+                rating = q.rating.copy(points = q.rating.points - 1))
+
+              db.quest.update(nq.updateStatus)
+            }
+          }
+        }
+
+        // Updating user profile.
         val q = user.getRandomQuestForSolution
         val questCost = user.costOfPurchasingQuest
 
@@ -62,7 +82,9 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
             assets = user.profile.assets - questCost,
             questContext = user.profile.questContext.copy(
               numberOfPurchasedQuests = user.profile.questContext.numberOfPurchasedQuests + 1,
-              purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))))
+              purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))),
+          stats = user.stats.copy(
+            questsReviewed = user.stats.questsReviewed + 1))
 
         db.user.update(u)
 
@@ -90,7 +112,30 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
     user.canTakeQuest match {
 
       case OK => {
+        
+        // Updating quest info.
+        if (user.stats.questsReviewedPast > 0) {
+          val quest = db.quest.readByID(user.profile.questContext.purchasedQuest.get.id)
 
+          quest match {
+            case None => {
+              Logger.error("Quest by id not found n purchaseQuest")
+              InternalErrorApiResult(None)
+            }
+
+            case Some(q) => {
+              val ratio = user.stats.questsReviewedPast / user.stats.questsAccepted
+              
+              val nq = q.copy(
+                rating = q.rating.copy(points = q.rating.points + ratio))
+
+              db.quest.update(nq.updateStatus)
+            }
+          }
+        }
+
+
+        // Updating user profile.
         val pq = user.profile.questContext.purchasedQuest
 
         val u = user.copy(
@@ -100,7 +145,9 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
               purchasedQuest = None,
               takenQuest = pq,
               questCooldown = user.getCooldownForTakeQuest(pq.get.obj)),
-            assets = user.profile.assets - user.costOfTakingQuest))
+            assets = user.profile.assets - user.costOfTakingQuest),
+          stats = user.stats.copy(
+            questsAccepted = user.stats.questsAccepted + 1))
 
         db.user.update(u)
 
