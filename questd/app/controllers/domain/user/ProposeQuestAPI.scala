@@ -143,7 +143,7 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
 
     user.canGiveUpQuestProposal match {
       case OK => {
-        val newAssets = (user.profile.assets - user.costOfGivingUpQuestProposal).clamp
+        val newAssets = (user.profile.assets - user.costOfGivingUpQuestProposal).clampBot
 
         val u = user.copy(
           profile = user.profile.copy(

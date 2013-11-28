@@ -132,7 +132,7 @@ class UserLogic(val user: User) {
    *
    */
   def costOfGivingUpQuestProposal = {
-    Assets(rating = ratingToGiveUpQuestProposal(user.profile.level))
+    Assets(rating = ratingToGiveUpQuestProposal(user.profile.level)) clampTop user.profile.assets
   }
 
   /**
@@ -253,7 +253,7 @@ class UserLogic(val user: User) {
       case None => 0
     }
 
-    Assets(rating = ratingToGiveUpQuest(user.profile.level, duration))
+    Assets(rating = ratingToGiveUpQuest(user.profile.level, duration)) clampTop user.profile.assets
   }
 
   /**

@@ -55,7 +55,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
       case OK => {
 
         // Updating quest info.
-        if ((user.profile.questContext.purchasedQuest != None) && (user.stats.questsReviewedPast > 0)) {
+        if ((user.profile.questContext.purchasedQuest != None) && (user.stats.questsAcceptedPast > 0)) {
           val quest = db.quest.readByID(user.profile.questContext.purchasedQuest.get.id)
 
           quest match {
@@ -114,7 +114,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
       case OK => {
         
         // Updating quest info.
-        if (user.stats.questsReviewedPast > 0) {
+        if (user.stats.questsAcceptedPast > 0) {
           val quest = db.quest.readByID(user.profile.questContext.purchasedQuest.get.id)
 
           quest match {
@@ -124,7 +124,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
             }
 
             case Some(q) => {
-              val ratio = user.stats.questsReviewedPast / user.stats.questsAccepted
+              val ratio = Math.round(user.stats.questsReviewedPast.toFloat / user.stats.questsAcceptedPast) - 1
               
               val nq = q.copy(
                 rating = q.rating.copy(points = q.rating.points + ratio))
@@ -206,7 +206,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
     user.canGiveUpQuest match {
       case OK => {
-        val newAssets = (user.profile.assets - user.costOfGivingUpQuest).clamp
+        val newAssets = (user.profile.assets - user.costOfGivingUpQuest).clampBot
 
         val u = user.copy(
           profile = user.profile.copy(
