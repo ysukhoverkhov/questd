@@ -115,7 +115,7 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
   def proposeQuest(request: ProposeQuestRequest): ApiResult[ProposeQuestResult] = handleDbException {
     import request._
 
-    user.canProposeQuest(ContentType.apply(quest.content.contentType)) match {
+    user.canProposeQuest(ContentType.withName(quest.content.contentType)) match {
       case OK => {
 
         db.quest.create(Quest(info = quest, userID = user.id))

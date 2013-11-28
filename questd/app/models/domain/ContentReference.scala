@@ -3,13 +3,13 @@ package models.domain
 object ContentType extends Enumeration {
   type ContentType = Value
 
-  val Photo = Value(0, "Photo")
-  val Video = Value(1, "Video")
+  val Photo = Value(0)
+  val Video = Value(1)
 }
 
 
 case class ContentReference(
-  contentType: Int, // This is int to make it serializable to DB.
+  contentType: String,
   storage: String = "",
   reference: String = "")
 

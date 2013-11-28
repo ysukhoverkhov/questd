@@ -17,4 +17,3 @@ case class Quest(
   status: String = QuestStatus.OnVoting.toString,
   level: Int = 0) extends ID
 
-  // TODO make content type as a string.

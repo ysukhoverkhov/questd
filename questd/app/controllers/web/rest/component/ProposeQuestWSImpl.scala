@@ -34,6 +34,10 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl with Common
       throw new org.json4s.ParserUtil$ParseException("Empty request", null)
     } { x =>
       val v = Json.read[QuestInfo](x.toString)
+
+      // Check for existing content type.
+      ContentType.withName(v.content.contentType)
+      
       api.proposeQuest(ProposeQuestRequest(r.user, v))
     }
   }

@@ -164,7 +164,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
   def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
     import request._
 
-    user.canResulveQuest(ContentType.apply(solution.content.contentType)) match {
+    user.canResulveQuest(ContentType.withName(solution.content.contentType)) match {
       case OK => {
 
         db.solution.create(
