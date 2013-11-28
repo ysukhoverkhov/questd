@@ -14,12 +14,12 @@ private [domain] trait QuestsAdminAPI { this: DBAccessor =>
 
 
   /**
-   * List all Quests
+   * List all Quests with approved status.
    */
-  def allQuests: ApiResult[AllQuestsResult] = handleDbException {
+  def allQuestsInRotation: ApiResult[AllQuestsResult] = handleDbException {
     Logger.info("Admin request for all quests. THIS SHOULD NOT BE CALLED IN PRODUCTION SINCE IT'S VERY SLOW!!!!!!")
 
-    OkApiResult(Some(AllQuestsResult(List() ++ db.quest.all)))
+    OkApiResult(Some(AllQuestsResult(List() ++ db.quest.allWithStatus(QuestStatus.InRotation.toString))))
   }
 
 }

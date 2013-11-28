@@ -14,8 +14,8 @@ private[mongo] class MongoQuestDAO
   extends BaseMongoDAO[Quest](collectionName = "quests")
   with QuestDAO {
 
-  def allWithStatus(stauts: Int): Iterator[Quest] = {
-    all
+  def allWithStatus(status: String): Iterator[Quest] = {
+    allByExample("status", status)
   }
 
 }

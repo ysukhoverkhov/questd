@@ -179,7 +179,7 @@ class UserLogic(val user: User) {
    * Takes everything into account and returns possible quest to be solved by user.
    */
   def getRandomQuestForSolution: Quest = {
-    val quests = api.allQuests.body.get.quests
+    val quests = api.allQuestsInRotation.body.get.quests
 
     if (quests.length == 0) {
       Quest(info = QuestInfo(ContentReference(0, "this", "is a stub quest since no quests are in db")), userID = "userID")

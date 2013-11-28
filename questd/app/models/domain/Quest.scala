@@ -14,5 +14,7 @@ case class Quest(
   info: QuestInfo,
   rating: QuestRating = QuestRating(),
   // The field is by group.
-  status: Int = QuestStatus.OnVoting.id,
+  status: String = QuestStatus.OnVoting.toString,
   level: Int = 0) extends ID
+
+  // TODO make content type as a string.

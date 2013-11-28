@@ -104,5 +104,12 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
   def all: Iterator[T] = wrapMongoException {
     find(MongoDBObject())
   }
+  
+  /**
+   * All objects with filter.
+   */
+  def allByExample(fieldName: String, key: String): Iterator[T] = wrapMongoException {
+    find(makeKeyDbObject(fieldName, key))
+  } 
 
 }
