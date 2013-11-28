@@ -10,5 +10,6 @@ case class Profile(
   assets: Assets = Assets(0, 0, 0),
   rights: Rights = Rights(),
   questProposalContext: QuestProposalConext = QuestProposalConext(),
-  questContext: QuestContext = QuestContext())
+  questSolutionContext: QuestSolutionContext = QuestSolutionContext(),
+  questVoteContext: QuestVoteConext = QuestVoteConext())
 

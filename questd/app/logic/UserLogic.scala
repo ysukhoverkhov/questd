@@ -149,9 +149,9 @@ class UserLogic(val user: User) {
       LevelTooLow
     else if (!(user.profile.assets canAfford costOfPurchasingQuest))
       NotEnoughAssets
-    else if (user.profile.questContext.questCooldown.after(new Date()))
+    else if (user.profile.questSolutionContext.questCooldown.after(new Date()))
       CoolDown
-    else if (user.profile.questContext.takenQuest != None)
+    else if (user.profile.questSolutionContext.takenQuest != None)
       InvalidState
     else
       OK
@@ -161,14 +161,14 @@ class UserLogic(val user: User) {
    * Tells cost of next theme purchase
    */
   def costOfPurchasingQuest = {
-    if (user.profile.questContext.numberOfPurchasedQuests < numberOfQuestsSkipsForCoins) {
+    if (user.profile.questSolutionContext.numberOfPurchasedQuests < numberOfQuestsSkipsForCoins) {
 
-      val questDuration = user.profile.questContext.purchasedQuest match {
+      val questDuration = user.profile.questSolutionContext.purchasedQuest match {
         case Some(QuestInfoWithID(_, q)) => q.duration
         case _ => 1
       }
 
-      val c = costToSkipQuest(user.profile.level, user.profile.questContext.numberOfPurchasedQuests + 1, questDuration)
+      val c = costToSkipQuest(user.profile.level, user.profile.questSolutionContext.numberOfPurchasedQuests + 1, questDuration)
       Assets(coins = c)
     } else {
       Assets(money = 1)
@@ -196,7 +196,7 @@ class UserLogic(val user: User) {
   def canTakeQuest = {
     if (user.profile.rights.submitPhotoResults > user.profile.level)
       LevelTooLow
-    else if (user.profile.questContext.purchasedQuest == None)
+    else if (user.profile.questSolutionContext.purchasedQuest == None)
       InvalidState
     else if (!(user.profile.assets canAfford costOfTakingQuest))
       NotEnoughAssets
@@ -209,10 +209,10 @@ class UserLogic(val user: User) {
    */
   def costOfTakingQuest = {
     val questDuration: Int =
-      if (user.profile.questContext.purchasedQuest == None)
+      if (user.profile.questSolutionContext.purchasedQuest == None)
         0
       else
-        user.profile.questContext.purchasedQuest.get.obj.duration
+        user.profile.questSolutionContext.purchasedQuest.get.obj.duration
 
     Assets(coins = costToTakeQuestToSolve(user.profile.level, questDuration))
   }
@@ -228,7 +228,7 @@ class UserLogic(val user: User) {
 
     if (level > user.profile.level)
       LevelTooLow
-    else if (user.profile.questContext.takenQuest == None)
+    else if (user.profile.questSolutionContext.takenQuest == None)
       InvalidState
     else
       OK
@@ -238,7 +238,7 @@ class UserLogic(val user: User) {
    * Is user can give up quest.
    */
   def canGiveUpQuest = {
-    if (user.profile.questContext.takenQuest == None)
+    if (user.profile.questSolutionContext.takenQuest == None)
       InvalidState
     else
       OK
@@ -248,7 +248,7 @@ class UserLogic(val user: User) {
    * How much it'll cost to give up quest.
    */
   def costOfGivingUpQuest = {
-    val duration = user.profile.questContext.takenQuest match {
+    val duration = user.profile.questSolutionContext.takenQuest match {
       case Some(QuestInfoWithID(_, i)) => i.duration
       case None => 0
     }

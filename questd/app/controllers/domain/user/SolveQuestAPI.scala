@@ -55,8 +55,8 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
       case OK => {
 
         // Updating quest info.
-        if ((user.profile.questContext.purchasedQuest != None) && (user.stats.questsAcceptedPast > 0)) {
-          val quest = db.quest.readByID(user.profile.questContext.purchasedQuest.get.id)
+        if ((user.profile.questSolutionContext.purchasedQuest != None) && (user.stats.questsAcceptedPast > 0)) {
+          val quest = db.quest.readByID(user.profile.questSolutionContext.purchasedQuest.get.id)
 
           quest match {
             case None => {
@@ -80,8 +80,8 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
         val u = user.copy(
           profile = user.profile.copy(
             assets = user.profile.assets - questCost,
-            questContext = user.profile.questContext.copy(
-              numberOfPurchasedQuests = user.profile.questContext.numberOfPurchasedQuests + 1,
+            questSolutionContext = user.profile.questSolutionContext.copy(
+              numberOfPurchasedQuests = user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
               purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))),
           stats = user.stats.copy(
             questsReviewed = user.stats.questsReviewed + 1))
@@ -115,7 +115,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
         
         // Updating quest info.
         if (user.stats.questsAcceptedPast > 0) {
-          val quest = db.quest.readByID(user.profile.questContext.purchasedQuest.get.id)
+          val quest = db.quest.readByID(user.profile.questSolutionContext.purchasedQuest.get.id)
 
           quest match {
             case None => {
@@ -136,11 +136,11 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
 
         // Updating user profile.
-        val pq = user.profile.questContext.purchasedQuest
+        val pq = user.profile.questSolutionContext.purchasedQuest
 
         val u = user.copy(
           profile = user.profile.copy(
-            questContext = user.profile.questContext.copy(
+            questSolutionContext = user.profile.questSolutionContext.copy(
               numberOfPurchasedQuests = 0,
               purchasedQuest = None,
               takenQuest = pq,
@@ -171,11 +171,11 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
           QuestSolution(
             info = solution,
             userID = user.id,
-            questID = user.profile.questContext.takenQuest.get.id))
+            questID = user.profile.questSolutionContext.takenQuest.get.id))
 
         val u = user.copy(
           profile = user.profile.copy(
-            questContext = user.profile.questContext.copy(
+            questSolutionContext = user.profile.questSolutionContext.copy(
               numberOfPurchasedQuests = 0,
               purchasedQuest = None,
               takenQuest = None)))
@@ -210,7 +210,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
         val u = user.copy(
           profile = user.profile.copy(
-            questContext = user.profile.questContext.copy(
+            questSolutionContext = user.profile.questSolutionContext.copy(
               numberOfPurchasedQuests = 0,
               purchasedQuest = None,
               takenQuest = None),
@@ -234,7 +234,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
     db.user.update {
       user.copy(
         profile = user.profile.copy(
-          questContext = user.profile.questContext.copy(
+          questSolutionContext = user.profile.questSolutionContext.copy(
             purchasedQuest = None,
             numberOfPurchasedQuests = 0),
           questProposalContext = user.profile.questProposalContext.copy(

@@ -21,8 +21,8 @@ object CheckGiveupQuest {
 class CheckGiveupQuest(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
 
   protected def check(user: User) = {
-    if ((user.profile.questContext.takenQuest != None) 
-      && (user.profile.questContext.questCooldown.before(new Date()))) {
+    if ((user.profile.questSolutionContext.takenQuest != None) 
+      && (user.profile.questSolutionContext.questCooldown.before(new Date()))) {
       api.giveUpQuest(GiveUpQuestRequest(user))
     }
   }

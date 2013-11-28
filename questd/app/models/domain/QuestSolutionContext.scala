@@ -6,7 +6,7 @@ case class QuestInfoWithID (
     id: String,
     obj: QuestInfo)
 
-case class QuestContext(
+case class QuestSolutionContext(
   purchasedQuest: Option[QuestInfoWithID] = None,
   takenQuest: Option[QuestInfoWithID] = None,
   numberOfPurchasedQuests: Int = 0,
