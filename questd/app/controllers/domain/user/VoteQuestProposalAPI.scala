@@ -4,14 +4,13 @@ import components.DBAccessor
 import controllers.domain.ApiResult
 import controllers.domain.OkApiResult
 import controllers.domain.helpers.exceptionwrappers.handleDbException
-import logic.user2Logic
-import models.domain.Assets
-import models.domain.Profile
-import models.domain.User
+import logic._
+import models.domain._
 import models.domain.base.QuestInfoWithID
 import protocol.ProfileModificationResult.OK
 import protocol.ProfileModificationResult.OutOfContent
 import protocol.ProfileModificationResult.ProfileModificationResult
+import play.Logger
 
 case class GetQuestToVoteRequest(user: User)
 case class GetQuestToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -46,7 +45,7 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
 
             val u = user.copy(
               profile = user.profile.copy(
-                questVoteContext = user.profile.questVoteContext.copy(
+                questProposalVoteContext = user.profile.questProposalVoteContext.copy(
                   reviewingQuest = qi)))
 
             db.user.update(u)
@@ -61,18 +60,56 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
 
   }
 
+  // TODO add difficulty and duration to voting.
+
   /**
    * Get cost of quest to shuffle.
    */
   def voteQuestProposal(request: VoteQuestRequest): ApiResult[VoteQuestResult] = handleDbException {
     import request._
 
+    def updateQuestWithVote(q: Quest, v: QuestProposalVote.Value): Quest = {
+      import QuestProposalVote._
+
+      def checkInc(v: QuestProposalVote.Value, c: QuestProposalVote.Value, n: Int) = if (v == c) n + 1 else n
+
+      q.copy(
+        rating = q.rating.copy(
+          votersCount = q.rating.votersCount + 1,
+          points = checkInc(v, Cool, q.rating.points),
+          cheating = checkInc(v, Cheating, q.rating.cheating),
+          iacpoints = q.rating.iacpoints.copy(
+            spam = checkInc(v, IASpam, q.rating.iacpoints.spam),
+            porn = checkInc(v, IAPorn, q.rating.iacpoints.porn))))
+    }
+
     user.canVoteQuest match {
       case OK => {
-        
-        
+        // 1. get quest to vote.
+        // 2. update quest params.
+        // 3. check change quest state
+        // 4. save quest in db.
+        db.quest.readByID(user.profile.questProposalVoteContext.reviewingQuest.get.id) match {
+          case None => Logger.error("Unable to find quest with id for voting " + user.profile.questProposalVoteContext.reviewingQuest.get.id)
+          case Some(q) => {
+            db.quest.update(updateQuestWithVote(q, vote).updateStatus)
+          }
+        }
 
-        OkApiResult(Some(VoteQuestResult(OK, Some(user.profile))))
+        // 5. update user profile.
+        // 6. save profile in db.
+        val reward = user.getQuestProposalVoteReward
+
+        val u = user.copy(
+          profile = user.profile.copy(
+            questProposalVoteContext = user.profile.questProposalVoteContext.copy(
+              numberOfReviewedQuests = user.profile.questProposalVoteContext.numberOfReviewedQuests + 1,
+              reviewingQuest = None),
+            assets = user.profile.assets + reward))
+
+        db.user.update(u)
+
+        OkApiResult(Some(VoteQuestResult(OK, Some(u.profile), Some(reward))))
 
       }
       case a => OkApiResult(Some(VoteQuestResult(a)))

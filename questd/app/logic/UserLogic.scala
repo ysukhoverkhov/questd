@@ -286,7 +286,7 @@ class UserLogic(val user: User) {
   def canGetQuestForVote = {
     if (user.profile.rights.voteQuestProposals > user.profile.level)
       LevelTooLow
-    else if (user.profile.questVoteContext.reviewingQuest != None)
+    else if (user.profile.questProposalVoteContext.reviewingQuest != None)
       InvalidState
     else
       OK
@@ -298,7 +298,7 @@ class UserLogic(val user: User) {
   def canVoteQuest = {
     if (user.profile.rights.voteQuestProposals > user.profile.level)
       LevelTooLow
-    else if (user.profile.questVoteContext.reviewingQuest == None)
+    else if (user.profile.questProposalVoteContext.reviewingQuest == None)
       InvalidState
     else
       OK
@@ -318,6 +318,13 @@ class UserLogic(val user: User) {
       Some(quests(random_index))
     }
 
+  }
+  
+  /**
+   * TODO implement me.
+   */
+  def getQuestProposalVoteReward = {
+    Assets(1, 1, 1)
   }
 }
 

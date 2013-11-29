@@ -6,8 +6,8 @@ package models.domain
 case class QuestRating(
     // The filed is by group.
   points: Int = 0,
-  cheatingPoints: Int = 0,
-  iacrating: IAContentRating = IAContentRating(),
+  cheating: Int = 0,
+  iacpoints: IAContentRating = IAContentRating(),
   difficultyRating: QuestDifficultyRating = QuestDifficultyRating(),
   durationRating: QuestDurationRating = QuestDurationRating(), 
   votersCount: Int = 0)
