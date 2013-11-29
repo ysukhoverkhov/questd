@@ -16,10 +16,16 @@ import protocol.ProfileModificationResult.ProfileModificationResult
 case class GetQuestToVoteRequest(user: User)
 case class GetQuestToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class VoteQuestRequest(user: User)
+// TODO make quest duration not integer in days but enum (after implementing voting).
+
+object QuestProposalVote extends Enumeration {
+  val Cool, SoSo, Cheating, IASpam, IAPorn = Value
+}
+
+case class VoteQuestRequest(user: User, vote: QuestProposalVote.Value)
 case class VoteQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None)
 
-private[domain] trait VoteQuestAPI { this: DBAccessor =>
+private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
 
   /**
    * Get cost of quest to shuffle.
@@ -27,7 +33,7 @@ private[domain] trait VoteQuestAPI { this: DBAccessor =>
   def getQuestToVote(request: GetQuestToVoteRequest): ApiResult[GetQuestToVoteResult] = handleDbException {
     import request._
 
-    user.canVoteQuest match {
+    user.canGetQuestForVote match {
       case OK => {
 
         // Updating user profile.
@@ -58,13 +64,21 @@ private[domain] trait VoteQuestAPI { this: DBAccessor =>
   /**
    * Get cost of quest to shuffle.
    */
-  def voteQuest(request: VoteQuestRequest): ApiResult[VoteQuestResult] = handleDbException {
+  def voteQuestProposal(request: VoteQuestRequest): ApiResult[VoteQuestResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(VoteQuestResult(OK)))
+    user.canVoteQuest match {
+      case OK => {
+        
+        
+
+        OkApiResult(Some(VoteQuestResult(OK, Some(user.profile))))
+
+      }
+      case a => OkApiResult(Some(VoteQuestResult(a)))
+    }
   }
 
 }
-
 
 

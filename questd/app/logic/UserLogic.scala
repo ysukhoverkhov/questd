@@ -283,7 +283,7 @@ class UserLogic(val user: User) {
   /**
    * 
    */
-  def canVoteQuest = {
+  def canGetQuestForVote = {
     if (user.profile.rights.voteQuestProposals > user.profile.level)
       LevelTooLow
     else if (user.profile.questVoteContext.reviewingQuest != None)
@@ -291,7 +291,19 @@ class UserLogic(val user: User) {
     else
       OK
   }
-  
+
+  /**
+   * 
+   */
+  def canVoteQuest = {
+    if (user.profile.rights.voteQuestProposals > user.profile.level)
+      LevelTooLow
+    else if (user.profile.questVoteContext.reviewingQuest == None)
+      InvalidState
+    else
+      OK
+  }
+
   /**
    * @return None if no more quests to vote for today.
    */

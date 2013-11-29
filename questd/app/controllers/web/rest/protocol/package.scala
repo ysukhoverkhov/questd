@@ -113,6 +113,14 @@ package object protocol {
   /**********************
    * Voting quests
    **********************/
+  
+  case class WSQuestProposalVoteRequest (
+      /**
+       * @see controllers.domain.user.QuestProposalVote
+       */
+      vote: String)
+  
+  
   type WSGetQuestToVoteResult = GetQuestToVoteResult
   
   type WSVoteQuestResult = VoteQuestResult
