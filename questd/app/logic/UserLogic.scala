@@ -286,6 +286,8 @@ class UserLogic(val user: User) {
   def canVoteQuest = {
     if (user.profile.rights.voteQuestProposals > user.profile.level)
       LevelTooLow
+    else if (user.profile.questVoteContext.reviewingQuest != None)
+      InvalidState
     else
       OK
   }
