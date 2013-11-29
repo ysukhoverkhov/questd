@@ -1,6 +1,8 @@
 package models.domain
 
+import models.domain.base._
+
 case class QuestVoteConext(
-  reviewingQuestID: Option[String] = None,
+  reviewingQuest: Option[QuestInfoWithID] = None,
   numberOfReviewedQuests: Int = 0)
     

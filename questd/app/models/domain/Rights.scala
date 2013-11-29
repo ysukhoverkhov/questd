@@ -6,7 +6,7 @@ import logic.constants
  * What does user can do an what level.
  */
 case class Rights(
-  voteQuestResults: Int = constants.voteQuestResults,
+  voteQuestSolutions: Int = constants.voteQuestResults,
   submitPhotoResults: Int = constants.submitPhotoResults,
   submitVideoResults: Int = constants.submitVideoResults,
   report: Int = constants.report,

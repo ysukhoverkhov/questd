@@ -22,6 +22,15 @@ private [domain] trait QuestsAdminAPI { this: DBAccessor =>
     OkApiResult(Some(AllQuestsResult(List() ++ db.quest.allWithStatus(QuestStatus.InRotation.toString))))
   }
 
+  /**
+   * List all Quests with OnVoting status.
+   */
+  def allQuestsOnVoting: ApiResult[AllQuestsResult] = handleDbException {
+    Logger.info("Admin request for all quests. THIS SHOULD NOT BE CALLED IN PRODUCTION SINCE IT'S VERY SLOW!!!!!!")
+
+    OkApiResult(Some(AllQuestsResult(List() ++ db.quest.allWithStatus(QuestStatus.OnVoting.toString))))
+  }
+
 }
 
 

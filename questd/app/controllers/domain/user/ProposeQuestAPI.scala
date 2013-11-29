@@ -11,13 +11,13 @@ import logic._
 import protocol.ProfileModificationResult._
 
 case class GetQuestThemeCostRequest(user: User)
-case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
+case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Assets)
 
 case class PurchaseQuestThemeRequest(user: User)
 case class PurchaseQuestThemeResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetQuestThemeTakeCostRequest(user: User)
-case class GetQuestThemeTakeCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
+case class GetQuestThemeTakeCostResult(allowed: ProfileModificationResult, cost: Assets)
 
 case class TakeQuestThemeRequest(user: User)
 case class TakeQuestThemeResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -29,7 +29,7 @@ case class GiveUpQuestProposalRequest(user: User)
 case class GiveUpQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetQuestProposalGiveUpCostRequest(user: User)
-case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
+case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets)
 
 private[domain] trait ProposeQuestAPI { this: DBAccessor =>
 

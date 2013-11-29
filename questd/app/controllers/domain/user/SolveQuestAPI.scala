@@ -1,6 +1,7 @@
 package controllers.domain.user
 
 import models.domain._
+import models.domain.base._
 import models.store._
 import play.Logger
 import helpers._
@@ -11,7 +12,7 @@ import logic._
 import protocol.ProfileModificationResult._
 
 case class GetQuestCostRequest(user: User)
-case class GetQuestCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
+case class GetQuestCostResult(allowed: ProfileModificationResult, cost: Assets)
 
 case class PurchaseQuestRequest(user: User)
 case class PurchaseQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -20,13 +21,13 @@ case class TakeQuestRequest(user: User)
 case class TakeQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetTakeQuestCostRequest(user: User)
-case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
+case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Assets)
 
 case class ProposeSolutionRequest(user: User, solution: QuestSolutionInfo)
 case class ProposeSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetQuestGiveUpCostRequest(user: User)
-case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets = Assets(0, 0, 0))
+case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets)
 
 case class GiveUpQuestRequest(user: User)
 case class GiveUpQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)

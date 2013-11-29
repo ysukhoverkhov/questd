@@ -1,10 +1,7 @@
 package models.domain
 
 import java.util.Date
-
-case class QuestInfoWithID (
-    id: String,
-    obj: QuestInfo)
+import models.domain.base._
 
 case class QuestSolutionContext(
   purchasedQuest: Option[QuestInfoWithID] = None,

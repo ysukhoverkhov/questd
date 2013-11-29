@@ -109,4 +109,12 @@ package object protocol {
   
   type WSGiveUpQuestResult = GiveUpQuestResult
 
+  
+  /**********************
+   * Voting quests
+   **********************/
+  type WSGetQuestToVoteResult = GetQuestToVoteResult
+  
+  type WSVoteQuestResult = VoteQuestResult
+  
 }

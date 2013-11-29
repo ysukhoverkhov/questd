@@ -6,8 +6,8 @@ import controllers.web.rest.component.helpers.AccessToWSInstance
 
 object VoteQuestWS extends Controller with AccessToWSInstance {
   
-  def getQuestToVote = TODO
-  def voteQuest = TODO
+  def getQuestToVote = ws.getQuestToVote
+  def voteQuest = ws.voteQuest
 
 }
 

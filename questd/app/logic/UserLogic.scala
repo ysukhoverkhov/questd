@@ -5,6 +5,7 @@ import scala.util.Random
 import com.github.nscala_time.time.Imports._
 import org.joda.time.DateTime
 import models.domain._
+import models.domain.base._
 import models.domain.ContentType._
 import controllers.domain.user.protocol.ProfileModificationResult._
 import components.componentregistry.ComponentRegistrySingleton
@@ -272,6 +273,37 @@ class UserLogic(val user: User) {
   def getResetPurchasesTimeout = {
     val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
     (DateTime.now(tz) + 1.day).hour(constants.flipHour).minute(0).second(0) toDate ()
+  }
+  
+  
+  /**********************
+   * Vote quest
+   **********************/
+  
+  /**
+   * 
+   */
+  def canVoteQuest = {
+    if (user.profile.rights.voteQuestProposals > user.profile.level)
+      LevelTooLow
+    else
+      OK
+  }
+  
+  /**
+   * @return None if no more quests to vote for today.
+   */
+  def getQuestToVote: Option[Quest] = {
+    val quests = api.allQuestsOnVoting.body.get.quests
+
+    if (quests.length == 0) {
+      None
+    } else {
+      val rand = new Random(System.currentTimeMillis())
+      val random_index = rand.nextInt(quests.length)
+      Some(quests(random_index))
+    }
+
   }
 }
 

@@ -27,5 +27,10 @@ object ProfileModificationResult extends Enumeration {
    * Invalid state. For example we try to take quest theme if no themes purchased.
    */
   val InvalidState = Value(4, "InvalidState")
+
+  /**
+   * Used when we do not have enough content to fulfill the request. 
+   */
+  val OutOfContent = Value(5, "OutOfContent")
 }
 
