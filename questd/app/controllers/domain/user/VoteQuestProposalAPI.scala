@@ -15,13 +15,7 @@ import play.Logger
 case class GetQuestToVoteRequest(user: User)
 case class GetQuestToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-// TODO make quest duration not integer in days but enum (after implementing voting).
-
-object QuestProposalVote extends Enumeration {
-  val Cool, SoSo, Cheating, IASpam, IAPorn = Value
-}
-
-case class VoteQuestRequest(user: User, vote: QuestProposalVote.Value)
+case class VoteQuestRequest(user: User, vote: QuestProposalVote.Value, duration: Option[QuestDuration.Value] = None, difficulty: Option[QuestDifficulty.Value] = None)
 case class VoteQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None)
 
 private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
@@ -60,20 +54,18 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
 
   }
 
-  // TODO add difficulty and duration to voting.
-
   /**
    * Get cost of quest to shuffle.
    */
   def voteQuestProposal(request: VoteQuestRequest): ApiResult[VoteQuestResult] = handleDbException {
     import request._
 
-    def updateQuestWithVote(q: Quest, v: QuestProposalVote.Value): Quest = {
+    def updateQuestWithVote(q: Quest, v: QuestProposalVote.Value, dur: Option[QuestDuration.Value], dif: Option[QuestDifficulty.Value]): Quest = {
       import QuestProposalVote._
 
-      def checkInc(v: QuestProposalVote.Value, c: QuestProposalVote.Value, n: Int) = if (v == c) n + 1 else n
+      def checkInc[T](v: T, c: T, n: Int) = if (v == c) n + 1 else n
 
-      q.copy(
+      val q2 = q.copy(
         rating = q.rating.copy(
           votersCount = q.rating.votersCount + 1,
           points = checkInc(v, Cool, q.rating.points),
@@ -81,6 +73,24 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
           iacpoints = q.rating.iacpoints.copy(
             spam = checkInc(v, IASpam, q.rating.iacpoints.spam),
             porn = checkInc(v, IAPorn, q.rating.iacpoints.porn))))
+
+      if (v == QuestProposalVote.Cool) {
+
+        q2.copy(rating = q.rating.copy(
+          difficultyRating = q.rating.difficultyRating.copy(
+            easy = checkInc(dif.get, QuestDifficulty.Easy, q2.rating.difficultyRating.easy),
+            normal = checkInc(dif.get, QuestDifficulty.Normal, q2.rating.difficultyRating.normal),
+            hard = checkInc(dif.get, QuestDifficulty.Normal, q2.rating.difficultyRating.hard),
+            extreme = checkInc(dif.get, QuestDifficulty.Normal, q2.rating.difficultyRating.extreme)),
+          durationRating = q.rating.durationRating.copy(
+            mins = checkInc(dur.get, QuestDuration.Minutes, q2.rating.durationRating.mins),
+            hour = checkInc(dur.get, QuestDuration.Hour, q2.rating.durationRating.hour),
+            day = checkInc(dur.get, QuestDuration.Day, q2.rating.durationRating.day),
+            days = checkInc(dur.get, QuestDuration.TwoDays, q2.rating.durationRating.days),
+            week = checkInc(dur.get, QuestDuration.Week, q2.rating.durationRating.week))))
+      } else {
+        q2
+      }
     }
 
     user.canVoteQuest match {
@@ -92,7 +102,7 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
         db.quest.readByID(user.profile.questProposalVoteContext.reviewingQuest.get.id) match {
           case None => Logger.error("Unable to find quest with id for voting " + user.profile.questProposalVoteContext.reviewingQuest.get.id)
           case Some(q) => {
-            db.quest.update(updateQuestWithVote(q, vote).updateStatus)
+            db.quest.update(updateQuestWithVote(q, vote, duration, difficulty).updateStatus)
           }
         }
 

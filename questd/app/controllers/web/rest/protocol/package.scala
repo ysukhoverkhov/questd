@@ -118,7 +118,17 @@ package object protocol {
       /**
        * @see controllers.domain.user.QuestProposalVote
        */
-      vote: String)
+      vote: String,
+      
+      /**
+       * @see QuestDuration 
+       */
+      duration: Option[String],
+
+      /**
+       * @see QuestDifficulty 
+       */
+      difficulty: Option[String])
   
   
   type WSGetQuestToVoteResult = GetQuestToVoteResult

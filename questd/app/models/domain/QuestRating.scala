@@ -1,5 +1,9 @@
 package models.domain
 
+object QuestProposalVote extends Enumeration {
+  val Cool, SoSo, Cheating, IASpam, IAPorn = Value
+}
+
 /**
  * Rating of a quest used during voting.
  */
