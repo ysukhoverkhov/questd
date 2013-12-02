@@ -165,7 +165,7 @@ class UserLogic(val user: User) {
     if (user.profile.questSolutionContext.numberOfPurchasedQuests < numberOfQuestsSkipsForCoins) {
 
       val questDuration = user.profile.questSolutionContext.purchasedQuest match {
-        case Some(QuestInfoWithID(_, q)) => q.duration
+        case Some(QuestInfoWithID(_, q)) => q.daysDuration
         case _ => 1
       }
 
@@ -213,7 +213,7 @@ class UserLogic(val user: User) {
       if (user.profile.questSolutionContext.purchasedQuest == None)
         0
       else
-        user.profile.questSolutionContext.purchasedQuest.get.obj.duration
+        user.profile.questSolutionContext.purchasedQuest.get.obj.daysDuration
 
     Assets(coins = costToTakeQuestToSolve(user.profile.level, questDuration))
   }
@@ -250,7 +250,7 @@ class UserLogic(val user: User) {
    */
   def costOfGivingUpQuest = {
     val duration = user.profile.questSolutionContext.takenQuest match {
-      case Some(QuestInfoWithID(_, i)) => i.duration
+      case Some(QuestInfoWithID(_, i)) => i.daysDuration
       case None => 0
     }
 
@@ -261,7 +261,7 @@ class UserLogic(val user: User) {
    * Cooldown for taking quest.
    */
   def getCooldownForTakeQuest(qi: QuestInfo) = {
-    val daysToSkipt = qi.duration
+    val daysToSkipt = qi.daysDuration
 
     val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
     (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate ()
