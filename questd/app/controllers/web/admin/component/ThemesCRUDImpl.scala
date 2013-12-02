@@ -34,7 +34,7 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
       api.getTheme(GetThemeRequest(id)) match {
         case OkApiResult(Some(GetThemeResult(theme))) => {
 
-          newThemeForm.fill(ThemeForm(theme.id.toString, theme.text, theme.comment))
+          newThemeForm.fill(ThemeForm(id = theme.id.toString, text = theme.text, comment = theme.comment))
         }
         case _ => newThemeForm
       }
@@ -78,11 +78,11 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
       themeForm => {
 
         if (themeForm.id == "") {
-          val theme = Theme("", themeForm.text, themeForm.comment)
+          val theme = Theme(id = "", text = themeForm.text, comment = themeForm.comment)
           api.createTheme(CreateThemeRequest(theme))
         } else {
           
-          val theme = Theme(themeForm.id, themeForm.text, themeForm.comment)
+          val theme = Theme(id = themeForm.id, text = themeForm.text, comment = themeForm.comment)
           api.updateTheme(UpdateThemeRequest(theme))
         }
 

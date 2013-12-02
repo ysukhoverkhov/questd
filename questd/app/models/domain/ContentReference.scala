@@ -7,10 +7,9 @@ object ContentType extends Enumeration {
   val Video = Value(1)
 }
 
-
 case class ContentReference(
   contentType: String,
-  storage: String = "",
-  reference: String = "")
+  storage: String,
+  reference: String)
 
   
