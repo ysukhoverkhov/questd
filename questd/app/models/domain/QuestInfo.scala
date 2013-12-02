@@ -9,10 +9,11 @@ object QuestDuration extends Enumeration {
 }
 
 case class QuestInfo(
-    content: ContentReference,
-    duration: String = QuestDuration.Minutes.toString,
-    difficulty: String = QuestDifficulty.Easy.toString) {
-  
+  content: ContentReference,
+  level: Int = 0,
+  duration: String = QuestDuration.Minutes.toString,
+  difficulty: String = QuestDifficulty.Easy.toString) {
+
   def daysDuration = QuestDuration.withName(duration) match {
     case QuestDuration.Minutes => 1
     case QuestDuration.Hours => 1

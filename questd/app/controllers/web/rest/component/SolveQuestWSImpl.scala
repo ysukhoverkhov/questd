@@ -15,7 +15,7 @@ trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFu
   def getQuestCost = wrapApiCallReturnBody[WSGetQuestCostResult] { r =>
     api.getQuestCost(GetQuestCostRequest(r.user))
   }
-  
+
   def purchaseQuest = wrapApiCallReturnBody[WSPurchaseQuestResult] { r =>
     api.purchaseQuest(PurchaseQuestRequest(r.user))
   }
@@ -23,28 +23,24 @@ trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFu
   def getTakeQuestCost = wrapApiCallReturnBody[WSGetTakeQuestCostResult] { r =>
     api.getTakeQuestCost(GetTakeQuestCostRequest(r.user))
   }
-  
+
   def takeQuest = wrapApiCallReturnBody[WSTakeQuestResult] { r =>
     api.takeQuest(TakeQuestRequest(r.user))
   }
 
-  def proposeSolution = wrapApiCallReturnBody[WSProposeSolutionResult] { r =>
-    r.body.asJson.fold {
-      throw new org.json4s.ParserUtil$ParseException("Empty request", null)
-    } { x =>
-      val v = Json.read[QuestSolutionInfo](x.toString)
+  def proposeSolution = wrapJsonApiCallReturnBody[WSProposeSolutionResult] { (js, r) =>
+    val v = Json.read[QuestSolutionInfo](js.toString)
 
-      // Check for existing content type.
-      ContentType.withName(v.content.contentType)
+    // Check for existing content type.
+    ContentType.withName(v.content.contentType)
 
-      api.proposeSolution(ProposeSolutionRequest(r.user, v))
-    }
+    api.proposeSolution(ProposeSolutionRequest(r.user, v))
   }
 
   def getQuestGiveUpCost = wrapApiCallReturnBody[WSGetQuestGiveUpCostResult] { r =>
     api.getQuestGiveUpCost(GetQuestGiveUpCostRequest(r.user))
   }
-  
+
   def giveUpQuest = wrapApiCallReturnBody[WSGiveUpQuestResult] { r =>
     api.giveUpQuest(GiveUpQuestRequest(r.user))
   }

@@ -9,7 +9,7 @@ import controllers.domain._
 import controllers.web.rest.protocol._
 import org.json4s._
 
-private [component] trait CommonFunctions { this: QuestController with SecurityWSImpl =>
+private[component] trait CommonFunctions { this: QuestController with SecurityWSImpl =>
 
   def wrapApiCall[T <: AnyRef](apiCall: AuthenticatedRequest[AnyContent] => ApiResult[T])(body: Option[T] => SimpleResult) = Authenticated.async { implicit request =>
     Future {
@@ -46,5 +46,15 @@ private [component] trait CommonFunctions { this: QuestController with SecurityW
   }
 
   def wrapApiCallReturnBody[T <: AnyRef](apiCall: AuthenticatedRequest[AnyContent] => ApiResult[T]) = wrapApiCall(apiCall)(writeBodyInResponse)
+
+  def wrapJsonApiCallReturnBody[T <: AnyRef](jsonApiCall: (String, AuthenticatedRequest[AnyContent]) => ApiResult[T]) = wrapApiCall { r =>
+
+    r.body.asJson.fold {
+      throw new org.json4s.ParserUtil$ParseException("Empty request", null)
+    } { js =>
+      jsonApiCall(js.toString, r)
+    }
+
+  }(writeBodyInResponse)
 
 }

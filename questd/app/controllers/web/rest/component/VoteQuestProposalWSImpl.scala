@@ -16,27 +16,21 @@ trait VoteQuestProposalWSImpl extends QuestController with SecurityWSImpl with C
     api.getQuestToVote(GetQuestToVoteRequest(r.user))
   }
 
-  // TODO make additional wrapper for working with json bodies.
-  // TODO replace all occurences. find them with "Empty request"
-  def voteQuestProposal = wrapApiCallReturnBody[WSVoteQuestResult] { r =>
+  def voteQuestProposal = wrapJsonApiCallReturnBody[WSVoteQuestResult] { (js, r) =>
 
-    r.body.asJson.fold {
-      throw new org.json4s.ParserUtil$ParseException("Empty request", null)
-    } { x =>
-      val v = Json.read[WSQuestProposalVoteRequest](x.toString)
-      val vote = QuestProposalVote.withName(v.vote)
-      
-      val duration = v.duration match {
-        case None => None
-        case Some(d) => Some(QuestDuration.withName(d))
-      }
-      val difficulty = v.difficulty match {
-        case None => None
-        case Some(d) => Some(QuestDifficulty.withName(d))
-      }
+    val v = Json.read[WSQuestProposalVoteRequest](js)
+    val vote = QuestProposalVote.withName(v.vote)
 
-      api.voteQuestProposal(VoteQuestRequest(r.user, vote, duration, difficulty))
+    val duration = v.duration match {
+      case None => None
+      case Some(d) => Some(QuestDuration.withName(d))
     }
+    val difficulty = v.difficulty match {
+      case None => None
+      case Some(d) => Some(QuestDifficulty.withName(d))
+    }
+
+    api.voteQuestProposal(VoteQuestRequest(r.user, vote, duration, difficulty))
 
   }
 

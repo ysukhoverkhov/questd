@@ -29,17 +29,13 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl with Common
   }
 
   
-  def proposeQuest = wrapApiCallReturnBody[WSProposeQuestResult] { r =>
-    r.body.asJson.fold {
-      throw new org.json4s.ParserUtil$ParseException("Empty request", null)
-    } { x =>
-      val v = Json.read[QuestInfo](x.toString)
+  def proposeQuest = wrapJsonApiCallReturnBody[WSProposeQuestResult] { (js, r) =>
+      val v = Json.read[QuestInfo](js)
 
       // Check for existing content type.
       ContentType.withName(v.content.contentType)
       
       api.proposeQuest(ProposeQuestRequest(r.user, v))
-    }
   }
   
   
