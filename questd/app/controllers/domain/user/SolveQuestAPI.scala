@@ -64,7 +64,9 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
             case Some(q) => {
               val nq = q.copy(
-                rating = q.rating.copy(points = q.rating.points - 1))
+                rating = q.rating.copy(
+                    points = q.rating.points - 1,
+                    votersCount = q.rating.votersCount + 1))
 
               db.quest.update(nq.updateStatus)
             }
@@ -125,7 +127,9 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
               val ratio = Math.round(user.stats.questsReviewedPast.toFloat / user.stats.questsAcceptedPast) - 1
               
               val nq = q.copy(
-                rating = q.rating.copy(points = q.rating.points + ratio))
+                rating = q.rating.copy(
+                    points = q.rating.points + ratio,
+                    votersCount = q.rating.votersCount + 1))
 
               db.quest.update(nq.updateStatus)
             }

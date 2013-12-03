@@ -321,10 +321,10 @@ class UserLogic(val user: User) {
   }
   
   /**
-   * TODO implement me.
+   * Reward for voting for quest proposal.
    */
   def getQuestProposalVoteReward = {
-    Assets(1, 1, 1)
+    Assets(coins = rewardForVotingProposal(user.profile.level, user.profile.questProposalVoteContext.numberOfReviewedQuests + 1)).clampBot
   }
 }
 

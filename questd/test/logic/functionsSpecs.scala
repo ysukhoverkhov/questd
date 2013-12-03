@@ -66,7 +66,15 @@ class FunctionsSpecs extends Specification {
       ratingToGiveUpQuest(20, 1) must beEqualTo(3732)
     }
 
-    
+    "rewardForVotingProposal" in {
+      rewardForVotingProposal(10, 1) must beEqualTo(32)
+      rewardForVotingProposal(10, 4) must beEqualTo(5)
+      rewardForVotingProposal(15, 1) must beEqualTo(102)
+      rewardForVotingProposal(15, 6) must beEqualTo(26)
+      rewardForVotingProposal(20, 1) must beEqualTo(136)
+      rewardForVotingProposal(20, 10) must beEqualTo(8)
+    }
+
   }
 
 }
