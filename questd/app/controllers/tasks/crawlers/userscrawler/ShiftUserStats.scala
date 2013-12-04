@@ -10,20 +10,19 @@ import controllers.domain.user._
 import models.domain._
 import java.util.Date
 
-object ResetCountersAtNight {
+object ShiftUserStats {
   def props(api: DomainAPIComponent#DomainAPI) = {
-    Props(classOf[ResetCountersAtNight], api)
+    Props(classOf[ShiftUserStats], api)
   }
-  
-  def name = "ResetCountersAtNight"
+
+  def name = "ShiftUserStats"
 }
 
-class ResetCountersAtNight(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
+class ShiftUserStats(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
 
+  // TODO test me.
   protected def check(user: User) = {
-    if (user.schedules.purchases.before(new Date())) {
-      api.resetCounters(ResetCountersRequest(user))
-    }
+    api.shiftStats(ShiftStatsRequest(user))
   }
 
 }

@@ -10,6 +10,8 @@ import controllers.domain.user._
 import models.domain._
 import java.util.Date
 
+case class ProcessUser(user: User)
+
 abstract class BaseUserCrawler(api: DomainAPIComponent#DomainAPI) extends EasyRestartActor {
 
   def receive = {

@@ -11,19 +11,18 @@ import controllers.domain.user._
 import models.domain._
 
 
-object UsersHourlyCrawler {
+object UsersWeeklyCrawler {
   def props(api: DomainAPIComponent#DomainAPI) = {
-    Props(classOf[UsersHourlyCrawler], api)
+    Props(classOf[UsersWeeklyCrawler], api)
   }
 
-  def name = "UsersHourlyCrawler"
+  def name = "UsersWeeklyCrawler"
 }
 
-class UsersHourlyCrawler(api: DomainAPIComponent#DomainAPI) extends BaseUsersScheduleCrawler(api) {
+class UsersWeeklyCrawler(api: DomainAPIComponent#DomainAPI) extends BaseUsersScheduleCrawler(api) {
 
   protected val userActors = List(
-      classOf[CheckGiveupQuestProposal],
-      classOf[CheckGiveupQuest],
-      classOf[ResetCountersAtNight])
+      classOf[ShiftUserStats])
 
 }
+

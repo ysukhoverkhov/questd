@@ -24,9 +24,11 @@ trait TasksComponent { component: DomainAPIComponent =>
     val configSectionName = "Tasks"
     val defaultConfiguration = ConfigSection(
       configSectionName,
-      Map(("akka://application/user/UsersHourlCrawler", "0 0 0/1 * * ?")))
+      Map(("akka://application/user/UsersHourlyCrawler", "0 0 0/1 * * ?"),
+          ("akka://application/user/UsersWeeklyCrawler", "0 0 5 * * 1"))) // TODO check it.
 
-    val usersHourlCrawler = Akka.system.actorOf(UsersHourlCrawler.props(api), name = UsersHourlCrawler.name)
+    val usersHourlyCrawler = Akka.system.actorOf(UsersHourlyCrawler.props(api), name = UsersHourlyCrawler.name)
+    val usersWeeklyCrawler = Akka.system.actorOf(UsersWeeklyCrawler.props(api), name = UsersWeeklyCrawler.name)
 
     // Creating main tasks dispatcher.
     val dispetcher = Akka.system.actorOf(TasksDispatcher.props(config), name = TasksDispatcher.name)

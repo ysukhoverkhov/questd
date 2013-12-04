@@ -13,6 +13,7 @@ trait DomainAPIComponent { component: DatabaseComponent =>
     extends DBAccessor
     with AuthAPI
     with ProfileAPI
+    with StatsAPI
     with ProposeQuestAPI
     with SolveQuestAPI
     with VoteQuestProposalAPI
