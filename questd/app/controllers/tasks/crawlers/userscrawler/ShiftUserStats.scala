@@ -20,7 +20,6 @@ object ShiftUserStats {
 
 class ShiftUserStats(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
 
-  // TODO test me.
   protected def check(user: User) = {
     api.shiftStats(ShiftStatsRequest(user))
   }
