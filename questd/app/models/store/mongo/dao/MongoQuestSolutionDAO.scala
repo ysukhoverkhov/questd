@@ -14,5 +14,9 @@ private[mongo] class MongoQuestSolutionDAO
   extends BaseMongoDAO[QuestSolution](collectionName = "solutions")
   with QuestSolutionDAO {
 
+  def allWithStatus(status: String): Iterator[QuestSolution] = {
+    allByExample("status", status)
+  }
+
 }
 

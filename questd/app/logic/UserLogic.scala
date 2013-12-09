@@ -277,13 +277,13 @@ class UserLogic(val user: User) {
   
   
   /**********************
-   * Vote quest
+   * Vote quest proposal
    **********************/
   
   /**
    * 
    */
-  def canGetQuestForVote = {
+  def canGetQuestProposalForVote = {
     if (user.profile.rights.voteQuestProposals > user.profile.level)
       LevelTooLow
     else if (user.profile.questProposalVoteContext.reviewingQuest != None)
@@ -307,7 +307,7 @@ class UserLogic(val user: User) {
   /**
    * @return None if no more quests to vote for today.
    */
-  def getQuestToVote: Option[Quest] = {
+  def getQuestProposalToVote: Option[Quest] = {
     val quests = api.allQuestsOnVoting.body.get.quests
 
     if (quests.length == 0) {
@@ -326,5 +326,39 @@ class UserLogic(val user: User) {
   def getQuestProposalVoteReward = {
     Assets(coins = rewardForVotingProposal(user.profile.level, user.profile.questProposalVoteContext.numberOfReviewedQuests + 1)).clampBot
   }
+  
+ 
+  /**********************
+   * Vote quest solution
+   **********************/
+
+  /**
+   * 
+   */
+  def canGetQuestSolutionForVote = {
+    if (user.profile.rights.voteQuestSolutions > user.profile.level)
+      LevelTooLow
+    else if (user.profile.questSolutionVoteContext.reviewingQuestSolution != None)
+      InvalidState
+    else
+      OK
+  }
+
+  /**
+   * @return None if no more quests to vote for today.
+   */
+  def getQuestSolutionToVote: Option[QuestSolution] = {
+    val quests = api.allQuestSolutionsOnVoting.body.get.quests
+
+    if (quests.length == 0) {
+      None
+    } else {
+      val rand = new Random(System.currentTimeMillis())
+      val random_index = rand.nextInt(quests.length)
+      Some(quests(random_index))
+    }
+
+  }
+
 }
 

@@ -4,7 +4,7 @@ import models.domain._
 
 trait QuestDAO extends BaseDAO[Quest] {
 
-  def allWithStatus(stauts: String): Iterator[Quest]
+  def allWithStatus(status: String): Iterator[Quest]
 
 }
 

@@ -12,28 +12,28 @@ import protocol.ProfileModificationResult.OutOfContent
 import protocol.ProfileModificationResult.ProfileModificationResult
 import play.Logger
 
-case class GetQuestToVoteRequest(user: User)
-case class GetQuestToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class GetQuestProposalToVoteRequest(user: User)
+case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class VoteQuestRequest(user: User, vote: QuestProposalVote.Value, duration: Option[QuestDuration.Value] = None, difficulty: Option[QuestDifficulty.Value] = None)
-case class VoteQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None)
+case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: Option[QuestDuration.Value] = None, difficulty: Option[QuestDifficulty.Value] = None)
+case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None)
 
 private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
 
   /**
    * Get cost of quest to shuffle.
    */
-  def getQuestToVote(request: GetQuestToVoteRequest): ApiResult[GetQuestToVoteResult] = handleDbException {
+  def getQuestProposalToVote(request: GetQuestProposalToVoteRequest): ApiResult[GetQuestProposalToVoteResult] = handleDbException {
     import request._
 
-    user.canGetQuestForVote match {
+    user.canGetQuestProposalForVote match {
       case OK => {
 
         // Updating user profile.
-        val q = user.getQuestToVote
+        val q = user.getQuestProposalToVote
 
         q match {
-          case None => OkApiResult(Some(GetQuestToVoteResult(OutOfContent)))
+          case None => OkApiResult(Some(GetQuestProposalToVoteResult(OutOfContent)))
           case Some(a) => {
             val qi = Some(QuestInfoWithID(a.id, a.info))
 
@@ -44,12 +44,12 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
 
             db.user.update(u)
 
-            OkApiResult(Some(GetQuestToVoteResult(OK, Some(u.profile))))
+            OkApiResult(Some(GetQuestProposalToVoteResult(OK, Some(u.profile))))
           }
         }
 
       }
-      case a => OkApiResult(Some(GetQuestToVoteResult(a)))
+      case a => OkApiResult(Some(GetQuestProposalToVoteResult(a)))
     }
 
   }
@@ -57,7 +57,7 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
   /**
    * Get cost of quest to shuffle.
    */
-  def voteQuestProposal(request: VoteQuestRequest): ApiResult[VoteQuestResult] = handleDbException {
+  def voteQuestProposal(request: VoteQuestProposalRequest): ApiResult[VoteQuestProposalResult] = handleDbException {
     import request._
 
     def updateQuestWithVote(q: Quest, v: QuestProposalVote.Value, dur: Option[QuestDuration.Value], dif: Option[QuestDifficulty.Value]): Quest = {
@@ -119,10 +119,10 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
 
         db.user.update(u)
 
-        OkApiResult(Some(VoteQuestResult(OK, Some(u.profile), Some(reward))))
+        OkApiResult(Some(VoteQuestProposalResult(OK, Some(u.profile), Some(reward))))
 
       }
-      case a => OkApiResult(Some(VoteQuestResult(a)))
+      case a => OkApiResult(Some(VoteQuestProposalResult(a)))
     }
   }
 

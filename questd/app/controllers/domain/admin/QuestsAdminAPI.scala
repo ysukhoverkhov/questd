@@ -9,6 +9,7 @@ import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 
 case class AllQuestsResult(quests: List[Quest])
+case class AllQuestSolutionsResult(quests: List[QuestSolution])
 
 private [domain] trait QuestsAdminAPI { this: DBAccessor => 
 
@@ -31,6 +32,14 @@ private [domain] trait QuestsAdminAPI { this: DBAccessor =>
     OkApiResult(Some(AllQuestsResult(List() ++ db.quest.allWithStatus(QuestStatus.OnVoting.toString))))
   }
 
+  /**
+   * List all Quests solution s with OnVoting status.
+   */
+  def allQuestSolutionsOnVoting: ApiResult[AllQuestSolutionsResult] = handleDbException {
+    Logger.info("Admin request for all quests. THIS SHOULD NOT BE CALLED IN PRODUCTION SINCE IT'S VERY SLOW!!!!!!")
+
+    OkApiResult(Some(AllQuestSolutionsResult(List() ++ db.solution.allWithStatus(QuestStatus.OnVoting.toString))))
+  }
 }
 
 

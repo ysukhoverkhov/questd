@@ -111,7 +111,7 @@ package object protocol {
 
   
   /**********************
-   * Voting quests
+   * Voting quest proposals
    **********************/
   
   case class WSQuestProposalVoteRequest (
@@ -131,8 +131,16 @@ package object protocol {
       difficulty: Option[String])
   
   
-  type WSGetQuestToVoteResult = GetQuestToVoteResult
+  type WSGetQuestProposalToVoteResult = GetQuestProposalToVoteResult
   
-  type WSVoteQuestResult = VoteQuestResult
+  type WSVoteQuestProposalResult = VoteQuestProposalResult
   
+  
+  /**********************
+   * Voting quest solutions
+   **********************/
+
+  type WSGetQuestSolutionToVoteResult = GetQuestSolutionToVoteResult
+  
+  type WSVoteQuestSolutionResult = VoteQuestSolutionResult
 }

@@ -12,13 +12,12 @@ import org.json4s._
 
 trait VoteQuestSolutionWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
-  // TODO implement me.
-  def getQuestSolutionToVote = wrapApiCallReturnBody[WSGetQuestToVoteResult] { r =>
-    api.getQuestToVote(GetQuestToVoteRequest(r.user))
+  def getQuestSolutionToVote = wrapApiCallReturnBody[WSGetQuestSolutionToVoteResult] { r =>
+    api.getQuestSolutionToVote(GetQuestSolutionToVoteRequest(r.user))
   }
 
   // TODO implement me.
-  def voteQuestSolution = wrapJsonApiCallReturnBody[WSVoteQuestResult] { (js, r) =>
+  def voteQuestSolution = wrapJsonApiCallReturnBody[WSVoteQuestSolutionResult] { (js, r) =>
 
     val v = Json.read[WSQuestProposalVoteRequest](js)
     val vote = QuestProposalVote.withName(v.vote)
@@ -32,7 +31,7 @@ trait VoteQuestSolutionWSImpl extends QuestController with SecurityWSImpl with C
       case Some(d) => Some(QuestDifficulty.withName(d))
     }
 
-    api.voteQuestProposal(VoteQuestRequest(r.user, vote, duration, difficulty))
+    api.voteQuestSolution(VoteQuestSolutionRequest(r.user/*, vote, duration, difficulty*/))
 
   }
 

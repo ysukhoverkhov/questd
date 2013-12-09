@@ -11,5 +11,6 @@ case class Profile(
   rights: Rights = Rights(),
   questProposalContext: QuestProposalConext = QuestProposalConext(),
   questSolutionContext: QuestSolutionContext = QuestSolutionContext(),
-  questProposalVoteContext: QuestProposalVoteConext = QuestProposalVoteConext())
+  questProposalVoteContext: QuestProposalVoteContext = QuestProposalVoteContext(),
+  questSolutionVoteContext: QuestSolutionVoteContext = QuestSolutionVoteContext())
 
