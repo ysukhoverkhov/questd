@@ -93,7 +93,7 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
       }
     }
 
-    user.canVoteQuest match {
+    user.canVoteQuestProposal match {
       case OK => {
         // 1. get quest to vote.
         // 2. update quest params.

@@ -31,7 +31,6 @@ trait VoteQuestProposalWSImpl extends QuestController with SecurityWSImpl with C
     }
 
     api.voteQuestProposal(VoteQuestProposalRequest(r.user, vote, duration, difficulty))
-
   }
 
 }

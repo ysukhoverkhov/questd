@@ -11,4 +11,5 @@ case class QuestSolution(
   questID: String,
   userID: String,
   info: QuestSolutionInfo,
+  rating: QuestSolutionRating = QuestSolutionRating(),
   status: String = QuestSolutionStatus.OnVoting.toString) extends ID
