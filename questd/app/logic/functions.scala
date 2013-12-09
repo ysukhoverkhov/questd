@@ -147,7 +147,7 @@ object functions {
       k * rewardFunction(voteNumber.toDouble / (rewardedSolutionVotesPerLevel(level) + 1))
     }
 
-    math.round(rewardForVotingSolutionInt(level, voteNumber, kf(level)).toFloat)
+    math.max(1, math.round(rewardForVotingSolutionInt(level, voteNumber, kf(level)).toFloat))
   }
 
 }

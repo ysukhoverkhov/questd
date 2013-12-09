@@ -76,13 +76,13 @@ class FunctionsSpecs extends Specification {
     }
 
     "rewardForVotingSolution" in {
-      rewardForVotingSolution(1, 1) must beEqualTo(32)
-      rewardForVotingSolution(1, 10) must beEqualTo(5)
-      rewardForVotingSolution(1, 20) must beEqualTo(102)
-      rewardForVotingSolution(10, 10) must beEqualTo(26)
-      rewardForVotingSolution(20, 1) must beEqualTo(136)
-      rewardForVotingSolution(20, 10) must beEqualTo(8)
-      rewardForVotingSolution(20, 20) must beEqualTo(8)
+      rewardForVotingSolution(1, 1) must beEqualTo(4)
+      rewardForVotingSolution(1, 5) must beEqualTo(2)
+      rewardForVotingSolution(1, 10) must beEqualTo(1)
+      rewardForVotingSolution(10, 8) must beEqualTo(30)
+      rewardForVotingSolution(20, 1) must beEqualTo(68)
+      rewardForVotingSolution(20, 10) must beEqualTo(33)
+      rewardForVotingSolution(20, 20) must beEqualTo(9)
     }
   }
 
