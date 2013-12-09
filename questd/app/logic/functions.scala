@@ -101,14 +101,18 @@ object functions {
    * Voting quest proposals.
    * ***********************
    */
+  
+  /**
+   * Number of rewarded proposal votes per level.
+   */
+  def rewardedProposalVotesPerLevel(level: Int): Int = {
+    math.floor(4 * math.pow((level + 1 - constants.voteQuestProposals), 0.39)).toInt
+  }
+
   /**
    * How much rating we will receive for voting quest proposal.
    */
   def rewardForVotingProposal(level: Int, voteNumber: Int): Int = {
-
-    def rewardedProposalVotesPerLevel(level: Int): Int = {
-      math.floor(4 * math.pow((level + 1 - constants.voteQuestProposals), 0.39)).toInt
-    }
 
     def kf(level: Int): Double = coinForVoteProposal(level) / (1 to rewardedProposalVotesPerLevel(level)).map(x => rewardForVotingProposalInt(level, x, 1)).sum
 
@@ -118,4 +122,33 @@ object functions {
 
     math.round(rewardForVotingProposalInt(level, voteNumber, kf(level)).toFloat)
   }
+
+  /**
+   * ***********************
+   * Voting quest solutions.
+   * ***********************
+   */
+
+  /**
+   * Number of rewarded solution votes per level.
+   */
+  def rewardedSolutionVotesPerLevel(level: Int): Int = {
+    math.floor(10 * math.pow((level + 1 - constants.voteQuestSolutions), 0.3)).toInt
+  }
+
+  /**
+   * How much rating we will receive for voting quest solution.
+   */
+  def rewardForVotingSolution(level: Int, voteNumber: Int): Int = {
+
+    def kf(level: Int): Double = coinForVoteResult(level) / (1 to rewardedSolutionVotesPerLevel(level)).map(x => rewardForVotingSolutionInt(level, x, 1)).sum
+
+    def rewardForVotingSolutionInt(level: Int, voteNumber: Int, k: Double) = {
+      k * rewardFunction(voteNumber.toDouble / (rewardedSolutionVotesPerLevel(level) + 1))
+    }
+
+    math.round(rewardForVotingSolutionInt(level, voteNumber, kf(level)).toFloat)
+  }
+
 }
+

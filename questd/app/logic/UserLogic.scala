@@ -274,14 +274,15 @@ class UserLogic(val user: User) {
     val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
     (DateTime.now(tz) + 1.day).hour(constants.flipHour).minute(0).second(0) toDate ()
   }
-  
-  
-  /**********************
-   * Vote quest proposal
-   **********************/
-  
+
   /**
-   * 
+   * ********************
+   * Vote quest proposal
+   * ********************
+   */
+
+  /**
+   *
    */
   def canGetQuestProposalForVote = {
     if (user.profile.rights.voteQuestProposals > user.profile.level)
@@ -293,7 +294,7 @@ class UserLogic(val user: User) {
   }
 
   /**
-   * 
+   *
    */
   def canVoteQuestProposal = {
     if (user.profile.rights.voteQuestProposals > user.profile.level)
@@ -319,21 +320,28 @@ class UserLogic(val user: User) {
     }
 
   }
-  
+
   /**
    * Reward for voting for quest proposal.
    */
   def getQuestProposalVoteReward = {
-    Assets(coins = rewardForVotingProposal(user.profile.level, user.profile.questProposalVoteContext.numberOfReviewedQuests + 1)).clampBot
+    val level = user.profile.level
+    val count = user.profile.questProposalVoteContext.numberOfReviewedQuests 
+
+    if (count< rewardedProposalVotesPerLevel(level))
+      (Assets(coins = rewardForVotingProposal(level, count + 1))).clampBot
+    else
+      Assets()
   }
-  
- 
-  /**********************
-   * Vote quest solution
-   **********************/
 
   /**
-   * 
+   * ********************
+   * Vote quest solution
+   * ********************
+   */
+
+  /**
+   *
    */
   def canGetQuestSolutionForVote = {
     if (user.profile.rights.voteQuestSolutions > user.profile.level)
@@ -361,7 +369,7 @@ class UserLogic(val user: User) {
   }
 
   /**
-   * 
+   *
    */
   def canVoteQuestSolution = {
     if (user.profile.rights.voteQuestSolutions > user.profile.level)
@@ -370,6 +378,19 @@ class UserLogic(val user: User) {
       InvalidState
     else
       OK
+  }
+
+  /**
+   * Reward for quest solution.
+   */
+  def getQuestSolutionVoteReward = {
+    val level = user.profile.level
+    val count = user.profile.questSolutionVoteContext.numberOfReviewedSolutions
+    
+    if (count < rewardedSolutionVotesPerLevel(level))
+      Assets(coins = rewardForVotingSolution(level, count + 1)).clampBot
+    else
+      Assets()
   }
 
 }

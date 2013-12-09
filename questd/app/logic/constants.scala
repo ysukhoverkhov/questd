@@ -5,7 +5,7 @@ object constants {
   val maxLevel = 20
   
   // user level restriction constants.
-  val voteQuestResults: Int = 1
+  val voteQuestSolutions: Int = 1
   val submitPhotoResults: Int = 3
   val submitVideoResults: Int = 4
   val report: Int = 5

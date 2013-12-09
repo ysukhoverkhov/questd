@@ -89,8 +89,7 @@ private[domain] trait VoteQuestSolutionAPI { this: DBAccessor =>
 
         // 5. update user profile.
         // 6. save profile in db.
-        // TODO implement me.
-        val reward = Assets(1, 2, 3)//user.getQuestSolutionVoteReward
+        val reward = user.getQuestSolutionVoteReward
 
         val u = user.copy(
           profile = user.profile.copy(
