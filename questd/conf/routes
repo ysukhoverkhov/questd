@@ -39,10 +39,13 @@ POST	/rest/proposeSolution				controllers.web.rest.SolveQuestWS.proposeSolution
 POST	/rest/getQuestGiveUpCost			controllers.web.rest.SolveQuestWS.getQuestGiveUpCost
 POST	/rest/giveUpQuest					controllers.web.rest.SolveQuestWS.giveUpQuest
 
-# Vote quest
-POST	/rest/getQuestToVote				controllers.web.rest.VoteQuestProposalWS.getQuestToVote
+# Vote quest proposal
+POST	/rest/getQuestProposalToVote		controllers.web.rest.VoteQuestProposalWS.getQuestProposalToVote
 POST	/rest/voteQuestProposal				controllers.web.rest.VoteQuestProposalWS.voteQuestProposal
 
+# Vote quest solution
+POST	/rest/getQuestSolutionToVote		controllers.web.rest.VoteQuestSolutionWS.getQuestSolutionToVote
+POST	/rest/voteQuestSolution				controllers.web.rest.VoteQuestSolutionWS.voteQuestSolution
 
 
 #######################

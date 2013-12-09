@@ -10,13 +10,15 @@ import controllers.web.rest.protocol._
 import models.domain._
 import org.json4s._
 
-trait VoteQuestProposalWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+trait VoteQuestSolutionWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
-  def getQuestProposalToVote = wrapApiCallReturnBody[WSGetQuestToVoteResult] { r =>
+  // TODO implement me.
+  def getQuestSolutionToVote = wrapApiCallReturnBody[WSGetQuestToVoteResult] { r =>
     api.getQuestToVote(GetQuestToVoteRequest(r.user))
   }
 
-  def voteQuestProposal = wrapJsonApiCallReturnBody[WSVoteQuestResult] { (js, r) =>
+  // TODO implement me.
+  def voteQuestSolution = wrapJsonApiCallReturnBody[WSVoteQuestResult] { (js, r) =>
 
     val v = Json.read[WSQuestProposalVoteRequest](js)
     val vote = QuestProposalVote.withName(v.vote)

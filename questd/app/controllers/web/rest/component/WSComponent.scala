@@ -14,6 +14,7 @@ trait WSComponent { component: DomainAPIComponent with FacebookComponent =>
     with ProposeQuestWSImpl
     with SolveQuestWSImpl
     with VoteQuestProposalWSImpl
+    with VoteQuestSolutionWSImpl
     
     with FBAccessor
     with APIAccessor {
