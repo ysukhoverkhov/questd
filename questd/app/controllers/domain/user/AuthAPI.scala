@@ -8,16 +8,13 @@ import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 import components._
 
-
 case class LoginFBRequest(fbid: String)
 case class LoginFBResult(session: String)
 
-case class UserRequest(sessionID: String)
+case class UserRequest(userID: Option[String] = None, sessionID: Option[String] = None)
 case class UserResult(user: User)
 
-
-private [domain] trait AuthAPI { this: DBAccessor => 
-
+private[domain] trait AuthAPI { this: DBAccessor =>
 
   /**
    * Login with FB. Or create new one if it doesn't exists.
@@ -27,7 +24,7 @@ private [domain] trait AuthAPI { this: DBAccessor =>
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString()
       val newUser = user.copy(auth = user.auth.copy(session = Some(uuid)))
-      
+
       db.user.update(newUser)
 
       val a = List(1, 2)
@@ -71,16 +68,30 @@ private [domain] trait AuthAPI { this: DBAccessor =>
   }
 
   /**
-   * User for session
+   * User by session or id. At first we check session
    */
   def user(params: UserRequest): ApiResult[UserResult] = handleDbException {
 
-    db.user.readBySessionID(params.sessionID) match {
-      case None => NotAuthorisedApiResult(None)
+    if (params.sessionID != None) {
+      db.user.readBySessionID(params.sessionID.get) match {
+        case None => NotAuthorisedApiResult(None)
 
-      case Some(user: User) => OkApiResult(
-        Some(UserResult(user)))
+        case Some(user: User) => OkApiResult(
+          Some(UserResult(user)))
+      }
+    } else if (params.userID != null) {
+      db.user.readByID(params.userID.get) match {
+        case None => NotFoundApiResult(None)
+
+        case Some(user: User) => OkApiResult(
+          Some(UserResult(user)))
+      }
+      
+    } else {
+      Logger.error("Wrong request for user.")
+      InternalErrorApiResult(None)
     }
+
   }
 
 }

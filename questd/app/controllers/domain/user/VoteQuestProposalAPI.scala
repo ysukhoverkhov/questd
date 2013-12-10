@@ -76,13 +76,13 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
 
       if (v == QuestProposalVote.Cool) {
 
-        q2.copy(rating = q.rating.copy(
-          difficultyRating = q.rating.difficultyRating.copy(
+        q2.copy(rating = q2.rating.copy(
+          difficultyRating = q2.rating.difficultyRating.copy(
             easy = checkInc(dif.get, QuestDifficulty.Easy, q2.rating.difficultyRating.easy),
             normal = checkInc(dif.get, QuestDifficulty.Normal, q2.rating.difficultyRating.normal),
             hard = checkInc(dif.get, QuestDifficulty.Normal, q2.rating.difficultyRating.hard),
             extreme = checkInc(dif.get, QuestDifficulty.Normal, q2.rating.difficultyRating.extreme)),
-          durationRating = q.rating.durationRating.copy(
+          durationRating = q2.rating.durationRating.copy(
             mins = checkInc(dur.get, QuestDuration.Minutes, q2.rating.durationRating.mins),
             hour = checkInc(dur.get, QuestDuration.Hours, q2.rating.durationRating.hour),
             day = checkInc(dur.get, QuestDuration.Day, q2.rating.durationRating.day),

@@ -3,7 +3,7 @@ package models.domain
 import models.domain.base.ID
 
 object QuestSolutionStatus extends Enumeration {
-  val OnVoting, Voted, CheatingBanned, IACBanned = Value
+  val OnVoting, WaitingForCompetitor, Won, Lost, CheatingBanned, IACBanned = Value
 }
 
 case class QuestSolution(
