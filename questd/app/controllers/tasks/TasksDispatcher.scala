@@ -69,9 +69,7 @@ class TasksDispatcher(config: ConfigSection) extends EasyRestartActor {
   }
 
   def receive = {
-
     case WakeCrawlerUp(c) => c ! DoTask
-
     case _ => Logger.error("Unexpected message received")
   }
 }

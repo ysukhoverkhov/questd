@@ -33,7 +33,6 @@ abstract class BaseUsersScheduleCrawler(api: DomainAPIComponent#DomainAPI) exten
   }
 
   private def doCrawl(users: Iterator[User]) = {
-    // TODO check here what will happen in case of overflowed input queue.
     for (user <- users) {
       context.actorSelection("*") ! ProcessUser(user)
     }
