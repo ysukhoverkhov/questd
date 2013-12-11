@@ -172,7 +172,8 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
           QuestSolution(
             info = solution,
             userID = user.id,
-            questID = user.profile.questSolutionContext.takenQuest.get.id))
+            questID = user.profile.questSolutionContext.takenQuest.get.id,
+            questlevel = user.profile.questSolutionContext.takenQuest.get.obj.level))
 
         val u = user.copy(
           profile = user.profile.copy(
