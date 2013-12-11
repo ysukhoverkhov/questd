@@ -24,6 +24,7 @@ class UserLogic(val user: User) {
    * ************************
    */
 
+  // TODO move me to API - all functions modifyng something should be in API, logic is solely for calculations.
   def giveUserReward(reward: Assets): User = {
     user.copy(
       profile = user.profile.copy(
@@ -151,16 +152,15 @@ class UserLogic(val user: User) {
    * Reward for approving quest.
    */
   def rewardForMakingQuest = {
-    // TODO implement me.
-    Assets(0, 0, 100)
+    Assets(rating = ratingForProposalAtLevel(user.profile.level))
   }
 
   def penaltyForCheating = {
-    rewardForMakingQuest * questProposalCheatingPenalty
+    (rewardForMakingQuest * questProposalCheatingPenalty) clampTop user.profile.assets
   }
 
   def penaltyForIAC = {
-    rewardForMakingQuest * questProposalIACPenalty
+    (rewardForMakingQuest * questProposalIACPenalty) clampTop user.profile.assets
   }
 
   /**

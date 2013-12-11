@@ -120,6 +120,7 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
         // 2. update quest params.
         // 3. check change quest state
         // 4. save quest in db.
+        // 5. Update quest author.
         db.quest.readByID(user.profile.questProposalVoteContext.reviewingQuest.get.id) match {
           case None => Logger.error("Unable to find quest with id for voting " + user.profile.questProposalVoteContext.reviewingQuest.get.id)
           case Some(q) => {

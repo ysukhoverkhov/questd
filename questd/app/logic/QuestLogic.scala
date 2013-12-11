@@ -14,6 +14,8 @@ class QuestLogic(val quest: Quest) {
   /**
    * Check should quest change its status or should not.
    */
+  
+  // TODO split me and move modifications to API, but leave check here.
   def updateStatus: Quest = {
     {
       checkAddToRotation.checkRemoveFromRotation.checkBanQuest.checkCheatingQuest.checkRemoveQuestFromVotingByTime.capPoints
