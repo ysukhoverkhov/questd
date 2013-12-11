@@ -93,6 +93,30 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
       }
     }
 
+    def rewardQuestProposalAuthor(q: Quest): Unit = {
+      db.user.readByID(q.userID) match {
+        case None => Logger.error("Unable to find author of quest user " + q.userID)
+        case Some(author) => {
+          val u: User = QuestStatus.withName(q.status) match {
+            case QuestStatus.OnVoting => {
+              Logger.error("We are rewarding player for proposal what is on voting.")
+              author
+            }
+            case QuestStatus.InRotation => author.giveUserReward(author.rewardForMakingQuest)
+            case QuestStatus.RatingBanned => author
+            case QuestStatus.CheatingBanned => author.giveUserPenalty(author.penaltyForCheating)
+            case QuestStatus.IACBanned => author.giveUserPenalty(author.penaltyForIAC)
+            case QuestStatus.OldBanned => author
+          }
+          
+          db.user.update(u)
+        }
+      }
+
+    }
+    
+    // TODO everywhere replace direct giving of reward to player with call to a single function in logic (rename assets field to find them).
+
     user.canVoteQuestProposal match {
       case OK => {
         // 1. get quest to vote.
@@ -102,7 +126,13 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
         db.quest.readByID(user.profile.questProposalVoteContext.reviewingQuest.get.id) match {
           case None => Logger.error("Unable to find quest with id for voting " + user.profile.questProposalVoteContext.reviewingQuest.get.id)
           case Some(q) => {
-            db.quest.update(updateQuestWithVote(q, vote, duration, difficulty).updateStatus)
+            val updatedQuest = updateQuestWithVote(q, vote, duration, difficulty).updateStatus
+
+            if (updatedQuest.status != q.status) {
+              rewardQuestProposalAuthor(updatedQuest)
+            }
+
+            db.quest.update(updatedQuest)
           }
         }
 

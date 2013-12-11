@@ -18,6 +18,11 @@ case class Assets(
       this.money + o.money,
       this.rating + o.rating)
 
+  def *(m: Int): Assets =
+    Assets(this.coins * m,
+      this.money * m,
+      this.rating * m)
+
   def canAfford(o: Assets): Boolean =
     this.coins >= o.coins && this.money >= o.money && this.rating >= o.rating
 

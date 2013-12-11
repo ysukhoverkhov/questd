@@ -19,6 +19,24 @@ class UserLogic(val user: User) {
   lazy val api = ComponentRegistrySingleton.api
 
   /**
+   * ************************
+   * General
+   * ************************
+   */
+
+  def giveUserReward(reward: Assets): User = {
+    user.copy(
+      profile = user.profile.copy(
+        assets = user.profile.assets + reward))
+  }
+
+  def giveUserPenalty(penalty: Assets): User = {
+    user.copy(
+      profile = user.profile.copy(
+        assets = user.profile.assets - penalty))
+  }
+
+  /**
    * **************************
    * Proposing quests.
    * **************************
@@ -127,6 +145,22 @@ class UserLogic(val user: User) {
       InvalidState
     else
       OK
+  }
+
+  /**
+   * Reward for approving quest.
+   */
+  def rewardForMakingQuest = {
+    // TODO implement me.
+    Assets(0, 0, 100)
+  }
+
+  def penaltyForCheating = {
+    rewardForMakingQuest * questProposalCheatingPenalty
+  }
+
+  def penaltyForIAC = {
+    rewardForMakingQuest * questProposalIACPenalty
   }
 
   /**
@@ -326,9 +360,9 @@ class UserLogic(val user: User) {
    */
   def getQuestProposalVoteReward = {
     val level = user.profile.level
-    val count = user.profile.questProposalVoteContext.numberOfReviewedQuests 
+    val count = user.profile.questProposalVoteContext.numberOfReviewedQuests
 
-    if (count< rewardedProposalVotesPerLevel(level))
+    if (count < rewardedProposalVotesPerLevel(level))
       (Assets(coins = rewardForVotingProposal(level, count + 1))).clampBot
     else
       Assets()
@@ -386,7 +420,7 @@ class UserLogic(val user: User) {
   def getQuestSolutionVoteReward = {
     val level = user.profile.level
     val count = user.profile.questSolutionVoteContext.numberOfReviewedSolutions
-    
+
     if (count < rewardedSolutionVotesPerLevel(level))
       Assets(coins = rewardForVotingSolution(level, count + 1)).clampBot
     else

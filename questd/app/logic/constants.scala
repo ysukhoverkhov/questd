@@ -23,7 +23,20 @@ object constants {
   
   val flipHour = 5
   
+  
+  /**
+   * Quest proposing.
+   */
   val questProposalGiveUpPenalty = 2
+  
+  val questProposalCheatingPenalty = 10
+  
+  val questProposalIACPenalty = 10
+  
+  /**
+   * Quest resolving.
+   */
+  
   val questSolutionGiveUpPenalty = 2
 
   /**
