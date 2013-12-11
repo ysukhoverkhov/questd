@@ -1,6 +1,6 @@
 package controllers.domain.user
 
-import components.DBAccessor
+import components._
 import controllers.domain.ApiResult
 import controllers.domain.OkApiResult
 import controllers.domain.helpers.exceptionwrappers.handleDbException
@@ -19,7 +19,7 @@ case class GetQuestSolutionToVoteResult(allowed: ProfileModificationResult, prof
 case class VoteQuestSolutionRequest(user: User, vote: QuestSolutionVote.Value)
 case class VoteQuestSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None)
 
-private[domain] trait VoteQuestSolutionAPI { this: DBAccessor =>
+private[domain] trait VoteQuestSolutionAPI { this: DBAccessor with APIAccessor =>
 
   /**
    * Get quest solution to vote for.
@@ -96,9 +96,9 @@ private[domain] trait VoteQuestSolutionAPI { this: DBAccessor =>
             questSolutionVoteContext = user.profile.questSolutionVoteContext.copy(
               numberOfReviewedSolutions = user.profile.questSolutionVoteContext.numberOfReviewedSolutions + 1,
               reviewingQuestSolution = None)))
-          .giveUserReward(reward)
-
         db.user.update(u)
+
+        api.adjustAssets(AdjustAssetsRequest(user = u, reward = Some(reward)))
 
         OkApiResult(Some(VoteQuestSolutionResult(OK, Some(u.profile), Some(reward))))
 

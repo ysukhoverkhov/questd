@@ -1,6 +1,6 @@
 package controllers.domain.user
 
-import components.DBAccessor
+import components._
 import controllers.domain.ApiResult
 import controllers.domain.OkApiResult
 import controllers.domain.helpers.exceptionwrappers.handleDbException
@@ -18,7 +18,7 @@ case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, prof
 case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: Option[QuestDuration.Value] = None, difficulty: Option[QuestDifficulty.Value] = None)
 case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None)
 
-private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
+private[domain] trait VoteQuestProposalAPI { this: DBAccessor with APIAccessor =>
 
   /**
    * Get cost of quest to shuffle.
@@ -97,19 +97,16 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
       db.user.readByID(q.userID) match {
         case None => Logger.error("Unable to find author of quest user " + q.userID)
         case Some(author) => {
-          val u = QuestStatus.withName(q.status) match {
+          QuestStatus.withName(q.status) match {
             case QuestStatus.OnVoting => {
               Logger.error("We are rewarding player for proposal what is on voting.")
-              author
             }
-            case QuestStatus.InRotation => author.giveUserReward(author.rewardForMakingQuest)
-            case QuestStatus.RatingBanned => author
-            case QuestStatus.CheatingBanned => author.giveUserCost(author.penaltyForCheating)
-            case QuestStatus.IACBanned => author.giveUserCost(author.penaltyForIAC)
-            case QuestStatus.OldBanned => author
+            case QuestStatus.InRotation => api.adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.rewardForMakingQuest)))
+            case QuestStatus.RatingBanned => 
+            case QuestStatus.CheatingBanned => api.adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheating))) 
+            case QuestStatus.IACBanned => api.adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIAC)))
+            case QuestStatus.OldBanned => 
           }
-
-          db.user.update(u)
         }
       }
     }
@@ -136,19 +133,17 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
 
         // 5. update user profile.
         // 6. save profile in db.
-        val reward = user.getQuestProposalVoteReward
-
         val u = user.copy(
           profile = user.profile.copy(
             questProposalVoteContext = user.profile.questProposalVoteContext.copy(
               numberOfReviewedQuests = user.profile.questProposalVoteContext.numberOfReviewedQuests + 1,
               reviewingQuest = None)))
-          .giveUserReward(reward)
-
         db.user.update(u)
 
-        OkApiResult(Some(VoteQuestProposalResult(OK, Some(u.profile), Some(reward))))
+        val reward = user.getQuestProposalVoteReward
+        api.adjustAssets(AdjustAssetsRequest(user = u, reward = Some(reward)))
 
+        OkApiResult(Some(VoteQuestProposalResult(OK, Some(u.profile), Some(reward))))
       }
       case a => OkApiResult(Some(VoteQuestProposalResult(a)))
     }

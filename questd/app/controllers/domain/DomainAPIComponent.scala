@@ -11,6 +11,8 @@ trait DomainAPIComponent { component: DatabaseComponent =>
 
   class DomainAPI
     extends DBAccessor
+    with APIAccessor
+
     with AuthAPI
     with ProfileAPI
     with StatsAPI
@@ -18,14 +20,14 @@ trait DomainAPIComponent { component: DatabaseComponent =>
     with SolveQuestAPI
     with VoteQuestProposalAPI
     with VoteQuestSolutionAPI
-    
-    with ThemesAdminAPI 
+
+    with ThemesAdminAPI
     with QuestsAdminAPI
     with ConfigAdminAPI {
 
     // db for out traits
     val db = component.db
-
+    val api = component.api
   }
 
 }

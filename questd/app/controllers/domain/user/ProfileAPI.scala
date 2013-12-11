@@ -8,15 +8,17 @@ import controllers.domain._
 import controllers.domain.helpers.exceptionwrappers._
 import logic._
 
-
 case class GetAllUsersRequest()
 case class GetAllUsersResult(users: Iterator[User])
 
 case class ResetCountersRequest(user: User)
 case class ResetCountersResult()
 
-private [domain] trait ProfileAPI { this: DBAccessor => 
-  
+case class AdjustAssetsRequest(user: User, reward: Option[Assets] = None, cost: Option[Assets] = None)
+case class AdjustAssetsResult()
+
+private[domain] trait ProfileAPI { this: DBAccessor =>
+
   /**
    * Get iterator for all users.
    */
@@ -49,6 +51,24 @@ private [domain] trait ProfileAPI { this: DBAccessor =>
     }
 
     OkApiResult(Some(ResetCountersResult()))
+  }
+
+  /**
+   * Adjust assets value and performs other modifications on profile because of this.
+   */
+  def adjustAssets(request: AdjustAssetsRequest): ApiResult[AdjustAssetsResult] = handleDbException {
+    import request._
+
+    val rew = if (reward == None) Assets() else reward.get
+    val co = if (cost == None) Assets() else cost.get
+
+    db.user.update {
+      user.copy(
+        profile = user.profile.copy(
+          assets = user.profile.assets + rew - co))
+    }
+
+    OkApiResult(Some(AdjustAssetsResult()))
   }
 
 }

@@ -18,24 +18,6 @@ class UserLogic(val user: User) {
 
   lazy val api = ComponentRegistrySingleton.api
 
-  /**
-   * ************************
-   * General
-   * ************************
-   */
-
-  // TODO move me to API - all functions modifyng something should be in API, logic is solely for calculations.
-  def giveUserReward(reward: Assets): User = {
-    user.copy(
-      profile = user.profile.copy(
-        assets = user.profile.assets + reward))
-  }
-
-  def giveUserCost(cost: Assets): User = {
-    user.copy(
-      profile = user.profile.copy(
-        assets = user.profile.assets - cost))
-  }
 
   /**
    * **************************

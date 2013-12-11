@@ -32,7 +32,7 @@ case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: As
 case class GiveUpQuestRequest(user: User)
 case class GiveUpQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-private[domain] trait SolveQuestAPI { this: DBAccessor =>
+private[domain] trait SolveQuestAPI { this: DBAccessor with APIAccessor =>
 
   /**
    * Get cost of quest to shuffle.
@@ -84,9 +84,9 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
               purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))),
           stats = user.stats.copy(
             questsReviewed = user.stats.questsReviewed + 1))
-          .giveUserCost(questCost)
-
         db.user.update(u)
+
+        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(questCost)))
 
         OkApiResult(Some(PurchaseQuestResult(OK, Some(u.profile))))
       }
@@ -148,9 +148,9 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
               questCooldown = user.getCooldownForTakeQuest(pq.get.obj))),
           stats = user.stats.copy(
             questsAccepted = user.stats.questsAccepted + 1))
-          .giveUserCost(user.costOfTakingQuest)
-
         db.user.update(u)
+
+        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfTakingQuest)))
 
         OkApiResult(Some(TakeQuestResult(OK, Some(u.profile))))
       }
@@ -214,9 +214,9 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
               numberOfPurchasedQuests = 0,
               purchasedQuest = None,
               takenQuest = None)))
-          .giveUserCost(user.costOfGivingUpQuest)
-
         db.user.update(u)
+
+        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfGivingUpQuest)))
 
         OkApiResult(Some(GiveUpQuestResult(OK, Some(u.profile))))
       }

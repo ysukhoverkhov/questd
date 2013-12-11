@@ -31,7 +31,7 @@ case class GiveUpQuestProposalResult(allowed: ProfileModificationResult, profile
 case class GetQuestProposalGiveUpCostRequest(user: User)
 case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets)
 
-private[domain] trait ProposeQuestAPI { this: DBAccessor =>
+private[domain] trait ProposeQuestAPI { this: DBAccessor with APIAccessor =>
 
   /**
    * Get cost of next quest purchase.
@@ -59,9 +59,10 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
           profile = user.profile.copy(
             questProposalContext = user.profile.questProposalContext.copy(
               numberOfPurchasedThemes = user.profile.questProposalContext.numberOfPurchasedThemes + 1,
-              purchasedTheme = Some(t)))).giveUserCost(themeCost)
-
+              purchasedTheme = Some(t))))
         db.user.update(u)
+
+        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(themeCost)))
 
         OkApiResult(Some(PurchaseQuestThemeResult(OK, Some(u.profile))))
 
@@ -97,9 +98,9 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
               purchasedTheme = None,
               takenTheme = pt,
               questProposalCooldown = user.getCooldownForTakeTheme)))
-          .giveUserCost(user.costOfTakingQuestTheme)
-
         db.user.update(u)
+
+        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfTakingQuestTheme)))
 
         OkApiResult(Some(TakeQuestThemeResult(OK, Some(u.profile))))
       }
@@ -148,9 +149,9 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
               numberOfPurchasedThemes = 0,
               purchasedTheme = None,
               takenTheme = None)))
-          .giveUserCost(user.costOfGivingUpQuestProposal)
-
         db.user.update(u)
+
+        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfGivingUpQuestProposal)))
 
         OkApiResult(Some(GiveUpQuestProposalResult(OK, Some(u.profile))))
       }
