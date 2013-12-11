@@ -11,6 +11,7 @@ import protocol.ProfileModificationResult.OK
 import protocol.ProfileModificationResult.OutOfContent
 import protocol.ProfileModificationResult.ProfileModificationResult
 import play.Logger
+import controllers.domain.DomainAPIComponent
 
 case class GetQuestProposalToVoteRequest(user: User)
 case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -18,7 +19,7 @@ case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, prof
 case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: Option[QuestDuration.Value] = None, difficulty: Option[QuestDifficulty.Value] = None)
 case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None)
 
-private[domain] trait VoteQuestProposalAPI { this: DBAccessor with APIAccessor =>
+private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Get cost of quest to shuffle.
@@ -60,57 +61,6 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor with APIAccessor =
   def voteQuestProposal(request: VoteQuestProposalRequest): ApiResult[VoteQuestProposalResult] = handleDbException {
     import request._
 
-    def updateQuestWithVote(q: Quest, v: QuestProposalVote.Value, dur: Option[QuestDuration.Value], dif: Option[QuestDifficulty.Value]): Quest = {
-      import QuestProposalVote._
-
-      def checkInc[T](v: T, c: T, n: Int) = if (v == c) n + 1 else n
-
-      val q2 = q.copy(
-        rating = q.rating.copy(
-          votersCount = q.rating.votersCount + 1,
-          points = checkInc(v, Cool, q.rating.points),
-          cheating = checkInc(v, Cheating, q.rating.cheating),
-          iacpoints = q.rating.iacpoints.copy(
-            spam = checkInc(v, IASpam, q.rating.iacpoints.spam),
-            porn = checkInc(v, IAPorn, q.rating.iacpoints.porn))))
-
-      if (v == QuestProposalVote.Cool) {
-
-        q2.copy(rating = q2.rating.copy(
-          difficultyRating = q2.rating.difficultyRating.copy(
-            easy = checkInc(dif.get, QuestDifficulty.Easy, q2.rating.difficultyRating.easy),
-            normal = checkInc(dif.get, QuestDifficulty.Normal, q2.rating.difficultyRating.normal),
-            hard = checkInc(dif.get, QuestDifficulty.Normal, q2.rating.difficultyRating.hard),
-            extreme = checkInc(dif.get, QuestDifficulty.Normal, q2.rating.difficultyRating.extreme)),
-          durationRating = q2.rating.durationRating.copy(
-            mins = checkInc(dur.get, QuestDuration.Minutes, q2.rating.durationRating.mins),
-            hour = checkInc(dur.get, QuestDuration.Hours, q2.rating.durationRating.hour),
-            day = checkInc(dur.get, QuestDuration.Day, q2.rating.durationRating.day),
-            days = checkInc(dur.get, QuestDuration.TwoDays, q2.rating.durationRating.days),
-            week = checkInc(dur.get, QuestDuration.Week, q2.rating.durationRating.week))))
-      } else {
-        q2
-      }
-    }
-
-    def rewardQuestProposalAuthor(q: Quest): Unit = {
-      db.user.readByID(q.userID) match {
-        case None => Logger.error("Unable to find author of quest user " + q.userID)
-        case Some(author) => {
-          QuestStatus.withName(q.status) match {
-            case QuestStatus.OnVoting => {
-              Logger.error("We are rewarding player for proposal what is on voting.")
-            }
-            case QuestStatus.InRotation => api.adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.rewardForMakingQuest)))
-            case QuestStatus.RatingBanned => 
-            case QuestStatus.CheatingBanned => api.adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheating))) 
-            case QuestStatus.IACBanned => api.adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIAC)))
-            case QuestStatus.OldBanned => 
-          }
-        }
-      }
-    }
-
     user.canVoteQuestProposal match {
       case OK => {
         // 1. get quest to vote.
@@ -121,13 +71,8 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor with APIAccessor =
         db.quest.readByID(user.profile.questProposalVoteContext.reviewingQuest.get.id) match {
           case None => Logger.error("Unable to find quest with id for voting " + user.profile.questProposalVoteContext.reviewingQuest.get.id)
           case Some(q) => {
-            val updatedQuest = updateQuestWithVote(q, vote, duration, difficulty).updateStatus
-
-            if (updatedQuest.status != q.status) {
-              rewardQuestProposalAuthor(updatedQuest)
-            }
-
-            db.quest.update(updatedQuest)
+            
+            voteQuest(VoteQuestUpdateRequest(q, vote, duration, difficulty))
           }
         }
 
@@ -141,7 +86,7 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor with APIAccessor =
         db.user.update(u)
 
         val reward = user.getQuestProposalVoteReward
-        api.adjustAssets(AdjustAssetsRequest(user = u, reward = Some(reward)))
+        adjustAssets(AdjustAssetsRequest(user = u, reward = Some(reward)))
 
         OkApiResult(Some(VoteQuestProposalResult(OK, Some(u.profile), Some(reward))))
       }

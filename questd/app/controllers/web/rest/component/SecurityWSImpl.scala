@@ -40,7 +40,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
 
             val params = UserRequest(sessionID = Some(sessionid))
 
-            api.user(params) match {
+            api.getUser(params) match {
               case OkApiResult(body) => body match {
                 case Some(result: UserResult) => result.user
                 case None => ServerError

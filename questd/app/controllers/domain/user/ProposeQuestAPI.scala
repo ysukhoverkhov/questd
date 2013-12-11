@@ -31,7 +31,10 @@ case class GiveUpQuestProposalResult(allowed: ProfileModificationResult, profile
 case class GetQuestProposalGiveUpCostRequest(user: User)
 case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets)
 
-private[domain] trait ProposeQuestAPI { this: DBAccessor with APIAccessor =>
+case class RewardQuestProposalAuthorRequest(quest: Quest, author: User)
+case class RewardQuestProposalAuthorResult()
+
+private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Get cost of next quest purchase.
@@ -62,7 +65,7 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor with APIAccessor =>
               purchasedTheme = Some(t))))
         db.user.update(u)
 
-        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(themeCost)))
+        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(themeCost)))
 
         OkApiResult(Some(PurchaseQuestThemeResult(OK, Some(u.profile))))
 
@@ -100,7 +103,7 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor with APIAccessor =>
               questProposalCooldown = user.getCooldownForTakeTheme)))
         db.user.update(u)
 
-        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfTakingQuestTheme)))
+        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfTakingQuestTheme)))
 
         OkApiResult(Some(TakeQuestThemeResult(OK, Some(u.profile))))
       }
@@ -151,7 +154,7 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor with APIAccessor =>
               takenTheme = None)))
         db.user.update(u)
 
-        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfGivingUpQuestProposal)))
+        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfGivingUpQuestProposal)))
 
         OkApiResult(Some(GiveUpQuestProposalResult(OK, Some(u.profile))))
       }
@@ -169,7 +172,25 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor with APIAccessor =>
     OkApiResult(Some(GetQuestProposalGiveUpCostResult(OK, user.costOfGivingUpQuestProposal)))
   }
 
+  /**
+   * Give quest proposal author a reward on quest status change
+   */
+  def rewardQuestProposalAuthor(request: RewardQuestProposalAuthorRequest): ApiResult[RewardQuestProposalAuthorResult] = handleDbException {
+    import request._
+    
+    QuestStatus.withName(quest.status) match {
+      case QuestStatus.OnVoting => {
+        Logger.error("We are rewarding player for proposal what is on voting.")
+      }
+      case QuestStatus.InRotation => adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.rewardForMakingQuest)))
+      case QuestStatus.RatingBanned =>
+      case QuestStatus.CheatingBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheating)))
+      case QuestStatus.IACBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIAC)))
+      case QuestStatus.OldBanned =>
+    }
+    
+    OkApiResult(Some(RewardQuestProposalAuthorResult()))
+  }
+
 }
-
-
 

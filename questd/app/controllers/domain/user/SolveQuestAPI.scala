@@ -32,7 +32,7 @@ case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: As
 case class GiveUpQuestRequest(user: User)
 case class GiveUpQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-private[domain] trait SolveQuestAPI { this: DBAccessor with APIAccessor =>
+private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Get cost of quest to shuffle.
@@ -58,18 +58,11 @@ private[domain] trait SolveQuestAPI { this: DBAccessor with APIAccessor =>
 
           quest match {
             case None => {
-              Logger.error("Quest by id not found n purchaseQuest")
+              Logger.error("Quest by id not found in purchaseQuest")
               InternalErrorApiResult(None)
             }
 
-            case Some(q) => {
-              val nq = q.copy(
-                rating = q.rating.copy(
-                  points = q.rating.points - 1,
-                  votersCount = q.rating.votersCount + 1))
-
-              db.quest.update(nq.updateStatus)
-            }
+            case Some(q) => skipQuest(SkipQuestRequest(q))
           }
         }
 
@@ -86,7 +79,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor with APIAccessor =>
             questsReviewed = user.stats.questsReviewed + 1))
         db.user.update(u)
 
-        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(questCost)))
+        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(questCost)))
 
         OkApiResult(Some(PurchaseQuestResult(OK, Some(u.profile))))
       }
@@ -126,12 +119,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor with APIAccessor =>
             case Some(q) => {
               val ratio = Math.round(user.stats.questsReviewedPast.toFloat / user.stats.questsAcceptedPast) - 1
 
-              val nq = q.copy(
-                rating = q.rating.copy(
-                  points = q.rating.points + ratio,
-                  votersCount = q.rating.votersCount + 1))
-
-              db.quest.update(nq.updateStatus)
+              takeQuestUpdate(TakeQuestUpdateRequest(q, ratio))
             }
           }
         }
@@ -150,7 +138,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor with APIAccessor =>
             questsAccepted = user.stats.questsAccepted + 1))
         db.user.update(u)
 
-        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfTakingQuest)))
+        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfTakingQuest)))
 
         OkApiResult(Some(TakeQuestResult(OK, Some(u.profile))))
       }
@@ -216,7 +204,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor with APIAccessor =>
               takenQuest = None)))
         db.user.update(u)
 
-        api.adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfGivingUpQuest)))
+        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfGivingUpQuest)))
 
         OkApiResult(Some(GiveUpQuestResult(OK, Some(u.profile))))
       }

@@ -12,6 +12,7 @@ import protocol.ProfileModificationResult.OutOfContent
 import protocol.ProfileModificationResult.ProfileModificationResult
 import play.Logger
 import models.domain.base._
+import controllers.domain.DomainAPIComponent
 
 case class GetQuestSolutionToVoteRequest(user: User)
 case class GetQuestSolutionToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -19,7 +20,7 @@ case class GetQuestSolutionToVoteResult(allowed: ProfileModificationResult, prof
 case class VoteQuestSolutionRequest(user: User, vote: QuestSolutionVote.Value)
 case class VoteQuestSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None)
 
-private[domain] trait VoteQuestSolutionAPI { this: DBAccessor with APIAccessor =>
+private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Get quest solution to vote for.
@@ -98,7 +99,7 @@ private[domain] trait VoteQuestSolutionAPI { this: DBAccessor with APIAccessor =
               reviewingQuestSolution = None)))
         db.user.update(u)
 
-        api.adjustAssets(AdjustAssetsRequest(user = u, reward = Some(reward)))
+        adjustAssets(AdjustAssetsRequest(user = u, reward = Some(reward)))
 
         OkApiResult(Some(VoteQuestSolutionResult(OK, Some(u.profile), Some(reward))))
 

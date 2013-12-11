@@ -70,7 +70,7 @@ private[domain] trait AuthAPI { this: DBAccessor =>
   /**
    * User by session or id. At first we check session
    */
-  def user(params: UserRequest): ApiResult[UserResult] = handleDbException {
+  def getUser(params: UserRequest): ApiResult[UserResult] = handleDbException {
 
     if (params.sessionID != None) {
       db.user.readBySessionID(params.sessionID.get) match {
