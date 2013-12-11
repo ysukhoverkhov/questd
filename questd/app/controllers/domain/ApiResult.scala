@@ -5,7 +5,7 @@ sealed abstract class ApiResult[+T] {
 }
 
 final case class OkApiResult[T] (body: Option[T]) extends ApiResult[T]
-final case class NotFoundApiResult[T] (body: Option[T]) extends ApiResult[T]
-final case class NotAuthorisedApiResult[T] (body: Option[T]) extends ApiResult[T]
-final case class InternalErrorApiResult[T] (body: Option[T]) extends ApiResult[T]
+final case class NotFoundApiResult() extends ApiResult[Nothing] { val body = None }
+final case class NotAuthorisedApiResult() extends ApiResult[Nothing] { val body = None }
+final case class InternalErrorApiResult() extends ApiResult[Nothing] { val body = None }
 

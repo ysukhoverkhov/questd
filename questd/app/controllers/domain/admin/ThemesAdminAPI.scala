@@ -66,7 +66,7 @@ private [domain] trait ThemesAdminAPI { this: DBAccessor =>
 
     db.theme.readByID(request.id) match {
       case Some(r) => OkApiResult(Some(GetThemeResult(r)))
-      case None => NotFoundApiResult(None)
+      case None => NotFoundApiResult()
     }
     
   }

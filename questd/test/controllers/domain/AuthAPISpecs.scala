@@ -79,7 +79,7 @@ class AuthAPISpecs extends Specification
 
       there was one(user).readByFBid(anyString)
 
-      rv must beAnInstanceOf[InternalErrorApiResult[LoginFBResult]]
+      rv must beAnInstanceOf[InternalErrorApiResult]
       rv.body must beNone
     }
 
@@ -107,7 +107,7 @@ class AuthAPISpecs extends Specification
 
       val rv = api.getUser(UserRequest(sessionID = Some(sesid)))
 
-      rv must beAnInstanceOf[NotAuthorisedApiResult[UserResult]]
+      rv must beAnInstanceOf[NotAuthorisedApiResult]
       rv.body must beNone
     }
   }

@@ -14,7 +14,7 @@ object exceptionwrappers {
   } catch {
     case ex: Throwable => {
       Logger.error("Exceptionally unexpected exception", ex)
-      InternalErrorApiResult(None)
+      InternalErrorApiResult()
     }
   }
 
@@ -27,7 +27,7 @@ object exceptionwrappers {
     } catch {
       case ex: DatabaseException => {
         Logger.error("DB error during login", ex)
-        InternalErrorApiResult(None)
+        InternalErrorApiResult()
       }
     }
   }

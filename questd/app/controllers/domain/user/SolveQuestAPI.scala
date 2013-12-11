@@ -59,7 +59,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           quest match {
             case None => {
               Logger.error("Quest by id not found in purchaseQuest")
-              InternalErrorApiResult(None)
+              InternalErrorApiResult()
             }
 
             case Some(q) => skipQuest(SkipQuestRequest(q))
@@ -113,7 +113,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           quest match {
             case None => {
               Logger.error("Quest by id not found n purchaseQuest")
-              InternalErrorApiResult(None)
+              InternalErrorApiResult()
             }
 
             case Some(q) => {

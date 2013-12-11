@@ -46,7 +46,7 @@ private[domain] trait AuthAPI { this: DBAccessor =>
 
           case None => {
             Logger.error("Unable to find user just created in DB with fbid " + params.fbid)
-            InternalErrorApiResult(None)
+            InternalErrorApiResult()
           }
 
           case Some(user) => {
@@ -74,14 +74,14 @@ private[domain] trait AuthAPI { this: DBAccessor =>
 
     if (params.sessionID != None) {
       db.user.readBySessionID(params.sessionID.get) match {
-        case None => NotAuthorisedApiResult(None)
+        case None => NotAuthorisedApiResult()
 
         case Some(user: User) => OkApiResult(
           Some(UserResult(user)))
       }
     } else if (params.userID != null) {
       db.user.readByID(params.userID.get) match {
-        case None => NotFoundApiResult(None)
+        case None => NotFoundApiResult()
 
         case Some(user: User) => OkApiResult(
           Some(UserResult(user)))
@@ -89,7 +89,7 @@ private[domain] trait AuthAPI { this: DBAccessor =>
       
     } else {
       Logger.error("Wrong request for user.")
-      InternalErrorApiResult(None)
+      InternalErrorApiResult()
     }
 
   }

@@ -20,7 +20,7 @@ private[component] trait CommonFunctions { this: QuestController with SecurityWS
             body(r)
           }
 
-          case NotAuthorisedApiResult(_) => Unauthorized(
+          case NotAuthorisedApiResult() => Unauthorized(
             Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)
 
           case _ => ServerError
