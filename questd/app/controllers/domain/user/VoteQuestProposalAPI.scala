@@ -97,25 +97,22 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
       db.user.readByID(q.userID) match {
         case None => Logger.error("Unable to find author of quest user " + q.userID)
         case Some(author) => {
-          val u: User = QuestStatus.withName(q.status) match {
+          val u = QuestStatus.withName(q.status) match {
             case QuestStatus.OnVoting => {
               Logger.error("We are rewarding player for proposal what is on voting.")
               author
             }
             case QuestStatus.InRotation => author.giveUserReward(author.rewardForMakingQuest)
             case QuestStatus.RatingBanned => author
-            case QuestStatus.CheatingBanned => author.giveUserPenalty(author.penaltyForCheating)
-            case QuestStatus.IACBanned => author.giveUserPenalty(author.penaltyForIAC)
+            case QuestStatus.CheatingBanned => author.giveUserCost(author.penaltyForCheating)
+            case QuestStatus.IACBanned => author.giveUserCost(author.penaltyForIAC)
             case QuestStatus.OldBanned => author
           }
-          
+
           db.user.update(u)
         }
       }
-
     }
-    
-    // TODO everywhere replace direct giving of reward to player with call to a single function in logic (rename assets field to find them).
 
     user.canVoteQuestProposal match {
       case OK => {
@@ -144,8 +141,8 @@ private[domain] trait VoteQuestProposalAPI { this: DBAccessor =>
           profile = user.profile.copy(
             questProposalVoteContext = user.profile.questProposalVoteContext.copy(
               numberOfReviewedQuests = user.profile.questProposalVoteContext.numberOfReviewedQuests + 1,
-              reviewingQuest = None),
-            assets = user.profile.assets + reward))
+              reviewingQuest = None)))
+          .giveUserReward(reward)
 
         db.user.update(u)
 

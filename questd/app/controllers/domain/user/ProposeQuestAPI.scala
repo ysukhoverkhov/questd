@@ -57,10 +57,9 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
 
         val u = user.copy(
           profile = user.profile.copy(
-            assets = user.profile.assets - themeCost,
             questProposalContext = user.profile.questProposalContext.copy(
               numberOfPurchasedThemes = user.profile.questProposalContext.numberOfPurchasedThemes + 1,
-              purchasedTheme = Some(t))))
+              purchasedTheme = Some(t)))).giveUserCost(themeCost)
 
         db.user.update(u)
 
@@ -97,8 +96,8 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
               numberOfPurchasedThemes = 0,
               purchasedTheme = None,
               takenTheme = pt,
-              questProposalCooldown = user.getCooldownForTakeTheme),
-            assets = user.profile.assets - user.costOfTakingQuestTheme))
+              questProposalCooldown = user.getCooldownForTakeTheme)))
+          .giveUserCost(user.costOfTakingQuestTheme)
 
         db.user.update(u)
 
@@ -143,15 +142,13 @@ private[domain] trait ProposeQuestAPI { this: DBAccessor =>
 
     user.canGiveUpQuestProposal match {
       case OK => {
-        val newAssets = (user.profile.assets - user.costOfGivingUpQuestProposal).clampBot
-
         val u = user.copy(
           profile = user.profile.copy(
             questProposalContext = user.profile.questProposalContext.copy(
               numberOfPurchasedThemes = 0,
               purchasedTheme = None,
-              takenTheme = None),
-            assets = newAssets))
+              takenTheme = None)))
+          .giveUserCost(user.costOfGivingUpQuestProposal)
 
         db.user.update(u)
 

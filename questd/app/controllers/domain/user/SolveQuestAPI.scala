@@ -65,8 +65,8 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
             case Some(q) => {
               val nq = q.copy(
                 rating = q.rating.copy(
-                    points = q.rating.points - 1,
-                    votersCount = q.rating.votersCount + 1))
+                  points = q.rating.points - 1,
+                  votersCount = q.rating.votersCount + 1))
 
               db.quest.update(nq.updateStatus)
             }
@@ -79,12 +79,12 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
         val u = user.copy(
           profile = user.profile.copy(
-            assets = user.profile.assets - questCost,
             questSolutionContext = user.profile.questSolutionContext.copy(
               numberOfPurchasedQuests = user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
               purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))),
           stats = user.stats.copy(
             questsReviewed = user.stats.questsReviewed + 1))
+          .giveUserCost(questCost)
 
         db.user.update(u)
 
@@ -112,7 +112,7 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
     user.canTakeQuest match {
 
       case OK => {
-        
+
         // Updating quest info.
         if (user.stats.questsAcceptedPast > 0) {
           val quest = db.quest.readByID(user.profile.questSolutionContext.purchasedQuest.get.id)
@@ -125,17 +125,16 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
             case Some(q) => {
               val ratio = Math.round(user.stats.questsReviewedPast.toFloat / user.stats.questsAcceptedPast) - 1
-              
+
               val nq = q.copy(
                 rating = q.rating.copy(
-                    points = q.rating.points + ratio,
-                    votersCount = q.rating.votersCount + 1))
+                  points = q.rating.points + ratio,
+                  votersCount = q.rating.votersCount + 1))
 
               db.quest.update(nq.updateStatus)
             }
           }
         }
-
 
         // Updating user profile.
         val pq = user.profile.questSolutionContext.purchasedQuest
@@ -146,10 +145,10 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
               numberOfPurchasedQuests = 0,
               purchasedQuest = None,
               takenQuest = pq,
-              questCooldown = user.getCooldownForTakeQuest(pq.get.obj)),
-            assets = user.profile.assets - user.costOfTakingQuest),
+              questCooldown = user.getCooldownForTakeQuest(pq.get.obj))),
           stats = user.stats.copy(
             questsAccepted = user.stats.questsAccepted + 1))
+          .giveUserCost(user.costOfTakingQuest)
 
         db.user.update(u)
 
@@ -208,15 +207,13 @@ private[domain] trait SolveQuestAPI { this: DBAccessor =>
 
     user.canGiveUpQuest match {
       case OK => {
-        val newAssets = (user.profile.assets - user.costOfGivingUpQuest).clampBot
-
         val u = user.copy(
           profile = user.profile.copy(
             questSolutionContext = user.profile.questSolutionContext.copy(
               numberOfPurchasedQuests = 0,
               purchasedQuest = None,
-              takenQuest = None),
-            assets = newAssets))
+              takenQuest = None)))
+          .giveUserCost(user.costOfGivingUpQuest)
 
         db.user.update(u)
 

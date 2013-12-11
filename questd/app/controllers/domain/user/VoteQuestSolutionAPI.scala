@@ -95,8 +95,8 @@ private[domain] trait VoteQuestSolutionAPI { this: DBAccessor =>
           profile = user.profile.copy(
             questSolutionVoteContext = user.profile.questSolutionVoteContext.copy(
               numberOfReviewedSolutions = user.profile.questSolutionVoteContext.numberOfReviewedSolutions + 1,
-              reviewingQuestSolution = None),
-            assets = user.profile.assets + reward))
+              reviewingQuestSolution = None)))
+          .giveUserReward(reward)
 
         db.user.update(u)
 

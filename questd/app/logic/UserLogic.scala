@@ -30,10 +30,10 @@ class UserLogic(val user: User) {
         assets = user.profile.assets + reward))
   }
 
-  def giveUserPenalty(penalty: Assets): User = {
+  def giveUserCost(cost: Assets): User = {
     user.copy(
       profile = user.profile.copy(
-        assets = user.profile.assets - penalty))
+        assets = user.profile.assets - cost))
   }
 
   /**
