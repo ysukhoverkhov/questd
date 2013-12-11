@@ -65,9 +65,21 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
               purchasedTheme = Some(t))))
         db.user.update(u)
 
-        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(themeCost)))
+        // TODO return latest result everywhere since in other way we will give not the latest result to your users.
+        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(themeCost))) match {
+          case OkApiResult(Some(r)) => {
+            // TODO here take user from result.
+            OkApiResult(Some(PurchaseQuestThemeResult(OK, Some(u.profile))))
+          }
+          case _ => {
+            OkApiResult(Some(PurchaseQuestThemeResult(OK)))
+            // TODO log here and return internal error
+          }
+        }
+        
+        // TODO think how to standart things above.
 
-        OkApiResult(Some(PurchaseQuestThemeResult(OK, Some(u.profile))))
+        
 
       }
       case a => OkApiResult(Some(PurchaseQuestThemeResult(a)))
