@@ -15,7 +15,7 @@ private[mongo] class MongoQuestSolutionDAO
   with QuestSolutionDAO {
 
   def allWithStatus(status: String): Iterator[QuestSolution] = {
-    allByExample("status", status)
+    allByExample(("status" -> status))
   }
 
 }

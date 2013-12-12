@@ -42,6 +42,8 @@ object constants {
    * Quest resolving.
    */
   
+  val questLevelTolerance = 20
+  
   val questSolutionGiveUpPenalty = 2
 
   

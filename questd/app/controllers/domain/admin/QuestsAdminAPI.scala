@@ -20,10 +20,10 @@ private [domain] trait QuestsAdminAPI { this: DBAccessor =>
   /**
    * List all Quests with approved status.
    */
-  def allQuestsInRotation: ApiResult[AllQuestsResult] = handleDbException {
+  def allQuestsInRotation(request: AllQuestsRequest): ApiResult[AllQuestsResult] = handleDbException {
     Logger.info("Admin request for all quests. THIS SHOULD NOT BE CALLED IN PRODUCTION SINCE IT'S VERY SLOW!!!!!!")
 
-    OkApiResult(Some(AllQuestsResult(List() ++ db.quest.allWithStatus(QuestStatus.InRotation.toString))))
+    OkApiResult(Some(AllQuestsResult(List() ++ db.quest.allWithStatus(QuestStatus.InRotation.toString, request.fromLevel, request.toLevel))))
   }
 
   /**
@@ -32,7 +32,7 @@ private [domain] trait QuestsAdminAPI { this: DBAccessor =>
   def allQuestsOnVoting: ApiResult[AllQuestsResult] = handleDbException {
     Logger.info("Admin request for all quests. THIS SHOULD NOT BE CALLED IN PRODUCTION SINCE IT'S VERY SLOW!!!!!!")
 
-    OkApiResult(Some(AllQuestsResult(List() ++ db.quest.allWithStatus(QuestStatus.OnVoting.toString))))
+    OkApiResult(Some(AllQuestsResult(List() ++ db.quest.allWithStatus(QuestStatus.OnVoting.toString, 0, 21))))
   }
 
   /**

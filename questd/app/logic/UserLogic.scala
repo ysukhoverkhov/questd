@@ -12,6 +12,7 @@ import components.componentregistry.ComponentRegistrySingleton
 import functions._
 import constants._
 import play.Logger
+import controllers.domain.admin._
 
 // This should not go to DB directly since API may have cache layer.
 class UserLogic(val user: User) {
@@ -194,10 +195,9 @@ class UserLogic(val user: User) {
 
   /**
    * Takes everything into account and returns possible quest to be solved by user.
-   * TODO add quest level here.
    */
   def getRandomQuestForSolution: Option[Quest] = {
-    val quests = api.allQuestsInRotation.body.get.quests
+    val quests = api.allQuestsInRotation(AllQuestsRequest(user.profile.level - questLevelTolerance, user.profile.level + questLevelTolerance)).body.get.quests
 
     if (quests.length == 0) {
       None

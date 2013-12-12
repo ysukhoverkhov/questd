@@ -21,11 +21,15 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
   private val keyFieldName: String = "id"
 
   private def makeKeyDbObject(key: String): DBObject = {
-    MongoDBObject(keyFieldName -> key)
+    makeKeyDbObject(keyFieldName -> key)
   }
 
   private def makeKeyDbObject(fieldName: String, key: String): DBObject = {
-    MongoDBObject(fieldName -> key)
+    makeKeyDbObject(fieldName -> key)
+  }
+
+  private def makeKeyDbObject(example: (String, Any)*): DBObject = {
+    MongoDBObject(example:_*)
   }
 
   /**
@@ -108,8 +112,8 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
   /**
    * All objects with filter.
    */
-  def allByExample(fieldName: String, key: String): Iterator[T] = wrapMongoException {
-    find(makeKeyDbObject(fieldName, key))
+  def allByExample(example: (String, Any)*): Iterator[T] = wrapMongoException {
+    find(makeKeyDbObject(example:_*))
   } 
 
 }
