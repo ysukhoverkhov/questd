@@ -61,20 +61,6 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
    */
   def voteQuestSolution(request: VoteQuestSolutionRequest): ApiResult[VoteQuestSolutionResult] = handleDbException {
 
-    def updateQuestSolutionWithVote(q: QuestSolution, v: QuestSolutionVote.Value): QuestSolution = {
-      import QuestSolutionVote._
-
-      def checkInc[T](v: T, c: T, n: Int) = if (v == c) n + 1 else n
-
-      q.copy(
-        rating = q.rating.copy(
-          pointsRandom = checkInc(v, Cool, q.rating.pointsRandom),
-          cheating = checkInc(v, Cheating, q.rating.cheating),
-          iacpoints = q.rating.iacpoints.copy(
-            spam = checkInc(v, IASpam, q.rating.iacpoints.spam),
-            porn = checkInc(v, IAPorn, q.rating.iacpoints.porn))))
-    }
-
     request.user.canVoteQuestSolution match {
       case OK => {
         // 1. get quest to vote.
@@ -82,31 +68,31 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
         // 3. check change quest state
         // 4. save quest in db.
         val reward = request.user.getQuestSolutionVoteReward
-        
+
         db.solution.readByID(request.user.profile.questSolutionVoteContext.reviewingQuestSolution.get.id) match {
           case None => {
             Logger.error("Unable to find quest solution with id for voting " + request.user.profile.questSolutionVoteContext.reviewingQuestSolution.get.id)
             InternalErrorApiResult()
           }
           case Some(q) => {
-            // TODO make it as API call 
-            db.solution.update(updateQuestSolutionWithVote(q, request.vote))
+            voteQuestSolutionUpdate(VoteQuestSolutionUpdateRequest(q, request.vote)) map {
+              // 5. update user profile.
+              // 6. save profile in db.
+              adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward))) map { r =>
+                val u = r.user.copy(
+                  profile = r.user.profile.copy(
+                    questSolutionVoteContext = r.user.profile.questSolutionVoteContext.copy(
+                      numberOfReviewedSolutions = r.user.profile.questSolutionVoteContext.numberOfReviewedSolutions + 1,
+                      reviewingQuestSolution = None)))
+                db.user.update(u)
 
-            // 5. update user profile.
-            // 6. save profile in db.
-            adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward))) map { r=>
-              val u = r.user.copy(
-                profile = r.user.profile.copy(
-                  questSolutionVoteContext = r.user.profile.questSolutionVoteContext.copy(
-                    numberOfReviewedSolutions = r.user.profile.questSolutionVoteContext.numberOfReviewedSolutions + 1,
-                    reviewingQuestSolution = None)))
-              db.user.update(u)
-
-              OkApiResult(Some(VoteQuestSolutionResult(OK, Some(u.profile), Some(reward))))
+                OkApiResult(Some(VoteQuestSolutionResult(OK, Some(u.profile), Some(reward))))
+              }
             }
           }
         }
       }
+      
       case a => OkApiResult(Some(VoteQuestSolutionResult(a)))
     }
   }
