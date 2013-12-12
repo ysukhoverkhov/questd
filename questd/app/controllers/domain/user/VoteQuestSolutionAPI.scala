@@ -13,6 +13,7 @@ import protocol.ProfileModificationResult.ProfileModificationResult
 import play.Logger
 import models.domain.base._
 import controllers.domain.DomainAPIComponent
+import controllers.domain.InternalErrorApiResult
 
 case class GetQuestSolutionToVoteRequest(user: User)
 case class GetQuestSolutionToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -59,7 +60,6 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
    * Get cost of quest to shuffle.
    */
   def voteQuestSolution(request: VoteQuestSolutionRequest): ApiResult[VoteQuestSolutionResult] = handleDbException {
-    import request._
 
     def updateQuestSolutionWithVote(q: QuestSolution, v: QuestSolutionVote.Value): QuestSolution = {
       import QuestSolutionVote._
@@ -75,34 +75,37 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
             porn = checkInc(v, IAPorn, q.rating.iacpoints.porn))))
     }
 
-    user.canVoteQuestSolution match {
+    request.user.canVoteQuestSolution match {
       case OK => {
         // 1. get quest to vote.
         // 2. update quest params.
         // 3. check change quest state
         // 4. save quest in db.
-        db.solution.readByID(user.profile.questSolutionVoteContext.reviewingQuestSolution.get.id) match {
-          case None => Logger.error("Unable to find quest solution with id for voting " + user.profile.questSolutionVoteContext.reviewingQuestSolution.get.id)
+        val reward = request.user.getQuestSolutionVoteReward
+        
+        db.solution.readByID(request.user.profile.questSolutionVoteContext.reviewingQuestSolution.get.id) match {
+          case None => {
+            Logger.error("Unable to find quest solution with id for voting " + request.user.profile.questSolutionVoteContext.reviewingQuestSolution.get.id)
+            InternalErrorApiResult()
+          }
           case Some(q) => {
-            db.solution.update(updateQuestSolutionWithVote(q, vote))
+            // TODO make it as API call 
+            db.solution.update(updateQuestSolutionWithVote(q, request.vote))
+
+            // 5. update user profile.
+            // 6. save profile in db.
+            adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward))) map { r=>
+              val u = r.user.copy(
+                profile = r.user.profile.copy(
+                  questSolutionVoteContext = r.user.profile.questSolutionVoteContext.copy(
+                    numberOfReviewedSolutions = r.user.profile.questSolutionVoteContext.numberOfReviewedSolutions + 1,
+                    reviewingQuestSolution = None)))
+              db.user.update(u)
+
+              OkApiResult(Some(VoteQuestSolutionResult(OK, Some(u.profile), Some(reward))))
+            }
           }
         }
-
-        // 5. update user profile.
-        // 6. save profile in db.
-        val reward = user.getQuestSolutionVoteReward
-
-        val u = user.copy(
-          profile = user.profile.copy(
-            questSolutionVoteContext = user.profile.questSolutionVoteContext.copy(
-              numberOfReviewedSolutions = user.profile.questSolutionVoteContext.numberOfReviewedSolutions + 1,
-              reviewingQuestSolution = None)))
-        db.user.update(u)
-
-        adjustAssets(AdjustAssetsRequest(user = u, reward = Some(reward)))
-
-        OkApiResult(Some(VoteQuestSolutionResult(OK, Some(u.profile), Some(reward))))
-
       }
       case a => OkApiResult(Some(VoteQuestSolutionResult(a)))
     }

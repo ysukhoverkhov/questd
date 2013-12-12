@@ -15,7 +15,7 @@ case class ResetCountersRequest(user: User)
 case class ResetCountersResult()
 
 case class AdjustAssetsRequest(user: User, reward: Option[Assets] = None, cost: Option[Assets] = None)
-case class AdjustAssetsResult()
+case class AdjustAssetsResult(user: User)
 
 private[domain] trait ProfileAPI { this: DBAccessor =>
 
@@ -62,13 +62,13 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
     val rew = if (reward == None) Assets() else reward.get
     val co = if (cost == None) Assets() else cost.get
 
-    db.user.update {
-      user.copy(
-        profile = user.profile.copy(
-          assets = user.profile.assets + rew - co))
-    }
+    val u = user.copy(
+      profile = user.profile.copy(
+        assets = user.profile.assets + rew - co))
 
-    OkApiResult(Some(AdjustAssetsResult()))
+    db.user.update(u)
+
+    OkApiResult(Some(AdjustAssetsResult(u)))
   }
 
 }

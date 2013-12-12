@@ -47,14 +47,12 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    * Purchase an option of quest to chose.
    */
   def purchaseQuest(request: PurchaseQuestRequest): ApiResult[PurchaseQuestResult] = handleDbException {
-    import request._
-
-    user.canPurchaseQuest match {
+    request.user.canPurchaseQuest match {
       case OK => {
 
         // Updating quest info.
-        if ((user.profile.questSolutionContext.purchasedQuest != None) && (user.stats.questsAcceptedPast > 0)) {
-          val quest = db.quest.readByID(user.profile.questSolutionContext.purchasedQuest.get.id)
+        val v = if ((request.user.profile.questSolutionContext.purchasedQuest != None) && (request.user.stats.questsAcceptedPast > 0)) {
+          val quest = db.quest.readByID(request.user.profile.questSolutionContext.purchasedQuest.get.id)
 
           quest match {
             case None => {
@@ -64,25 +62,33 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
             case Some(q) => skipQuest(SkipQuestRequest(q))
           }
+        } else {
+          OkApiResult(Some(SkipQuestResult()))
         }
 
-        // Updating user profile.
-        val q = user.getRandomQuestForSolution
-        val questCost = user.costOfPurchasingQuest
+        v map {
 
-        val u = user.copy(
-          profile = user.profile.copy(
-            questSolutionContext = user.profile.questSolutionContext.copy(
-              numberOfPurchasedQuests = user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
-              purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))),
-          stats = user.stats.copy(
-            questsReviewed = user.stats.questsReviewed + 1))
-        db.user.update(u)
+          // Updating user profile.
+          val q = request.user.getRandomQuestForSolution
+          val questCost = request.user.costOfPurchasingQuest
 
-        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(questCost)))
+          adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(questCost))) map { r =>
 
-        OkApiResult(Some(PurchaseQuestResult(OK, Some(u.profile))))
+            val u = r.user.copy(
+              profile = r.user.profile.copy(
+                questSolutionContext = r.user.profile.questSolutionContext.copy(
+                  numberOfPurchasedQuests = r.user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
+                  purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))),
+              stats = r.user.stats.copy(
+                questsReviewed = r.user.stats.questsReviewed + 1))
+            db.user.update(u)
+
+            OkApiResult(Some(PurchaseQuestResult(OK, Some(u.profile))))
+          }
+
+        }
       }
+
       case a => OkApiResult(Some(PurchaseQuestResult(a)))
     }
   }
@@ -100,15 +106,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    * Take quest to deal with.
    */
   def takeQuest(request: TakeQuestRequest): ApiResult[TakeQuestResult] = handleDbException {
-    import request._
-
-    user.canTakeQuest match {
+    request.user.canTakeQuest match {
 
       case OK => {
 
         // Updating quest info.
-        if (user.stats.questsAcceptedPast > 0) {
-          val quest = db.quest.readByID(user.profile.questSolutionContext.purchasedQuest.get.id)
+        val v = if (request.user.stats.questsAcceptedPast > 0) {
+          val quest = db.quest.readByID(request.user.profile.questSolutionContext.purchasedQuest.get.id)
 
           quest match {
             case None => {
@@ -117,30 +121,36 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             }
 
             case Some(q) => {
-              val ratio = Math.round(user.stats.questsReviewedPast.toFloat / user.stats.questsAcceptedPast) - 1
+              val ratio = Math.round(request.user.stats.questsReviewedPast.toFloat / request.user.stats.questsAcceptedPast) - 1
 
               takeQuestUpdate(TakeQuestUpdateRequest(q, ratio))
             }
           }
+        } else {
+          OkApiResult(Some(TakeQuestUpdateResult))
         }
 
-        // Updating user profile.
-        val pq = user.profile.questSolutionContext.purchasedQuest
+        v map {
+          adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuest)))
+        } map { r =>
 
-        val u = user.copy(
-          profile = user.profile.copy(
-            questSolutionContext = user.profile.questSolutionContext.copy(
-              numberOfPurchasedQuests = 0,
-              purchasedQuest = None,
-              takenQuest = pq,
-              questCooldown = user.getCooldownForTakeQuest(pq.get.obj))),
-          stats = user.stats.copy(
-            questsAccepted = user.stats.questsAccepted + 1))
-        db.user.update(u)
+          // Updating user profile.
+          val pq = r.user.profile.questSolutionContext.purchasedQuest
 
-        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfTakingQuest)))
+          val u = r.user.copy(
+            profile = r.user.profile.copy(
+              questSolutionContext = r.user.profile.questSolutionContext.copy(
+                numberOfPurchasedQuests = 0,
+                purchasedQuest = None,
+                takenQuest = pq,
+                questCooldown = r.user.getCooldownForTakeQuest(pq.get.obj))),
+            stats = r.user.stats.copy(
+              questsAccepted = r.user.stats.questsAccepted + 1))
+          db.user.update(u)
 
-        OkApiResult(Some(TakeQuestResult(OK, Some(u.profile))))
+          OkApiResult(Some(TakeQuestResult(OK, Some(u.profile))))
+        }
+
       }
 
       case (a: ProfileModificationResult) => OkApiResult(Some(TakeQuestResult(a)))
@@ -192,21 +202,20 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    * Give up quest and do not deal with it anymore.
    */
   def giveUpQuest(request: GiveUpQuestRequest): ApiResult[GiveUpQuestResult] = handleDbException {
-    import request._
-
-    user.canGiveUpQuest match {
+    request.user.canGiveUpQuest match {
       case OK => {
-        val u = user.copy(
-          profile = user.profile.copy(
-            questSolutionContext = user.profile.questSolutionContext.copy(
-              numberOfPurchasedQuests = 0,
-              purchasedQuest = None,
-              takenQuest = None)))
-        db.user.update(u)
 
-        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfGivingUpQuest)))
+        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) map { r =>
+          val u = r.user.copy(
+            profile = r.user.profile.copy(
+              questSolutionContext = r.user.profile.questSolutionContext.copy(
+                numberOfPurchasedQuests = 0,
+                purchasedQuest = None,
+                takenQuest = None)))
+          db.user.update(u)
 
-        OkApiResult(Some(GiveUpQuestResult(OK, Some(u.profile))))
+          OkApiResult(Some(GiveUpQuestResult(OK, Some(u.profile))))
+        }
       }
 
       case (a: ProfileModificationResult) => OkApiResult(Some(GiveUpQuestResult(a)))

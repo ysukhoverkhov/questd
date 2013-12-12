@@ -50,36 +50,25 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    * Returns purchased quest theme.
    */
   def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
-    import request._
 
-    user.canPurchaseQuestProposals match {
+    request.user.canPurchaseQuestProposals match {
       case OK => {
 
-        val t = user.getRandomThemeForQuestProposal
-        val themeCost = user.costOfPurchasingQuestProposal
+        val themeCost = request.user.costOfPurchasingQuestProposal
 
-        val u = user.copy(
-          profile = user.profile.copy(
-            questProposalContext = user.profile.questProposalContext.copy(
-              numberOfPurchasedThemes = user.profile.questProposalContext.numberOfPurchasedThemes + 1,
-              purchasedTheme = Some(t))))
-        db.user.update(u)
+        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(themeCost))) map { r =>
+          val user = r.user
+          val t = r.user.getRandomThemeForQuestProposal
 
-        // TODO return latest result everywhere since in other way we will give not the latest result to your users.
-        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(themeCost))) match {
-          case OkApiResult(Some(r)) => {
-            // TODO here take user from result.
-            OkApiResult(Some(PurchaseQuestThemeResult(OK, Some(u.profile))))
-          }
-          case _ => {
-            OkApiResult(Some(PurchaseQuestThemeResult(OK)))
-            // TODO log here and return internal error
-          }
+          val u = user.copy(
+            profile = user.profile.copy(
+              questProposalContext = user.profile.questProposalContext.copy(
+                numberOfPurchasedThemes = user.profile.questProposalContext.numberOfPurchasedThemes + 1,
+                purchasedTheme = Some(t))))
+          db.user.update(u)
+
+          OkApiResult(Some(PurchaseQuestThemeResult(OK, Some(u.profile))))
         }
-        
-        // TODO think how to standart things above.
-
-        
 
       }
       case a => OkApiResult(Some(PurchaseQuestThemeResult(a)))
@@ -99,25 +88,26 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    * Takes currently purchased theme to make a quest with it.
    */
   def takeQuestTheme(request: TakeQuestThemeRequest): ApiResult[TakeQuestThemeResult] = handleDbException {
-    import request._
-    user.canTakeQuestTheme match {
+
+    request.user.canTakeQuestTheme match {
 
       case OK => {
 
-        val pt = user.profile.questProposalContext.purchasedTheme
+        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuestTheme))) map { r =>
+          val user = r.user
+          val pt = user.profile.questProposalContext.purchasedTheme
 
-        val u = user.copy(
-          profile = user.profile.copy(
-            questProposalContext = user.profile.questProposalContext.copy(
-              numberOfPurchasedThemes = 0,
-              purchasedTheme = None,
-              takenTheme = pt,
-              questProposalCooldown = user.getCooldownForTakeTheme)))
-        db.user.update(u)
+          val u = user.copy(
+            profile = user.profile.copy(
+              questProposalContext = user.profile.questProposalContext.copy(
+                numberOfPurchasedThemes = 0,
+                purchasedTheme = None,
+                takenTheme = pt,
+                questProposalCooldown = user.getCooldownForTakeTheme)))
+          db.user.update(u)
 
-        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfTakingQuestTheme)))
-
-        OkApiResult(Some(TakeQuestThemeResult(OK, Some(u.profile))))
+          OkApiResult(Some(TakeQuestThemeResult(OK, Some(u.profile))))
+        }
       }
 
       case (a: ProfileModificationResult) => OkApiResult(Some(TakeQuestThemeResult(a)))
@@ -128,16 +118,15 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    * Takes currently purchased theme to make a quest with it.
    */
   def proposeQuest(request: ProposeQuestRequest): ApiResult[ProposeQuestResult] = handleDbException {
-    import request._
 
-    user.canProposeQuest(ContentType.withName(quest.content.contentType)) match {
+    request.user.canProposeQuest(ContentType.withName(request.quest.content.contentType)) match {
       case OK => {
 
-        db.quest.create(Quest(info = quest, userID = user.id))
+        db.quest.create(Quest(info = request.quest, userID = request.user.id))
 
-        val u = user.copy(
-          profile = user.profile.copy(
-            questProposalContext = user.profile.questProposalContext.copy(
+        val u = request.user.copy(
+          profile = request.user.profile.copy(
+            questProposalContext = request.user.profile.questProposalContext.copy(
               numberOfPurchasedThemes = 0,
               purchasedTheme = None,
               takenTheme = None)))
@@ -158,17 +147,20 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
     user.canGiveUpQuestProposal match {
       case OK => {
-        val u = user.copy(
-          profile = user.profile.copy(
-            questProposalContext = user.profile.questProposalContext.copy(
-              numberOfPurchasedThemes = 0,
-              purchasedTheme = None,
-              takenTheme = None)))
-        db.user.update(u)
 
-        adjustAssets(AdjustAssetsRequest(user = u, cost = Some(user.costOfGivingUpQuestProposal)))
+        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(user.costOfGivingUpQuestProposal))) map { r =>
 
-        OkApiResult(Some(GiveUpQuestProposalResult(OK, Some(u.profile))))
+          val u = r.user.copy(
+            profile = user.profile.copy(
+              questProposalContext = user.profile.questProposalContext.copy(
+                numberOfPurchasedThemes = 0,
+                purchasedTheme = None,
+                takenTheme = None)))
+          db.user.update(u)
+
+          OkApiResult(Some(GiveUpQuestProposalResult(OK, Some(u.profile))))
+        }
+
       }
 
       case (a: ProfileModificationResult) => OkApiResult(Some(GiveUpQuestProposalResult(a)))
@@ -189,19 +181,22 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    */
   def rewardQuestProposalAuthor(request: RewardQuestProposalAuthorRequest): ApiResult[RewardQuestProposalAuthorResult] = handleDbException {
     import request._
-    
-    QuestStatus.withName(quest.status) match {
+
+    val r = QuestStatus.withName(quest.status) match {
       case QuestStatus.OnVoting => {
         Logger.error("We are rewarding player for proposal what is on voting.")
+        InternalErrorApiResult()
       }
       case QuestStatus.InRotation => adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.rewardForMakingQuest)))
-      case QuestStatus.RatingBanned =>
+      case QuestStatus.RatingBanned => OkApiResult(Some(AdjustAssetsResult(author)))
       case QuestStatus.CheatingBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheating)))
       case QuestStatus.IACBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIAC)))
-      case QuestStatus.OldBanned =>
+      case QuestStatus.OldBanned => OkApiResult(Some(AdjustAssetsResult(author)))
     }
-    
-    OkApiResult(Some(RewardQuestProposalAuthorResult()))
+
+    r map { r =>
+      OkApiResult(Some(RewardQuestProposalAuthorResult()))
+    }
   }
 
 }
