@@ -48,6 +48,15 @@ object constants {
 
   
   
+  /**
+   * Voting quest solutions.
+   */
+  
+  val solutionLevelDownTolerance = 20
+  
+  val solutionLevelUpTolerance = 2
+  
+  
   // Constants bellow are used in algorithms and should not be changed.
   
   /**

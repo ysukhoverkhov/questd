@@ -19,7 +19,6 @@ class UserLogic(val user: User) {
 
   lazy val api = ComponentRegistrySingleton.api
 
-
   /**
    * **************************
    * Proposing quests.
@@ -373,7 +372,8 @@ class UserLogic(val user: User) {
    * @return None if no more quests to vote for today.
    */
   def getQuestSolutionToVote: Option[QuestSolution] = {
-    val quests = api.allQuestSolutionsOnVoting.body.get.quests
+    val quests = api.allQuestSolutionsOnVoting(
+      AllQuestSolutionsRequest(user.profile.level - constants.solutionLevelDownTolerance, user.profile.level - constants.solutionLevelUpTolerance)).body.get.quests
 
     if (quests.length == 0) {
       None

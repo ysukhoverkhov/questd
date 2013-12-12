@@ -10,7 +10,7 @@ case class QuestSolution(
   id: String = ID.generateUUID(),
   questID: String,
   userID: String,
-  questlevel: Int,
+  questLevel: Int,
   info: QuestSolutionInfo,
   rating: QuestSolutionRating = QuestSolutionRating(),
   status: String = QuestSolutionStatus.OnVoting.toString) extends ID
