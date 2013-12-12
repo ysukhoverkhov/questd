@@ -194,16 +194,17 @@ class UserLogic(val user: User) {
 
   /**
    * Takes everything into account and returns possible quest to be solved by user.
+   * TODO add quest level here.
    */
-  def getRandomQuestForSolution: Quest = {
+  def getRandomQuestForSolution: Option[Quest] = {
     val quests = api.allQuestsInRotation.body.get.quests
 
     if (quests.length == 0) {
-      Quest(info = QuestInfo(ContentReference(ContentType.Photo.toString, "url", "is a stub quest since no quests are in db")), userID = "userID")
+      None
     } else {
       val rand = new Random(System.currentTimeMillis())
       val random_index = rand.nextInt(quests.length)
-      quests(random_index)
+      Some(quests(random_index))
     }
   }
 

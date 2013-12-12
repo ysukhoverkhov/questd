@@ -33,12 +33,21 @@ object constants {
   
   val questProposalIACPenalty = 10
   
+  val minQuestLevel = 0
+  
+  val maxQuestLevel = 21
+  
+  
   /**
    * Quest resolving.
    */
   
   val questSolutionGiveUpPenalty = 2
 
+  
+  
+  // Constants bellow are used in algorithms and should not be changed.
+  
   /**
    * Number of themes skips for coins.
    */

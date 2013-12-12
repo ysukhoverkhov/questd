@@ -48,7 +48,7 @@ class QuestLogic(val quest: Quest) {
 
     api.getUser(UserRequest(userID = Some(quest.userID))) match {
       case OkApiResult(Some(UserResult(u))) => {
-        math.min(21, math.max(0, u.profile.level + levelShift))
+        math.min(constants.maxQuestLevel, math.max(constants.minQuestLevel, u.profile.level + levelShift))
 
       }
       case _ => {

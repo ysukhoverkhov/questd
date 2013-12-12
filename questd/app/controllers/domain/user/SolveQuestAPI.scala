@@ -69,23 +69,26 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         v map {
 
           // Updating user profile.
-          val q = request.user.getRandomQuestForSolution
-          val questCost = request.user.costOfPurchasingQuest
+          request.user.getRandomQuestForSolution match {
+            case None => OkApiResult(Some(PurchaseQuestResult(OutOfContent)))
+            case Some(q) => {
+              val questCost = request.user.costOfPurchasingQuest
 
-          adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(questCost))) map { r =>
+              adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(questCost))) map { r =>
 
-            val u = r.user.copy(
-              profile = r.user.profile.copy(
-                questSolutionContext = r.user.profile.questSolutionContext.copy(
-                  numberOfPurchasedQuests = r.user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
-                  purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))),
-              stats = r.user.stats.copy(
-                questsReviewed = r.user.stats.questsReviewed + 1))
-            db.user.update(u)
+                val u = r.user.copy(
+                  profile = r.user.profile.copy(
+                    questSolutionContext = r.user.profile.questSolutionContext.copy(
+                      numberOfPurchasedQuests = r.user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
+                      purchasedQuest = Some(QuestInfoWithID(q.id, q.info)))),
+                  stats = r.user.stats.copy(
+                    questsReviewed = r.user.stats.questsReviewed + 1))
+                db.user.update(u)
 
-            OkApiResult(Some(PurchaseQuestResult(OK, Some(u.profile))))
+                OkApiResult(Some(PurchaseQuestResult(OK, Some(u.profile))))
+              }
+            }
           }
-
         }
       }
 
