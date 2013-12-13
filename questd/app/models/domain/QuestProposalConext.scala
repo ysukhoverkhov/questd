@@ -9,4 +9,3 @@ case class QuestProposalConext(
   numberOfPurchasedThemes: Int = 0,
   questProposalCooldown: Date = new Date(0))
     
-// TODO: calculate approve reward on purchasing theme and do not recalculate it after that.

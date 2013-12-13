@@ -32,6 +32,7 @@ class QuestDAOSpecs extends Specification
         id = id,
         themeID = "theme_id",
         authorUserID = "user id",
+        approveReward = Assets(),
         info = QuestInfo(
           content = QuestInfoContent(
 
@@ -44,7 +45,7 @@ class QuestDAOSpecs extends Specification
       q must beSome[Quest]
       q.get.id must beEqualTo(id)
     }
-    // TODO make icon optional in quest content.
+
     "Update quest" in new WithApplication(appWithTestDatabase) {
       clearDB()
       val id = "ididiid"
@@ -53,6 +54,7 @@ class QuestDAOSpecs extends Specification
         id = id,
         themeID = "theme_id",
         authorUserID = "user id",
+        approveReward = Assets(),
         info = QuestInfo(
           content = QuestInfoContent(
 
@@ -83,6 +85,7 @@ class QuestDAOSpecs extends Specification
         id = id,
         themeID = "theme_id",
         authorUserID = "user id",
+        approveReward = Assets(),
         info = QuestInfo(
           content = QuestInfoContent(
 

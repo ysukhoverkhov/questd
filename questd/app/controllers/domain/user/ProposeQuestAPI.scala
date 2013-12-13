@@ -59,10 +59,12 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(themeCost))) map { r =>
           val user = r.user
           val t = r.user.getRandomThemeForQuestProposal
+          val reward = r.user.rewardForMakingQuest
 
           val u = user.copy(
             profile = user.profile.copy(
               questProposalContext = user.profile.questProposalContext.copy(
+                approveReward = reward,
                 numberOfPurchasedThemes = user.profile.questProposalContext.numberOfPurchasedThemes + 1,
                 purchasedTheme = Some(t))))
           db.user.update(u)
@@ -128,7 +130,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
           Quest(
             themeID = "", //request.user.profile.questProposalContext.takenTheme,
             authorUserID = request.user.id,
-
+            approveReward = request.user.profile.questProposalContext.approveReward,
             info = QuestInfo(
               content = request.quest)))
 
@@ -195,7 +197,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         Logger.error("We are rewarding player for proposal what is on voting.")
         InternalErrorApiResult()
       }
-      case QuestStatus.InRotation => adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.rewardForMakingQuest)))
+      case QuestStatus.InRotation => adjustAssets(AdjustAssetsRequest(user = author, reward = Some(quest.approveReward)))
       case QuestStatus.RatingBanned => OkApiResult(Some(AdjustAssetsResult(author)))
       case QuestStatus.CheatingBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheating)))
       case QuestStatus.IACBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIAC)))

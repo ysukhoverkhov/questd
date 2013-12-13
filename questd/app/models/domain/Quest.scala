@@ -11,6 +11,7 @@ case class Quest(
   id: String = ID.generateUUID(),
   themeID: String,
   authorUserID: String,
+  approveReward: Assets,
   info: QuestInfo,
   rating: QuestRating = QuestRating(),
   // The field is by group.
