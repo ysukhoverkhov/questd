@@ -12,7 +12,6 @@ import com.mongodb.casbah.commons.MongoDBObject
 import models.store._
 import models.domain._
 
-
 //@RunWith(classOf[JUnitRunner])
 class QuestDAOSpecs extends Specification
   with MongoDatabaseComponent
@@ -29,7 +28,15 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.create(Quest(id, "user id", QuestInfo(ContentReference(ContentType.Video.toString, "", ""))))
+      db.quest.create(Quest(id, QuestInfo(
+        themeID = "theme_id",
+        authorUserID = "user id",
+        content = QuestInfoContent(
+
+          media = ContentReference(ContentType.Video.toString, "", ""),
+          icon = ContentReference(ContentType.Video.toString, "", ""),
+          description = "The description"))))
+
       val q = db.quest.readByID(id)
 
       q must beSome[Quest]
@@ -40,17 +47,27 @@ class QuestDAOSpecs extends Specification
       clearDB()
       val id = "ididiid"
 
-      db.quest.create(Quest(id, "user id", QuestInfo(ContentReference(ContentType.Video.toString, "", ""))))
-      val q = db.quest.readByID(id)
-      q.get.info.content.reference must beEqualTo("")
+      db.quest.create(Quest(id, QuestInfo(
+        themeID = "theme_id",
+        authorUserID = "user id",
+        content = QuestInfoContent(
 
-      db.quest.update(q.get.copy(info = QuestInfo(ContentReference(ContentType.Video.toString, "2", "3"))))
-      
+          media = ContentReference(ContentType.Video.toString, "", ""),
+          icon = ContentReference(ContentType.Video.toString, "", ""),
+          description = "The description"))))
+
+      val q = db.quest.readByID(id)
+      q.get.info.content.media.reference must beEqualTo("")
+
+      db.quest.update(q.get.copy(info = q.get.info.copy(
+        content = q.get.info.content.copy(
+          media = ContentReference(ContentType.Video.toString, "2", "3")))))
+
       val q2 = db.quest.readByID(id)
-      
+
       q2 must beSome[Quest]
       q2.get.id must beEqualTo(id)
-      q2.get.info.content.reference must beEqualTo("3")
+      q2.get.info.content.media.reference must beEqualTo("3")
     }
 
     "Delete quest" in new WithApplication(appWithTestDatabase) {
@@ -58,12 +75,20 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.create(Quest(id, "user id", QuestInfo(ContentReference(ContentType.Video.toString, "", ""))))
+      db.quest.create(Quest(id, QuestInfo(
+        themeID = "theme_id",
+        authorUserID = "user id",
+        content = QuestInfoContent(
+
+          media = ContentReference(ContentType.Video.toString, "", ""),
+          icon = ContentReference(ContentType.Video.toString, "", ""),
+          description = "The description"))))
+
       val q = db.quest.readByID(id)
 
       q must beSome[Quest]
       q.get.id must beEqualTo(id)
-      
+
       db.quest.delete(id)
       db.quest.readByID(id) must beNone
     }

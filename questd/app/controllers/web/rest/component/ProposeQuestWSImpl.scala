@@ -30,10 +30,11 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl with Common
 
   
   def proposeQuest = wrapJsonApiCallReturnBody[WSProposeQuestResult] { (js, r) =>
-      val v = Json.read[QuestInfo](js)
+      val v = Json.read[QuestInfoContent](js)
 
       // Check for existing content type.
-      ContentType.withName(v.content.contentType)
+      ContentType.withName(v.media.contentType)
+      ContentType.withName(v.icon.contentType)
       
       api.proposeQuest(ProposeQuestRequest(r.user, v))
   }

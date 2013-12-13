@@ -8,8 +8,15 @@ object QuestDuration extends Enumeration {
   val Minutes, Hours, Day, TwoDays, Week = Value
 }
 
+case class QuestInfoContent(
+  media: ContentReference,
+  icon: ContentReference,
+  description: String)
+
 case class QuestInfo(
-  content: ContentReference,
+  themeID: String,
+  authorUserID: String,
+  content: QuestInfoContent,
   level: Int = 0,
   duration: String = QuestDuration.Minutes.toString,
   difficulty: String = QuestDifficulty.Easy.toString) {
@@ -22,5 +29,4 @@ case class QuestInfo(
     case QuestDuration.Week => 7
   }
 }
-    
     

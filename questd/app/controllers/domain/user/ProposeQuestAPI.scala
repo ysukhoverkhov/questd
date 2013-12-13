@@ -22,7 +22,7 @@ case class GetQuestThemeTakeCostResult(allowed: ProfileModificationResult, cost:
 case class TakeQuestThemeRequest(user: User)
 case class TakeQuestThemeResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class ProposeQuestRequest(user: User, quest: QuestInfo)
+case class ProposeQuestRequest(user: User, quest: QuestInfoContent)
 case class ProposeQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GiveUpQuestProposalRequest(user: User)
@@ -119,10 +119,16 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    */
   def proposeQuest(request: ProposeQuestRequest): ApiResult[ProposeQuestResult] = handleDbException {
 
-    request.user.canProposeQuest(ContentType.withName(request.quest.content.contentType)) match {
+    request.user.canProposeQuest(ContentType.withName(request.quest.media.contentType)) match {
       case OK => {
 
-        db.quest.create(Quest(info = request.quest, userID = request.user.id))
+        
+        
+        // TODO fill theme id here.
+        db.quest.create(Quest(info = QuestInfo(
+            themeID = "",
+            authorUserID = request.user.id,
+            content = request.quest)))
 
         val u = request.user.copy(
           profile = request.user.profile.copy(

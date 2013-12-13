@@ -46,7 +46,7 @@ class QuestLogic(val quest: Quest) {
       maxTuple(dif)._1 + maxTuple(dur)._1
     }
 
-    api.getUser(UserRequest(userID = Some(quest.userID))) match {
+    api.getUser(UserRequest(userID = Some(quest.info.authorUserID))) match {
       case OkApiResult(Some(UserResult(u))) => {
         math.min(constants.maxQuestLevel, math.max(constants.minQuestLevel, u.profile.level + levelShift))
 

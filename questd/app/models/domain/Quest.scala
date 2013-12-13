@@ -9,8 +9,6 @@ object QuestStatus extends Enumeration {
 
 case class Quest(
   id: String = ID.generateUUID(),
-  //  themeID: String, // perhaps it's better to store theme here. or, perhaps, in quest info as in a object we pass to client.
-  userID: String,
   info: QuestInfo,
   rating: QuestRating = QuestRating(),
   // The field is by group.
