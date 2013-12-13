@@ -124,9 +124,9 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
         
         
-        // TODO fill theme id here.
+        // TODO fill theme id here. or perhaps put there here itself since them may be removed or added.
         db.quest.create(Quest(info = QuestInfo(
-            themeID = "",
+            themeID = "", //request.user.profile.questProposalContext.takenTheme,
             authorUserID = request.user.id,
             content = request.quest)))
 
