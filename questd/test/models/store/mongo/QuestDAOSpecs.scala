@@ -28,33 +28,37 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.create(Quest(id, QuestInfo(
+      db.quest.create(Quest(
+        id = id,
         themeID = "theme_id",
         authorUserID = "user id",
-        content = QuestInfoContent(
+        info = QuestInfo(
+          content = QuestInfoContent(
 
-          media = ContentReference(ContentType.Video.toString, "", ""),
-          icon = ContentReference(ContentType.Video.toString, "", ""),
-          description = "The description"))))
+            media = ContentReference(ContentType.Video.toString, "", ""),
+            icon = None,
+            description = "The description"))))
 
       val q = db.quest.readByID(id)
 
       q must beSome[Quest]
       q.get.id must beEqualTo(id)
     }
-
+    // TODO make icon optional in quest content.
     "Update quest" in new WithApplication(appWithTestDatabase) {
       clearDB()
       val id = "ididiid"
 
-      db.quest.create(Quest(id, QuestInfo(
+      db.quest.create(Quest(
+        id = id,
         themeID = "theme_id",
         authorUserID = "user id",
-        content = QuestInfoContent(
+        info = QuestInfo(
+          content = QuestInfoContent(
 
-          media = ContentReference(ContentType.Video.toString, "", ""),
-          icon = ContentReference(ContentType.Video.toString, "", ""),
-          description = "The description"))))
+            media = ContentReference(ContentType.Video.toString, "", ""),
+            icon = None,
+            description = "The description"))))
 
       val q = db.quest.readByID(id)
       q.get.info.content.media.reference must beEqualTo("")
@@ -75,14 +79,16 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.create(Quest(id, QuestInfo(
+      db.quest.create(Quest(
+        id = id,
         themeID = "theme_id",
         authorUserID = "user id",
-        content = QuestInfoContent(
+        info = QuestInfo(
+          content = QuestInfoContent(
 
-          media = ContentReference(ContentType.Video.toString, "", ""),
-          icon = ContentReference(ContentType.Video.toString, "", ""),
-          description = "The description"))))
+            media = ContentReference(ContentType.Video.toString, "", ""),
+            icon = None,
+            description = "The description"))))
 
       val q = db.quest.readByID(id)
 

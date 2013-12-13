@@ -122,13 +122,15 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     request.user.canProposeQuest(ContentType.withName(request.quest.media.contentType)) match {
       case OK => {
 
-        
-        
         // TODO fill theme id here. or perhaps put there here itself since them may be removed or added.
-        db.quest.create(Quest(info = QuestInfo(
+        db.quest.create(
+
+          Quest(
             themeID = "", //request.user.profile.questProposalContext.takenTheme,
             authorUserID = request.user.id,
-            content = request.quest)))
+
+            info = QuestInfo(
+              content = request.quest)))
 
         val u = request.user.copy(
           profile = request.user.profile.copy(

@@ -34,7 +34,8 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl with Common
 
       // Check for existing content type.
       ContentType.withName(v.media.contentType)
-      ContentType.withName(v.icon.contentType)
+      if (v.icon != None)
+        ContentType.withName(v.icon.get.contentType)
       
       api.proposeQuest(ProposeQuestRequest(r.user, v))
   }

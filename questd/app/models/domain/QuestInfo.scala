@@ -10,12 +10,10 @@ object QuestDuration extends Enumeration {
 
 case class QuestInfoContent(
   media: ContentReference,
-  icon: ContentReference,
+  icon: Option[ContentReference],
   description: String)
 
 case class QuestInfo(
-  themeID: String,
-  authorUserID: String,
   content: QuestInfoContent,
   level: Int = 0,
   duration: String = QuestDuration.Minutes.toString,
