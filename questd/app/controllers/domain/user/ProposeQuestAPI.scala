@@ -1,6 +1,7 @@
 package controllers.domain.user
 
 import models.domain._
+import models.domain.base._
 import models.store._
 import play.Logger
 import helpers._
@@ -66,7 +67,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
               questProposalContext = user.profile.questProposalContext.copy(
                 approveReward = reward,
                 numberOfPurchasedThemes = user.profile.questProposalContext.numberOfPurchasedThemes + 1,
-                purchasedTheme = Some(t))))
+                purchasedTheme = Some(ThemeWithID(t.id, t)))))
           db.user.update(u)
 
           OkApiResult(Some(PurchaseQuestThemeResult(OK, Some(u.profile))))
@@ -124,11 +125,9 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     request.user.canProposeQuest(ContentType.withName(request.quest.media.contentType)) match {
       case OK => {
 
-        // TODO fill theme id here. or perhaps put there here itself since them may be removed or added.
         db.quest.create(
-
           Quest(
-            themeID = "", //request.user.profile.questProposalContext.takenTheme,
+            themeID = request.user.profile.questProposalContext.takenTheme.get.id,
             authorUserID = request.user.id,
             approveReward = request.user.profile.questProposalContext.approveReward,
             info = QuestInfo(
