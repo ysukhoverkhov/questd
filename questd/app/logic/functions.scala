@@ -93,9 +93,24 @@ object functions {
    * How much in rating we will lose in case of giving quest up.
    */
   def ratingToGiveUpQuest(level: Int, questDuration: Int): Int = {
-    math.round(ratingForSubmitResult(level) * questDuration).toInt
+    math.round(ratingForSubmitResult(level) * questDuration * questSolutionGiveUpPenalty).toInt
   }
 
+  /**
+   * How much rating we will receive for losing quest.
+   */
+  def ratingToLoseQuest(level: Int, questDuration: Int): Int = {
+    math.round(ratingForSubmitResult(level) * questDuration * questLosingMultiplier).toInt
+  }  
+
+  /**
+   * How much rating we will receive for winning quest.
+   */
+  def ratingToWinQuest(level: Int, questDuration: Int): Int = {
+    ratingToLoseQuest(level, questDuration) * questVictoryMultiplier
+  }  
+
+  
   /**
    * ***********************
    * Voting quest proposals.

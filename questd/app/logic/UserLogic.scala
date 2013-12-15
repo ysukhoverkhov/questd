@@ -225,13 +225,7 @@ class UserLogic(val user: User) {
    * Get cost of taking quest to resolve.
    */
   def costOfTakingQuest = {
-    val questDuration: Int =
-      if (user.profile.questSolutionContext.purchasedQuest == None)
-        0
-      else
-        user.profile.questSolutionContext.purchasedQuest.get.obj.daysDuration
-
-    Assets(coins = costToTakeQuestToSolve(user.profile.level, questDuration))
+    Assets(coins = costToTakeQuestToSolve(user.profile.level, purchasedQuestDuration))
   }
 
   /**
@@ -265,12 +259,7 @@ class UserLogic(val user: User) {
    * How much it'll cost to give up quest.
    */
   def costOfGivingUpQuest = {
-    val duration = user.profile.questSolutionContext.takenQuest match {
-      case Some(QuestInfoWithID(_, i)) => i.daysDuration
-      case None => 0
-    }
-
-    Assets(rating = ratingToGiveUpQuest(user.profile.level, duration)) clampTop user.profile.assets
+    Assets(rating = ratingToGiveUpQuest(user.profile.level, takenQuestDuration)) clampTop user.profile.assets
   }
 
   /**
@@ -291,6 +280,41 @@ class UserLogic(val user: User) {
     (DateTime.now(tz) + 1.day).hour(constants.flipHour).minute(0).second(0) toDate ()
   }
 
+  /**
+   * Reward for lost quest.
+   */
+  def rewardForLosingQuest = {
+    Assets(rating = ratingToLoseQuest(user.profile.level, takenQuestDuration))
+  }
+
+  /**
+   * Reward for won quest.
+   */
+  def rewardForWinningQuest = {
+    Assets(rating = ratingToWinQuest(user.profile.level, takenQuestDuration))
+  }
+
+  /**
+   * Returns taken quest duration in days.
+   */
+  private def takenQuestDuration = {
+    questDuration(user.profile.questSolutionContext.takenQuest)
+  }
+
+  /**
+   * Returns purchased quest duration in days.
+   */
+  private def purchasedQuestDuration = {
+    questDuration(user.profile.questSolutionContext.purchasedQuest)
+  }
+
+  private def questDuration(q: Option[QuestInfoWithID]) = {
+    q match {
+      case Some(QuestInfoWithID(_, i)) => i.daysDuration
+      case None => 0
+    }
+  }
+  
   /**
    * ********************
    * Vote quest proposal

@@ -46,7 +46,15 @@ object constants {
   
   val questSolutionGiveUpPenalty = 2
 
+  /**
+   * Multiplier is relative to base (average) rating for resolving quests per day.
+   */
+  val questLosingMultiplier = 0.6666667
   
+  /**
+   * Multiplier is relative to quest losing
+   */
+  val questVictoryMultiplier = 2
   
   /**
    * Voting quest solutions.

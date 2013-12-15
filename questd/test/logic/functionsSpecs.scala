@@ -60,10 +60,17 @@ class FunctionsSpecs extends Specification {
     }
 
     "ratingToGiveUpQuest" in {
-      ratingToGiveUpQuest(3, 1) must beEqualTo(744)
-      ratingToGiveUpQuest(11, 1) must beEqualTo(2301)
-      ratingToGiveUpQuest(12, 1) must beEqualTo(2407)
-      ratingToGiveUpQuest(20, 1) must beEqualTo(3732)
+      ratingToGiveUpQuest(3, 1) must beEqualTo(1488)
+      ratingToGiveUpQuest(11, 1) must beEqualTo(4601)
+      ratingToGiveUpQuest(12, 1) must beEqualTo(4814)
+      ratingToGiveUpQuest(20, 1) must beEqualTo(7465)
+    }
+    
+    "ratingToLoseQuest" in {
+      ratingToLoseQuest(3, 1) must beEqualTo(496)
+      ratingToLoseQuest(11, 1) must beEqualTo(1534)
+      ratingToLoseQuest(12, 1) must beEqualTo(1605)
+      ratingToLoseQuest(20, 1) must beEqualTo(2488)
     }
 
     "rewardForVotingProposal" in {

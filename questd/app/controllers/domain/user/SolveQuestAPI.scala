@@ -75,14 +75,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               val questCost = request.user.costOfPurchasingQuest
 
               adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(questCost))) map { r =>
-// TODO get correct rewards.
+
                 val u = r.user.copy(
                   profile = r.user.profile.copy(
                     questSolutionContext = r.user.profile.questSolutionContext.copy(
                       numberOfPurchasedQuests = r.user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
                       purchasedQuest = Some(QuestInfoWithID(q.id, q.info)),
-                      defeatReward = Assets(),
-                      victoryReward = Assets())),
+                      defeatReward = r.user.rewardForLosingQuest,
+                      victoryReward = r.user.rewardForWinningQuest)),
                   stats = r.user.stats.copy(
                     questsReviewed = r.user.stats.questsReviewed + 1))
                 db.user.update(u)
