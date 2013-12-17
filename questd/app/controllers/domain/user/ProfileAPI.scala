@@ -7,6 +7,7 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers.exceptionwrappers._
 import logic._
+import play.Logger
 
 case class GetAllUsersRequest()
 case class GetAllUsersResult(users: Iterator[User])
@@ -58,6 +59,8 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
    */
   def adjustAssets(request: AdjustAssetsRequest): ApiResult[AdjustAssetsResult] = handleDbException {
     import request._
+
+    Logger.debug("API - adjustAssets")
 
     val rew = if (reward == None) Assets() else reward.get
     val co = if (cost == None) Assets() else cost.get

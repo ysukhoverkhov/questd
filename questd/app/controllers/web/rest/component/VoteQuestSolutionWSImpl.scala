@@ -17,7 +17,9 @@ trait VoteQuestSolutionWSImpl extends QuestController with SecurityWSImpl with C
   }
 
   def voteQuestSolution = wrapJsonApiCallReturnBody[WSVoteQuestSolutionResult] { (js, r) =>
-
+    
+    Logger.debug("REST - Voting quest solution")
+    
     val v = Json.read[WSQuestSolutionVoteRequest](js)
     val vote = QuestSolutionVote.withName(v.vote)
 

@@ -236,6 +236,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def rewardQuestSolutionAuthor(request: RewardQuestSolutionAuthorRequest): ApiResult[RewardQuestSolutionAuthorResult] = handleDbException {
     import request._
 
+    Logger.debug("API - rewardQuestSolutionAuthor")
+
     db.quest.readByID(solution.questID) match {
       case Some(q) => {
         val r = QuestSolutionStatus.withName(solution.status) match {

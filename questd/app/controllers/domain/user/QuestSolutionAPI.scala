@@ -26,6 +26,8 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
     import request._
     import QuestSolutionVote._
 
+    Logger.debug("API - voteQuestSolutionUpdate")
+    
     def checkInc[T](v: T, c: T, n: Int) = if (v == c) n + 1 else n
 
     val q2 = solution.copy(
@@ -41,7 +43,6 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
 
     updateQuestSolutionState(UpdateQuestSolutionStateRequest(q2)) map
       OkApiResult(Some(VoteQuestSolutionUpdateResult()))
-
   }
 
   /**
@@ -50,6 +51,8 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
   def updateQuestSolutionState(request: UpdateQuestSolutionStateRequest): ApiResult[UpdateQuestSolutionStateResult] = handleDbException {
     import request._
 
+    Logger.debug("API - updateQuestSolutionState")
+    
     def checkWaitCompetitor(qs: QuestSolution) = {
       if (qs.shouldStopVoting)
         qs.copy(status = QuestSolutionStatus.WaitingForCompetitor.toString)
@@ -94,7 +97,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
       } else {
         OkApiResult(None)
       }
-
+    
     authorUpdateResult map OkApiResult(Some(UpdateQuestSolutionStateResult()))
   }
 

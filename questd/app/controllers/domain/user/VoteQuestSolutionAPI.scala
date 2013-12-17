@@ -61,6 +61,8 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
    */
   def voteQuestSolution(request: VoteQuestSolutionRequest): ApiResult[VoteQuestSolutionResult] = handleDbException {
 
+    Logger.debug("API - voteQuestSolution")
+    
     request.user.canVoteQuestSolution match {
       case OK => {
         // 1. get quest to vote.

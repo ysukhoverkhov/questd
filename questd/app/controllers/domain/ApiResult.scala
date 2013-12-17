@@ -1,5 +1,7 @@
 package controllers.domain
 
+import play.Logger
+
 sealed abstract class ApiResult[+T] {
   def body: Option[T]
 
@@ -9,7 +11,10 @@ sealed abstract class ApiResult[+T] {
         f(r)
       }
 
-      case OkApiResult(None) => InternalErrorApiResult()
+      case OkApiResult(None) => {
+        Logger.error("OkApiResult should contain result, but it doesn't")
+        InternalErrorApiResult()
+      }
       case NotFoundApiResult() => NotFoundApiResult()
       case NotAuthorisedApiResult() => NotAuthorisedApiResult()
       case InternalErrorApiResult() => InternalErrorApiResult()
@@ -17,8 +22,14 @@ sealed abstract class ApiResult[+T] {
     }
   }
   
-  def map[T2](f: => ApiResult[T2]): ApiResult[T2] = map(r => f)
-  
+  def map[T2](f: => ApiResult[T2]): ApiResult[T2] = {
+    this match {
+      case OkApiResult(_) => f
+      case NotFoundApiResult() => NotFoundApiResult()
+      case NotAuthorisedApiResult() => NotAuthorisedApiResult()
+      case InternalErrorApiResult() => InternalErrorApiResult()
+    }
+  }
 }
 
 final case class OkApiResult[T](body: Option[T]) extends ApiResult[T]
