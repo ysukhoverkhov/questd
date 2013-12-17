@@ -7,14 +7,13 @@ import org.junit.runner._
 import play.Logger
 import play.api.test._
 import play.api.test.Helpers._
-
 import controllers.domain._
 import controllers.domain.user._
-
 import models.store._
 import models.domain._
 import models.store.mongo._
 import models.store.dao.UserDAO
+import controllers.domain.libs.facebook.UserFB
 
 
 class AuthAPISpecs extends Specification
@@ -39,13 +38,15 @@ class AuthAPISpecs extends Specification
     "Register user with new FB id" in context {
 
       val fbid = "fbid"
+      val userfb = mock[UserFB]
+      userfb.getId returns fbid
         
       db.user.readByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(fbid = Some(fbid))))
       //    db.createUser(newUser)
       //    db.readUserByFBid(fbid) returns 
       //    db.updateUser(user.replaceSessionID(uuid))
 
-      val rv = api.loginfb(LoginFBRequest(fbid))
+      val rv = api.loginfb(LoginFBRequest(userfb))
 
       there was one(user).readByFBid(fbid) andThen 
         one(user).create(any[User]) andThen
@@ -59,11 +60,13 @@ class AuthAPISpecs extends Specification
     "Login existing user with new FB id" in context {
 
       val fbid = "fbid"
+      val userfb = mock[UserFB]
+      userfb.getId returns fbid
 
       db.user.readByFBid(anyString) returns Some(User("", AuthInfo(fbid = Some(fbid))))
       //    db.updateUser(user.replaceSessionID(uuid))
 
-      val rv = api.loginfb(LoginFBRequest(fbid))
+      val rv = api.loginfb(LoginFBRequest(userfb))
 
       there was one(user).readByFBid(fbid) andThen one(user).create(any[User])
 
@@ -75,7 +78,10 @@ class AuthAPISpecs extends Specification
 
       db.user.readByFBid(anyString) throws new DatabaseException("Test exception")
 
-      val rv = api.loginfb(LoginFBRequest("any id"))
+      val userfb = mock[UserFB]
+      userfb.getId returns "1"
+
+      val rv = api.loginfb(LoginFBRequest(userfb))
 
       there was one(user).readByFBid(anyString)
 

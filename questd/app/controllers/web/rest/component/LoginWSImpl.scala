@@ -46,7 +46,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
             } map { rv =>
               rv match {
                 case (Some(user: UserFB), _) => {
-                  val params = LoginFBRequest(user.getId())
+                  val params = LoginFBRequest(user)
 
                   api.loginfb(params) match {
                     case OkApiResult(Some(loginResult: LoginFBResult)) =>

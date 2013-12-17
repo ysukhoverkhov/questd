@@ -7,8 +7,9 @@ import helpers._
 import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 import components._
+import controllers.domain.libs.facebook.UserFB
 
-case class LoginFBRequest(fbid: String)
+case class LoginFBRequest(userfb: UserFB)
 case class LoginFBResult(session: String)
 
 case class UserRequest(userID: Option[String] = None, sessionID: Option[String] = None)
@@ -33,26 +34,38 @@ private[domain] trait AuthAPI { this: DBAccessor =>
       OkApiResult(Some(LoginFBResult(uuid)))
     }
 
-    Logger.debug("Searching for user in database for login with fbid " + params.fbid)
+    def genderFromFBUser(u: UserFB) = {
+      (u.getGender()) match {
+        case "male" => Gender.Male
+        case "female" => Gender.Female
+        case _ => Gender.Unknown
+      }
+    }
 
-    db.user.readByFBid(params.fbid) match {
+    Logger.debug("Searching for user in database for login with fbid " + params.userfb.getId())
+
+    db.user.readByFBid(params.userfb.getId()) match {
       case None => {
 
-        Logger.debug("No user with FB id found, creating new one " + params.fbid)
+        Logger.debug("No user with FB id found, creating new one " + params.userfb.getId())
 
-        val newUser = User(auth = AuthInfo(fbid = Some(params.fbid)))
+        val newUser = User(
+          auth = AuthInfo(
+            fbid = Some(params.userfb.getId())),
+          profile = Profile(
+            bio = Bio(
+              name = params.userfb.getFirstName(),
+              gender = genderFromFBUser(params.userfb).toString,
+              timezone = params.userfb.getTimezone().toInt)))
+
         db.user.create(newUser)
-        db.user.readByFBid(params.fbid) match {
-
+        db.user.readByFBid(params.userfb.getId()) match {
           case None => {
-            Logger.error("Unable to find user just created in DB with fbid " + params.fbid)
+            Logger.error("Unable to find user just created in DB with fbid " + params.userfb.getId())
             InternalErrorApiResult()
           }
 
           case Some(user) => {
-
-            // IMPLEMENT fill profile from fb here.
-
             Logger.debug("New user with FB created " + user)
 
             login(user)
@@ -86,7 +99,7 @@ private[domain] trait AuthAPI { this: DBAccessor =>
         case Some(user: User) => OkApiResult(
           Some(UserResult(user)))
       }
-      
+
     } else {
       Logger.error("Wrong request for user.")
       InternalErrorApiResult()

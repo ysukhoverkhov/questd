@@ -37,14 +37,17 @@ class LoginWSSpecs extends Specification
     "Login user with correct FB token" in new WithApplication {
 
       val facebookToken = "Facebook token"
-      val fbid = "fb id"
       val sessid = "sess id"
 
+      val fbid = "fb id"
+      val userfb = mock[UserFB]
+      userfb.getId returns fbid
+
       val user = mock[UserFB]
-      
+
       user.getId() returns fbid
       fb.fetchObject(facebookToken, "me", classOf[UserFB]) returns user
-      api.loginfb(LoginFBRequest(fbid)) returns OkApiResult(Some(LoginFBResult(sessid)))
+      api.loginfb(LoginFBRequest(userfb)) returns OkApiResult(Some(LoginFBResult(sessid)))
 
       val data = Json.obj(
         "token" -> facebookToken)
@@ -63,7 +66,6 @@ class LoginWSSpecs extends Specification
       session(r).get(controllers.web.rest.component.SecurityWSImpl.SessionIdKey) must beSome
     }
 
-    
     "Do not login user with incorrect FB token" in new WithApplication {
 
       val facebookToken = "Facebook token"
@@ -84,7 +86,6 @@ class LoginWSSpecs extends Specification
       status(r) must equalTo(UNAUTHORIZED)
     }
 
-    
     "Report about unaccessable FB in case of unavailable Facebook" in new WithApplication {
 
       val facebookToken = "Facebook token"
