@@ -133,16 +133,16 @@ class UserLogic(val user: User) {
   /**
    * Reward for approving quest.
    */
-  def rewardForMakingQuest = {
+  def rewardForMakingApprovedQuest = {
     Assets(rating = ratingForProposalAtLevel(user.profile.level))
   }
 
-  def penaltyForCheating = {
-    (rewardForMakingQuest * questProposalCheatingPenalty) clampTop user.profile.assets
+  def penaltyForCheatingQuest = {
+    (rewardForMakingApprovedQuest * questProposalCheatingPenalty) clampTop user.profile.assets
   }
 
-  def penaltyForIAC = {
-    (rewardForMakingQuest * questProposalIACPenalty) clampTop user.profile.assets
+  def penaltyForIACQuest = {
+    (rewardForMakingApprovedQuest * questProposalIACPenalty) clampTop user.profile.assets
   }
 
   /**
@@ -256,7 +256,7 @@ class UserLogic(val user: User) {
   }
 
   /**
-   * How much it'll cost to give up quest.
+   * How much it'll cost to give up taken quest.
    */
   def costOfGivingUpQuest = {
     Assets(rating = ratingToGiveUpQuest(user.profile.level, takenQuestDuration)) clampTop user.profile.assets
@@ -283,15 +283,29 @@ class UserLogic(val user: User) {
   /**
    * Reward for lost quest.
    */
-  def rewardForLosingQuest = {
-    Assets(rating = ratingToLoseQuest(user.profile.level, takenQuestDuration))
+  def rewardForLosingQuest(quest: Quest) = {
+    Assets(rating = ratingToLoseQuest(user.profile.level, quest.info.daysDuration))
   }
 
   /**
    * Reward for won quest.
    */
-  def rewardForWinningQuest = {
-    Assets(rating = ratingToWinQuest(user.profile.level, takenQuestDuration))
+  def rewardForWinningQuest(quest: Quest) = {
+    Assets(rating = ratingToWinQuest(user.profile.level, quest.info.daysDuration))
+  }
+
+  /**
+   * Penalty for cheating solution
+   */
+  def penaltyForCheatingSolution(quest: Quest) = {
+    (rewardForLosingQuest(quest) * questSolutionCheatingPenalty) clampTop user.profile.assets
+  }
+
+  /**
+   * Penalty for IAC solution
+   */
+  def penaltyForIACSolution(quest: Quest) = {
+    (rewardForLosingQuest(quest) * questSolutionIACPenalty) clampTop user.profile.assets
   }
 
   /**
@@ -314,7 +328,7 @@ class UserLogic(val user: User) {
       case None => 0
     }
   }
-  
+
   /**
    * ********************
    * Vote quest proposal

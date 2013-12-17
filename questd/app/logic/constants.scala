@@ -56,6 +56,13 @@ object constants {
    */
   val questVictoryMultiplier = 2
   
+  
+  val questSolutionCheatingPenalty = 10
+  
+  val questSolutionIACPenalty = 10
+
+  
+  
   /**
    * Voting quest solutions.
    */

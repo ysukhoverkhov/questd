@@ -3,8 +3,8 @@ package logic
 import internal.gainratingfunctions._
 import internal.gaincoinsfunctions._
 import internal.spendcoinsfunctions._
-
 import logic.internal.basefunctions._
+import play.Logger
 
 object functions {
 

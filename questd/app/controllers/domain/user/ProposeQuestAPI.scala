@@ -60,7 +60,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(themeCost))) map { r =>
           val user = r.user
           val t = r.user.getRandomThemeForQuestProposal
-          val reward = r.user.rewardForMakingQuest
+          val reward = r.user.rewardForMakingApprovedQuest
 
           val u = user.copy(
             profile = user.profile.copy(
@@ -198,8 +198,8 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
       }
       case QuestStatus.InRotation => adjustAssets(AdjustAssetsRequest(user = author, reward = Some(quest.approveReward)))
       case QuestStatus.RatingBanned => OkApiResult(Some(AdjustAssetsResult(author)))
-      case QuestStatus.CheatingBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheating)))
-      case QuestStatus.IACBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIAC)))
+      case QuestStatus.CheatingBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingQuest)))
+      case QuestStatus.IACBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACQuest)))
       case QuestStatus.OldBanned => OkApiResult(Some(AdjustAssetsResult(author)))
     }
 

@@ -32,6 +32,9 @@ case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: As
 case class GiveUpQuestRequest(user: User)
 case class GiveUpQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
+case class RewardQuestSolutionAuthorRequest(solution: QuestSolution, author: User)
+case class RewardQuestSolutionAuthorResult()
+
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -81,8 +84,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                     questSolutionContext = r.user.profile.questSolutionContext.copy(
                       numberOfPurchasedQuests = r.user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
                       purchasedQuest = Some(QuestInfoWithID(q.id, q.info)),
-                      defeatReward = r.user.rewardForLosingQuest,
-                      victoryReward = r.user.rewardForWinningQuest)),
+                      defeatReward = r.user.rewardForLosingQuest(q),
+                      victoryReward = r.user.rewardForWinningQuest(q))),
                   stats = r.user.stats.copy(
                     questsReviewed = r.user.stats.questsReviewed + 1))
                 db.user.update(u)
@@ -227,7 +230,38 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     }
   }
 
-}
+  /**
+   * Give quest solution author a reward on quest status change
+   */
+  def rewardQuestSolutionAuthor(request: RewardQuestSolutionAuthorRequest): ApiResult[RewardQuestSolutionAuthorResult] = handleDbException {
+    import request._
 
+    db.quest.readByID(solution.questID) match {
+      case Some(q) => {
+        val r = QuestSolutionStatus.withName(solution.status) match {
+          case QuestSolutionStatus.OnVoting => {
+            Logger.error("We are rewarding player for solution what is on voting.")
+            InternalErrorApiResult()
+          }
+          case QuestSolutionStatus.WaitingForCompetitor => OkApiResult(Some(AdjustAssetsResult(author)))
+          case QuestSolutionStatus.Won => adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.victoryReward)))
+          case QuestSolutionStatus.Lost => adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.defeatReward)))
+          case QuestSolutionStatus.CheatingBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingSolution(q))))
+          case QuestSolutionStatus.IACBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACSolution(q))))
+        }
+
+        r map {
+          OkApiResult(Some(RewardQuestSolutionAuthorResult()))
+        }
+      }
+      case None => {
+        Logger.error("No quest found for updating player assets for changing solution state.")
+        InternalErrorApiResult()
+      }
+    }
+
+  }
+
+}
 
 

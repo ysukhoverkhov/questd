@@ -8,6 +8,7 @@ object QuestSolutionVote extends Enumeration {
  * Rating of a quest used during voting.
  */
 case class QuestSolutionRating(
+  reviewsCount: Int = 0,
   pointsRandom: Int = 0,
   pointsFriends: Int = 0,
   pointsInvited: Int = 0,

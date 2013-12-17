@@ -42,7 +42,10 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     def checkAddToRotation(quest: Quest): Quest = {
       if (quest.shouldAddToRotation)
-        quest.copy(status = QuestStatus.InRotation.toString)
+        quest.copy(
+          status = QuestStatus.InRotation.toString,
+          info = quest.info.copy(
+            level = quest.calculateQuestLevel))
       else
         quest
     }
@@ -82,7 +85,8 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         checkCheatingQuest(
           checkBanQuest(
             checkRemoveFromRotation(
-              checkAddToRotation(capPoints(quest))))))
+              checkAddToRotation(
+                capPoints(quest))))))
 
     db.quest.update(updatedQuest)
 
