@@ -14,12 +14,18 @@ private[mongo] class MongoQuestSolutionDAO
   extends BaseMongoDAO[QuestSolution](collectionName = "solutions")
   with QuestSolutionDAO {
 
-  def allWithStatus(status: String, minLevel: Int, maxLevel: Int): Iterator[QuestSolution] = {
+  def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[QuestSolution] = {
     allByExample(
       ("status" -> status),
       ("$and" -> Array(
         MongoDBObject("questLevel" -> MongoDBObject("$gte" -> minLevel)),
         MongoDBObject("questLevel" -> MongoDBObject("$lte" -> maxLevel)))))
+  }
+
+  def allWithStatusAndQuest(status: String, questId: String): Iterator[QuestSolution] = {
+    allByExample(
+      ("status" -> status),
+      ("questID" -> questId))
   }
 
 }

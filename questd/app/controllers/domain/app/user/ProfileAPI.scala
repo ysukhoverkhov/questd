@@ -60,7 +60,7 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
   def adjustAssets(request: AdjustAssetsRequest): ApiResult[AdjustAssetsResult] = handleDbException {
     import request._
 
-    Logger.debug("API - adjustAssets")
+    Logger.debug("API - adjustAssets for user " + user.id)
 
     val rew = if (reward == None) Assets() else reward.get
     val co = if (cost == None) Assets() else cost.get

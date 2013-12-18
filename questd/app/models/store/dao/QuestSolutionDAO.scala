@@ -4,7 +4,8 @@ import models.domain._
 
 trait QuestSolutionDAO  extends BaseDAO[QuestSolution] {
 
-    def allWithStatus(status: String, minLevel: Int, maxLevel: Int): Iterator[QuestSolution]
+    def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[QuestSolution]
+    def allWithStatusAndQuest(status: String, questId: String): Iterator[QuestSolution]
 
 }
 

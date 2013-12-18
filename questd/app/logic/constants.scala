@@ -71,6 +71,9 @@ object constants {
   
   val solutionLevelUpTolerance = 2
   
+  val friendsVoteMult = 2
+  
+  val invitedVoteMult = 2
   
   // Constants bellow are used in algorithms and should not be changed.
   

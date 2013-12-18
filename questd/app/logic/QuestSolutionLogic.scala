@@ -22,6 +22,13 @@ class QuestSolutionLogic(val qs: QuestSolution) {
     ((qs.rating.iacpoints.porn.toFloat / qs.rating.reviewsCount > iacBanRatio)
       || (qs.rating.iacpoints.spam.toFloat / qs.rating.reviewsCount > iacBanRatio))
   }
+  
+  /**
+   * Calculate points for quest solution voting.
+   */
+  def calculatePoints = {
+    qs.rating.pointsRandom + qs.rating.pointsFriends * constants.friendsVoteMult + qs.rating.pointsInvited * constants.invitedVoteMult
+  }
 
   private def reviewsToFinishVoting = 3
   private def cheatingToThreatAsCheating = 3

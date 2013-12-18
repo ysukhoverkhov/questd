@@ -42,7 +42,7 @@ private [domain] trait QuestsAdminAPI { this: DBAccessor =>
   def allQuestSolutionsOnVoting(request: AllQuestSolutionsRequest): ApiResult[AllQuestSolutionsResult] = handleDbException {
     Logger.info("Admin request for all quests. THIS SHOULD NOT BE CALLED IN PRODUCTION SINCE IT'S VERY SLOW!!!!!!")
 
-    OkApiResult(Some(AllQuestSolutionsResult(List() ++ db.solution.allWithStatus(QuestSolutionStatus.OnVoting.toString, request.minLevel, request.maxLevel))))
+    OkApiResult(Some(AllQuestSolutionsResult(List() ++ db.solution.allWithStatusAndLevels(QuestSolutionStatus.OnVoting.toString, request.minLevel, request.maxLevel))))
   }
 }
 

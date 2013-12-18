@@ -36,6 +36,9 @@ case class GiveUpQuestResult(allowed: ProfileModificationResult, profile: Option
 case class RewardQuestSolutionAuthorRequest(solution: QuestSolution, author: User)
 case class RewardQuestSolutionAuthorResult()
 
+case class TryFightQuestRequest(solution: QuestSolution)
+case class TryFightQuestResult()
+
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -246,11 +249,21 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             Logger.error("We are rewarding player for solution what is on voting.")
             InternalErrorApiResult()
           }
-          case QuestSolutionStatus.WaitingForCompetitor => OkApiResult(Some(AdjustAssetsResult(author)))
-          case QuestSolutionStatus.Won => adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.victoryReward)))
-          case QuestSolutionStatus.Lost => adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.defeatReward)))
-          case QuestSolutionStatus.CheatingBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingSolution(q))))
-          case QuestSolutionStatus.IACBanned => adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACSolution(q))))
+
+          case QuestSolutionStatus.WaitingForCompetitor =>
+            tryFightQuest(TryFightQuestRequest(solution)) map OkApiResult(Some(AdjustAssetsResult(author)))
+
+          case QuestSolutionStatus.Won =>
+            adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.victoryReward)))
+
+          case QuestSolutionStatus.Lost =>
+            adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.defeatReward)))
+
+          case QuestSolutionStatus.CheatingBanned =>
+            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingSolution(q))))
+
+          case QuestSolutionStatus.IACBanned =>
+            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACSolution(q))))
         }
 
         r map {
@@ -262,7 +275,83 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         InternalErrorApiResult()
       }
     }
+  }
 
+  /**
+   * Tries to find competitor to us on quest and resolve our battle. Updates db after that.
+   */
+  def tryFightQuest(request: TryFightQuestRequest): ApiResult[TryFightQuestResult] = handleDbException {
+    // 1. find all solutions with the same quest id with status waiting for compettor.
+
+    Logger.error("!!!! Very slow request here. Replace with findOne and order by date excluding self.") // Also use here findandmodify with updating last access timestampt.
+    // EVERYWHERE there we update last access timestamp we should use findandmodify to make the action atomic.
+    val solutionsForQuest = db.solution.allWithStatusAndQuest(QuestSolutionStatus.WaitingForCompetitor.toString, request.solution.questID)
+
+    def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {
+      if (s1.calculatePoints == s2.calculatePoints)
+        (List(s1, s2), List())
+      else if (s1.calculatePoints > s2.calculatePoints)
+        (List(s1), List(s2))
+      else
+        (List(s2), List(s1))
+    }
+
+    def compete(solutions: Iterator[QuestSolution]): ApiResult[TryFightQuestResult] = {
+      if (solutions.hasNext) {
+        val other = solutions.next
+
+        if (other.userID != request.solution.userID) {
+
+          Logger.debug("Found fight pair for quest " + request.solution + ":")
+          Logger.debug("  s1.id=" + request.solution.id)
+          Logger.debug("  s2.id=" + other.id)
+          
+          // Compare two solutions.
+          val (winners, losers) = fight(other, request.solution)
+
+          // update solutions, winners 
+          for (curSol <- winners) {
+            Logger.debug("  winner id=" + curSol.id)
+
+            db.solution.update(
+              curSol.copy(
+                status = QuestSolutionStatus.Won.toString))
+
+            val u = db.user.readByID(curSol.userID)
+            if (u != None) {
+              adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.victoryReward)))
+            }
+          }
+
+          // and losers
+          for (curSol <- losers) {
+            Logger.debug("  loser id=" + curSol.id)
+
+            db.solution.update(
+              curSol.copy(
+                status = QuestSolutionStatus.Lost.toString))
+
+            val u = db.user.readByID(curSol.userID)
+            if (u != None) {
+              adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.victoryReward)))
+            }
+          }
+          
+          OkApiResult(Some(TryFightQuestResult()))
+
+        } else {
+
+          // Skipping to next if current is we are.
+          compete(solutions)
+        }
+      } else {
+
+        // We didn;t find competitor but this is ok.
+        OkApiResult(Some(TryFightQuestResult()))
+      }
+    }
+
+    compete(solutionsForQuest)
   }
 
 }
