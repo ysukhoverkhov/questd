@@ -3,7 +3,7 @@ package controllers.web.rest
 import play.api.libs.json._
 import play.Logger
 
-import controllers.domain.user._
+import controllers.domain.app.user._
 import models.domain.Profile
 
 package object protocol {

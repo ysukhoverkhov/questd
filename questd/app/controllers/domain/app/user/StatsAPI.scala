@@ -1,4 +1,4 @@
-package controllers.domain.user
+package controllers.domain.app.user
 
 import models.domain._
 import models.store._

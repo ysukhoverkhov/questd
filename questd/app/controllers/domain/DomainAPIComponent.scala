@@ -2,8 +2,11 @@ package controllers.domain
 
 import models.store._
 import components._
-import controllers.domain.user._
+import controllers.domain.app.user._
+import controllers.domain.app.quest._
+import controllers.domain.app.questsolution._
 import controllers.domain.admin._
+import controllers.domain.app.questsolution.QuestSolutionAPI
 
 trait DomainAPIComponent { component: DatabaseComponent =>
 

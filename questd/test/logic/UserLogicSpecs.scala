@@ -5,7 +5,7 @@ import org.specs2.runner._
 import org.specs2.mock.Mockito
 import org.junit.runner._
 import logic._
-import controllers.domain.user.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
 import org.joda.time.Hours
 import play.Logger

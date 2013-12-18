@@ -12,7 +12,7 @@ import play.api.libs.json.Json._
 import models.domain._
 import controllers.web.rest.component.helpers._
 import controllers.domain._
-import controllers.domain.user._
+import controllers.domain.app.user._
 import components._
 import controllers.web.rest.protocol._
 

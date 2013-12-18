@@ -1,18 +1,15 @@
-package controllers.domain.user
+package controllers.domain.app.user
 
 import components._
-import controllers.domain.ApiResult
-import controllers.domain.OkApiResult
-import controllers.domain.helpers.exceptionwrappers.handleDbException
+import controllers.domain._
+import controllers.domain.app.quest._
+import controllers.domain.helpers.exceptionwrappers._
 import logic._
 import models.domain._
 import models.domain.base.QuestInfoWithID
-import protocol.ProfileModificationResult.OK
-import protocol.ProfileModificationResult.OutOfContent
-import protocol.ProfileModificationResult.ProfileModificationResult
+import controllers.domain.app.protocol.ProfileModificationResult._
 import play.Logger
-import controllers.domain.DomainAPIComponent
-import controllers.domain.InternalErrorApiResult
+import controllers.domain._
 
 case class GetQuestProposalToVoteRequest(user: User)
 case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)

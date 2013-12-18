@@ -1,10 +1,11 @@
-package controllers.domain.user
+package controllers.domain.app.quest
 
 import models.domain._
 import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
+import controllers.domain.app.user._
 import controllers.domain.helpers.exceptionwrappers._
 import logic._
 import play.Logger

@@ -1,4 +1,4 @@
-package controllers.domain.user.protocol
+package controllers.domain.app.protocol
 
 object ProfileModificationResult extends Enumeration {
   type ProfileModificationResult = Value

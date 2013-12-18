@@ -6,7 +6,7 @@ import play.Logger
 import helpers.akka.EasyRestartActor
 import controllers.tasks.messages.DoTask
 import controllers.domain._
-import controllers.domain.user._
+import controllers.domain.app.user._
 import models.domain._
 import java.util.Date
 
@@ -29,3 +29,4 @@ class CheckGiveupQuestProposal(api: DomainAPIComponent#DomainAPI) extends BaseUs
 
 }
 
+// TODO replace cooldown with another field dedicated to quest resolution.

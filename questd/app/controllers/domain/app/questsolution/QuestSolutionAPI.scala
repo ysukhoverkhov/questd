@@ -1,13 +1,14 @@
-package controllers.domain.user
+package controllers.domain.app.questsolution
 
 import models.domain._
 import models.store._
-import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.app.user._
 import logic._
 import play.Logger
+import models.domain.QuestSolutionVote._
 
 case class VoteQuestSolutionUpdateRequest(
   solution: QuestSolution,

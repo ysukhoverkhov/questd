@@ -2,7 +2,7 @@ package controllers.web.rest.component
 
 import play.api._
 import play.api.mvc._
-import controllers.domain.user._
+import controllers.domain.app.user._
 import controllers.domain._
 import controllers.web.rest.component.helpers._
 import controllers.web.rest.component._

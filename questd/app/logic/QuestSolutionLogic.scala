@@ -3,9 +3,8 @@ package logic
 import components.componentregistry.ComponentRegistrySingleton
 import play.Logger
 import models.domain._
-import controllers.domain.user.UserRequest
+import controllers.domain.app.user._
 import controllers.domain.OkApiResult
-import controllers.domain.user.UserResult
 
 class QuestSolutionLogic(val qs: QuestSolution) {
 

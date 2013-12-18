@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 import models.domain._
 import models.domain.base._
 import models.domain.ContentType._
-import controllers.domain.user.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.ProfileModificationResult._
 import components.componentregistry.ComponentRegistrySingleton
 import functions._
 import constants._

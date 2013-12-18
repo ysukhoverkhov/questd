@@ -1,4 +1,4 @@
-package controllers.domain.user
+package controllers.domain.app.user
 
 import models.domain._
 import models.domain.base._
@@ -9,7 +9,7 @@ import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 import components._
 import logic._
-import protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.ProfileModificationResult._
 
 case class GetQuestThemeCostRequest(user: User)
 case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Assets)
