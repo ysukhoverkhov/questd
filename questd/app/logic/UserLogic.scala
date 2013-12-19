@@ -448,5 +448,12 @@ class UserLogic(val user: User) {
       Assets()
   }
 
+  /*************************
+   * Daily results
+   *************************/
+  def getStartOfCurrentDailyResultPeriod: Date = {
+        val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
+    DateTime.now(tz).hour(constants.flipHour).minute(0).second(0) toDate ()
+  }
 }
 

@@ -9,6 +9,7 @@ case class Profile(
   bio: Bio = Bio(),
   assets: Assets = Assets(0, 0, 0),
   rights: Rights = Rights(),
+  dailyResults: List[DailyResult] = List(),
   questProposalContext: QuestProposalConext = QuestProposalConext(),
   questSolutionContext: QuestSolutionContext = QuestSolutionContext(),
   questProposalVoteContext: QuestProposalVoteContext = QuestProposalVoteContext(),

@@ -24,6 +24,7 @@ class UsersHourlyCrawler(api: DomainAPIComponent#DomainAPI) extends BaseUsersSch
   protected val userActors = List(
       classOf[CheckGiveupQuestProposal],
       classOf[CheckGiveupQuest],
-      classOf[ResetCountersAtNight])
+      classOf[ResetCountersAtNight],
+      classOf[CheckShiftDailyResult])
 
 }

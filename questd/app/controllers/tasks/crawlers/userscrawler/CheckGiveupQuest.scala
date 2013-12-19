@@ -10,6 +10,10 @@ import controllers.domain.app.user._
 import models.domain._
 import java.util.Date
 
+import com.github.nscala_time.time.Imports._
+import org.joda.time.DateTime
+
+
 object CheckGiveupQuest {
   def props(api: DomainAPIComponent#DomainAPI) = {
     Props(classOf[CheckGiveupQuest], api)
@@ -21,10 +25,14 @@ object CheckGiveupQuest {
 class CheckGiveupQuest(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
 
   protected def check(user: User) = {
-    if ((user.profile.questSolutionContext.takenQuest != None) 
-      && (user.profile.questSolutionContext.questCooldown.before(new Date()))) {
-      api.giveUpQuest(GiveUpQuestRequest(user))
+    
+    if (user.privateDailyResults.length == 0)
+      api.shiftDailyResult(ShiftDailyResultRequest(user))
+    else {
+      if ((new DateTime(user.privateDailyResults(0).startOfPeriod) +1.day).toDate.before(new Date()))
+        api.shiftDailyResult(ShiftDailyResultRequest(user))
     }
+    
   }
 
 }
