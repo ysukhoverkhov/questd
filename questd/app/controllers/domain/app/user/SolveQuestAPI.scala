@@ -155,7 +155,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 numberOfPurchasedQuests = 0,
                 purchasedQuest = None,
                 takenQuest = pq,
-                questCooldown = r.user.getCooldownForTakeQuest(pq.get.obj))),
+                questCooldown = r.user.getCooldownForTakeQuest(pq.get.obj),
+                questDeadline = r.user.getDeadlineForTakeQuest(pq.get.obj))),
+                
             stats = r.user.stats.copy(
               questsAccepted = r.user.stats.questsAccepted + 1))
           db.user.update(u)

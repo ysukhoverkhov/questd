@@ -26,5 +26,13 @@ case class QuestInfo(
     case QuestDuration.TwoDays => 2
     case QuestDuration.Week => 7
   }
+
+  def minutesDuration = QuestDuration.withName(duration) match {
+    case QuestDuration.Minutes => 20
+    case QuestDuration.Hours => 120
+    case QuestDuration.Day => 60 * 24
+    case QuestDuration.TwoDays => 60 * 48
+    case QuestDuration.Week => 60 * 34 * 7
+  }
 }
     

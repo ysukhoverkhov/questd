@@ -29,4 +29,3 @@ class CheckGiveupQuestProposal(api: DomainAPIComponent#DomainAPI) extends BaseUs
 
 }
 
-// TODO replace cooldown with another field dedicated to quest resolution.

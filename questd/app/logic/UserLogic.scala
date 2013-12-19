@@ -273,6 +273,16 @@ class UserLogic(val user: User) {
   }
 
   /**
+   * Time to solve quest.
+   */
+  def getDeadlineForTakeQuest(qi: QuestInfo) = {
+    val minutesToSolveQuest = qi.minutesDuration
+
+    val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
+    (DateTime.now(tz) + minutesToSolveQuest.minutes) toDate ()
+  }
+  
+  /**
    * Cooldown for reseting purchases. Purchases should be reset in nearest 5am at user's time.
    */
   def getResetPurchasesTimeout = {

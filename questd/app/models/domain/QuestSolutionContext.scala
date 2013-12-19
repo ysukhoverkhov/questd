@@ -9,5 +9,6 @@ case class QuestSolutionContext(
   purchasedQuest: Option[QuestInfoWithID] = None,
   takenQuest: Option[QuestInfoWithID] = None,
   numberOfPurchasedQuests: Int = 0,
-  questCooldown: Date = new Date(0))
+  questCooldown: Date = new Date(0),
+  questDeadline: Date = new Date(0))
     
