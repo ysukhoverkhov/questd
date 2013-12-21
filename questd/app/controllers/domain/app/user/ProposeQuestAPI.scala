@@ -61,13 +61,23 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
           val user = r.user
           val t = r.user.getRandomThemeForQuestProposal
           val reward = r.user.rewardForMakingApprovedQuest
+          val sampleQuest = {
+            val all = db.quest.all
+            if (all.hasNext) {
+              Some(all.next.info)
+            } else {
+              None
+            }
+          }
+          Logger.error("Very slow request to db here, should be removed!!!!")
 
           val u = user.copy(
             profile = user.profile.copy(
               questProposalContext = user.profile.questProposalContext.copy(
                 approveReward = reward,
                 numberOfPurchasedThemes = user.profile.questProposalContext.numberOfPurchasedThemes + 1,
-                purchasedTheme = Some(ThemeWithID(t.id, t)))))
+                purchasedTheme = Some(ThemeWithID(t.id, t)),
+                sampleQuest = sampleQuest)))
           db.user.update(u)
 
           OkApiResult(Some(PurchaseQuestThemeResult(OK, Some(u.profile))))
