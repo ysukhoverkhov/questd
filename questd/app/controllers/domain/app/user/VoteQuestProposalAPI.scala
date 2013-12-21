@@ -15,7 +15,7 @@ case class GetQuestProposalToVoteRequest(user: User)
 case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: Option[QuestDuration.Value] = None, difficulty: Option[QuestDifficulty.Value] = None)
-case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None)
+case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, author: Option[Profile] = None)
 
 private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -35,11 +35,13 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
           case None => OkApiResult(Some(GetQuestProposalToVoteResult(OutOfContent)))
           case Some(a) => {
             val qi = Some(QuestInfoWithID(a.id, a.info))
+            val theme = db.theme.readByID(a.themeID)
 
             val u = user.copy(
               profile = user.profile.copy(
                 questProposalVoteContext = user.profile.questProposalVoteContext.copy(
-                  reviewingQuest = qi)))
+                  reviewingQuest = qi,
+                  themeOfQuest = theme)))
 
             db.user.update(u)
 
@@ -81,8 +83,17 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
                     numberOfReviewedQuests = r.user.profile.questProposalVoteContext.numberOfReviewedQuests + 1,
                     reviewingQuest = None)))
               db.user.update(u)
+              
+              val author = if (request.vote == QuestProposalVote.Cool) {
+                  db.user.readByID(q.authorUserID) match {
+                    case Some(u) => Some(u.profile)
+                    case None => None
+                  }
+                } else {
+                  None
+                }
 
-              OkApiResult(Some(VoteQuestProposalResult(OK, Some(u.profile), Some(reward))))
+              OkApiResult(Some(VoteQuestProposalResult(OK, Some(u.profile), Some(reward), author)))
             }
           }
         }
