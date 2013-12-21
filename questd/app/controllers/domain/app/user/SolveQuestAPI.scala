@@ -80,6 +80,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             case None => OkApiResult(Some(PurchaseQuestResult(OutOfContent)))
             case Some(q) => {
               val questCost = request.user.costOfPurchasingQuest
+              val author = db.user.readByID(q.authorUserID).map(_.profile)
 
               adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(questCost))) map { r =>
 
@@ -88,6 +89,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                     questSolutionContext = r.user.profile.questSolutionContext.copy(
                       numberOfPurchasedQuests = r.user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
                       purchasedQuest = Some(QuestInfoWithID(q.id, q.info)),
+                      questAuthor = author,
                       defeatReward = r.user.rewardForLosingQuest(q),
                       victoryReward = r.user.rewardForWinningQuest(q))),
                   stats = r.user.stats.copy(

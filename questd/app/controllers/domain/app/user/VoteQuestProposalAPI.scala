@@ -85,10 +85,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
               db.user.update(u)
               
               val author = if (request.vote == QuestProposalVote.Cool) {
-                  db.user.readByID(q.authorUserID) match {
-                    case Some(u) => Some(u.profile)
-                    case None => None
-                  }
+                  db.user.readByID(q.authorUserID).map(_.profile)
                 } else {
                   None
                 }
