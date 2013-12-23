@@ -465,5 +465,13 @@ class UserLogic(val user: User) {
         val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
     DateTime.now(tz).hour(constants.flipHour).minute(0).second(0) toDate ()
   }
+  
+  /**
+   * Tells cost of next theme purchase
+   */
+  def dailyAssetsDecrease = {
+    Assets(rating = dailyRatingDecrease(user.profile.level)) clampTop(user.profile.assets)
+  }
+
 }
 

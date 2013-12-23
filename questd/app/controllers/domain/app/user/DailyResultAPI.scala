@@ -23,15 +23,15 @@ private[domain] trait DailyResultAPI { this: DBAccessor =>
   def shiftDailyResult(request: ShiftDailyResultRequest): ApiResult[ShiftDailyResultResult] = handleDbException {
     import request._
 
-    db.user.update(user.copy(privateDailyResults = DailyResult(user.getStartOfCurrentDailyResultPeriod) :: user.privateDailyResults))
+    val dailyAssetsDecrease = user.dailyAssetsDecrease
     
-    // TODO apply daily rating decrease here.
+    db.user.update(user.copy(privateDailyResults = DailyResult(user.getStartOfCurrentDailyResultPeriod, dailyAssetsDecrease) :: user.privateDailyResults))
 
     OkApiResult(Some(ShiftDailyResultResult()))
   }
 
   /**
-   * Returns moves ready daily results to publick daily results and returns public results to client
+   * Returns moves ready daily results to public daily results and returns public results to client
    */
   def getDailyResult(request: GetDailyResultRequest): ApiResult[GetDailyResultResult] = handleDbException {
     // Check replace old public daily results with new daily results.
@@ -43,7 +43,7 @@ private[domain] trait DailyResultAPI { this: DBAccessor =>
 
       db.user.update(u)
       
-      // TODO upply all canges in daily results to profile here.
+      // TODO upply all changes in daily results to profile here.
 
       (u, true)
     } else {

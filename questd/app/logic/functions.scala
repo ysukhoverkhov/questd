@@ -3,6 +3,7 @@ package logic
 import internal.gainratingfunctions._
 import internal.gaincoinsfunctions._
 import internal.spendcoinsfunctions._
+import internal.spendratingfunctions._
 import logic.internal.basefunctions._
 import play.Logger
 
@@ -165,5 +166,12 @@ object functions {
     math.max(1, math.round(rewardForVotingSolutionInt(level, voteNumber, kf(level)).toFloat))
   }
 
+  /***************************
+   * Daily results
+   ***************************/
+  
+  def dailyRatingDecrease(level: Int): Int = {
+    math.round(ratDecrease(level)).toInt
+  }
 }
 
