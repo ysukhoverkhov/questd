@@ -47,6 +47,19 @@ POST	/rest/voteQuestProposal				controllers.web.rest.VoteQuestProposalWS.voteQue
 POST	/rest/getQuestSolutionToVote		controllers.web.rest.VoteQuestSolutionWS.getQuestSolutionToVote
 POST	/rest/voteQuestSolution				controllers.web.rest.VoteQuestSolutionWS.voteQuestSolution
 
+# Daily result
+POST	/rest/getDailyResult				controllers.web.rest.DailyResultWS.getDailyResult
+
+
+
+
+
+
+#######################
+# Debug (Should be removed in production)
+#######################
+POST	/rest/debug/shiftDailyResult		controllers.web.rest.DailyResultWS.shiftDailyResult
+
 
 #######################
 # Admin

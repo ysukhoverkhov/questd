@@ -150,4 +150,13 @@ package object protocol {
   type WSGetQuestSolutionToVoteResult = GetQuestSolutionToVoteResult
   
   type WSVoteQuestSolutionResult = VoteQuestSolutionResult
+
+  
+  /**********************
+   * Daily result
+   **********************/
+  type WSGetDailyResultResult = GetDailyResultResult
+  
+  type WSShiftDailyResultResult = ShiftDailyResultResult
 }
+
