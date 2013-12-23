@@ -91,6 +91,13 @@ class FunctionsSpecs extends Specification {
       rewardForVotingSolution(20, 10) must beEqualTo(33)
       rewardForVotingSolution(20, 20) must beEqualTo(9)
     }
+    
+    "dailyRatingDecrease" in {
+      dailyRatingDecrease(1) must beEqualTo(0)
+      dailyRatingDecrease(3) must beEqualTo(302)
+      dailyRatingDecrease(10) must beEqualTo(939)
+      dailyRatingDecrease(20) must beEqualTo(4024)
+    }
   }
 
 }
