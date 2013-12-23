@@ -7,7 +7,19 @@ import java.util.Date
  */
 case class DailyResult(
   startOfPeriod: Date,
-  dailyAssetsDecrease: Assets
+  dailyAssetsDecrease: Assets,
+  decidedQuestSolutions: List[QuestSolutionResult] = List(),
+  decidedQuestProposals: List[QuestProposalResult] = List()
   )
   
-  // TODO: do not forget to add first daily result is no one is present on adding thing to daily result.
+  
+case class QuestSolutionResult(
+    questSolutionId: String,
+    reward: Option[Assets],
+    penalty: Option[Assets])
+  
+case class QuestProposalResult(
+    questProposalId: String,
+    reward: Option[Assets],
+    penalty: Option[Assets])
+  

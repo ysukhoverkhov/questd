@@ -248,6 +248,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     db.quest.readByID(solution.questID) match {
       case Some(q) => {
+        
         val r = QuestSolutionStatus.withName(solution.status) match {
           case QuestSolutionStatus.OnVoting => {
             Logger.error("We are rewarding player for solution what is on voting.")
@@ -255,19 +256,23 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           }
 
           case QuestSolutionStatus.WaitingForCompetitor =>
-            tryFightQuest(TryFightQuestRequest(solution)) map OkApiResult(Some(AdjustAssetsResult(author)))
+            tryFightQuest(TryFightQuestRequest(solution)) map OkApiResult(Some(StoreSolutionInDailyResultResult(author)))
 
           case QuestSolutionStatus.Won =>
-            adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.victoryReward)))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
+            //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.victoryReward)))
 
           case QuestSolutionStatus.Lost =>
-            adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.defeatReward)))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.defeatReward)))
+            //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.defeatReward)))
 
           case QuestSolutionStatus.CheatingBanned =>
-            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingSolution(q))))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForCheatingSolution(q))))
+//            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingSolution(q))))
 
           case QuestSolutionStatus.IACBanned =>
-            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACSolution(q))))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForIACSolution(q))))
+//            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACSolution(q))))
         }
 
         r map {
@@ -317,13 +322,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- winners) {
             Logger.debug("  winner id=" + curSol.id)
 
-            db.solution.update(
-              curSol.copy(
-                status = QuestSolutionStatus.Won.toString))
-
+            val s = curSol.copy(
+                status = QuestSolutionStatus.Won.toString) 
+            db.solution.update(s)
+              
             val u = db.user.readByID(curSol.userID)
             if (u != None) {
-              adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.victoryReward)))
+              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u.get))
+//              adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.victoryReward)))
             }
           }
 
@@ -331,13 +337,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- losers) {
             Logger.debug("  loser id=" + curSol.id)
 
-            db.solution.update(
-              curSol.copy(
-                status = QuestSolutionStatus.Lost.toString))
+            val s = curSol.copy(
+                status = QuestSolutionStatus.Lost.toString) 
+            db.solution.update(s)
 
             val u = db.user.readByID(curSol.userID)
             if (u != None) {
-              adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.victoryReward)))
+              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u.get))
+              //adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.defeatReward)))
             }
           }
           

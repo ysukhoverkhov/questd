@@ -72,8 +72,13 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
             InternalErrorApiResult()
           }
           case Some(q) => {
-            voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty)) map {
-              adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))
+            {
+              voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
+            } map {
+              // TODO REFACTOR this read from db is for debug until work with db is not refactored.
+              val us = db.user.readByID(request.user.id).get
+              
+              adjustAssets(AdjustAssetsRequest(user = us, reward = Some(reward)))
             } map { r =>
               // 3. update user profile.
               // 4. save profile in db.
