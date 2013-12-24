@@ -21,7 +21,7 @@ case class StoreProposalInDailyResultResult(user: User)
 case class StoreSolutionInDailyResultRequest(user: User, solutionId: String, reward: Option[Assets] = None, penalty: Option[Assets] = None)
 case class StoreSolutionInDailyResultResult(user: User)
 
-private[domain] trait DailyResultAPI { this: DBAccessor =>
+private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Shifts daily result.
@@ -41,6 +41,25 @@ private[domain] trait DailyResultAPI { this: DBAccessor =>
    * Returns moves ready daily results to public daily results and returns public results to client
    */
   def getDailyResult(request: GetDailyResultRequest): ApiResult[GetDailyResultResult] = handleDbException {
+
+    def applyDailyResults(u: User) = {
+
+      val deltaAssets = u.profile.dailyResults.foldLeft(Assets()) { (a, dr) =>
+
+        val assetsAfterProposals = dr.decidedQuestProposals.foldLeft(a) { (a, dqp) =>
+          a + dqp.reward.getOrElse(Assets()) - dqp.penalty.getOrElse(Assets())
+        }
+
+        val assetsAfterSolutions = dr.decidedQuestSolutions.foldLeft(assetsAfterProposals) { (a, dqs) =>
+          a + dqs.reward.getOrElse(Assets()) - dqs.penalty.getOrElse(Assets())
+        }
+        
+        assetsAfterSolutions - dr.dailyAssetsDecrease
+      }
+
+      adjustAssets(AdjustAssetsRequest(user = u, reward = Some(deltaAssets)))
+    }
+
     // Check replace old public daily results with new daily results.
     val (u, newOne) = if (request.user.privateDailyResults.length > 1) {
       val u = request.user.copy(
@@ -50,7 +69,7 @@ private[domain] trait DailyResultAPI { this: DBAccessor =>
 
       db.user.update(u)
 
-      // TODO upply all changes in daily results to profile here.
+      applyDailyResults(u)
 
       (u, true)
     } else {
@@ -65,19 +84,19 @@ private[domain] trait DailyResultAPI { this: DBAccessor =>
    */
   def storeProposalInDailyResult(request: StoreProposalInDailyResultRequest): ApiResult[StoreProposalInDailyResultResult] = handleDbException {
     import request._
-    
+
     val u = if (user.privateDailyResults.length == 0) {
       shiftDailyResult(ShiftDailyResultRequest(user)).body.get.user
     } else {
       request.user
     }
-    
+
     val qpr = QuestProposalResult(questProposalId = request.questId, reward = request.reward, penalty = request.penalty)
     val updatedResult = u.privateDailyResults.head.copy(decidedQuestProposals = qpr :: u.privateDailyResults.head.decidedQuestProposals)
-    
+
     val u2 = user.copy(privateDailyResults = updatedResult :: user.privateDailyResults.tail)
     db.user.update(u2)
-    
+
     OkApiResult(Some(StoreProposalInDailyResultResult(u2)))
   }
 
@@ -86,19 +105,19 @@ private[domain] trait DailyResultAPI { this: DBAccessor =>
    */
   def storeSolutionInDailyResult(request: StoreSolutionInDailyResultRequest): ApiResult[StoreSolutionInDailyResultResult] = handleDbException {
     import request._
-    
+
     val u = if (user.privateDailyResults.length == 0) {
       shiftDailyResult(ShiftDailyResultRequest(user)).body.get.user
     } else {
       request.user
     }
-    
+
     val qpr = QuestSolutionResult(questSolutionId = request.solutionId, reward = request.reward, penalty = request.penalty)
     val updatedResult = u.privateDailyResults.head.copy(decidedQuestSolutions = qpr :: u.privateDailyResults.head.decidedQuestSolutions)
-    
+
     val u2 = user.copy(privateDailyResults = updatedResult :: user.privateDailyResults.tail)
     db.user.update(u2)
-    
+
     OkApiResult(Some(StoreSolutionInDailyResultResult(u2)))
   }
 }
