@@ -23,6 +23,7 @@ trait DomainAPIComponent { component: DatabaseComponent =>
     with SolveQuestAPI
     with VoteQuestProposalAPI
     with VoteQuestSolutionAPI
+    with ContentAPI
     
     with QuestAPI
     with QuestSolutionAPI

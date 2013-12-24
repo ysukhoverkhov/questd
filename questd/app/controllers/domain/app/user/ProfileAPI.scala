@@ -64,7 +64,7 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
 
     val rew = if (reward == None) Assets() else reward.get
     val co = if (cost == None) Assets() else cost.get
-// TODO do not allow rating to go negative
+// TODO IMPLEMENT do not allow rating to go negative
     val u = user.copy(
       profile = user.profile.copy(
         assets = user.profile.assets + rew - co))

@@ -140,11 +140,11 @@ package object protocol {
    * Voting quest solutions
    **********************/
   
-    case class WSQuestSolutionVoteRequest (
-      /**
-       * @see controllers.domain.user.QuestSolutionVote
-       */
-      vote: String)
+  case class WSQuestSolutionVoteRequest (
+    /**
+     * @see controllers.domain.user.QuestSolutionVote
+     */
+    vote: String)
   
 
   type WSGetQuestSolutionToVoteResult = GetQuestSolutionToVoteResult
@@ -158,5 +158,18 @@ package object protocol {
   type WSGetDailyResultResult = GetDailyResultResult
   
   type WSShiftDailyResultResult = ShiftDailyResultResult
+  
+  
+  /**********************
+   * Content
+   **********************/
+  case class WSGetQuestRequest (
+    id: String)
+  
+  type WSGetQuestResult = GetQuestResult
+    
+    
+  case class WSGetSolutionRequest (
+    id: String)
 }
 

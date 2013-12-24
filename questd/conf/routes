@@ -52,6 +52,10 @@ POST	/rest/getDailyResult				controllers.web.rest.DailyResultWS.getDailyResult
 
 
 
+# Content requests
+POST	/rest/getQuest						controllers.web.rest.ContentWS.getQuest
+POST	/rest/getSolution					controllers.web.rest.ContentWS.getSolution
+
 
 
 
