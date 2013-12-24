@@ -11,7 +11,20 @@ import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
 
 case class GetQuestRequest(user: User, questId: String)
-case class GetQuestResult(allowed: ProfileModificationResult, quest: Option[QuestInfo], theme: Option[Theme])
+case class GetQuestResult(
+  allowed: ProfileModificationResult,
+  quest: Option[QuestInfo] = None,
+  theme: Option[Theme] = None)
+
+case class GetSolutionRequest(user: User, solutionId: String)
+case class GetSolutionResult(
+  allowed: ProfileModificationResult,
+  mySolution: Option[QuestSolutionInfo] = None,
+  myRating: Option[QuestSolutionRating] = None,
+  rivalSolution: Option[QuestSolutionInfo] = None,
+  rivalRating: Option[QuestSolutionRating] = None,
+  rivalProfile: Option[Profile] = None,
+  quest: Option[QuestInfo] = None)
 
 private[domain] trait ContentAPI { this: DBAccessor =>
 
@@ -42,5 +55,34 @@ private[domain] trait ContentAPI { this: DBAccessor =>
     }
   }
 
+  // TODO set rival in solution
+
+  /**
+   * Get solution by its id
+   */
+  def getSolution(request: GetSolutionRequest): ApiResult[GetSolutionResult] = handleDbException {
+    import request._
+
+    db.solution.readByID(solutionId).fold[ApiResult[GetSolutionResult]] {
+      Logger.error("API - getSolution. Unable to find solution in db with id = " + solutionId)
+      InternalErrorApiResult()
+    } { s =>
+
+      val quest = db.quest.readByID(s.questID).map(q => q.info)
+      val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readByID(id))
+      val rivalSolutionInfo = rivalSolution.map(rs => rs.info)
+      val rivalRating = rivalSolution.map(rs => rs.rating)
+      val rivalProfile = rivalSolution.flatMap(rs => db.user.readByID(rs.userID)).map(ru => ru.profile)  
+
+      OkApiResult(Some(GetSolutionResult(
+        allowed = OK,
+        mySolution = Some(s.info),
+        myRating = Some(s.rating),
+        rivalSolution = rivalSolutionInfo,
+        rivalRating = rivalRating,
+        rivalProfile = rivalProfile,
+        quest = quest)))
+    }
+  }
 }
 

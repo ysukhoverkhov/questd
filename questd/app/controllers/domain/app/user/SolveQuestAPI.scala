@@ -315,8 +315,12 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           Logger.debug("  s1.id=" + request.solution.id)
           Logger.debug("  s2.id=" + other.id)
           
+          // Updating solution rivals
+          val ourSol = request.solution.copy(rivalSolutionId = Some(other.id))
+          val otherSol = other.copy(rivalSolutionId = Some(request.solution.id))
+          
           // Compare two solutions.
-          val (winners, losers) = fight(other, request.solution)
+          val (winners, losers) = fight(otherSol, ourSol)
 
           // update solutions, winners 
           for (curSol <- winners) {

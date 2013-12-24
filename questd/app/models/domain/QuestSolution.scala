@@ -10,6 +10,7 @@ case class QuestSolution(
   id: String = ID.generateUUID(),
   questID: String,
   userID: String,
+  rivalSolutionId: Option[String] = None,
   questLevel: Int,
   info: QuestSolutionInfo,
   rating: QuestSolutionRating = QuestSolutionRating(),

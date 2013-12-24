@@ -14,11 +14,10 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getQuest(GetQuestRequest(r.user, v.id))
   }
 
-  // TODO implement me.
-  def getSolution = wrapJsonApiCallReturnBody[WSGetQuestResult] { (js, r) =>
-    val v = Json.read[WSGetQuestRequest](js)
+  def getSolution = wrapJsonApiCallReturnBody[WSGetSolutionResult] { (js, r) =>
+    val v = Json.read[WSGetSolutionRequest](js)
 
-    api.getQuest(GetQuestRequest(r.user, v.id))
+    api.getSolution(GetSolutionRequest(r.user, v.id))
   }
 
 }

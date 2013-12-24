@@ -171,5 +171,7 @@ package object protocol {
     
   case class WSGetSolutionRequest (
     id: String)
+    
+  type WSGetSolutionResult = GetSolutionResult
 }
 
