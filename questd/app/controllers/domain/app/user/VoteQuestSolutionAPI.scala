@@ -18,7 +18,7 @@ case class GetQuestSolutionToVoteRequest(user: User)
 case class GetQuestSolutionToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class VoteQuestSolutionRequest(user: User, vote: QuestSolutionVote.Value)
-case class VoteQuestSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None)
+case class VoteQuestSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, solver: Option[Profile] = None)
 
 private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -38,11 +38,16 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
           case None => OkApiResult(Some(GetQuestSolutionToVoteResult(OutOfContent)))
           case Some(a) => {
             val qi = Some(QuestSolutionInfoWithID(a.id, a.info))
+            val questInfo = db.quest.readByID(a.questID) match {
+              case Some(q) => Some(q.info)
+              case None => None
+            }
 
             val u = user.copy(
               profile = user.profile.copy(
                 questSolutionVoteContext = user.profile.questSolutionVoteContext.copy(
-                  reviewingQuestSolution = qi)))
+                  reviewingQuestSolution = qi,
+                  questOfSolution = questInfo)))
 
             db.user.update(u)
 
@@ -61,7 +66,7 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
   def voteQuestSolution(request: VoteQuestSolutionRequest): ApiResult[VoteQuestSolutionResult] = handleDbException {
 
     Logger.debug("API - voteQuestSolution")
-    
+
     request.user.canVoteQuestSolution match {
       case OK => {
         // 1. get quest to vote.
@@ -87,13 +92,22 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
                       reviewingQuestSolution = None)))
                 db.user.update(u)
 
-                OkApiResult(Some(VoteQuestSolutionResult(OK, Some(u.profile), Some(reward))))
+                val solver = if (request.vote == QuestSolutionVote.Cool) {
+                  db.user.readByID(q.userID) match {
+                    case Some(u) => Some(u.profile)
+                    case None => None
+                  }
+                } else {
+                  None
+                }
+
+                OkApiResult(Some(VoteQuestSolutionResult(OK, Some(u.profile), Some(reward), solver)))
               }
             }
           }
         }
       }
-      
+
       case a => OkApiResult(Some(VoteQuestSolutionResult(a)))
     }
   }
