@@ -55,8 +55,6 @@ private[domain] trait ContentAPI { this: DBAccessor =>
     }
   }
 
-  // TODO set rival in solution
-
   /**
    * Get solution by its id
    */

@@ -6,6 +6,7 @@ package models.domain
  */
 case class Profile(
   level: Int = 1,
+  ratingToNextLevel: Int = 1000,
   bio: Bio = Bio(),
   assets: Assets = Assets(0, 0, 0),
   rights: Rights = Rights(),
