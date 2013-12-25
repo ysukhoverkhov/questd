@@ -1,0 +1,15 @@
+@(menuItems: Map[String, String], leftMenuItems: Map[String, String], sectionName: String, values: Map[String, String])
+
+@main("Config")(menuItems, leftMenuItems) {
+
+	@if(values.size > 0) {
+		@helper.form(action=controllers.web.admin.routes.Config.configUpdate(sectionName)) {       
+
+           	@for((name, value) <- values) {
+            	@name <input type='text' name='@name' value='@value'/> <br/>
+        	}
+			
+			<input type='submit' value='Update' />    
+		}
+	}
+}

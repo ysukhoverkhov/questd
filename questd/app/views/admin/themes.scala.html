@@ -1,0 +1,36 @@
+@(menuItems: Map[String, String], themes: List[models.domain.Theme], newThemeForm: Form[controllers.web.admin.component.ThemeForm])
+
+@import helper._
+<!-- @inputText(newThemeForm("id")) -->
+
+@main("Themes")(menuItems, Map()) {
+
+	<p>
+		@form(action = controllers.web.admin.routes.ThemesCRUD.createThemeCB()) {
+			@inputText(newThemeForm("id"), 'size -> 50, 'readonly -> "readonly")
+			@inputText(newThemeForm("text"), 'size -> 20, 'placeholder -> "Text")
+			@inputText(newThemeForm("comment"), 'size -> 100, 'placeholder -> "Comment")
+			@if(newThemeForm("id").value == None) {
+				<input type="submit" value="Create">
+			} else {
+				<input type="submit" value="Update">
+			}
+   		}
+	</p>
+	
+	<p>
+	<table border="1">
+		@for(t <- themes) {
+	    	<tr>
+	    		<td>@t.id.toString</td>
+	    		<td>@t.text</td>
+	    		<td>@t.comment</td>
+				<td><a href="@controllers.web.admin.routes.ThemesCRUD.themes(t.id.toString)">edit</a></td>
+				<td><a href="@controllers.web.admin.routes.ThemesCRUD.deleteThemeCB(t.id.toString)">delete</a></td>
+	    	</tr>
+	    }
+	</table>
+	</p>
+	
+}
+
