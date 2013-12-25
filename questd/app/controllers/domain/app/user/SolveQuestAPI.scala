@@ -55,7 +55,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    */
   def purchaseQuest(request: PurchaseQuestRequest): ApiResult[PurchaseQuestResult] = handleDbException {
 
-    val user = if (request.user.isQuestDeadlinePassed) {
+    val user = if (request.user.shouldGiveupQuest) {
       giveUpQuest(GiveUpQuestRequest(request.user.user))
       db.user.readByID(request.user.id).get
     } else {
@@ -186,7 +186,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    */
   def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
 
-    val user = if (request.user.isQuestDeadlinePassed) {
+    val user = if (request.user.shouldGiveupQuest) {
       giveUpQuest(GiveUpQuestRequest(request.user.user))
       db.user.readByID(request.user.id).get
     } else {

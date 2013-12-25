@@ -151,6 +151,15 @@ class UserLogic(val user: User) {
   def costOfGivingUpQuestProposal = {
     Assets(rating = ratingToGiveUpQuestProposal(user.profile.level)) clampTop user.profile.assets
   }
+  
+  /**
+   * Check is quest deadline passed and quest should be autogave up.
+   */
+  def shouldGiveupProposal = {
+    ((user.profile.questProposalContext.takenTheme != None) 
+      && (user.profile.questProposalContext.questProposalCooldown.before(new Date())))
+  }
+
 
   /**
    * **********************************
@@ -342,7 +351,7 @@ class UserLogic(val user: User) {
   /**
    * Check is quest deadline passed and quest should be autogave up.
    */
-  def isQuestDeadlinePassed = {
+  def shouldGiveupQuest = {
     ((user.profile.questSolutionContext.takenQuest != None)
       && (user.profile.questSolutionContext.questDeadline.before(new Date())))
   }

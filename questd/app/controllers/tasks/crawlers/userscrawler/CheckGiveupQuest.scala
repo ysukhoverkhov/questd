@@ -22,7 +22,7 @@ object CheckGiveupQuest {
 class CheckGiveupQuest(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
 
   protected def check(user: User) = {
-    if (user.isQuestDeadlinePassed) {
+    if (user.shouldGiveupQuest) {
       api.giveUpQuest(GiveUpQuestRequest(user))
     }
   }

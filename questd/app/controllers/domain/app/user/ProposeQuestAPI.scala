@@ -52,12 +52,19 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    */
   def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
 
-    request.user.canPurchaseQuestProposals match {
+    val user = if (request.user.shouldGiveupProposal) {
+      giveUpQuestProposal(GiveUpQuestProposalRequest(request.user.user))
+      db.user.readByID(request.user.id).get
+    } else {
+      request.user
+    }
+    
+    user.canPurchaseQuestProposals match {
       case OK => {
 
-        val themeCost = request.user.costOfPurchasingQuestProposal
+        val themeCost = user.costOfPurchasingQuestProposal
 
-        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(themeCost))) map { r =>
+        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) map { r =>
           val user = r.user
           val t = r.user.getRandomThemeForQuestProposal
           val reward = r.user.rewardForMakingApprovedQuest
@@ -132,20 +139,27 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    */
   def proposeQuest(request: ProposeQuestRequest): ApiResult[ProposeQuestResult] = handleDbException {
 
-    request.user.canProposeQuest(ContentType.withName(request.quest.media.contentType)) match {
+    val user = if (request.user.shouldGiveupProposal) {
+      giveUpQuestProposal(GiveUpQuestProposalRequest(request.user.user))
+      db.user.readByID(request.user.id).get
+    } else {
+      request.user
+    }
+
+    user.canProposeQuest(ContentType.withName(request.quest.media.contentType)) match {
       case OK => {
 
         db.quest.create(
           Quest(
-            themeID = request.user.profile.questProposalContext.takenTheme.get.id,
-            authorUserID = request.user.id,
-            approveReward = request.user.profile.questProposalContext.approveReward,
+            themeID = user.profile.questProposalContext.takenTheme.get.id,
+            authorUserID = user.id,
+            approveReward = user.profile.questProposalContext.approveReward,
             info = QuestInfo(
               content = request.quest)))
 
-        val u = request.user.copy(
-          profile = request.user.profile.copy(
-            questProposalContext = request.user.profile.questProposalContext.copy(
+        val u = user.copy(
+          profile = user.profile.copy(
+            questProposalContext = user.profile.questProposalContext.copy(
               numberOfPurchasedThemes = 0,
               purchasedTheme = None,
               takenTheme = None)))
