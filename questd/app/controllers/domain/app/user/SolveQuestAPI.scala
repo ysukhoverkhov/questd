@@ -54,12 +54,20 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    * Purchase an option of quest to chose.
    */
   def purchaseQuest(request: PurchaseQuestRequest): ApiResult[PurchaseQuestResult] = handleDbException {
-    request.user.canPurchaseQuest match {
+
+    val user = if (request.user.isQuestDeadlinePassed) {
+      giveUpQuest(GiveUpQuestRequest(request.user.user))
+      db.user.readByID(request.user.id).get
+    } else {
+      request.user
+    }
+    
+    user.canPurchaseQuest match {
       case OK => {
 
         // Updating quest info.
-        val v = if ((request.user.profile.questSolutionContext.purchasedQuest != None) && (request.user.stats.questsAcceptedPast > 0)) {
-          val quest = db.quest.readByID(request.user.profile.questSolutionContext.purchasedQuest.get.id)
+        val v = if ((user.profile.questSolutionContext.purchasedQuest != None) && (user.stats.questsAcceptedPast > 0)) {
+          val quest = db.quest.readByID(user.profile.questSolutionContext.purchasedQuest.get.id)
 
           quest match {
             case None => {
@@ -76,13 +84,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         v map {
 
           // Updating user profile.
-          request.user.getRandomQuestForSolution match {
+          user.getRandomQuestForSolution match {
             case None => OkApiResult(Some(PurchaseQuestResult(OutOfContent)))
             case Some(q) => {
-              val questCost = request.user.costOfPurchasingQuest
+              val questCost = user.costOfPurchasingQuest
               val author = db.user.readByID(q.authorUserID).map(_.profile)
 
-              adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(questCost))) map { r =>
+              adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) map { r =>
 
                 val u = r.user.copy(
                   profile = r.user.profile.copy(
@@ -177,14 +185,20 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    * Propose solution for quest.
    */
   def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
-    import request._
 
-    user.canResulveQuest(ContentType.withName(solution.content.contentType)) match {
+    val user = if (request.user.isQuestDeadlinePassed) {
+      giveUpQuest(GiveUpQuestRequest(request.user.user))
+      db.user.readByID(request.user.id).get
+    } else {
+      request.user
+    }
+
+    user.canResulveQuest(ContentType.withName(request.solution.content.contentType)) match {
       case OK => {
 
         db.solution.create(
           QuestSolution(
-            info = solution,
+            info = request.solution,
             userID = user.id,
             questID = user.profile.questSolutionContext.takenQuest.get.id,
             questLevel = user.profile.questSolutionContext.takenQuest.get.obj.level))

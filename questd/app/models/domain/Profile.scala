@@ -5,10 +5,10 @@ package models.domain
  * This can be given to client as is, thus contains only public information.
  */
 case class Profile(
-  level: Int = 1,
-  ratingToNextLevel: Int = 1000,
+  level: Int = 20,
+  ratingToNextLevel: Int = 100000,
   bio: Bio = Bio(),
-  assets: Assets = Assets(0, 0, 0),
+  assets: Assets = Assets(100000, 1000, 0),
   rights: Rights = Rights(),
   dailyResults: List[DailyResult] = List(),
   questProposalContext: QuestProposalConext = QuestProposalConext(),

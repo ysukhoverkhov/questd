@@ -281,7 +281,7 @@ class UserLogic(val user: User) {
     val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
     (DateTime.now(tz) + minutesToSolveQuest.minutes) toDate ()
   }
-  
+
   /**
    * Cooldown for reseting purchases. Purchases should be reset in nearest 5am at user's time.
    */
@@ -337,6 +337,14 @@ class UserLogic(val user: User) {
       case Some(QuestInfoWithID(_, i)) => i.daysDuration
       case None => 0
     }
+  }
+
+  /**
+   * Check is quest deadline passed and quest should be autogave up.
+   */
+  def isQuestDeadlinePassed = {
+    ((user.profile.questSolutionContext.takenQuest != None)
+      && (user.profile.questSolutionContext.questDeadline.before(new Date())))
   }
 
   /**
@@ -458,19 +466,21 @@ class UserLogic(val user: User) {
       Assets()
   }
 
-  /*************************
+  /**
+   * ***********************
    * Daily results
-   *************************/
+   * ***********************
+   */
   def getStartOfCurrentDailyResultPeriod: Date = {
-        val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
+    val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
     DateTime.now(tz).hour(constants.flipHour).minute(0).second(0) toDate ()
   }
-  
+
   /**
    * Tells cost of next theme purchase
    */
   def dailyAssetsDecrease = {
-    Assets(rating = dailyRatingDecrease(user.profile.level)) clampTop(user.profile.assets)
+    Assets(rating = dailyRatingDecrease(user.profile.level)) clampTop (user.profile.assets)
   }
 
 }
