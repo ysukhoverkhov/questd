@@ -56,7 +56,9 @@ private[domain] trait AuthAPI { this: DBAccessor =>
             bio = Bio(
               name = params.userfb.getFirstName(),
               gender = genderFromFBUser(params.userfb).toString,
-              timezone = params.userfb.getTimezone().toInt)))
+              timezone = params.userfb.getTimezone().toInt,
+              avatar = Some(
+                ContentReference(contentType = ContentType.Photo.toString, storage = "fb_avatar", reference = params.userfb.getId())))))
 
         db.user.create(newUser)
         db.user.readByFBid(params.userfb.getId()) match {

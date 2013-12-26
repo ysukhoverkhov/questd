@@ -23,12 +23,12 @@ package object protocol {
     /**
      *  FB tells us it doesn't know the token.
      */
-    val InvalidFBToken = Value(1, "1")
+    val InvalidFBToken = Value
 
     /**
      *  Supplied session is not valid on our server.
      */
-    val SessionNotFound = Value(2, "2")
+    val SessionNotFound = Value
   }
 
 
