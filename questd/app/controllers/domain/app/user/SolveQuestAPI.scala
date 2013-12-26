@@ -88,7 +88,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             case None => OkApiResult(Some(PurchaseQuestResult(OutOfContent)))
             case Some(q) => {
               val questCost = user.costOfPurchasingQuest
-              val author = db.user.readByID(q.authorUserID).map(_.profile)
+              val author = db.user.readByID(q.authorUserID).map(x => BioWithID(q.authorUserID, x.profile.bio))
 
               adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) map { r =>
 
