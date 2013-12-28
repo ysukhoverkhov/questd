@@ -14,10 +14,33 @@ import models.store.mongo.SalatContext._
 import models.store.exceptions.DatabaseException
 import models.domain.base.ID
 
+
+
+trait QDAOMethods [ObjectType <: AnyRef, ID <: Any] {
+  /** Returns a single object from this collection.
+   *  @param t object for which to search
+   *  @tparam A type view bound to DBObject
+   *  @return (Option[ObjectType]) Some() of the object found, or <code>None</code> if no such object exists
+   */
+  def findAndModify(q: DBObject, o: DBObject, upsert: Boolean, returnNew: Boolean): Option[ObjectType]
+
+}
+
+class QSalatDAO[ObjectType <: AnyRef, ID <: Any](collection: MongoCollection)(implicit mot: Manifest[ObjectType],
+                                                                                          mid: Manifest[ID], ctx: Context)
+    extends SalatDAO[ObjectType, ID](collection) with QDAOMethods[ObjectType, ID]
+{
+  def findAndModify(q: DBObject, u: DBObject, upsert: Boolean, returnNew: Boolean): Option[ObjectType] = {
+    collection.findAndModify(decorateQuery(q), MongoDBObject(), MongoDBObject(), false, u, returnNew, upsert).map(_grater.asObject(_))
+  }
+
+}
+
+
 abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
   extends ModelCompanion[T, ObjectId] {
 
-  val dao = new SalatDAO[T, ObjectId](collection = mongoCollection(collectionName)) {}
+  val dao = new QSalatDAO[T, ObjectId](collection = mongoCollection(collectionName))
   private val keyFieldName: String = "id"
 
   private def makeKeyDbObject(key: String): DBObject = {
@@ -47,22 +70,18 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
    * Searches for object by query object.
    */
   def readByID(key: String): Option[T] = wrapMongoException {
-    findOne(makeKeyDbObject(key)) match {
-      case None => None
-      case Some(r) => Some(r)
-    }
+    findOne(makeKeyDbObject(key))
   }
 
   /**
    * Searches for object by query object.
    */
   def readByExample[R](fieldName: String, key: String)(implicit view: T => R): Option[R] = wrapMongoException {
-    findOne(makeKeyDbObject(fieldName, key)) match {
-      case None => None
-      case Some(r) => Some(view(r))
-    }
+    findOne(makeKeyDbObject(fieldName, key)).map(view(_))
   }
 
+  // TODO remove update
+  
   /**
    * Update object with new object
    */
@@ -91,6 +110,13 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
     }
   }
 
+  /**
+   * Searches for a object, modifies it and returns after modification
+   */
+  def findAndModify(key: String, u: DBObject): Option[T] = wrapMongoException {
+    dao.findAndModify(makeKeyDbObject(key), u, false, true)
+  }
+  
   /**
    * Delete object
    */

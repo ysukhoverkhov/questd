@@ -5,7 +5,7 @@ import models.store.dao._
 import models.store._
 import models.domain._
 import play.Logger
-
+import com.mongodb.casbah.commons.MongoDBObject
 
 /**
  * DOA for User objects
@@ -28,6 +28,18 @@ private[mongo] class MongoUserDAO
     readByExample("auth.fbid", fbid)
   }
 
+  /**
+   * Add assets to profile
+   */
+  def addToAssets(id: String, assets: Assets): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.assets.coins" -> assets.coins,
+          "profile.assets.money" -> assets.money,
+          "profile.assets.rating" -> assets.rating))))
+  }
 }
 
 /**
@@ -40,7 +52,7 @@ import models.store.mongo.SalatContext._
 import com.mongodb.casbah.MongoConnection
 
 class MongoUserDAOForTest extends MongoUserDAO {
-  override val dao = new SalatDAO[User, ObjectId](collection = MongoConnection("localhost", 55555)("test_db")("test_coll")) {}
+  override val dao = new QSalatDAO[User, ObjectId](collection = MongoConnection("localhost", 55555)("test_db")("test_coll")) {}
 
 }
 

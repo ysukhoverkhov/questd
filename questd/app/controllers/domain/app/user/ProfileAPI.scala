@@ -62,14 +62,17 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
 
     Logger.debug("API - adjustAssets for user " + user.id)
 
-    val rew = if (reward == None) Assets() else reward.get
-    val co = if (cost == None) Assets() else cost.get
-// TODO IMPLEMENT do not allow rating to go negative
-    val u = user.copy(
-      profile = user.profile.copy(
-        assets = user.profile.assets + rew - co))
+    val del = reward.getOrElse(Assets()) - cost.getOrElse(Assets())
 
-    db.user.update(u)
+    val del2 = if ((del + user.profile.assets).rating < 0)
+      Assets(del.coins, del.money, -user.profile.assets.rating)
+    else
+      del
+
+    val u = db.user.addToAssets(user.id, del2).getOrElse{
+      Logger.error("API - adjustAssets. Unable to find user in db")
+      user
+    }
 
     OkApiResult(Some(AdjustAssetsResult(u)))
   }
