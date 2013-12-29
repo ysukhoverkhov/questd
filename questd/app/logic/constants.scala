@@ -67,7 +67,7 @@ object constants {
    * Voting quest solutions.
    */
   
-  val solutionLevelDownTolerance = 20
+  val solutionLevelDownTolerance = 30
   
   val solutionLevelUpTolerance = 2
   

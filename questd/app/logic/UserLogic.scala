@@ -438,7 +438,7 @@ class UserLogic(val user: User) {
    */
   def getQuestSolutionToVote: Option[QuestSolution] = {
     val quests = api.allQuestSolutionsOnVoting(
-      AllQuestSolutionsRequest(user.profile.level - constants.solutionLevelDownTolerance, user.profile.level - constants.solutionLevelUpTolerance)).body.get.quests
+      AllQuestSolutionsRequest(user.profile.level - constants.solutionLevelDownTolerance, user.profile.level + constants.solutionLevelUpTolerance)).body.get.quests
 
     if (quests.length == 0) {
       None

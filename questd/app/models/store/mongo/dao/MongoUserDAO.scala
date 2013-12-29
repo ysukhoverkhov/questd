@@ -4,6 +4,7 @@ import models.store.mongo.helpers._
 import models.store.dao._
 import models.store._
 import models.domain._
+import models.domain.base._
 import play.Logger
 import com.mongodb.casbah.commons.MongoDBObject
 
@@ -39,6 +40,38 @@ private[mongo] class MongoUserDAO
           "profile.assets.coins" -> assets.coins,
           "profile.assets.money" -> assets.money,
           "profile.assets.rating" -> assets.rating))))
+  }
+
+
+  /**
+   * 
+   */
+  def selectQuestSolutionVote(id: String, qsi: QuestSolutionInfoWithID, qi: QuestInfo): Option[User] = {
+    
+    import com.novus.salat._
+    import models.store.mongo.SalatContext._
+
+    
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.questSolutionVoteContext.reviewingQuestSolution" -> grater[QuestSolutionInfoWithID].asDBObject(qsi),
+          "profile.questSolutionVoteContext.questOfSolution" -> grater[QuestInfo].asDBObject(qi)))))
+  }
+
+  /**
+   *
+   */
+  def recordQuestSolutionVote(id: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.questSolutionVoteContext.numberOfReviewedSolutions" -> 1)),
+        ("$unset" -> MongoDBObject(
+          "profile.questSolutionVoteContext.reviewingQuestSolution" -> "",
+          "profile.questSolutionVoteContext.questOfSolution" -> ""))))
   }
 }
 

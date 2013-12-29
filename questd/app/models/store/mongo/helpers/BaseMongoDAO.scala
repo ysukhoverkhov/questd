@@ -14,7 +14,9 @@ import models.store.mongo.SalatContext._
 import models.store.exceptions.DatabaseException
 import models.domain.base.ID
 
-
+/******************************
+ * This should be a part of salat.
+ */
 
 trait QDAOMethods [ObjectType <: AnyRef, ID <: Any] {
   /** Returns a single object from this collection.
@@ -35,6 +37,11 @@ class QSalatDAO[ObjectType <: AnyRef, ID <: Any](collection: MongoCollection)(im
   }
 
 }
+
+/*************************
+ * End of "Should"
+ *************************/
+
 
 
 abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
@@ -80,8 +87,6 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
     findOne(makeKeyDbObject(fieldName, key)).map(view(_))
   }
 
-  // TODO remove update
-  
   /**
    * Update object with new object
    */
