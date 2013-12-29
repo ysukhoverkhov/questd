@@ -78,16 +78,8 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
           }
           Logger.error("Very slow request to db here, should be removed!!!!")
 
-          val u = user.copy(
-            profile = user.profile.copy(
-              questProposalContext = user.profile.questProposalContext.copy(
-                approveReward = reward,
-                numberOfPurchasedThemes = user.profile.questProposalContext.numberOfPurchasedThemes + 1,
-                purchasedTheme = Some(ThemeWithID(t.id, t)),
-                sampleQuest = sampleQuest)))
-          db.user.update(u)
-
-          OkApiResult(Some(PurchaseQuestThemeResult(OK, Some(u.profile))))
+          val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t), sampleQuest, reward)
+          OkApiResult(Some(PurchaseQuestThemeResult(OK, u.map(_.profile))))
         }
 
       }
@@ -114,19 +106,14 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
       case OK => {
 
         adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuestTheme))) map { r =>
-          val user = r.user
-          val pt = user.profile.questProposalContext.purchasedTheme
-
-          val u = user.copy(
-            profile = user.profile.copy(
-              questProposalContext = user.profile.questProposalContext.copy(
-                numberOfPurchasedThemes = 0,
-                purchasedTheme = None,
-                takenTheme = pt,
-                questProposalCooldown = user.getCooldownForTakeTheme)))
-          db.user.update(u)
-
-          OkApiResult(Some(TakeQuestThemeResult(OK, Some(u.profile))))
+          val pt = r.user.profile.questProposalContext.purchasedTheme
+          if (pt == None) {
+            Logger.error("API - takeQuestTheme. Purchased theme is None")
+            InternalErrorApiResult()
+          } else {
+            val u = db.user.takeQuestTheme(r.user.id, pt.get, r.user.getCooldownForTakeTheme)
+            OkApiResult(Some(TakeQuestThemeResult(OK, u.map(_.profile))))
+          }
         }
       }
 

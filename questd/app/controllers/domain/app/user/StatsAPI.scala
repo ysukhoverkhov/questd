@@ -19,6 +19,7 @@ private[domain] trait StatsAPI { this: DBAccessor =>
   def shiftStats(request: ShiftStatsRequest): ApiResult[ShiftStatsResult] = handleDbException {
     import request._
 
+    // Update is allowed here.
     db.user.update {
       user.copy(
         stats = user.stats.copy(

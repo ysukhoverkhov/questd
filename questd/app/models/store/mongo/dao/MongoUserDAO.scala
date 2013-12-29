@@ -147,11 +147,48 @@ private[mongo] class MongoUserDAO
           "profile.questSolutionContext.takenQuest" -> "",
           "profile.questSolutionContext.questAuthor" -> ""))))
   }
-  
-  
-  
+
   /**
-   * 
+   *
+   */
+  def purchaseQuestTheme(id: String, purchasedTheme: ThemeWithID, sampleQuest: Option[QuestInfo], approveReward: Assets): Option[User] = {
+
+    val setObject = if (sampleQuest != None) {
+      MongoDBObject(
+        "profile.questProposalContext.purchasedTheme" -> grater[ThemeWithID].asDBObject(purchasedTheme),
+        "profile.questProposalContext.sampleQuest" -> grater[QuestInfo].asDBObject(sampleQuest.get),
+        "profile.questProposalContext.approveReward" -> grater[Assets].asDBObject(approveReward))
+    } else {
+      MongoDBObject(
+        "profile.questProposalContext.purchasedTheme" -> grater[ThemeWithID].asDBObject(purchasedTheme),
+        "profile.questProposalContext.approveReward" -> grater[Assets].asDBObject(approveReward))
+    }
+
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> setObject),
+        ("$inc" -> MongoDBObject(
+          "profile.questProposalContext.numberOfPurchasedThemes" -> 1))))
+  }
+
+  /**
+   *
+   */
+  def takeQuestTheme(id: String, takenTheme: ThemeWithID, cooldown: Date): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.questProposalContext.numberOfPurchasedThemes" -> 0,
+          "profile.questProposalContext.takenTheme" -> grater[ThemeWithID].asDBObject(takenTheme),
+          "profile.questProposalContext.questProposalCooldown" -> cooldown)),
+        ("$unset" -> MongoDBObject(
+          "profile.questProposalContext.purchasedTheme" -> ""))))
+  }
+
+  /**
+   *
    */
   def resetQuestProposal(id: String): Option[User] = {
     findAndModify(
@@ -161,7 +198,8 @@ private[mongo] class MongoUserDAO
           "profile.questProposalContext.numberOfPurchasedThemes" -> 0)),
         ("$unset" -> MongoDBObject(
           "profile.questProposalContext.purchasedTheme" -> "",
-          "profile.questProposalContext.takenTheme" -> ""))))
+          "profile.questProposalContext.takenTheme" -> "",
+          "profile.questProposalContext.sampleQuest" -> ""))))
   }
 
 }
