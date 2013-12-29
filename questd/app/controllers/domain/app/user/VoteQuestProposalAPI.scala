@@ -34,21 +34,18 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
         q match {
           case None => OkApiResult(Some(GetQuestProposalToVoteResult(OutOfContent)))
           case Some(a) => {
-            val qi = Some(QuestInfoWithID(a.id, a.info))
+            val qi = QuestInfoWithID(a.id, a.info)
             val theme = db.theme.readByID(a.themeID)
 
-            val u = user.copy(
-              profile = user.profile.copy(
-                questProposalVoteContext = user.profile.questProposalVoteContext.copy(
-                  reviewingQuest = qi,
-                  themeOfQuest = theme)))
-
-            db.user.update(u)
-
-            OkApiResult(Some(GetQuestProposalToVoteResult(OK, Some(u.profile))))
+            if (theme == None) {
+              Logger.error("API - getQuestProposalToVote. Unable to find theme for quest.")
+              InternalErrorApiResult()
+            } else {
+              val u = db.user.selectQuestProposalVote(user.id, qi, theme.get)
+              OkApiResult(Some(GetQuestProposalToVoteResult(OK, u.map(_.profile))))
+            }
           }
         }
-
       }
       case a => OkApiResult(Some(GetQuestProposalToVoteResult(a)))
     }
@@ -65,7 +62,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
         // 1. get quest to vote.
         // 2. vote it.
         val reward = request.user.getQuestProposalVoteReward
-        
+
         db.quest.readByID(request.user.profile.questProposalVoteContext.reviewingQuest.get.id) match {
           case None => {
             Logger.error("Unable to find quest with id for voting " + request.user.profile.questProposalVoteContext.reviewingQuest.get.id)
@@ -75,27 +72,19 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
             {
               voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
             } map {
-              // TODO REFACTOR this read from db is for debug until work with db is not refactored.
-              val us = db.user.readByID(request.user.id).get
-              
-              adjustAssets(AdjustAssetsRequest(user = us, reward = Some(reward)))
+              adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))
             } map { r =>
               // 3. update user profile.
               // 4. save profile in db.
-              val u = r.user.copy(
-                profile = r.user.profile.copy(
-                  questProposalVoteContext = r.user.profile.questProposalVoteContext.copy(
-                    numberOfReviewedQuests = r.user.profile.questProposalVoteContext.numberOfReviewedQuests + 1,
-                    reviewingQuest = None)))
-              db.user.update(u)
-              
-              val author = if (request.vote == QuestProposalVote.Cool) {
-                  db.user.readByID(q.authorUserID).map(_.profile)
-                } else {
-                  None
-                }
+              val u = db.user.recordQuestProposalVote(r.user.id)
 
-              OkApiResult(Some(VoteQuestProposalResult(OK, Some(u.profile), Some(reward), author)))
+              val author = if (request.vote == QuestProposalVote.Cool) {
+                db.user.readByID(q.authorUserID).map(_.profile)
+              } else {
+                None
+              }
+
+              OkApiResult(Some(VoteQuestProposalResult(OK, u.map(_.profile), Some(reward), author)))
             }
           }
         }

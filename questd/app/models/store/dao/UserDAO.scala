@@ -1,7 +1,7 @@
 package models.store.dao
 
 import models.domain._
-import models.domain.base.QuestSolutionInfoWithID
+import models.domain.base._
 
 trait UserDAO extends BaseDAO[User] {
 
@@ -12,5 +12,8 @@ trait UserDAO extends BaseDAO[User] {
 
   def selectQuestSolutionVote(id: String, qsi: QuestSolutionInfoWithID, qi: QuestInfo): Option[User]
   def recordQuestSolutionVote(id: String): Option[User]
+
+  def selectQuestProposalVote(id: String, qi: QuestInfoWithID, theme: Theme): Option[User]
+  def recordQuestProposalVote(id: String): Option[User]
 }
 

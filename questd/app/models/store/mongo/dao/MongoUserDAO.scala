@@ -8,6 +8,10 @@ import models.domain.base._
 import play.Logger
 import com.mongodb.casbah.commons.MongoDBObject
 
+import com.novus.salat._
+import models.store.mongo.SalatContext._
+
+
 /**
  * DOA for User objects
  */
@@ -42,16 +46,10 @@ private[mongo] class MongoUserDAO
           "profile.assets.rating" -> assets.rating))))
   }
 
-
   /**
-   * 
+   *
    */
   def selectQuestSolutionVote(id: String, qsi: QuestSolutionInfoWithID, qi: QuestInfo): Option[User] = {
-    
-    import com.novus.salat._
-    import models.store.mongo.SalatContext._
-
-    
     findAndModify(
       id,
       MongoDBObject(
@@ -73,6 +71,34 @@ private[mongo] class MongoUserDAO
           "profile.questSolutionVoteContext.reviewingQuestSolution" -> "",
           "profile.questSolutionVoteContext.questOfSolution" -> ""))))
   }
+
+
+  /**
+   * 
+   */
+  def selectQuestProposalVote(id: String, qi: QuestInfoWithID, theme: Theme): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.questProposalVoteContext.reviewingQuest" -> grater[QuestInfoWithID].asDBObject(qi),
+          "profile.questProposalVoteContext.themeOfQuest" -> grater[Theme].asDBObject(theme)))))
+  }
+
+  /**
+   *
+   */
+  def recordQuestProposalVote(id: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.questProposalVoteContext.numberOfReviewedQuests" -> 1)),
+        ("$unset" -> MongoDBObject(
+          "profile.questProposalVoteContext.reviewingQuest" -> "",
+          "profile.questProposalVoteContext.themeOfQuest" -> ""))))
+  }
+
 }
 
 /**
