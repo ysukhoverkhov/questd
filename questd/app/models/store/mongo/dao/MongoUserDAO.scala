@@ -147,6 +147,23 @@ private[mongo] class MongoUserDAO
           "profile.questSolutionContext.takenQuest" -> "",
           "profile.questSolutionContext.questAuthor" -> ""))))
   }
+  
+  
+  
+  /**
+   * 
+   */
+  def resetQuestProposal(id: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.questProposalContext.numberOfPurchasedThemes" -> 0)),
+        ("$unset" -> MongoDBObject(
+          "profile.questProposalContext.purchasedTheme" -> "",
+          "profile.questProposalContext.takenTheme" -> ""))))
+  }
+
 }
 
 /**

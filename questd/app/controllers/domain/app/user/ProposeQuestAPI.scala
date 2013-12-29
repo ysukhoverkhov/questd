@@ -58,7 +58,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     } else {
       request.user
     }
-    
+
     user.canPurchaseQuestProposals match {
       case OK => {
 
@@ -157,16 +157,9 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
             info = QuestInfo(
               content = request.quest)))
 
-        val u = user.copy(
-          profile = user.profile.copy(
-            questProposalContext = user.profile.questProposalContext.copy(
-              numberOfPurchasedThemes = 0,
-              purchasedTheme = None,
-              takenTheme = None)))
+        val u = db.user.resetQuestProposal(user.id)
 
-        db.user.update(u)
-
-        OkApiResult(Some(ProposeQuestResult(OK, Some(u.profile))))
+        OkApiResult(Some(ProposeQuestResult(OK, u.map(_.profile))))
       }
       case (a: ProfileModificationResult) => OkApiResult(Some(ProposeQuestResult(a)))
     }
@@ -182,16 +175,8 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
       case OK => {
 
         adjustAssets(AdjustAssetsRequest(user = user, cost = Some(user.costOfGivingUpQuestProposal))) map { r =>
-
-          val u = r.user.copy(
-            profile = user.profile.copy(
-              questProposalContext = user.profile.questProposalContext.copy(
-                numberOfPurchasedThemes = 0,
-                purchasedTheme = None,
-                takenTheme = None)))
-          db.user.update(u)
-
-          OkApiResult(Some(GiveUpQuestProposalResult(OK, Some(u.profile))))
+          val u = db.user.resetQuestProposal(r.user.id)
+          OkApiResult(Some(GiveUpQuestProposalResult(OK, u.map(_.profile))))
         }
 
       }
@@ -214,28 +199,28 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    */
   def rewardQuestProposalAuthor(request: RewardQuestProposalAuthorRequest): ApiResult[RewardQuestProposalAuthorResult] = handleDbException {
     import request._
-    
+
     val r = QuestStatus.withName(quest.status) match {
       case QuestStatus.OnVoting => {
         Logger.error("We are rewarding player for proposal what is on voting.")
         InternalErrorApiResult()
       }
-      case QuestStatus.InRotation =>  
+      case QuestStatus.InRotation =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, reward = Some(quest.approveReward)))
-        //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(quest.approveReward)))
-      
-      case QuestStatus.RatingBanned => 
+      //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(quest.approveReward)))
+
+      case QuestStatus.RatingBanned =>
         OkApiResult(Some(StoreProposalInDailyResultResult(author)))
-      
-      case QuestStatus.CheatingBanned => 
+
+      case QuestStatus.CheatingBanned =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, penalty = Some(author.penaltyForCheatingQuest)))
-        //adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingQuest)))
-      
-      case QuestStatus.IACBanned => 
+      //adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingQuest)))
+
+      case QuestStatus.IACBanned =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, penalty = Some(author.penaltyForIACQuest)))
-        //adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACQuest)))
-      
-      case QuestStatus.OldBanned => 
+      //adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACQuest)))
+
+      case QuestStatus.OldBanned =>
         OkApiResult(Some(StoreProposalInDailyResultResult(author)))
     }
 
