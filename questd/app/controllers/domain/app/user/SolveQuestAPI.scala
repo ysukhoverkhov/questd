@@ -96,19 +96,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               } else {
                 adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) map { r =>
 
-                  val u = r.user.copy(
-                    profile = r.user.profile.copy(
-                      questSolutionContext = r.user.profile.questSolutionContext.copy(
-                        numberOfPurchasedQuests = r.user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
-                        purchasedQuest = Some(QuestInfoWithID(q.id, q.info)),
-                        questAuthor = author,
-                        defeatReward = r.user.rewardForLosingQuest(q),
-                        victoryReward = r.user.rewardForWinningQuest(q))),
-                    stats = r.user.stats.copy(
-                      questsReviewed = r.user.stats.questsReviewed + 1))
-                  db.user.update(u)
+                  val u = db.user.purchaseQuest(
+                      r.user.id, 
+                      QuestInfoWithID(q.id, q.info), 
+                      author.get, 
+                      r.user.rewardForLosingQuest(q), 
+                      r.user.rewardForWinningQuest(q))
 
-                  OkApiResult(Some(PurchaseQuestResult(OK, Some(u.profile))))
+                  OkApiResult(Some(PurchaseQuestResult(OK, u.map(_.profile))))
                 }
               }
             }
@@ -163,23 +158,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
           // Updating user profile.
           val pq = r.user.profile.questSolutionContext.purchasedQuest
-
-          val u = r.user.copy(
-            profile = r.user.profile.copy(
-              questSolutionContext = r.user.profile.questSolutionContext.copy(
-                numberOfPurchasedQuests = 0,
-                purchasedQuest = None,
-                takenQuest = pq,
-                questCooldown = r.user.getCooldownForTakeQuest(pq.get.obj),
-                questDeadline = r.user.getDeadlineForTakeQuest(pq.get.obj))),
-
-            stats = r.user.stats.copy(
-              questsAccepted = r.user.stats.questsAccepted + 1))
-          db.user.update(u)
-
-          OkApiResult(Some(TakeQuestResult(OK, Some(u.profile))))
+          if (pq == None) {
+            Logger.error("API - takeQuest. Purchased quest is None")
+            InternalErrorApiResult()
+          } else {
+            val u = db.user.takeQuest(r.user.id, pq.get, r.user.getCooldownForTakeQuest(pq.get.obj), r.user.getDeadlineForTakeQuest(pq.get.obj))
+            OkApiResult(Some(TakeQuestResult(OK, u.map(_.profile))))
+          }
         }
-
       }
 
       case (a: ProfileModificationResult) => OkApiResult(Some(TakeQuestResult(a)))
@@ -208,16 +194,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             questID = user.profile.questSolutionContext.takenQuest.get.id,
             questLevel = user.profile.questSolutionContext.takenQuest.get.obj.level))
 
-        val u = user.copy(
-          profile = user.profile.copy(
-            questSolutionContext = user.profile.questSolutionContext.copy(
-              numberOfPurchasedQuests = 0,
-              purchasedQuest = None,
-              takenQuest = None)))
+        val u = db.user.resetQuestSolution(user.id)
 
-        db.user.update(u)
-
-        OkApiResult(Some(ProposeSolutionResult(OK, Some(u.profile))))
+        OkApiResult(Some(ProposeSolutionResult(OK, u.map(_.profile))))
       }
 
       case (a: ProfileModificationResult) => OkApiResult(Some(ProposeSolutionResult(a)))
@@ -241,15 +220,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       case OK => {
 
         adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) map { r =>
-          val u = r.user.copy(
-            profile = r.user.profile.copy(
-              questSolutionContext = r.user.profile.questSolutionContext.copy(
-                numberOfPurchasedQuests = 0,
-                purchasedQuest = None,
-                takenQuest = None)))
-          db.user.update(u)
-
-          OkApiResult(Some(GiveUpQuestResult(OK, Some(u.profile))))
+          val u = db.user.resetQuestSolution(r.user.id)
+          OkApiResult(Some(GiveUpQuestResult(OK, u.map(_.profile))))
         }
       }
 

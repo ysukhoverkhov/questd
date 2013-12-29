@@ -2,6 +2,7 @@ package models.store.dao
 
 import models.domain._
 import models.domain.base._
+import java.util.Date
 
 trait UserDAO extends BaseDAO[User] {
 
@@ -15,5 +16,9 @@ trait UserDAO extends BaseDAO[User] {
 
   def selectQuestProposalVote(id: String, qi: QuestInfoWithID, theme: Theme): Option[User]
   def recordQuestProposalVote(id: String): Option[User]
+  
+  def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: BioWithID, defeatReward: Assets, victoryReward: Assets): Option[User]
+  def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User]
+  def resetQuestSolution(id: String): Option[User]
 }
 
