@@ -61,7 +61,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     } else {
       request.user
     }
-    
+
     user.canPurchaseQuest match {
       case OK => {
 
@@ -90,21 +90,26 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               val questCost = user.costOfPurchasingQuest
               val author = db.user.readByID(q.authorUserID).map(_.profile)
 
-              adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) map { r =>
+              if (author == None) {
+                Logger.error("API - purchaseQuest. Unable to find quest author")
+                InternalErrorApiResult()
+              } else {
+                adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) map { r =>
 
-                val u = r.user.copy(
-                  profile = r.user.profile.copy(
-                    questSolutionContext = r.user.profile.questSolutionContext.copy(
-                      numberOfPurchasedQuests = r.user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
-                      purchasedQuest = Some(QuestInfoWithID(q.id, q.info)),
-                      questAuthor = author,
-                      defeatReward = r.user.rewardForLosingQuest(q),
-                      victoryReward = r.user.rewardForWinningQuest(q))),
-                  stats = r.user.stats.copy(
-                    questsReviewed = r.user.stats.questsReviewed + 1))
-                db.user.update(u)
+                  val u = r.user.copy(
+                    profile = r.user.profile.copy(
+                      questSolutionContext = r.user.profile.questSolutionContext.copy(
+                        numberOfPurchasedQuests = r.user.profile.questSolutionContext.numberOfPurchasedQuests + 1,
+                        purchasedQuest = Some(QuestInfoWithID(q.id, q.info)),
+                        questAuthor = author,
+                        defeatReward = r.user.rewardForLosingQuest(q),
+                        victoryReward = r.user.rewardForWinningQuest(q))),
+                    stats = r.user.stats.copy(
+                      questsReviewed = r.user.stats.questsReviewed + 1))
+                  db.user.update(u)
 
-                OkApiResult(Some(PurchaseQuestResult(OK, Some(u.profile))))
+                  OkApiResult(Some(PurchaseQuestResult(OK, Some(u.profile))))
+                }
               }
             }
           }
@@ -167,7 +172,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 takenQuest = pq,
                 questCooldown = r.user.getCooldownForTakeQuest(pq.get.obj),
                 questDeadline = r.user.getDeadlineForTakeQuest(pq.get.obj))),
-                
+
             stats = r.user.stats.copy(
               questsAccepted = r.user.stats.questsAccepted + 1))
           db.user.update(u)
@@ -262,7 +267,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     db.quest.readByID(solution.questID) match {
       case Some(q) => {
-        
+
         val r = QuestSolutionStatus.withName(solution.status) match {
           case QuestSolutionStatus.OnVoting => {
             Logger.error("We are rewarding player for solution what is on voting.")
@@ -274,19 +279,19 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
           case QuestSolutionStatus.Won =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
-            //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.victoryReward)))
+          //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.victoryReward)))
 
           case QuestSolutionStatus.Lost =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.defeatReward)))
-            //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.defeatReward)))
+          //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.defeatReward)))
 
           case QuestSolutionStatus.CheatingBanned =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForCheatingSolution(q))))
-//            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingSolution(q))))
+          //            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingSolution(q))))
 
           case QuestSolutionStatus.IACBanned =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForIACSolution(q))))
-//            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACSolution(q))))
+          //            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACSolution(q))))
         }
 
         r map {
@@ -328,11 +333,11 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           Logger.debug("Found fight pair for quest " + request.solution + ":")
           Logger.debug("  s1.id=" + request.solution.id)
           Logger.debug("  s2.id=" + other.id)
-          
+
           // Updating solution rivals
           val ourSol = request.solution.copy(rivalSolutionId = Some(other.id))
           val otherSol = other.copy(rivalSolutionId = Some(request.solution.id))
-          
+
           // Compare two solutions.
           val (winners, losers) = fight(otherSol, ourSol)
 
@@ -341,13 +346,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             Logger.debug("  winner id=" + curSol.id)
 
             val s = curSol.copy(
-                status = QuestSolutionStatus.Won.toString) 
+              status = QuestSolutionStatus.Won.toString)
             db.solution.update(s)
-              
+
             val u = db.user.readByID(curSol.userID)
             if (u != None) {
               rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u.get))
-//              adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.victoryReward)))
+              //              adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.victoryReward)))
             }
           }
 
@@ -356,7 +361,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             Logger.debug("  loser id=" + curSol.id)
 
             val s = curSol.copy(
-                status = QuestSolutionStatus.Lost.toString) 
+              status = QuestSolutionStatus.Lost.toString)
             db.solution.update(s)
 
             val u = db.user.readByID(curSol.userID)
@@ -365,7 +370,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               //adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.defeatReward)))
             }
           }
-          
+
           OkApiResult(Some(TryFightQuestResult()))
 
         } else {
