@@ -48,6 +48,7 @@ class AuthAPISpecs extends Specification
 
       val rv = api.loginfb(LoginFBRequest(userfb))
 
+      // Update allowed.
       there was one(user).readByFBid(fbid) andThen 
         one(user).create(any[User]) andThen
         one(user).readByFBid(fbid) andThen

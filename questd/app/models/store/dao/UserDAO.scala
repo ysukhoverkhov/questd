@@ -6,6 +6,8 @@ import java.util.Date
 
 trait UserDAO extends BaseDAO[User] {
 
+  def updateSessionID(id: String, sessionid: String): Option[User]
+  
   def readBySessionID(sessionid: String): Option[User]
   def readByFBid(fbid: String): Option[User]
 

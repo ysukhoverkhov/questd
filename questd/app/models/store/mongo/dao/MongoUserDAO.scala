@@ -47,6 +47,19 @@ private[mongo] class MongoUserDAO
   }
 
   /**
+   * Update user's session id
+   */
+  def updateSessionID(id: String, sessionid: String): Option[User] = {
+        findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "auth.session" -> sessionid
+          ))))
+
+  }
+
+  /**
    *
    */
   def selectQuestSolutionVote(id: String, qsi: QuestSolutionInfoWithID, qi: QuestInfo): Option[User] = {

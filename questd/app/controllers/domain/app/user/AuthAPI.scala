@@ -24,9 +24,7 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
 
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString()
-      val newUser = user.copy(auth = user.auth.copy(session = Some(uuid)))
-
-      db.user.update(newUser)
+      db.user.updateSessionID(user.id, uuid)
 
       // API Test place
 
