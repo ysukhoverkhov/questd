@@ -15,7 +15,7 @@ case class LoginFBResult(session: String)
 case class UserRequest(userID: Option[String] = None, sessionID: Option[String] = None)
 case class UserResult(user: User)
 
-private[domain] trait AuthAPI { this: DBAccessor =>
+private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Login with FB. Or create new one if it doesn't exists.
@@ -28,8 +28,7 @@ private[domain] trait AuthAPI { this: DBAccessor =>
 
       db.user.update(newUser)
 
-      val a = List(1, 2)
-      a.foreach(print)
+      // API Test place
 
       OkApiResult(Some(LoginFBResult(uuid)))
     }
@@ -77,6 +76,7 @@ private[domain] trait AuthAPI { this: DBAccessor =>
       }
       case Some(user) => {
         Logger.debug("Existing user login with FB " + user)
+        
         login(user)
       }
     }

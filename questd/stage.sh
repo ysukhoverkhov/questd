@@ -1,0 +1,3 @@
+#!/bin/bash
+/opt/play-2.2.1/play clean compile stage
+

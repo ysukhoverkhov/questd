@@ -35,22 +35,8 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
   def resetCounters(request: ResetCountersRequest): ApiResult[ResetCountersResult] = handleDbException {
     import request._
 
-    db.user.update {
-      user.copy(
-        profile = user.profile.copy(
-          questSolutionContext = user.profile.questSolutionContext.copy(
-            purchasedQuest = None,
-            numberOfPurchasedQuests = 0),
-          questProposalContext = user.profile.questProposalContext.copy(
-            purchasedTheme = None,
-            numberOfPurchasedThemes = 0),
-          questProposalVoteContext = user.profile.questProposalVoteContext.copy(
-            reviewingQuest = None,
-            numberOfReviewedQuests = 0)),
-        schedules = user.schedules.copy(
-          purchases = user.getResetPurchasesTimeout))
-    }
-
+    db.user.resetCounters(user.id, user.getResetPurchasesTimeout)
+    
     OkApiResult(Some(ResetCountersResult()))
   }
 

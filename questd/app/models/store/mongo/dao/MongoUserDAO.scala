@@ -202,6 +202,27 @@ private[mongo] class MongoUserDAO
           "profile.questProposalContext.sampleQuest" -> ""))))
   }
 
+  /**
+   * 
+   */
+  def resetCounters(id: String, resetPurchasesTimeout: Date): Option[User] = {
+    Logger.error(resetPurchasesTimeout.toString)
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.questSolutionContext.numberOfPurchasedQuests" -> 0,
+          "profile.questProposalContext.numberOfPurchasedThemes" -> 0,
+          "profile.questProposalVoteContext.numberOfReviewedQuests" -> 0,
+          "profile.questSolutionVoteContext.numberOfReviewedSolutions" -> 0,
+          "schedules.purchases" -> resetPurchasesTimeout)),
+        ("$unset" -> MongoDBObject(
+          "profile.questSolutionContext.purchasedQuest" -> "",
+          "profile.questProposalContext.purchasedTheme" -> "",
+          "profile.questProposalVoteContext.reviewingQuest" -> "",
+          "profile.questSolutionVoteContext.reviewingQuestSolution" -> ""))))
+  }
+
 }
 
 /**
