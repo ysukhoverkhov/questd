@@ -22,5 +22,17 @@ private[mongo] class MongoQuestDAO
         MongoDBObject("info.level" -> MongoDBObject("$lte" -> maxLevel)))))
   }
 
+  /**
+   * 
+   */
+  def updatePoints(id: String, pointsChange: Int, votersCountChange: Int): Option[Quest] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "rating.points" -> pointsChange,
+          "rating.votersCount" -> votersCountChange))))
+  }
+
 }
 

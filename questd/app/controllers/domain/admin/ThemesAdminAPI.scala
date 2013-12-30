@@ -52,6 +52,7 @@ private [domain] trait ThemesAdminAPI { this: DBAccessor =>
   def updateTheme(request: UpdateThemeRequest): ApiResult[UpdateThemeResult] = handleDbException {
     Logger.debug("Admin request for update a theme " + request.theme.id)
 
+    // Update allowed here.
     db.theme.update(request.theme)
     
     OkApiResult(Some(UpdateThemeResult()))

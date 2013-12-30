@@ -116,11 +116,6 @@ Logger.error("Fu 2")
     }
 
     val qpr = QuestSolutionResult(questSolutionId = request.solutionId, reward = request.reward, penalty = request.penalty)
-//    val updatedResult = u.privateDailyResults.head.copy(decidedQuestSolutions = qpr :: u.privateDailyResults.head.decidedQuestSolutions)
-//
-//    val u2 = user.copy(privateDailyResults = updatedResult :: user.privateDailyResults.tail)
-//    db.user.update(u2)
-    
     val u2 = db.user.storeSolutionInDailyResult(user.id, qpr)
 
     OkApiResult(Some(StoreSolutionInDailyResultResult(u2.get)))

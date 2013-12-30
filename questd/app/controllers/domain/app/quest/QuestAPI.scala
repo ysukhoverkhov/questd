@@ -110,13 +110,8 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def skipQuest(request: SkipQuestRequest): ApiResult[SkipQuestResult] = handleDbException {
     import request._
 
-    val nq = quest.copy(
-      rating = quest.rating.copy(
-        points = quest.rating.points - 1,
-        votersCount = quest.rating.votersCount + 1))
-    db.quest.update(nq)
-
-    updateQuestStatus(UpdateQuestStatusRequest(nq))
+    val nq = db.quest.updatePoints(quest.id, -1, 1)
+    updateQuestStatus(UpdateQuestStatusRequest(nq.get))
 
     OkApiResult(Some(SkipQuestResult()))
   }
@@ -127,13 +122,8 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def takeQuestUpdate(request: TakeQuestUpdateRequest): ApiResult[TakeQuestUpdateResult] = handleDbException {
     import request._
 
-    val nq = quest.copy(
-      rating = quest.rating.copy(
-        points = quest.rating.points + ratio,
-        votersCount = quest.rating.votersCount + 1))
-    db.quest.update(nq)
-
-    updateQuestStatus(UpdateQuestStatusRequest(nq))
+    val nq = db.quest.updatePoints(quest.id, ratio, 1)
+    updateQuestStatus(UpdateQuestStatusRequest(nq.get))
 
     OkApiResult(Some(TakeQuestUpdateResult()))
   }
