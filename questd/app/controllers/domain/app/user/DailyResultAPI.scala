@@ -31,17 +31,23 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val dailyAssetsDecrease = user.dailyAssetsDecrease
 
-    val u = user.copy(privateDailyResults = DailyResult(user.getStartOfCurrentDailyResultPeriod, dailyAssetsDecrease) :: user.privateDailyResults)
-    db.user.update(u)
+    //    val u = user.copy(privateDailyResults = DailyResult(user.getStartOfCurrentDailyResultPeriod, dailyAssetsDecrease) :: user.privateDailyResults)
+    val u = db.user.addPrivateDailyResult(user.id, DailyResult(user.getStartOfCurrentDailyResultPeriod, dailyAssetsDecrease))
 
-    OkApiResult(Some(ShiftDailyResultResult(u)))
+    u match {
+      case Some(u: User) => OkApiResult(Some(ShiftDailyResultResult(u)))
+      case _ => {
+        Logger.error("API - shiftDailyResult. user is not in db after update.")
+        InternalErrorApiResult()
+      }
+    }
   }
 
   /**
    * Returns moves ready daily results to public daily results and returns public results to client
    */
   def getDailyResult(request: GetDailyResultRequest): ApiResult[GetDailyResultResult] = handleDbException {
-
+Logger.error("Fu 2")
     def applyDailyResults(u: User) = {
 
       val deltaAssets = u.profile.dailyResults.foldLeft(Assets()) { (a, dr) =>
@@ -53,7 +59,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
         val assetsAfterSolutions = dr.decidedQuestSolutions.foldLeft(assetsAfterProposals) { (a, dqs) =>
           a + dqs.reward.getOrElse(Assets()) - dqs.penalty.getOrElse(Assets())
         }
-        
+
         assetsAfterSolutions - dr.dailyAssetsDecrease
       }
 
@@ -62,16 +68,16 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     // Check replace old public daily results with new daily results.
     val (u, newOne) = if (request.user.privateDailyResults.length > 1) {
-      val u = request.user.copy(
-        privateDailyResults = List(request.user.privateDailyResults.head),
-        profile = request.user.profile.copy(
-          dailyResults = request.user.privateDailyResults.tail))
+      val u = db.user.movePrivateDailyResultsToPublic(request.user.id, request.user.privateDailyResults.tail)
 
-      db.user.update(u)
+      if (u != None) {
+        applyDailyResults(u.get)
+        (u.get, true)
+      } else {
+        Logger.error("API - getDailyResult. Unable to find user for getting daily result")
+        (request.user, false)
+      }
 
-      applyDailyResults(u)
-
-      (u, true)
     } else {
       (request.user, false)
     }
@@ -92,12 +98,9 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     }
 
     val qpr = QuestProposalResult(questProposalId = request.questId, reward = request.reward, penalty = request.penalty)
-    val updatedResult = u.privateDailyResults.head.copy(decidedQuestProposals = qpr :: u.privateDailyResults.head.decidedQuestProposals)
+    val u2 = db.user.storeProposalInDailyResult(user.id, qpr)
 
-    val u2 = user.copy(privateDailyResults = updatedResult :: user.privateDailyResults.tail)
-    db.user.update(u2)
-
-    OkApiResult(Some(StoreProposalInDailyResultResult(u2)))
+    OkApiResult(Some(StoreProposalInDailyResultResult(u2.get)))
   }
 
   /**
@@ -113,12 +116,14 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     }
 
     val qpr = QuestSolutionResult(questSolutionId = request.solutionId, reward = request.reward, penalty = request.penalty)
-    val updatedResult = u.privateDailyResults.head.copy(decidedQuestSolutions = qpr :: u.privateDailyResults.head.decidedQuestSolutions)
+//    val updatedResult = u.privateDailyResults.head.copy(decidedQuestSolutions = qpr :: u.privateDailyResults.head.decidedQuestSolutions)
+//
+//    val u2 = user.copy(privateDailyResults = updatedResult :: user.privateDailyResults.tail)
+//    db.user.update(u2)
+    
+    val u2 = db.user.storeSolutionInDailyResult(user.id, qpr)
 
-    val u2 = user.copy(privateDailyResults = updatedResult :: user.privateDailyResults.tail)
-    db.user.update(u2)
-
-    OkApiResult(Some(StoreSolutionInDailyResultResult(u2)))
+    OkApiResult(Some(StoreSolutionInDailyResultResult(u2.get)))
   }
 }
 

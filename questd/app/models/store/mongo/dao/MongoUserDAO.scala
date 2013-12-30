@@ -7,7 +7,7 @@ import models.store._
 import models.domain._
 import models.domain.base._
 import play.Logger
-import com.mongodb.casbah.commons.MongoDBObject
+import com.mongodb.casbah.commons._
 
 import com.novus.salat._
 import models.store.mongo.SalatContext._
@@ -50,12 +50,11 @@ private[mongo] class MongoUserDAO
    * Update user's session id
    */
   def updateSessionID(id: String, sessionid: String): Option[User] = {
-        findAndModify(
+    findAndModify(
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
-          "auth.session" -> sessionid
-          ))))
+          "auth.session" -> sessionid))))
 
   }
 
@@ -216,10 +215,9 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def resetCounters(id: String, resetPurchasesTimeout: Date): Option[User] = {
-    Logger.error(resetPurchasesTimeout.toString)
     findAndModify(
       id,
       MongoDBObject(
@@ -236,7 +234,66 @@ private[mongo] class MongoUserDAO
           "profile.questSolutionVoteContext.reviewingQuestSolution" -> ""))))
   }
 
+  /**
+   *
+   */
+  def addPrivateDailyResult(id: String, dailyResult: DailyResult): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$push" -> MongoDBObject(
+          "privateDailyResults" ->
+            MongoDBObject(
+              "$each" -> List(grater[DailyResult].asDBObject(dailyResult)),
+              "$position" -> 0)))))
+  }
+
+  /**
+   *
+   */
+  def movePrivateDailyResultsToPublic(id: String, dailyResults: List[DailyResult]): Option[User] = {
+    Logger.error("1")
+    for (a <- 1 to dailyResults.length) {
+      findAndModify(
+        id,
+        MongoDBObject(
+          ("$pop" -> MongoDBObject(
+            "privateDailyResults" -> 1))))
+    }
+    
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.dailyResults" -> dailyResults.map(grater[DailyResult].asDBObject(_))))))
+  }
+  
+  /**
+   * 
+   */
+  def storeProposalInDailyResult(id: String, proposal: QuestProposalResult): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$push" -> MongoDBObject(
+          "privateDailyResults.0.decidedQuestProposals" -> grater[QuestProposalResult].asDBObject(proposal)))))
+  }
+
+  /**
+   * 
+   */
+  def storeSolutionInDailyResult(id: String, solution: QuestSolutionResult): Option[User] = {
+    Logger.error("haha")
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$push" -> MongoDBObject(
+          "privateDailyResults.0.decidedQuestSolutions" -> grater[QuestSolutionResult].asDBObject(solution)))))
+  }
+
 }
+
+
 
 /**
  * Test version of dao what fails al the time
