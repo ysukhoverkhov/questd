@@ -35,50 +35,49 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     import request._
 
     def capPoints(quest: Quest): Quest = {
-      if (quest.rating.points > Int.MaxValue / 2)
-        quest.copy(rating = quest.rating.copy(points = quest.rating.points / 2))
-      else
-        quest
+      if (quest.rating.votersCount > Int.MaxValue / 2) {
+        Logger.error("quest.rating.votersCount > Int.MaxValue / 2. this is the time to invent what to do with this.")
+      }
+
+      quest
     }
 
     def checkAddToRotation(quest: Quest): Quest = {
-      if (quest.shouldAddToRotation)
-        quest.copy(
-          status = QuestStatus.InRotation.toString,
-          info = quest.info.copy(
-            level = quest.calculateQuestLevel))
-      else
-        quest
+      if (quest.shouldAddToRotation) {
+        db.quest.updateStatus(quest.id, QuestStatus.InRotation.toString)
+        db.quest.updateLevel(quest.id, quest.calculateQuestLevel)
+      }
+
+      quest
     }
 
     def checkRemoveFromRotation(quest: Quest): Quest = {
       if (quest.shouldRemoveFromRotation)
-        quest.copy(status = QuestStatus.RatingBanned.toString)
-      else
-        quest
+        db.quest.updateStatus(quest.id, QuestStatus.RatingBanned.toString)
+
+      quest
     }
 
     def checkBanQuest(quest: Quest): Quest = {
       if (quest.shouldBanQuest)
-        quest.copy(status = QuestStatus.IACBanned.toString)
-      else
-        quest
+        db.quest.updateStatus(quest.id, QuestStatus.IACBanned.toString)
+
+      quest
     }
 
     def checkCheatingQuest(quest: Quest): Quest = {
       if (quest.shouldCheatingQuest)
-        quest.copy(status = QuestStatus.CheatingBanned.toString)
-      else
-        quest
+        db.quest.updateStatus(quest.id, QuestStatus.CheatingBanned.toString)
+
+      quest
 
     }
 
     def checkRemoveQuestFromVotingByTime(quest: Quest): Quest = {
       if (quest.shouldRemoveQuestFromVotingByTime)
-        quest.copy(status = QuestStatus.OldBanned.toString)
-      else
-        quest
+        db.quest.updateStatus(quest.id, QuestStatus.OldBanned.toString)
 
+      quest
     }
 
     val updatedQuest =
@@ -88,8 +87,6 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
             checkRemoveFromRotation(
               checkAddToRotation(
                 capPoints(quest))))))
-
-    db.quest.update(updatedQuest)
 
     if (updatedQuest.status != quest.status) {
       val authorID = quest.authorUserID
@@ -135,37 +132,43 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     import request._
     import QuestProposalVote._
 
-    def checkInc[T](v: T, c: T, n: Int) = if (v == c) n + 1 else n
+    def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
-    val q2 = quest.copy(
-      rating = quest.rating.copy(
-        votersCount = quest.rating.votersCount + 1,
-        points = checkInc(vote, Cool, quest.rating.points),
-        cheating = checkInc(vote, Cheating, quest.rating.cheating),
-        iacpoints = quest.rating.iacpoints.copy(
-          spam = checkInc(vote, IASpam, quest.rating.iacpoints.spam),
-          porn = checkInc(vote, IAPorn, quest.rating.iacpoints.porn))))
+    val q = db.quest.updatePoints(
+      quest.id,
+      checkInc(vote, Cool),
+      1,
+      checkInc(vote, Cheating),
 
-    val q3 = if (vote == QuestProposalVote.Cool) {
-      q2.copy(rating = q2.rating.copy(
-        difficultyRating = q2.rating.difficultyRating.copy(
-          easy = checkInc(difficulty.get, QuestDifficulty.Easy, q2.rating.difficultyRating.easy),
-          normal = checkInc(difficulty.get, QuestDifficulty.Normal, q2.rating.difficultyRating.normal),
-          hard = checkInc(difficulty.get, QuestDifficulty.Normal, q2.rating.difficultyRating.hard),
-          extreme = checkInc(difficulty.get, QuestDifficulty.Normal, q2.rating.difficultyRating.extreme)),
-        durationRating = q2.rating.durationRating.copy(
-          mins = checkInc(duration.get, QuestDuration.Minutes, q2.rating.durationRating.mins),
-          hour = checkInc(duration.get, QuestDuration.Hours, q2.rating.durationRating.hour),
-          day = checkInc(duration.get, QuestDuration.Day, q2.rating.durationRating.day),
-          days = checkInc(duration.get, QuestDuration.TwoDays, q2.rating.durationRating.days),
-          week = checkInc(duration.get, QuestDuration.Week, q2.rating.durationRating.week))))
+      checkInc(vote, IASpam),
+      checkInc(vote, IAPorn))
+
+    val q2 = if (vote == QuestProposalVote.Cool) {
+
+      db.quest.updatePoints(
+        quest.id,
+        0,
+        0,
+        0,
+
+        0,
+        0,
+
+        checkInc(difficulty.get, QuestDifficulty.Easy),
+        checkInc(difficulty.get, QuestDifficulty.Normal),
+        checkInc(difficulty.get, QuestDifficulty.Hard),
+        checkInc(difficulty.get, QuestDifficulty.Extreme),
+
+        checkInc(duration.get, QuestDuration.Minutes),
+        checkInc(duration.get, QuestDuration.Hours),
+        checkInc(duration.get, QuestDuration.Day),
+        checkInc(duration.get, QuestDuration.TwoDays),
+        checkInc(duration.get, QuestDuration.Week))
     } else {
-      q2
+      q
     }
 
-    db.quest.update(q3)
-
-    updateQuestStatus(UpdateQuestStatusRequest(q3))
+    updateQuestStatus(UpdateQuestStatusRequest(q2.get))
 
     OkApiResult(Some(VoteQuestUpdateResult()))
   }
