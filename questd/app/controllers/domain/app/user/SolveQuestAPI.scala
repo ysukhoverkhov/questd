@@ -97,11 +97,11 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) map { r =>
 
                   val u = db.user.purchaseQuest(
-                      r.user.id, 
-                      QuestInfoWithID(q.id, q.info), 
-                      author.get, 
-                      r.user.rewardForLosingQuest(q), 
-                      r.user.rewardForWinningQuest(q))
+                    r.user.id,
+                    QuestInfoWithID(q.id, q.info),
+                    author.get,
+                    r.user.rewardForLosingQuest(q),
+                    r.user.rewardForWinningQuest(q))
 
                   OkApiResult(Some(PurchaseQuestResult(OK, u.map(_.profile))))
                 }
@@ -317,13 +317,11 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- winners) {
             Logger.debug("  winner id=" + curSol.id)
 
-            val s = curSol.copy(
-              status = QuestSolutionStatus.Won.toString)
-            db.solution.update(s)
+            val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString)
 
             val u = db.user.readByID(curSol.userID)
             if (u != None) {
-              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u.get))
+              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s.get, author = u.get))
               //              adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.victoryReward)))
             }
           }
@@ -332,13 +330,11 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- losers) {
             Logger.debug("  loser id=" + curSol.id)
 
-            val s = curSol.copy(
-              status = QuestSolutionStatus.Lost.toString)
-            db.solution.update(s)
+            val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString)
 
             val u = db.user.readByID(curSol.userID)
             if (u != None) {
-              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u.get))
+              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s.get, author = u.get))
               //adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.defeatReward)))
             }
           }

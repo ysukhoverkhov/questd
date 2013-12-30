@@ -28,5 +28,42 @@ private[mongo] class MongoQuestSolutionDAO
       ("questID" -> questId))
   }
 
+  def updateStatus(id: String, newStatus: String): Option[QuestSolution] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "status" -> newStatus))))
+
+  }
+
+  def updatePoints(
+    id: String,
+
+    reviewsCountChange: Int = 0,
+    pointsRandomChange: Int = 0,
+    pointsFriendsChange: Int = 0,
+    pointsInvitedChange: Int = 0,
+    cheatingChange: Int = 0,
+
+    spamChange: Int = 0,
+    pornChange: Int = 0): Option[QuestSolution] = {
+    
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "rating.reviewsCount" -> reviewsCountChange,
+          "rating.pointsRandom" -> pointsRandomChange,
+          
+          "rating.pointsFriends" -> pointsFriendsChange,
+          "rating.pointsInvited" -> pointsInvitedChange,
+          
+          "rating.cheating" -> cheatingChange,
+
+          "rating.iacpoints.spam" -> spamChange,
+          "rating.iacpoints.porn" -> pornChange))))
+  }
+
 }
 

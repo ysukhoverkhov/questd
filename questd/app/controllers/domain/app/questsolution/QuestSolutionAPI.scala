@@ -28,21 +28,33 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
     import QuestSolutionVote._
 
     Logger.debug("API - voteQuestSolutionUpdate")
-    
-    def checkInc[T](v: T, c: T, n: Int) = if (v == c) n + 1 else n
 
-    val q2 = solution.copy(
-      rating = solution.rating.copy(
-        reviewsCount = solution.rating.reviewsCount + 1,
-        pointsRandom = checkInc(vote, Cool, solution.rating.pointsRandom),
-        cheating = checkInc(vote, Cheating, solution.rating.cheating),
-        iacpoints = solution.rating.iacpoints.copy(
-          spam = checkInc(vote, IASpam, solution.rating.iacpoints.spam),
-          porn = checkInc(vote, IAPorn, solution.rating.iacpoints.porn))))
+    def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
-    db.solution.update(q2)
+    //    val q2 = solution.copy(
+    //      rating = solution.rating.copy(
+    //        reviewsCount = solution.rating.reviewsCount + 1,
+    //        pointsRandom = checkInc(vote, Cool, solution.rating.pointsRandom),
+    //        cheating = checkInc(vote, Cheating, solution.rating.cheating),
+    //        iacpoints = solution.rating.iacpoints.copy(
+    //          spam = checkInc(vote, IASpam, solution.rating.iacpoints.spam),
+    //          porn = checkInc(vote, IAPorn, solution.rating.iacpoints.porn))))
+    //
+    //    db.solution.update(q2)
 
-    updateQuestSolutionState(UpdateQuestSolutionStateRequest(q2)) map
+    val q = db.solution.updatePoints(
+      solution.id,
+
+      reviewsCountChange = 1,
+      pointsRandomChange = checkInc(vote, Cool),
+      pointsFriendsChange = 0,
+      pointsInvitedChange = 0,
+      cheatingChange = checkInc(vote, Cheating),
+
+      spamChange = checkInc(vote, IASpam),
+      pornChange = checkInc(vote, IAPorn))
+
+    updateQuestSolutionState(UpdateQuestSolutionStateRequest(q.get)) map
       OkApiResult(Some(VoteQuestSolutionUpdateResult()))
   }
 
@@ -53,26 +65,26 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
     import request._
 
     Logger.debug("API - updateQuestSolutionState")
-    
+
     def checkWaitCompetitor(qs: QuestSolution) = {
       if (qs.shouldStopVoting)
-        qs.copy(status = QuestSolutionStatus.WaitingForCompetitor.toString)
-      else
-        qs
+        db.solution.updateStatus(solution.id, QuestSolutionStatus.WaitingForCompetitor.toString)
+
+      qs
     }
 
     def checkCheatingSolution(qs: QuestSolution) = {
       if (qs.shouldBanCheating)
-        qs.copy(status = QuestSolutionStatus.CheatingBanned.toString)
-      else
-        qs
+        db.solution.updateStatus(solution.id, QuestSolutionStatus.CheatingBanned.toString)
+
+      qs
     }
 
     def checkAICSolution(qs: QuestSolution) = {
       if (qs.shouldBanIAC)
-        qs.copy(status = QuestSolutionStatus.IACBanned.toString)
-      else
-        qs
+        db.solution.updateStatus(solution.id, QuestSolutionStatus.IACBanned.toString)
+
+      qs
     }
 
     val updatedSolution =
@@ -80,8 +92,6 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         checkAICSolution(
           checkWaitCompetitor(
             solution)))
-
-    db.solution.update(updatedSolution)
 
     val authorUpdateResult =
       if (updatedSolution.status != solution.status) {
@@ -98,7 +108,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
       } else {
         OkApiResult(None)
       }
-    
+
     authorUpdateResult map OkApiResult(Some(UpdateQuestSolutionStateResult()))
   }
 
