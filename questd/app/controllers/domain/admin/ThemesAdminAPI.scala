@@ -39,9 +39,11 @@ private [domain] trait ThemesAdminAPI { this: DBAccessor =>
    * Create new theme
    */
   def createTheme(request: CreateThemeRequest): ApiResult[CreateThemeResult] = handleDbException {
+    import models.domain.base.ID
+    
     Logger.debug("Admin request for create new theme.")
 
-    db.theme.create(request.theme)
+    db.theme.create(request.theme.copy(id = ID.generateUUID()))
     
     OkApiResult(Some(CreateThemeResult()))
   }
