@@ -12,48 +12,17 @@ class QuestLogic(val quest: Quest) {
 
 
   /**
-   * calculate level of a quest with current votes.
+   * Calculate level of a quest with current votes.
    */
   def calculateQuestLevel = {
-    def maxTuple(o: List[(Int, Int)]): (Int, Int) = {
-      if (o.size == 1) {
-        o.head
-      } else {
-        val r = maxTuple(o.tail)
-
-        if (o.head._2 >= r._2)
-          o.head
-        else
-          r
-      }
-    }
-
-    def levelShift = {
-      val dif = List(
-        (-1, quest.rating.difficultyRating.easy),
-        (0, quest.rating.difficultyRating.normal),
-        (1, quest.rating.difficultyRating.hard),
-        (2, quest.rating.difficultyRating.extreme))
-
-      val dur = List(
-        (-2, quest.rating.durationRating.mins),
-        (-1, quest.rating.durationRating.hour),
-        (0, quest.rating.durationRating.day),
-        (1, quest.rating.durationRating.days),
-        (2, quest.rating.durationRating.week))
-
-      maxTuple(dif)._1 + maxTuple(dur)._1
-    }
-
-    api.getUser(UserRequest(userID = Some(quest.authorUserID))) match {
-      case OkApiResult(Some(UserResult(u))) => {
-        math.min(constants.maxQuestLevel, math.max(constants.minQuestLevel, u.profile.level + levelShift))
-
-      }
-      case _ => {
-        throw new Exception
-      }
-    }
+    
+    val totalVotes = quest.rating.difficultyRating.easy + quest.rating.difficultyRating.normal + quest.rating.difficultyRating.hard + quest.rating.difficultyRating.extreme
+    val l: Int = (quest.rating.difficultyRating.easy * constants.easyWeight 
+        + quest.rating.difficultyRating.normal * constants.normalWeight 
+        + quest.rating.difficultyRating.hard * constants.hardWeight 
+        + quest.rating.difficultyRating.extreme * constants.extremeWeight) / totalVotes
+    
+    math.min(constants.maxQuestLevel, math.max(constants.minQuestLevel, l))
 
   }
 

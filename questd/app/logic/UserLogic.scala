@@ -205,7 +205,7 @@ class UserLogic(val user: User) {
    * Takes everything into account and returns possible quest to be solved by user.
    */
   def getRandomQuestForSolution: Option[Quest] = {
-    val quests = api.allQuestsInRotation(AllQuestsRequest(user.profile.level - questLevelTolerance, user.profile.level + questLevelTolerance)).body.get.quests
+    val quests = api.allQuestsInRotation(AllQuestsRequest(user.profile.level - questLevelToleranceDown, user.profile.level + questLevelToleranceUp)).body.get.quests
 
     if (quests.length == 0) {
       None

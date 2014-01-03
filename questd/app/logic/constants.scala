@@ -33,16 +33,22 @@ object constants {
   
   val questProposalIACPenalty = 10
   
-  val minQuestLevel = 0
+  val minQuestLevel = 2
   
   val maxQuestLevel = 21
+  
+  val easyWeight = 0
+  val normalWeight = 8
+  val hardWeight = 15
+  val extremeWeight = 22
   
   
   /**
    * Quest resolving.
    */
   
-  val questLevelTolerance = 20
+  val questLevelToleranceUp = 1
+  val questLevelToleranceDown = 20
   
   val questSolutionGiveUpPenalty = 2
 
