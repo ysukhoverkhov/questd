@@ -6,6 +6,7 @@ import models.store.dao._
 import models.store._
 import models.domain._
 import com.mongodb.casbah.commons.MongoDBObject
+import java.util.Date
 
 /**
  * DOA for Quest objects
@@ -14,12 +15,14 @@ private[mongo] class MongoQuestDAO
   extends BaseMongoDAO[Quest](collectionName = "quests")
   with QuestDAO {
 
-  def allWithStatus(status: String, minLevel: Int, maxLevel: Int): Iterator[Quest] = {
-    allByExample(
-      ("status" -> status),
-      ("$and" -> Array(
-        MongoDBObject("info.level" -> MongoDBObject("$gte" -> minLevel)),
-        MongoDBObject("info.level" -> MongoDBObject("$lte" -> maxLevel)))))
+  def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[Quest] = {
+    findByExample(
+      MongoDBObject(
+        ("status" -> status),
+        ("$and" -> Array(
+          MongoDBObject("info.level" -> MongoDBObject("$gte" -> minLevel)),
+          MongoDBObject("info.level" -> MongoDBObject("$lte" -> maxLevel))))),
+      MongoDBObject("lastModDate" -> 1))
   }
 
   /**
@@ -65,7 +68,9 @@ private[mongo] class MongoQuestDAO
           "rating.durationRating.hour" -> hourChange,
           "rating.durationRating.day" -> dayChange,
           "rating.durationRating.days" -> daysChange,
-          "rating.durationRating.week" -> weekChange))))
+          "rating.durationRating.week" -> weekChange)),
+        ("$set" -> MongoDBObject(
+          "lastModDate" -> new Date()))))
   }
 
   /**
@@ -76,7 +81,8 @@ private[mongo] class MongoQuestDAO
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
-          "status" -> newStatus))))
+          "status" -> newStatus,
+          "lastModDate" -> new Date()))))
   }
 
   /**
@@ -87,7 +93,8 @@ private[mongo] class MongoQuestDAO
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
-          "info.level" -> newLevel))))
+          "info.level" -> newLevel,
+          "lastModDate" -> new Date()))))
   }
 }
 

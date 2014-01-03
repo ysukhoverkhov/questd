@@ -151,15 +151,14 @@ class UserLogic(val user: User) {
   def costOfGivingUpQuestProposal = {
     Assets(rating = ratingToGiveUpQuestProposal(user.profile.level)) clampTop user.profile.assets
   }
-  
+
   /**
    * Check is quest deadline passed and quest should be autogave up.
    */
   def shouldGiveupProposal = {
-    ((user.profile.questProposalContext.takenTheme != None) 
+    ((user.profile.questProposalContext.takenTheme != None)
       && (user.profile.questProposalContext.questProposalCooldown.before(new Date())))
   }
-
 
   /**
    * **********************************
@@ -207,13 +206,21 @@ class UserLogic(val user: User) {
   def getRandomQuestForSolution: Option[Quest] = {
     val quests = api.allQuestsInRotation(AllQuestsRequest(user.profile.level - questLevelToleranceDown, user.profile.level + questLevelToleranceUp)).body.get.quests
 
-    if (quests.length == 0) {
-      None
-    } else {
-      val rand = new Random(System.currentTimeMillis())
-      val random_index = rand.nextInt(quests.length)
-      Some(quests(random_index))
+    def selectQuest(i: Iterator[Quest]): Option[Quest] = {
+      if (i.hasNext) {
+        val q = i.next()
+        
+        if (q.authorUserID != user.id) {
+          Some(q)
+        } else {
+          selectQuest(i)
+        }
+      } else {
+        None
+      }
     }
+    
+    selectQuest(quests)
   }
 
   /**
@@ -392,14 +399,21 @@ class UserLogic(val user: User) {
   def getQuestProposalToVote: Option[Quest] = {
     val quests = api.allQuestsOnVoting.body.get.quests
 
-    if (quests.length == 0) {
-      None
-    } else {
-      val rand = new Random(System.currentTimeMillis())
-      val random_index = rand.nextInt(quests.length)
-      Some(quests(random_index))
+    def selectQuest(i: Iterator[Quest]): Option[Quest] = {
+      if (i.hasNext) {
+        val q = i.next()
+        
+        if (q.authorUserID != user.id) {
+          Some(q)
+        } else {
+          selectQuest(i)
+        }
+      } else {
+        None
+      }
     }
-
+    
+    selectQuest(quests)
   }
 
   /**
@@ -491,8 +505,7 @@ class UserLogic(val user: User) {
   def dailyAssetsDecrease = {
     Assets(rating = dailyRatingDecrease(user.profile.level)) clampTop (user.profile.assets)
   }
-  
-  
+
   /**
    * ***********************
    * Leveling up

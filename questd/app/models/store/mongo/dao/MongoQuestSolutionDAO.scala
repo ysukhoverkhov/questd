@@ -6,6 +6,7 @@ import models.store.dao._
 import models.store._
 import models.domain._
 import com.mongodb.casbah.commons.MongoDBObject
+import java.util.Date
 
 /**
  * DOA for Config objects
@@ -15,17 +16,21 @@ private[mongo] class MongoQuestSolutionDAO
   with QuestSolutionDAO {
 
   def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[QuestSolution] = {
-    allByExample(
-      ("status" -> status),
-      ("$and" -> Array(
-        MongoDBObject("questLevel" -> MongoDBObject("$gte" -> minLevel)),
-        MongoDBObject("questLevel" -> MongoDBObject("$lte" -> maxLevel)))))
+    findByExample(
+      MongoDBObject(
+        ("status" -> status),
+        ("$and" -> Array(
+          MongoDBObject("questLevel" -> MongoDBObject("$gte" -> minLevel)),
+          MongoDBObject("questLevel" -> MongoDBObject("$lte" -> maxLevel))))),
+      MongoDBObject("lastModDate" -> 1))
   }
 
   def allWithStatusAndQuest(status: String, questId: String): Iterator[QuestSolution] = {
-    allByExample(
-      ("status" -> status),
-      ("questID" -> questId))
+    findByExample(
+      MongoDBObject(
+        ("status" -> status),
+        ("questID" -> questId)),
+      MongoDBObject("lastModDate" -> 1))
   }
 
   def updateStatus(id: String, newStatus: String): Option[QuestSolution] = {
@@ -33,7 +38,8 @@ private[mongo] class MongoQuestSolutionDAO
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
-          "status" -> newStatus))))
+          "status" -> newStatus,
+          "lastModDate" -> new Date()))))
 
   }
 
@@ -48,22 +54,26 @@ private[mongo] class MongoQuestSolutionDAO
 
     spamChange: Int = 0,
     pornChange: Int = 0): Option[QuestSolution] = {
-    
+
     findAndModify(
       id,
       MongoDBObject(
         ("$inc" -> MongoDBObject(
           "rating.reviewsCount" -> reviewsCountChange,
           "rating.pointsRandom" -> pointsRandomChange,
-          
+
           "rating.pointsFriends" -> pointsFriendsChange,
           "rating.pointsInvited" -> pointsInvitedChange,
-          
+
           "rating.cheating" -> cheatingChange,
 
           "rating.iacpoints.spam" -> spamChange,
-          "rating.iacpoints.porn" -> pornChange))))
+          "rating.iacpoints.porn" -> pornChange)),
+        ("$set" -> MongoDBObject(
+          "lastModDate" -> new Date()))))
   }
 
 }
+
+// TODO: update date on each update.
 

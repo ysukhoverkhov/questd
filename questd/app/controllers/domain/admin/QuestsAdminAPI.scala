@@ -9,7 +9,7 @@ import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 
 case class AllQuestsRequest(fromLevel: Int, toLevel: Int)
-case class AllQuestsResult(quests: List[Quest])
+case class AllQuestsResult(quests: Iterator[Quest])
 
 
 case class AllQuestSolutionsRequest(minLevel: Int, maxLevel: Int)
@@ -22,18 +22,14 @@ private [domain] trait QuestsAdminAPI { this: DBAccessor =>
    * List all Quests with approved status.
    */
   def allQuestsInRotation(request: AllQuestsRequest): ApiResult[AllQuestsResult] = handleDbException {
-    Logger.info("Admin request for all quests. THIS SHOULD NOT BE CALLED IN PRODUCTION SINCE IT'S VERY SLOW!!!!!!")
-
-    OkApiResult(Some(AllQuestsResult(List() ++ db.quest.allWithStatus(QuestStatus.InRotation.toString, request.fromLevel, request.toLevel))))
+    OkApiResult(Some(AllQuestsResult(db.quest.allWithStatusAndLevels(QuestStatus.InRotation.toString, request.fromLevel, request.toLevel))))
   }
 
   /**
    * List all Quests with OnVoting status.
    */
   def allQuestsOnVoting: ApiResult[AllQuestsResult] = handleDbException {
-    Logger.info("Admin request for all quests. THIS SHOULD NOT BE CALLED IN PRODUCTION SINCE IT'S VERY SLOW!!!!!!")
-
-    OkApiResult(Some(AllQuestsResult(List() ++ db.quest.allWithStatus(QuestStatus.OnVoting.toString, 0, 21))))
+    OkApiResult(Some(AllQuestsResult(db.quest.allWithStatusAndLevels(QuestStatus.OnVoting.toString, 0, 21))))
   }
 
   /**

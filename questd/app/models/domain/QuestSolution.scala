@@ -1,6 +1,7 @@
 package models.domain
 
 import models.domain.base.ID
+import java.util.Date
 
 object QuestSolutionStatus extends Enumeration {
   val OnVoting, WaitingForCompetitor, Won, Lost, CheatingBanned, IACBanned = Value
@@ -8,6 +9,7 @@ object QuestSolutionStatus extends Enumeration {
 
 case class QuestSolution(
   id: String = ID.generateUUID(),
+  lastModDate: Date = new Date(),
   questID: String,
   userID: String,
   rivalSolutionId: Option[String] = None,

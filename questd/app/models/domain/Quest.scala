@@ -1,6 +1,7 @@
 package models.domain
 
 import models.domain.base.ID
+import java.util.Date
 
 
 object QuestStatus extends Enumeration {
@@ -9,6 +10,7 @@ object QuestStatus extends Enumeration {
 
 case class Quest(
   id: String = ID.generateUUID(),
+  lastModDate: Date = new Date(),
   themeID: String,
   authorUserID: String,
   approveReward: Assets,
