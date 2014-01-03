@@ -260,16 +260,16 @@ private[mongo] class MongoUserDAO
           ("$pop" -> MongoDBObject(
             "privateDailyResults" -> 1))))
     }
-    
+
     findAndModify(
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
           "profile.dailyResults" -> dailyResults.map(grater[DailyResult].asDBObject(_))))))
   }
-  
+
   /**
-   * 
+   *
    */
   def storeProposalInDailyResult(id: String, proposal: QuestProposalResult): Option[User] = {
     findAndModify(
@@ -280,7 +280,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def storeSolutionInDailyResult(id: String, solution: QuestSolutionResult): Option[User] = {
     Logger.error("haha")
@@ -291,9 +291,30 @@ private[mongo] class MongoUserDAO
           "privateDailyResults.0.decidedQuestSolutions" -> grater[QuestSolutionResult].asDBObject(solution)))))
   }
 
+  /**
+   *
+   */
+  def levelup(id: String, ratingToNextlevel: Int): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.level" -> 1,
+          "profile.assets.rating" -> -ratingToNextlevel))))
+  }
+
+  /**
+   * 
+   */
+  def setNextLevelRating(id: String, newRatingToNextlevel: Int): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.ratingToNextLevel" -> newRatingToNextlevel))))
+  }
+
 }
-
-
 
 /**
  * Test version of dao what fails al the time

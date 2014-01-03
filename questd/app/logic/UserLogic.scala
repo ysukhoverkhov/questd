@@ -491,6 +491,16 @@ class UserLogic(val user: User) {
   def dailyAssetsDecrease = {
     Assets(rating = dailyRatingDecrease(user.profile.level)) clampTop (user.profile.assets)
   }
+  
+  
+  /**
+   * ***********************
+   * Leveling up
+   * ***********************
+   */
+  def ratingToNextLevel: Int = {
+    ratToGainLevel(user.profile.level + 1)
+  }
 
 }
 

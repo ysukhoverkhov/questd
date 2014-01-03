@@ -98,6 +98,12 @@ class FunctionsSpecs extends Specification {
       dailyRatingDecrease(10) must beEqualTo(939)
       dailyRatingDecrease(20) must beEqualTo(4024)
     }
+    
+    "ratToGainLevel" in {
+      ratToGainLevel(2) must beEqualTo(246)
+      ratToGainLevel(10) must beEqualTo(10000)
+      ratToGainLevel(20) must beEqualTo(500000)
+    }
   }
 
 }

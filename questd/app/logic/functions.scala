@@ -166,12 +166,31 @@ object functions {
     math.max(1, math.round(rewardForVotingSolutionInt(level, voteNumber, kf(level)).toFloat))
   }
 
-  /***************************
+  /**
+   * *************************
    * Daily results
-   ***************************/
+   * *************************
+   */
   
   def dailyRatingDecrease(level: Int): Int = {
     math.round(ratDecrease(level)).toInt
+  }
+  
+  
+  /**
+   * ********************
+   * Leveling up
+   * ********************
+   */
+  def ratToGainLevel(level: Int): Int = {
+
+    def ratToGainLevelInt(level: Int, k: Double, d: Double, b: Double) = megaf(level, k, d, b, 0)
+    
+    val k = 307.3998426
+    val d = 2.5694326
+    val b = -207.3998426
+    
+    if (level <= 1) 0 else math.round(ratToGainLevelInt(level, k, d, b)).toInt
   }
 }
 

@@ -58,6 +58,8 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
                 ContentReference(contentType = ContentType.Photo.toString, storage = "fb_avatar", reference = params.userfb.getId())))))
 
         db.user.create(newUser)
+        checkIncreaseLevel(CheckIncreaseLevelRequest(newUser)) 
+        
         db.user.readByFBid(params.userfb.getId()) match {
           case None => {
             Logger.error("Unable to find user just created in DB with fbid " + params.userfb.getId())
