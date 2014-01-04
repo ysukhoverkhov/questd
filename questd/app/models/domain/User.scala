@@ -11,5 +11,6 @@ case class User(
   profile: Profile = Profile(),
   schedules: UserSchedules = UserSchedules(),
   stats: UserStats = UserStats(),
-  privateDailyResults: List[DailyResult] = List()) extends ID
+  privateDailyResults: List[DailyResult] = List(),
+  history: UserHistory = UserHistory()) extends ID
 

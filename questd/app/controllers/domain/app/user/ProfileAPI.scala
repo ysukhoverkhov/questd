@@ -90,4 +90,3 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
 
 }
 
-// TODO: call to increase level on creating new user.

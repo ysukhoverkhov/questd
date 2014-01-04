@@ -75,5 +75,3 @@ private[mongo] class MongoQuestSolutionDAO
 
 }
 
-// TODO: update date on each update.
-
