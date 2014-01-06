@@ -44,7 +44,7 @@ class UserLogic(val user: User) {
    * Check is the user can purchase quest proposals.
    */
   def canPurchaseQuestProposals = {
-    if (user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString()))
       LevelTooLow
     else if (!(user.profile.assets canAfford costOfPurchasingQuestProposal))
       NotEnoughAssets
@@ -60,7 +60,7 @@ class UserLogic(val user: User) {
    * Is user can propose quest of given type.
    */
   def canTakeQuestTheme = {
-    if (user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString()))
       LevelTooLow
     else if (user.profile.questProposalContext.purchasedTheme == None)
       InvalidState
@@ -185,7 +185,7 @@ class UserLogic(val user: User) {
    * Check can the user purchase quest.
    */
   def canPurchaseQuest = {
-    if (user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults.toString()))
       LevelTooLow
     else if (!(user.profile.assets canAfford costOfPurchasingQuest))
       NotEnoughAssets
@@ -228,7 +228,7 @@ class UserLogic(val user: User) {
    * Check are we able to take quest.
    */
   def canTakeQuest = {
-    if (user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults.toString()))
       LevelTooLow
     else if (user.profile.questSolutionContext.purchasedQuest == None)
       InvalidState
@@ -374,7 +374,7 @@ class UserLogic(val user: User) {
    *
    */
   def canGetQuestProposalForVote = {
-    if (user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestProposals.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestProposals.toString()))
       LevelTooLow
     else if (user.profile.questProposalVoteContext.reviewingQuest != None)
       InvalidState
@@ -386,7 +386,7 @@ class UserLogic(val user: User) {
    *
    */
   def canVoteQuestProposal = {
-    if (user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestProposals.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestProposals.toString()))
       LevelTooLow
     else if (user.profile.questProposalVoteContext.reviewingQuest == None)
       InvalidState
@@ -426,7 +426,7 @@ class UserLogic(val user: User) {
    *
    */
   def canGetQuestSolutionForVote = {
-    if (user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestSolutions.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestSolutions.toString()))
       LevelTooLow
     else if (user.profile.questSolutionVoteContext.reviewingQuestSolution != None)
       InvalidState
@@ -448,7 +448,7 @@ class UserLogic(val user: User) {
    *
    */
   def canVoteQuestSolution = {
-    if (user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestSolutions.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestSolutions.toString()))
       LevelTooLow
     else if (user.profile.questSolutionVoteContext.reviewingQuestSolution == None)
       InvalidState
