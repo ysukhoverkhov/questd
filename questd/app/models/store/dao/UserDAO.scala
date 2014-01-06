@@ -35,7 +35,7 @@ trait UserDAO extends BaseDAO[User] {
   def storeSolutionInDailyResult(id: String, solution: QuestSolutionResult): Option[User]
 
   def levelup(id: String, ratingToNextlevel: Int): Option[User]
-  def setNextLevelRating(id: String, newRatingToNextlevel: Int): Option[User]
+  def setNextLevelRatingAndRights(id: String, newRatingToNextlevel: Int, rights: Rights): Option[User]
   
   def addFreshDayToHistory(id: String): Option[User]
   def removeLastDayFromHistory(id: String): Option[User]

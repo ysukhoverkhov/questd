@@ -304,12 +304,13 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def setNextLevelRating(id: String, newRatingToNextlevel: Int): Option[User] = {
+  def setNextLevelRatingAndRights(id: String, newRatingToNextlevel: Int, rights: Rights): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
-          "profile.ratingToNextLevel" -> newRatingToNextlevel))))
+          "profile.ratingToNextLevel" -> newRatingToNextlevel,
+          "profile.rights" -> grater[Rights].asDBObject(rights)))))
   }
 
   /**

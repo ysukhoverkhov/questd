@@ -2,21 +2,27 @@ package models.domain
 
 import logic.constants
 
+object Functionality extends Enumeration {
+  val VoteQuestSolutions = Value
+  val SubmitPhotoResults = Value
+  val SubmitVideoResults = Value
+  val Report = Value
+  val InviteFriends = Value
+  val AddToShortList = Value
+  val VoteQuestProposals = Value
+  val SubmitPhotoQuests = Value
+  val SubmitVideoQuests = Value
+  val VoteReviews = Value
+  val SubmitReviewsForResults = Value
+  val SubmitReviewsForProposals = Value
+  val GiveRewards = Value
+}
+
 /**
  * What does user can do an what level.
  */
 case class Rights(
-  voteQuestSolutions: Int = constants.voteQuestSolutions,
-  submitPhotoResults: Int = constants.submitPhotoResults,
-  submitVideoResults: Int = constants.submitVideoResults,
-  report: Int = constants.report,
-  inviteFriends: Int = constants.inviteFriends,
-  addToShortList: Int = constants.addToShortList,
-  voteQuestProposals: Int = constants.voteQuestProposals,
-  submitPhotoQuests: Int = constants.submitPhotoQuests,
-  submitVideoQuests: Int = constants.submitVideoQuests,
-  voteReviews: Int = constants.voteReviews,
-  submitReviewsForResults: Int = constants.submitReviewsForResults,
-  submitReviewsForProposals: Int = constants.submitReviewsForProposals,
-  giveRewards: Int = constants.giveRewards)
+    val unlockedFunctionality: Set[String] = Set())
     
+
+// TODO implement ws call to get rights for each level.

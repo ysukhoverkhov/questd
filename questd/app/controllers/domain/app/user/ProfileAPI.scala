@@ -21,7 +21,6 @@ case class AdjustAssetsResult(user: User)
 case class CheckIncreaseLevelRequest(user: User)
 case class CheckIncreaseLevelResult(user: User)
 
-
 private[domain] trait ProfileAPI { this: DBAccessor =>
 
   /**
@@ -40,7 +39,7 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
     import request._
 
     db.user.resetCounters(user.id, user.getResetPurchasesTimeout)
-    
+
     OkApiResult(Some(ResetCountersResult()))
   }
 
@@ -59,14 +58,14 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
     else
       del
 
-    val u = db.user.addToAssets(user.id, del2).getOrElse{
+    val u = db.user.addToAssets(user.id, del2).getOrElse {
       Logger.error("API - adjustAssets. Unable to find user in db")
       user
     }
-    
-    checkIncreaseLevel(CheckIncreaseLevelRequest(u)) map {r => OkApiResult(Some(AdjustAssetsResult(r.user))) } 
+
+    checkIncreaseLevel(CheckIncreaseLevelRequest(u)) map { r => OkApiResult(Some(AdjustAssetsResult(r.user))) }
   }
-  
+
   /**
    * Check is user should increase its level and increases it if he should.
    */
@@ -76,16 +75,17 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
         Logger.error("API - checkIncreaseLevel. Unable to get user after increasing level")
         request.user
       }
-      
-      val newRatingToNextlevel = user.ratingToNextLevel
-      
-      db.user.setNextLevelRating(user.id, newRatingToNextlevel).getOrElse {
-        Logger.error("API - checkIncreaseLevel. Unable to get user after setting rating to next level.")
-        request.user
-      }
+
+      db.user.setNextLevelRatingAndRights(
+        user.id,
+        user.ratingToNextLevel,
+        user.calculateRights).getOrElse {
+          Logger.error("API - checkIncreaseLevel. Unable to get user after setting rating to next level.")
+          request.user
+        }
     } else request.user
-    
-    OkApiResult(Some(CheckIncreaseLevelResult(u))) 
+
+    OkApiResult(Some(CheckIncreaseLevelResult(u)))
   }
 
 }
