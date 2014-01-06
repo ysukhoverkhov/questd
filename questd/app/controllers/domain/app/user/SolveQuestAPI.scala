@@ -87,23 +87,27 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           user.getRandomQuestForSolution match {
             case None => OkApiResult(Some(PurchaseQuestResult(OutOfContent)))
             case Some(q) => {
-              val questCost = user.costOfPurchasingQuest
-              val author = db.user.readByID(q.authorUserID).map(x => BioWithID(q.authorUserID, x.profile.bio))
+              {
+                rememberQuestSolvingInHistory (RememberQuestSolvingRequest(user, q.id))
+              } map {
+                val questCost = user.costOfPurchasingQuest
+                val author = db.user.readByID(q.authorUserID).map(x => BioWithID(q.authorUserID, x.profile.bio))
 
-              if (author == None) {
-                Logger.error("API - purchaseQuest. Unable to find quest author")
-                InternalErrorApiResult()
-              } else {
-                adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) map { r =>
+                if (author == None) {
+                  Logger.error("API - purchaseQuest. Unable to find quest author")
+                  InternalErrorApiResult()
+                } else {
+                  adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) map { r =>
 
-                  val u = db.user.purchaseQuest(
-                    r.user.id,
-                    QuestInfoWithID(q.id, q.info),
-                    author.get,
-                    r.user.rewardForLosingQuest(q),
-                    r.user.rewardForWinningQuest(q))
+                    val u = db.user.purchaseQuest(
+                      r.user.id,
+                      QuestInfoWithID(q.id, q.info),
+                      author.get,
+                      r.user.rewardForLosingQuest(q),
+                      r.user.rewardForWinningQuest(q))
 
-                  OkApiResult(Some(PurchaseQuestResult(OK, u.map(_.profile))))
+                    OkApiResult(Some(PurchaseQuestResult(OK, u.map(_.profile))))
+                  }
                 }
               }
             }

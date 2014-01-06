@@ -13,6 +13,7 @@ import functions._
 import constants._
 import play.Logger
 import controllers.domain.admin._
+import com.mongodb.BasicDBList
 
 // This should not go to DB directly since API may have cache layer.
 class UserLogic(val user: User) {
@@ -206,21 +207,7 @@ class UserLogic(val user: User) {
   def getRandomQuestForSolution: Option[Quest] = {
     val quests = api.allQuestsInRotation(AllQuestsRequest(user.profile.level - questLevelToleranceDown, user.profile.level + questLevelToleranceUp)).body.get.quests
 
-    def selectQuest(i: Iterator[Quest]): Option[Quest] = {
-      if (i.hasNext) {
-        val q = i.next()
-        
-        if (q.authorUserID != user.id) {
-          Some(q)
-        } else {
-          selectQuest(i)
-        }
-      } else {
-        None
-      }
-    }
-    
-    selectQuest(quests)
+    util.selectQuest[Quest](quests, (_.id), (_.authorUserID), user.history.solvedQuestIds)
   }
 
   /**
@@ -399,21 +386,7 @@ class UserLogic(val user: User) {
   def getQuestProposalToVote: Option[Quest] = {
     val quests = api.allQuestsOnVoting.body.get.quests
 
-    def selectQuest(i: Iterator[Quest]): Option[Quest] = {
-      if (i.hasNext) {
-        val q = i.next()
-        
-        if (q.authorUserID != user.id) {
-          Some(q)
-        } else {
-          selectQuest(i)
-        }
-      } else {
-        None
-      }
-    }
-    
-    selectQuest(quests)
+    util.selectQuest[Quest](quests, (_.id), (_.authorUserID), user.history.votedQuestProposalIds)
   }
 
   /**
@@ -451,17 +424,10 @@ class UserLogic(val user: User) {
    * @return None if no more quests to vote for today.
    */
   def getQuestSolutionToVote: Option[QuestSolution] = {
-    val quests = api.allQuestSolutionsOnVoting(
+    val solutions = api.allQuestSolutionsOnVoting(
       AllQuestSolutionsRequest(user.profile.level - constants.solutionLevelDownTolerance, user.profile.level + constants.solutionLevelUpTolerance)).body.get.quests
 
-    if (quests.length == 0) {
-      None
-    } else {
-      val rand = new Random(System.currentTimeMillis())
-      val random_index = rand.nextInt(quests.length)
-      Some(quests(random_index))
-    }
-
+    util.selectQuest[QuestSolution](solutions, (_.id), (_.userID), user.history.votedQuestSolutionIds)
   }
 
   /**
@@ -513,6 +479,65 @@ class UserLogic(val user: User) {
    */
   def ratingToNextLevel: Int = {
     ratToGainLevel(user.profile.level + 1)
+  }
+
+  /**
+   * *******************************************
+   * Utils for user logic
+   * *******************************************
+   */
+  private object util {
+
+    /**
+     * Check is string in list of dblists of strings.
+     */
+    def listOfListsContainsString(l: List[List[String]], s: String) = {
+      if (l.length > 0) {
+
+        // This is required since salat makes embedded lists as BasicDBLists.
+        val rv = if (l.head.getClass() == classOf[BasicDBList]) {
+          for (
+            out <- l.asInstanceOf[List[BasicDBList]];
+            in <- out.toArray();
+            if in == s
+          ) yield {
+            true
+          }
+        } else {
+          for (
+            out <- l;
+            in <- out;
+            if in == s
+          ) yield {
+            true
+          }
+        }
+
+        rv.length > 0
+
+      } else {
+        false
+      }
+    }
+
+    /**
+     * Select quest what is not or quest and not in given list.
+     */
+    def selectQuest[T](i: Iterator[T], fid: (T => String), fauthorid: (T => String), usedQuests: List[List[String]]): Option[T] = {
+      if (i.hasNext) {
+        val q = i.next()
+
+        if (fauthorid(q) != user.id
+          && !(util.listOfListsContainsString(usedQuests, fid(q)))) {
+          Some(q)
+        } else {
+          selectQuest(i, fid, fauthorid, usedQuests)
+        }
+      } else {
+        None
+      }
+    }
+
   }
 
 }

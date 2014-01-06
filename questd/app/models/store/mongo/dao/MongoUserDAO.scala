@@ -252,7 +252,6 @@ private[mongo] class MongoUserDAO
    *
    */
   def movePrivateDailyResultsToPublic(id: String, dailyResults: List[DailyResult]): Option[User] = {
-    Logger.error("1")
     for (a <- 1 to dailyResults.length) {
       findAndModify(
         id,
@@ -283,7 +282,6 @@ private[mongo] class MongoUserDAO
    *
    */
   def storeSolutionInDailyResult(id: String, solution: QuestSolutionResult): Option[User] = {
-    Logger.error("haha")
     findAndModify(
       id,
       MongoDBObject(
@@ -304,7 +302,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def setNextLevelRating(id: String, newRatingToNextlevel: Int): Option[User] = {
     findAndModify(
@@ -312,6 +310,74 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         ("$set" -> MongoDBObject(
           "profile.ratingToNextLevel" -> newRatingToNextlevel))))
+  }
+
+  /**
+   *
+   */
+  def addFreshDayToHistory(id: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$push" -> MongoDBObject(
+          "history.votedQuestProposalIds" ->
+            MongoDBObject(
+              "$each" -> List(List()),
+              "$position" -> 0),
+          "history.solvedQuestIds" ->
+            MongoDBObject(
+              "$each" -> List(List()),
+              "$position" -> 0),
+          "history.votedQuestSolutionIds" ->
+            MongoDBObject(
+              "$each" -> List(List()),
+              "$position" -> 0)))))
+  }
+
+  /**
+   *
+   */
+  def removeLastDayFromHistory(id: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$pop" -> MongoDBObject(
+          "history.votedQuestProposalIds" -> 1,
+          "history.solvedQuestIds" -> 1,
+          "history.votedQuestSolutionIds" -> 1))))
+  }
+
+  /**
+   * 
+   */
+  def rememberProposalVotingInHistory(id: String, proposalId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$push" -> MongoDBObject(
+          "history.votedQuestProposalIds.0" -> proposalId))))
+  }
+  
+  /**
+   * 
+   */
+  def rememberQuestSolvingInHistory(id: String, questId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$push" -> MongoDBObject(
+          "history.solvedQuestIds.0" -> questId))))
+  }
+  
+  /**
+   * 
+   */
+  def rememberSolutionVotingInHistory(id: String, solutionId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$push" -> MongoDBObject(
+          "history.votedQuestSolutionIds.0" -> solutionId))))
   }
 
 }

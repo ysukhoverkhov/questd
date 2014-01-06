@@ -79,6 +79,8 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
             {
               voteQuestSolutionUpdate(VoteQuestSolutionUpdateRequest(q, request.vote))
             } map {
+              rememberSolutionVotingInHistory(RememberSolutionVotingRequest(request.user, q.id))
+            } map {
 
               // 5. update user profile.
               // 6. save profile in db.

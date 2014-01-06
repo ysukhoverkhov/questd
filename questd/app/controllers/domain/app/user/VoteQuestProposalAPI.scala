@@ -72,6 +72,9 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
             {
               voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
             } map {
+              rememberProposalVotingInHistory(RememberProposalVotingRequest(request.user, q.id))
+            } map {
+
               adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))
             } map { r =>
               // 3. update user profile.

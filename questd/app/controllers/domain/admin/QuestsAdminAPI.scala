@@ -13,7 +13,7 @@ case class AllQuestsResult(quests: Iterator[Quest])
 
 
 case class AllQuestSolutionsRequest(minLevel: Int, maxLevel: Int)
-case class AllQuestSolutionsResult(quests: List[QuestSolution])
+case class AllQuestSolutionsResult(quests: Iterator[QuestSolution])
 
 private [domain] trait QuestsAdminAPI { this: DBAccessor => 
 
@@ -36,9 +36,7 @@ private [domain] trait QuestsAdminAPI { this: DBAccessor =>
    * List all Quests solution s with OnVoting status.
    */
   def allQuestSolutionsOnVoting(request: AllQuestSolutionsRequest): ApiResult[AllQuestSolutionsResult] = handleDbException {
-    Logger.info("Admin request for all quests. THIS SHOULD NOT BE CALLED IN PRODUCTION SINCE IT'S VERY SLOW!!!!!!")
-
-    OkApiResult(Some(AllQuestSolutionsResult(List() ++ db.solution.allWithStatusAndLevels(QuestSolutionStatus.OnVoting.toString, request.minLevel, request.maxLevel))))
+    OkApiResult(Some(AllQuestSolutionsResult(db.solution.allWithStatusAndLevels(QuestSolutionStatus.OnVoting.toString, request.minLevel, request.maxLevel))))
   }
 }
 

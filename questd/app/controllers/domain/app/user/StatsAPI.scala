@@ -11,6 +11,18 @@ import logic._
 case class ShiftStatsRequest(user: User)
 case class ShiftStatsResult()
 
+case class ShiftHistoryRequest(user: User)
+case class ShiftHistoryResult()
+
+case class RememberProposalVotingRequest(user: User, proposalId: String)
+case class RememberProposalVotingResult()
+
+case class RememberQuestSolvingRequest(user: User, questId: String)
+case class RememberQuestSolvingResult()
+
+case class RememberSolutionVotingRequest(user: User, solutionId: String)
+case class RememberSolutionVotingResult()
+
 private[domain] trait StatsAPI { this: DBAccessor =>
 
   /**
@@ -32,5 +44,57 @@ private[domain] trait StatsAPI { this: DBAccessor =>
     OkApiResult(Some(ShiftStatsResult()))
   }
 
+  /**
+   * Shifts user history one day forward.
+   */
+  def shiftHistory(request: ShiftHistoryRequest): ApiResult[ShiftHistoryResult] = handleDbException {
+    import request._
+    
+    val historyDepth = 15
+    
+    db.user.addFreshDayToHistory(user.id)
+    
+    if (user.history.votedQuestProposalIds.length >= historyDepth) {
+      db.user.removeLastDayFromHistory(user.id)
+    }
+    
+    OkApiResult(Some(ShiftHistoryResult()))
+  }
+  
+  /**
+   * Remember voted proposal
+   */
+  def rememberProposalVotingInHistory(request: RememberProposalVotingRequest): ApiResult[RememberProposalVotingResult] = handleDbException {
+    import request._
+    
+    db.user.rememberProposalVotingInHistory(user.id, request.proposalId)
+    
+    OkApiResult(Some(RememberProposalVotingResult()))
+  }
+  
+  /**
+   * Remember solved quest
+   */
+  def rememberQuestSolvingInHistory(request: RememberQuestSolvingRequest): ApiResult[RememberQuestSolvingResult] = handleDbException {
+    import request._
+    
+    db.user.rememberQuestSolvingInHistory(user.id, request.questId)
+    
+    OkApiResult(Some(RememberQuestSolvingResult()))
+  }
+  
+  /**
+   * Remember voted solution
+   */
+  def rememberSolutionVotingInHistory(request: RememberSolutionVotingRequest): ApiResult[RememberSolutionVotingResult] = handleDbException {
+    import request._
+    
+    db.user.rememberSolutionVotingInHistory(user.id, request.solutionId)
+    
+    OkApiResult(Some(RememberSolutionVotingResult()))
+  }
+  
+  
+  
 }
 
