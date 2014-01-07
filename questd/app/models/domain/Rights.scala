@@ -24,5 +24,3 @@ object Functionality extends Enumeration {
 case class Rights(
     val unlockedFunctionality: Set[String] = Set())
     
-
-// TODO implement ws call to get rights for each level.

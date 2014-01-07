@@ -49,7 +49,7 @@ POST	/rest/voteQuestSolution				controllers.web.rest.VoteQuestSolutionWS.voteQue
 
 # Daily result
 POST	/rest/getDailyResult				controllers.web.rest.DailyResultWS.getDailyResult
-
+POST	/rest/getRightsAtLevel				controllers.web.rest.DailyResultWS.getRightsAtLevel
 
 
 # Content requests

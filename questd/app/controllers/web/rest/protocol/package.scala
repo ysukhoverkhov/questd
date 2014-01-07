@@ -19,7 +19,7 @@ package object protocol {
   object UnauthorisedReason extends Enumeration {
 
     type UnauthorisedReason = UnauthorisedReason.Value
-    
+
     /**
      *  FB tells us it doesn't know the token.
      */
@@ -30,7 +30,6 @@ package object protocol {
      */
     val SessionNotFound = Value
   }
-
 
   /**
    * Login Request
@@ -44,18 +43,16 @@ package object protocol {
    */
   case class WSLoginFBResult(sessionid: String)
 
-  
   /**
    * Get profile response
    */
   type WSProfileResult = Profile
-  
-  
+
   /**
    * Get Quest theme cost result
    */
   type WSGetQuestThemeCostResult = GetQuestThemeCostResult
-  
+
   /**
    * Result for purchase quest.
    */
@@ -66,112 +63,118 @@ package object protocol {
    */
   type WSTakeQuestThemeResult = TakeQuestThemeResult
 
-  
-  
   type WSGetQuestThemeTakeCostResult = GetQuestThemeTakeCostResult
-  
+
   /**
-   * 
+   *
    */
   type WSProposeQuestRequest = ProposeQuestRequest
-  
+
   /**
-   * 
+   *
    */
   type WSProposeQuestResult = ProposeQuestResult
-  
+
   /**
-   * 
+   *
    */
   type WSGiveUpQuestProposalResult = GiveUpQuestProposalResult
 
   /**
-   * 
+   *
    */
   type WSGetQuestProposalGiveUpCostResult = GetQuestProposalGiveUpCostResult
 
-  
-  /*********************
+  /**
+   * *******************
    * Solving quests
-   *********************/
+   * *******************
+   */
   type WSGetQuestCostResult = GetQuestCostResult
-  
+
   type WSPurchaseQuestResult = PurchaseQuestResult
-  
+
   type WSGetTakeQuestCostResult = GetTakeQuestCostResult
-  
+
   type WSTakeQuestResult = TakeQuestResult
 
   type WSProposeSolutionRequest = ProposeSolutionRequest
   type WSProposeSolutionResult = ProposeSolutionResult
-  
+
   type WSGetQuestGiveUpCostResult = GetQuestGiveUpCostResult
-  
+
   type WSGiveUpQuestResult = GiveUpQuestResult
 
-  
-  /**********************
+  /**
+   * ********************
    * Voting quest proposals
-   **********************/
-  
-  case class WSQuestProposalVoteRequest (
-      /**
-       * @see controllers.domain.user.QuestProposalVote
-       */
-      vote: String,
-      
-      /**
-       * @see QuestDuration 
-       */
-      duration: Option[String],
+   * ********************
+   */
 
-      /**
-       * @see QuestDifficulty 
-       */
-      difficulty: Option[String])
-  
-  
+  case class WSQuestProposalVoteRequest(
+    /**
+     * @see controllers.domain.user.QuestProposalVote
+     */
+    vote: String,
+
+    /**
+     * @see QuestDuration
+     */
+    duration: Option[String],
+
+    /**
+     * @see QuestDifficulty
+     */
+    difficulty: Option[String])
+
   type WSGetQuestProposalToVoteResult = GetQuestProposalToVoteResult
-  
+
   type WSVoteQuestProposalResult = VoteQuestProposalResult
-  
-  
-  /**********************
+
+  /**
+   * ********************
    * Voting quest solutions
-   **********************/
-  
-  case class WSQuestSolutionVoteRequest (
+   * ********************
+   */
+
+  case class WSQuestSolutionVoteRequest(
     /**
      * @see controllers.domain.user.QuestSolutionVote
      */
     vote: String)
-  
 
   type WSGetQuestSolutionToVoteResult = GetQuestSolutionToVoteResult
-  
+
   type WSVoteQuestSolutionResult = VoteQuestSolutionResult
 
-  
-  /**********************
+  /**
+   * ********************
    * Daily result
-   **********************/
+   * ********************
+   */
   type WSGetDailyResultResult = GetDailyResultResult
-  
+
   type WSShiftDailyResultResult = ShiftDailyResultResult
-  
-  
-  /**********************
+
+  case class WSGetRightsAtLevelsRequest(
+    levelFrom: Int,
+    levelTo: Int)
+
+  type WSGetRightsAtLevelsResult = GetRightsAtLevelsResult
+
+  /**
+   * ********************
    * Content
-   **********************/
-  case class WSGetQuestRequest (
+   * ********************
+   */
+  case class WSGetQuestRequest(
     id: String)
-  
+
   type WSGetQuestResult = GetQuestResult
-    
-    
-  case class WSGetSolutionRequest (
+
+  case class WSGetSolutionRequest(
     id: String)
-    
+
   type WSGetSolutionResult = GetSolutionResult
 }
 

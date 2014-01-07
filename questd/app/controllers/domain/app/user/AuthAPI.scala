@@ -27,6 +27,7 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
       db.user.updateSessionID(user.id, uuid)
 
       // API Test place
+//      Logger.warn(getRightsAtLevels(GetRightsAtLevelsRequest(user, 1, 20)).toString)
 
       OkApiResult(Some(LoginFBResult(uuid)))
     }

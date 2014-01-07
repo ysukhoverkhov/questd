@@ -21,6 +21,9 @@ case class AdjustAssetsResult(user: User)
 case class CheckIncreaseLevelRequest(user: User)
 case class CheckIncreaseLevelResult(user: User)
 
+case class GetRightsAtLevelsRequest(user: User, levelFrom: Int, levelTo: Int)
+case class GetRightsAtLevelsResult(rights: List[Rights])
+
 private[domain] trait ProfileAPI { this: DBAccessor =>
 
   /**
@@ -86,6 +89,20 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
     } else request.user
 
     OkApiResult(Some(CheckIncreaseLevelResult(u)))
+  }
+  
+  /**
+   * Get rights for user if he would be at level.
+   */
+  def getRightsAtLevels(request: GetRightsAtLevelsRequest): ApiResult[GetRightsAtLevelsResult] = handleDbException {
+    import request._
+    
+    val rights = for (l <- levelFrom to levelTo) yield {
+      val u = user.copy(profile = user.profile.copy(level = l))
+      u.calculateRights
+    } 
+    
+    OkApiResult(Some(GetRightsAtLevelsResult(rights.toList)))
   }
 
 }

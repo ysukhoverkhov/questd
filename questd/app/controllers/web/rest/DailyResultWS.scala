@@ -8,6 +8,8 @@ object DailyResultWS extends Controller with AccessToWSInstance {
   
   def getDailyResult = ws.getDailyResult
   
+  def getRightsAtLevel = ws.getRightsAtLevel
+  
   def shiftDailyResult = ws.shiftDailyResult
 }
 
