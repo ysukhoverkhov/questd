@@ -1,10 +1,10 @@
 package models.domain
 
-
 /**
  * This can be given to client as is, thus contains only public information.
  */
 case class Profile(
+  profileVersion: Int = 1,
   level: Int = 18, // Should be 0 here.
   ratingToNextLevel: Int = 0,
   bio: Bio = Bio(),
@@ -14,5 +14,6 @@ case class Profile(
   questProposalContext: QuestProposalConext = QuestProposalConext(),
   questSolutionContext: QuestSolutionContext = QuestSolutionContext(),
   questProposalVoteContext: QuestProposalVoteContext = QuestProposalVoteContext(),
-  questSolutionVoteContext: QuestSolutionVoteContext = QuestSolutionVoteContext())
+  questSolutionVoteContext: QuestSolutionVoteContext = QuestSolutionVoteContext(),
+  debug: String = "")
 

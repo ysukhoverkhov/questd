@@ -31,7 +31,6 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val dailyAssetsDecrease = user.dailyAssetsDecrease
 
-    //    val u = user.copy(privateDailyResults = DailyResult(user.getStartOfCurrentDailyResultPeriod, dailyAssetsDecrease) :: user.privateDailyResults)
     val u = db.user.addPrivateDailyResult(user.id, DailyResult(user.getStartOfCurrentDailyResultPeriod, dailyAssetsDecrease))
 
     u match {
