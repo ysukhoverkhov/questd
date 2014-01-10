@@ -1,5 +1,6 @@
 package controllers.web.rest.component
 
+import scala.concurrent.Future
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.specs2.mock.Mockito
@@ -16,8 +17,9 @@ import controllers.web.rest.component._
 import models.store._
 import models.domain._
 import models.store.mongo._
-import com.restfb.exception.FacebookOAuthException
-import com.restfb.exception.FacebookNetworkException
+import com.restfb.exception._
+import controllers.web.rest.protocol._
+import play.api.mvc._
 
 class LoginWSSpecs extends Specification
   with WSComponent
@@ -43,16 +45,17 @@ class LoginWSSpecs extends Specification
       fb.fetchObject(facebookToken, "me", classOf[UserFB]) returns user
       api.loginfb(LoginFBRequest(user)) returns OkApiResult(Some(LoginFBResult(sessid)))
 
-      val data = Json.obj(
-        "token" -> facebookToken)
+//      import controllers.web.rest.component.helpers._
 
-      val fakeRequest = FakeRequest(
+      val data = AnyContentAsText(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1)))
+
+      val fakeRequest = FakeRequest[AnyContent](
         Helpers.POST,
         "",
         FakeHeaders(),
         data)
 
-      val r = ws.loginfb()(fakeRequest)
+      val r: Future[SimpleResult] = ws.loginfb()(fakeRequest)
 
       status(r) must equalTo(OK)
       contentType(r) must beSome("application/json")
@@ -66,8 +69,7 @@ class LoginWSSpecs extends Specification
 
       fb.fetchObject(facebookToken, "me", classOf[UserFB]) throws new FacebookOAuthException("", "", 1, 1)
 
-      val data = Json.obj(
-        "token" -> facebookToken)
+      val data = AnyContentAsText(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1)))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,
@@ -86,8 +88,7 @@ class LoginWSSpecs extends Specification
 
       fb.fetchObject(facebookToken, "me", classOf[UserFB]) throws new FacebookNetworkException("", null, 1)
 
-      val data = Json.obj(
-        "token" -> facebookToken)
+      val data = AnyContentAsText(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1)))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,

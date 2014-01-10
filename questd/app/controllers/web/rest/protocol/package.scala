@@ -29,13 +29,18 @@ package object protocol {
      *  Supplied session is not valid on our server.
      */
     val SessionNotFound = Value
+    
+    /**
+     * Passed version of the application is not supported.
+     */
+    val UnsupportedAppVersion = Value
   }
 
   /**
    * Login Request
    * Single entry. Key - "token", value - value.
    */
-  type WSLoginFBRequest = Map[String, String]
+  case class WSLoginFBRequest (token: String, appVersion: Int)
 
   /**
    * Login Result

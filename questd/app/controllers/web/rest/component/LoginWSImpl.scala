@@ -12,6 +12,7 @@ import controllers.domain.libs.facebook.UserFB
 import com.restfb.exception._
 import components._
 import controllers.web.rest.protocol._
+import org.json4s.MappingException
 
 trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor with APIAccessor =>
 
@@ -24,52 +25,108 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
    * 500 - Internal error.
    * 503 - Unable to connect to facebook to check status.
    */
-  def loginfb = Action.async(parse.json) { implicit request =>
-    request.body.validate[WSLoginFBRequest].map {
-      case params => {
-        params.head match {
-          case ("token", token: String) => {
-            Future {
-              try {
-                (Option(fb.fetchObject(token, "me", classOf[UserFB])), None)
-              } catch {
-                case ex: FacebookOAuthException => {
-                  Logger.debug("Facebook auth failed")
-                  (None, Some(Unauthorized(
-                    Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)))
-                }
-                case ex: FacebookNetworkException => {
-                  Logger.debug("Unable to connect to facebook")
-                  (None, Some(ServiceUnavailable("Unable to connect to Facebook")))
-                }
-              }
-            } map { rv =>
-              rv match {
-                case (Some(user: UserFB), _) => {
-                  val params = LoginFBRequest(user)
+  def loginfb = Action.async { implicit request =>
 
-                  api.loginfb(params) match {
-                    case OkApiResult(Some(loginResult: LoginFBResult)) =>
-                      storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session.toString))).as(JSON), loginResult)
+    request.body.asJson.fold {
+      Future.successful { BadRequest("Detected error: Empty request") }
+    } { js =>
 
-                    case _ => ServerError
-                  }
+      Future {
 
-                }
-                case (None, Some(r: SimpleResult)) => r
-                case (None, None) => ServerError
-              }
+        try {
+          val loginRequest = Json.read[WSLoginFBRequest](js.toString)
+
+          try {
+            (Option(fb.fetchObject(loginRequest.token, "me", classOf[UserFB])), None)
+          } catch {
+            case ex: FacebookOAuthException => {
+              Logger.debug("Facebook auth failed")
+              (None, Some(Unauthorized(
+                Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)))
+            }
+            case ex: FacebookNetworkException => {
+              Logger.debug("Unable to connect to facebook")
+              (None, Some(ServiceUnavailable("Unable to connect to Facebook")))
             }
           }
 
-          case badRequest => Future.successful { BadRequest("Detected error:" + badRequest.toString + " is not valid request") }
+        } catch {
+          case ex @ (_: MappingException | _: org.json4s.ParserUtil$ParseException) => {
+            (None, Some(BadRequest(ex.getMessage())))
+          }
+          case ex: Throwable => {
+            Logger.error("Api calling exception", ex)
+            (None, Some(ServerError))
+          }
         }
 
+      } map { rv =>
+        rv match {
+          case (Some(user: UserFB), _) => {
+            val params = LoginFBRequest(user)
+
+            api.loginfb(params) match {
+              case OkApiResult(Some(loginResult: LoginFBResult)) =>
+                storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session.toString))).as(JSON), loginResult)
+
+              case _ => ServerError
+            }
+
+          }
+          case (None, Some(r: SimpleResult)) => r
+          case (None, None) => ServerError
+        }
       }
 
-    }.recoverTotal {
-      e => Future.successful { BadRequest("Detected error:" + JsError.toFlatJson(e)) }
     }
+
+    //UnsupportedAppVersion
+    //
+    //    request.body.validate[WSLoginFBRequest].map {
+    //      case params => {
+    //        params.head match {
+    //          case ("token", token: String) => {
+    //            Future {
+    //              try {
+    //                (Option(fb.fetchObject(token, "me", classOf[UserFB])), None)
+    //              } catch {
+    //                case ex: FacebookOAuthException => {
+    //                  Logger.debug("Facebook auth failed")
+    //                  (None, Some(Unauthorized(
+    //                    Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)))
+    //                }
+    //                case ex: FacebookNetworkException => {
+    //                  Logger.debug("Unable to connect to facebook")
+    //                  (None, Some(ServiceUnavailable("Unable to connect to Facebook")))
+    //                }
+    //              }
+    //            } map { rv =>
+    //              rv match {
+    //                case (Some(user: UserFB), _) => {
+    //                  val params = LoginFBRequest(user)
+    //
+    //                  api.loginfb(params) match {
+    //                    case OkApiResult(Some(loginResult: LoginFBResult)) =>
+    //                      storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session.toString))).as(JSON), loginResult)
+    //
+    //                    case _ => ServerError
+    //                  }
+    //
+    //                }
+    //                case (None, Some(r: SimpleResult)) => r
+    //                case (None, None) => ServerError
+    //              }
+    //            }
+    //          }
+    //
+    //          case badRequest => Future.successful { BadRequest("Detected error:" + badRequest.toString + " is not valid request") }
+    //        }
+    //
+    //      }
+    //
+    //    }.recoverTotal {
+    //      e => Future.successful { BadRequest("Detected error:" + JsError.toFlatJson(e)) }
+    //    }
 
   }
 
