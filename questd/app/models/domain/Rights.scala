@@ -22,5 +22,28 @@ object Functionality extends Enumeration {
  * What does user can do an what level.
  */
 case class Rights(
-    val unlockedFunctionality: Set[String] = Set())
-    
+  val unlockedFunctionality: Set[String] = Set())
+
+
+object Rights {
+  import Functionality._
+
+  /**
+   * All rights given.
+   */
+  val all: Rights = Rights(Set(
+    VoteQuestSolutions.toString,
+    SubmitPhotoResults.toString,
+    SubmitVideoResults.toString,
+    Report.toString,
+    InviteFriends.toString,
+    AddToShortList.toString,
+    VoteQuestProposals.toString,
+    SubmitPhotoQuests.toString,
+    SubmitVideoQuests.toString,
+    VoteReviews.toString,
+    SubmitReviewsForResults.toString,
+    SubmitReviewsForProposals.toString,
+    GiveRewards.toString))
+}
+

@@ -17,7 +17,7 @@ class UserLogicSpecs extends Specification
 
     "Do not allow user without coins purchase themes" in {
       val u = User(id = "",
-        profile = Profile(level = 20, assets = Assets(0, 0, 0)))
+        profile = Profile(level = 20, assets = Assets(0, 0, 0), rights = Rights.all))
 
       u.canPurchaseQuestProposals must beEqualTo(NotEnoughAssets)
     }
@@ -31,7 +31,7 @@ class UserLogicSpecs extends Specification
 
     "Allow user with level and money purchase themes" in {
       val u = User(id = "",
-        profile = Profile(level = 12, assets = Assets(100000, 100000, 1000000)))
+        profile = Profile(level = 12, assets = Assets(100000, 100000, 1000000), rights = Rights.all))
 
       u.canPurchaseQuestProposals must beEqualTo(OK)
     }
@@ -45,6 +45,7 @@ class UserLogicSpecs extends Specification
         profile = Profile(
           level = 12,
           assets = Assets(100000, 100000, 1000000),
+          rights = Rights.all,
           questProposalContext = QuestProposalConext(questProposalCooldown = (DateTime.now + Hours.hours(1)).toDate)))
 
       u.canPurchaseQuestProposals must beEqualTo(CoolDown)
@@ -60,6 +61,7 @@ class UserLogicSpecs extends Specification
         profile = Profile(
           level = 12,
           assets = Assets(100000, 100000, 1000000),
+          rights = Rights.all,
           bio = Bio(timezone = 0)))
 
       val t1 = u1.getCooldownForTakeTheme
@@ -69,6 +71,7 @@ class UserLogicSpecs extends Specification
         profile = Profile(
           level = 12,
           assets = Assets(100000, 100000, 1000000),
+          rights = Rights.all,
           bio = Bio(timezone = 1)))
 
       val t2 = u2.getCooldownForTakeTheme

@@ -45,11 +45,10 @@ class LoginWSSpecs extends Specification
       fb.fetchObject(facebookToken, "me", classOf[UserFB]) returns user
       api.loginfb(LoginFBRequest(user)) returns OkApiResult(Some(LoginFBResult(sessid)))
 
-//      import controllers.web.rest.component.helpers._
 
-      val data = AnyContentAsText(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1)))
-
-      val fakeRequest = FakeRequest[AnyContent](
+      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1))))
+      
+      val fakeRequest = FakeRequest(
         Helpers.POST,
         "",
         FakeHeaders(),
@@ -69,7 +68,7 @@ class LoginWSSpecs extends Specification
 
       fb.fetchObject(facebookToken, "me", classOf[UserFB]) throws new FacebookOAuthException("", "", 1, 1)
 
-      val data = AnyContentAsText(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1)))
+      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,
@@ -88,7 +87,7 @@ class LoginWSSpecs extends Specification
 
       fb.fetchObject(facebookToken, "me", classOf[UserFB]) throws new FacebookNetworkException("", null, 1)
 
-      val data = AnyContentAsText(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1)))
+      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,

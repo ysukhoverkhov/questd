@@ -81,9 +81,9 @@ class UserDAOSpecs extends Specification
       val userid = "id to test all"
 
       db.user.create(User(userid))
-      val all = db.user.all
+      val all = List() ++ db.user.all
 
-      all must contain(User(userid))
+      all.map(_.id) must contain(userid)
     }
 
     "One more check for listing and deleting everything" in new WithApplication(appWithTestDatabase) {
@@ -100,7 +100,7 @@ class UserDAOSpecs extends Specification
     }
 
     """Return "None" in search for not existing user""" in new WithApplication(appWithTestDatabase) {
-      val u = db.user.readBySessionID("Another id of another neveer existign user")
+      val u = db.user.readBySessionID("Another id of another never existign user")
       u must beNone
     }
 
