@@ -14,7 +14,7 @@ import components._
 import controllers.web.rest.protocol._
 import org.json4s.MappingException
 
-trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor with APIAccessor =>
+trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor with APIAccessor with ConfigHolder =>
 
   /**
    * Logins with Facebook or create new user if it not exists
@@ -36,20 +36,27 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
         try {
           val loginRequest = Json.read[WSLoginFBRequest](js.toString)
 
-          try {
-            (Option(fb.fetchObject(loginRequest.token, "me", classOf[UserFB])), None)
-          } catch {
-            case ex: FacebookOAuthException => {
-              Logger.debug("Facebook auth failed")
-              (None, Some(Unauthorized(
-                Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)))
-            }
-            case ex: FacebookNetworkException => {
-              Logger.debug("Unable to connect to facebook")
-              (None, Some(ServiceUnavailable("Unable to connect to Facebook")))
+          // Check app version.
+          if (config.values("Min App Version").toInt > loginRequest.appVersion) {
+            (None, Some(Unauthorized(
+              Json.write(WSUnauthorisedResult(UnauthorisedReason.UnsupportedAppVersion))).as(JSON)))
+          } else {
+            
+            // Login facebook.
+            try {
+              (Option(fb.fetchObject(loginRequest.token, "me", classOf[UserFB])), None)
+            } catch {
+              case ex: FacebookOAuthException => {
+                Logger.debug("Facebook auth failed")
+                (None, Some(Unauthorized(
+                  Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)))
+              }
+              case ex: FacebookNetworkException => {
+                Logger.debug("Unable to connect to facebook")
+                (None, Some(ServiceUnavailable("Unable to connect to Facebook")))
+              }
             }
           }
-
         } catch {
           case ex @ (_: MappingException | _: org.json4s.ParserUtil$ParseException) => {
             (None, Some(BadRequest(ex.getMessage())))
@@ -59,7 +66,6 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
             (None, Some(ServerError))
           }
         }
-
       } map { rv =>
         rv match {
           case (Some(user: UserFB), _) => {

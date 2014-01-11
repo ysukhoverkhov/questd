@@ -3,6 +3,7 @@ package controllers.web.rest.component
 import controllers.domain.libs.facebook.FacebookComponent
 import controllers.domain.DomainAPIComponent
 import components._
+import models.domain.admin.ConfigSection
 
 trait WSComponent { component: DomainAPIComponent with FacebookComponent =>
 
@@ -17,13 +18,20 @@ trait WSComponent { component: DomainAPIComponent with FacebookComponent =>
     with VoteQuestSolutionWSImpl
     with DailyResultWSImpl
     with ContentWSImpl
-    
+
     with FBAccessor
-    with APIAccessor {
+    with APIAccessor
+
+    with ConfigHolder {
 
     val fb = component.fb
     val api = component.api
 
+    
+    val configSectionName = "Web Service"
+    val defaultConfiguration = ConfigSection(
+      configSectionName,
+      Map(("Min App Version", "1")))
   }
 
 }
