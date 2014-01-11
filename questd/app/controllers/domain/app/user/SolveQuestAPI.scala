@@ -287,8 +287,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def tryFightQuest(request: TryFightQuestRequest): ApiResult[TryFightQuestResult] = handleDbException {
     // 1. find all solutions with the same quest id with status waiting for compettor.
 
-    Logger.error("!!!! Very slow request here. Replace with findOne and order by date excluding self.") // Also use here findandmodify with updating last access timestampt.
-    // EVERYWHERE there we update last access timestamp we should use findandmodify to make the action atomic.
     val solutionsForQuest = db.solution.allWithStatusAndQuest(QuestSolutionStatus.WaitingForCompetitor.toString, request.solution.questID)
 
     def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {
@@ -326,7 +324,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             val u = db.user.readByID(curSol.userID)
             if (u != None) {
               rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s.get, author = u.get))
-              //              adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.victoryReward)))
             }
           }
 
@@ -339,7 +336,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             val u = db.user.readByID(curSol.userID)
             if (u != None) {
               rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s.get, author = u.get))
-              //adjustAssets(AdjustAssetsRequest(user = u.get, reward = Some(u.get.profile.questSolutionContext.defeatReward)))
             }
           }
 
