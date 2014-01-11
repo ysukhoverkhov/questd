@@ -176,6 +176,14 @@ private[mongo] class MongoUserDAO
         "profile.questProposalContext.approveReward" -> grater[Assets].asDBObject(approveReward))
     }
 
+    if (sampleQuest == None) {
+      findAndModify(
+        id,
+        MongoDBObject(
+          ("$unset" -> MongoDBObject(
+            "profile.questProposalContext.sampleQuest" -> ""))))
+    }
+
     findAndModify(
       id,
       MongoDBObject(
@@ -349,7 +357,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def rememberProposalVotingInHistory(id: String, proposalId: String): Option[User] = {
     findAndModify(
@@ -358,9 +366,9 @@ private[mongo] class MongoUserDAO
         ("$push" -> MongoDBObject(
           "history.votedQuestProposalIds.0" -> proposalId))))
   }
-  
+
   /**
-   * 
+   *
    */
   def rememberQuestSolvingInHistory(id: String, questId: String): Option[User] = {
     findAndModify(
@@ -369,9 +377,9 @@ private[mongo] class MongoUserDAO
         ("$push" -> MongoDBObject(
           "history.solvedQuestIds.0" -> questId))))
   }
-  
+
   /**
-   * 
+   *
    */
   def rememberSolutionVotingInHistory(id: String, solutionId: String): Option[User] = {
     findAndModify(

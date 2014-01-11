@@ -6,6 +6,11 @@ trait QuestDAO extends BaseDAO[Quest] {
 
   def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[Quest]
 
+  /**
+   * All quests with status for theme id ordered by points.
+   */
+  def allWithStatusAndThemeByPoints(status: String, themeID: String): Iterator[Quest]
+
   def updatePoints(
     id: String,
     pointsChange: Int,

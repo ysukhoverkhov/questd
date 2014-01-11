@@ -24,6 +24,15 @@ private[mongo] class MongoQuestDAO
           MongoDBObject("info.level" -> MongoDBObject("$lte" -> maxLevel))))),
       MongoDBObject("lastModDate" -> 1))
   }
+  
+  def allWithStatusAndThemeByPoints(status: String, themeID: String): Iterator[Quest] = {
+    findByExample(
+      MongoDBObject(
+        ("status" -> status),
+        ("themeID" -> themeID)),
+      MongoDBObject("rating.points" -> -1))
+  }
+  
 
   /**
    *
