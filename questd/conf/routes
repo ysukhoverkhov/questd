@@ -54,7 +54,7 @@ POST	/rest/getRightsAtLevel				controllers.web.rest.DailyResultWS.getRightsAtLev
 # Content requests
 POST	/rest/getQuest						controllers.web.rest.ContentWS.getQuest
 POST	/rest/getSolution					controllers.web.rest.ContentWS.getSolution
-POST	/rest/getProfileById				controllers.web.rest.ContentWS.getProfileById
+POST	/rest/getPublicProfile				controllers.web.rest.ContentWS.getPublicProfile
 
 POST	/rest/getSolutionsForQuest			controllers.web.rest.ContentWS.getSolutionsForQuest
 POST	/rest/getSolutionsForPerson			controllers.web.rest.ContentWS.getSolutionsForPerson

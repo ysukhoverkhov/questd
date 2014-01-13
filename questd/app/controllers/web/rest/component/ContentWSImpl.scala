@@ -29,7 +29,11 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
   /**
    * Get profile by id.
    */
-  def getProfileById = TODO
+  def getPublicProfile = wrapJsonApiCallReturnBody[WSGetPublicProfileResult] { (js, r) =>
+    val v = Json.read[WSGetPublicProfileRequest](js)
+
+    api.getPublicProfile(GetPublicProfileRequest(r.user, v.id))
+  }
 
   /**
    * Get solutions for a given quest id.

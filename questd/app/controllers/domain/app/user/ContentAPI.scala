@@ -26,7 +26,14 @@ case class GetSolutionResult(
   rivalProfile: Option[Profile] = None,
   quest: Option[QuestInfo] = None)
 
-private[domain] trait ContentAPI { this: DBAccessor =>
+  
+case class GetPublicProfileRequest(user: User, userId: String)
+case class GetPublicProfileResult(
+  allowed: ProfileModificationResult,
+  publicProfile: Option[Bio])
+  
+
+private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Get quest by its id
@@ -82,5 +89,18 @@ private[domain] trait ContentAPI { this: DBAccessor =>
         quest = quest)))
     }
   }
+  
+  /**
+   * Get public profile
+   */
+  def getPublicProfile(request: GetPublicProfileRequest): ApiResult[GetPublicProfileResult] = handleDbException {
+    
+    getUser(UserRequest(userID = Some(request.userId))) map { r => 
+      OkApiResult(Some(GetPublicProfileResult(
+        allowed = OK,
+        publicProfile = Some(r.user.profile.bio))))
+    }
+  }
+
 }
 

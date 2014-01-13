@@ -177,9 +177,16 @@ package object protocol {
 
   type WSGetQuestResult = GetQuestResult
 
+  
   case class WSGetSolutionRequest(
     id: String)
 
   type WSGetSolutionResult = GetSolutionResult
+  
+  
+  case class WSGetPublicProfileRequest(
+    id: String)
+
+  type WSGetPublicProfileResult = GetPublicProfileResult
 }
 
