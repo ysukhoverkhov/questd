@@ -8,7 +8,6 @@ case class QuestSolutionContext(
   victoryReward: Assets = Assets(),
   purchasedQuest: Option[QuestInfoWithID] = None,
   takenQuest: Option[QuestInfoWithID] = None,
-  // TODO: Store public profile here.
   questAuthor: Option[BioWithID] = None,
   numberOfPurchasedQuests: Int = 0,
   questCooldown: Date = new Date(0),

@@ -5,6 +5,7 @@ import play.api.mvc._
 import controllers.web.rest.component.helpers._
 import controllers.web.rest.protocol._
 import controllers.domain.app.user._
+import models.domain._
 
 trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
@@ -38,13 +39,22 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
   /**
    * Get solutions for a given quest id.
    */
-  def getSolutionsForQuest = TODO
-  
+  def getSolutionsForQuest = wrapJsonApiCallReturnBody[WSGetSolutionsForQuestResult] { (js, r) =>
+    val v = Json.read[WSGetSolutionsForQuestRequest](js)
+
+    api.getSolutionsForQuest(GetSolutionsForQuestRequest(
+      r.user,
+      v.id,
+      v.status.map(QuestSolutionStatus.withName(_)),
+      v.pageNumber,
+      v.pageSize))
+  }
+
   /**
    * Get solutions for a given person.
    */
   def getSolutionsForPerson = TODO
-  
+
   /**
    * Get quests for a given person.
    */

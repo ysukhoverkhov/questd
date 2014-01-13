@@ -5,7 +5,6 @@ package models.domain
  */
 case class Profile(
   profileVersion: Int = 1,
-  // TODO move level and Bio to Public profile.
   level: Int = 18, // Should be 0 here.
   ratingToNextLevel: Int = 0,
   bio: Bio = Bio(),

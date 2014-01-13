@@ -143,8 +143,8 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
   /**
    * All objects with filter.
    */
-  def findByExample(example: DBObject, sort: DBObject = MongoDBObject.empty): Iterator[T] = wrapMongoException {
-    find(example).sort(sort)
+  def findByExample(example: DBObject, sort: DBObject = MongoDBObject.empty, skip: Int = 0): Iterator[T] = wrapMongoException {
+    find(example).sort(sort).skip(skip)
   }
 
 }

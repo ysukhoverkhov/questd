@@ -29,7 +29,7 @@ package object protocol {
      *  Supplied session is not valid on our server.
      */
     val SessionNotFound = Value
-    
+
     /**
      * Passed version of the application is not supported.
      */
@@ -40,7 +40,7 @@ package object protocol {
    * Login Request
    * Single entry. Key - "token", value - value.
    */
-  case class WSLoginFBRequest (token: String, appVersion: Int)
+  case class WSLoginFBRequest(token: String, appVersion: Int)
 
   /**
    * Login Result
@@ -177,16 +177,29 @@ package object protocol {
 
   type WSGetQuestResult = GetQuestResult
 
-  
   case class WSGetSolutionRequest(
     id: String)
 
   type WSGetSolutionResult = GetSolutionResult
-  
-  
+
   case class WSGetPublicProfileRequest(
     id: String)
 
   type WSGetPublicProfileResult = GetPublicProfileResult
+
+  case class WSGetSolutionsForQuestRequest(
+    id: String,
+
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: Option[String],
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+
+  type WSGetSolutionsForQuestResult = GetSolutionsForQuestResult
+
 }
 

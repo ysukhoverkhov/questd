@@ -26,12 +26,22 @@ case class GetSolutionResult(
   rivalProfile: Option[Profile] = None,
   quest: Option[QuestInfo] = None)
 
-  
 case class GetPublicProfileRequest(user: User, userId: String)
 case class GetPublicProfileResult(
   allowed: ProfileModificationResult,
   publicProfile: Option[Bio])
-  
+
+case class GetSolutionsForQuestRequest(
+  user: User,
+  questId: String,
+  status: Option[QuestSolutionStatus.Value],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetSolutionsForQuestResult(
+  allowed: ProfileModificationResult,
+  solutions: List[QuestSolution],
+  pageSize: Int,
+  hasMore: Boolean)
 
 private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -77,7 +87,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readByID(id))
       val rivalSolutionInfo = rivalSolution.map(rs => rs.info)
       val rivalRating = rivalSolution.map(rs => rs.rating)
-      val rivalProfile = rivalSolution.flatMap(rs => db.user.readByID(rs.userID)).map(ru => ru.profile)  
+      val rivalProfile = rivalSolution.flatMap(rs => db.user.readByID(rs.userID)).map(ru => ru.profile)
 
       OkApiResult(Some(GetSolutionResult(
         allowed = OK,
@@ -89,17 +99,36 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         quest = quest)))
     }
   }
-  
+
   /**
    * Get public profile
    */
   def getPublicProfile(request: GetPublicProfileRequest): ApiResult[GetPublicProfileResult] = handleDbException {
-    
-    getUser(UserRequest(userID = Some(request.userId))) map { r => 
+
+    getUser(UserRequest(userID = Some(request.userId))) map { r =>
       OkApiResult(Some(GetPublicProfileResult(
         allowed = OK,
         publicProfile = Some(r.user.profile.bio))))
     }
+  }
+
+  /**
+   * Get solutions for a quest.
+   */
+  def getSolutionsForQuest(request: GetSolutionsForQuestRequest): ApiResult[GetSolutionsForQuestResult] = handleDbException {
+    
+    val pageSize = if (request.pageSize > 50) 50 else request.pageSize
+    
+    val solutionsForQuest = db.solution.allWithStatusAndQuest(
+        request.status.map(_.toString), 
+        request.questId,
+        request.pageNumber * pageSize)
+
+    OkApiResult(Some(GetSolutionsForQuestResult(
+      allowed = OK,
+      solutions = solutionsForQuest.take(pageSize).toList,
+      pageSize,
+      solutionsForQuest.hasNext)))
   }
 
 }

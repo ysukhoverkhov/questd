@@ -287,7 +287,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def tryFightQuest(request: TryFightQuestRequest): ApiResult[TryFightQuestResult] = handleDbException {
     // 1. find all solutions with the same quest id with status waiting for compettor.
 
-    val solutionsForQuest = db.solution.allWithStatusAndQuest(QuestSolutionStatus.WaitingForCompetitor.toString, request.solution.questID)
+    val solutionsForQuest = db.solution.allWithStatusAndQuest(
+        Some(QuestSolutionStatus.WaitingForCompetitor.toString), 
+        request.solution.questID)
 
     def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {
       if (s1.calculatePoints == s2.calculatePoints)
