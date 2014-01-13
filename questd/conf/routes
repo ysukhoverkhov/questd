@@ -51,10 +51,14 @@ POST	/rest/voteQuestSolution				controllers.web.rest.VoteQuestSolutionWS.voteQue
 POST	/rest/getDailyResult				controllers.web.rest.DailyResultWS.getDailyResult
 POST	/rest/getRightsAtLevel				controllers.web.rest.DailyResultWS.getRightsAtLevel
 
-
 # Content requests
 POST	/rest/getQuest						controllers.web.rest.ContentWS.getQuest
 POST	/rest/getSolution					controllers.web.rest.ContentWS.getSolution
+POST	/rest/getProfileById				controllers.web.rest.ContentWS.getProfileById
+
+POST	/rest/getSolutionsForQuest			controllers.web.rest.ContentWS.getSolutionsForQuest
+POST	/rest/getSolutionsForPerson			controllers.web.rest.ContentWS.getSolutionsForPerson
+POST	/rest/getQuestsForPerson			controllers.web.rest.ContentWS.getQuestsForPerson
 
 
 

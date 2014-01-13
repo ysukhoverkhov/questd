@@ -10,5 +10,10 @@ object ContentWS extends Controller with AccessToWSInstance {
   def getQuest = ws.getQuest
   def getSolution = ws.getSolution
 
+  def getProfileById = ws.getProfileById
+  def getSolutionsForQuest = ws.getSolutionsForQuest
+  def getSolutionsForPerson = ws.getSolutionsForPerson
+  def getQuestsForPerson = ws.getQuestsForPerson
+
 }
 
