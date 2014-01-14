@@ -10,12 +10,14 @@ import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
 
+
 case class GetQuestRequest(user: User, questId: String)
 case class GetQuestResult(
   allowed: ProfileModificationResult,
   quest: Option[QuestInfo] = None,
   theme: Option[Theme] = None)
 
+  
 case class GetSolutionRequest(user: User, solutionId: String)
 case class GetSolutionResult(
   allowed: ProfileModificationResult,
@@ -26,11 +28,13 @@ case class GetSolutionResult(
   rivalProfile: Option[Profile] = None,
   quest: Option[QuestInfo] = None)
 
+  
 case class GetPublicProfileRequest(user: User, userId: String)
 case class GetPublicProfileResult(
   allowed: ProfileModificationResult,
   publicProfile: Option[Bio])
 
+  
 case class GetSolutionsForQuestRequest(
   user: User,
   questId: String,
@@ -43,6 +47,33 @@ case class GetSolutionsForQuestResult(
   pageSize: Int,
   hasMore: Boolean)
 
+  
+case class GetSolutionsForUserRequest(
+  user: User,
+  userId: String,
+  status: Option[QuestSolutionStatus.Value],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetSolutionsForUserResult(
+  allowed: ProfileModificationResult,
+  solutions: List[QuestSolution],
+  pageSize: Int,
+  hasMore: Boolean)
+
+  
+case class GetQuestsForUserRequest(
+  user: User,
+  userId: String,
+  status: Option[QuestStatus.Value],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetQuestsForUserResult(
+  allowed: ProfileModificationResult,
+  quests: List[Quest],
+  pageSize: Int,
+  hasMore: Boolean)
+  
+  
 private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -116,7 +147,6 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get solutions for a quest.
    */
   def getSolutionsForQuest(request: GetSolutionsForQuestRequest): ApiResult[GetSolutionsForQuestResult] = handleDbException {
-    
     val pageSize = if (request.pageSize > 50) 50 else request.pageSize
     
     val solutionsForQuest = db.solution.allWithStatusAndQuest(
@@ -131,5 +161,40 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       solutionsForQuest.hasNext)))
   }
 
+  /**
+   * Get all solutions for a user.
+   */
+  def getSolutionsForUser(request: GetSolutionsForUserRequest): ApiResult[GetSolutionsForUserResult] = handleDbException {
+    val pageSize = if (request.pageSize > 50) 50 else request.pageSize
+    
+    val solutionsForUser = db.solution.allWithStatusAndUser(
+        request.status.map(_.toString), 
+        request.userId,
+        request.pageNumber * pageSize)
+
+    OkApiResult(Some(GetSolutionsForUserResult(
+      allowed = OK,
+      solutions = solutionsForUser.take(pageSize).toList,
+      pageSize,
+      solutionsForUser.hasNext)))
+  }
+
+  /**
+   * Get all quests for a user.
+   */
+  def getQuestsForUser(request: GetQuestsForUserRequest): ApiResult[GetQuestsForUserResult] = handleDbException {
+    val pageSize = if (request.pageSize > 50) 50 else request.pageSize
+    
+    val questsForUser = db.quest.allWithStatusAndUser(
+        request.status.map(_.toString), 
+        request.userId,
+        request.pageNumber * pageSize)
+
+    OkApiResult(Some(GetQuestsForUserResult(
+      allowed = OK,
+      quests = questsForUser.take(pageSize).toList,
+      pageSize,
+      questsForUser.hasNext)))
+  }
 }
 

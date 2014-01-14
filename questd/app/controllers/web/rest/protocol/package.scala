@@ -201,5 +201,33 @@ package object protocol {
 
   type WSGetSolutionsForQuestResult = GetSolutionsForQuestResult
 
+  case class WSGetSolutionsForUserRequest(
+    id: String,
+
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: Option[String],
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+
+  type WSGetSolutionsForUserResult = GetSolutionsForUserResult
+
+  case class WSGetQuestsForUserRequest(
+    id: String,
+
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: Option[String],
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+
+  type WSGetQuestsForUserResult = GetQuestsForUserResult
+
 }
 

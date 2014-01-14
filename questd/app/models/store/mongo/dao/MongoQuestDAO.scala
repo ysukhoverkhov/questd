@@ -24,7 +24,7 @@ private[mongo] class MongoQuestDAO
           MongoDBObject("info.level" -> MongoDBObject("$lte" -> maxLevel))))),
       MongoDBObject("lastModDate" -> 1))
   }
-  
+
   def allWithStatusAndThemeByPoints(status: String, themeID: String): Iterator[Quest] = {
     findByExample(
       MongoDBObject(
@@ -32,7 +32,19 @@ private[mongo] class MongoQuestDAO
         ("themeID" -> themeID)),
       MongoDBObject("rating.points" -> -1))
   }
-  
+
+  def allWithStatusAndUser(status: Option[String], userId: String, skip: Int = 0): Iterator[Quest] = {
+    val queryBuilder = MongoDBObject.newBuilder
+    queryBuilder += ("authorUserID" -> userId)
+    if (status != None) {
+      queryBuilder += ("status" -> status.get)
+    }
+        
+    findByExample(
+      queryBuilder.result,
+      MongoDBObject("lastModDate" -> 1),
+      skip)
+  }
 
   /**
    *

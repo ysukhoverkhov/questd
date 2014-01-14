@@ -53,12 +53,29 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
   /**
    * Get solutions for a given person.
    */
-  def getSolutionsForPerson = TODO
+  def getSolutionsForUser = wrapJsonApiCallReturnBody[WSGetSolutionsForUserResult] { (js, r) =>
+    val v = Json.read[WSGetSolutionsForUserRequest](js)
+
+    api.getSolutionsForUser(GetSolutionsForUserRequest(
+      r.user,
+      v.id,
+      v.status.map(QuestSolutionStatus.withName(_)),
+      v.pageNumber,
+      v.pageSize))
+  }
 
   /**
    * Get quests for a given person.
    */
-  def getQuestsForPerson = TODO
+  def getQuestsForUser  = wrapJsonApiCallReturnBody[WSGetQuestsForUserResult] { (js, r) =>
+    val v = Json.read[WSGetQuestsForUserRequest](js)
 
+    api.getQuestsForUser(GetQuestsForUserRequest(
+      r.user,
+      v.id,
+      v.status.map(QuestStatus.withName(_)),
+      v.pageNumber,
+      v.pageSize))
+  }
 }
 

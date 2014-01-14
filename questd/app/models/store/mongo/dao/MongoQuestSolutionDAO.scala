@@ -41,6 +41,19 @@ private[mongo] class MongoQuestSolutionDAO
       MongoDBObject("lastModDate" -> 1),
       skip)
   }
+  
+  def allWithStatusAndUser(status: Option[String], userId: String, skip: Int = 0): Iterator[QuestSolution] = {
+    val queryBuilder = MongoDBObject.newBuilder
+    queryBuilder += ("userID" -> userId)
+    if (status != None) {
+      queryBuilder += ("status" -> status.get)
+    }
+        
+    findByExample(
+      queryBuilder.result,
+      MongoDBObject("lastModDate" -> 1),
+      skip)
+  }
 
   def updateStatus(id: String, newStatus: String): Option[QuestSolution] = {
     findAndModify(
@@ -49,7 +62,6 @@ private[mongo] class MongoQuestSolutionDAO
         ("$set" -> MongoDBObject(
           "status" -> newStatus,
           "lastModDate" -> new Date()))))
-
   }
 
   def updatePoints(

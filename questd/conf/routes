@@ -57,8 +57,8 @@ POST	/rest/getSolution					controllers.web.rest.ContentWS.getSolution
 POST	/rest/getPublicProfile				controllers.web.rest.ContentWS.getPublicProfile
 
 POST	/rest/getSolutionsForQuest			controllers.web.rest.ContentWS.getSolutionsForQuest
-POST	/rest/getSolutionsForPerson			controllers.web.rest.ContentWS.getSolutionsForPerson
-POST	/rest/getQuestsForPerson			controllers.web.rest.ContentWS.getQuestsForPerson
+POST	/rest/getSolutionsForUser			controllers.web.rest.ContentWS.getSolutionsForUser
+POST	/rest/getQuestsForUser				controllers.web.rest.ContentWS.getQuestsForUser
 
 
 
