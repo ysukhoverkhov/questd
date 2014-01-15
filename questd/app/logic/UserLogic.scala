@@ -30,7 +30,8 @@ class UserLogic(val user: User) {
   
   def calculateRights: Rights = {
     Rights(
-        unlockedFunctionality = restrictions.foldLeft(Set[String]()){case (c, (right, level)) => if (level <= user.profile.level) c + right else c})
+        unlockedFunctionality = restrictions.foldLeft(Set[String]()){case (c, (right, level)) => if (level <= user.profile.level) c + right else c},
+        maxFriendsCount = maxNumberOfFriendsOnLevel(user.profile.level))
   }
   
   

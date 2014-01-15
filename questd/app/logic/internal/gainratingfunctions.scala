@@ -2,6 +2,7 @@ package logic.internal
 
 import logic.constants._
 import basefunctions._
+import models.domain.Functionality._
 
 object gainratingfunctions {
   
@@ -14,7 +15,7 @@ object gainratingfunctions {
     val b = -1702.1146
     val y = -9.08269
     
-    if (level < submitPhotoQuests)
+    if (level < levelFor(SubmitPhotoQuests))
       0
     else
       megaf(level, k, d, b, y)
@@ -31,9 +32,9 @@ object gainratingfunctions {
     
     def ratingForSubmitResultInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
       level match {
-        case _ if level < submitPhotoResults => 0
-        case _ if (level < submitPhotoQuests) && (level >= submitPhotoResults) => megaf(level, k, d, b, y)
-        case _ => ratingForSubmitResultInt(submitPhotoQuests - 1, k, d, b, y) * 0.68 + megaf(level, k, d, b, y) * 0.32
+        case _ if level < levelFor(SubmitPhotoResults) => 0
+        case _ if (level < levelFor(SubmitPhotoQuests)) && (level >= levelFor(SubmitPhotoResults)) => megaf(level, k, d, b, y)
+        case _ => ratingForSubmitResultInt(levelFor(SubmitPhotoQuests) - 1, k, d, b, y) * 0.68 + megaf(level, k, d, b, y) * 0.32
       }
     }
     

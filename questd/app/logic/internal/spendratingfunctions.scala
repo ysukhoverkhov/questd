@@ -2,6 +2,7 @@ package logic.internal
 
 import logic.constants._
 import basefunctions._
+import models.domain.Functionality._
 
 object spendratingfunctions {
  
@@ -14,7 +15,7 @@ object spendratingfunctions {
     val b = 190.761 
     val y = 18.34
     
-    if (level < submitPhotoResults)
+    if (level < levelFor(SubmitPhotoResults))
       0
     else
       -megaf(level, k, d, b, y)

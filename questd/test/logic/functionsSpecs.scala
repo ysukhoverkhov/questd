@@ -104,6 +104,12 @@ class FunctionsSpecs extends Specification {
       ratToGainLevel(10) must beEqualTo(10000)
       ratToGainLevel(20) must beEqualTo(500000)
     }
+    
+    "maxNumberOfFriendsOnLevel" in {
+      maxNumberOfFriendsOnLevel(1) must beEqualTo(4)
+      maxNumberOfFriendsOnLevel(10) must beEqualTo(20)
+      maxNumberOfFriendsOnLevel(20) must beEqualTo(100)
+    }
   }
 
 }

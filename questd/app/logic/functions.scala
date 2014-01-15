@@ -5,11 +5,11 @@ import internal.gaincoinsfunctions._
 import internal.spendcoinsfunctions._
 import internal.spendratingfunctions._
 import logic.internal.basefunctions._
+import models.domain.Functionality._
+import constants._
 import play.Logger
 
 object functions {
-
-  import constants._
 
   /**
    * ************************
@@ -102,27 +102,26 @@ object functions {
    */
   def ratingToLoseQuest(level: Int, questDuration: Int): Int = {
     math.round(ratingForSubmitResult(level) * questDuration * questLosingMultiplier).toInt
-  }  
+  }
 
   /**
    * How much rating we will receive for winning quest.
    */
   def ratingToWinQuest(level: Int, questDuration: Int): Int = {
     ratingToLoseQuest(level, questDuration) * questVictoryMultiplier
-  }  
+  }
 
-  
   /**
    * ***********************
    * Voting quest proposals.
    * ***********************
    */
-  
+
   /**
    * Number of rewarded proposal votes per level.
    */
   def rewardedProposalVotesPerLevel(level: Int): Int = {
-    math.floor(4 * math.pow((level + 1 - constants.voteQuestProposals), 0.39)).toInt
+    math.floor(4 * math.pow((level + 1 - levelFor(VoteQuestProposals)), 0.39)).toInt
   }
 
   /**
@@ -149,7 +148,7 @@ object functions {
    * Number of rewarded solution votes per level.
    */
   def rewardedSolutionVotesPerLevel(level: Int): Int = {
-    math.floor(10 * math.pow((level + 1 - constants.voteQuestSolutions), 0.3)).toInt
+    math.floor(10 * math.pow((level + 1 - levelFor(VoteQuestSolutions)), 0.3)).toInt
   }
 
   /**
@@ -171,26 +170,36 @@ object functions {
    * Daily results
    * *************************
    */
-  
+
   def dailyRatingDecrease(level: Int): Int = {
     math.round(ratDecrease(level)).toInt
   }
-  
-  
+
   /**
    * ********************
    * Leveling up
    * ********************
    */
+
   def ratToGainLevel(level: Int): Int = {
 
     def ratToGainLevelInt(level: Int, k: Double, d: Double, b: Double) = megaf(level, k, d, b, 0)
-    
+
     val k = 307.3998426
     val d = 2.5694326
     val b = -207.3998426
-    
+
     if (level <= 1) 0 else math.round(ratToGainLevelInt(level, k, d, b)).toInt
+  }
+
+  /**
+   * **********************
+   * Friends
+   * **********************
+   */
+
+  def maxNumberOfFriendsOnLevel(level: Int): Int = {
+    math.floor((numberOfFreindsOnLastLevel / coinToSpentDailyFriendsOnly(maxLevel)) * coinToSpentDailyFriendsOnly(level)).toInt
   }
 }
 

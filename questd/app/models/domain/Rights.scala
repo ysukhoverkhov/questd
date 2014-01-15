@@ -22,7 +22,8 @@ object Functionality extends Enumeration {
  * What does user can do an what level.
  */
 case class Rights(
-  val unlockedFunctionality: Set[String] = Set())
+  val unlockedFunctionality: Set[String] = Set(),
+  val maxFriendsCount: Int = 0)
 
 
 object Rights {

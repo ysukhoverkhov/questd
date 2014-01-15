@@ -2,6 +2,7 @@ package logic.internal
 
 import logic.constants._
 import basefunctions._
+import models.domain.Functionality._
 
 object gaincoinsfunctions {
  
@@ -13,9 +14,9 @@ object gaincoinsfunctions {
     
     def coinForVoteProposalInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
       level match {
-        case _ if level < voteQuestProposals => 0
-        case _ if (level < voteReviews) && (level >= voteQuestProposals) => megaf(level, k, d, b, y)
-        case _ => coinForVoteProposalInt(voteReviews - 1, k, d, b, y) * 0.63 + megaf(level, k, d, b, y) * 0.37
+        case _ if level < levelFor(VoteQuestProposals) => 0
+        case _ if (level < levelFor(VoteReviews)) && (level >= levelFor(VoteQuestProposals)) => megaf(level, k, d, b, y)
+        case _ => coinForVoteProposalInt(levelFor(VoteReviews) - 1, k, d, b, y) * 0.63 + megaf(level, k, d, b, y) * 0.37
       }
     }
 
@@ -31,9 +32,9 @@ object gaincoinsfunctions {
     
     def coinForVoteResultInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
       level match {
-        case _ if level < voteQuestSolutions => 0
-        case _ if (level < voteQuestProposals) && (level >= voteQuestSolutions) => megaf(level, k, d, b, y)
-        case _ => coinForVoteResultInt(voteQuestProposals - 1, k, d, b, y) * 0.85 + megaf(level, k, d, b, y) * 0.15
+        case _ if level < levelFor(VoteQuestSolutions) => 0
+        case _ if (level < levelFor(VoteQuestProposals)) && (level >= levelFor(VoteQuestSolutions)) => megaf(level, k, d, b, y)
+        case _ => coinForVoteResultInt(levelFor(VoteQuestProposals) - 1, k, d, b, y) * 0.85 + megaf(level, k, d, b, y) * 0.15
       }
     }
 
