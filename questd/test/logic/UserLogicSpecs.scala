@@ -26,7 +26,7 @@ class UserLogicSpecs extends Specification
       val u = User(id = "",
         profile = Profile(publicProfile = PublicProfile(level = 1), assets = Assets(100000, 100000, 1000000)))
 
-      u.canPurchaseQuestProposals must beEqualTo(LevelTooLow)
+      u.canPurchaseQuestProposals must beEqualTo(NotEnoughRights)
     }
 
     "Allow user with level and money purchase themes" in {
