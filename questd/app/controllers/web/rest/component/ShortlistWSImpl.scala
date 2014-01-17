@@ -6,17 +6,21 @@ import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.web.rest.component.helpers._
 import controllers.web.rest.protocol._
+import controllers.domain.app.user._
 
 trait ShortlistWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
 
-//  def getProfile = Authenticated.async { implicit request =>
-//    Future {
-//      Ok(Json.write[WSProfileResult](request.user.profile)).as(JSON) 
-//    }
-//  }
 
-  def getShortlist = TODO
-  def costToShortlist = TODO
+  def getShortlist = wrapApiCallReturnBody[WSGetShortlistResult] { r =>
+    api.getShortlist(GetShortlistRequest(r.user))
+  }
+  
+  def costToShortlist = wrapApiCallReturnBody[WSCostToShortlistResult] { r =>
+    api.costToShortlist(CostToShortlistRequest(r.user))
+  }
+  
+  
+  
   def addToShortlist = TODO
   def removeFromShortlist = TODO
 

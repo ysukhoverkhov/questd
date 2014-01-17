@@ -24,6 +24,7 @@ trait DomainAPIComponent { component: DatabaseComponent =>
     with VoteQuestProposalAPI
     with VoteQuestSolutionAPI
     with ContentAPI
+    with ShortlistAPI
     
     with QuestAPI
     with QuestSolutionAPI

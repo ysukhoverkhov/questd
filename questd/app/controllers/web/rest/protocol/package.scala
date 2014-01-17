@@ -229,5 +229,13 @@ package object protocol {
 
   type WSGetQuestsForUserResult = GetQuestsForUserResult
 
+  
+  /**
+   * Shortlist
+   */
+  
+  type WSGetShortlistResult = GetShortlistResult
+  
+  type WSCostToShortlistResult = CostToShortlistResult
 }
 

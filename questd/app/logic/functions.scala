@@ -201,5 +201,15 @@ object functions {
   def maxNumberOfFriendsOnLevel(level: Int): Int = {
     math.floor((numberOfFreindsOnLastLevel / coinToSpentDailyFriendsOnly(maxLevel)) * coinToSpentDailyFriendsOnly(level)).toInt
   }
+  
+  
+  /**
+   * ********************
+   * Shortlist
+   * ********************
+   */
+  def costToShortlistPerson(level: Int): Int = {
+    math.round(coinAddShort(level) / 3).toInt
+  }
 }
 

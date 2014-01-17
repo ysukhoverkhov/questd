@@ -554,6 +554,25 @@ class UserLogic(val user: User) {
     }
 
   }
+  
+  
+  /**
+   * *******************
+   * Shortlist
+   * *******************
+   */
 
+  def canShortlist = {
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.AddToShortList.toString()))
+      NotEnoughRights
+    else if (!(user.profile.assets canAfford costToShortlist))
+      NotEnoughAssets
+    else
+      OK
+  }
+  
+  def costToShortlist = {
+    Assets(coins = costToShortlistPerson(user.profile.publicProfile.level))
+  }
 }
 

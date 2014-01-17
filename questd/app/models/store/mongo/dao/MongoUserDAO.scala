@@ -389,6 +389,15 @@ private[mongo] class MongoUserDAO
           "history.votedQuestSolutionIds.0" -> solutionId))))
   }
 
+  /**
+   * 
+   */
+//  def getShortlist(id: String, skip: Int = 0): Iterator[String] = {
+//    findByExample(
+//        example = MongoDBObject("id" -> id),
+//        skip = skip)
+//  }
+
 }
 
 /**

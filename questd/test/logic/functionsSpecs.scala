@@ -110,6 +110,15 @@ class FunctionsSpecs extends Specification {
       maxNumberOfFriendsOnLevel(10) must beEqualTo(20)
       maxNumberOfFriendsOnLevel(20) must beEqualTo(100)
     }
+    
+    "costToShortlistPerson" in {
+      costToShortlistPerson(1) must beEqualTo(0)
+      costToShortlistPerson(7) must beEqualTo(0)
+      costToShortlistPerson(8) must beEqualTo(4)
+      costToShortlistPerson(10) must beEqualTo(14)
+      costToShortlistPerson(11) must beEqualTo(20)
+      costToShortlistPerson(20) must beEqualTo(20)
+    }
   }
 
 }

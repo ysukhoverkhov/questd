@@ -88,6 +88,13 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
   }
 
   /**
+   * All objects with filter.
+   */
+  def findByExample(example: DBObject, sort: DBObject = MongoDBObject.empty, skip: Int = 0): Iterator[T] = wrapMongoException {
+    find(example).sort(sort).skip(skip)
+  }
+
+  /**
    * Update object with new object
    */
   def update(key: String, u: T): Unit = updateInt(key, u, false)
@@ -140,11 +147,4 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
     find(MongoDBObject())
   }
   
-  /**
-   * All objects with filter.
-   */
-  def findByExample(example: DBObject, sort: DBObject = MongoDBObject.empty, skip: Int = 0): Iterator[T] = wrapMongoException {
-    find(example).sort(sort).skip(skip)
-  }
-
 }

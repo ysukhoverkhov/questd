@@ -42,5 +42,7 @@ trait UserDAO extends BaseDAO[User] {
   def rememberProposalVotingInHistory(id: String, proposalId: String): Option[User]
   def rememberQuestSolvingInHistory(id: String, questId: String): Option[User]
   def rememberSolutionVotingInHistory(id: String, solutionId: String): Option[User]
+  
+//  def getShortlist(id: String, skip: Int = 0): Iterator[String]
 }
 
