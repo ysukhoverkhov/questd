@@ -60,6 +60,14 @@ POST	/rest/getSolutionsForQuest			controllers.web.rest.ContentWS.getSolutionsFor
 POST	/rest/getSolutionsForUser			controllers.web.rest.ContentWS.getSolutionsForUser
 POST	/rest/getQuestsForUser				controllers.web.rest.ContentWS.getQuestsForUser
 
+# Shortlist requests
+POST	/rest/getShortlist					controllers.web.rest.ShortlistWS.getShortlist
+POST	/rest/costToShortlist				controllers.web.rest.ShortlistWS.costToShortlist
+POST	/rest/addToShortlist				controllers.web.rest.ShortlistWS.addToShortlist
+POST	/rest/removeFromShortlist			controllers.web.rest.ShortlistWS.removeFromShortlist
+
+# Friends requests
+#POST	/rest/getFriends					controllers.web.rest.ContentWS.getFriends
 
 
 
