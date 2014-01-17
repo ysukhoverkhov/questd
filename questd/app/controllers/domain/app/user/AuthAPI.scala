@@ -27,7 +27,7 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
       db.user.updateSessionID(user.id, uuid)
 
       // API Test place
-//      Logger.warn(getRightsAtLevels(GetRightsAtLevelsRequest(user, 1, 20)).toString)
+      //      Logger.warn(getRightsAtLevels(GetRightsAtLevelsRequest(user, 1, 20)).toString)
 
       OkApiResult(Some(LoginFBResult(uuid)))
     }
@@ -51,16 +51,17 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
           auth = AuthInfo(
             fbid = Some(params.userfb.getId())),
           profile = Profile(
-            bio = Bio(
-              name = params.userfb.getFirstName(),
-              gender = genderFromFBUser(params.userfb).toString,
-              timezone = params.userfb.getTimezone().toInt,
-              avatar = Some(
-                ContentReference(contentType = ContentType.Photo.toString, storage = "fb_avatar", reference = params.userfb.getId())))))
+            publicProfile = PublicProfile(
+              bio = Bio(
+                name = params.userfb.getFirstName(),
+                gender = genderFromFBUser(params.userfb).toString,
+                timezone = params.userfb.getTimezone().toInt,
+                avatar = Some(
+                  ContentReference(contentType = ContentType.Photo.toString, storage = "fb_avatar", reference = params.userfb.getId()))))))
 
         db.user.create(newUser)
-        checkIncreaseLevel(CheckIncreaseLevelRequest(newUser)) 
-        
+        checkIncreaseLevel(CheckIncreaseLevelRequest(newUser))
+
         db.user.readByFBid(params.userfb.getId()) match {
           case None => {
             Logger.error("Unable to find user just created in DB with fbid " + params.userfb.getId())
@@ -77,7 +78,7 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
       }
       case Some(user) => {
         Logger.debug("Existing user login with FB " + user)
-        
+
         login(user)
       }
     }

@@ -98,7 +98,7 @@ private[domain] trait ProfileAPI { this: DBAccessor =>
     import request._
     
     val rights = for (l <- levelFrom to levelTo) yield {
-      val u = user.copy(profile = user.profile.copy(level = l))
+      val u = user.copy(profile = user.profile.copy(publicProfile = user.profile.publicProfile.copy(level = l)))
       u.calculateRights
     } 
     

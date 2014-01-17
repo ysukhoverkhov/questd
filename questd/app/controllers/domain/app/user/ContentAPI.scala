@@ -32,7 +32,7 @@ case class GetSolutionResult(
 case class GetPublicProfileRequest(user: User, userId: String)
 case class GetPublicProfileResult(
   allowed: ProfileModificationResult,
-  publicProfile: Option[Bio])
+  publicProfile: Option[PublicProfile])
 
   
 case class GetSolutionsForQuestRequest(
@@ -139,7 +139,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     getUser(UserRequest(userID = Some(request.userId))) map { r =>
       OkApiResult(Some(GetPublicProfileResult(
         allowed = OK,
-        publicProfile = Some(r.user.profile.bio))))
+        publicProfile = Some(r.user.profile.publicProfile))))
     }
   }
 

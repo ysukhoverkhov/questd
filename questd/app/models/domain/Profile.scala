@@ -5,9 +5,8 @@ package models.domain
  */
 case class Profile(
   profileVersion: Int = 1,
-  level: Int = 18, // Should be 0 here.
+  publicProfile: PublicProfile = PublicProfile(),
   ratingToNextLevel: Int = 0,
-  bio: Bio = Bio(),
   assets: Assets = Assets(100000, 1000, 0), // Should be (0, 0, 0) here.
   rights: Rights = Rights(),
   dailyResults: List[DailyResult] = List(),

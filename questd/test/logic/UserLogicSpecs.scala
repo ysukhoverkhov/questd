@@ -17,21 +17,21 @@ class UserLogicSpecs extends Specification
 
     "Do not allow user without coins purchase themes" in {
       val u = User(id = "",
-        profile = Profile(level = 20, assets = Assets(0, 0, 0), rights = Rights.all))
+        profile = Profile(publicProfile = PublicProfile(level = 20), assets = Assets(0, 0, 0), rights = Rights.all))
 
       u.canPurchaseQuestProposals must beEqualTo(NotEnoughAssets)
     }
 
     "Do not allow user with low level purchase themes" in {
       val u = User(id = "",
-        profile = Profile(level = 1, assets = Assets(100000, 100000, 1000000)))
+        profile = Profile(publicProfile = PublicProfile(level = 1), assets = Assets(100000, 100000, 1000000)))
 
       u.canPurchaseQuestProposals must beEqualTo(LevelTooLow)
     }
 
     "Allow user with level and money purchase themes" in {
       val u = User(id = "",
-        profile = Profile(level = 12, assets = Assets(100000, 100000, 1000000), rights = Rights.all))
+        profile = Profile(publicProfile = PublicProfile(level = 12), assets = Assets(100000, 100000, 1000000), rights = Rights.all))
 
       u.canPurchaseQuestProposals must beEqualTo(OK)
     }
@@ -43,7 +43,7 @@ class UserLogicSpecs extends Specification
       val u = User(
         id = "",
         profile = Profile(
-          level = 12,
+          publicProfile = PublicProfile(level = 12),
           assets = Assets(100000, 100000, 1000000),
           rights = Rights.all,
           questProposalContext = QuestProposalConext(questProposalCooldown = (DateTime.now + Hours.hours(1)).toDate)))
@@ -59,20 +59,18 @@ class UserLogicSpecs extends Specification
       val u1 = User(
         id = "",
         profile = Profile(
-          level = 12,
+          publicProfile = PublicProfile(level = 12, bio = Bio(timezone = 0)),
           assets = Assets(100000, 100000, 1000000),
-          rights = Rights.all,
-          bio = Bio(timezone = 0)))
+          rights = Rights.all))
 
       val t1 = u1.getCooldownForTakeTheme
 
       val u2 = User(
         id = "",
         profile = Profile(
-          level = 12,
+          publicProfile = PublicProfile(level = 12, bio = Bio(timezone = 1)),
           assets = Assets(100000, 100000, 1000000),
-          rights = Rights.all,
-          bio = Bio(timezone = 1)))
+          rights = Rights.all))
 
       val t2 = u2.getCooldownForTakeTheme
       

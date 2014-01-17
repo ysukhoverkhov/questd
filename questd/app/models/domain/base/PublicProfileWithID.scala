@@ -2,6 +2,6 @@ package models.domain.base
 
 import models.domain._
 
-case class BioWithID (
+case class PublicProfileWithID (
     id: String,
-    obj: Bio)
+    obj: PublicProfile)

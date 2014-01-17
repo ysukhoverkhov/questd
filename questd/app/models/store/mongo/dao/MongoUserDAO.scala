@@ -113,13 +113,13 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: BioWithID, defeatReward: Assets, victoryReward: Assets): Option[User] = {
+  def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: PublicProfileWithID, defeatReward: Assets, victoryReward: Assets): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
           "profile.questSolutionContext.purchasedQuest" -> grater[QuestInfoWithID].asDBObject(purchasedQuest),
-          "profile.questSolutionContext.questAuthor" -> grater[BioWithID].asDBObject(author),
+          "profile.questSolutionContext.questAuthor" -> grater[PublicProfileWithID].asDBObject(author),
           "profile.questSolutionContext.defeatReward" -> grater[Assets].asDBObject(defeatReward),
           "profile.questSolutionContext.victoryReward" -> grater[Assets].asDBObject(victoryReward))),
         ("$inc" -> MongoDBObject(
@@ -305,7 +305,7 @@ private[mongo] class MongoUserDAO
       id,
       MongoDBObject(
         ("$inc" -> MongoDBObject(
-          "profile.level" -> 1,
+          "profile.publicProfile.level" -> 1,
           "profile.assets.rating" -> -ratingToNextlevel))))
   }
 

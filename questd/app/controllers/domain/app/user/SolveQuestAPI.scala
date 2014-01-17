@@ -91,7 +91,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 rememberQuestSolvingInHistory (RememberQuestSolvingRequest(user, q.id))
               } map {
                 val questCost = user.costOfPurchasingQuest
-                val author = db.user.readByID(q.authorUserID).map(x => BioWithID(q.authorUserID, x.profile.bio))
+                val author = db.user.readByID(q.authorUserID).map(x => PublicProfileWithID(q.authorUserID, x.profile.publicProfile))
 
                 if (author == None) {
                   Logger.error("API - purchaseQuest. Unable to find quest author")

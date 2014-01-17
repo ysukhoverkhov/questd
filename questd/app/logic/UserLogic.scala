@@ -30,8 +30,8 @@ class UserLogic(val user: User) {
   
   def calculateRights: Rights = {
     Rights(
-        unlockedFunctionality = restrictions.foldLeft(Set[String]()){case (c, (right, level)) => if (level <= user.profile.level) c + right else c},
-        maxFriendsCount = maxNumberOfFriendsOnLevel(user.profile.level))
+        unlockedFunctionality = restrictions.foldLeft(Set[String]()){case (c, (right, level)) => if (level <= user.profile.publicProfile.level) c + right else c},
+        maxFriendsCount = maxNumberOfFriendsOnLevel(user.profile.publicProfile.level))
   }
   
   
@@ -93,7 +93,7 @@ class UserLogic(val user: User) {
    */
   def costOfPurchasingQuestProposal = {
     if (user.profile.questProposalContext.numberOfPurchasedThemes < numberOfThemesSkipsForCoins) {
-      val c = costToSkipProposal(user.profile.level, user.profile.questProposalContext.numberOfPurchasedThemes + 1)
+      val c = costToSkipProposal(user.profile.publicProfile.level, user.profile.questProposalContext.numberOfPurchasedThemes + 1)
       Assets(coins = c)
     } else {
       Assets(money = 1)
@@ -104,7 +104,7 @@ class UserLogic(val user: User) {
    * Cost of proposing quest.
    */
   def costOfTakingQuestTheme = {
-    Assets(coins = costToTakeQuestTheme(user.profile.level))
+    Assets(coins = costToTakeQuestTheme(user.profile.publicProfile.level))
   }
 
   /**
@@ -130,9 +130,9 @@ class UserLogic(val user: User) {
     import com.github.nscala_time.time.Imports._
     import org.joda.time.DateTime
 
-    val daysToSkipt = questProposalPeriod(user.profile.level)
+    val daysToSkipt = questProposalPeriod(user.profile.publicProfile.level)
 
-    val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
+    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
     (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate ()
   }
 
@@ -150,7 +150,7 @@ class UserLogic(val user: User) {
    * Reward for approving quest.
    */
   def rewardForMakingApprovedQuest = {
-    Assets(rating = ratingForProposalAtLevel(user.profile.level))
+    Assets(rating = ratingForProposalAtLevel(user.profile.publicProfile.level))
   }
 
   def penaltyForCheatingQuest = {
@@ -165,7 +165,7 @@ class UserLogic(val user: User) {
    *
    */
   def costOfGivingUpQuestProposal = {
-    Assets(rating = ratingToGiveUpQuestProposal(user.profile.level)) clampTop user.profile.assets
+    Assets(rating = ratingToGiveUpQuestProposal(user.profile.publicProfile.level)) clampTop user.profile.assets
   }
 
   /**
@@ -209,7 +209,7 @@ class UserLogic(val user: User) {
         case _ => 1
       }
 
-      val c = costToSkipQuest(user.profile.level, user.profile.questSolutionContext.numberOfPurchasedQuests + 1, questDuration)
+      val c = costToSkipQuest(user.profile.publicProfile.level, user.profile.questSolutionContext.numberOfPurchasedQuests + 1, questDuration)
       Assets(coins = c)
     } else {
       Assets(money = 1)
@@ -220,7 +220,7 @@ class UserLogic(val user: User) {
    * Takes everything into account and returns possible quest to be solved by user.
    */
   def getRandomQuestForSolution: Option[Quest] = {
-    val quests = api.allQuestsInRotation(AllQuestsRequest(user.profile.level - questLevelToleranceDown, user.profile.level + questLevelToleranceUp)).body.get.quests
+    val quests = api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
 
     util.selectQuest[Quest](quests, (_.id), (_.authorUserID), user.history.solvedQuestIds)
   }
@@ -243,7 +243,7 @@ class UserLogic(val user: User) {
    * Get cost of taking quest to resolve.
    */
   def costOfTakingQuest = {
-    Assets(coins = costToTakeQuestToSolve(user.profile.level, purchasedQuestDuration))
+    Assets(coins = costToTakeQuestToSolve(user.profile.publicProfile.level, purchasedQuestDuration))
   }
 
   /**
@@ -277,7 +277,7 @@ class UserLogic(val user: User) {
    * How much it'll cost to give up taken quest.
    */
   def costOfGivingUpQuest = {
-    Assets(rating = ratingToGiveUpQuest(user.profile.level, takenQuestDuration)) clampTop user.profile.assets
+    Assets(rating = ratingToGiveUpQuest(user.profile.publicProfile.level, takenQuestDuration)) clampTop user.profile.assets
   }
 
   /**
@@ -286,7 +286,7 @@ class UserLogic(val user: User) {
   def getCooldownForTakeQuest(qi: QuestInfo) = {
     val daysToSkipt = qi.daysDuration
 
-    val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
+    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
     (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate ()
   }
 
@@ -296,7 +296,7 @@ class UserLogic(val user: User) {
   def getDeadlineForTakeQuest(qi: QuestInfo) = {
     val minutesToSolveQuest = qi.minutesDuration
 
-    val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
+    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
     (DateTime.now(tz) + minutesToSolveQuest.minutes) toDate ()
   }
 
@@ -304,7 +304,7 @@ class UserLogic(val user: User) {
    * Cooldown for reseting purchases. Purchases should be reset in nearest 5am at user's time.
    */
   def getResetPurchasesTimeout = {
-    val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
+    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
     (DateTime.now(tz) + 1.day).hour(constants.flipHour).minute(0).second(0) toDate ()
   }
 
@@ -312,14 +312,14 @@ class UserLogic(val user: User) {
    * Reward for lost quest.
    */
   def rewardForLosingQuest(quest: Quest) = {
-    Assets(rating = ratingToLoseQuest(user.profile.level, quest.info.daysDuration))
+    Assets(rating = ratingToLoseQuest(user.profile.publicProfile.level, quest.info.daysDuration))
   }
 
   /**
    * Reward for won quest.
    */
   def rewardForWinningQuest(quest: Quest) = {
-    Assets(rating = ratingToWinQuest(user.profile.level, quest.info.daysDuration))
+    Assets(rating = ratingToWinQuest(user.profile.publicProfile.level, quest.info.daysDuration))
   }
 
   /**
@@ -408,7 +408,7 @@ class UserLogic(val user: User) {
    * Reward for voting for quest proposal.
    */
   def getQuestProposalVoteReward = {
-    val level = user.profile.level
+    val level = user.profile.publicProfile.level
     val count = user.profile.questProposalVoteContext.numberOfReviewedQuests
 
     if (count < rewardedProposalVotesPerLevel(level))
@@ -440,7 +440,7 @@ class UserLogic(val user: User) {
    */
   def getQuestSolutionToVote: Option[QuestSolution] = {
     val solutions = api.allQuestSolutionsOnVoting(
-      AllQuestSolutionsRequest(user.profile.level - constants.solutionLevelDownTolerance, user.profile.level + constants.solutionLevelUpTolerance)).body.get.quests
+      AllQuestSolutionsRequest(user.profile.publicProfile.level - constants.solutionLevelDownTolerance, user.profile.publicProfile.level + constants.solutionLevelUpTolerance)).body.get.quests
 
     util.selectQuest[QuestSolution](solutions, (_.id), (_.userID), user.history.votedQuestSolutionIds)
   }
@@ -461,7 +461,7 @@ class UserLogic(val user: User) {
    * Reward for quest solution.
    */
   def getQuestSolutionVoteReward = {
-    val level = user.profile.level
+    val level = user.profile.publicProfile.level
     val count = user.profile.questSolutionVoteContext.numberOfReviewedSolutions
 
     if (count < rewardedSolutionVotesPerLevel(level))
@@ -476,7 +476,7 @@ class UserLogic(val user: User) {
    * ***********************
    */
   def getStartOfCurrentDailyResultPeriod: Date = {
-    val tz = DateTimeZone.forOffsetHours(user.profile.bio.timezone)
+    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
     DateTime.now(tz).hour(constants.flipHour).minute(0).second(0) toDate ()
   }
 
@@ -484,7 +484,7 @@ class UserLogic(val user: User) {
    * Tells cost of next theme purchase
    */
   def dailyAssetsDecrease = {
-    Assets(rating = dailyRatingDecrease(user.profile.level)) clampTop (user.profile.assets)
+    Assets(rating = dailyRatingDecrease(user.profile.publicProfile.level)) clampTop (user.profile.assets)
   }
 
   /**
@@ -493,7 +493,7 @@ class UserLogic(val user: User) {
    * ***********************
    */
   def ratingToNextLevel: Int = {
-    ratToGainLevel(user.profile.level + 1)
+    ratToGainLevel(user.profile.publicProfile.level + 1)
   }
 
   /**
