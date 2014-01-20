@@ -248,5 +248,11 @@ package object protocol {
     id: String)
 
   type WSRemoveFromShortlistResult = RemoveFromShortlistResult
+  
+  /**
+   * Friends
+   */
+  
+  type WSGetFriendsResult = GetFriendsResult
 }
 
