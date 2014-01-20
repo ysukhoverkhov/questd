@@ -390,18 +390,31 @@ private[mongo] class MongoUserDAO
   }
 
   /**
+   *
+   */
+  def addToShortlist(id: String, idToAdd: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$addToSet" -> MongoDBObject(
+          "shortlist" -> idToAdd))))
+  }
+
+  /**
    * 
    */
-//  def getShortlist(id: String, skip: Int = 0): Iterator[String] = {
-//    findByExample(
-//        example = MongoDBObject("id" -> id),
-//        skip = skip)
-//  }
+  def removeFromShortlist(id: String, idToRemove: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$pull" -> MongoDBObject(
+          "shortlist" -> idToRemove))))
+  }
 
 }
 
 /**
- * Test version of dao what fails al the time
+ * Test version of dao what fails all the time
  */
 
 import com.novus.salat.dao.SalatDAO

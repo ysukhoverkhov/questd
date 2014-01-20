@@ -229,13 +229,24 @@ package object protocol {
 
   type WSGetQuestsForUserResult = GetQuestsForUserResult
 
-  
   /**
    * Shortlist
    */
-  
+
   type WSGetShortlistResult = GetShortlistResult
-  
+
   type WSCostToShortlistResult = CostToShortlistResult
+
+  case class WSAddToShortlistRequest(
+    /// Id of a person to add.
+    id: String)
+
+  type WSAddToShortlistResult = AddToShortlistResult
+
+  case class WSRemoveFromShortlistRequest(
+    /// Id of a person to remove.
+    id: String)
+
+  type WSRemoveFromShortlistResult = RemoveFromShortlistResult
 }
 

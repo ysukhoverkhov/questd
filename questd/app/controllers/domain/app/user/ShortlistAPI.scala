@@ -22,18 +22,19 @@ case class CostToShortlistResult(
   allowed: ProfileModificationResult,
   cost: Option[Assets] = None)
 
-private[domain] trait ShortlistAPI { this: DBAccessor =>
+case class AddToShortlistRequest(
+  user: User,
+  userIdToAdd: String)
+case class AddToShortlistResult(
+  allowed: ProfileModificationResult)
 
-  /**
-   * Reset all purchases (quests and themes) overnight.
-   */
-  //  def resetCounters(request: ResetCountersRequest): ApiResult[ResetCountersResult] = handleDbException {
-  //    import request._
-  //
-  //    db.user.resetCounters(user.id, user.getResetPurchasesTimeout)
-  //
-  //    OkApiResult(Some(ResetCountersResult()))
-  //  }
+case class RemoveFromShortlistRequest(
+  user: User,
+  userIdToAdd: String)
+case class RemoveFromShortlistResult(
+  allowed: ProfileModificationResult)
+
+private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#DomainAPI =>
 
   /**
    * Get ids of users from our shortlist.
@@ -53,35 +54,46 @@ private[domain] trait ShortlistAPI { this: DBAccessor =>
       cost = Some(request.user.costToShortlist))))
   }
 
-  /*
+  /**
+   * Adds a user to shortlist
+   */
+  def addToShortlist(request: AddToShortlistRequest): ApiResult[AddToShortlistResult] = handleDbException {
 
-
-        request.user.canShortlist match {
+    val maxShortlistSize = 1000
+    
+    request.user.canShortlist match {
       case OK => {
 
-//        val themeCost = user.costOfPurchasingQuestProposal
-//
-//        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) map { r =>
-//          val user = r.user
-//          val t = r.user.getRandomThemeForQuestProposal
-//          val reward = r.user.rewardForMakingApprovedQuest
-//          val sampleQuest = {
-//            val all = db.quest.allWithStatusAndThemeByPoints(QuestStatus.InRotation.toString, t.id)
-//            if (all.hasNext) {
-//              Some(all.next.info)
-//            } else {
-//              None
-//            }
-//          }
-//
-//          val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t), sampleQuest, reward)
-//          OkApiResult(Some(PurchaseQuestThemeResult(OK, u.map(_.profile))))
-        }
+        val cost = request.user.costToShortlist
+        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) map { r =>
 
+          if (request.user.shortlist.length >= maxShortlistSize) {
+            OkApiResult(Some(AddToShortlistResult(LimitExceeded)))
+          } else {
+            db.user.addToShortlist(r.user.id, request.userIdToAdd)
+            OkApiResult(Some(AddToShortlistResult(OK)))
+          }
+        }
       }
-      case a => OkApiResult(Some(GetShortlistResult(a)))
+      case a => OkApiResult(Some(AddToShortlistResult(a)))
     }
-*/
+
+  }
+
+  /**
+   * Adds a user to shortlist
+   */
+  def removeFromShortlist(request: RemoveFromShortlistRequest): ApiResult[RemoveFromShortlistResult] = handleDbException {
+
+    request.user.canShortlist match {
+      case OK => {
+        db.user.removeFromShortlist(request.user.id, request.userIdToAdd)
+        OkApiResult(Some(RemoveFromShortlistResult(OK)))
+      }
+      case a => OkApiResult(Some(RemoveFromShortlistResult(a)))
+    }
+
+  }
 
 }
 
