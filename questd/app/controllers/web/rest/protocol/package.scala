@@ -248,11 +248,18 @@ package object protocol {
     id: String)
 
   type WSRemoveFromShortlistResult = RemoveFromShortlistResult
-  
+
   /**
    * Friends
    */
-  
+
   type WSGetFriendsResult = GetFriendsResult
+
+  case class WSCostToRequestFriendshipRequest(
+    /// Id of a person to add to friends.
+    id: String)
+
+  type WSCostToRequestFriendshipResult = CostToRequestFriendshipResult
+
 }
 

@@ -25,7 +25,13 @@ trait FriendsWSImpl extends QuestController with SecurityWSImpl { this: WSCompon
     api.getFriends(GetFriendsRequest(r.user))
   }
     
-  def costToRequestFriendship = TODO
+  def costToRequestFriendship = wrapJsonApiCallReturnBody[WSCostToRequestFriendshipResult] { (js, r) =>
+    val v = Json.read[WSAddToShortlistRequest](js.toString)
+
+    api.costToRequestFriendship(CostToRequestFriendshipRequest(r.user, v.id))
+  }
+
+  
   def askFriendship = TODO
   def respondFriendsip = TODO
   def removeFromFriends = TODO
