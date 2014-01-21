@@ -119,6 +119,17 @@ class FunctionsSpecs extends Specification {
       costToShortlistPerson(11) must beEqualTo(20)
       costToShortlistPerson(20) must beEqualTo(20)
     }
+    
+    "costToInviteFriend" in {
+      costToInviteFriend(1, 0) must beEqualTo(0)
+      costToInviteFriend(5, 0) must beEqualTo(0)
+      costToInviteFriend(6, 0) must beEqualTo(25)
+      costToInviteFriend(6, 5) must beEqualTo(7)
+      costToInviteFriend(13, 0) must beEqualTo(259)
+      costToInviteFriend(13, 10) must beEqualTo(23)
+      costToInviteFriend(20, 0) must beEqualTo(992)
+      costToInviteFriend(20, 15) must beEqualTo(26)
+    }
   }
 
 }

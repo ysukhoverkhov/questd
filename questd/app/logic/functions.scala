@@ -202,6 +202,15 @@ object functions {
     math.floor((numberOfFreindsOnLastLevel / coinToSpentDailyFriendsOnly(maxLevel)) * coinToSpentDailyFriendsOnly(level)).toInt
   }
   
+  def costToInviteFriend(level: Int, levelDifference: Int): Int = {
+    
+    def costToInviteFriendCoef(levelDif: Int) = {
+      math.pow(0.78475, levelDif)
+    }
+    
+    math.round(costToInviteFriendCoef (levelDifference) * coinAddFriend(level)).toInt
+  }
+
   
   /**
    * ********************
@@ -211,5 +220,7 @@ object functions {
   def costToShortlistPerson(level: Int): Int = {
     math.round(coinAddShort(level) / 3).toInt
   }
+  
+  
 }
 

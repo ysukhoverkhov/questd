@@ -20,21 +20,18 @@ class UserLogic(val user: User) {
 
   lazy val api = ComponentRegistrySingleton.api
 
-  
-  
   /**
    * **************************
    * Rights
    * **************************
    */
-  
+
   def calculateRights: Rights = {
     Rights(
-        unlockedFunctionality = restrictions.foldLeft(Set[String]()){case (c, (right, level)) => if (level <= user.profile.publicProfile.level) c + right else c},
-        maxFriendsCount = maxNumberOfFriendsOnLevel(user.profile.publicProfile.level))
+      unlockedFunctionality = restrictions.foldLeft(Set[String]()) { case (c, (right, level)) => if (level <= user.profile.publicProfile.level) c + right else c },
+      maxFriendsCount = maxNumberOfFriendsOnLevel(user.profile.publicProfile.level))
   }
-  
-  
+
   /**
    * **************************
    * Proposing quests.
@@ -554,8 +551,7 @@ class UserLogic(val user: User) {
     }
 
   }
-  
-  
+
   /**
    * *******************
    * Shortlist
@@ -570,9 +566,36 @@ class UserLogic(val user: User) {
     else
       OK
   }
-  
+
   def costToShortlist = {
     Assets(coins = costToShortlistPerson(user.profile.publicProfile.level))
+  }
+
+  /**
+   * ********************
+   * Friends
+   * ********************
+   */
+
+  def canAddFriend(potentialFriend: User) = {
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends.toString()))
+      NotEnoughRights
+    else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
+      NotEnoughAssets
+    else if (user.friends.length >= user.profile.rights.maxFriendsCount)
+      LimitExceeded
+    else
+      OK
+  }
+
+  def costToAddFriend(potentialFriend: User) = {
+    val friendAhead = potentialFriend.profile.publicProfile.level - user.profile.publicProfile.level
+
+    if (friendAhead > 0) {
+      Assets(money = friendAhead)
+    } else {
+      Assets(coins = costToInviteFriend(user.profile.publicProfile.level, -friendAhead))
+    }
   }
 }
 

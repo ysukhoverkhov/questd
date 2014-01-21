@@ -117,4 +117,27 @@ object spendcoinsfunctions {
     
     coinAddShortInt(level, k, d, b, y)
   }
+  
+  /**
+   * How much coins we should spend on adding friends each day.
+   */
+  def coinAddFriend(level: Int): Double = {
+    val k = 55.587
+    val d = 5.695
+    val b = -128.005
+    val y = 3.154
+    
+    def coinAddFriendInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
+      level match {
+        case _ if level < levelFor(InviteFriends) => 0
+        case _ if (level < levelFor(AddToShortList)) && (level >= levelFor(InviteFriends)) => megaf(level, k, d, b, y)
+        case _ => coinAddFriendInt(levelFor(AddToShortList) - 1, k, d, b, y) * 0.35 + megaf(level, k, d, b, y) * 0.65
+      }
+    }
+    
+    coinAddFriendInt(level, k, d, b, y)
+  }
+  
+  
+  
 }
