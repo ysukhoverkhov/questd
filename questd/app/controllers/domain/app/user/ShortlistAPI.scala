@@ -61,22 +61,22 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
   def addToShortlist(request: AddToShortlistRequest): ApiResult[AddToShortlistResult] = handleDbException {
 
     val maxShortlistSize = 1000
-    
-    request.user.canShortlist match {
-      case OK => {
 
-        val cost = request.user.costToShortlist
-        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) map { r =>
+    if (request.user.shortlist.length >= maxShortlistSize) {
+      OkApiResult(Some(AddToShortlistResult(LimitExceeded)))
+    } else {
+      request.user.canShortlist match {
+        case OK => {
 
-          if (request.user.shortlist.length >= maxShortlistSize) {
-            OkApiResult(Some(AddToShortlistResult(LimitExceeded)))
-          } else {
+          val cost = request.user.costToShortlist
+          adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) map { r =>
+
             db.user.addToShortlist(r.user.id, request.userIdToAdd)
             OkApiResult(Some(AddToShortlistResult(OK, Some(r.user.profile.assets))))
           }
         }
+        case a => OkApiResult(Some(AddToShortlistResult(a)))
       }
-      case a => OkApiResult(Some(AddToShortlistResult(a)))
     }
 
   }

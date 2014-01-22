@@ -23,18 +23,12 @@ case class CostToRequestFriendshipResult(
   allowed: ProfileModificationResult,
   cost: Option[Assets] = None)
 
-//case class AddToShortlistRequest(
-//  user: User,
-//  userIdToAdd: String)
-//case class AddToShortlistResult(
-//  allowed: ProfileModificationResult,
-//  assets: Option[Assets] = None)
-//
-//case class RemoveFromShortlistRequest(
-//  user: User,
-//  userIdToAdd: String)
-//case class RemoveFromShortlistResult(
-//  allowed: ProfileModificationResult)
+case class AskFriendshipRequest(
+  user: User,
+  friendId: String)
+case class AskFriendshipResult(
+  allowed: ProfileModificationResult,
+  assets: Option[Assets] = None)
 
 private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#DomainAPI =>
 
@@ -58,7 +52,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
           allowed = OK,
           cost = Some(request.user.costToAddFriend(u)))))
       }
-      
+
       case None => {
         OkApiResult(Some(CostToRequestFriendshipResult(
           allowed = OutOfContent)))
@@ -66,46 +60,46 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
     }
   }
 
-  //  /**
-  //   * Adds a user to shortlist
-  //   */
-  //  def addToShortlist(request: AddToShortlistRequest): ApiResult[AddToShortlistResult] = handleDbException {
-  //
-  //    val maxShortlistSize = 1000
-  //    
-  //    request.user.canShortlist match {
-  //      case OK => {
-  //
-  //        val cost = request.user.costToShortlist
-  //        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) map { r =>
-  //
-  //          if (request.user.shortlist.length >= maxShortlistSize) {
-  //            OkApiResult(Some(AddToShortlistResult(LimitExceeded)))
-  //          } else {
-  //            db.user.addToShortlist(r.user.id, request.userIdToAdd)
-  //            OkApiResult(Some(AddToShortlistResult(OK, Some(r.user.profile.assets))))
-  //          }
-  //        }
-  //      }
-  //      case a => OkApiResult(Some(AddToShortlistResult(a)))
-  //    }
-  //
-  //  }
-  //
-  //  /**
-  //   * Adds a user to shortlist
-  //   */
-  //  def removeFromShortlist(request: RemoveFromShortlistRequest): ApiResult[RemoveFromShortlistResult] = handleDbException {
-  //
-  //    request.user.canShortlist match {
-  //      case OK => {
-  //        db.user.removeFromShortlist(request.user.id, request.userIdToAdd)
-  //        OkApiResult(Some(RemoveFromShortlistResult(OK)))
-  //      }
-  //      case a => OkApiResult(Some(RemoveFromShortlistResult(a)))
-  //    }
-  //
-  //  }
+  /**
+   * Ask person to become our friend.
+   */
+  def askFriendship(request: AskFriendshipRequest): ApiResult[AskFriendshipResult] = handleDbException {
+
+    if (request.friendId == request.user.id ||
+        request.user.friends.map(_.friendId).contains(request.friendId)) {
+      OkApiResult(Some(AskFriendshipResult(
+        allowed = OutOfContent)))
+    } else {
+      db.user.readByID(request.friendId) match {
+        case Some(u) => {
+          request.user.canAddFriend(u) match {
+            case OK => {
+
+              val cost = request.user.costToAddFriend(u)
+              adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) map { r =>
+
+                db.user.askFriendship(
+                  r.user.id,
+                  request.friendId,
+                  Friendship(request.friendId, FriendshipStatus.Invited.toString()),
+                  Friendship(r.user.id, FriendshipStatus.Invites.toString()))
+
+                OkApiResult(Some(AskFriendshipResult(OK, Some(r.user.profile.assets))))
+              }
+            }
+            case a => OkApiResult(Some(AskFriendshipResult(a)))
+          }
+        }
+
+        case None => {
+          OkApiResult(Some(AskFriendshipResult(
+            allowed = OutOfContent)))
+        }
+      }
+    }
+
+  }
+
 
 }
 

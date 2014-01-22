@@ -401,7 +401,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def removeFromShortlist(id: String, idToRemove: String): Option[User] = {
     findAndModify(
@@ -409,6 +409,23 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         ("$pull" -> MongoDBObject(
           "shortlist" -> idToRemove))))
+  }
+
+  /**
+   *
+   */
+  def askFriendship(id: String, idToAdd: String, myFriendship: Friendship, hisFriendship: Friendship): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$push" -> MongoDBObject(
+          "friends" -> grater[Friendship].asDBObject(myFriendship)))))
+
+    findAndModify(
+      idToAdd,
+      MongoDBObject(
+        ("$push" -> MongoDBObject(
+          "friends" -> grater[Friendship].asDBObject(hisFriendship)))))
   }
 
 }

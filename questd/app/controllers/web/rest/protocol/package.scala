@@ -261,5 +261,10 @@ package object protocol {
 
   type WSCostToRequestFriendshipResult = CostToRequestFriendshipResult
 
+  case class WSAskFriendshipRequest(
+    /// Id of a person to add to friends.
+    id: String)
+  
+  type WSAskFriendshipResult = AskFriendshipResult
 }
 
