@@ -126,7 +126,14 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
    * Searches for a object, modifies it and returns after modification
    */
   def findAndModify(key: String, u: DBObject): Option[T] = wrapMongoException {
-    dao.findAndModify(makeKeyDbObject(key), u, false, true)
+    findAndModify(makeKeyDbObject(key), u)
+  }
+
+  /**
+   * Searches for a object, modifies it and returns after modification
+   */
+  def findAndModify(f: DBObject, u: DBObject): Option[T] = wrapMongoException {
+    dao.findAndModify(f, u, false, true)
   }
   
   /**
