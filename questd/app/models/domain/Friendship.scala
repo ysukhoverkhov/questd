@@ -2,7 +2,7 @@ package models.domain
 
 
 object FriendshipStatus extends Enumeration {
-  val Invited, Invites, Accepted, Rejected, Divorsed = Value
+  val Invited, Invites, Accepted = Value
 }
 
 

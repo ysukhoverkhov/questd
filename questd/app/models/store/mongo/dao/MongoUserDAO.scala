@@ -427,17 +427,38 @@ private[mongo] class MongoUserDAO
         ("$push" -> MongoDBObject(
           "friends" -> grater[Friendship].asDBObject(hisFriendship)))))
   }
-  
-  def updateFriendship(id: String, friendId: String, status: String): Option[User] = {
+
+  def updateFriendship(id: String, friendId: String, myStatus: String, friendStatus: String): Option[User] = {
     findAndModify(
       MongoDBObject(
-          "id" -> id,
-          "friends.friendId" -> friendId),
+        "id" -> id,
+        "friends.friendId" -> friendId),
       MongoDBObject(
         ("$set" -> MongoDBObject(
-          "friends.$.status" -> status))))
+          "friends.$.status" -> myStatus))))
+
+    findAndModify(
+      MongoDBObject(
+        "id" -> friendId,
+        "friends.friendId" -> id),
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "friends.$.status" -> friendStatus))))
   }
 
+  def removeFriendship(id: String, friendId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$pull" -> MongoDBObject(
+          "friends" -> MongoDBObject("friendId" -> friendId)))))
+
+    findAndModify(
+      friendId,
+      MongoDBObject(
+        ("$pull" -> MongoDBObject(
+          "friends" -> MongoDBObject("friendId" -> id)))))
+  }
 
 }
 

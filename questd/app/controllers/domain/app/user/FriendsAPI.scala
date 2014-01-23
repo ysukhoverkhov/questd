@@ -30,6 +30,19 @@ case class AskFriendshipResult(
   allowed: ProfileModificationResult,
   assets: Option[Assets] = None)
 
+case class RespondFriendshipRequest(
+  user: User,
+  friendId: String,
+  accept: Boolean)
+case class RespondFriendshipResult(
+  allowed: ProfileModificationResult)
+
+case class RemoveFromFriendsRequest(
+  user: User,
+  friendId: String)
+case class RemoveFromFriendsResult(
+  allowed: ProfileModificationResult)
+
 private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#DomainAPI =>
 
   /**
@@ -66,7 +79,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
   def askFriendship(request: AskFriendshipRequest): ApiResult[AskFriendshipResult] = handleDbException {
 
     if (request.friendId == request.user.id ||
-        request.user.friends.map(_.friendId).contains(request.friendId)) {
+      request.user.friends.map(_.friendId).contains(request.friendId)) {
       OkApiResult(Some(AskFriendshipResult(
         allowed = OutOfContent)))
     } else {
@@ -100,6 +113,59 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
   }
 
+  /**
+   * Respond from a person to friendship request
+   */
+  def respondFriendship(request: RespondFriendshipRequest): ApiResult[RespondFriendshipResult] = handleDbException {
+    if (request.friendId == request.user.id ||
+      request.user.friends.find {
+        x => (x.friendId == request.friendId) && (x.status == FriendshipStatus.Invites.toString())
+      } == None) {
+      OkApiResult(Some(RespondFriendshipResult(
+        allowed = OutOfContent)))
+    } else {
+      if (request.accept == true) {
+        db.user.updateFriendship(
+          request.user.id,
+          request.friendId,
+          FriendshipStatus.Accepted.toString,
+          FriendshipStatus.Accepted.toString)
+
+        // TODO: make a note to friend's daily results here.
+
+      } else {
+
+        db.user.removeFriendship(request.user.id, request.friendId)
+
+        // TODO: make a note to friend's daily results here.
+      }
+
+      OkApiResult(Some(RespondFriendshipResult(OK)))
+    }
+  }
+
+  /**
+   * Respond from a person to friendship request
+   */
+  def removeFromFriends(request: RemoveFromFriendsRequest): ApiResult[RemoveFromFriendsResult] = handleDbException {
+    if (request.friendId == request.user.id
+      || request.user.friends.find {
+        x => (x.friendId == request.friendId) && (x.status == FriendshipStatus.Accepted.toString() || x.status == FriendshipStatus.Invited.toString())
+      } == None) {
+      OkApiResult(Some(RemoveFromFriendsResult(
+        allowed = OutOfContent)))
+    } else {
+
+      db.user.removeFriendship(request.user.id, request.friendId)
+
+      if (request.user.friends.find(_.friendId == request.friendId).get.status == FriendshipStatus.Accepted.toString()) {
+        // TODO: make a note to friend's daily results here.
+      }
+
+      OkApiResult(Some(RemoveFromFriendsResult(OK)))
+
+    }
+  }
 
 }
 

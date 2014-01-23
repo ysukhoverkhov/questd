@@ -70,7 +70,7 @@ POST	/rest/removeFromShortlist			controllers.web.rest.ShortlistWS.removeFromShor
 POST	/rest/getFriends					controllers.web.rest.FriendsWS.getFriends
 POST	/rest/costToRequestFriendship		controllers.web.rest.FriendsWS.costToRequestFriendship
 POST	/rest/askFriendship					controllers.web.rest.FriendsWS.askFriendship
-POST	/rest/respondFriendsip				controllers.web.rest.FriendsWS.respondFriendsip
+POST	/rest/respondFriendship				controllers.web.rest.FriendsWS.respondFriendship
 POST	/rest/removeFromFriends				controllers.web.rest.FriendsWS.removeFromFriends
 
 

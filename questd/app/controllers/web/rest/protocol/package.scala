@@ -258,13 +258,23 @@ package object protocol {
   case class WSCostToRequestFriendshipRequest(
     /// Id of a person to add to friends.
     id: String)
-
   type WSCostToRequestFriendshipResult = CostToRequestFriendshipResult
 
   case class WSAskFriendshipRequest(
     /// Id of a person to add to friends.
     id: String)
-  
   type WSAskFriendshipResult = AskFriendshipResult
+
+  case class WSRespondFriendshipRequest(
+    /// Id of a person we respond to.
+    id: String,
+    accepted: Boolean)
+  type WSRespondFriendshipResult = RespondFriendshipResult
+
+  case class WSRemoveFromFriendsRequest(
+    /// Id of a person to add to friends.
+    id: String)
+  type WSRemoveFromFriendsResult = RemoveFromFriendsResult
+
 }
 

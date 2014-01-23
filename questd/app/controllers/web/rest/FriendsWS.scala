@@ -10,7 +10,7 @@ object FriendsWS extends Controller with AccessToWSInstance {
   def getFriends = ws.getFriends
   def costToRequestFriendship = ws.costToRequestFriendship
   def askFriendship = ws.askFriendship
-  def respondFriendsip = ws.respondFriendsip
+  def respondFriendship = ws.respondFriendship
   def removeFromFriends = ws.removeFromFriends
 }
 

@@ -597,5 +597,6 @@ class UserLogic(val user: User) {
       Assets(coins = costToInviteFriend(user.profile.publicProfile.level, -friendAhead))
     }
   }
+
 }
 

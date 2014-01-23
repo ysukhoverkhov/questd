@@ -26,11 +26,17 @@ trait FriendsWSImpl extends QuestController with SecurityWSImpl { this: WSCompon
     api.askFriendship(AskFriendshipRequest(r.user, v.id))
   }
 
+  def respondFriendship = wrapJsonApiCallReturnBody[WSRespondFriendshipResult] { (js, r) =>
+    val v = Json.read[WSRespondFriendshipRequest](js.toString)
+
+    api.respondFriendship(RespondFriendshipRequest(r.user, v.id, v.accepted))
+  }
   
-  
-  
-  def respondFriendsip = TODO
-  def removeFromFriends = TODO
+  def removeFromFriends = wrapJsonApiCallReturnBody[WSRemoveFromFriendsResult] { (js, r) =>
+    val v = Json.read[WSRemoveFromFriendsRequest](js.toString)
+
+    api.removeFromFriends(RemoveFromFriendsRequest(r.user, v.id))
+  }
 
 }
 
