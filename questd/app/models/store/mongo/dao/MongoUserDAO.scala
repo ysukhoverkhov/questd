@@ -428,6 +428,9 @@ private[mongo] class MongoUserDAO
           "friends" -> grater[Friendship].asDBObject(hisFriendship)))))
   }
 
+  /**
+   * 
+   */
   def updateFriendship(id: String, friendId: String, myStatus: String, friendStatus: String): Option[User] = {
     findAndModify(
       MongoDBObject(
@@ -446,6 +449,9 @@ private[mongo] class MongoUserDAO
           "friends.$.status" -> friendStatus))))
   }
 
+  /**
+   * 
+   */
   def removeFriendship(id: String, friendId: String): Option[User] = {
     findAndModify(
       id,
@@ -458,6 +464,28 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         ("$pull" -> MongoDBObject(
           "friends" -> MongoDBObject("friendId" -> id)))))
+  }
+
+  /**
+   * 
+   */
+  def addMessage(id: String, message: Message): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$push" -> MongoDBObject(
+          "messages" -> grater[Message].asDBObject(message)))))
+  }
+  
+  /**
+   * 
+   */
+  def removeOldestMessage(id: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$pop" -> MongoDBObject(
+          "messages" -> -1))))
   }
 
 }

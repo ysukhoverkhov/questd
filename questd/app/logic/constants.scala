@@ -81,6 +81,14 @@ object constants {
 
   val invitedVoteMult = 2
 
+  
+  
+  /**
+   * Messages
+   */
+  val numberOfStoredMessages = 100
+  
+  
   // Constants bellow are used in algorithms and should not be changed.
 
   /**
@@ -97,5 +105,6 @@ object constants {
    * Friends
    */
   val numberOfFreindsOnLastLevel = 100
+  
 }
 

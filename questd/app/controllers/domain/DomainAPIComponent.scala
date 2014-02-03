@@ -26,6 +26,7 @@ trait DomainAPIComponent { component: DatabaseComponent =>
     with ContentAPI
     with ShortlistAPI
     with FriendsAPI
+    with MessagesAPI 
     
     with QuestAPI
     with QuestSolutionAPI

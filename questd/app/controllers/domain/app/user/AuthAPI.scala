@@ -28,6 +28,7 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
 
       // API Test place
       //      Logger.warn(getRightsAtLevels(GetRightsAtLevelsRequest(user, 1, 20)).toString)
+//      sendMessage(SendMessageRequest(user, Message(text = "26")))
 
       OkApiResult(Some(LoginFBResult(uuid)))
     }

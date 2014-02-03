@@ -14,5 +14,6 @@ case class User(
   privateDailyResults: List[DailyResult] = List(),
   history: UserHistory = UserHistory(),
   shortlist: List[String] = List(),
-  friends: List[Friendship] = List()) extends ID
+  friends: List[Friendship] = List(),
+  messages: List[Message] = List()) extends ID
 

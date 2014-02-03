@@ -49,5 +49,8 @@ trait UserDAO extends BaseDAO[User] {
   def askFriendship(id: String, idToAdd: String, myFriendship: Friendship, hisFriendship: Friendship): Option[User]
   def updateFriendship(id: String, friendId: String, myStatus: String, friendStatus: String): Option[User]
   def removeFriendship(id: String, friendId: String): Option[User]
+  
+  def addMessage(id: String, message: Message): Option[User]
+  def removeOldestMessage(id: String): Option[User]
 }
 
