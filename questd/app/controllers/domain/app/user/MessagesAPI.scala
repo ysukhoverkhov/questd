@@ -8,9 +8,13 @@ import controllers.domain._
 import controllers.domain.helpers.exceptionwrappers._
 import logic._
 import play.Logger
+import controllers.domain.app.protocol.ProfileModificationResult._
 
 case class SendMessageRequest(user: User, message: Message)
 case class SendMessageResult()
+
+case class RemoveMessageRequest(user: User, messageId: String)
+case class RemoveMessageResult(allowed: ProfileModificationResult)
 
 private[domain] trait MessagesAPI { this: DBAccessor =>
 
@@ -41,5 +45,16 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
     OkApiResult(Some(SendMessageResult()))
   }
 
+  /**
+   * Remove message from user's list of messages by message's id.
+   */
+  def removeMessage(request: RemoveMessageRequest): ApiResult[RemoveMessageResult] = handleDbException {
+    import request._
+
+    db.user.removeMessage(user.id, messageId)
+
+    OkApiResult(Some(RemoveMessageResult(OK)))
+  }
+  
 }
 

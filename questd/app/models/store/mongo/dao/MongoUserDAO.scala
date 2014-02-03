@@ -488,6 +488,17 @@ private[mongo] class MongoUserDAO
           "messages" -> -1))))
   }
 
+  /**
+   * 
+   */
+  def removeMessage(id: String, messageId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$pull" -> MongoDBObject(
+          "messages" -> MongoDBObject("id" -> messageId)))))
+  }
+  
 }
 
 /**
