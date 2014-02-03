@@ -247,6 +247,7 @@ package object protocol {
 
   type WSRemoveFromShortlistResult = RemoveFromShortlistResult
 
+  
   /**
    * Friends
    */
@@ -274,5 +275,11 @@ package object protocol {
     id: String)
   type WSRemoveFromFriendsResult = RemoveFromFriendsResult
 
+  
+  /**
+   * Messages
+   */
+  
+  type WSGetMessagesResult = GetMessagesResult
 }
 
