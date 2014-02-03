@@ -14,10 +14,10 @@ trait MessagesWSImpl extends QuestController with SecurityWSImpl { this: WSCompo
     api.getMessages(GetMessagesRequest(r.user))
   }
     
-  def removeMessage = wrapJsonApiCallReturnBody[WSCostToRequestFriendshipResult] { (js, r) =>
-    val v = Json.read[WSCostToRequestFriendshipRequest](js.toString)
+  def removeMessage = wrapJsonApiCallReturnBody[WSRemoveMessageResult] { (js, r) =>
+    val v = Json.read[WSRemoveMessageRequest](js.toString)
 
-    api.costToRequestFriendship(CostToRequestFriendshipRequest(r.user, v.id))
+    api.removeMessage(RemoveMessageRequest(r.user, v.id))
   }
 
 
