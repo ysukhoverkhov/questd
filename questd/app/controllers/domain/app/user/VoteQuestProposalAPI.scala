@@ -15,7 +15,7 @@ case class GetQuestProposalToVoteRequest(user: User)
 case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: Option[QuestDuration.Value] = None, difficulty: Option[QuestDifficulty.Value] = None)
-case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, author: Option[Profile] = None)
+case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, author: Option[PublicProfile] = None)
 
 private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -82,7 +82,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
               val u = db.user.recordQuestProposalVote(r.user.id)
 
               val author = if (request.vote == QuestProposalVote.Cool) {
-                db.user.readByID(q.authorUserID).map(_.profile)
+                db.user.readByID(q.authorUserID).map(_.profile.publicProfile)
               } else {
                 None
               }

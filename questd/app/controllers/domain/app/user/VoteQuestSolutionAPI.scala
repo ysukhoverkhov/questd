@@ -19,7 +19,7 @@ case class GetQuestSolutionToVoteRequest(user: User)
 case class GetQuestSolutionToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class VoteQuestSolutionRequest(user: User, vote: QuestSolutionVote.Value)
-case class VoteQuestSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, solver: Option[Profile] = None)
+case class VoteQuestSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, solver: Option[PublicProfile] = None)
 
 private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -95,7 +95,7 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
                 val u = db.user.recordQuestSolutionVote(r.user.id)
 
                 val solver = if (request.vote == QuestSolutionVote.Cool) {
-                  db.user.readByID(q.userID).map(_.profile)
+                  db.user.readByID(q.userID).map(_.profile.publicProfile)
                 } else {
                   None
                 }

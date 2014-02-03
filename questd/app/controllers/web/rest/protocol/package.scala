@@ -18,8 +18,6 @@ package object protocol {
    */
   object UnauthorisedReason extends Enumeration {
 
-    type UnauthorisedReason = UnauthorisedReason.Value
-
     /**
      *  FB tells us it doesn't know the token.
      */
