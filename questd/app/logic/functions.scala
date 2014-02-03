@@ -199,7 +199,7 @@ object functions {
    */
 
   def maxNumberOfFriendsOnLevel(level: Int): Int = {
-    math.floor((numberOfFreindsOnLastLevel / coinToSpentDailyFriendsOnly(maxLevel)) * coinToSpentDailyFriendsOnly(level)).toInt
+    math.round((numberOfFreindsOnLastLevel / coinToSpentDailyFriendsOnly(maxLevel)) * coinToSpentDailyFriendsOnly(level)).toInt
   }
   
   def costToInviteFriend(level: Int, levelDifference: Int): Int = {

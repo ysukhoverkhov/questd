@@ -107,6 +107,7 @@ class FunctionsSpecs extends Specification {
     
     "maxNumberOfFriendsOnLevel" in {
       maxNumberOfFriendsOnLevel(1) must beEqualTo(4)
+      maxNumberOfFriendsOnLevel(2) must beEqualTo(5)
       maxNumberOfFriendsOnLevel(10) must beEqualTo(20)
       maxNumberOfFriendsOnLevel(20) must beEqualTo(100)
     }

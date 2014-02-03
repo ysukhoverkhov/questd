@@ -10,10 +10,9 @@ object spendcoinsfunctions {
    * How much player will spend daily.
    */
   def coinToSpentDaily(level: Int): Double = {
-    // TODO more digits after points here.
-    val k = 129.677
-    val d = 6.396
-    val b = -29.677
+    val k = 129.676794
+    val d = 6.39558
+    val b = -29.676794
     
     def coinToSpentDailyInt(level: Int, k: Double, d: Double, b: Double) = megaf(level, k, d, b, 0)
     
@@ -91,10 +90,10 @@ object spendcoinsfunctions {
   }
   
   /**
-   * How much we spend on firends daily.
+   * How much we spend on friends daily.
    */
   def coinToSpentDailyFriendsOnly(level: Int): Double = {
-    val k = 0.176
+    val k = 0.17555787
     coinToSpentDaily(level) * k
   }
   
