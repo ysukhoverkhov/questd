@@ -117,12 +117,12 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
    * Respond from a person to friendship request
    */
   def respondFriendship(request: RespondFriendshipRequest): ApiResult[RespondFriendshipResult] = handleDbException {
+
     if (request.friendId == request.user.id ||
       request.user.friends.find {
         x => (x.friendId == request.friendId) && (x.status == FriendshipStatus.Invites.toString())
       } == None) {
-      OkApiResult(Some(RespondFriendshipResult(
-        allowed = OutOfContent)))
+      OkApiResult(Some(RespondFriendshipResult(allowed = OutOfContent)))
     } else {
       if (request.accept == true) {
         db.user.updateFriendship(
@@ -131,13 +131,22 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
           FriendshipStatus.Accepted.toString,
           FriendshipStatus.Accepted.toString)
 
-        // TODO: make a note to friend's daily results here.
+        // Sending message about good response on friendship.
+        // TODO: move text to tralslation
+        db.user.readByID(request.friendId) match {
+          case Some(f) => sendMessage(SendMessageRequest(f, Message(text = "accepted")))
+          case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
+        }
 
       } else {
 
         db.user.removeFriendship(request.user.id, request.friendId)
 
-        // TODO: make a note to friend's daily results here.
+        // TODO: move text to tralslation
+        db.user.readByID(request.friendId) match {
+          case Some(f) => sendMessage(SendMessageRequest(f, Message(text = "rejected")))
+          case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
+        }
       }
 
       OkApiResult(Some(RespondFriendshipResult(OK)))
@@ -159,7 +168,11 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
       db.user.removeFriendship(request.user.id, request.friendId)
 
       if (request.user.friends.find(_.friendId == request.friendId).get.status == FriendshipStatus.Accepted.toString()) {
-        // TODO: make a note to friend's daily results here.
+        // TODO: move to translation.
+        db.user.readByID(request.friendId) match {
+          case Some(f) => sendMessage(SendMessageRequest(f, Message(text = "removed")))
+          case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
+        }
       }
 
       OkApiResult(Some(RemoveFromFriendsResult(OK)))
