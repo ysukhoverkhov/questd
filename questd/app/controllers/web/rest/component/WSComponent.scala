@@ -21,6 +21,7 @@ trait WSComponent { component: DomainAPIComponent with FacebookComponent =>
     with ShortlistWSImpl
     with FriendsWSImpl
     with MessagesWSImpl
+    with MiscWSImpl
 
     with FBAccessor
     with APIAccessor
