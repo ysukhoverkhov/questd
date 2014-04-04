@@ -11,11 +11,9 @@ import controllers.domain.app.user._
 trait MiscWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
 
   // TODO: implement me.
-  def getTime = wrapApiCallReturnBody[WSGetMessagesResult] { r =>
-    api.getMessages(GetMessagesRequest(r.user))
+  def getTime = wrapApiCallReturnBody[WSGetTimeResult] { r =>
+    api.getTime(GetTimeRequest(r.user))
   }
-    
-
 
 }
 
