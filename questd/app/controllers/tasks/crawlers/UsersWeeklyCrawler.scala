@@ -22,7 +22,7 @@ object UsersWeeklyCrawler {
 class UsersWeeklyCrawler(api: DomainAPIComponent#DomainAPI) extends BaseUsersScheduleCrawler(api) {
 
   protected val userActors = List(
-      classOf[ShiftUserStats])
-
+      classOf[ShiftUserStats],
+      classOf[CalculateProposalThreshold])
 }
 

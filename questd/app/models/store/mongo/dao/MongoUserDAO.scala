@@ -412,6 +412,17 @@ private[mongo] class MongoUserDAO
   }
 
   /**
+   * 
+   */
+  def updateStats(id: String, stats: UserStats): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "stats" -> grater[UserStats].asDBObject(stats)))))
+  }
+
+  /**
    *
    */
   def addToShortlist(id: String, idToAdd: String): Option[User] = {

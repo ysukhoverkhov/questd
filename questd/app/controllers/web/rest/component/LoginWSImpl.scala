@@ -13,8 +13,9 @@ import com.restfb.exception._
 import components._
 import controllers.web.rest.protocol._
 import org.json4s.MappingException
+import controllers.web.rest.config.WSConfigHolder
 
-trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor with APIAccessor with ConfigHolder =>
+trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor with APIAccessor with WSConfigHolder =>
 
   /**
    * Logins with Facebook or create new user if it not exists
@@ -37,7 +38,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
           val loginRequest = Json.read[WSLoginFBRequest](js.toString)
 
           // Check app version.
-          if (config.values("Min App Version").toInt > loginRequest.appVersion) {
+          if (config.values(ConfigParams.MinAppVersion).toInt > loginRequest.appVersion) {
             (None, Some(Unauthorized(
               Json.write(WSUnauthorisedResult(UnauthorisedReason.UnsupportedAppVersion))).as(JSON)))
           } else {
