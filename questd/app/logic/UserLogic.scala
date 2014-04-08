@@ -494,6 +494,68 @@ class UserLogic(val user: User) {
   }
 
   /**
+   * *******************
+   * Shortlist
+   * *******************
+   */
+
+  def canShortlist = {
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.AddToShortList.toString()))
+      NotEnoughRights
+    else if (!(user.profile.assets canAfford costToShortlist))
+      NotEnoughAssets
+    else
+      OK
+  }
+
+  def costToShortlist = {
+    Assets(coins = costToShortlistPerson(user.profile.publicProfile.level))
+  }
+
+  /**
+   * ********************
+   * Friends
+   * ********************
+   */
+
+  def canAddFriend(potentialFriend: User) = {
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends.toString()))
+      NotEnoughRights
+    else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
+      NotEnoughAssets
+    else if (user.friends.length >= user.profile.rights.maxFriendsCount)
+      LimitExceeded
+    else
+      OK
+  }
+
+  def costToAddFriend(potentialFriend: User) = {
+    val friendAhead = potentialFriend.profile.publicProfile.level - user.profile.publicProfile.level
+
+    if (friendAhead > 0) {
+      Assets(money = friendAhead)
+    } else {
+      Assets(coins = costToInviteFriend(user.profile.publicProfile.level, -friendAhead))
+    }
+  }
+
+  /**
+   * ********************
+   * Friends
+   * ********************
+   */
+  def userActive = {
+    // TODO: store active duration delay somewhere in _const_ or in config).
+
+    user.auth.lastLogin match {
+      case None => false
+      case Some(d) => {
+        (new DateTime(d) + 7.days) > (DateTime.now)
+      }
+    }
+  }
+
+  /**
    * *******************************************
    * Utils for user logic
    * *******************************************
@@ -550,52 +612,6 @@ class UserLogic(val user: User) {
       }
     }
 
-  }
-
-  /**
-   * *******************
-   * Shortlist
-   * *******************
-   */
-
-  def canShortlist = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.AddToShortList.toString()))
-      NotEnoughRights
-    else if (!(user.profile.assets canAfford costToShortlist))
-      NotEnoughAssets
-    else
-      OK
-  }
-
-  def costToShortlist = {
-    Assets(coins = costToShortlistPerson(user.profile.publicProfile.level))
-  }
-
-  /**
-   * ********************
-   * Friends
-   * ********************
-   */
-
-  def canAddFriend(potentialFriend: User) = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends.toString()))
-      NotEnoughRights
-    else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
-      NotEnoughAssets
-    else if (user.friends.length >= user.profile.rights.maxFriendsCount)
-      LimitExceeded
-    else
-      OK
-  }
-
-  def costToAddFriend(potentialFriend: User) = {
-    val friendAhead = potentialFriend.profile.publicProfile.level - user.profile.publicProfile.level
-
-    if (friendAhead > 0) {
-      Assets(money = friendAhead)
-    } else {
-      Assets(coins = costToInviteFriend(user.profile.publicProfile.level, -friendAhead))
-    }
   }
 
 }

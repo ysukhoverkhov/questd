@@ -54,8 +54,8 @@ private[mongo] class MongoUserDAO
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
-          "auth.session" -> sessionid))))
-
+          "auth.session" -> sessionid,
+          "auth.lastLogin" -> new Date))))
   }
 
   /**
