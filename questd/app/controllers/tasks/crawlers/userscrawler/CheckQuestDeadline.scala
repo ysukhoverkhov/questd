@@ -11,19 +11,19 @@ import models.domain._
 import java.util.Date
 import logic._
 
-object CheckGiveupQuest {
+object CheckQuestDeadline {
   def props(api: DomainAPIComponent#DomainAPI) = {
-    Props(classOf[CheckGiveupQuest], api)
+    Props(classOf[CheckQuestDeadline], api)
   }
 
-  def name = "CheckGiveupQuest"
+  def name = "CheckQuestDeadline"
 }
 
-class CheckGiveupQuest(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
+class CheckQuestDeadline(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
 
   protected def check(user: User) = {
-    if (user.shouldGiveupQuest) {
-      api.giveUpQuest(GiveUpQuestRequest(user))
+    if (user.questDeadlineReached) {
+      api.deadlineQuest(DeadlineQuestRequest(user))
     }
   }
 

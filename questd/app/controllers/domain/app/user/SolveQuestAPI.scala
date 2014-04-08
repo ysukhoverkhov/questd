@@ -33,6 +33,9 @@ case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: As
 case class GiveUpQuestRequest(user: User)
 case class GiveUpQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
+case class DeadlineQuestRequest(user: User)
+case class DeadlineQuestResult(user: Option[User])
+
 case class RewardQuestSolutionAuthorRequest(solution: QuestSolution, author: User)
 case class RewardQuestSolutionAuthorResult()
 
@@ -55,12 +58,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    */
   def purchaseQuest(request: PurchaseQuestRequest): ApiResult[PurchaseQuestResult] = handleDbException {
 
-    val user = if (request.user.shouldGiveupQuest) {
-      giveUpQuest(GiveUpQuestRequest(request.user.user))
-      db.user.readByID(request.user.id).get
-    } else {
-      request.user
-    }
+    val user = ensureNoDeadlineQuest(request.user)
 
     user.canPurchaseQuest match {
       case OK => {
@@ -181,13 +179,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    */
   def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
 
-    val user = if (request.user.shouldGiveupQuest) {
-      giveUpQuest(GiveUpQuestRequest(request.user.user))
-      db.user.readByID(request.user.id).get
-    } else {
-      request.user
-    }
-
+    val user = ensureNoDeadlineQuest(request.user)
+    // TODO fix misspelling.
     user.canResulveQuest(ContentType.withName(request.solution.content.contentType)) match {
       case OK => {
 
@@ -233,6 +226,16 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     }
   }
 
+  /**
+   * Stop from solving quests because its deadline reached.
+   */
+  def deadlineQuest(request: DeadlineQuestRequest): ApiResult[DeadlineQuestResult] = handleDbException {
+    storeSolutionOutOfTimePenalty(StoreSolutionOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuest)) map { r =>
+      val u = db.user.resetQuestSolution(r.user.id)
+      OkApiResult(Some(DeadlineQuestResult(u)))
+    }
+  }
+  
   /**
    * Give quest solution author a reward on quest status change
    */
@@ -354,6 +357,15 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     compete(solutionsForQuest)
   }
 
+  
+  private def ensureNoDeadlineQuest(user: User): User = {
+    if (user.questDeadlineReached) {
+      deadlineQuest(DeadlineQuestRequest(user)).body.get.user.get
+    } else {
+      user
+    }
+  } 
+  
 }
 
 
