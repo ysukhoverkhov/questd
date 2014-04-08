@@ -21,6 +21,12 @@ case class StoreProposalInDailyResultResult(user: User)
 case class StoreSolutionInDailyResultRequest(user: User, solutionId: String, reward: Option[Assets] = None, penalty: Option[Assets] = None)
 case class StoreSolutionInDailyResultResult(user: User)
 
+case class StoreProposalOutOfTimePenaltyReqest(user: User, penalty: Assets)
+case class StoreProposalOutOfTimePenaltyResult(user: User)
+
+case class StoreSolutionOutOfTimePenaltyReqest(user: User, penalty: Assets)
+case class StoreSolutionOutOfTimePenaltyResult(user: User)
+
 private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -46,7 +52,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
    * Returns moves ready daily results to public daily results and returns public results to client
    */
   def getDailyResult(request: GetDailyResultRequest): ApiResult[GetDailyResultResult] = handleDbException {
-Logger.error("Fu 2")
+
     def applyDailyResults(u: User) = {
 
       val deltaAssets = u.profile.dailyResults.foldLeft(Assets()) { (a, dr) =>
@@ -59,7 +65,10 @@ Logger.error("Fu 2")
           a + dqs.reward.getOrElse(Assets()) - dqs.penalty.getOrElse(Assets())
         }
 
-        assetsAfterSolutions - dr.dailyAssetsDecrease
+        assetsAfterSolutions - 
+        dr.dailyAssetsDecrease - 
+        dr.questGiveUpAssetsDecrease.getOrElse(Assets()) - 
+        dr.proposalGiveUpAssetsDecrease.getOrElse(Assets())
       }
 
       adjustAssets(AdjustAssetsRequest(user = u, reward = Some(deltaAssets)))
@@ -87,20 +96,16 @@ Logger.error("Fu 2")
   /**
    * Stores result of voting of quest proposal in db
    */
-  def storeProposalInDailyResult(request: StoreProposalInDailyResultRequest): ApiResult[StoreProposalInDailyResultResult] = handleDbException {
+  def storeProposalInDailyResult(request: StoreProposalInDailyResultRequest): ApiResult[StoreProposalInDailyResultResult] = handleDbException ({
     import request._
 
-    val u = if (user.privateDailyResults.length == 0) {
-      shiftDailyResult(ShiftDailyResultRequest(user)).body.get.user
-    } else {
-      request.user
-    }
+    val u = ensurePrivateDailyResultExists(user)
 
     val qpr = QuestProposalResult(questProposalId = request.questId, reward = request.reward, penalty = request.penalty)
     val u2 = db.user.storeProposalInDailyResult(user.id, qpr)
 
     OkApiResult(Some(StoreProposalInDailyResultResult(u2.get)))
-  }
+  })
 
   /**
    * Stores result of voting of quest solution in db
@@ -108,17 +113,40 @@ Logger.error("Fu 2")
   def storeSolutionInDailyResult(request: StoreSolutionInDailyResultRequest): ApiResult[StoreSolutionInDailyResultResult] = handleDbException {
     import request._
 
-    val u = if (user.privateDailyResults.length == 0) {
-      shiftDailyResult(ShiftDailyResultRequest(user)).body.get.user
-    } else {
-      request.user
-    }
+    val u = ensurePrivateDailyResultExists(user)
 
     val qpr = QuestSolutionResult(questSolutionId = request.solutionId, reward = request.reward, penalty = request.penalty)
     val u2 = db.user.storeSolutionInDailyResult(user.id, qpr)
 
     OkApiResult(Some(StoreSolutionInDailyResultResult(u2.get)))
   }
+  
+  def storeProposalOutOfTimePenalty(request: StoreProposalOutOfTimePenaltyReqest): ApiResult[StoreProposalOutOfTimePenaltyResult] = handleDbException {
+    import request._
+
+    val u = ensurePrivateDailyResultExists(user)
+    
+    val u2 = db.user.storeProposalOutOfTimePenalty(user.id, penalty)
+    OkApiResult(Some(StoreProposalOutOfTimePenaltyResult(u2.get)))
+  }
+
+  def storeSolutionOutOfTimePenalty(request: StoreSolutionOutOfTimePenaltyReqest): ApiResult[StoreSolutionOutOfTimePenaltyResult] = handleDbException {
+    import request._
+
+    val u = ensurePrivateDailyResultExists(user)
+
+    val u2 = db.user.storeSolutionOutOfTimePenalty(user.id, penalty)
+    OkApiResult(Some(StoreSolutionOutOfTimePenaltyResult(u2.get)))
+  }
+  
+  private def ensurePrivateDailyResultExists(user: User): User = {
+    if (user.privateDailyResults.length == 0) {
+      shiftDailyResult(ShiftDailyResultRequest(user)).body.get.user
+    } else {
+      user
+    }
+  }
+  
 }
 
 

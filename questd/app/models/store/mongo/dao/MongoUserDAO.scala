@@ -298,6 +298,28 @@ private[mongo] class MongoUserDAO
   }
 
   /**
+   * 
+   */
+  def storeProposalOutOfTimePenalty(id: String, penalty: Assets): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "privateDailyResults.0.proposalGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty)))))
+  }
+  
+  /**
+   * 
+   */
+  def storeSolutionOutOfTimePenalty(id: String, penalty: Assets): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "privateDailyResults.0.questGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty)))))
+  }
+  
+  /**
    *
    */
   def levelup(id: String, ratingToNextlevel: Int): Option[User] = {

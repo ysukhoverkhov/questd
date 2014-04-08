@@ -33,7 +33,9 @@ trait UserDAO extends BaseDAO[User] {
   def movePrivateDailyResultsToPublic(id: String, dailyResults: List[DailyResult]): Option[User]
   def storeProposalInDailyResult(id: String, proposal: QuestProposalResult): Option[User]
   def storeSolutionInDailyResult(id: String, solution: QuestSolutionResult): Option[User]
-
+  def storeProposalOutOfTimePenalty(id: String, penalty: Assets): Option[User]
+  def storeSolutionOutOfTimePenalty(id: String, penalty: Assets): Option[User]
+  
   def levelup(id: String, ratingToNextlevel: Int): Option[User]
   def setNextLevelRatingAndRights(id: String, newRatingToNextlevel: Int, rights: Rights): Option[User]
   
