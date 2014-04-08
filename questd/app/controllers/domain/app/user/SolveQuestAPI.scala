@@ -180,8 +180,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
 
     val user = ensureNoDeadlineQuest(request.user)
-    // TODO fix misspelling.
-    user.canResulveQuest(ContentType.withName(request.solution.content.contentType)) match {
+
+    user.canResolveQuest(ContentType.withName(request.solution.content.contentType)) match {
       case OK => {
 
         db.solution.create(

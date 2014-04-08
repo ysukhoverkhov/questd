@@ -246,7 +246,7 @@ class UserLogic(val user: User) {
   /**
    * Is user can propose quest of given type.
    */
-  def canResulveQuest(conentType: ContentType) = {
+  def canResolveQuest(conentType: ContentType) = {
     val content = conentType match {
       case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults.toString())
       case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoResults.toString())
