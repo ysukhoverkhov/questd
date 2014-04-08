@@ -22,7 +22,6 @@ trait ComponentRegistry
   lazy val ws = new WS
   lazy val admin = new Admin
   lazy val tasks = new Tasks
-  
 }
 
 

@@ -21,17 +21,17 @@ case class GetConfigurationResult(config: Configuration)
 
 private[domain] trait ConfigAdminAPI { this: DBAccessor =>
 
-  @volatile var config: Configuration = null
+  @volatile var adminConfig: Configuration = null
 
   private def storeConfigInDB(section: ConfigSection): Unit = {
     db.config.upsert(section)
 
-    config = db.config.readConfig
+    adminConfig = db.config.readConfig
   }
   
   private def checkInit(): Unit = {
-    if (config == null)
-      config = db.config.readConfig
+    if (adminConfig == null)
+      adminConfig = db.config.readConfig
   }
 
   /**
@@ -40,7 +40,7 @@ private[domain] trait ConfigAdminAPI { this: DBAccessor =>
   def getConfigSection(request: GetConfigSectionRequest): ApiResult[GetConfigSectionResult] = handleDbException {
     checkInit()
 
-    OkApiResult(Some(GetConfigSectionResult(config(request.name))))
+    OkApiResult(Some(GetConfigSectionResult(adminConfig(request.name))))
   }
 
   /**
@@ -48,7 +48,7 @@ private[domain] trait ConfigAdminAPI { this: DBAccessor =>
    */
   def getConfiguration(request: GetConfigurationRequest): ApiResult[GetConfigurationResult] = handleDbException {
     checkInit()
-    OkApiResult(Some(GetConfigurationResult(config)))
+    OkApiResult(Some(GetConfigurationResult(adminConfig)))
   }
 
   /**
