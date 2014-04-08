@@ -48,10 +48,10 @@ private[domain] trait StatsAPI { this: DBAccessor =>
           questsAccepted = 0,
           questsReviewedPast = (user.stats.questsReviewedPast * 3) / 4 + user.stats.questsReviewed,
           questsAcceptedPast = (user.stats.questsAcceptedPast * 3) / 4 + user.stats.questsAccepted,
-          proposalsReviewed = 0,
-          proposalsReviewedPerDay = if (deltaDays == Double.NaN) 0 else user.stats.proposalsReviewed / deltaDays,
-          proposalsAccepted = 0,
-          proposalsAcceptedPerDay = if (deltaDays == Double.NaN) 0 else user.stats.proposalsAccepted / deltaDays
+          proposalsVoted = 0,
+          proposalsVotedPerDay = if (deltaDays == Double.NaN) 0 else user.stats.proposalsVoted / deltaDays,
+          proposalsLiked = 0,
+          proposalsLikedPerDay = if (deltaDays == Double.NaN) 0 else user.stats.proposalsLiked / deltaDays
         ))
 
     OkApiResult(Some(ShiftStatsResult()))

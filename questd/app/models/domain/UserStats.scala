@@ -13,33 +13,33 @@ case class UserStats (
   lastStatShift: Date = new Date(0),
   
   /**
-   * How many quests we were reviewing during voting. 
+   * How many quests we were reviewing during selection to take. 
    */
   questsReviewed: Int = 0,
   questsReviewedPast: Int = 0,
   
   /**
-   * How many quests we've liked.
+   * How many quests we've taken.
    */
   questsAccepted: Int = 0,
   questsAcceptedPast: Int = 0,
 
   /**
-   * How many proposals reviewed since last stats update.
+   * How many proposals reviewed since last stats update during voting.
    */
-  proposalsReviewed: Int = 0,
+  proposalsVoted: Int = 0,
   /**
    * How many proposals per day reviewed.
    */
-  proposalsReviewedPerDay: Double = 0,
+  proposalsVotedPerDay: Double = 0,
   
   /**
-   * How many reviewed proposals accepted since last stats update.
+   * How many reviewed proposals voted up since last stats update.
    */
-  proposalsAccepted: Int = 0,
+  proposalsLiked: Int = 0,
   /**
    * How many reviewed proposals accepted per day.
    */
-  proposalsAcceptedPerDay: Double = 0
+  proposalsLikedPerDay: Double = 0
   )
 

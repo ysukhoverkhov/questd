@@ -93,18 +93,22 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         ("$set" -> MongoDBObject(
           "profile.questProposalVoteContext.reviewingQuest" -> grater[QuestInfoWithID].asDBObject(qi),
-          "profile.questProposalVoteContext.themeOfQuest" -> grater[Theme].asDBObject(theme)))))
+          "profile.questProposalVoteContext.themeOfQuest" -> grater[Theme].asDBObject(theme))),
+        ("$inc" -> MongoDBObject(
+          "stats.proposalsVoted" -> 1))
+      ))
   }
 
   /**
    *
    */
-  def recordQuestProposalVote(id: String): Option[User] = {
+  def recordQuestProposalVote(id: String, liked: Boolean): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         ("$inc" -> MongoDBObject(
-          "profile.questProposalVoteContext.numberOfReviewedQuests" -> 1)),
+          "profile.questProposalVoteContext.numberOfReviewedQuests" -> 1,
+          "stats.proposalsLiked" -> (if (liked) 1 else 0))),
         ("$unset" -> MongoDBObject(
           "profile.questProposalVoteContext.reviewingQuest" -> "",
           "profile.questProposalVoteContext.themeOfQuest" -> ""))))

@@ -17,7 +17,7 @@ trait UserDAO extends BaseDAO[User] {
   def recordQuestSolutionVote(id: String): Option[User]
 
   def selectQuestProposalVote(id: String, qi: QuestInfoWithID, theme: Theme): Option[User]
-  def recordQuestProposalVote(id: String): Option[User]
+  def recordQuestProposalVote(id: String, liked: Boolean): Option[User]
   
   def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: PublicProfileWithID, defeatReward: Assets, victoryReward: Assets): Option[User]
   def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User]
