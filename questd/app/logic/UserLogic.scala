@@ -168,7 +168,7 @@ class UserLogic(val user: User) {
   /**
    * Check is quest deadline passed and quest should be autogave up.
    */
-  def shouldGiveupProposal = {
+  def proposalDeadlineReached = {
     ((user.profile.questProposalContext.takenTheme != None)
       && (user.profile.questProposalContext.questProposalCooldown.before(new Date())))
   }

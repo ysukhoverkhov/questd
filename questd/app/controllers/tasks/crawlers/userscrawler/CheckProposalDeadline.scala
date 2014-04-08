@@ -1,4 +1,4 @@
-package controllers.tasks.crawlers
+package controllers.tasks.crawlers.userscrawler
 
 import akka.actor.Actor
 import akka.actor.Props
@@ -11,19 +11,19 @@ import models.domain._
 import logic._
 import java.util.Date
 
-object CheckGiveupQuestProposal {
+object CheckProposalDeadline {
   def props(api: DomainAPIComponent#DomainAPI) = {
-    Props(classOf[CheckGiveupQuestProposal], api)
+    Props(classOf[CheckProposalDeadline], api)
   }
 
-  def name = "CheckGiveupQuestProposal"
+  def name = "CheckProposalDeadline"
 }
 
-class CheckGiveupQuestProposal(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
+class CheckProposalDeadline(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
 
   protected def check(user: User) = {
-    if (user.shouldGiveupProposal) {
-      api.giveUpQuestProposal(GiveUpQuestProposalRequest(user))
+    if (user.proposalDeadlineReached) {
+      api.deadlineQuestProposal(DeadlineQuestProposalRequest(user))
     }
   }
 
