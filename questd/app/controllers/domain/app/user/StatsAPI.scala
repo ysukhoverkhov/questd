@@ -50,12 +50,18 @@ private[domain] trait StatsAPI { this: DBAccessor =>
   def shiftHistory(request: ShiftHistoryRequest): ApiResult[ShiftHistoryResult] = handleDbException {
     import request._
     
+    // TODO: take me from settings in admin.
     val historyDepth = 15
     
     db.user.addFreshDayToHistory(user.id)
+    clearOldHistory(user)
     
-    if (user.history.votedQuestProposalIds.length >= historyDepth) {
-      db.user.removeLastDayFromHistory(user.id)
+    def clearOldHistory(u: User): User = {
+	  if (u.history.votedQuestProposalIds.length >= historyDepth) {
+	    clearOldHistory(db.user.removeLastDayFromHistory(u.id).get)
+      } else {
+        u
+      }
     }
     
     OkApiResult(Some(ShiftHistoryResult()))
