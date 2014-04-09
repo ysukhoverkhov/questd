@@ -15,6 +15,12 @@ private[mongo] class MongoQuestDAO
   extends BaseMongoDAO[Quest](collectionName = "quests")
   with QuestDAO {
 
+  def countWithStatus(status: String): Long = {
+    countByExample(
+      MongoDBObject(("status" -> status)))
+  }
+
+    
   def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[Quest] = {
     findByExample(
       MongoDBObject(

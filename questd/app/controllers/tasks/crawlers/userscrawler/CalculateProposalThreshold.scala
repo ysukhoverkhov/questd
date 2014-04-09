@@ -10,6 +10,7 @@ import controllers.domain.app.user._
 import models.domain._
 import java.util.Date
 import logic._
+import controllers.domain.app.quest.CalculateProposalThresholdsRequest
 
 
 object CalculateProposalThreshold {
@@ -18,30 +19,33 @@ object CalculateProposalThreshold {
   }
 
   def name = "CalculateProposalThreshold"
+
+  @volatile var proposalsVoted: Double = 0;
+  @volatile var proposalsLiked: Double = 0;
 }
 
 class CalculateProposalThreshold(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
 
-  var maxVotes: Double = 0;
-  var maxProposals: Double = 0;
   
   protected override def start(): Unit = {
-    maxVotes = 0;
-    maxProposals = 0;
-    Logger.error("start")
+    CalculateProposalThreshold.proposalsVoted = 0;
+    CalculateProposalThreshold.proposalsLiked = 0;
   }
   
   protected def check(user: User) = {
-    if (user.userActive) {
+    if (user.userActive)
+    {
+      if (!user.stats.proposalsVotedPerDay.isNaN) {
+        CalculateProposalThreshold.proposalsVoted += user.stats.proposalsVotedPerDay
+      }
+      if (!user.stats.proposalsLikedPerDay.isNaN) {
+        CalculateProposalThreshold.proposalsLiked += user.stats.proposalsLikedPerDay
+      }
     }
-    Logger.error("check")
   }
 
   protected override def end(): Unit = {
-    
-    // TODO store config section name in constant (check how we did it for WS config).
-//    api.updateConfig("a" -> "b")
-    Logger.error("end")
+    api.CalculateProposalThresholds(CalculateProposalThresholdsRequest(CalculateProposalThreshold.proposalsVoted, CalculateProposalThreshold.proposalsLiked))
   }
 }
 

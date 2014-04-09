@@ -95,6 +95,13 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
   }
 
   /**
+   * Count or records. 
+   */
+  def countByExample(example: DBObject): Long = {
+    count(example)
+  }
+  
+  /**
    * Update object with new object
    */
   def update(key: String, u: T): Unit = updateInt(key, u, false)

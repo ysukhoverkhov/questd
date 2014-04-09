@@ -26,6 +26,9 @@ case class VoteQuestUpdateRequest(
   difficulty: Option[QuestDifficulty.Value])
 case class VoteQuestUpdateResult()
 
+case class CalculateProposalThresholdsRequest(proposalsVoted: Double, proposalsLiked: Double)
+case class CalculateProposalThresholdsResult()
+
 private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -173,5 +176,16 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     OkApiResult(Some(VoteQuestUpdateResult()))
   }
 
+  
+  def CalculateProposalThresholds(request: CalculateProposalThresholdsRequest): ApiResult[CalculateProposalThresholdsResult] = handleDbException {
+    
+    val count = db.quest.countWithStatus(QuestStatus.OnVoting.toString)
+
+    updateConfig(api.ConfigParams.TotalDailyProposalVotes -> request.proposalsVoted.toString)
+    updateConfig(api.ConfigParams.TotalDailyProposalLikes -> request.proposalsLiked.toString)
+    updateConfig(api.ConfigParams.ProposalsCountOnVoting -> count.toString)
+    
+    OkApiResult(Some(CalculateProposalThresholdsResult()))
+  }
 }
 
