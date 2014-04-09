@@ -38,9 +38,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
         case Some(sessionid: String) => {
           Future {
 
-            val params = UserRequest(sessionID = Some(sessionid))
-
-            api.getUser(params) match {
+            api.getUser(UserRequest(sessionID = Some(sessionid))) match {
               case OkApiResult(body) => body match {
                 case Some(result: UserResult) => result.user
                 case None => ServerError
@@ -48,7 +46,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
 
               case NotAuthorisedApiResult() => {
                 Unauthorized(
-                  Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)
+                  Json.write(WSUnauthorisedResult(UnauthorisedReason.SessionNotFound))).as(JSON)
               }
 
               case InternalErrorApiResult() => {
