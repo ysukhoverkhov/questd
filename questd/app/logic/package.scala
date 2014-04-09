@@ -1,6 +1,7 @@
 
 import scala.language.implicitConversions
 import models.domain._
+import models.domain.admin.ConfigSection
 
 package object logic {
 

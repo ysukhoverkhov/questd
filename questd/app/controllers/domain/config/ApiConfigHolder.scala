@@ -5,18 +5,19 @@ import components.APIAccessor
 import models.domain.admin.ConfigSection
 
 trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
- 
+
+  val configSectionName = "API"
+    
   object ConfigParams {
-    val TotalDailyProposalVotes = "Total daily proposal votes" 
-    val TotalDailyProposalLikes = "Total daily proposal likes" 
-    val ProposalsCountOnVoting = "Proposals count on voting" 
+    val ProposalNormalDaysToEnterRotation = "Proposal Normal Days To Enter Rotation" 
+    val ProposalDaysToLeaveVoting = "Proposal Days To Leave Voting" 
+    val ProposalLikesToEnterRotation = "Proposal Likes To Enter Rotation (calculated)" 
   }
   
-  val configSectionName = "API"
   val defaultConfiguration = ConfigSection(
     configSectionName,
     Map(
-        ConfigParams.TotalDailyProposalVotes -> "10", 
-        ConfigParams.TotalDailyProposalLikes -> "5",
-        ConfigParams.ProposalsCountOnVoting -> "10"))
+        ConfigParams.ProposalNormalDaysToEnterRotation -> "7", 
+        ConfigParams.ProposalDaysToLeaveVoting -> "14",
+        ConfigParams.ProposalLikesToEnterRotation -> "10"))
 }

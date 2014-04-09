@@ -179,11 +179,11 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   
   def CalculateProposalThresholds(request: CalculateProposalThresholdsRequest): ApiResult[CalculateProposalThresholdsResult] = handleDbException {
     
-    val count = db.quest.countWithStatus(QuestStatus.OnVoting.toString)
-
-    updateConfig(api.ConfigParams.TotalDailyProposalVotes -> request.proposalsVoted.toString)
-    updateConfig(api.ConfigParams.TotalDailyProposalLikes -> request.proposalsLiked.toString)
-    updateConfig(api.ConfigParams.ProposalsCountOnVoting -> count.toString)
+    val proposalsOnVoting = db.quest.countWithStatus(QuestStatus.OnVoting.toString)
+    val daysForQuestToEnter: Long = config(ConfigParams.ProposalNormalDaysToEnterRotation).toInt
+    val likesToAddToRotation: Long = Math.round(request.proposalsLiked / proposalsOnVoting * daysForQuestToEnter) 
+    
+    updateConfig(ConfigParams.ProposalLikesToEnterRotation -> likesToAddToRotation.toString)
     
     OkApiResult(Some(CalculateProposalThresholdsResult()))
   }
