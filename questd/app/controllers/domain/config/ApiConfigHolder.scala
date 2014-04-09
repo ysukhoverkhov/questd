@@ -10,14 +10,18 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     
   object ConfigParams {
     val ProposalNormalDaysToEnterRotation = "Proposal Normal Days To Enter Rotation" 
-    val ProposalDaysToLeaveVoting = "Proposal Days To Leave Voting" 
+    val ProposalAverageToWorstLikesRatio = "Proposal Average To Worst Likes Ratio"
     val ProposalLikesToEnterRotation = "Proposal Likes To Enter Rotation (calculated)" 
+    val ProposalVotesToLeaveVoting = "Proposal Votes To Leave Voting (calculated)" 
   }
   
   val defaultConfiguration = ConfigSection(
     configSectionName,
     Map(
         ConfigParams.ProposalNormalDaysToEnterRotation -> "7", 
-        ConfigParams.ProposalDaysToLeaveVoting -> "14",
-        ConfigParams.ProposalLikesToEnterRotation -> "10"))
+        ConfigParams.ProposalAverageToWorstLikesRatio -> "2",
+        
+        ConfigParams.ProposalLikesToEnterRotation -> "10",
+        ConfigParams.ProposalVotesToLeaveVoting -> "100"
+        ))
 }

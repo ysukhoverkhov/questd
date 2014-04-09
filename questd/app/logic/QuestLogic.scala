@@ -67,14 +67,13 @@ class QuestLogic(val quest: Quest) {
   }
 
   def shouldRemoveQuestFromVotingByTime = {
-    if ((quest.rating.votersCount > votersToRemoveQuestFromVoting) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
+    if ((quest.rating.votersCount > api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
       true
     else
       false
   }
 
 
-  private def votersToRemoveQuestFromVoting = 100
   private def iacBanRatio = 0.1
 }
 
