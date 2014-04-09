@@ -11,6 +11,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
   object ConfigParams {
     val ProposalNormalDaysToEnterRotation = "Proposal Normal Days To Enter Rotation" 
     val ProposalAverageToWorstLikesRatio = "Proposal Average To Worst Likes Ratio"
+    val ProposalCheatingRatio = "Proposal Cheating to Votes Ratio"
+    val ProposalIACRatio = "Proposal IAC to Votes Ratio"
     val ProposalLikesToEnterRotation = "Proposal Likes To Enter Rotation (calculated)" 
     val ProposalVotesToLeaveVoting = "Proposal Votes To Leave Voting (calculated)" 
   }
@@ -19,8 +21,9 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     configSectionName,
     Map(
         ConfigParams.ProposalNormalDaysToEnterRotation -> "7", 
-        ConfigParams.ProposalAverageToWorstLikesRatio -> "2",
-        
+        ConfigParams.ProposalAverageToWorstLikesRatio -> "1",
+        ConfigParams.ProposalCheatingRatio -> "0.1",
+        ConfigParams.ProposalIACRatio -> "0.03",
         ConfigParams.ProposalLikesToEnterRotation -> "10",
         ConfigParams.ProposalVotesToLeaveVoting -> "100"
         ))

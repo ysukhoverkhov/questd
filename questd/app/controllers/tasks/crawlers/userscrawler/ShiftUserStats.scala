@@ -21,9 +21,8 @@ object ShiftUserStats {
 class ShiftUserStats(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
 
   protected def check(user: User) = {
-    // TODO: uncomment me.
-//    api.shiftStats(ShiftStatsRequest(user))
-//    api.shiftHistory(ShiftHistoryRequest(user))
+    api.shiftStats(ShiftStatsRequest(user))
+    api.shiftHistory(ShiftHistoryRequest(user))
   }
 
 }

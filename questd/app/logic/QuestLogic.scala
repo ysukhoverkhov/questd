@@ -52,18 +52,18 @@ class QuestLogic(val quest: Quest) {
    * Should we ban quest.
    */
   def shouldBanQuest = {
-    if ((quest.rating.iacpoints.porn.toFloat / quest.rating.votersCount > iacBanRatio)
-      || (quest.rating.iacpoints.spam.toFloat / quest.rating.votersCount > iacBanRatio))
+    val maxIACVotes = api.config(api.ConfigParams.ProposalIACRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
+    if ((quest.rating.iacpoints.porn > maxIACVotes)
+      || (quest.rating.iacpoints.spam > maxIACVotes))
       true
     else
       false
   }
 
   def shouldCheatingQuest = {
-    if ((quest.rating.cheating > api.config(api.ConfigParams.ProposalLikesToEnterRotation).toLong) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
-      true
-    else
-      false
+    val maxCheatingVotes = api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
+    if ((quest.rating.cheating > maxCheatingVotes) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
+      true else false
   }
 
   def shouldRemoveQuestFromVotingByTime = {
@@ -72,8 +72,5 @@ class QuestLogic(val quest: Quest) {
     else
       false
   }
-
-
-  private def iacBanRatio = 0.1
 }
 
