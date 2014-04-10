@@ -208,7 +208,10 @@ private[mongo] class MongoUserDAO
           "profile.questProposalContext.takenTheme" -> grater[ThemeWithID].asDBObject(takenTheme),
           "profile.questProposalContext.questProposalCooldown" -> cooldown)),
         ("$unset" -> MongoDBObject(
-          "profile.questProposalContext.purchasedTheme" -> ""))))
+          "profile.questProposalContext.purchasedTheme" -> "")),
+        ("$addToSet" -> MongoDBObject(
+          "history.selectedThemeIds" -> takenTheme.id))    
+      ))
   }
 
   /**
@@ -380,6 +383,21 @@ private[mongo] class MongoUserDAO
           "history.votedQuestProposalIds" -> 1,
           "history.solvedQuestIds" -> 1,
           "history.votedQuestSolutionIds" -> 1))))
+  }
+
+  /**
+   *  
+   */
+  def removeLastThemesFromHistory(id: String, themesToRemove: Int): Option[User] = {
+    (1 to themesToRemove) map {a: Int =>
+      findAndModify(
+        id,
+        MongoDBObject(
+          ("$pop" -> MongoDBObject(
+            "history.selectedThemeIds" -> -1))))
+    } reduce{(r,c) => 
+      r
+    }
   }
 
   /**

@@ -19,7 +19,10 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     val ProposalIACRatio = "50 04 Proposal IAC to Votes Ratio"
     val ProposalLikesToEnterRotation = "50 05 Proposal Likes To Enter Rotation (calculated)" 
     val ProposalVotesToLeaveVoting = "50 06 Proposal Votes To Leave Voting (calculated)" 
-    val ProposalRatioToLeaveVoting = "50 07 Proposal Ratio To Leave Voting (calculated)" 
+    val ProposalRatioToLeaveVoting = "50 07 Proposal Ratio To Leave Voting (calculated)"
+      
+    val FavoriteThemesShare = "60 01 Favorite Themes Share"
+    val FavoriteThemesProbability = "60 02 Favorite Themes Probability"
   }
   
   val defaultConfiguration = ConfigSection(
@@ -34,6 +37,9 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
         ConfigParams.ProposalIACRatio -> "0.03",
         ConfigParams.ProposalLikesToEnterRotation -> "10",
         ConfigParams.ProposalVotesToLeaveVoting -> "100",
-        ConfigParams.ProposalRatioToLeaveVoting -> "0.05"
-        ))
+        ConfigParams.ProposalRatioToLeaveVoting -> "0.05",
+        
+        ConfigParams.FavoriteThemesShare -> "0.2",
+        ConfigParams.FavoriteThemesProbability -> "0.8"
+       ))
 }

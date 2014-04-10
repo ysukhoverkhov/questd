@@ -28,8 +28,9 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
 
       // API Test place
 //      shiftStats(ShiftStatsRequest(user))
-import controllers.domain.app.quest._
-	  CalculateProposalThresholds(CalculateProposalThresholdsRequest(10, 3))
+//import controllers.domain.app.quest._
+//	  calculateProposalThresholds(CalculateProposalThresholdsRequest(10, 3))
+      shiftHistory(ShiftHistoryRequest(user))
 
       OkApiResult(Some(LoginFBResult(uuid)))
     }

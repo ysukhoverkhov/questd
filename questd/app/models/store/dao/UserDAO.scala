@@ -41,6 +41,7 @@ trait UserDAO extends BaseDAO[User] {
   
   def addFreshDayToHistory(id: String): Option[User]
   def removeLastDayFromHistory(id: String): Option[User]
+  def removeLastThemesFromHistory(id: String, themesToRemove: Int): Option[User]
   def rememberProposalVotingInHistory(id: String, proposalId: String): Option[User]
   def rememberQuestSolvingInHistory(id: String, questId: String): Option[User]
   def rememberSolutionVotingInHistory(id: String, solutionId: String): Option[User]

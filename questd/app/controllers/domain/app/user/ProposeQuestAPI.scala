@@ -64,7 +64,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
         adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) map { r =>
           val user = r.user
-          val t = r.user.getRandomThemeForQuestProposal
+          val t = r.user.getRandomThemeForQuestProposal(db.theme.count)
           val reward = r.user.rewardForMakingApprovedQuest
           val sampleQuest = {
             val all = db.quest.allWithStatusAndThemeByPoints(QuestStatus.InRotation.toString, t.id)
@@ -109,6 +109,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
             InternalErrorApiResult()
           } else {
             val u = db.user.takeQuestTheme(r.user.id, pt.get, r.user.getCooldownForTakeTheme)
+            
             OkApiResult(Some(TakeQuestThemeResult(OK, u.map(_.profile))))
           }
         }

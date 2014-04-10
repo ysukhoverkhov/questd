@@ -18,6 +18,7 @@ private[domain] trait MiscAPI { this: DBAccessor =>
 
   /**
    * Get server's time.
+   * TODO move me out of user to misc api.
    */
   def getTime(request: GetTimeRequest): ApiResult[GetTimeResult] = handleDbException {
     import request._

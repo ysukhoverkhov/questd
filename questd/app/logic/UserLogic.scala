@@ -106,17 +106,41 @@ class UserLogic(val user: User) {
 
   /**
    * Select theme for the user to take.
+   * TODO: test me.
    */
-  def getRandomThemeForQuestProposal = {
-    val themes = api.allThemes.body.get.themes
+  def getRandomThemeForQuestProposal(themesCount: Long): Theme = {
+    val probabilityOfRecentList = {
+      val maxShare = api.config(api.ConfigParams.FavoriteThemesShare).toDouble
+      val minShare = maxShare / 4
+      val ourShare = user.history.selectedThemeIds.length / themesCount.toDouble
 
-    if (themes.size > 0) {
-      val rand = new Random(System.currentTimeMillis())
-      val random_index = rand.nextInt(themes.length)
-      themes(random_index)
+      if (minShare > ourShare)
+        0
+      else
+        Math.min(1, (ourShare - minShare) / (maxShare - minShare)) * api.config(api.ConfigParams.FavoriteThemesProbability).toDouble
+    }
+
+    val rand = new Random(System.currentTimeMillis())
+    if (rand.nextDouble < probabilityOfRecentList) {
+      // Use recent list
+      Logger.error("Using recent list")
+      
+      
+        Theme()
     } else {
-      Logger.error("No themes in database, stub theme returned")
-      Theme()
+      // Use global list.
+      Logger.error("Using global list")
+
+      val themes = api.allThemes.body.get.themes
+
+      if (themes.size > 0) {
+        val rand = new Random(System.currentTimeMillis())
+        val random_index = rand.nextInt(themes.length)
+        themes(random_index)
+      } else {
+        Logger.error("No themes in database, stub theme returned")
+        Theme()
+      }
     }
   }
 
@@ -545,7 +569,7 @@ class UserLogic(val user: User) {
    * ********************
    */
   def userActive = {
-    val activeDays = api.config(api.ConfigParams.ActiveUserDays).toInt 
+    val activeDays = api.config(api.ConfigParams.ActiveUserDays).toInt
 
     user.auth.lastLogin match {
       case None => false

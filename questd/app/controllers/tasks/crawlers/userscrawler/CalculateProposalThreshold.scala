@@ -45,7 +45,7 @@ class CalculateProposalThreshold(api: DomainAPIComponent#DomainAPI) extends Base
   }
 
   protected override def end(): Unit = {
-    api.CalculateProposalThresholds(CalculateProposalThresholdsRequest(CalculateProposalThreshold.proposalsVoted, CalculateProposalThreshold.proposalsLiked))
+    api.calculateProposalThresholds(CalculateProposalThresholdsRequest(CalculateProposalThreshold.proposalsVoted, CalculateProposalThreshold.proposalsLiked))
   }
 }
 

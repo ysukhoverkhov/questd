@@ -63,17 +63,26 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def shiftHistory(request: ShiftHistoryRequest): ApiResult[ShiftHistoryResult] = handleDbException {
     import request._
     
-    val historyDepth = config(ConfigParams.UserHistoryDays).toInt
+    val daysHistoryDepth = config(ConfigParams.UserHistoryDays).toInt
+    val themesHistoryDepth: Int = Math.max(1, Math.round(db.theme.count * config(ConfigParams.FavoriteThemesShare).toFloat))
     
     db.user.addFreshDayToHistory(user.id)
-    clearOldHistory(user)
+    clearOldDaysHistory(user)
+    clearOldThemesHistory(user)
     
-    def clearOldHistory(u: User): User = {
-	  if (u.history.votedQuestProposalIds.length >= historyDepth) {
-	    clearOldHistory(db.user.removeLastDayFromHistory(u.id).get)
+    def clearOldDaysHistory(u: User): User = {
+	  if (u.history.votedQuestProposalIds.length > daysHistoryDepth) {
+	    clearOldDaysHistory(db.user.removeLastDayFromHistory(u.id).get)
       } else {
         u
       }
+    }
+    
+    def clearOldThemesHistory(u: User): User = {
+      if (u.history.selectedThemeIds.length > themesHistoryDepth)
+        db.user.removeLastThemesFromHistory(u.id, u.history.selectedThemeIds.length - themesHistoryDepth).get
+      else
+        u
     }
     
     OkApiResult(Some(ShiftHistoryResult()))
