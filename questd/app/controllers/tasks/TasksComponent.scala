@@ -9,6 +9,7 @@ import controllers.domain.DomainAPIComponent
 import components._
 import models.domain._
 import models.domain.admin._
+import controllers.tasks.config.TasksConfigHolder
 
 trait TasksComponent { component: DomainAPIComponent =>
 
@@ -16,16 +17,9 @@ trait TasksComponent { component: DomainAPIComponent =>
 
   class Tasks
     extends APIAccessor
-    with ConfigHolder {
+    with TasksConfigHolder {
 
     val api = component.api
-
-    // ConfigHolder implementation
-    val configSectionName = "Tasks"
-    val defaultConfiguration = ConfigSection(
-      configSectionName,
-      Map(("akka://application/user/UsersHourlyCrawler", "0 0 0/1 * * ?"),
-          ("akka://application/user/UsersWeeklyCrawler", "0 0 5 ? * MON")))
 
     val usersHourlyCrawler = Akka.system.actorOf(UsersHourlyCrawler.props(api), name = UsersHourlyCrawler.name)
     val usersWeeklyCrawler = Akka.system.actorOf(UsersWeeklyCrawler.props(api), name = UsersWeeklyCrawler.name)

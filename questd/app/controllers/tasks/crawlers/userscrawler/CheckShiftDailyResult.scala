@@ -1,4 +1,4 @@
-package controllers.tasks.crawlers
+package controllers.tasks.crawlers.userscrawler
 
 import akka.actor.Actor
 import akka.actor.Props

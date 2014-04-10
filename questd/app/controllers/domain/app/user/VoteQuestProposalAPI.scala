@@ -79,9 +79,10 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
             } map { r =>
               // 3. update user profile.
               // 4. save profile in db.
-              val u = db.user.recordQuestProposalVote(r.user.id)
+              val liked = (request.vote == QuestProposalVote.Cool)
+              val u = db.user.recordQuestProposalVote(r.user.id, liked)
 
-              val author = if (request.vote == QuestProposalVote.Cool) {
+              val author = if (liked) {
                 db.user.readByID(q.authorUserID).map(_.profile.publicProfile)
               } else {
                 None

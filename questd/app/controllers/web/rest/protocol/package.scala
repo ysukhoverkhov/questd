@@ -282,11 +282,17 @@ package object protocol {
   
   type WSGetMessagesResult = GetMessagesResult
 
-
   case class WSRemoveMessageRequest(
     /// Id of a message to remove.
     id: String)
   type WSRemoveMessageResult = RemoveMessageResult
+
+
+  /**
+   * Misc
+   */
+  
+  type WSGetTimeResult = GetTimeResult
 
 }
 

@@ -27,9 +27,9 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
       db.user.updateSessionID(user.id, uuid)
 
       // API Test place
-      //      Logger.warn(getRightsAtLevels(GetRightsAtLevelsRequest(user, 1, 20)).toString)
-//      sendMessage(SendMessageRequest(user, Message(text = "26")))
-//      removeMessage(RemoveMessageRequest(user, "2a52692b-f62a-49e9-97b1-0a304dbf730a"))
+//      shiftStats(ShiftStatsRequest(user))
+import controllers.domain.app.quest._
+	  CalculateProposalThresholds(CalculateProposalThresholdsRequest(10, 3))
 
       OkApiResult(Some(LoginFBResult(uuid)))
     }

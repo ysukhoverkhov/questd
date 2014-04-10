@@ -5,6 +5,8 @@ import play.Logger
 import models.domain._
 import controllers.domain.app.user._
 import controllers.domain.OkApiResult
+import models.domain.admin.ConfigSection
+import controllers.domain.config.ApiConfigHolder
 
 class QuestLogic(val quest: Quest) {
 
@@ -30,7 +32,7 @@ class QuestLogic(val quest: Quest) {
    * Are we able to add quest to rotation.
    */
   def shouldAddToRotation = {
-    if ((quest.rating.points > pointsToAddQuestToRotation) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
+    if ((quest.rating.points > api.config(api.ConfigParams.ProposalLikesToEnterRotation).toLong) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
       true
     else
       false
@@ -40,7 +42,7 @@ class QuestLogic(val quest: Quest) {
    * Should we remove quest from rotation.
    */
   def shouldRemoveFromRotation = {
-    if ((quest.rating.points < pointsToAddQuestToRotation / 2) && (QuestStatus.withName(quest.status) == QuestStatus.InRotation))
+    if ((quest.rating.points < api.config(api.ConfigParams.ProposalLikesToEnterRotation).toLong / 2) && (QuestStatus.withName(quest.status) == QuestStatus.InRotation))
       true
     else
       false
@@ -50,30 +52,27 @@ class QuestLogic(val quest: Quest) {
    * Should we ban quest.
    */
   def shouldBanQuest = {
-    if ((quest.rating.iacpoints.porn.toFloat / quest.rating.votersCount > iacBanRatio)
-      || (quest.rating.iacpoints.spam.toFloat / quest.rating.votersCount > iacBanRatio))
+    val maxIACVotes = api.config(api.ConfigParams.ProposalIACRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
+    if ((quest.rating.iacpoints.porn > maxIACVotes)
+      || (quest.rating.iacpoints.spam > maxIACVotes))
       true
     else
       false
   }
 
   def shouldCheatingQuest = {
-    if ((quest.rating.cheating > pointsToAddQuestToRotation) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
-      true
-    else
-      false
+    val maxCheatingVotes = api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
+    if ((quest.rating.cheating > maxCheatingVotes) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
+      true else false
   }
 
   def shouldRemoveQuestFromVotingByTime = {
-    if ((quest.rating.votersCount > votersToRemoveQuestFromVoting) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
+    if ((quest.rating.votersCount > api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong) &&
+        ((quest.rating.points / quest.rating.votersCount) < api.config(api.ConfigParams.ProposalRatioToLeaveVoting).toDouble) &&
+        (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
       true
     else
       false
   }
-
-
-  private def votersToRemoveQuestFromVoting = 100
-  private def pointsToAddQuestToRotation = 10
-  private def iacBanRatio = 0.1
 }
 

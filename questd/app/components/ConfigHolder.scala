@@ -16,6 +16,9 @@ trait ConfigHolder { this: APIAccessor =>
    */
   def defaultConfiguration: ConfigSection
 
+  /**
+   * Read values from configuration.
+   */
   def config: ConfigSection = {
     api.getConfigSection(GetConfigSectionRequest(configSectionName)) match {
       case OkApiResult(Some(GetConfigSectionResult(Some(c: ConfigSection)))) => {
@@ -34,11 +37,22 @@ trait ConfigHolder { this: APIAccessor =>
   }
 
   /**
+   * Updates a field in configuration section.
+   */
+  def updateConfig(field: (String, String)): Unit = {
+    api.setConfigSection(SetConfigSectionRequest(config.copy(values = config.values + field)))
+  }
+
+  /**
    * Resets component's configuration to default one.
    */
   def resetConfig(): Unit = {
     api.setConfigSection(SetConfigSectionRequest(defaultConfiguration))
   }
 
+  /**
+   * Check if config section is not initialized and initialize it.
+   */
+  private def initConfiguration(): Unit = config
 }
 

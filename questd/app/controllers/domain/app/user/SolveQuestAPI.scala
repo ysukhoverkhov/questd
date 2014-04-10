@@ -33,6 +33,9 @@ case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: As
 case class GiveUpQuestRequest(user: User)
 case class GiveUpQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
+case class DeadlineQuestRequest(user: User)
+case class DeadlineQuestResult(user: Option[User])
+
 case class RewardQuestSolutionAuthorRequest(solution: QuestSolution, author: User)
 case class RewardQuestSolutionAuthorResult()
 
@@ -55,12 +58,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    */
   def purchaseQuest(request: PurchaseQuestRequest): ApiResult[PurchaseQuestResult] = handleDbException {
 
-    val user = if (request.user.shouldGiveupQuest) {
-      giveUpQuest(GiveUpQuestRequest(request.user.user))
-      db.user.readByID(request.user.id).get
-    } else {
-      request.user
-    }
+    val user = ensureNoDeadlineQuest(request.user)
 
     user.canPurchaseQuest match {
       case OK => {
@@ -181,14 +179,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    */
   def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
 
-    val user = if (request.user.shouldGiveupQuest) {
-      giveUpQuest(GiveUpQuestRequest(request.user.user))
-      db.user.readByID(request.user.id).get
-    } else {
-      request.user
-    }
+    val user = ensureNoDeadlineQuest(request.user)
 
-    user.canResulveQuest(ContentType.withName(request.solution.content.contentType)) match {
+    user.canResolveQuest(ContentType.withName(request.solution.content.contentType)) match {
       case OK => {
 
         db.solution.create(
@@ -234,6 +227,16 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   }
 
   /**
+   * Stop from solving quests because its deadline reached.
+   */
+  def deadlineQuest(request: DeadlineQuestRequest): ApiResult[DeadlineQuestResult] = handleDbException {
+    storeSolutionOutOfTimePenalty(StoreSolutionOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuest)) map { r =>
+      val u = db.user.resetQuestSolution(r.user.id)
+      OkApiResult(Some(DeadlineQuestResult(u)))
+    }
+  }
+  
+  /**
    * Give quest solution author a reward on quest status change
    */
   def rewardQuestSolutionAuthor(request: RewardQuestSolutionAuthorRequest): ApiResult[RewardQuestSolutionAuthorResult] = handleDbException {
@@ -255,19 +258,15 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
           case QuestSolutionStatus.Won =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
-          //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.victoryReward)))
 
           case QuestSolutionStatus.Lost =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.defeatReward)))
-          //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(author.profile.questSolutionContext.defeatReward)))
 
           case QuestSolutionStatus.CheatingBanned =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForCheatingSolution(q))))
-          //            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingSolution(q))))
 
           case QuestSolutionStatus.IACBanned =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForIACSolution(q))))
-          //            adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACSolution(q))))
         }
 
         r map {
@@ -358,6 +357,15 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     compete(solutionsForQuest)
   }
 
+  
+  private def ensureNoDeadlineQuest(user: User): User = {
+    if (user.questDeadlineReached) {
+      deadlineQuest(DeadlineQuestRequest(user)).body.get.user.get
+    } else {
+      user
+    }
+  } 
+  
 }
 
 

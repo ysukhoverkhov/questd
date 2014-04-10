@@ -7,6 +7,7 @@ import controllers.domain.app.quest._
 import controllers.domain.app.questsolution._
 import controllers.domain.admin._
 import controllers.domain.app.questsolution.QuestSolutionAPI
+import controllers.domain.config.ApiConfigHolder
 
 trait DomainAPIComponent { component: DatabaseComponent =>
 
@@ -14,6 +15,7 @@ trait DomainAPIComponent { component: DatabaseComponent =>
 
   class DomainAPI
     extends DBAccessor
+    with APIAccessor
 
     with AuthAPI
     with ProfileAPI
@@ -27,16 +29,19 @@ trait DomainAPIComponent { component: DatabaseComponent =>
     with ShortlistAPI
     with FriendsAPI
     with MessagesAPI 
+    with MiscAPI
     
     with QuestAPI
     with QuestSolutionAPI
 
     with ThemesAdminAPI
     with QuestsAdminAPI
-    with ConfigAdminAPI {
+    with ConfigAdminAPI 
+    
+    with ApiConfigHolder { 
 
-    // db for out traits
     val db = component.db
+    lazy val api = component.api // This is lazy since it references to his parent which creates us during initialization.
   }
 
 }

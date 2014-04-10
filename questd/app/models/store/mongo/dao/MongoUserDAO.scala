@@ -54,8 +54,8 @@ private[mongo] class MongoUserDAO
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
-          "auth.session" -> sessionid))))
-
+          "auth.session" -> sessionid,
+          "auth.lastLogin" -> new Date))))
   }
 
   /**
@@ -93,18 +93,22 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         ("$set" -> MongoDBObject(
           "profile.questProposalVoteContext.reviewingQuest" -> grater[QuestInfoWithID].asDBObject(qi),
-          "profile.questProposalVoteContext.themeOfQuest" -> grater[Theme].asDBObject(theme)))))
+          "profile.questProposalVoteContext.themeOfQuest" -> grater[Theme].asDBObject(theme))),
+        ("$inc" -> MongoDBObject(
+          "stats.proposalsVoted" -> 1))
+      ))
   }
 
   /**
    *
    */
-  def recordQuestProposalVote(id: String): Option[User] = {
+  def recordQuestProposalVote(id: String, liked: Boolean): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         ("$inc" -> MongoDBObject(
-          "profile.questProposalVoteContext.numberOfReviewedQuests" -> 1)),
+          "profile.questProposalVoteContext.numberOfReviewedQuests" -> 1,
+          "stats.proposalsLiked" -> (if (liked) 1 else 0))),
         ("$unset" -> MongoDBObject(
           "profile.questProposalVoteContext.reviewingQuest" -> "",
           "profile.questProposalVoteContext.themeOfQuest" -> ""))))
@@ -298,6 +302,28 @@ private[mongo] class MongoUserDAO
   }
 
   /**
+   * 
+   */
+  def storeProposalOutOfTimePenalty(id: String, penalty: Assets): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "privateDailyResults.0.proposalGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty)))))
+  }
+  
+  /**
+   * 
+   */
+  def storeSolutionOutOfTimePenalty(id: String, penalty: Assets): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "privateDailyResults.0.questGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty)))))
+  }
+  
+  /**
    *
    */
   def levelup(id: String, ratingToNextlevel: Int): Option[User] = {
@@ -387,6 +413,17 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         ("$push" -> MongoDBObject(
           "history.votedQuestSolutionIds.0" -> solutionId))))
+  }
+
+  /**
+   * 
+   */
+  def updateStats(id: String, stats: UserStats): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "stats" -> grater[UserStats].asDBObject(stats)))))
   }
 
   /**

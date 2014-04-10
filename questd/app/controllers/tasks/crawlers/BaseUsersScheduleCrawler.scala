@@ -7,8 +7,8 @@ import helpers.akka.EasyRestartActor
 import controllers.tasks.messages.DoTask
 import controllers.domain._
 import controllers.domain.app.user._
-
 import models.domain._
+import controllers.tasks.crawlers.userscrawler._
 
 
 abstract class BaseUsersScheduleCrawler(api: DomainAPIComponent#DomainAPI) extends EasyRestartActor {
@@ -33,9 +33,11 @@ abstract class BaseUsersScheduleCrawler(api: DomainAPIComponent#DomainAPI) exten
   }
 
   private def doCrawl(users: Iterator[User]) = {
+    context.actorSelection("*") ! StartWork
     for (user <- users) {
       context.actorSelection("*") ! ProcessUser(user)
     }
+    context.actorSelection("*") ! EndWork
   }
 
 }

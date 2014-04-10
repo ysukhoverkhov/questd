@@ -168,7 +168,7 @@ class UserLogic(val user: User) {
   /**
    * Check is quest deadline passed and quest should be autogave up.
    */
-  def shouldGiveupProposal = {
+  def proposalDeadlineReached = {
     ((user.profile.questProposalContext.takenTheme != None)
       && (user.profile.questProposalContext.questProposalCooldown.before(new Date())))
   }
@@ -246,7 +246,7 @@ class UserLogic(val user: User) {
   /**
    * Is user can propose quest of given type.
    */
-  def canResulveQuest(conentType: ContentType) = {
+  def canResolveQuest(conentType: ContentType) = {
     val content = conentType match {
       case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults.toString())
       case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoResults.toString())
@@ -357,7 +357,7 @@ class UserLogic(val user: User) {
   /**
    * Check is quest deadline passed and quest should be autogave up.
    */
-  def shouldGiveupQuest = {
+  def questDeadlineReached = {
     ((user.profile.questSolutionContext.takenQuest != None)
       && (user.profile.questSolutionContext.questDeadline.before(new Date())))
   }
@@ -494,6 +494,68 @@ class UserLogic(val user: User) {
   }
 
   /**
+   * *******************
+   * Shortlist
+   * *******************
+   */
+
+  def canShortlist = {
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.AddToShortList.toString()))
+      NotEnoughRights
+    else if (!(user.profile.assets canAfford costToShortlist))
+      NotEnoughAssets
+    else
+      OK
+  }
+
+  def costToShortlist = {
+    Assets(coins = costToShortlistPerson(user.profile.publicProfile.level))
+  }
+
+  /**
+   * ********************
+   * Friends
+   * ********************
+   */
+
+  def canAddFriend(potentialFriend: User) = {
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends.toString()))
+      NotEnoughRights
+    else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
+      NotEnoughAssets
+    else if (user.friends.length >= user.profile.rights.maxFriendsCount)
+      LimitExceeded
+    else
+      OK
+  }
+
+  def costToAddFriend(potentialFriend: User) = {
+    val friendAhead = potentialFriend.profile.publicProfile.level - user.profile.publicProfile.level
+
+    if (friendAhead > 0) {
+      Assets(money = friendAhead)
+    } else {
+      Assets(coins = costToInviteFriend(user.profile.publicProfile.level, -friendAhead))
+    }
+  }
+
+  /**
+   * ********************
+   * Friends
+   * ********************
+   */
+  def userActive = {
+    val activeDays = api.config(api.ConfigParams.ActiveUserDays).toInt 
+
+    user.auth.lastLogin match {
+      case None => false
+      case Some(d) => {
+        (new DateTime(d) + activeDays.days) > (DateTime.now)
+      }
+    }
+  }
+
+  /**
    * *******************************************
    * Utils for user logic
    * *******************************************
@@ -550,52 +612,6 @@ class UserLogic(val user: User) {
       }
     }
 
-  }
-
-  /**
-   * *******************
-   * Shortlist
-   * *******************
-   */
-
-  def canShortlist = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.AddToShortList.toString()))
-      NotEnoughRights
-    else if (!(user.profile.assets canAfford costToShortlist))
-      NotEnoughAssets
-    else
-      OK
-  }
-
-  def costToShortlist = {
-    Assets(coins = costToShortlistPerson(user.profile.publicProfile.level))
-  }
-
-  /**
-   * ********************
-   * Friends
-   * ********************
-   */
-
-  def canAddFriend(potentialFriend: User) = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends.toString()))
-      NotEnoughRights
-    else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
-      NotEnoughAssets
-    else if (user.friends.length >= user.profile.rights.maxFriendsCount)
-      LimitExceeded
-    else
-      OK
-  }
-
-  def costToAddFriend(potentialFriend: User) = {
-    val friendAhead = potentialFriend.profile.publicProfile.level - user.profile.publicProfile.level
-
-    if (friendAhead > 0) {
-      Assets(money = friendAhead)
-    } else {
-      Assets(coins = costToInviteFriend(user.profile.publicProfile.level, -friendAhead))
-    }
   }
 
 }

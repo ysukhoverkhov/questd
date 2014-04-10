@@ -4,6 +4,14 @@ import models.domain._
 
 trait QuestDAO extends BaseDAO[Quest] {
 
+  /**
+   * Count quests with given status.
+   */
+  def countWithStatus(status: String): Long
+
+  /**
+   * Return iterator to quests with given status and levels.
+   */
   def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[Quest]
 
   /**

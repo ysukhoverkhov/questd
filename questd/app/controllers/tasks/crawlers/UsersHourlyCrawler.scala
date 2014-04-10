@@ -7,6 +7,7 @@ import helpers.akka.EasyRestartActor
 import controllers.tasks.messages.DoTask
 import controllers.domain._
 import controllers.domain.app.user._
+import controllers.tasks.crawlers.userscrawler._
 
 import models.domain._
 
@@ -22,8 +23,8 @@ object UsersHourlyCrawler {
 class UsersHourlyCrawler(api: DomainAPIComponent#DomainAPI) extends BaseUsersScheduleCrawler(api) {
 
   protected val userActors = List(
-      classOf[CheckGiveupQuestProposal],
-      classOf[CheckGiveupQuest],
+      classOf[CheckProposalDeadline],
+      classOf[CheckQuestDeadline],
       classOf[ResetCountersAtNight],
       classOf[CheckShiftDailyResult])
 

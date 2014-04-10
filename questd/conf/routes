@@ -77,6 +77,9 @@ POST	/rest/removeFromFriends				controllers.web.rest.FriendsWS.removeFromFriends
 POST	/rest/getMessages					controllers.web.rest.MessagesWS.getMessages
 POST	/rest/removeMessage					controllers.web.rest.MessagesWS.removeMessage
 
+# Misc
+POST	/rest/getTime						controllers.web.rest.MiscWS.getTime
+
 
 
 #######################

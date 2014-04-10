@@ -29,6 +29,9 @@ case class ProposeQuestResult(allowed: ProfileModificationResult, profile: Optio
 case class GiveUpQuestProposalRequest(user: User)
 case class GiveUpQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
+case class DeadlineQuestProposalRequest(user: User)
+case class DeadlineQuestProposalResult(user: Option[User])
+
 case class GetQuestProposalGiveUpCostRequest(user: User)
 case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets)
 
@@ -52,12 +55,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    */
   def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
 
-    val user = if (request.user.shouldGiveupProposal) {
-      giveUpQuestProposal(GiveUpQuestProposalRequest(request.user.user))
-      db.user.readByID(request.user.id).get
-    } else {
-      request.user
-    }
+    val user = ensureNoDeadlineProposal(request.user)
 
     user.canPurchaseQuestProposals match {
       case OK => {
@@ -125,12 +123,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    */
   def proposeQuest(request: ProposeQuestRequest): ApiResult[ProposeQuestResult] = handleDbException {
 
-    val user = if (request.user.shouldGiveupProposal) {
-      giveUpQuestProposal(GiveUpQuestProposalRequest(request.user.user))
-      db.user.readByID(request.user.id).get
-    } else {
-      request.user
-    }
+    val user = ensureNoDeadlineProposal(request.user)
 
     user.canProposeQuest(ContentType.withName(request.quest.media.contentType)) match {
       case OK => {
@@ -171,6 +164,16 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     }
   }
 
+  /**
+   * Stop from solving quests because its deadline reached.
+   */
+  def deadlineQuestProposal(request: DeadlineQuestProposalRequest): ApiResult[DeadlineQuestProposalResult] = handleDbException {
+    storeProposalOutOfTimePenalty(StoreProposalOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuestProposal)) map { r =>
+      val u = db.user.resetQuestSolution(r.user.id)
+      OkApiResult(Some(DeadlineQuestProposalResult(u)))
+    }
+  }
+  
   /**
    * Get cost for giving up quest proposal.
    */
@@ -215,5 +218,12 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     }
   }
 
+  private def ensureNoDeadlineProposal(user: User): User = {
+    if (user.proposalDeadlineReached) {
+      deadlineQuestProposal(DeadlineQuestProposalRequest(user)).body.get.user.get
+    } else {
+      user
+    }  
+  }
 }
 

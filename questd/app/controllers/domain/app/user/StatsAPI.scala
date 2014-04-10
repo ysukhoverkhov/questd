@@ -7,6 +7,9 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers.exceptionwrappers._
 import logic._
+import java.util.Date
+import org.joda.time.DateTime
+import org.joda.time.Interval
 
 case class ShiftStatsRequest(user: User)
 case class ShiftStatsResult()
@@ -23,23 +26,33 @@ case class RememberQuestSolvingResult()
 case class RememberSolutionVotingRequest(user: User, solutionId: String)
 case class RememberSolutionVotingResult()
 
-private[domain] trait StatsAPI { this: DBAccessor =>
+private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Reset all purchases (quests and themes) overnight.
    */
   def shiftStats(request: ShiftStatsRequest): ApiResult[ShiftStatsResult] = handleDbException {
     import request._
+    
+    val deltaDays: Double = 
+      if (user.stats.lastStatShift.equals(UserStats().lastStatShift))
+        Double.NaN 
+      else 
+        (new Interval(new DateTime(user.stats.lastStatShift), DateTime.now)).toDuration().getStandardHours() / 24.0
 
-    // Update is allowed here.
-    db.user.update {
-      user.copy(
-        stats = user.stats.copy(
+    db.user.updateStats (
+        user.id, 
+        UserStats (
+          lastStatShift = new Date(),
           questsReviewed = 0,
           questsAccepted = 0,
           questsReviewedPast = (user.stats.questsReviewedPast * 3) / 4 + user.stats.questsReviewed,
-          questsAcceptedPast = (user.stats.questsAcceptedPast * 3) / 4 + user.stats.questsAccepted))
-    }
+          questsAcceptedPast = (user.stats.questsAcceptedPast * 3) / 4 + user.stats.questsAccepted,
+          proposalsVoted = 0,
+          proposalsVotedPerDay = if (deltaDays == Double.NaN) 0 else user.stats.proposalsVoted / deltaDays,
+          proposalsLiked = 0,
+          proposalsLikedPerDay = if (deltaDays == Double.NaN) 0 else user.stats.proposalsLiked / deltaDays
+        ))
 
     OkApiResult(Some(ShiftStatsResult()))
   }
@@ -50,12 +63,17 @@ private[domain] trait StatsAPI { this: DBAccessor =>
   def shiftHistory(request: ShiftHistoryRequest): ApiResult[ShiftHistoryResult] = handleDbException {
     import request._
     
-    val historyDepth = 15
+    val historyDepth = config(ConfigParams.UserHistoryDays).toInt
     
     db.user.addFreshDayToHistory(user.id)
+    clearOldHistory(user)
     
-    if (user.history.votedQuestProposalIds.length >= historyDepth) {
-      db.user.removeLastDayFromHistory(user.id)
+    def clearOldHistory(u: User): User = {
+	  if (u.history.votedQuestProposalIds.length >= historyDepth) {
+	    clearOldHistory(db.user.removeLastDayFromHistory(u.id).get)
+      } else {
+        u
+      }
     }
     
     OkApiResult(Some(ShiftHistoryResult()))

@@ -17,7 +17,7 @@ trait UserDAO extends BaseDAO[User] {
   def recordQuestSolutionVote(id: String): Option[User]
 
   def selectQuestProposalVote(id: String, qi: QuestInfoWithID, theme: Theme): Option[User]
-  def recordQuestProposalVote(id: String): Option[User]
+  def recordQuestProposalVote(id: String, liked: Boolean): Option[User]
   
   def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: PublicProfileWithID, defeatReward: Assets, victoryReward: Assets): Option[User]
   def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User]
@@ -33,7 +33,9 @@ trait UserDAO extends BaseDAO[User] {
   def movePrivateDailyResultsToPublic(id: String, dailyResults: List[DailyResult]): Option[User]
   def storeProposalInDailyResult(id: String, proposal: QuestProposalResult): Option[User]
   def storeSolutionInDailyResult(id: String, solution: QuestSolutionResult): Option[User]
-
+  def storeProposalOutOfTimePenalty(id: String, penalty: Assets): Option[User]
+  def storeSolutionOutOfTimePenalty(id: String, penalty: Assets): Option[User]
+  
   def levelup(id: String, ratingToNextlevel: Int): Option[User]
   def setNextLevelRatingAndRights(id: String, newRatingToNextlevel: Int, rights: Rights): Option[User]
   
@@ -42,6 +44,8 @@ trait UserDAO extends BaseDAO[User] {
   def rememberProposalVotingInHistory(id: String, proposalId: String): Option[User]
   def rememberQuestSolvingInHistory(id: String, questId: String): Option[User]
   def rememberSolutionVotingInHistory(id: String, solutionId: String): Option[User]
+  
+  def updateStats(id: String, stats: UserStats): Option[User]
   
   def addToShortlist(id: String, idToAdd: String): Option[User]
   def removeFromShortlist(id: String, idToRemove: String): Option[User]
