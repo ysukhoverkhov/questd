@@ -182,10 +182,13 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     val proposalsOnVoting = db.quest.countWithStatus(QuestStatus.OnVoting.toString)
     val daysForQuestToEnter: Long = config(ConfigParams.ProposalNormalDaysToEnterRotation).toInt
     val likesToAddToRotation: Long = Math.round(request.proposalsLiked / proposalsOnVoting * daysForQuestToEnter)
-    val votesToRemoveFromRotation: Long = Math.round(config(ConfigParams.ProposalAverageToWorstLikesRatio).toDouble * request.proposalsVoted / proposalsOnVoting * daysForQuestToEnter) 
+    val votesToRemoveFromRotation: Long = Math.round(request.proposalsVoted / proposalsOnVoting * daysForQuestToEnter) 
+    val ratioToRemoveFromRotation: Double = request.proposalsLiked / request.proposalsVoted * config(ConfigParams.ProposalWorstLikesRatio).toDouble
+    Logger.error(ratioToRemoveFromRotation.toString + " ")
     
     updateConfig(ConfigParams.ProposalLikesToEnterRotation -> likesToAddToRotation.toString)
     updateConfig(ConfigParams.ProposalVotesToLeaveVoting -> votesToRemoveFromRotation.toString)
+    updateConfig(ConfigParams.ProposalRatioToLeaveVoting -> ratioToRemoveFromRotation.toString)
     
     OkApiResult(Some(CalculateProposalThresholdsResult()))
   }
