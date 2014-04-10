@@ -26,7 +26,7 @@ case class RememberQuestSolvingResult()
 case class RememberSolutionVotingRequest(user: User, solutionId: String)
 case class RememberSolutionVotingResult()
 
-private[domain] trait StatsAPI { this: DBAccessor =>
+private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Reset all purchases (quests and themes) overnight.
@@ -63,8 +63,7 @@ private[domain] trait StatsAPI { this: DBAccessor =>
   def shiftHistory(request: ShiftHistoryRequest): ApiResult[ShiftHistoryResult] = handleDbException {
     import request._
     
-    // TODO: take me from settings in admin.
-    val historyDepth = 15
+    val historyDepth = config(ConfigParams.UserHistoryDays).toInt
     
     db.user.addFreshDayToHistory(user.id)
     clearOldHistory(user)

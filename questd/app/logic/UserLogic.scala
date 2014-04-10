@@ -545,12 +545,12 @@ class UserLogic(val user: User) {
    * ********************
    */
   def userActive = {
-    // TODO: store active duration delay somewhere in _const_ or in config).
+    val activeDays = api.config(api.ConfigParams.ActiveUserDays).toInt 
 
     user.auth.lastLogin match {
       case None => false
       case Some(d) => {
-        (new DateTime(d) + 7.days) > (DateTime.now)
+        (new DateTime(d) + activeDays.days) > (DateTime.now)
       }
     }
   }
