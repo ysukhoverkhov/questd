@@ -26,6 +26,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     configSectionName,
     Map(
         ConfigParams.ActiveUserDays -> "7",
+        ConfigParams.UserHistoryDays -> "15",
         
         ConfigParams.ProposalNormalDaysToEnterRotation -> "7", 
         ConfigParams.ProposalWorstLikesRatio -> "0.1",
