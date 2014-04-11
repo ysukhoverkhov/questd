@@ -10,9 +10,14 @@ import play.api.test.Helpers._
 import models.store._
 import models.domain._
 import play.Logger
+import models.domain.base.ThemeWithID
+import models.domain.base.ThemeWithID
+import models.domain.base.ThemeWithID
+import org.specs2.matcher.BeEqualTo
 
 //@RunWith(classOf[JUnitRunner])
-class UserDAOSpecs extends Specification
+class UserDAOSpecs
+  extends Specification
   with MongoDatabaseComponent
   with BaseDAOSpecs {
 
@@ -104,12 +109,74 @@ class UserDAOSpecs extends Specification
       u must beNone
     }
 
+    "Purchase quest theme with sample quest" in new WithApplication(appWithTestDatabase) {
+      val userid = "lalala2"
+      val themeid = "themeid"
+      val questdescr = "questdescr"
+      val rew = Assets(1, 2, 3)
+
+      db.user.create(User(userid))
+      db.user.purchaseQuestTheme(
+        userid,
+        ThemeWithID(themeid, Theme(text = "text", comment = "comment")),
+        Some(QuestInfo(QuestInfoContent(ContentReference("type", "storage", "reference"), None, questdescr))),
+        rew)
+
+      val ou = db.user.readByID(userid)
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+
+      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.obj.id == themeid) and
+        beSome.which((t: ThemeWithID) => t.id == themeid)
+
+      ou.get.profile.questProposalContext.sampleQuest must beSome.which((q: QuestInfo) => q.content.description == questdescr)
+
+      ou.get.profile.questProposalContext.approveReward must beEqualTo(rew)
+      
+      ou.get.profile.questProposalContext.numberOfPurchasedThemes must beEqualTo(1)
+      
+      ou.get.profile.questProposalContext.todayReviewedThemeIds must contain(themeid)
+    }
+
+    "Purchase quest theme without sample quest" in new WithApplication(appWithTestDatabase) {
+      val userid = "lalala3"
+      val themeid = "themeid"
+      val questdescr = "questdescr"
+      val rew = Assets(1, 2, 3)
+
+      db.user.create(User(userid))
+      db.user.purchaseQuestTheme(
+        userid,
+        ThemeWithID(themeid, Theme(text = "text", comment = "comment")),
+        Some(QuestInfo(QuestInfoContent(ContentReference("type", "storage", "reference"), None, questdescr))),
+        rew)
+      db.user.purchaseQuestTheme(
+        userid,
+        ThemeWithID(themeid, Theme(text = "text", comment = "comment")),
+        None,
+        rew)
+
+      val ou = db.user.readByID(userid)
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+
+      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.obj.id == themeid) and
+        beSome.which((t: ThemeWithID) => t.id == themeid)
+
+      ou.get.profile.questProposalContext.sampleQuest must beNone
+
+      ou.get.profile.questProposalContext.approveReward must beEqualTo(rew)
+
+      ou.get.profile.questProposalContext.numberOfPurchasedThemes must beEqualTo(2)
+      
+      ou.get.profile.questProposalContext.todayReviewedThemeIds must contain(themeid)
+    }
   }
 
 }
 
 /**
- * Spec with another component setup for testing 
+ * Spec with another component setup for testing
  */
 class UserDAOFailSpecs extends Specification
   with MongoDatabaseForTestComponent {
@@ -128,7 +195,7 @@ class UserDAOFailSpecs extends Specification
 
   "Mongo User DAO" should {
     "Throw StoreException in case of underlaying error" in new WithApplication(appWithTestDatabase) {
-      db.user.create(User("tutumc")) must throwA[DatabaseException] 
+      db.user.create(User("tutumc")) must throwA[DatabaseException]
     }
   }
 }
