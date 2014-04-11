@@ -15,15 +15,15 @@ private[mongo] class MongoThemeDAO
   extends BaseMongoDAO[Theme](collectionName = "themes")
   with ThemeDAO {
 
-  def count(): Long = wrapMongoException {
+  def count(): Long = {
     countByExample(MongoDBObject())
   }
   
-  def allSortedByUseDate: Iterator[Theme] = wrapMongoException {
+  def allSortedByUseDate: Iterator[Theme] = {
     findByExample(MongoDBObject(), MongoDBObject("lastUseDate" -> 1))
   }
   
-  def updateLastUseDate(id: String): Option[Theme] = wrapMongoException {
+  def updateLastUseDate(id: String): Option[Theme] = {
     findAndModify(
       id,
       MongoDBObject(

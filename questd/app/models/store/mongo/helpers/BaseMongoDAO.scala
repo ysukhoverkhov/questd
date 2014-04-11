@@ -97,7 +97,7 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
   /**
    * Count or records. 
    */
-  def countByExample(example: DBObject): Long = {
+  def countByExample(example: DBObject): Long = wrapMongoException {
     count(example)
   }
   
