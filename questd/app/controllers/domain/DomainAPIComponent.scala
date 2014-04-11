@@ -8,6 +8,7 @@ import controllers.domain.app.questsolution._
 import controllers.domain.admin._
 import controllers.domain.app.questsolution.QuestSolutionAPI
 import controllers.domain.config.ApiConfigHolder
+import controllers.domain.app.misc.MiscAPI
 
 trait DomainAPIComponent { component: DatabaseComponent =>
 

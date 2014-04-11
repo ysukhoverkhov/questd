@@ -2,9 +2,9 @@ package controllers.web.rest
 
 import play.api.libs.json._
 import play.Logger
-
 import controllers.domain.app.user._
 import models.domain.Profile
+import controllers.domain.app.misc.GetTimeResult
 
 package object protocol {
 
