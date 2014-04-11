@@ -164,7 +164,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * // TODO rewrite me using queryBuilder (ctrl + H for it.)
    */
   def purchaseQuestTheme(id: String, purchasedTheme: ThemeWithID, sampleQuest: Option[QuestInfo], approveReward: Assets): Option[User] = {
 
