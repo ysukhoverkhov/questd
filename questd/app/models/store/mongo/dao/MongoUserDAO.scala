@@ -164,37 +164,34 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * // TODO rewrite me using queryBuilder (ctrl + H for it.)
+   * 
    */
   def purchaseQuestTheme(id: String, purchasedTheme: ThemeWithID, sampleQuest: Option[QuestInfo], approveReward: Assets): Option[User] = {
 
-    val setObject = if (sampleQuest != None) {
-      MongoDBObject(
+    val queryBuilder = MongoDBObject.newBuilder
+
+    if (sampleQuest != None) {
+      queryBuilder += ("$set" -> MongoDBObject(
         "profile.questProposalContext.purchasedTheme" -> grater[ThemeWithID].asDBObject(purchasedTheme),
         "profile.questProposalContext.sampleQuest" -> grater[QuestInfo].asDBObject(sampleQuest.get),
-        "profile.questProposalContext.approveReward" -> grater[Assets].asDBObject(approveReward))
+        "profile.questProposalContext.approveReward" -> grater[Assets].asDBObject(approveReward)))
     } else {
-      MongoDBObject(
+      queryBuilder += ("$set" -> MongoDBObject(
         "profile.questProposalContext.purchasedTheme" -> grater[ThemeWithID].asDBObject(purchasedTheme),
-        "profile.questProposalContext.approveReward" -> grater[Assets].asDBObject(approveReward))
+        "profile.questProposalContext.approveReward" -> grater[Assets].asDBObject(approveReward)))
+      queryBuilder += ("$unset" -> MongoDBObject(
+        "profile.questProposalContext.sampleQuest" -> ""))
     }
 
-    if (sampleQuest == None) {
-      findAndModify(
-        id,
-        MongoDBObject(
-          ("$unset" -> MongoDBObject(
-            "profile.questProposalContext.sampleQuest" -> ""))))
-    }
+    queryBuilder += ("$inc" -> MongoDBObject(
+      "profile.questProposalContext.numberOfPurchasedThemes" -> 1))
+
+    queryBuilder += ("$addToSet" -> MongoDBObject(
+      "profile.questProposalContext.todayReviewedThemeIds" -> purchasedTheme.id))
 
     findAndModify(
       id,
-      MongoDBObject(
-        ("$set" -> setObject),
-        ("$inc" -> MongoDBObject(
-          "profile.questProposalContext.numberOfPurchasedThemes" -> 1)),
-        ("$addToSet" -> MongoDBObject(
-          "profile.questProposalContext.todayReviewedThemeIds" -> purchasedTheme.id))))
+      queryBuilder.result)
   }
 
   /**
