@@ -175,7 +175,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    */
   def deadlineQuestProposal(request: DeadlineQuestProposalRequest): ApiResult[DeadlineQuestProposalResult] = handleDbException {
     storeProposalOutOfTimePenalty(StoreProposalOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuestProposal)) map { r =>
-      val u = db.user.resetQuestSolution(r.user.id)
+      val u = db.user.resetQuestProposal(r.user.id)
       OkApiResult(Some(DeadlineQuestProposalResult(u)))
     }
   }

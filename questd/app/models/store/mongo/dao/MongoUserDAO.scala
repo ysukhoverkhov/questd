@@ -245,6 +245,7 @@ private[mongo] class MongoUserDAO
         ("$unset" -> MongoDBObject(
           "profile.questSolutionContext.purchasedQuest" -> "",
           "profile.questProposalContext.purchasedTheme" -> "",
+          "profile.questProposalContext.todayReviewedThemeIds" -> "",
           "profile.questProposalVoteContext.reviewingQuest" -> "",
           "profile.questSolutionVoteContext.reviewingQuestSolution" -> ""))))
   }
