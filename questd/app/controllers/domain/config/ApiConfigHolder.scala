@@ -40,6 +40,6 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
         ConfigParams.ProposalRatioToLeaveVoting -> "0.05",
         
         ConfigParams.FavoriteThemesShare -> "0.2",
-        ConfigParams.FavoriteThemesProbability -> "0.8"
+        ConfigParams.FavoriteThemesProbability -> "0.75"
        ))
 }

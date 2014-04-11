@@ -64,19 +64,24 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
         adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) map { r =>
           val user = r.user
-          val t = r.user.getRandomThemeForQuestProposal(db.theme.count)
           val reward = r.user.rewardForMakingApprovedQuest
-          val sampleQuest = {
-            val all = db.quest.allWithStatusAndThemeByPoints(QuestStatus.InRotation.toString, t.id)
-            if (all.hasNext) {
-              Some(all.next.info)
-            } else {
-              None
-            }
-          }
+          r.user.getRandomThemeForQuestProposal(db.theme.count) match {
+            case Some(t) => {
+              val sampleQuest = {
+                val all = db.quest.allWithStatusAndThemeByPoints(QuestStatus.InRotation.toString, t.id)
+                if (all.hasNext) {
+                  Some(all.next.info)
+                } else {
+                  None
+                }
+              }
 
-          val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t), sampleQuest, reward)
-          OkApiResult(Some(PurchaseQuestThemeResult(OK, u.map(_.profile))))
+              val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t), sampleQuest, reward)
+              OkApiResult(Some(PurchaseQuestThemeResult(OK, u.map(_.profile))))
+            }
+            
+            case None => OkApiResult(Some(PurchaseQuestThemeResult(NotEnoughAssets)))
+          }
         }
 
       }
@@ -109,7 +114,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
             InternalErrorApiResult()
           } else {
             val u = db.user.takeQuestTheme(r.user.id, pt.get, r.user.getCooldownForTakeTheme)
-            
+            db.theme.updateLastUseDate(pt.get.id)
             OkApiResult(Some(TakeQuestThemeResult(OK, u.map(_.profile))))
           }
         }
@@ -174,7 +179,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
       OkApiResult(Some(DeadlineQuestProposalResult(u)))
     }
   }
-  
+
   /**
    * Get cost for giving up quest proposal.
    */
@@ -224,7 +229,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
       deadlineQuestProposal(DeadlineQuestProposalRequest(user)).body.get.user.get
     } else {
       user
-    }  
+    }
   }
 }
 

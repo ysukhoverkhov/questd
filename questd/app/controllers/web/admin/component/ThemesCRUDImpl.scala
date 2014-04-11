@@ -41,11 +41,11 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
     }
 
     // Filling table.
-    api.allThemes match {
+    api.allThemes(AllThemesRequest(sorted = false)) match {
 
       case OkApiResult(Some(a: AllThemesResult)) => Ok(
         views.html.admin.themes(Menu(request),
-          a.themes,
+          List() ++ a.themes,
           form))
 
       case _ => Ok("Internal server error - themes not received.")

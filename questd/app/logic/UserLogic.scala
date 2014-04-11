@@ -14,6 +14,8 @@ import constants._
 import play.Logger
 import controllers.domain.admin._
 import com.mongodb.BasicDBList
+import models.store.dao.ThemeDAO
+import controllers.domain.OkApiResult
 
 // This should not go to DB directly since API may have cache layer.
 class UserLogic(val user: User) {
@@ -108,7 +110,15 @@ class UserLogic(val user: User) {
    * Select theme for the user to take.
    * TODO: test me.
    */
-  def getRandomThemeForQuestProposal(themesCount: Long): Theme = {
+  def getRandomThemeForQuestProposal(themesCount: Long): Option[Theme] = {
+
+    def themeFromGlobal = {
+      val themes = api.allThemes(AllThemesRequest(sorted = true)).body.get.themes
+
+      // TODO pass here list of themes we reviewed today.
+      util.selectTheme(themes, List())
+    }
+
     val probabilityOfRecentList = {
       val maxShare = api.config(api.ConfigParams.FavoriteThemesShare).toDouble
       val minShare = maxShare / 4
@@ -119,29 +129,34 @@ class UserLogic(val user: User) {
       else
         Math.min(1, (ourShare - minShare) / (maxShare - minShare)) * api.config(api.ConfigParams.FavoriteThemesProbability).toDouble
     }
+    
+    Logger.debug("Probability of recent list " + probabilityOfRecentList)
 
     val rand = new Random(System.currentTimeMillis())
     if (rand.nextDouble < probabilityOfRecentList) {
       // Use recent list
-      Logger.error("Using recent list")
+      Logger.debug("Using recent list")
+      val id = user.history.selectedThemeIds(rand.nextInt(user.history.selectedThemeIds.length))
       
-      
-        Theme()
+      Logger.trace("  Selected id from themes in history: " + id)
+
+      // TODO: check here it's not in today's list of themes
+      if (List().contains(id)) {
+        Logger.debug("Recent list returned theme we've used today, requesting from global one.")
+        themeFromGlobal
+      } else {
+        api.getTheme(GetThemeRequest(id)) match {
+          case OkApiResult(Some(GetThemeResult(theme))) => Some(theme)
+          case _ => None
+        }
+      }
     } else {
       // Use global list.
-      Logger.error("Using global list")
-
-      val themes = api.allThemes.body.get.themes
-
-      if (themes.size > 0) {
-        val rand = new Random(System.currentTimeMillis())
-        val random_index = rand.nextInt(themes.length)
-        themes(random_index)
-      } else {
-        Logger.error("No themes in database, stub theme returned")
-        Theme()
-      }
+      Logger.debug("Using global list")
+      themeFromGlobal
     }
+
+    None
   }
 
   /**
@@ -621,7 +636,7 @@ class UserLogic(val user: User) {
     /**
      * Select quest what is not or quest and not in given list.
      */
-    def selectQuest[T](i: Iterator[T], fid: (T => String), fauthorid: (T => String), usedQuests: List[List[String]]): Option[T] = {
+    private[logic] def selectQuest[T](i: Iterator[T], fid: (T => String), fauthorid: (T => String), usedQuests: List[List[String]]): Option[T] = {
       if (i.hasNext) {
         val q = i.next()
 
@@ -630,6 +645,24 @@ class UserLogic(val user: User) {
           Some(q)
         } else {
           selectQuest(i, fid, fauthorid, usedQuests)
+        }
+      } else {
+        None
+      }
+    }
+
+    /**
+     * Select theme from returned iterator what is not contained in given list.
+     */
+    private[logic] def selectTheme(i: Iterator[Theme], usedThemes: List[Theme]): Option[Theme] = {
+      if (i.hasNext) {
+        val t = i.next()
+
+        if (!usedThemes.contains(t.id)) {
+          Logger.trace("  Theme selected: " + t.id)
+          Some(t)
+        } else {
+          selectTheme(i, usedThemes)
         }
       } else {
         None

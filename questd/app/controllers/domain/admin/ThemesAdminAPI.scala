@@ -8,7 +8,8 @@ import models.domain._
 import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 
-case class AllThemesResult(themes: List[Theme])
+case class AllThemesRequest(sorted: Boolean)
+case class AllThemesResult(themes: Iterator[Theme])
 
 case class CreateThemeRequest(theme: Theme)
 case class CreateThemeResult()
@@ -22,17 +23,18 @@ case class DeleteThemeResult()
 case class GetThemeRequest(id: String)
 case class GetThemeResult(theme: Theme)
 
-
-private [domain] trait ThemesAdminAPI { this: DBAccessor => 
-
+private[domain] trait ThemesAdminAPI { this: DBAccessor =>
 
   /**
    * List all themes
    */
-  def allThemes: ApiResult[AllThemesResult] = handleDbException {
+  def allThemes(request: AllThemesRequest): ApiResult[AllThemesResult] = handleDbException {
     Logger.debug("Admin request for all themes.")
 
-    OkApiResult(Some(AllThemesResult(List() ++ db.theme.all)))
+    if (request.sorted)
+      OkApiResult(Some(AllThemesResult(db.theme.allSortedByUseDate)))
+    else
+      OkApiResult(Some(AllThemesResult(db.theme.all)))
   }
 
   /**
@@ -40,11 +42,11 @@ private [domain] trait ThemesAdminAPI { this: DBAccessor =>
    */
   def createTheme(request: CreateThemeRequest): ApiResult[CreateThemeResult] = handleDbException {
     import models.domain.base.ID
-    
+
     Logger.debug("Admin request for create new theme.")
 
     db.theme.create(request.theme.copy(id = ID.generateUUID()))
-    
+
     OkApiResult(Some(CreateThemeResult()))
   }
 
@@ -56,33 +58,29 @@ private [domain] trait ThemesAdminAPI { this: DBAccessor =>
 
     // Update allowed here.
     db.theme.update(request.theme)
-    
+
     OkApiResult(Some(UpdateThemeResult()))
   }
-
 
   /**
    * Get a theme
    */
   def getTheme(request: GetThemeRequest): ApiResult[GetThemeResult] = handleDbException {
-    Logger.debug("Admin request for create new theme.")
+    Logger.debug("Admin request for getting theme by id.")
 
     db.theme.readByID(request.id) match {
       case Some(r) => OkApiResult(Some(GetThemeResult(r)))
       case None => NotFoundApiResult()
     }
-    
   }
 
-  
   /**
    * Delete theme.
    */
   def deleteTheme(request: DeleteThemeRequest): ApiResult[DeleteThemeResult] = handleDbException {
     Logger.debug("Admin request for delete theme " + request.id.toString)
-
     db.theme.delete(request.id)
-    
+
     OkApiResult(Some(DeleteThemeResult()))
   }
 

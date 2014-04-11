@@ -73,7 +73,7 @@ private[mongo] class MongoQuestDAO
     hourChange: Int = 0,
     dayChange: Int = 0,
     daysChange: Int = 0,
-    weekChange: Int = 0): Option[Quest] = {
+    weekChange: Int = 0): Option[Quest] = wrapMongoException {
 
     findAndModify(
       id,
