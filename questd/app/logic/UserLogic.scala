@@ -21,6 +21,7 @@ import controllers.domain.OkApiResult
 class UserLogic(val user: User) {
 
   lazy val api = ComponentRegistrySingleton.api
+  lazy val rand = ComponentRegistrySingleton.rand
 
   /**
    * **************************
@@ -131,7 +132,6 @@ class UserLogic(val user: User) {
     
     Logger.debug("Probability of recent list " + probabilityOfRecentList)
 
-    val rand = new Random(System.currentTimeMillis())
     if (rand.nextDouble < probabilityOfRecentList) {
       // Use recent list
       Logger.debug("Using recent list")

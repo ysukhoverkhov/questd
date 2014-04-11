@@ -76,6 +76,11 @@ class UserLogicSpecs extends Specification
       
       t2.before(t1) must beEqualTo(true)
     }
+    
+    "Return correct theme for quest proposal" in {
+      // TODO implement me.
+      success
+    }
 
   }
 

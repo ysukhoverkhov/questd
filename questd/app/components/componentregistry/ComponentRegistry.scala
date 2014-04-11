@@ -7,6 +7,7 @@ import controllers.domain.DomainAPIComponent
 import models.store.mongo.MongoDatabaseComponent
 import controllers.web.admin.component.AdminComponent
 import controllers.tasks.TasksComponent
+import components.random.RandomComponent
 
 trait ComponentRegistry
   extends WSComponent
@@ -14,7 +15,8 @@ trait ComponentRegistry
   with MongoDatabaseComponent
   with DomainAPIComponent 
   with AdminComponent 
-  with TasksComponent {
+  with TasksComponent 
+  with RandomComponent {
 
   lazy val db: Database = new MongoDatabase
   lazy val api = new DomainAPI
@@ -22,6 +24,7 @@ trait ComponentRegistry
   lazy val ws = new WS
   lazy val admin = new Admin
   lazy val tasks = new Tasks
+  lazy val rand = new Random
 }
 
 

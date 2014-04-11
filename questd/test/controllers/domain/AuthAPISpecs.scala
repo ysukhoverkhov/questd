@@ -23,10 +23,12 @@ class AuthAPISpecs extends Specification
 
   isolated
 
+  // Constructing our cake
   val db = mock[Database]
   val user = mock[UserDAO]
   
   val api = new DomainAPI
+  // End constructing
 
   object context extends org.specs2.mutable.Before {
     def before =  db.user returns user
