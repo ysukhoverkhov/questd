@@ -7,6 +7,7 @@ case class QuestProposalConext(
   approveReward: Assets = Assets(),
   purchasedTheme: Option[ThemeWithID] = None,
   takenTheme: Option[ThemeWithID] = None,
+  todayReviewedThemeIds: List[String] = List(),
   sampleQuest: Option[QuestInfo] = None,
   numberOfPurchasedThemes: Int = 0,
   questProposalCooldown: Date = new Date(0))

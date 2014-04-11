@@ -115,8 +115,7 @@ class UserLogic(val user: User) {
     def themeFromGlobal = {
       val themes = api.allThemes(AllThemesRequest(sorted = true)).body.get.themes
 
-      // TODO pass here list of themes we reviewed today.
-      util.selectTheme(themes, List())
+      util.selectTheme(themes, user.profile.questProposalContext.todayReviewedThemeIds)
     }
 
     val probabilityOfRecentList = {
@@ -140,8 +139,7 @@ class UserLogic(val user: User) {
       
       Logger.trace("  Selected id from themes in history: " + id)
 
-      // TODO: check here it's not in today's list of themes
-      if (List().contains(id)) {
+      if (user.profile.questProposalContext.todayReviewedThemeIds.contains(id)) {
         Logger.debug("Recent list returned theme we've used today, requesting from global one.")
         themeFromGlobal
       } else {
@@ -155,8 +153,6 @@ class UserLogic(val user: User) {
       Logger.debug("Using global list")
       themeFromGlobal
     }
-
-    None
   }
 
   /**
@@ -654,22 +650,20 @@ class UserLogic(val user: User) {
     /**
      * Select theme from returned iterator what is not contained in given list.
      */
-    private[logic] def selectTheme(i: Iterator[Theme], usedThemes: List[Theme]): Option[Theme] = {
+    private[logic] def selectTheme(i: Iterator[Theme], usedThemesIds: List[String]): Option[Theme] = {
       if (i.hasNext) {
         val t = i.next()
 
-        if (!usedThemes.contains(t.id)) {
+        if (!usedThemesIds.contains(t.id)) {
           Logger.trace("  Theme selected: " + t.id)
           Some(t)
         } else {
-          selectTheme(i, usedThemes)
+          selectTheme(i, usedThemesIds)
         }
       } else {
         None
       }
     }
-
   }
-
 }
 

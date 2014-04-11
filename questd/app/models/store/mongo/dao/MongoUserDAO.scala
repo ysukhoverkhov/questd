@@ -95,8 +95,7 @@ private[mongo] class MongoUserDAO
           "profile.questProposalVoteContext.reviewingQuest" -> grater[QuestInfoWithID].asDBObject(qi),
           "profile.questProposalVoteContext.themeOfQuest" -> grater[Theme].asDBObject(theme))),
         ("$inc" -> MongoDBObject(
-          "stats.proposalsVoted" -> 1))
-      ))
+          "stats.proposalsVoted" -> 1))))
   }
 
   /**
@@ -193,7 +192,9 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         ("$set" -> setObject),
         ("$inc" -> MongoDBObject(
-          "profile.questProposalContext.numberOfPurchasedThemes" -> 1))))
+          "profile.questProposalContext.numberOfPurchasedThemes" -> 1)),
+        ("$addToSet" -> MongoDBObject(
+          "profile.questProposalContext.todayReviewedThemeIds" -> purchasedTheme.id))))
   }
 
   /**
@@ -210,8 +211,7 @@ private[mongo] class MongoUserDAO
         ("$unset" -> MongoDBObject(
           "profile.questProposalContext.purchasedTheme" -> "")),
         ("$addToSet" -> MongoDBObject(
-          "history.selectedThemeIds" -> takenTheme.id))    
-      ))
+          "history.selectedThemeIds" -> takenTheme.id))))
   }
 
   /**
@@ -305,7 +305,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def storeProposalOutOfTimePenalty(id: String, penalty: Assets): Option[User] = {
     findAndModify(
@@ -314,9 +314,9 @@ private[mongo] class MongoUserDAO
         ("$set" -> MongoDBObject(
           "privateDailyResults.0.proposalGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty)))))
   }
-  
+
   /**
-   * 
+   *
    */
   def storeSolutionOutOfTimePenalty(id: String, penalty: Assets): Option[User] = {
     findAndModify(
@@ -325,7 +325,7 @@ private[mongo] class MongoUserDAO
         ("$set" -> MongoDBObject(
           "privateDailyResults.0.questGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty)))))
   }
-  
+
   /**
    *
    */
@@ -386,16 +386,16 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *  
+   *
    */
   def removeLastThemesFromHistory(id: String, themesToRemove: Int): Option[User] = {
-    (1 to themesToRemove) map {a: Int =>
+    (1 to themesToRemove) map { a: Int =>
       findAndModify(
         id,
         MongoDBObject(
           ("$pop" -> MongoDBObject(
             "history.selectedThemeIds" -> -1))))
-    } reduce{(r,c) => 
+    } reduce { (r, c) =>
       r
     }
   }
@@ -434,7 +434,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def updateStats(id: String, stats: UserStats): Option[User] = {
     findAndModify(
@@ -484,7 +484,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def updateFriendship(id: String, friendId: String, myStatus: String, friendStatus: String): Option[User] = {
     findAndModify(
@@ -505,7 +505,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def removeFriendship(id: String, friendId: String): Option[User] = {
     findAndModify(
@@ -522,7 +522,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def addMessage(id: String, message: Message): Option[User] = {
     findAndModify(
@@ -531,9 +531,9 @@ private[mongo] class MongoUserDAO
         ("$push" -> MongoDBObject(
           "messages" -> grater[Message].asDBObject(message)))))
   }
-  
+
   /**
-   * 
+   *
    */
   def removeOldestMessage(id: String): Option[User] = {
     findAndModify(
@@ -544,7 +544,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def removeMessage(id: String, messageId: String): Option[User] = {
     findAndModify(
@@ -553,7 +553,7 @@ private[mongo] class MongoUserDAO
         ("$pull" -> MongoDBObject(
           "messages" -> MongoDBObject("id" -> messageId)))))
   }
-  
+
 }
 
 /**
