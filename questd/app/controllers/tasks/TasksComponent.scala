@@ -13,7 +13,7 @@ import controllers.tasks.config.TasksConfigHolder
 
 trait TasksComponent { component: DomainAPIComponent =>
 
-  val tasks: Tasks
+  protected val tasks: Tasks
 
   class Tasks
     extends APIAccessor

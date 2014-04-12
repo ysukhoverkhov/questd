@@ -11,6 +11,8 @@ import models.domain._
 import java.util.Date
 import logic._
 import controllers.domain.app.quest.CalculateProposalThresholdsRequest
+import components.APIAccessor
+import components.random.RandomComponent
 
 
 object CalculateProposalThreshold {
@@ -24,9 +26,10 @@ object CalculateProposalThreshold {
   @volatile var proposalsLiked: Double = 0;
 }
 
-class CalculateProposalThreshold(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
+class CalculateProposalThreshold(
+    apiPar: DomainAPIComponent#DomainAPI,
+    randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
 
-  
   protected override def start(): Unit = {
     CalculateProposalThreshold.proposalsVoted = 0;
     CalculateProposalThreshold.proposalsLiked = 0;

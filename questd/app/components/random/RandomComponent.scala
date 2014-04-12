@@ -1,7 +1,9 @@
 package components.random
 
+import components.RandomAccessor
+
 trait RandomComponent {
-  val rand: Random
+  protected val rand: Random
   
   class Random extends RandomImplementation 
 }

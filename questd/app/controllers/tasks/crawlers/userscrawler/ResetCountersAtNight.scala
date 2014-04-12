@@ -9,6 +9,7 @@ import controllers.domain._
 import controllers.domain.app.user._
 import models.domain._
 import java.util.Date
+import components.random.RandomComponent
 
 object ResetCountersAtNight {
   def props(api: DomainAPIComponent#DomainAPI) = {
@@ -18,7 +19,9 @@ object ResetCountersAtNight {
   def name = "ResetCountersAtNight"
 }
 
-class ResetCountersAtNight(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
+class ResetCountersAtNight(
+    apiPar: DomainAPIComponent#DomainAPI,
+    randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
 
   protected def check(user: User) = {
     if (user.schedules.purchases.before(new Date())) {

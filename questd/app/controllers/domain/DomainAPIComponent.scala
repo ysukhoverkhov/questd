@@ -9,14 +9,19 @@ import controllers.domain.admin._
 import controllers.domain.app.questsolution.QuestSolutionAPI
 import controllers.domain.config.ApiConfigHolder
 import controllers.domain.app.misc.MiscAPI
+import models.domain.User
+import logic.UserLogic
+import logic.LogicBootstrapper
+import components.random.RandomComponent
 
-trait DomainAPIComponent { component: DatabaseComponent =>
+trait DomainAPIComponent { component: DatabaseComponent with RandomComponent =>
 
-  val api: DomainAPI
+  protected val api: DomainAPI
 
   class DomainAPI
     extends DBAccessor
     with APIAccessor
+    with RandomAccessor
 
     with AuthAPI
     with ProfileAPI
@@ -39,10 +44,15 @@ trait DomainAPIComponent { component: DatabaseComponent =>
     with QuestsAdminAPI
     with ConfigAdminAPI 
     
-    with ApiConfigHolder { 
+    with ApiConfigHolder 
+    
+    with LogicBootstrapper { 
 
-    val db = component.db
+    lazy val db = component.db
     lazy val api = component.api // This is lazy since it references to his parent which creates us during initialization.
+    lazy val rand = component.rand
+    
+    
   }
 
 }

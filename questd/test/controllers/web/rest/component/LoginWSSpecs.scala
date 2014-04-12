@@ -20,8 +20,10 @@ import models.store.mongo._
 import com.restfb.exception._
 import controllers.web.rest.protocol._
 import play.api.mvc._
+import components.random.RandomComponent
 
 class LoginWSSpecs extends Specification
+  with RandomComponent
   with WSComponent
   with FacebookComponent
   with DatabaseComponent
@@ -33,6 +35,7 @@ class LoginWSSpecs extends Specification
   val db = mock[Database]
   val api = mock[DomainAPI]
   val fb = mock[Facebook]
+  val rand = mock[Random]
   lazy val ws = new WS
 
   "Login Web Service" should {

@@ -18,13 +18,13 @@ trait ComponentRegistry
   with TasksComponent 
   with RandomComponent {
 
-  lazy val db: Database = new MongoDatabase
-  lazy val api = new DomainAPI
-  lazy val fb = new Facebook
+  protected lazy val rand = new Random
+  protected lazy val db: Database = new MongoDatabase
+  protected lazy val api = new DomainAPI
+  protected lazy val fb = new Facebook
   lazy val ws = new WS
   lazy val admin = new Admin
-  lazy val tasks = new Tasks
-  lazy val rand = new Random
+  protected lazy val tasks = new Tasks
 }
 
 

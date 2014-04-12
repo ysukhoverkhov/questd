@@ -5,10 +5,11 @@ import play.Logger
 import models.domain._
 import controllers.domain.app.user._
 import controllers.domain.OkApiResult
+import controllers.domain.DomainAPIComponent
 
-class QuestSolutionLogic(val qs: QuestSolution) {
-
-  lazy val api = ComponentRegistrySingleton.api
+class QuestSolutionLogic(
+    val qs: QuestSolution, 
+    val api: DomainAPIComponent#DomainAPI) {
 
   def shouldStopVoting = {
     (qs.status == QuestSolutionStatus.OnVoting.toString) && (qs.rating.reviewsCount >= reviewsToFinishVoting)

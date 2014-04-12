@@ -9,9 +9,9 @@ import controllers.domain._
 import controllers.domain.app.user._
 import models.domain._
 import java.util.Date
-
 import com.github.nscala_time.time.Imports._
 import org.joda.time.DateTime
+import components.random.RandomComponent
 
 object CheckShiftDailyResult {
   def props(api: DomainAPIComponent#DomainAPI) = {
@@ -21,7 +21,9 @@ object CheckShiftDailyResult {
   def name = "CheckShiftDailyResult"
 }
 
-class CheckShiftDailyResult(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
+class CheckShiftDailyResult(
+    apiPar: DomainAPIComponent#DomainAPI,
+    randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
 
   protected def check(user: User) = {
     if (user.privateDailyResults.length == 0)

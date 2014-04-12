@@ -9,6 +9,7 @@ import controllers.domain._
 import controllers.domain.app.user._
 import models.domain._
 import java.util.Date
+import components.random.RandomComponent
 
 object ShiftUserStats {
   def props(api: DomainAPIComponent#DomainAPI) = {
@@ -18,7 +19,9 @@ object ShiftUserStats {
   def name = "ShiftUserStats"
 }
 
-class ShiftUserStats(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
+class ShiftUserStats(
+    apiPar: DomainAPIComponent#DomainAPI,
+    randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
 
   protected def check(user: User) = {
     api.shiftStats(ShiftStatsRequest(user))

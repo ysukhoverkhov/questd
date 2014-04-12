@@ -7,11 +7,11 @@ import controllers.domain.app.user._
 import controllers.domain.OkApiResult
 import models.domain.admin.ConfigSection
 import controllers.domain.config.ApiConfigHolder
+import controllers.domain.DomainAPIComponent
 
-class QuestLogic(val quest: Quest) {
-
-  lazy val api = ComponentRegistrySingleton.api
-
+class QuestLogic(
+    val quest: Quest,
+    val api: DomainAPIComponent#DomainAPI) {
 
   /**
    * Calculate level of a quest with current votes.

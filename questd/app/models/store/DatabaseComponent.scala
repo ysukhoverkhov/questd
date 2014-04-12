@@ -7,7 +7,7 @@ import models.store.dao._
  */
 trait DatabaseComponent {
 
-  val db: Database
+  protected val db: Database
 
   trait Database {
     val user: UserDAO

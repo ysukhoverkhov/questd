@@ -14,9 +14,11 @@ import models.domain._
 import models.store.mongo._
 import models.store.dao.UserDAO
 import controllers.domain.libs.facebook.UserFB
+import components.random.RandomComponent
 
 
 class AuthAPISpecs extends Specification
+  with RandomComponent
   with DatabaseComponent
   with DomainAPIComponent
   with Mockito {
@@ -26,6 +28,7 @@ class AuthAPISpecs extends Specification
   // Constructing our cake
   val db = mock[Database]
   val user = mock[UserDAO]
+  val rand = mock[Random]
   
   val api = new DomainAPI
   // End constructing

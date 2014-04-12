@@ -10,6 +10,8 @@ import controllers.domain.app.user._
 import models.domain._
 import java.util.Date
 import logic._
+import components.APIAccessor
+import components.random.RandomComponent
 
 object CheckQuestDeadline {
   def props(api: DomainAPIComponent#DomainAPI) = {
@@ -19,7 +21,9 @@ object CheckQuestDeadline {
   def name = "CheckQuestDeadline"
 }
 
-class CheckQuestDeadline(api: DomainAPIComponent#DomainAPI) extends BaseUserCrawler(api) {
+class CheckQuestDeadline(
+    apiPar: DomainAPIComponent#DomainAPI,
+    randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
 
   protected def check(user: User) = {
     if (user.questDeadlineReached) {

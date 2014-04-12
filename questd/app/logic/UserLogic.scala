@@ -16,12 +16,14 @@ import controllers.domain.admin._
 import com.mongodb.BasicDBList
 import models.store.dao.ThemeDAO
 import controllers.domain.OkApiResult
+import controllers.domain.DomainAPIComponent
+import components.random.RandomComponent
 
 // This should not go to DB directly since API may have cache layer.
-class UserLogic(val user: User) {
-
-  lazy val api = ComponentRegistrySingleton.api
-  lazy val rand = ComponentRegistrySingleton.rand
+class UserLogic(
+    val user: User,
+    val api: DomainAPIComponent#DomainAPI,
+    val rand: RandomComponent#Random) {
 
   /**
    * **************************

@@ -24,7 +24,7 @@ case class CheckIncreaseLevelResult(user: User)
 case class GetRightsAtLevelsRequest(user: User, levelFrom: Int, levelTo: Int)
 case class GetRightsAtLevelsResult(rights: List[Rights])
 
-private[domain] trait ProfileAPI { this: DBAccessor =>
+private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Get iterator for all users.

@@ -5,7 +5,7 @@ import com.restfb._
 
 trait FacebookComponent {
 
-  val fb: Facebook
+  protected val fb: Facebook
 
   class Facebook {
     val FacebookClient = (x: String) => new FacebookClientRepeater(new DefaultFacebookClient(x))

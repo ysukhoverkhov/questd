@@ -9,9 +9,25 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
 import org.joda.time.Hours
 import play.Logger
+import components.APIAccessor
+import controllers.domain.DomainAPIComponent
+import models.store.DatabaseComponent
+import components.random.RandomComponent
+import components.RandomAccessor
 
 class UserLogicSpecs extends Specification
-  with Mockito {
+  with Mockito 
+  with RandomComponent
+  with LogicBootstrapper 
+  with APIAccessor
+  with RandomAccessor
+  
+  with DatabaseComponent
+  with DomainAPIComponent {
+  
+  val db = mock[Database]
+  val api = mock[DomainAPI]
+  val rand = mock[Random]
 
   "User Logic" should {
 
