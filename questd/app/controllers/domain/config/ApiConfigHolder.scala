@@ -4,11 +4,7 @@ import components.ConfigHolder
 import components.APIAccessor
 import models.domain.admin.ConfigSection
 
-trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
-
-  val configSectionName = "API"
-    
-  object ConfigParams {
+  class _ConfigParams {
     val ActiveUserDays = "10 01 Active User Days" 
 
     val UserHistoryDays = "20 01 User History Days" 
@@ -24,7 +20,13 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     val FavoriteThemesShare = "60 01 Favorite Themes Share"
     val FavoriteThemesProbability = "60 02 Favorite Themes Probability"
   }
-  
+object _ConfigParams extends _ConfigParams
+
+trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
+
+  val configSectionName = "API"
+    
+  def ConfigParams = _ConfigParams
   val defaultConfiguration = ConfigSection(
     configSectionName,
     Map(

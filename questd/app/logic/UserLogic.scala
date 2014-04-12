@@ -136,13 +136,13 @@ class UserLogic(
 
     if (rand.nextDouble < probabilityOfRecentList) {
       // Use recent list
-      Logger.debug("Using recent list")
+      Logger.error("Using recent list") // !!!!!!!!!!!!!!!!!!!!!!! debug
       val id = user.history.selectedThemeIds(rand.nextInt(user.history.selectedThemeIds.length))
       
-      Logger.trace("  Selected id from themes in history: " + id)
+      Logger.error("  Selected id from themes in history: " + id) // !!!!!!!!!!!!!!!!!!!!!!! trace
 
       if (user.profile.questProposalContext.todayReviewedThemeIds.contains(id)) {
-        Logger.debug("Recent list returned theme we've used today, requesting from global one.")
+        Logger.error("Recent list returned theme we've used today, requesting from global one.") // !!!!!!!!!!!!!!!!!!!! debug
         themeFromGlobal
       } else {
         api.getTheme(GetThemeRequest(id)) match {

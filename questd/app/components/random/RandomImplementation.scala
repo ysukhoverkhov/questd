@@ -3,11 +3,11 @@ package components.random
 import scala.util.Random
 
 private[random] class RandomImplementation {
-  private val rand = new Random(System.currentTimeMillis())
+  private val _rand = new Random(System.currentTimeMillis())
   
-  def nextInt = rand.nextInt
-  def nextInt(i: Int) = rand.nextInt(i)
+  def nextInt = _rand.nextInt
+  def nextInt(i: Int) = _rand.nextInt(i)
   
-  def nextDouble = rand.nextDouble
+  def nextDouble = _rand.nextDouble
 }
 
