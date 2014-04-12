@@ -111,7 +111,6 @@ class UserLogic(
 
   /**
    * Select theme for the user to take.
-   * TODO: test me.
    */
   def getRandomThemeForQuestProposal(themesCount: Long): Option[Theme] = {
 
@@ -136,13 +135,13 @@ class UserLogic(
 
     if (rand.nextDouble < probabilityOfRecentList) {
       // Use recent list
-      Logger.error("Using recent list") // !!!!!!!!!!!!!!!!!!!!!!! debug
+      Logger.debug("Using recent list")  
       val id = user.history.selectedThemeIds(rand.nextInt(user.history.selectedThemeIds.length))
       
-      Logger.error("  Selected id from themes in history: " + id) // !!!!!!!!!!!!!!!!!!!!!!! trace
+      Logger.trace("  Selected id from themes in history: " + id) 
 
       if (user.profile.questProposalContext.todayReviewedThemeIds.contains(id)) {
-        Logger.error("Recent list returned theme we've used today, requesting from global one.") // !!!!!!!!!!!!!!!!!!!! debug
+        Logger.debug("Recent list returned theme we've used today, requesting from global one.") 
         themeFromGlobal
       } else {
         api.getTheme(GetThemeRequest(id)) match {

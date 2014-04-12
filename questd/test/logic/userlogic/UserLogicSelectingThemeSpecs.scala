@@ -23,11 +23,12 @@ import controllers.domain.config._ConfigParams
 import com.github.nscala_time.time.Imports.DateTime
 import com.github.nscala_time.time.Imports.richDateTime
 import logic.LogicBootstrapper
+import java.util.Date
 
 class UserLogicSpecs extends BaseUserLogicSpecs {
 
-  isolated 
- 
+  isolated
+
   /**
    * Creates 10 themes for mocking
    */
@@ -62,13 +63,13 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
 
       val themes = createStubThemes
       val favTheme = 4
-      
+
       def fillMocks = {
         api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(Some(AllThemesResult(themes.iterator)))
         api.getTheme(GetThemeRequest(themes(favTheme).id)) returns OkApiResult(Some(GetThemeResult(themes(favTheme))))
-        
+
         api.config returns createStubConfig
-        
+
         rand.nextDouble returns 0.013
         rand.nextInt(anyInt) returns 0
       }
@@ -85,13 +86,13 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
     "Return correct theme from global" in {
 
       val themes = createStubThemes
-      
+
       def fillMocks = {
         api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(Some(AllThemesResult(themes.iterator)))
         api.getTheme(GetThemeRequest(themes(0).id)) returns OkApiResult(Some(GetThemeResult(themes(0))))
-        
+
         api.config returns createStubConfig
-        
+
         rand.nextDouble returns 1.0
         rand.nextInt(anyInt) returns 0
       }
