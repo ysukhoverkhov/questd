@@ -69,7 +69,7 @@ class LoginWSSpecs extends Specification
 
       val facebookToken = "Facebook token"
 
-      fb.fetchObject(facebookToken, "me", classOf[UserFB]) throws new FacebookOAuthException("", "", 1, 1)
+      fb.fetchObject(facebookToken, "me", classOf[UserFB]) throws new FacebookOAuthException("", "", 1, 1, 1)
 
       val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1))))
 
