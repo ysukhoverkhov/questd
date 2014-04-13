@@ -25,6 +25,7 @@ class UserLogic(
     val user: User,
     val api: DomainAPIComponent#DomainAPI,
     val rand: RandomComponent#Random) 
+    
     extends CalculatingRights
     with ProposingQuests 
     with SolvingQuests

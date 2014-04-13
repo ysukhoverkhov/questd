@@ -21,7 +21,6 @@ import controllers.domain._
  */
 trait SolvingQuests { this: UserLogic =>
 
-  
   /**
    * Check can the user purchase quest.
    */
@@ -60,11 +59,95 @@ trait SolvingQuests { this: UserLogic =>
    * Takes everything into account and returns possible quest to be solved by user.
    */
   def getRandomQuestForSolution: Option[Quest] = {
-    val quests = api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
+    val quests = getQuests
 
     selectQuest[Quest](quests, (_.id), (_.authorUserID), user.history.solvedQuestIds)
   }
 
+  private def getQuests = {
+    List(
+      () => getTutorialQuests,
+      () => getStartingQuests,
+      () => getDefaultQuests).
+      foldLeft[Option[Iterator[Quest]]](None)((run, fun) => {
+        if (run == None) fun() else run
+      }).
+      getOrElse(List().iterator)
+  }
+
+  private def getTutorialQuests: Option[Iterator[Quest]] = {
+    Logger.trace("getTutorialQuests")
+    None
+  }
+
+  private def getStartingQuests: Option[Iterator[Quest]] = {
+    Logger.trace("getStartingQuests")
+    None
+  }
+
+  private def getDefaultQuests: Option[Iterator[Quest]] = {
+    Logger.trace("getDefaultQuests")
+
+    val dice = rand.nextDouble
+
+    // TODO: get probabilities from admin.
+    List(
+      (0.25, () => getFriendsQuests),
+      (0.25, () => getShortlistQuests),
+      (0.10, () => getLikedQuests),
+      (0.10, () => getStarQuests),
+      (1.00, () => getOtherQuests) // Last one in the list is 1 to ensure quest will be selected.
+      ).foldLeft[Either[Double, Option[Iterator[Quest]]]](Left(0))((run, fun) => {
+        run match {
+          case Left(p) => {
+            val curProbabiliy = p + fun._1
+            if (curProbabiliy > dice) {
+              Right(fun._2())
+            } else {
+              Left(curProbabiliy)
+            }
+          }
+          case _ => run
+        }
+      }) match {
+      case Right(oi) => oi match {
+        case Some(i) => if (i.hasNext) i else getOtherQuests 
+        case None => getOtherQuests
+      }
+      case Left(_) => {
+        Logger.error("getDefaultQuests - None of quest selector functions were called. Check probabilities.")
+        None
+      }
+    }
+    
+
+    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+  }
+
+  private def getFriendsQuests = {
+    Logger.error("getFriendsQuests")
+    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+  }
+
+  private def getShortlistQuests = {
+    Logger.error("getShortlistQuests")
+    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+  }
+
+  private def getLikedQuests = {
+    Logger.error("getLikedQuests")
+    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+  }
+
+  private def getStarQuests = {
+    Logger.error("getStarQuests")
+    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+  }
+
+  private def getOtherQuests = {
+    Logger.error("getOtherQuests")
+    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+  }
   /**
    * Check are we able to take quest.
    */
