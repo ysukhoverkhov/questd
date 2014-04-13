@@ -62,6 +62,8 @@ trait SolvingQuests { this: UserLogic =>
     val quests = getQuests
 
     selectQuest[Quest](quests, (_.id), (_.authorUserID), user.history.solvedQuestIds)
+    
+    // TODO: here after filtering we can get none as a result in this case we should repeat with all quests. 
   }
 
   private def getQuests = {
