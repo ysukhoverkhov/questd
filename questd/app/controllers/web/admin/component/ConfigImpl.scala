@@ -24,8 +24,8 @@ trait ConfigImpl extends Controller { this: APIAccessor =>
 
   def config(sectionName: String) = Action { implicit request =>
     api.getConfigSection(GetConfigSectionRequest(sectionName)) match {
-      case OkApiResult(Some(GetConfigSectionResult(Some(r)))) => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, r.values))
-      case _ => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, Map()))
+      case OkApiResult(Some(GetConfigSectionResult(Some(r)))) => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, r.values.toSeq.sortBy(_._1)))
+      case _ => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, Map().toSeq))
     }
   }
 
