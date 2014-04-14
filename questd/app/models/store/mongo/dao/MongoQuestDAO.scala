@@ -39,9 +39,9 @@ private[mongo] class MongoQuestDAO
       MongoDBObject("rating.points" -> -1))
   }
 
-  def allWithStatusAndUser(status: Option[String], userId: String, skip: Int = 0): Iterator[Quest] = {
+  def allWithStatusAndUsers(status: Option[String], userIds: List[String], skip: Int = 0): Iterator[Quest] = {
     val queryBuilder = MongoDBObject.newBuilder
-    queryBuilder += ("authorUserID" -> userId)
+    queryBuilder += ("authorUserID" -> MongoDBObject("$in" -> userIds))
     if (status != None) {
       queryBuilder += ("status" -> status.get)
     }

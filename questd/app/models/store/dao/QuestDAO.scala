@@ -20,10 +20,13 @@ trait QuestDAO extends BaseDAO[Quest] {
   def allWithStatusAndThemeByPoints(status: String, themeID: String): Iterator[Quest]
 
   /**
-   * All with status and user.
+   * All with status and users.
    */
-  def allWithStatusAndUser(status: Option[String], userId: String, skip: Int = 0): Iterator[Quest]
+  def allWithStatusAndUsers(status: Option[String], userIds: List[String], skip: Int = 0): Iterator[Quest]
 
+  /**
+   * Update quest's points.
+   */
   def updatePoints(
     id: String,
     pointsChange: Int,
