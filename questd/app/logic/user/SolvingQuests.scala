@@ -61,9 +61,14 @@ trait SolvingQuests { this: UserLogic =>
   def getRandomQuestForSolution: Option[Quest] = {
     val quests = getQuests
 
-    selectQuest[Quest](quests, (_.id), (_.authorUserID), user.history.solvedQuestIds)
-    
-    // TODO: here after filtering we can get none as a result in this case we should repeat with all quests. 
+    selectQuest[Quest](quests, (_.id), (_.authorUserID), user.history.solvedQuestIds) orElse {
+      val allQuests = api.allQuestsInRotation(
+        AllQuestsRequest(
+          user.profile.publicProfile.level - questLevelToleranceDown,
+          user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
+
+      selectQuest[Quest](allQuests, (_.id), (_.authorUserID), user.history.solvedQuestIds)
+    }
   }
 
   private def getQuests = {
@@ -92,13 +97,12 @@ trait SolvingQuests { this: UserLogic =>
 
     val dice = rand.nextDouble
 
-    // TODO: get probabilities from admin.
     List(
-      (0.25, () => getFriendsQuests),
-      (0.25, () => getShortlistQuests),
-      (0.10, () => getLikedQuests),
-      (0.10, () => getStarQuests),
-      (1.00, () => getOtherQuests) // Last one in the list is 1 to ensure quest will be selected.
+      (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests),
+      (api.config(api.ConfigParams.QuestProbabilityShortlist).toDouble, () => getShortlistQuests),
+      (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests),
+      (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getStarQuests),
+      (1.00, () => getOtherQuests) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       ).foldLeft[Either[Double, Option[Iterator[Quest]]]](Left(0))((run, fun) => {
         run match {
           case Left(p) => {
@@ -112,16 +116,15 @@ trait SolvingQuests { this: UserLogic =>
           case _ => run
         }
       }) match {
-      case Right(oi) => oi match {
-        case Some(i) => if (i.hasNext) i else getOtherQuests 
-        case None => getOtherQuests
+        case Right(oi) => oi match {
+          case Some(i) => if (i.hasNext) i else getOtherQuests
+          case None => getOtherQuests
+        }
+        case Left(_) => {
+          Logger.error("getDefaultQuests - None of quest selector functions were called. Check probabilities.")
+          None
+        }
       }
-      case Left(_) => {
-        Logger.error("getDefaultQuests - None of quest selector functions were called. Check probabilities.")
-        None
-      }
-    }
-    
 
     Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
