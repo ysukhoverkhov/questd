@@ -52,9 +52,6 @@ private[mongo] class MongoQuestDAO
       skip)
   }
 
-  /**
-   *
-   */
   def updatePoints(
     id: String,
     pointsChange: Int,

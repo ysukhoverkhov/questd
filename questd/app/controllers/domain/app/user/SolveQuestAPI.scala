@@ -42,6 +42,15 @@ case class RewardQuestSolutionAuthorResult()
 case class TryFightQuestRequest(solution: QuestSolution)
 case class TryFightQuestResult()
 
+
+case class GetFriendsQuestsRequest(user: User)
+case class GetFriendsQuestsResult(quests: Iterator[Quest])
+
+case class GetShortlistQuestsRequest(user: User)
+case class GetShortlistQuestsResult(quests: Iterator[Quest])
+
+
+
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -357,7 +366,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     compete(solutionsForQuest)
   }
 
-  
   private def ensureNoDeadlineQuest(user: User): User = {
     if (user.questDeadlineReached) {
       deadlineQuest(DeadlineQuestRequest(user)).body.get.user.get
@@ -365,7 +373,19 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       user
     }
   } 
+
+  def getFriendsQuestsRequest(request: GetFriendsQuestsRequest): ApiResult[GetFriendsQuestsResult] = handleDbException {
+    // TODO: filter here to show friends with approved status only.
+    // TODO: test we have here friends with approved status only.
+    OkApiResult(Some(GetFriendsQuestsResult(db.quest.allWithStatusAndUsers(Some(QuestStatus.InRotation.toString), request.user.friends.map(_.friendId)))))
+  }
+  
+  def getFriendsQuestsRequest(request: GetShortlistQuestsRequest): ApiResult[GetShortlistQuestsResult] = handleDbException {
+    // TODO: filter here to show friends with approved status only.
+    // TODO: test we have here friends with approved status only.
+    OkApiResult(Some(GetShortlistQuestsResult(db.quest.allWithStatusAndUsers(Some(QuestStatus.InRotation.toString), request.user.shortlist))))
+  }
   
 }
 
-
+// TODO: test each option out of posible quest slution options is selectable. 
