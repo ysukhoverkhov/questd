@@ -60,13 +60,14 @@ trait SolvingQuests { this: UserLogic =>
    */
   def getRandomQuestForSolution: Option[Quest] = {
     val quests = getQuests
-
     selectQuest[Quest](quests, (_.id), (_.authorUserID), user.history.solvedQuestIds) orElse {
+      val regularQuests = getOtherQuests.getOrElse(List().iterator)
+      selectQuest[Quest](regularQuests, (_.id), (_.authorUserID), user.history.solvedQuestIds)
+    } orElse {
       val allQuests = api.allQuestsInRotation(
         AllQuestsRequest(
           user.profile.publicProfile.level - questLevelToleranceDown,
           user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
-
       selectQuest[Quest](allQuests, (_.id), (_.authorUserID), user.history.solvedQuestIds)
     }
   }

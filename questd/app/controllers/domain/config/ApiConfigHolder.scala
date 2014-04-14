@@ -52,7 +52,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
 
       ConfigParams.QuestProbabilityFriends -> "0.25",
       ConfigParams.QuestProbabilityShortlist -> "0.25",
-      ConfigParams.QuestProbabilityLiked -> "0.10",
+      ConfigParams.QuestProbabilityLiked -> "0.20",
       ConfigParams.QuestProbabilityStar -> "0.10"))
 }
 
