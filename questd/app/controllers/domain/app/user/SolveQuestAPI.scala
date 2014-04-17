@@ -378,7 +378,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       Some(request.fromLevel, request.toLevel)))))
   }
 
-  def getFriendsQuests(request: GetShortlistQuestsRequest): ApiResult[GetShortlistQuestsResult] = handleDbException {
+  def getShortlistQuests(request: GetShortlistQuestsRequest): ApiResult[GetShortlistQuestsResult] = handleDbException {
     OkApiResult(Some(GetShortlistQuestsResult(db.quest.allWithParams(
       Some(QuestStatus.InRotation.toString),
       request.user.shortlist,

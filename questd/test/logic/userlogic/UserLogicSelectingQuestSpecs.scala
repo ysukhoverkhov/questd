@@ -77,7 +77,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
     "Return quest from friends if dice rolls so" in {
 
       api.config returns createStubConfig
-      rand.nextDouble returns 0.013
+      rand.nextDouble returns 0.13
 
       val qid = "qid"
 
@@ -93,7 +93,20 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
     }
 
     "Return quest from shortlist if dice rolls so" in {
-      success
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.38
+
+      val qid = "qid"
+
+      api.getShortlistQuests(any[GetShortlistQuestsRequest]) returns OkApiResult(Some(GetShortlistQuestsResult(List(createQuest(qid, "author")).iterator)))
+
+      val u = User()
+      val q = u.getRandomQuestForSolution
+
+      there was one(rand).nextDouble
+      there was one(api).getShortlistQuests(any[GetShortlistQuestsRequest])
+
+      q must beSome.which(q => q.id == qid)
     }
 
   }

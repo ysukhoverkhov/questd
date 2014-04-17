@@ -13,7 +13,8 @@ import models.domain.base._
 import models.domain.ContentType._
 import controllers.domain.admin._
 import controllers.domain._
-import controllers.domain.app.user.GetFriendsQuestsRequest
+import controllers.domain.app.user._
+
 
 /**
  * All logic related to solving quests.
@@ -136,8 +137,11 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getShortlistQuests = {
-    Logger.error("getShortlistQuests")
-    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+    Logger.trace("getShortlistQuests")
+    Some(api.getShortlistQuests(GetShortlistQuestsRequest(
+      user,
+      user.profile.publicProfile.level - questLevelToleranceDown,
+      user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
 
   private def getLikedQuests = {
