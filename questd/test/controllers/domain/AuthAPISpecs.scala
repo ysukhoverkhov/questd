@@ -17,7 +17,7 @@ import controllers.domain.libs.facebook.UserFB
 import components.random.RandomComponent
 
 
-class AuthAPISpecs extends BaseUserLogicSpecs {
+class AuthAPISpecs extends BaseAPISpecs {
 
   "Auth API" should {
 

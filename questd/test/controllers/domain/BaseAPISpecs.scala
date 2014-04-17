@@ -9,7 +9,7 @@ import models.store.DatabaseComponent
 import controllers.domain.admin._
 import models.store.dao._
 
-private[domain] abstract class BaseUserLogicSpecs extends Specification 
+private[domain] abstract class BaseAPISpecs extends Specification 
   with RandomComponent
   with DatabaseComponent
   with DomainAPIComponent
@@ -20,13 +20,18 @@ private[domain] abstract class BaseUserLogicSpecs extends Specification
   // Constructing our cake
   val db = mock[Database]
   val user = mock[UserDAO]
+  val quest = mock[QuestDAO]
+  
   val rand = mock[Random]
   
   val api = new DomainAPI
   // End constructing
 
   object context extends org.specs2.mutable.Before {
-    def before =  db.user returns user
+    def before = {
+      db.user returns user
+      db.quest returns quest
+    } 
   }
   
 }

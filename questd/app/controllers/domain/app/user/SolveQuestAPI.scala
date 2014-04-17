@@ -374,14 +374,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     }
   } 
 
-  def getFriendsQuestsRequest(request: GetFriendsQuestsRequest): ApiResult[GetFriendsQuestsResult] = handleDbException {
-    // TODO: test we have here friends with approved status only.
+  def getFriendsQuests(request: GetFriendsQuestsRequest): ApiResult[GetFriendsQuestsResult] = handleDbException {
     OkApiResult(Some(GetFriendsQuestsResult(db.quest.allWithStatusAndUsers(
         Some(QuestStatus.InRotation.toString),
-        request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId)))))
+        request.user.friends.filter(_.status == FriendshipStatus.Accepted.toString).map(_.friendId)))))
   }
   
-  def getFriendsQuestsRequest(request: GetShortlistQuestsRequest): ApiResult[GetShortlistQuestsResult] = handleDbException {
+  def getFriendsQuests(request: GetShortlistQuestsRequest): ApiResult[GetShortlistQuestsResult] = handleDbException {
     OkApiResult(Some(GetShortlistQuestsResult(db.quest.allWithStatusAndUsers(
         Some(QuestStatus.InRotation.toString), 
         request.user.shortlist))))
