@@ -185,10 +185,10 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def getQuestsForUser(request: GetQuestsForUserRequest): ApiResult[GetQuestsForUserResult] = handleDbException {
     val pageSize = if (request.pageSize > 50) 50 else request.pageSize
     
-    val questsForUser = db.quest.allWithStatusAndUsers(
+    val questsForUser = db.quest.allWithParams(
         request.status.map(_.toString), 
         List(request.userId),
-        request.pageNumber * pageSize)
+        skip = request.pageNumber * pageSize)
 
     OkApiResult(Some(GetQuestsForUserResult(
       allowed = OK,

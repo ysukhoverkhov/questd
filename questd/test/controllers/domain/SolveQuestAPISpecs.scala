@@ -35,19 +35,27 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val u = createUser(List(Friendship(f1.id, FriendshipStatus.Accepted.toString), Friendship(f2.id, FriendshipStatus.Invited.toString)))
 
-      db.quest.allWithStatusAndUsers(Some(QuestStatus.InRotation.toString), List(f1.id), 0) returns List().iterator
-      db.quest.allWithStatusAndUsers(Some(QuestStatus.InRotation.toString), List(f1.id, f2.id), 0) returns List().iterator
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0) returns List().iterator
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0) returns List().iterator
 
-      val result = api.getFriendsQuests(GetFriendsQuestsRequest(u))
+      val result = api.getFriendsQuests(GetFriendsQuestsRequest(u, 1, 2))
 
-      there was one(quest).allWithStatusAndUsers(
+      there was one(quest).allWithParams(
         Some(QuestStatus.InRotation.toString),
         List(f1.id),
+        Some(1, 2),
         0)
 
-      there was no(quest).allWithStatusAndUsers(
+      there was no(quest).allWithParams(
+        Some(QuestStatus.InRotation.toString),
+        List(),
+        Some(1, 2),
+        0)
+        
+      there was no(quest).allWithParams(
         Some(QuestStatus.InRotation.toString),
         List(f1.id, f2.id),
+        Some(1, 2),
         0)
     }
   }

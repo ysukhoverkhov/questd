@@ -22,7 +22,7 @@ trait QuestDAO extends BaseDAO[Quest] {
   /**
    * All with status and users.
    */
-  def allWithStatusAndUsers(status: Option[String], userIds: List[String], skip: Int = 0): Iterator[Quest]
+  def allWithParams(status: Option[String], userIds: List[String], levels: Option[(Int, Int)] = None, skip: Int = 0): Iterator[Quest]
 
   /**
    * Update quest's points.

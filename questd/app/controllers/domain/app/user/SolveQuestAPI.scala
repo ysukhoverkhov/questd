@@ -42,14 +42,11 @@ case class RewardQuestSolutionAuthorResult()
 case class TryFightQuestRequest(solution: QuestSolution)
 case class TryFightQuestResult()
 
-
-case class GetFriendsQuestsRequest(user: User)
+case class GetFriendsQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
 case class GetFriendsQuestsResult(quests: Iterator[Quest])
 
-case class GetShortlistQuestsRequest(user: User)
+case class GetShortlistQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
 case class GetShortlistQuestsResult(quests: Iterator[Quest])
-
-
 
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -95,7 +92,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             case None => OkApiResult(Some(PurchaseQuestResult(OutOfContent)))
             case Some(q) => {
               {
-                rememberQuestSolvingInHistory (RememberQuestSolvingRequest(user, q.id))
+                rememberQuestSolvingInHistory(RememberQuestSolvingRequest(user, q.id))
               } map {
                 val questCost = user.costOfPurchasingQuest
                 val author = db.user.readByID(q.authorUserID).map(x => PublicProfileWithID(q.authorUserID, x.profile.publicProfile))
@@ -244,7 +241,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       OkApiResult(Some(DeadlineQuestResult(u)))
     }
   }
-  
+
   /**
    * Give quest solution author a reward on quest status change
    */
@@ -296,8 +293,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     // 1. find all solutions with the same quest id with status waiting for compettor.
 
     val solutionsForQuest = db.solution.allWithStatusAndQuest(
-        Some(QuestSolutionStatus.WaitingForCompetitor.toString), 
-        request.solution.questID)
+      Some(QuestSolutionStatus.WaitingForCompetitor.toString),
+      request.solution.questID)
 
     def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {
       if (s1.calculatePoints == s2.calculatePoints)
@@ -372,20 +369,20 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     } else {
       user
     }
-  } 
+  }
 
   def getFriendsQuests(request: GetFriendsQuestsRequest): ApiResult[GetFriendsQuestsResult] = handleDbException {
-    OkApiResult(Some(GetFriendsQuestsResult(db.quest.allWithStatusAndUsers(
-        Some(QuestStatus.InRotation.toString),
-        request.user.friends.filter(_.status == FriendshipStatus.Accepted.toString).map(_.friendId)))))
+    OkApiResult(Some(GetFriendsQuestsResult(db.quest.allWithParams(
+      Some(QuestStatus.InRotation.toString),
+      request.user.friends.filter(_.status == FriendshipStatus.Accepted.toString).map(_.friendId),
+      Some(request.fromLevel, request.toLevel)))))
   }
-  
+
   def getFriendsQuests(request: GetShortlistQuestsRequest): ApiResult[GetShortlistQuestsResult] = handleDbException {
-    OkApiResult(Some(GetShortlistQuestsResult(db.quest.allWithStatusAndUsers(
-        Some(QuestStatus.InRotation.toString), 
-        request.user.shortlist))))
+    OkApiResult(Some(GetShortlistQuestsResult(db.quest.allWithParams(
+      Some(QuestStatus.InRotation.toString),
+      request.user.shortlist,
+      Some(request.fromLevel, request.toLevel)))))
   }
-  
 }
 
-// TODO: test each option out of posible quest slution options is selectable. 

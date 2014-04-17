@@ -3,9 +3,7 @@ package logic.user
 import java.util.Date
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
-
 import play.Logger
-
 import logic._
 import logic.constants._
 import logic.functions._
@@ -15,6 +13,7 @@ import models.domain.base._
 import models.domain.ContentType._
 import controllers.domain.admin._
 import controllers.domain._
+import controllers.domain.app.user.GetFriendsQuestsRequest
 
 /**
  * All logic related to solving quests.
@@ -131,8 +130,11 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getFriendsQuests = {
-    Logger.error("getFriendsQuests")
-    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+    Logger.trace("getFriendsQuests")
+    Some(api.getFriendsQuests(GetFriendsQuestsRequest(
+        user,
+        user.profile.publicProfile.level - questLevelToleranceDown,
+        user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
 
   private def getShortlistQuests = {
