@@ -22,16 +22,20 @@ private [domain] trait QuestsAdminAPI { this: DBAccessor =>
    * List all Quests with approved status.
    */
   def allQuestsInRotation(request: AllQuestsRequest): ApiResult[AllQuestsResult] = handleDbException {
-    OkApiResult(Some(AllQuestsResult(db.quest.allWithStatusAndLevels(QuestStatus.InRotation.toString, request.fromLevel, request.toLevel))))
+    OkApiResult(Some(AllQuestsResult(db.quest.allWithParams(
+        status = Some(QuestStatus.InRotation.toString),
+        levels = Some(request.fromLevel, request.toLevel)))))
   }
 
   /**
    * List all Quests with OnVoting status.
    */
   def allQuestsOnVoting: ApiResult[AllQuestsResult] = handleDbException {
-    OkApiResult(Some(AllQuestsResult(db.quest.allWithStatusAndLevels(QuestStatus.OnVoting.toString, 0, 21))))
+    OkApiResult(Some(AllQuestsResult(db.quest.allWithParams(
+        status = Some(QuestStatus.OnVoting.toString),
+        levels = Some(0, 21)))))
   }
-
+// TODO get min and max quests from config.
   /**
    * List all Quests solution s with OnVoting status.
    */

@@ -20,17 +20,6 @@ private[mongo] class MongoQuestDAO
       MongoDBObject(("status" -> status)))
   }
 
-  // TODO remove me.
-  def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[Quest] = {
-    findByExample(
-      MongoDBObject(
-        ("status" -> status),
-        ("$and" -> Array(
-          MongoDBObject("info.level" -> MongoDBObject("$gte" -> minLevel)),
-          MongoDBObject("info.level" -> MongoDBObject("$lte" -> maxLevel))))),
-      MongoDBObject("lastModDate" -> 1))
-  }
-
   def allWithStatusAndThemeByPoints(status: String, themeID: String): Iterator[Quest] = {
     findByExample(
       MongoDBObject(
@@ -39,11 +28,16 @@ private[mongo] class MongoQuestDAO
       MongoDBObject("rating.points" -> -1))
   }
 
-  def allWithParams(status: Option[String], userIds: List[String], levels: Option[(Int, Int)] = None, skip: Int = 0): Iterator[Quest] = {
+  def allWithParams(status: Option[String], userIds: List[String] = List(), levels: Option[(Int, Int)] = None, skip: Int = 0): Iterator[Quest] = {
     val queryBuilder = MongoDBObject.newBuilder
-    queryBuilder += ("authorUserID" -> MongoDBObject("$in" -> userIds))
+
     if (status != None) {
       queryBuilder += ("status" -> status.get)
+    }
+
+    if (userIds.length > 0) {
+      queryBuilder += ("authorUserID" -> MongoDBObject("$in" -> userIds))
+
     }
 
     if (levels != None) {

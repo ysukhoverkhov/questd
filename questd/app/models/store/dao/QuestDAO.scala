@@ -10,11 +10,6 @@ trait QuestDAO extends BaseDAO[Quest] {
   def countWithStatus(status: String): Long
 
   /**
-   * Return iterator to quests with given status and levels.
-   */
-  def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[Quest]
-
-  /**
    * All quests with status for theme id ordered by points.
    */
   def allWithStatusAndThemeByPoints(status: String, themeID: String): Iterator[Quest]
@@ -22,7 +17,7 @@ trait QuestDAO extends BaseDAO[Quest] {
   /**
    * All with status and users.
    */
-  def allWithParams(status: Option[String], userIds: List[String], levels: Option[(Int, Int)] = None, skip: Int = 0): Iterator[Quest]
+  def allWithParams(status: Option[String], userIds: List[String] = List(), levels: Option[(Int, Int)] = None, skip: Int = 0): Iterator[Quest]
 
   /**
    * Update quest's points.
