@@ -17,27 +17,8 @@ import controllers.domain.libs.facebook.UserFB
 import components.random.RandomComponent
 
 
-class AuthAPISpecs extends Specification
-  with RandomComponent
-  with DatabaseComponent
-  with DomainAPIComponent
-  with Mockito {
+class AuthAPISpecs extends BaseUserLogicSpecs {
 
-  isolated
-
-  // Constructing our cake
-  val db = mock[Database]
-  val user = mock[UserDAO]
-  val rand = mock[Random]
-  
-  val api = new DomainAPI
-  // End constructing
-
-  object context extends org.specs2.mutable.Before {
-    def before =  db.user returns user
-  }
-
-  
   "Auth API" should {
 
     "Register user with new FB id" in context {
@@ -47,9 +28,6 @@ class AuthAPISpecs extends Specification
       userfb.getId returns fbid
         
       db.user.readByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(fbid = Some(fbid))))
-      //    db.createUser(newUser)
-      //    db.readUserByFBid(fbid) returns 
-      //    db.updateUser(user.replaceSessionID(uuid))
 
       val rv = api.loginfb(LoginFBRequest(userfb))
 
@@ -70,7 +48,6 @@ class AuthAPISpecs extends Specification
       userfb.getId returns fbid
 
       db.user.readByFBid(anyString) returns Some(User("", AuthInfo(fbid = Some(fbid))))
-      //    db.updateUser(user.replaceSessionID(uuid))
 
       val rv = api.loginfb(LoginFBRequest(userfb))
 
@@ -94,9 +71,6 @@ class AuthAPISpecs extends Specification
       rv must beAnInstanceOf[InternalErrorApiResult]
       rv.body must beNone
     }
-
-    //    case class UserParams(sessionID: SessionID)
-    //case class UserResult(user: User)
 
     "Return logged in user" in context {
 

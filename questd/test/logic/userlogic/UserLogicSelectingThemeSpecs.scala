@@ -32,7 +32,7 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
   /**
    * Creates 10 themes for mocking
    */
-  def createStubThemes: List[Theme] = {
+  private def createStubThemes: List[Theme] = {
     (for (i <- List.range(1, 11)) yield {
       Theme(text = i.toString, comment = i.toString)
     })
@@ -41,7 +41,7 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
   /**
    * Creates stub config for our tests.
    */
-  def createStubConfig = {
+  private def createStubConfig = {
     api.ConfigParams returns _ConfigParams
 
     val config = mock[ConfigSection]
@@ -53,7 +53,7 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
   /**
    * Creates user we will test algorithm with
    */
-  def createUser(themes: List[Theme], favTheme: Int) = {
+  private def createUser(themes: List[Theme], favTheme: Int) = {
     User(history = UserHistory(selectedThemeIds = List(themes(favTheme).id, themes(1).id)))
   }
 
