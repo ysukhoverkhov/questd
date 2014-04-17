@@ -129,7 +129,7 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getFriendsQuests = {
-    Logger.trace("getFriendsQuests")
+    Logger.debug("Returning quest from friends")
     Some(api.getFriendsQuests(GetFriendsQuestsRequest(
       user,
       user.profile.publicProfile.level - questLevelToleranceDown,
@@ -137,7 +137,7 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getShortlistQuests = {
-    Logger.trace("getShortlistQuests")
+    Logger.debug("Returning quest from shortlist")
     Some(api.getShortlistQuests(GetShortlistQuestsRequest(
       user,
       user.profile.publicProfile.level - questLevelToleranceDown,
