@@ -33,9 +33,9 @@ private [domain] trait QuestsAdminAPI { this: DBAccessor =>
   def allQuestsOnVoting: ApiResult[AllQuestsResult] = handleDbException {
     OkApiResult(Some(AllQuestsResult(db.quest.allWithParams(
         status = Some(QuestStatus.OnVoting.toString),
-        levels = Some(0, 21)))))
+        levels = Some(1, logic.constants.maxLevel)))))
   }
-// TODO get min and max quests from config.
+
   /**
    * List all Quests solution s with OnVoting status.
    */

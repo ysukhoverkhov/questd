@@ -117,7 +117,7 @@ trait SolvingQuests { this: UserLogic =>
         }
       }) match {
         case Right(oi) => oi match {
-          case Some(i) => if (i.hasNext) i else getOtherQuests
+          case Some(i) => if (i.hasNext) Some(i) else getOtherQuests
           case None => getOtherQuests
         }
         case Left(_) => {
@@ -125,16 +125,14 @@ trait SolvingQuests { this: UserLogic =>
           None
         }
       }
-
-    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
 
   private def getFriendsQuests = {
     Logger.trace("getFriendsQuests")
     Some(api.getFriendsQuests(GetFriendsQuestsRequest(
-        user,
-        user.profile.publicProfile.level - questLevelToleranceDown,
-        user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+      user,
+      user.profile.publicProfile.level - questLevelToleranceDown,
+      user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
 
   private def getShortlistQuests = {

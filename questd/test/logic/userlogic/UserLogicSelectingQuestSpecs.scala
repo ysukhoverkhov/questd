@@ -45,8 +45,10 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
     api.ConfigParams returns _ConfigParams
 
     val config = mock[ConfigSection]
-    config.apply(api.ConfigParams.FavoriteThemesShare) returns "0.20"
-    config.apply(api.ConfigParams.FavoriteThemesProbability) returns "0.75"
+    config.apply(api.ConfigParams.QuestProbabilityFriends) returns "0.25"
+    config.apply(api.ConfigParams.QuestProbabilityShortlist) returns "0.25"
+    config.apply(api.ConfigParams.QuestProbabilityLiked) returns "0.20"
+    config.apply(api.ConfigParams.QuestProbabilityStar) returns "0.10"
     config
   }
 
@@ -57,31 +59,43 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
     User(friends = friends)
   }
 
-  
   private def createFriend(newid: String) = {
     User(id = newid)
   }
-  
+
   private def createQuest(newid: String, authorid: String) = {
     Quest(
-        themeID = "theme_id",
-        authorUserID = authorid,
-        approveReward = Assets(1, 2, 3),
-        info = QuestInfo(QuestInfoContent(media = ContentReference("", "", ""), icon = None, description = "descr")))
+      id = newid,
+      themeID = "theme_id",
+      authorUserID = authorid,
+      approveReward = Assets(1, 2, 3),
+      info = QuestInfo(QuestInfoContent(media = ContentReference("", "", ""), icon = None, description = "descr")))
   }
-  
-  
+
   "User Logic" should {
-    
+
     "Return quest from friends if dice rolls so" in {
-//      val q = u.getRandomQuestForSolution
-      success
+
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.013
+
+      val qid = "qid"
+
+      api.getFriendsQuests(any[GetFriendsQuestsRequest]) returns OkApiResult(Some(GetFriendsQuestsResult(List(createQuest(qid, "author")).iterator)))
+
+      val u = User()
+      val q = u.getRandomQuestForSolution
+
+      there was one(rand).nextDouble
+      there was one(api).getFriendsQuests(any[GetFriendsQuestsRequest])
+
+      q must beSome.which(q => q.id == qid)
     }
 
     "Return quest from shortlist if dice rolls so" in {
       success
     }
-    
+
   }
 }
 
