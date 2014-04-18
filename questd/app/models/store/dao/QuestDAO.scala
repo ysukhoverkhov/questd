@@ -17,7 +17,12 @@ trait QuestDAO extends BaseDAO[Quest] {
   /**
    * All with status and users.
    */
-  def allWithParams(status: Option[String], userIds: List[String] = List(), levels: Option[(Int, Int)] = None, skip: Int = 0): Iterator[Quest]
+  def allWithParams(
+      status: Option[String], 
+      userIds: List[String] = List(), 
+      levels: Option[(Int, Int)] = None, 
+      skip: Int = 0,
+      vip: Option[Boolean] = None): Iterator[Quest]
 
   /**
    * Update quest's points.

@@ -17,7 +17,8 @@ case class QuestInfo(
   content: QuestInfoContent,
   level: Int = 0,
   duration: String = QuestDuration.Minutes.toString,
-  difficulty: String = QuestDifficulty.Easy.toString) {
+  difficulty: String = QuestDifficulty.Easy.toString,
+  vip: Boolean = false) {
 
   def daysDuration = QuestDuration.withName(duration) match {
     case QuestDuration.Minutes => 1

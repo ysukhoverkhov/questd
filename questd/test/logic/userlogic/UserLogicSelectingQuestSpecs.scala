@@ -109,6 +109,22 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
+    "Return VIP quest if dice rolls so" in {
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.75
+
+      val qid = "qid"
+
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
+
+      val u = User()
+      val q = u.getRandomQuestForSolution
+
+      there was one(rand).nextDouble
+      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
+
+      q must beSome.which(q => q.id == qid)
+    }
   }
 }
 

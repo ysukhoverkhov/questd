@@ -48,6 +48,11 @@ case class GetFriendsQuestsResult(quests: Iterator[Quest])
 case class GetShortlistQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
 case class GetShortlistQuestsResult(quests: Iterator[Quest])
 
+case class GetVIPQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
+case class GetVIPQuestsResult(quests: Iterator[Quest])
+
+
+
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -384,5 +389,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       request.user.shortlist,
       Some(request.fromLevel, request.toLevel)))))
   }
+  
+  def getVIPQuests(request: GetVIPQuestsRequest): ApiResult[GetVIPQuestsResult] = handleDbException {
+    OkApiResult(Some(GetVIPQuestsResult(db.quest.allWithParams(
+      status = Some(QuestStatus.InRotation.toString),
+      levels = Some(request.fromLevel, request.toLevel),
+      vip = Some(true)))))
+  }
+  
 }
 

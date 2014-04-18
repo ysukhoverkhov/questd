@@ -35,8 +35,8 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val u = createUser(List(Friendship(f1.id, FriendshipStatus.Accepted.toString), Friendship(f2.id, FriendshipStatus.Invited.toString)))
 
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0) returns List().iterator
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0) returns List().iterator
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0, None) returns List().iterator
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0, None) returns List().iterator
 
       val result = api.getFriendsQuests(GetFriendsQuestsRequest(u, 1, 2))
 
@@ -44,19 +44,36 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         Some(QuestStatus.InRotation.toString),
         List(f1.id),
         Some(1, 2),
-        0)
+        0,
+        null)
 
       there was no(quest).allWithParams(
         Some(QuestStatus.InRotation.toString),
         List(),
         Some(1, 2),
-        0)
+        0,
+        null)
         
       there was no(quest).allWithParams(
         Some(QuestStatus.InRotation.toString),
         List(f1.id, f2.id),
         Some(1, 2),
-        0)
+        0,
+        null)
+    }
+
+    "getVIPQuests calls db correctly" in context {
+
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true)) returns List().iterator
+
+      val result = api.getVIPQuests(GetVIPQuestsRequest(User(), 1, 2))
+
+      there was one(quest).allWithParams(
+        Some(QuestStatus.InRotation.toString),
+        null,
+        Some(1, 2),
+        0,
+        Some(true))
     }
   }
 }

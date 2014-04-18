@@ -28,7 +28,13 @@ private[mongo] class MongoQuestDAO
       MongoDBObject("rating.points" -> -1))
   }
 
-  def allWithParams(status: Option[String], userIds: List[String] = List(), levels: Option[(Int, Int)] = None, skip: Int = 0): Iterator[Quest] = {
+  def allWithParams(
+      status: Option[String], 
+      userIds: List[String] = List(), 
+      levels: Option[(Int, Int)] = None, 
+      skip: Int = 0,
+      vip: Option[Boolean] = None): Iterator[Quest] = {
+    
     val queryBuilder = MongoDBObject.newBuilder
 
     if (status != None) {
@@ -44,6 +50,10 @@ private[mongo] class MongoQuestDAO
       queryBuilder += ("$and" -> Array(
         MongoDBObject("info.level" -> MongoDBObject("$gte" -> levels.get._1)),
         MongoDBObject("info.level" -> MongoDBObject("$lte" -> levels.get._2))))
+    }
+    
+    if (vip != None) {
+      queryBuilder += ("info.vip" -> vip.get)
     }
 
     findByExample(

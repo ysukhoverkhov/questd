@@ -102,7 +102,7 @@ trait SolvingQuests { this: UserLogic =>
       (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests),
       (api.config(api.ConfigParams.QuestProbabilityShortlist).toDouble, () => getShortlistQuests),
       (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests),
-      (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getStarQuests),
+      (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPQuests),
       (1.00, () => getOtherQuests) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       ).foldLeft[Either[Double, Option[Iterator[Quest]]]](Left(0))((run, fun) => {
         run match {
@@ -149,11 +149,14 @@ trait SolvingQuests { this: UserLogic =>
     Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
 
-  private def getStarQuests = {
-    Logger.error("getStarQuests")
-    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+  private def getVIPQuests = {
+    Logger.debug("Returning VIP quests")
+    Some(api.getVIPQuests(GetVIPQuestsRequest(
+      user,
+      user.profile.publicProfile.level - questLevelToleranceDown,
+      user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
-
+  
   private def getOtherQuests = {
     Logger.error("getOtherQuests")
     Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
