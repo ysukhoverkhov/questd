@@ -164,7 +164,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def purchaseQuestTheme(id: String, purchasedTheme: ThemeWithID, sampleQuest: Option[QuestInfo], approveReward: Assets): Option[User] = {
 
@@ -403,18 +403,17 @@ private[mongo] class MongoUserDAO
    *
    */
   def rememberProposalVotingInHistory(id: String, questId: String, liked: Boolean): Option[User] = {
-    // TODO: !!! test me.
-    
     val queryBuilder = MongoDBObject.newBuilder
-    
-    queryBuilder += ("$push" -> MongoDBObject(
-          "history.votedQuestProposalIds.0" -> questId))
 
     if (liked) {
       queryBuilder += ("$push" -> MongoDBObject(
-          "history.likedQuestProposalIds.0" -> questId))
+        "history.votedQuestProposalIds.0" -> questId,
+        "history.likedQuestProposalIds.0" -> questId))
+    } else {
+      queryBuilder += ("$push" -> MongoDBObject(
+        "history.votedQuestProposalIds.0" -> questId))
     }
-    
+
     findAndModify(
       id,
       queryBuilder.result)

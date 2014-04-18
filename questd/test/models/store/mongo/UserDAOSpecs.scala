@@ -14,6 +14,7 @@ import models.domain.base.ThemeWithID
 import models.domain.base.ThemeWithID
 import models.domain.base.ThemeWithID
 import org.specs2.matcher.BeEqualTo
+import com.mongodb.BasicDBList
 
 //@RunWith(classOf[JUnitRunner])
 class UserDAOSpecs
@@ -132,9 +133,9 @@ class UserDAOSpecs
       ou.get.profile.questProposalContext.sampleQuest must beSome.which((q: QuestInfo) => q.content.description == questdescr)
 
       ou.get.profile.questProposalContext.approveReward must beEqualTo(rew)
-      
+
       ou.get.profile.questProposalContext.numberOfPurchasedThemes must beEqualTo(1)
-      
+
       ou.get.profile.questProposalContext.todayReviewedThemeIds must contain(themeid)
     }
 
@@ -168,8 +169,31 @@ class UserDAOSpecs
       ou.get.profile.questProposalContext.approveReward must beEqualTo(rew)
 
       ou.get.profile.questProposalContext.numberOfPurchasedThemes must beEqualTo(2)
-      
+
       ou.get.profile.questProposalContext.todayReviewedThemeIds must contain(themeid)
+    }
+
+    "rememberProposalVotingInHistory should remember liked proposals" in new WithApplication(appWithTestDatabase) {
+      val userid = "rememberProposalVotingInHistory"
+      val q1id = "q1id"
+      val q2id = "q2id"
+        
+      db.user.create(User(userid))
+
+      db.user.rememberProposalVotingInHistory(userid, q1id, true)
+      db.user.rememberProposalVotingInHistory(userid, q2id, false)
+
+      val ou = db.user.readByID(userid)
+      ou must beSome.which((u: User) => u.id.toString == userid)
+
+      val arr1 = ou.get.history.likedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray().collect{ case s: String => s }
+      arr1.size must beEqualTo(3) // 2 is "", "" stub in list of lists.
+      arr1(2) must beEqualTo(q1id)
+
+      val arr2 = ou.get.history.votedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray().collect{ case s: String => s }
+      arr2.size must beEqualTo(4) // 2 is "", "" stub in list of lists.
+      arr2(2).asInstanceOf[String] must beEqualTo(q1id)
+      arr2(3).asInstanceOf[String] must beEqualTo(q2id)
     }
   }
 
