@@ -380,7 +380,8 @@ private[mongo] class MongoUserDAO
         ("$pop" -> MongoDBObject(
           "history.votedQuestProposalIds" -> 1,
           "history.solvedQuestIds" -> 1,
-          "history.votedQuestSolutionIds" -> 1))))
+          "history.votedQuestSolutionIds" -> 1,
+          "history.likedQuestProposalIds" -> 1))))
   }
 
   /**
@@ -402,13 +403,21 @@ private[mongo] class MongoUserDAO
    *
    */
   def rememberProposalVotingInHistory(id: String, questId: String, liked: Boolean): Option[User] = {
-    // TODO: push to liked here as well.
-    // TODO: test me.
+    // TODO: !!! test me.
+    
+    val queryBuilder = MongoDBObject.newBuilder
+    
+    queryBuilder += ("$push" -> MongoDBObject(
+          "history.votedQuestProposalIds.0" -> questId))
+
+    if (liked) {
+      queryBuilder += ("$push" -> MongoDBObject(
+          "history.likedQuestProposalIds.0" -> questId))
+    }
+    
     findAndModify(
       id,
-      MongoDBObject(
-        ("$push" -> MongoDBObject(
-          "history.votedQuestProposalIds.0" -> questId))))
+      queryBuilder.result)
   }
 
   /**

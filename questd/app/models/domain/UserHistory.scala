@@ -14,4 +14,3 @@ case class UserHistory(
   selectedThemeIds: List[String] = List()
   )
 
-// TODO: skip likedQuestProposals on day.
