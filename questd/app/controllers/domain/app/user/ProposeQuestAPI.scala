@@ -80,7 +80,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
               OkApiResult(Some(PurchaseQuestThemeResult(OK, u.map(_.profile))))
             }
             
-            case None => OkApiResult(Some(PurchaseQuestThemeResult(NotEnoughAssets)))
+            case None => OkApiResult(Some(PurchaseQuestThemeResult(OutOfContent)))
           }
         }
 
