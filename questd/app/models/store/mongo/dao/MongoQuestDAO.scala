@@ -27,9 +27,9 @@ private[mongo] class MongoQuestDAO
         ("themeID" -> themeID)),
       MongoDBObject("rating.points" -> -1))
   }
-// TODO: !!! unit test the function.
+
   def allWithParams(
-      status: Option[String], 
+      status: Option[String] = None, 
       userIds: List[String] = List(), 
       levels: Option[(Int, Int)] = None, 
       skip: Int = 0,

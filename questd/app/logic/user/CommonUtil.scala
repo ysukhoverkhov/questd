@@ -64,7 +64,7 @@ trait CommonUtil { this: UserLogic =>
     if (l.length > 0) {
 
       // This is required since salat makes embedded lists as BasicDBLists.
-      val rv = if (l.head.getClass() == classOf[BasicDBList]) { // TODO: replace here object with string or find a way how to deserialize with correct objects.
+      val rv = if (l.head.getClass() == classOf[BasicDBList]) {
         for ( // TODO rewrite me with flat map after test.
           out <- l.asInstanceOf[List[BasicDBList]];
           in <- out.toArray().asInstanceOf[Array[C]];

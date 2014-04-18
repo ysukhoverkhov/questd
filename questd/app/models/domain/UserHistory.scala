@@ -6,8 +6,8 @@ package models.domain
  * We store here 2, 2 lists since salat serializes them incorrectly in other case.
  */
 case class UserHistory(
-  votedQuestProposalIds: List[List[String]] = List(List("", ""), List("", "")), // TODO: change me to 2 and fix all errors.
-  likedQuestProposalIds: List[List[String]] = List(List("", ""), List("", "")), // TODO: add me on like.
+  votedQuestProposalIds: List[List[String]] = List(List("", ""), List("", "")), 
+  likedQuestProposalIds: List[List[String]] = List(List("", ""), List("", "")), 
   solvedQuestIds: List[List[String]] = List(List("", ""), List("", "")),
   votedQuestSolutionIds: List[List[String]] = List(List("", ""), List("", "")),
   
