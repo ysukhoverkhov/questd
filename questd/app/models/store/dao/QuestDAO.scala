@@ -16,13 +16,16 @@ trait QuestDAO extends BaseDAO[Quest] {
 
   /**
    * All with status and users.
+   * 
+   * @param ids list of identifiers chose quest from. 
    */
   def allWithParams(
       status: Option[String], 
       userIds: List[String] = List(), 
       levels: Option[(Int, Int)] = None, 
       skip: Int = 0,
-      vip: Option[Boolean] = None): Iterator[Quest]
+      vip: Option[Boolean] = None,
+      ids: List[String] = List()): Iterator[Quest]
 
   /**
    * Update quest's points.

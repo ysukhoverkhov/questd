@@ -33,7 +33,7 @@ private [domain] trait QuestsAdminAPI { this: DBAccessor =>
   def allQuestsOnVoting: ApiResult[AllQuestsResult] = handleDbException {
     OkApiResult(Some(AllQuestsResult(db.quest.allWithParams(
         status = Some(QuestStatus.OnVoting.toString),
-        levels = Some(1, logic.constants.maxLevel)))))
+        levels = Some(0, logic.constants.maxLevel)))))
   }
 
   /**

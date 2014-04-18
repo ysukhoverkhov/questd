@@ -72,7 +72,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
             {
               voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
             } map {
-              rememberProposalVotingInHistory(RememberProposalVotingRequest(request.user, q.id))
+              rememberProposalVotingInHistory(RememberProposalVotingRequest(request.user, q.id, request.vote == QuestProposalVote.Cool))
             } map {
 
               adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))

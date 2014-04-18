@@ -40,7 +40,7 @@ trait VotingQuestSolutions { this: UserLogic =>
     val solutions = api.allQuestSolutionsOnVoting(
       AllQuestSolutionsRequest(user.profile.publicProfile.level - constants.solutionLevelDownTolerance, user.profile.publicProfile.level + constants.solutionLevelUpTolerance)).body.get.quests
 
-    selectQuest[QuestSolution](solutions, (_.id), (_.userID), user.history.votedQuestSolutionIds)
+    selectQuestSolution(solutions, user.history.votedQuestSolutionIds)
   }
 
   /**

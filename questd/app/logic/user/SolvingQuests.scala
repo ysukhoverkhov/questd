@@ -15,7 +15,6 @@ import controllers.domain.admin._
 import controllers.domain._
 import controllers.domain.app.user._
 
-
 /**
  * All logic related to solving quests.
  */
@@ -60,16 +59,19 @@ trait SolvingQuests { this: UserLogic =>
    */
   def getRandomQuestForSolution: Option[Quest] = {
     val quests = getQuests
-    selectQuest[Quest](quests, (_.id), (_.authorUserID), user.history.solvedQuestIds) orElse {
-      val regularQuests = getOtherQuests.getOrElse(List().iterator)
-      selectQuest[Quest](regularQuests, (_.id), (_.authorUserID), user.history.solvedQuestIds)
-    } orElse {
-      val allQuests = api.allQuestsInRotation(
-        AllQuestsRequest(
-          user.profile.publicProfile.level - questLevelToleranceDown,
-          user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
-      selectQuest[Quest](allQuests, (_.id), (_.authorUserID), user.history.solvedQuestIds)
-    }
+
+    selectQuest(quests, user.history.solvedQuestIds) orElse {
+
+        val regularQuests = getOtherQuests.getOrElse(List().iterator)
+        selectQuest(quests, user.history.solvedQuestIds)
+      } orElse {
+
+        val allQuests = api.allQuestsInRotation(
+          AllQuestsRequest(
+            user.profile.publicProfile.level - questLevelToleranceDown,
+            user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
+        selectQuest(allQuests, user.history.solvedQuestIds)
+      }
   }
 
   private def getQuests = {
@@ -145,19 +147,22 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getLikedQuests = {
-    Logger.error("getLikedQuests")
-    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+    Logger.debug("Returning quests we liked recently")
+    Some(api.getLikedQuests(GetLikedQuestsRequest(
+      user,
+      user.profile.publicProfile.level - questLevelToleranceDown,
+      user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
 
-  private def getVIPQuests = {
+  private def getVIPQuests = { // TODO: weight me by favorite themes.
     Logger.debug("Returning VIP quests")
     Some(api.getVIPQuests(GetVIPQuestsRequest(
       user,
       user.profile.publicProfile.level - questLevelToleranceDown,
       user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
-  
-  private def getOtherQuests = {
+
+  private def getOtherQuests = { // TODO implement me.
     Logger.error("getOtherQuests")
     Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }

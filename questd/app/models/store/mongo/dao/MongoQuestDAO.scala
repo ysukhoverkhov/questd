@@ -27,16 +27,21 @@ private[mongo] class MongoQuestDAO
         ("themeID" -> themeID)),
       MongoDBObject("rating.points" -> -1))
   }
-
+// TODO: !!! unit test the function.
   def allWithParams(
       status: Option[String], 
       userIds: List[String] = List(), 
       levels: Option[(Int, Int)] = None, 
       skip: Int = 0,
-      vip: Option[Boolean] = None): Iterator[Quest] = {
+      vip: Option[Boolean] = None,
+      ids: List[String] = List()): Iterator[Quest] = {
     
     val queryBuilder = MongoDBObject.newBuilder
 
+    if (ids.length > 0) {
+      queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
+    }
+    
     if (status != None) {
       queryBuilder += ("status" -> status.get)
     }

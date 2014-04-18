@@ -186,9 +186,11 @@ trait ProposingQuests { this: UserLogic =>
    * Select theme from returned iterator what is not contained in given list.
    */
   private def selectTheme(i: Iterator[Theme], usedThemesIds: List[String]): Option[Theme] = {
+    Logger.trace("In selectTheme")
     if (i.hasNext) {
       val t = i.next()
 
+      Logger.trace("Checking used themes to have reviewed theme in: " + t.id + " IN " + usedThemesIds)
       if (!usedThemesIds.contains(t.id)) {
         Logger.trace("  Theme selected: " + t.id)
         Some(t)

@@ -51,6 +51,8 @@ case class GetShortlistQuestsResult(quests: Iterator[Quest])
 case class GetVIPQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
 case class GetVIPQuestsResult(quests: Iterator[Quest])
 
+case class GetLikedQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
+case class GetLikedQuestsResult(quests: Iterator[Quest])
 
 
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -388,6 +390,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       Some(QuestStatus.InRotation.toString),
       request.user.shortlist,
       Some(request.fromLevel, request.toLevel)))))
+  }
+  // TODO: test db is called with correct params here.
+  def getLikedQuests(request: GetLikedQuestsRequest): ApiResult[GetLikedQuestsResult] = handleDbException {
+    OkApiResult(Some(GetLikedQuestsResult(db.quest.allWithParams(
+      status = Some(QuestStatus.InRotation.toString),
+      levels = Some(request.fromLevel, request.toLevel),
+      ids = request.user.history.likedQuestProposalIds.flatten))))
   }
   
   def getVIPQuests(request: GetVIPQuestsRequest): ApiResult[GetVIPQuestsResult] = handleDbException {

@@ -17,7 +17,7 @@ case class ShiftStatsResult()
 case class ShiftHistoryRequest(user: User)
 case class ShiftHistoryResult()
 
-case class RememberProposalVotingRequest(user: User, proposalId: String)
+case class RememberProposalVotingRequest(user: User, questId: String, liked: Boolean)
 case class RememberProposalVotingResult()
 
 case class RememberQuestSolvingRequest(user: User, questId: String)
@@ -94,7 +94,7 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def rememberProposalVotingInHistory(request: RememberProposalVotingRequest): ApiResult[RememberProposalVotingResult] = handleDbException {
     import request._
     
-    db.user.rememberProposalVotingInHistory(user.id, request.proposalId)
+    db.user.rememberProposalVotingInHistory(user.id, request.questId, request.liked)
     
     OkApiResult(Some(RememberProposalVotingResult()))
   }

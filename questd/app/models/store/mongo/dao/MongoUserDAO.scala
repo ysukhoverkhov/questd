@@ -401,12 +401,14 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def rememberProposalVotingInHistory(id: String, proposalId: String): Option[User] = {
+  def rememberProposalVotingInHistory(id: String, questId: String, liked: Boolean): Option[User] = {
+    // TODO: push to liked here as well.
+    // TODO: test me.
     findAndModify(
       id,
       MongoDBObject(
         ("$push" -> MongoDBObject(
-          "history.votedQuestProposalIds.0" -> proposalId))))
+          "history.votedQuestProposalIds.0" -> questId))))
   }
 
   /**

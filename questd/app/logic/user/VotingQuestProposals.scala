@@ -49,9 +49,12 @@ trait VotingQuestProposals { this: UserLogic =>
    * @return None if no more quests to vote for today.
    */
   def getQuestProposalToVote: Option[Quest] = {
+    Logger.trace("Selecting quest proposal to vote")
+    
     val quests = api.allQuestsOnVoting.body.get.quests
-
-    selectQuest[Quest](quests, (_.id), (_.authorUserID), user.history.votedQuestProposalIds)
+    Logger.trace("There are " + api.allQuestsOnVoting.body.get.quests.size + " quests on voting")
+    
+    selectQuest(quests, user.history.votedQuestProposalIds)
   }
 
   /**
