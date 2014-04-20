@@ -60,31 +60,27 @@ trait CommonUtil { this: UserLogic =>
   /**
    * Check is string in list of dblists of strings.
    */
-  private def listOfListsContainsString[C](l: List[List[C]], getQuestIdInReference: (C => String), s: String) = {
+  private[user] def listOfListsContainsString[C](l: List[List[C]], getQuestIdInReference: (C => String), s: String) = {
     if (l.length > 0) {
 
       // This is required since salat makes embedded lists as BasicDBLists.
-      val rv = if (l.head.getClass() == classOf[BasicDBList]) {
-        for ( // TODO rewrite me with flat map after test.
+      if (l.head.getClass() == classOf[BasicDBList]) {
+        val rv = for ( // TODO rewrite me with flat map after test.
           out <- l.asInstanceOf[List[BasicDBList]];
           in <- out.toArray().asInstanceOf[Array[C]];
           if getQuestIdInReference(in) == s
         ) yield {
           true
         }
+        
+      rv.length > 0
+        
       } else {
-        for ( // TODO rewrite me with flat map after test.
-          out <- l;
-          in <- out;
-          if getQuestIdInReference(in) == s
-        ) yield {
-          true
-        }
+        l.flatten.contains(s)
       }
 
-      rv.length > 0
-
     } else {
+      // False if length of array is 0
       false
     }
   }
