@@ -162,8 +162,8 @@ trait SolvingQuests { this: UserLogic =>
       user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
 
-  private def getOtherQuests = { // TODO implement me.
-    Logger.error("getOtherQuests")
+  private def getOtherQuests = { // TODO weight me by favorite themes.
+    Logger.debug("getOtherQuests")
     Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
   /**
