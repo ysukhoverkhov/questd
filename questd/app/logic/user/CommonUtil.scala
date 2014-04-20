@@ -3,6 +3,7 @@ package logic.user
 import logic.UserLogic
 import com.mongodb.BasicDBList
 import models.domain._
+import com.mongodb.BasicDBObject
 
 trait CommonUtil { this: UserLogic =>
 
@@ -56,7 +57,6 @@ trait CommonUtil { this: UserLogic =>
     }
   }
   
-// TODO: write test for me.
   /**
    * Check is string in list of dblists of strings.
    */
@@ -65,10 +65,10 @@ trait CommonUtil { this: UserLogic =>
 
       // This is required since salat makes embedded lists as BasicDBLists.
       if (l.head.getClass() == classOf[BasicDBList]) {
-        val rv = for ( // TODO rewrite me with flat map after test.
+        val rv = for (
           out <- l.asInstanceOf[List[BasicDBList]];
-          in <- out.toArray().asInstanceOf[Array[C]];
-          if getQuestIdInReference(in) == s
+          in <- out.toArray().asInstanceOf[Array[Object]];
+          if getQuestIdInReference(in.asInstanceOf[C]) == s
         ) yield {
           true
         }
@@ -76,11 +76,12 @@ trait CommonUtil { this: UserLogic =>
       rv.length > 0
         
       } else {
+        // if we are dealing not with sic BasicDBList just do it in a nice way.
         l.flatten.contains(s)
       }
 
     } else {
-      // False if length of array is 0
+      // False if length of array is 0. This is required since we need to check type of first element in the array.
       false
     }
   }

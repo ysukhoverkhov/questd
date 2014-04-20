@@ -28,6 +28,8 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
     user.canGetQuestProposalForVote match {
       case OK => {
 
+        Logger.trace("getQuestProposalToVote - we are eligable to vote quest.")
+        
         // Updating user profile.
         val q = user.getQuestProposalToVote
 
@@ -72,6 +74,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
             {
               voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
             } map {
+              // TODO: this do the same as bellow.
               rememberProposalVotingInHistory(RememberProposalVotingRequest(request.user, q.id, request.vote == QuestProposalVote.Cool))
             } map {
 
@@ -80,6 +83,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
               // 3. update user profile.
               // 4. save profile in db.
               val liked = (request.vote == QuestProposalVote.Cool)
+              // TODO: this do the same as above.
               val u = db.user.recordQuestProposalVote(r.user.id, liked)
 
               val author = if (liked) {
