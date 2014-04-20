@@ -37,7 +37,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
           case None => OkApiResult(Some(GetQuestProposalToVoteResult(OutOfContent)))
           case Some(a) => {
             val qi = QuestInfoWithID(a.id, a.info)
-            val theme = db.theme.readByID(a.themeID)
+            val theme = db.theme.readByID(a.info.themeId)
 
             if (theme == None) {
               Logger.error("API - getQuestProposalToVote. Unable to find theme for quest.")

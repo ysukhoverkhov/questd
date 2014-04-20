@@ -68,7 +68,8 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     
     db.user.addFreshDayToHistory(user.id)
     clearOldDaysHistory(user)
-    clearOldThemesHistory(user)
+    clearOldThemesSelectedHistory(user)
+    clearOldQuestThemesHistory(user)
     
     def clearOldDaysHistory(u: User): User = {
 	  if (u.history.votedQuestProposalIds.length > daysHistoryDepth) {
@@ -78,9 +79,16 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       }
     }
     
-    def clearOldThemesHistory(u: User): User = {
+    def clearOldThemesSelectedHistory(u: User): User = {
       if (u.history.selectedThemeIds.length > themesHistoryDepth)
         db.user.removeLastThemesFromHistory(u.id, u.history.selectedThemeIds.length - themesHistoryDepth).get
+      else
+        u
+    }
+
+    def clearOldQuestThemesHistory(u: User): User = {
+      if (u.history.themesOfSelectedQuests.length > themesHistoryDepth)
+        db.user.removeLastQuestThemesFromHistory(u.id, u.history.themesOfSelectedQuests.length - themesHistoryDepth).get
       else
         u
     }

@@ -66,10 +66,15 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
   private def createQuest(newid: String, authorid: String) = {
     Quest(
       id = newid,
-      themeID = "theme_id",
       authorUserID = authorid,
       approveReward = Assets(1, 2, 3),
-      info = QuestInfo(QuestInfoContent(media = ContentReference("", "", ""), icon = None, description = "descr")))
+      info = QuestInfo(
+        themeId = "theme_id",
+        content = QuestInfoContent(
+
+          media = ContentReference(ContentType.Video.toString, "", ""),
+          icon = None,
+          description = "The description")))
   }
 
   "User Logic" should {
@@ -125,7 +130,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       q must beSome.which(q => q.id == qid)
     }
-    
+
     "Return VIP quest if dice rolls so" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75

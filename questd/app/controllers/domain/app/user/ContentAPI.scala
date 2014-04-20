@@ -84,13 +84,13 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     db.quest.readByID(questId) match {
       case Some(q) => {
-        db.theme.readByID(q.themeID) match {
+        db.theme.readByID(q.info.themeId) match {
           case Some(t) => {
             OkApiResult(Some(GetQuestResult(OK, Some(q.info), Some(t))))
           }
 
           case None => {
-            Logger.error("API - getQuest. Theme is missing for id = " + q.themeID)
+            Logger.error("API - getQuest. Theme is missing for id = " + q.info.themeId)
             InternalErrorApiResult()
           }
         }

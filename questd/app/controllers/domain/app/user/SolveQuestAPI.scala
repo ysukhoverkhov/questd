@@ -177,7 +177,11 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             Logger.error("API - takeQuest. Purchased quest is None")
             InternalErrorApiResult()
           } else {
-            val u = db.user.takeQuest(r.user.id, pq.get, r.user.getCooldownForTakeQuest(pq.get.obj), r.user.getDeadlineForTakeQuest(pq.get.obj))
+            val u = db.user.takeQuest(
+                r.user.id, 
+                pq.get, 
+                r.user.getCooldownForTakeQuest(pq.get.obj), 
+                r.user.getDeadlineForTakeQuest(pq.get.obj))
             OkApiResult(Some(TakeQuestResult(OK, u.map(_.profile))))
           }
         }

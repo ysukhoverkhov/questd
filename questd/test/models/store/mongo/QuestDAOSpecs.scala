@@ -30,10 +30,11 @@ class QuestDAOSpecs extends Specification
 
       db.quest.create(Quest(
         id = id,
-        themeID = "theme_id",
+
         authorUserID = "user id",
         approveReward = Assets(),
         info = QuestInfo(
+          themeId = "theme_id",
           content = QuestInfoContent(
 
             media = ContentReference(ContentType.Video.toString, "", ""),
@@ -52,10 +53,10 @@ class QuestDAOSpecs extends Specification
 
       db.quest.create(Quest(
         id = id,
-        themeID = "theme_id",
         authorUserID = "user id",
         approveReward = Assets(),
         info = QuestInfo(
+          themeId = "theme_id",
           content = QuestInfoContent(
 
             media = ContentReference(ContentType.Video.toString, "", ""),
@@ -83,10 +84,10 @@ class QuestDAOSpecs extends Specification
 
       db.quest.create(Quest(
         id = id,
-        themeID = "theme_id",
         authorUserID = "user id",
         approveReward = Assets(),
         info = QuestInfo(
+          themeId = "theme_id",
           content = QuestInfoContent(
             media = ContentReference(ContentType.Video.toString, "", ""),
             icon = None,
@@ -108,10 +109,10 @@ class QuestDAOSpecs extends Specification
       val qs = List(
         Quest(
           id = "q1",
-          themeID = "theme_id",
           authorUserID = "q1_author id",
           approveReward = Assets(),
           info = QuestInfo(
+            themeId = "theme_id",
             content = QuestInfoContent(
               media = ContentReference(ContentType.Video.toString, "", ""),
               icon = None,
@@ -122,10 +123,10 @@ class QuestDAOSpecs extends Specification
 
         Quest(
           id = "q2",
-          themeID = "theme_id",
           authorUserID = "q2_author id",
           approveReward = Assets(),
           info = QuestInfo(
+            themeId = "theme_id",
             content = QuestInfoContent(
               media = ContentReference(ContentType.Video.toString, "", ""),
               icon = None,
@@ -136,10 +137,10 @@ class QuestDAOSpecs extends Specification
 
         Quest(
           id = "q3",
-          themeID = "theme_id",
           authorUserID = "q3_author id",
           approveReward = Assets(),
           info = QuestInfo(
+            themeId = "theme_id",
             content = QuestInfoContent(
               media = ContentReference(ContentType.Video.toString, "", ""),
               icon = None,
@@ -152,14 +153,14 @@ class QuestDAOSpecs extends Specification
 
       val all = db.quest.allWithParams()
       all.size must beEqualTo(qs.size)
-      
+
       val status = db.quest.allWithParams(status = Some(QuestStatus.OnVoting.toString)).toList
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
-      
+
       val userids = db.quest.allWithParams(userIds = List("q2_author id")).toList
       userids.map(_.id) must beEqualTo(List(qs(1).id))
-      
+
       val levels = db.quest.allWithParams(levels = Some((1, 10))).toList
       levels.map(_.id).size must beEqualTo(2)
       levels.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
@@ -175,7 +176,7 @@ class QuestDAOSpecs extends Specification
       val statusVip = db.quest.allWithParams(status = Some(QuestStatus.OnVoting.toString), vip = Some(false)).toList
       statusVip.map(_.id).size must beEqualTo(1)
       statusVip.map(_.id) must beEqualTo(List(qs(0).id))
-      
+
       val ids = db.quest.allWithParams(ids = List("q1", "q2"), vip = Some(true)).toList
       ids.map(_.id).size must beEqualTo(1)
       ids.map(_.id) must beEqualTo(List(qs(1).id))

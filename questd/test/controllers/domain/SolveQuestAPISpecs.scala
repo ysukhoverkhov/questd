@@ -65,6 +65,26 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         null)
     }
 
+    "getLikedQuests calls db correctly" in context {
+
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4")) returns List().iterator
+
+      
+      val liked = List(
+          List("1", "2"),
+          List("3", "4")) 
+      val u = User(history = UserHistory(likedQuestProposalIds = liked))
+      val result = api.getLikedQuests(GetLikedQuestsRequest(u, 1, 2))
+
+      there was one(quest).allWithParams(
+        Some(QuestStatus.InRotation.toString),
+        null,
+        Some(1, 2),
+        0,
+        null,
+        List("1", "2", "3", "4"))
+    }
+    
     "getVIPQuests calls db correctly" in context {
 
       db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List()) returns List().iterator

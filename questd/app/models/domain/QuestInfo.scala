@@ -14,6 +14,7 @@ case class QuestInfoContent(
   description: String)
 
 case class QuestInfo(
+  themeId: String,
   content: QuestInfoContent,
   level: Int = 0,
   duration: String = QuestDuration.Minutes.toString,

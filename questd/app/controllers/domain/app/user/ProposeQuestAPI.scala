@@ -79,7 +79,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
               val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t), sampleQuest, reward)
               OkApiResult(Some(PurchaseQuestThemeResult(OK, u.map(_.profile))))
             }
-            
+
             case None => OkApiResult(Some(PurchaseQuestThemeResult(OutOfContent)))
           }
         }
@@ -136,10 +136,10 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
         db.quest.create(
           Quest(
-            themeID = user.profile.questProposalContext.takenTheme.get.id,
             authorUserID = user.id,
             approveReward = user.profile.questProposalContext.approveReward,
             info = QuestInfo(
+              themeId = user.profile.questProposalContext.takenTheme.get.id,
               content = request.quest)))
 
         val u = db.user.resetQuestProposal(user.id)

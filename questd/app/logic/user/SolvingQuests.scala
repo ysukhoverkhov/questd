@@ -154,7 +154,9 @@ trait SolvingQuests { this: UserLogic =>
       user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
 
-  private def getVIPQuests = { // TODO: weight me by favorite themes.
+  private def getVIPQuests = {
+    // TODO: get 3 random theme of selected themes.
+    // TODO: filter by one of its themes.
     Logger.debug("Returning VIP quests")
     Some(api.getVIPQuests(GetVIPQuestsRequest(
       user,
@@ -162,7 +164,10 @@ trait SolvingQuests { this: UserLogic =>
       user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
 
-  private def getOtherQuests = { // TODO weight me by favorite themes.
+  private def getOtherQuests = {
+    // TODO: record themes of all selected quests.
+    // TODO: get random theme of selected themes.
+    // TODO: filter by one of its themes.
     Logger.debug("getOtherQuests")
     Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }

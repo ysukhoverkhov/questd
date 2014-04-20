@@ -145,7 +145,9 @@ private[mongo] class MongoUserDAO
         ("$unset" -> MongoDBObject(
           "profile.questSolutionContext.purchasedQuest" -> "")),
         ("$inc" -> MongoDBObject(
-          "stats.questsAccepted" -> 1))))
+          "stats.questsAccepted" -> 1)),
+        ("$addToSet" -> MongoDBObject(
+          "history.themesOfSelectedQuests" -> takenQuest.obj.themeId))))
   }
 
   /**
@@ -394,6 +396,21 @@ private[mongo] class MongoUserDAO
         MongoDBObject(
           ("$pop" -> MongoDBObject(
             "history.selectedThemeIds" -> -1))))
+    } reduce { (r, c) =>
+      r
+    }
+  }
+
+  /**
+   * 
+   */
+  def removeLastQuestThemesFromHistory(id: String, themesToRemove: Int): Option[User] = {
+    (1 to themesToRemove) map { a: Int =>
+      findAndModify(
+        id,
+        MongoDBObject(
+          ("$pop" -> MongoDBObject(
+            "history.themesOfSelectedQuests" -> -1))))
     } reduce { (r, c) =>
       r
     }

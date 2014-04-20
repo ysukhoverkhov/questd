@@ -24,7 +24,7 @@ private[mongo] class MongoQuestDAO
     findByExample(
       MongoDBObject(
         ("status" -> status),
-        ("themeID" -> themeID)),
+        ("info.themeId" -> themeID)),
       MongoDBObject("rating.points" -> -1))
   }
 
