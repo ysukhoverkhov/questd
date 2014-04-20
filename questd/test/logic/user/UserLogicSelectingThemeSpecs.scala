@@ -1,4 +1,4 @@
-package logic.userlogic
+package logic.user
 
 import org.specs2.mutable._
 import org.specs2.runner._

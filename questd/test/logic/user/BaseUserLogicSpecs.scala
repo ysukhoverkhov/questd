@@ -1,4 +1,4 @@
-package logic.userlogic
+package logic.user
 
 import org.specs2.mutable._
 import org.specs2.mock.Mockito
@@ -10,7 +10,7 @@ import models.store.DatabaseComponent
 import controllers.domain.admin._
 import logic.LogicBootstrapper
 
-private[userlogic] abstract class BaseUserLogicSpecs extends Specification 
+private[user] abstract class BaseUserLogicSpecs extends Specification 
   with Mockito 
   with LogicBootstrapper 
   with APIAccessor
