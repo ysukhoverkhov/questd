@@ -169,6 +169,27 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
+    "Return All quest with favorite theme ids if dice rolls so" in {
+      val qid = "qid"
+      val u = User(
+        history = UserHistory(
+          themesOfSelectedQuests = List("1", "2", "3", "4")))
+
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.95
+      rand.nextInt(4) returns 1
+
+      api.getAllQuests(GetAllQuestsRequest(u, -2, 19, List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+
+      val q = u.getRandomQuestForSolution
+
+      there was one(rand).nextDouble
+      there was one(rand).nextInt(4)
+      there was one(api).getAllQuests(GetAllQuestsRequest(u, -2, 19, List("2")))
+
+      q must beSome.which(q => q.id == qid)
+    }
+    
   }
 }
 

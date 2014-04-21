@@ -104,6 +104,22 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         null,
         List("a"))
     }
+
+    "getAllQuests calls db correctly" in context {
+
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, None, List(), List("a")) returns List().iterator
+
+      val result = api.getAllQuests(GetAllQuestsRequest(User(), 1, 2, List("a")))
+
+      there was one(quest).allWithParams(
+        Some(QuestStatus.InRotation.toString),
+        null,
+        Some(1, 2),
+        0,
+        null,
+        null,
+        List("a"))
+    }
   }
 }
 

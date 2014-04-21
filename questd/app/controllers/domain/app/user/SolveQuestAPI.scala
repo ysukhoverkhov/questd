@@ -54,6 +54,9 @@ case class GetVIPQuestsResult(quests: Iterator[Quest])
 case class GetLikedQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
 case class GetLikedQuestsResult(quests: Iterator[Quest])
 
+case class GetAllQuestsRequest(user: User, fromLevel: Int, toLevel: Int, themeIds: List[String])
+case class GetAllQuestsResult(quests: Iterator[Quest])
+
 
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -408,6 +411,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       status = Some(QuestStatus.InRotation.toString),
       levels = Some(request.fromLevel, request.toLevel),
       vip = Some(true),
+      themeIds = request.themeIds))))
+  }
+
+  def getAllQuests(request: GetAllQuestsRequest): ApiResult[GetAllQuestsResult] = handleDbException {
+    OkApiResult(Some(GetAllQuestsResult(db.quest.allWithParams(
+      status = Some(QuestStatus.InRotation.toString),
+      levels = Some(request.fromLevel, request.toLevel),
       themeIds = request.themeIds))))
   }
   

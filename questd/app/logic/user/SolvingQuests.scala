@@ -157,14 +157,7 @@ trait SolvingQuests { this: UserLogic =>
   private def getVIPQuests = {
     Logger.debug("Returning VIP quests")
 
-    val themeIds = if (user.history.themesOfSelectedQuests.length > 0) {
-      for (i <- (1 to numberOfFavoriteThemesForVIPQuests).toList) yield {
-        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
-      }
-    } else {
-      List()
-    }
-
+    val themeIds = selectRandomThemes(numberOfFavoriteThemesForVIPQuests)
     Logger.trace("Selected themes of vip's quests: " + themeIds.mkString(", "))
 
     Some(api.getVIPQuests(GetVIPQuestsRequest(
@@ -175,12 +168,30 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getOtherQuests = {
-    // TODO: record themes of all selected quests.
-    // TODO: get random theme of selected themes.
-    // TODO: filter by one of its themes.
     Logger.debug("getOtherQuests")
-    Some(api.allQuestsInRotation(AllQuestsRequest(user.profile.publicProfile.level - questLevelToleranceDown, user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+
+    // TODO: record themes of all selected quests.
+    val themeIds = selectRandomThemes(numberOfFavoriteThemesForOtherQuests)
+    Logger.trace("Selected themes of other quests: " + themeIds.mkString(", "))
+
+    Some(api.getAllQuests(GetAllQuestsRequest(
+      user,
+      user.profile.publicProfile.level - questLevelToleranceDown,
+      user.profile.publicProfile.level + questLevelToleranceUp,
+      themeIds)).body.get.quests)
   }
+  
+  private def selectRandomThemes(count: Int): List[String] = {
+    if (user.history.themesOfSelectedQuests.length > 0) {
+      for (i <- (1 to count).toList) yield {
+        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
+      }
+    } else {
+      List()
+    }
+  }
+
+  
   /**
    * Check are we able to take quest.
    */
