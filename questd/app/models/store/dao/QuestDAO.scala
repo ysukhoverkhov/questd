@@ -20,12 +20,13 @@ trait QuestDAO extends BaseDAO[Quest] {
    * @param ids list of identifiers chose quest from. 
    */
   def allWithParams(
-      status: Option[String], 
+      status: Option[String] = None, 
       userIds: List[String] = List(), 
       levels: Option[(Int, Int)] = None, 
       skip: Int = 0,
       vip: Option[Boolean] = None,
-      ids: List[String] = List()): Iterator[Quest]
+      ids: List[String] = List(),
+      themeIds: List[String] = List()): Iterator[Quest]
 
   /**
    * Update quest's points.

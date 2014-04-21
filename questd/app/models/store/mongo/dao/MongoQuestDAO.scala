@@ -34,21 +34,17 @@ private[mongo] class MongoQuestDAO
       levels: Option[(Int, Int)] = None, 
       skip: Int = 0,
       vip: Option[Boolean] = None,
-      ids: List[String] = List()): Iterator[Quest] = {
+      ids: List[String] = List(),
+      themeIds: List[String] = List()): Iterator[Quest] = {
     
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (ids.length > 0) {
-      queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
-    }
-    
     if (status != None) {
       queryBuilder += ("status" -> status.get)
     }
 
     if (userIds.length > 0) {
       queryBuilder += ("authorUserID" -> MongoDBObject("$in" -> userIds))
-
     }
 
     if (levels != None) {
@@ -59,6 +55,14 @@ private[mongo] class MongoQuestDAO
     
     if (vip != None) {
       queryBuilder += ("info.vip" -> vip.get)
+    }
+
+    if (ids.length > 0) {
+      queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
+    }
+
+    if (themeIds.length > 0) {
+      queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
     }
 
     findByExample(

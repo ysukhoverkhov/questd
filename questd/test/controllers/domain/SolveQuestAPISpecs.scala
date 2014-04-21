@@ -35,8 +35,8 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val u = createUser(List(Friendship(f1.id, FriendshipStatus.Accepted.toString), Friendship(f2.id, FriendshipStatus.Invited.toString)))
 
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0, None, List()) returns List().iterator
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0, None, List()) returns List().iterator
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
 
       val result = api.getFriendsQuests(GetFriendsQuestsRequest(u, 1, 2))
 
@@ -46,6 +46,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         Some(1, 2),
         0,
         null,
+        null,
         null)
 
       there was no(quest).allWithParams(
@@ -53,6 +54,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         List(),
         Some(1, 2),
         0,
+        null,
         null,
         null)
         
@@ -62,12 +64,13 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         Some(1, 2),
         0,
         null,
+        null,
         null)
     }
 
     "getLikedQuests calls db correctly" in context {
 
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4")) returns List().iterator
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator
 
       
       val liked = List(
@@ -82,12 +85,13 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         Some(1, 2),
         0,
         null,
-        List("1", "2", "3", "4"))
+        List("1", "2", "3", "4"),
+        null)
     }
     
     "getVIPQuests calls db correctly" in context {
 
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List()) returns List().iterator
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List(), List()) returns List().iterator
 
       val result = api.getVIPQuests(GetVIPQuestsRequest(User(), 1, 2))
 
@@ -97,6 +101,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         Some(1, 2),
         0,
         Some(true),
+        null,
         null)
     }
   }

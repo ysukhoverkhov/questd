@@ -112,7 +112,7 @@ class QuestDAOSpecs extends Specification
           authorUserID = "q1_author id",
           approveReward = Assets(),
           info = QuestInfo(
-            themeId = "theme_id",
+            themeId = "t1",
             content = QuestInfoContent(
               media = ContentReference(ContentType.Video.toString, "", ""),
               icon = None,
@@ -126,7 +126,7 @@ class QuestDAOSpecs extends Specification
           authorUserID = "q2_author id",
           approveReward = Assets(),
           info = QuestInfo(
-            themeId = "theme_id",
+            themeId = "t2",
             content = QuestInfoContent(
               media = ContentReference(ContentType.Video.toString, "", ""),
               icon = None,
@@ -140,7 +140,7 @@ class QuestDAOSpecs extends Specification
           authorUserID = "q3_author id",
           approveReward = Assets(),
           info = QuestInfo(
-            themeId = "theme_id",
+            themeId = "t3",
             content = QuestInfoContent(
               media = ContentReference(ContentType.Video.toString, "", ""),
               icon = None,
@@ -167,7 +167,7 @@ class QuestDAOSpecs extends Specification
 
       val levelsSkip = db.quest.allWithParams(levels = Some((1, 10)), skip = 1).toList
       levelsSkip.map(_.id).size must beEqualTo(1)
-      levelsSkip.map(_.id) must beEqualTo(List(qs(2).id))
+      levelsSkip.map(_.id) must beEqualTo(List(qs(2).id)) or beEqualTo(List(qs(0).id))
 
       val vip = db.quest.allWithParams(vip = Some(true)).toList
       vip.map(_.id).size must beEqualTo(2)
@@ -180,6 +180,14 @@ class QuestDAOSpecs extends Specification
       val ids = db.quest.allWithParams(ids = List("q1", "q2"), vip = Some(true)).toList
       ids.map(_.id).size must beEqualTo(1)
       ids.map(_.id) must beEqualTo(List(qs(1).id))
+
+      val themeIds = db.quest.allWithParams(themeIds = List("t1", "t3")).toList
+      themeIds.map(_.id).size must beEqualTo(2)
+      themeIds.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
+
+      val themeIdsAndIds = db.quest.allWithParams(ids = List("q1", "q2"), themeIds = List("t1", "t3")).toList
+      themeIdsAndIds.map(_.id).size must beEqualTo(1)
+      themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))
     }
 
   }
