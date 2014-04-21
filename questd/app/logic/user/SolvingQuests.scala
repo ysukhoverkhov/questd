@@ -62,16 +62,16 @@ trait SolvingQuests { this: UserLogic =>
 
     selectQuest(quests, user.history.solvedQuestIds) orElse {
 
-        val regularQuests = getOtherQuests.getOrElse(List().iterator)
-        selectQuest(quests, user.history.solvedQuestIds)
-      } orElse {
+      val regularQuests = getOtherQuests.getOrElse(List().iterator)
+      selectQuest(quests, user.history.solvedQuestIds)
+    } orElse {
 
-        val allQuests = api.allQuestsInRotation(
-          AllQuestsRequest(
-            user.profile.publicProfile.level - questLevelToleranceDown,
-            user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
-        selectQuest(allQuests, user.history.solvedQuestIds)
-      }
+      val allQuests = api.allQuestsInRotation(
+        AllQuestsRequest(
+          user.profile.publicProfile.level - questLevelToleranceDown,
+          user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
+      selectQuest(allQuests, user.history.solvedQuestIds)
+    }
   }
 
   private def getQuests = {
@@ -155,13 +155,23 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getVIPQuests = {
-    // TODO: get 3 random theme of selected themes.
-    // TODO: filter by one of its themes.
     Logger.debug("Returning VIP quests")
+
+    val themeIds = if (user.history.themesOfSelectedQuests.length > 0) {
+      for (i <- (1 to numberOfFavoriteThemesForVIPQuests).toList) yield {
+        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
+      }
+    } else {
+      List()
+    }
+
+    Logger.trace("Selected themes of vip's quests: " + themeIds.mkString(", "))
+
     Some(api.getVIPQuests(GetVIPQuestsRequest(
       user,
       user.profile.publicProfile.level - questLevelToleranceDown,
-      user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+      user.profile.publicProfile.level + questLevelToleranceUp,
+      themeIds)).body.get.quests)
   }
 
   private def getOtherQuests = {

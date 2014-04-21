@@ -55,6 +55,9 @@ object constants {
 
   val questSolutionGiveUpPenalty = 2
 
+  val numberOfFavoriteThemesForVIPQuests = 3
+  val numberOfFavoriteThemesForOtherQuests = 1
+
   /**
    * Multiplier is relative to base (average) rating for resolving quests per day.
    */

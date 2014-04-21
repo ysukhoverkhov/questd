@@ -91,9 +91,9 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
     
     "getVIPQuests calls db correctly" in context {
 
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List(), List()) returns List().iterator
+      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List(), List("a")) returns List().iterator
 
-      val result = api.getVIPQuests(GetVIPQuestsRequest(User(), 1, 2))
+      val result = api.getVIPQuests(GetVIPQuestsRequest(User(), 1, 2, List("a")))
 
       there was one(quest).allWithParams(
         Some(QuestStatus.InRotation.toString),
@@ -102,7 +102,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         0,
         Some(true),
         null,
-        null)
+        List("a"))
     }
   }
 }
