@@ -45,7 +45,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
     api.ConfigParams returns _ConfigParams
 
     val config = mock[ConfigSection]
-    
+
     config.apply(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests) returns "5"
     config.apply(api.ConfigParams.QuestProbabilityStartingVIPQuests) returns "0.50"
 
@@ -53,7 +53,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
     config.apply(api.ConfigParams.QuestProbabilityShortlist) returns "0.25"
     config.apply(api.ConfigParams.QuestProbabilityLiked) returns "0.20"
     config.apply(api.ConfigParams.QuestProbabilityStar) returns "0.10"
-    
+
     config
   }
 
@@ -205,7 +205,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       api.config returns createStubConfig
       rand.nextDouble returns 0.0
-          
+
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       u.getRandomQuestForSolution
@@ -222,7 +222,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       api.config returns createStubConfig
       rand.nextDouble returns 1.0
-          
+
       api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       u.getRandomQuestForSolution
@@ -230,9 +230,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       there was one(rand).nextDouble
       there was one(api).getAllQuests(any[GetAllQuestsRequest])
     }
-   
+
   }
 }
 
-
-// TODO: test each option out of posible quest slution options is selectable. 

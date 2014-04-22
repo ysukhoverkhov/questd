@@ -131,7 +131,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * TODO: write test for me.
+   * 
    */
   def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User] = {
     findAndModify(

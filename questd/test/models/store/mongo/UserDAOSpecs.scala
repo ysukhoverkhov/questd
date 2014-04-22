@@ -15,6 +15,8 @@ import models.domain.base.ThemeWithID
 import models.domain.base.ThemeWithID
 import org.specs2.matcher.BeEqualTo
 import com.mongodb.BasicDBList
+import models.domain.base.QuestInfoWithID
+import java.util.Date
 
 //@RunWith(classOf[JUnitRunner])
 class UserDAOSpecs
@@ -177,7 +179,7 @@ class UserDAOSpecs
       val userid = "rememberProposalVotingInHistory"
       val q1id = "q1id"
       val q2id = "q2id"
-        
+
       db.user.create(User(userid))
 
       db.user.rememberProposalVotingInHistory(userid, q1id, true)
@@ -186,14 +188,41 @@ class UserDAOSpecs
       val ou = db.user.readByID(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
 
-      val arr1 = ou.get.history.likedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray().collect{ case s: String => s }
+      val arr1 = ou.get.history.likedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray().collect { case s: String => s }
       arr1.size must beEqualTo(3) // 2 is "", "" stub in list of lists.
       arr1(2) must beEqualTo(q1id)
 
-      val arr2 = ou.get.history.votedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray().collect{ case s: String => s }
+      val arr2 = ou.get.history.votedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray().collect { case s: String => s }
       arr2.size must beEqualTo(4) // 2 is "", "" stub in list of lists.
       arr2(2).asInstanceOf[String] must beEqualTo(q1id)
       arr2(3).asInstanceOf[String] must beEqualTo(q2id)
+    }
+
+    "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {
+      val userid = "takeQuest2"
+      val themeId = "tid"
+
+      db.user.create(User(userid))
+
+      db.user.takeQuest(
+        userid,
+        QuestInfoWithID(
+          "q",
+          QuestInfo(
+            themeId = themeId,
+            content = QuestInfoContent(
+              media = ContentReference(
+                contentType = "",
+                storage = "",
+                reference = ""),
+              icon = None,
+              description = ""))),
+              new Date(),
+              new Date())
+
+      val ou = db.user.readByID(userid)
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.history.themesOfSelectedQuests.contains(themeId))
     }
   }
 

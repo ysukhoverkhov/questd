@@ -86,7 +86,7 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getTutorialQuests: Option[Iterator[Quest]] = {
-    Logger.trace("getTutorialQuests")
+    Logger.trace("getTutorialQuests") // TODO test me.
     None
   }
 
