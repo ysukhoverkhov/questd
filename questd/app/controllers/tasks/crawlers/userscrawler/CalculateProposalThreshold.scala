@@ -16,8 +16,8 @@ import components.random.RandomComponent
 
 
 object CalculateProposalThreshold {
-  def props(api: DomainAPIComponent#DomainAPI) = {
-    Props(classOf[CalculateProposalThreshold], api)
+  def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
+    Props(classOf[CalculateProposalThreshold], api, rand: RandomComponent#Random)
   }
 
   def name = "CalculateProposalThreshold"

@@ -14,8 +14,8 @@ import org.joda.time.DateTime
 import components.random.RandomComponent
 
 object CheckShiftDailyResult {
-  def props(api: DomainAPIComponent#DomainAPI) = {
-    Props(classOf[CheckShiftDailyResult], api)
+  def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
+    Props(classOf[CheckShiftDailyResult], api, rand)
   }
 
   def name = "CheckShiftDailyResult"

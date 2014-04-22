@@ -12,8 +12,8 @@ import java.util.Date
 import components.random.RandomComponent
 
 object ShiftUserStats {
-  def props(api: DomainAPIComponent#DomainAPI) = {
-    Props(classOf[ShiftUserStats], api)
+  def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
+    Props(classOf[ShiftUserStats], api, rand)
   }
 
   def name = "ShiftUserStats"

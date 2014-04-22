@@ -14,8 +14,8 @@ import components.APIAccessor
 import components.random.RandomComponent
 
 object CheckProposalDeadline {
-  def props(api: DomainAPIComponent#DomainAPI) = {
-    Props(classOf[CheckProposalDeadline], api)
+  def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
+    Props(classOf[CheckProposalDeadline], api, rand)
   }
 
   def name = "CheckProposalDeadline"

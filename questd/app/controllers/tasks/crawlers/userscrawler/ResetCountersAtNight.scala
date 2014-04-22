@@ -12,8 +12,8 @@ import java.util.Date
 import components.random.RandomComponent
 
 object ResetCountersAtNight {
-  def props(api: DomainAPIComponent#DomainAPI) = {
-    Props(classOf[ResetCountersAtNight], api)
+  def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
+    Props(classOf[ResetCountersAtNight], api, rand)
   }
   
   def name = "ResetCountersAtNight"

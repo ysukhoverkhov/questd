@@ -10,19 +10,22 @@ import components._
 import models.domain._
 import models.domain.admin._
 import controllers.tasks.config.TasksConfigHolder
+import components.random.RandomComponent
 
-trait TasksComponent { component: DomainAPIComponent =>
+trait TasksComponent { component: DomainAPIComponent with RandomComponent =>
 
   protected val tasks: Tasks
 
   class Tasks
     extends APIAccessor
+    with RandomAccessor
     with TasksConfigHolder {
 
     val api = component.api
+    val rand = component.rand
 
-    val usersHourlyCrawler = Akka.system.actorOf(UsersHourlyCrawler.props(api), name = UsersHourlyCrawler.name)
-    val usersWeeklyCrawler = Akka.system.actorOf(UsersWeeklyCrawler.props(api), name = UsersWeeklyCrawler.name)
+    val usersHourlyCrawler = Akka.system.actorOf(UsersHourlyCrawler.props(api, rand), name = UsersHourlyCrawler.name)
+    val usersWeeklyCrawler = Akka.system.actorOf(UsersWeeklyCrawler.props(api, rand), name = UsersWeeklyCrawler.name)
 
     // Creating main tasks dispatcher.
     val dispetcher = Akka.system.actorOf(TasksDispatcher.props(config), name = TasksDispatcher.name)

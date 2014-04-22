@@ -9,15 +9,16 @@ import controllers.domain._
 import controllers.domain.app.user._
 import models.domain._
 import controllers.tasks.crawlers.userscrawler._
+import components.random.RandomComponent
 
 
-abstract class BaseUsersScheduleCrawler(api: DomainAPIComponent#DomainAPI) extends EasyRestartActor {
+abstract class BaseUsersScheduleCrawler(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) extends EasyRestartActor {
 
   protected val userActors: List[Class[_ <: akka.actor.Actor]]
 
   override def preStart(): Unit = {
     for (clazz <- userActors)
-      context.actorOf(Props(clazz, api))
+      context.actorOf(Props(clazz, api, rand))
   }
 
   def receive = {
