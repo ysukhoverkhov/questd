@@ -91,8 +91,22 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getStartingQuests: Option[Iterator[Quest]] = {
-    Logger.trace("getStartingQuests")
-    None
+    Logger.trace("getStartingQuests") // till level 5 including.
+
+    // TODO: move level 5 to config.
+    // TODO perhaps move this level further if tutorial will end not so soon.
+    if (user.profile.publicProfile.level > 5) {
+      None
+    } else {
+      // TODO: decide should we make it for sure or with some probability.
+      // TODO: move 0.5 to config.
+      if (rand.nextDouble < 0.5) {
+        getVIPQuests
+      } else {
+        getOtherQuests
+      }
+    }
+
   }
 
   private def getDefaultQuests: Option[Iterator[Quest]] = {
@@ -120,8 +134,8 @@ trait SolvingQuests { this: UserLogic =>
         }
       }) match {
         case Right(oi) => oi match {
-          case Some(i) => if (i.hasNext) Some(i) else getOtherQuests
-          case None => getOtherQuests
+          case Some(i) => if (i.hasNext) Some(i) else None
+          case None => None
         }
         case Left(_) => {
           Logger.error("getDefaultQuests - None of quest selector functions were called. Check probabilities.")
@@ -131,7 +145,7 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getFriendsQuests = {
-    Logger.debug("Returning quest from friends")
+    Logger.trace("Returning quest from friends")
     Some(api.getFriendsQuests(GetFriendsQuestsRequest(
       user,
       user.profile.publicProfile.level - questLevelToleranceDown,
@@ -139,7 +153,7 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getShortlistQuests = {
-    Logger.debug("Returning quest from shortlist")
+    Logger.trace("Returning quest from shortlist")
     Some(api.getShortlistQuests(GetShortlistQuestsRequest(
       user,
       user.profile.publicProfile.level - questLevelToleranceDown,
@@ -147,7 +161,7 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getLikedQuests = {
-    Logger.debug("Returning quests we liked recently")
+    Logger.trace("Returning quests we liked recently")
     Some(api.getLikedQuests(GetLikedQuestsRequest(
       user,
       user.profile.publicProfile.level - questLevelToleranceDown,
@@ -155,7 +169,7 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getVIPQuests = {
-    Logger.debug("Returning VIP quests")
+    Logger.trace("Returning VIP quests")
 
     val themeIds = selectRandomThemes(numberOfFavoriteThemesForVIPQuests)
     Logger.trace("Selected themes of vip's quests: " + themeIds.mkString(", "))
@@ -168,7 +182,7 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getOtherQuests = {
-    Logger.debug("getOtherQuests")
+    Logger.trace("getOtherQuests")
 
     // TODO: record themes of all selected quests.
     val themeIds = selectRandomThemes(numberOfFavoriteThemesForOtherQuests)
@@ -180,7 +194,7 @@ trait SolvingQuests { this: UserLogic =>
       user.profile.publicProfile.level + questLevelToleranceUp,
       themeIds)).body.get.quests)
   }
-  
+
   private def selectRandomThemes(count: Int): List[String] = {
     if (user.history.themesOfSelectedQuests.length > 0) {
       for (i <- (1 to count).toList) yield {
@@ -191,7 +205,6 @@ trait SolvingQuests { this: UserLogic =>
     }
   }
 
-  
   /**
    * Check are we able to take quest.
    */

@@ -151,6 +151,8 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
     "Return VIP quest with favorite theme ids if dice rolls so" in {
       val qid = "qid"
       val u = User(
+        profile = Profile(
+          publicProfile = PublicProfile(level = 10)),
         history = UserHistory(
           themesOfSelectedQuests = List("1", "2", "3", "4")))
 
@@ -158,13 +160,13 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.75
       rand.nextInt(4) returns 0 thenReturns 1 thenReturns 2
 
-      api.getVIPQuests(GetVIPQuestsRequest(u, -2, 19, List("1", "2", "3"))) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPQuests(GetVIPQuestsRequest(u, -10, 11, List("1", "2", "3"))) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       val q = u.getRandomQuestForSolution
 
       there was one(rand).nextDouble
       there were three(rand).nextInt(4)
-      there was one(api).getVIPQuests(GetVIPQuestsRequest(u, -2, 19, List("1", "2", "3")))
+      there was one(api).getVIPQuests(GetVIPQuestsRequest(u, -10, 11, List("1", "2", "3")))
 
       q must beSome.which(q => q.id == qid)
     }
@@ -188,6 +190,14 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       there was one(api).getAllQuests(GetAllQuestsRequest(u, -2, 19, List("2")))
 
       q must beSome.which(q => q.id == qid)
+    }
+
+    "Starting quests return vip quests" in {
+      success
+    }
+
+    "Starting quests return other quests" in {
+      success
     }
     
   }
