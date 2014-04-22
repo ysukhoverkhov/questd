@@ -20,10 +20,13 @@ class _ConfigParams {
   val ProposalVotesToLeaveVoting = "50 06 Proposal Votes To Leave Voting (calculated)"
   val ProposalRatioToLeaveVoting = "50 07 Proposal Ratio To Leave Voting (calculated)"
 
-  val QuestProbabilityFriends = "71 01 Probability of quests from friends"
-  val QuestProbabilityShortlist = "71 02 Probability of quests from shortlist"
-  val QuestProbabilityLiked = "71 03 Probability of liked quests"
-  val QuestProbabilityStar = "71 04 Probability of quests from stars"
+  val QuestProbabilityLevelsToGiveStartingQuests = "71 01 Level to give starting quests"
+  val QuestProbabilityStartingVIPQuests = "71 02 Probability of selecting VIP quests in initial stage"
+
+  val QuestProbabilityFriends = "72 01 Probability of quests from friends"
+  val QuestProbabilityShortlist = "72 02 Probability of quests from shortlist"
+  val QuestProbabilityLiked = "72 03 Probability of liked quests"
+  val QuestProbabilityStar = "72 04 Probability of quests from stars"
 }
 
 object _ConfigParams extends _ConfigParams
@@ -49,6 +52,9 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.ProposalLikesToEnterRotation -> "10",
       ConfigParams.ProposalVotesToLeaveVoting -> "100",
       ConfigParams.ProposalRatioToLeaveVoting -> "0.05",
+
+      ConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "5",
+      ConfigParams.QuestProbabilityStartingVIPQuests -> "0.5",
 
       ConfigParams.QuestProbabilityFriends -> "0.25",
       ConfigParams.QuestProbabilityShortlist -> "0.25",

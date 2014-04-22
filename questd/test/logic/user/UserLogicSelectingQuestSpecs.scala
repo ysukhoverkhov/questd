@@ -193,13 +193,39 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
     }
 
     "Starting quests return vip quests" in {
-      success
+      val qid = "qid"
+      val u = User(
+        profile = Profile(
+          publicProfile = PublicProfile(level = 1)))
+
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.0
+          
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
+
+      u.getRandomQuestForSolution
+
+      there was one(rand).nextDouble
+      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
     }
 
     "Starting quests return other quests" in {
-      success
+      val qid = "qid"
+      val u = User(
+        profile = Profile(
+          publicProfile = PublicProfile(level = 1)))
+
+      api.config returns createStubConfig
+      rand.nextDouble returns 1.0
+          
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+
+      u.getRandomQuestForSolution
+
+      there was one(rand).nextDouble
+      there was one(api).getAllQuests(any[GetAllQuestsRequest])
     }
-    
+   
   }
 }
 

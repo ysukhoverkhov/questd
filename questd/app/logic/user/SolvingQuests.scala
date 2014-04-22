@@ -91,22 +91,17 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   private def getStartingQuests: Option[Iterator[Quest]] = {
-    Logger.trace("getStartingQuests") // till level 5 including.
+    Logger.trace("getStartingQuests")
 
-    // TODO: move level 5 to config.
-    // TODO perhaps move this level further if tutorial will end not so soon.
-    if (user.profile.publicProfile.level > 5) {
+    if (user.profile.publicProfile.level > api.config(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
       None
     } else {
-      // TODO: decide should we make it for sure or with some probability.
-      // TODO: move 0.5 to config.
-      if (rand.nextDouble < 0.5) {
+      if (rand.nextDouble < api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble) {
         getVIPQuests
       } else {
         getOtherQuests
       }
     }
-
   }
 
   private def getDefaultQuests: Option[Iterator[Quest]] = {
@@ -184,7 +179,6 @@ trait SolvingQuests { this: UserLogic =>
   private def getOtherQuests = {
     Logger.trace("getOtherQuests")
 
-    // TODO: record themes of all selected quests.
     val themeIds = selectRandomThemes(numberOfFavoriteThemesForOtherQuests)
     Logger.trace("Selected themes of other quests: " + themeIds.mkString(", "))
 
