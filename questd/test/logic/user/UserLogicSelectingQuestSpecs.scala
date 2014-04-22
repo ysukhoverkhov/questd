@@ -45,10 +45,15 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
     api.ConfigParams returns _ConfigParams
 
     val config = mock[ConfigSection]
+    
+    config.apply(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests) returns "5"
+    config.apply(api.ConfigParams.QuestProbabilityStartingVIPQuests) returns "0.50"
+
     config.apply(api.ConfigParams.QuestProbabilityFriends) returns "0.25"
     config.apply(api.ConfigParams.QuestProbabilityShortlist) returns "0.25"
     config.apply(api.ConfigParams.QuestProbabilityLiked) returns "0.20"
     config.apply(api.ConfigParams.QuestProbabilityStar) returns "0.10"
+    
     config
   }
 
