@@ -30,11 +30,10 @@ trait QuestSelectUserLogic { this: UserLogic =>
       () => getQuestsWithSuperAlgorithm(reason),
       () => getOtherQuests(reason).getOrElse(List().iterator),
       () => {
-        api.allQuestsWithStatus(
-          AllQuestsRequest(
-            reason,
-            levelFrom(reason),
-            levelTo(reason))).body.get.quests
+        api.getAllQuests(GetAllQuestsRequest(
+          reason,
+          levelFrom(reason),
+          levelTo(reason))).body.get.quests
       }).
       foldLeft[Option[Quest]](None)((run, fun) => {
         if (run == None) {
@@ -158,7 +157,6 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("Selected themes of other quests: " + themeIds.mkString(", "))
 
     Some(api.getAllQuests(GetAllQuestsRequest(
-      user,
       reason,
       levelFrom(reason),
       levelTo(reason),

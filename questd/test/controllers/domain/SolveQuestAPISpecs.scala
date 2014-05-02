@@ -110,7 +110,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, None, List(), List("a")) returns List().iterator
 
-      val result = api.getAllQuests(GetAllQuestsRequest(User(), QuestStatus.InRotation, 1, 2, List("a")))
+      val result = api.getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, 1, 2, List("a")))
 
       there was one(quest).allWithParams(
         Some(QuestStatus.InRotation.toString),

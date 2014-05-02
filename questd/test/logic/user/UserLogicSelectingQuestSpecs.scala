@@ -24,7 +24,6 @@ import com.github.nscala_time.time.Imports.DateTime
 import com.github.nscala_time.time.Imports.richDateTime
 import logic.LogicBootstrapper
 import java.util.Date
-import controllers.domain.app.quest.AllQuestsRequest
 
 class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
@@ -187,13 +186,13 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.95
       rand.nextInt(4) returns 1
 
-      api.getAllQuests(GetAllQuestsRequest(u, QuestStatus.InRotation, -2, 19, List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, -2, 19, List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       val q = u.getRandomQuestForSolution
 
       there was one(rand).nextDouble
       there was one(rand).nextInt(4)
-      there was one(api).getAllQuests(GetAllQuestsRequest(u, QuestStatus.InRotation, -2, 19, List("2")))
+      there was one(api).getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, -2, 19, List("2")))
 
       q must beSome.which(q => q.id == qid)
     }
@@ -257,15 +256,13 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.75
 
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List().iterator)))
-      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List().iterator)))
-      api.allQuestsWithStatus(any[AllQuestsRequest]) returns OkApiResult(Some(AllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List().iterator))) thenReturns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       u.getRandomQuestForSolution
 
       there was one(rand).nextDouble
       there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
-      there was one(api).getAllQuests(any[GetAllQuestsRequest])
-      there was one(api).allQuestsWithStatus(any[AllQuestsRequest])
+      there were two(api).getAllQuests(any[GetAllQuestsRequest])
     }
     
     "Quests for voting are worked out correctly" in {
@@ -279,7 +276,6 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextInt(4) returns 1
 
       api.getAllQuests(GetAllQuestsRequest(
-          u, 
           QuestStatus.OnVoting, 
           constants.minQuestLevel, 
           constants.maxQuestLevel,
@@ -290,7 +286,6 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       there was one(rand).nextDouble
       there was one(rand).nextInt(4)
       there was one(api).getAllQuests(GetAllQuestsRequest(
-          u, 
           QuestStatus.OnVoting, 
           constants.minQuestLevel, 
           constants.maxQuestLevel,

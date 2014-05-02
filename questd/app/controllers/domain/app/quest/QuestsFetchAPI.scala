@@ -6,10 +6,6 @@ import models.domain._
 import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 
-// TODO: perhaps this all quests should be removed because we have other all quests bellow.
-case class AllQuestsRequest(status: QuestStatus.Value, fromLevel: Int, toLevel: Int)
-case class AllQuestsResult(quests: Iterator[Quest])
-
 case class GetFriendsQuestsRequest(user: User, status: QuestStatus.Value, fromLevel: Int, toLevel: Int)
 case class GetFriendsQuestsResult(quests: Iterator[Quest])
 
@@ -22,20 +18,11 @@ case class GetVIPQuestsResult(quests: Iterator[Quest])
 case class GetLikedQuestsRequest(user: User, status: QuestStatus.Value, fromLevel: Int, toLevel: Int)
 case class GetLikedQuestsResult(quests: Iterator[Quest])
 
-case class GetAllQuestsRequest(user: User, status: QuestStatus.Value, fromLevel: Int, toLevel: Int, themeIds: List[String])
+case class GetAllQuestsRequest(status: QuestStatus.Value, fromLevel: Int, toLevel: Int, themeIds: List[String] = List())
 case class GetAllQuestsResult(quests: Iterator[Quest])
 
 
 private [domain] trait QuestsFetchAPI { this: DBAccessor => 
-
-  /**
-   * List all Quests with specified status.
-   */
-  def allQuestsWithStatus(request: AllQuestsRequest): ApiResult[AllQuestsResult] = handleDbException {
-    OkApiResult(Some(AllQuestsResult(db.quest.allWithParams(
-        status = Some(request.status.toString),
-        levels = Some(request.fromLevel, request.toLevel)))))
-  }
 
   
   def getFriendsQuests(request: GetFriendsQuestsRequest): ApiResult[GetFriendsQuestsResult] = handleDbException {
