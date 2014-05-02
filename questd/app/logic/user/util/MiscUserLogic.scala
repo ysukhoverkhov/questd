@@ -1,11 +1,6 @@
-package logic.user
-
-import java.util.Date
+package logic.user.util
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
-
-import play.Logger
-
 import logic._
 import logic.constants._
 import logic.functions._
@@ -15,6 +10,7 @@ import models.domain.base._
 import models.domain.ContentType._
 import controllers.domain.admin._
 import controllers.domain._
+import logic.UserLogic
 
 trait MiscUserLogic { this: UserLogic =>
 

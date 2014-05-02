@@ -19,6 +19,7 @@ import com.mongodb.BasicDBList
 import models.store.dao.ThemeDAO
 import components.random.RandomComponent
 import logic.user._
+import logic.user.util._
 
 // This should not go to DB directly since API may have cache layer.
 class UserLogic(
@@ -34,6 +35,7 @@ class UserLogic(
     with DailyResults
     with Friends
     with MiscUserLogic
+    with QuestSelectUserLogic
     
     with CommonUtil {
 }
