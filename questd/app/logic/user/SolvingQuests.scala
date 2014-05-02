@@ -58,23 +58,20 @@ trait SolvingQuests { this: UserLogic =>
    * Takes everything into account and returns possible quest to be solved by user.
    */
   def getRandomQuestForSolution: Option[Quest] = {
-    
-    // TODO: write me in fold.
-    
-    val quests = getQuests
-
-    selectQuest(quests, user.history.solvedQuestIds) orElse {
-
-      val regularQuests = getOtherQuests.getOrElse(List().iterator)
-      selectQuest(regularQuests, user.history.solvedQuestIds) // TODO: Test this branch.
-    } orElse {
-
-      val allQuests = api.allQuestsInRotation(
-        AllQuestsRequest( // TODO: test this branch.
+    List(
+      () => getQuests,
+      () => getOtherQuests.getOrElse(List().iterator),
+      () => api.allQuestsInRotation(
+        AllQuestsRequest(
           user.profile.publicProfile.level - questLevelToleranceDown,
-          user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
-      selectQuest(allQuests, user.history.solvedQuestIds)
-    }
+          user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests).
+      foldLeft[Option[Quest]](None)((run, fun) => {
+        if (run == None) {
+          selectQuest(fun(), user.history.solvedQuestIds)
+        } else {
+          run
+        }
+      })
   }
 
   private def getQuests = {
