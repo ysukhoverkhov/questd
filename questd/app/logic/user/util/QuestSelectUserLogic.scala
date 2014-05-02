@@ -171,7 +171,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   private def levelFrom(reason: QuestGetReason) = {
     reason match {
       case ForSolving => user.profile.publicProfile.level - questForSolveLevelToleranceDown
-      case ForVoting => 0
+      case ForVoting => constants.minQuestLevel
     }
   }
 

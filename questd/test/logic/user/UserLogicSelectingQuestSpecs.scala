@@ -268,6 +268,37 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       there was one(api).allQuestsWithStatus(any[AllQuestsRequest])
     }
     
+    "Quests for voting are worked out correctly" in {
+      val qid = "qid"
+      val u = User(
+        history = UserHistory(
+          themesOfSelectedQuests = List("1", "2", "3", "4")))
+
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.95
+      rand.nextInt(4) returns 1
+
+      api.getAllQuests(GetAllQuestsRequest(
+          u, 
+          QuestStatus.OnVoting, 
+          constants.minQuestLevel, 
+          constants.maxQuestLevel,
+          List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+
+      val q = u.getQuestProposalToVote
+
+      there was one(rand).nextDouble
+      there was one(rand).nextInt(4)
+      there was one(api).getAllQuests(GetAllQuestsRequest(
+          u, 
+          QuestStatus.OnVoting, 
+          constants.minQuestLevel, 
+          constants.maxQuestLevel,
+          List("2")))
+
+      q must beSome.which(q => q.id == qid)
+    }
+    
   }
 }
 
