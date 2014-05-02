@@ -31,17 +31,6 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
-    //    val q2 = solution.copy(
-    //      rating = solution.rating.copy(
-    //        reviewsCount = solution.rating.reviewsCount + 1,
-    //        pointsRandom = checkInc(vote, Cool, solution.rating.pointsRandom),
-    //        cheating = checkInc(vote, Cheating, solution.rating.cheating),
-    //        iacpoints = solution.rating.iacpoints.copy(
-    //          spam = checkInc(vote, IASpam, solution.rating.iacpoints.spam),
-    //          porn = checkInc(vote, IAPorn, solution.rating.iacpoints.porn))))
-    //
-    //    db.solution.update(q2)
-
     val q = db.solution.updatePoints(
       solution.id,
 

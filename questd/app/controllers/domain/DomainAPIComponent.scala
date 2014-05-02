@@ -39,10 +39,11 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent =>
     with MiscAPI
     
     with QuestAPI
+    with QuestsFetchAPI
     with QuestSolutionAPI
+    with QuestsSolutionFetchAPI
 
     with ThemesAdminAPI
-    with QuestsFetchAPI
     with ConfigAdminAPI 
     
     with ApiConfigHolder 

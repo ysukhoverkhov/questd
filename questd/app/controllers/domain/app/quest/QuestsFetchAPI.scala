@@ -10,12 +10,6 @@ import controllers.domain._
 case class AllQuestsRequest(status: QuestStatus.Value, fromLevel: Int, toLevel: Int)
 case class AllQuestsResult(quests: Iterator[Quest])
 
-// TODO: this solution is in file dedicated to quests by mistake.
-case class AllQuestSolutionsRequest(minLevel: Int, maxLevel: Int)
-case class AllQuestSolutionsResult(quests: Iterator[QuestSolution])
-
-
-
 case class GetFriendsQuestsRequest(user: User, status: QuestStatus.Value, fromLevel: Int, toLevel: Int)
 case class GetFriendsQuestsResult(quests: Iterator[Quest])
 
@@ -43,13 +37,6 @@ private [domain] trait QuestsFetchAPI { this: DBAccessor =>
         levels = Some(request.fromLevel, request.toLevel)))))
   }
 
-  /**
-   * List all Quests solution s with OnVoting status.
-   */
-  def allQuestSolutionsOnVoting(request: AllQuestSolutionsRequest): ApiResult[AllQuestSolutionsResult] = handleDbException {
-    OkApiResult(Some(AllQuestSolutionsResult(db.solution.allWithStatusAndLevels(QuestSolutionStatus.OnVoting.toString, request.minLevel, request.maxLevel))))
-  }
-  
   
   def getFriendsQuests(request: GetFriendsQuestsRequest): ApiResult[GetFriendsQuestsResult] = handleDbException {
     OkApiResult(Some(GetFriendsQuestsResult(db.quest.allWithParams(

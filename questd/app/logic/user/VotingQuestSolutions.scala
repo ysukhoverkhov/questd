@@ -12,7 +12,7 @@ import models.domain._
 import models.domain.base._
 import models.domain.ContentType._
 import controllers.domain._
-import controllers.domain.app.quest._
+import controllers.domain.app.questsolution._
 
 /**
  * All logic about voting quest solutions is here.
