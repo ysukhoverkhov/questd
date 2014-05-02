@@ -43,6 +43,12 @@ trait VotingQuestSolutions { this: UserLogic =>
     selectQuestSolution(solutions, user.history.votedQuestSolutionIds)
   }
 
+  
+  
+  
+  
+  
+  
   /**
    *
    */

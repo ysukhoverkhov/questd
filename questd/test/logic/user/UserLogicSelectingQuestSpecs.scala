@@ -222,7 +222,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       api.config returns createStubConfig
       rand.nextDouble returns 1.0
-
+ 
       api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       u.getRandomQuestForSolution
@@ -231,6 +231,42 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       there was one(api).getAllQuests(any[GetAllQuestsRequest])
     }
 
+    "Other quests are used if vip quests are unavailable" in {
+      val qid = "qid"
+      val u = User()
+
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.75
+
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List().iterator)))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+
+      u.getRandomQuestForSolution
+
+      there was one(rand).nextDouble
+      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
+      there was one(api).getAllQuests(any[GetAllQuestsRequest])
+    }
+
+    "All quests are used if vip and Other quests are unavailable" in {
+      val qid = "qid"
+      val u = User()
+
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.75
+
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List().iterator)))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List().iterator)))
+      api.allQuestsInRotation(any[AllQuestsRequest]) returns OkApiResult(Some(AllQuestsResult(List(createQuest(qid, "author")).iterator)))
+
+      u.getRandomQuestForSolution
+
+      there was one(rand).nextDouble
+      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
+      there was one(api).getAllQuests(any[GetAllQuestsRequest])
+      there was one(api).allQuestsInRotation(any[AllQuestsRequest])
+    }
+    
   }
 }
 
