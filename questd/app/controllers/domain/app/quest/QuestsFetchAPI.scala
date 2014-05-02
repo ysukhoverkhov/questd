@@ -6,25 +6,29 @@ import models.domain._
 import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 
+// TODO: perhaps this all quests should be removed because we have other all quests bellow.
 case class AllQuestsRequest(status: QuestStatus.Value, fromLevel: Int, toLevel: Int)
 case class AllQuestsResult(quests: Iterator[Quest])
 
+// TODO: this solution is in file dedicated to quests by mistake.
 case class AllQuestSolutionsRequest(minLevel: Int, maxLevel: Int)
 case class AllQuestSolutionsResult(quests: Iterator[QuestSolution])
 
-case class GetFriendsQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
+
+
+case class GetFriendsQuestsRequest(user: User, status: QuestStatus.Value, fromLevel: Int, toLevel: Int)
 case class GetFriendsQuestsResult(quests: Iterator[Quest])
 
-case class GetShortlistQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
+case class GetShortlistQuestsRequest(user: User, status: QuestStatus.Value, fromLevel: Int, toLevel: Int)
 case class GetShortlistQuestsResult(quests: Iterator[Quest])
 
-case class GetVIPQuestsRequest(user: User, fromLevel: Int, toLevel: Int, themeIds: List[String])
+case class GetVIPQuestsRequest(user: User, status: QuestStatus.Value, fromLevel: Int, toLevel: Int, themeIds: List[String])
 case class GetVIPQuestsResult(quests: Iterator[Quest])
 
-case class GetLikedQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
+case class GetLikedQuestsRequest(user: User, status: QuestStatus.Value, fromLevel: Int, toLevel: Int)
 case class GetLikedQuestsResult(quests: Iterator[Quest])
 
-case class GetAllQuestsRequest(user: User, fromLevel: Int, toLevel: Int, themeIds: List[String])
+case class GetAllQuestsRequest(user: User, status: QuestStatus.Value, fromLevel: Int, toLevel: Int, themeIds: List[String])
 case class GetAllQuestsResult(quests: Iterator[Quest])
 
 

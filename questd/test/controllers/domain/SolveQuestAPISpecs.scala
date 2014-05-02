@@ -39,7 +39,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
       db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
 
-      val result = api.getFriendsQuests(GetFriendsQuestsRequest(u, 1, 2))
+      val result = api.getFriendsQuests(GetFriendsQuestsRequest(u, QuestStatus.InRotation, 1, 2))
 
       there was one(quest).allWithParams(
         Some(QuestStatus.InRotation.toString),
@@ -78,7 +78,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
           List("1", "2"),
           List("3", "4")) 
       val u = User(history = UserHistory(likedQuestProposalIds = liked))
-      val result = api.getLikedQuests(GetLikedQuestsRequest(u, 1, 2))
+      val result = api.getLikedQuests(GetLikedQuestsRequest(u, QuestStatus.InRotation, 1, 2))
 
       there was one(quest).allWithParams(
         Some(QuestStatus.InRotation.toString),
@@ -94,7 +94,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List(), List("a")) returns List().iterator
 
-      val result = api.getVIPQuests(GetVIPQuestsRequest(User(), 1, 2, List("a")))
+      val result = api.getVIPQuests(GetVIPQuestsRequest(User(), QuestStatus.InRotation, 1, 2, List("a")))
 
       there was one(quest).allWithParams(
         Some(QuestStatus.InRotation.toString),
@@ -110,7 +110,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, None, List(), List("a")) returns List().iterator
 
-      val result = api.getAllQuests(GetAllQuestsRequest(User(), 1, 2, List("a")))
+      val result = api.getAllQuests(GetAllQuestsRequest(User(), QuestStatus.InRotation, 1, 2, List("a")))
 
       there was one(quest).allWithParams(
         Some(QuestStatus.InRotation.toString),

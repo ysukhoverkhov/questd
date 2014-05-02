@@ -17,6 +17,8 @@ import controllers.domain.app.quest._
 
 trait QuestSelectUserLogic { this: UserLogic =>
 
+  import scala.language.implicitConversions
+  
   object QuestGetReason extends Enumeration {
     type QuestGetReason = QuestGetReason.Value
     val ForVoting, ForSolving = Value
@@ -123,6 +125,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("Returning quest from friends")
     Some(api.getFriendsQuests(GetFriendsQuestsRequest(
       user,
+      reason,
       user.profile.publicProfile.level - questLevelToleranceDown,
       user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
@@ -131,6 +134,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("Returning quest from shortlist")
     Some(api.getShortlistQuests(GetShortlistQuestsRequest(
       user,
+      reason,
       user.profile.publicProfile.level - questLevelToleranceDown,
       user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
@@ -139,6 +143,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("Returning quests we liked recently")
     Some(api.getLikedQuests(GetLikedQuestsRequest(
       user,
+      reason,
       user.profile.publicProfile.level - questLevelToleranceDown,
       user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
   }
@@ -151,6 +156,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
     Some(api.getVIPQuests(GetVIPQuestsRequest(
       user,
+      reason,
       user.profile.publicProfile.level - questLevelToleranceDown,
       user.profile.publicProfile.level + questLevelToleranceUp,
       themeIds)).body.get.quests)
@@ -164,12 +170,20 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
     Some(api.getAllQuests(GetAllQuestsRequest(
       user,
+      reason,
       user.profile.publicProfile.level - questLevelToleranceDown,
       user.profile.publicProfile.level + questLevelToleranceUp,
       themeIds)).body.get.quests)
   }
 
-  private[user] def selectRandomThemes(count: Int): List[String] = {
+  implicit private def statusForReason(reason: QuestGetReason): QuestStatus.Value = {
+    reason match {
+      case ForSolving => QuestStatus.InRotation
+      case ForVoting => QuestStatus.OnVoting
+    }
+  }
+  
+  private def selectRandomThemes(count: Int): List[String] = {
     if (user.history.themesOfSelectedQuests.length > 0) {
       for (i <- (1 to count).toList) yield {
         user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
