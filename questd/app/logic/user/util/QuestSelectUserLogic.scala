@@ -41,9 +41,9 @@ trait QuestSelectUserLogic { this: UserLogic =>
           case ForVoting => {
             api.allQuestsWithStatus( 
               AllQuestsRequest(
-                QuestStatus.OnVoting, // TODO: find out correct level boundaries here.
-                user.profile.publicProfile.level - questLevelToleranceDown,
-                user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
+                QuestStatus.OnVoting, 
+                0, // No level filtering on proposal voting.
+                constants.maxLevel)).body.get.quests
           }
         }
       }).
