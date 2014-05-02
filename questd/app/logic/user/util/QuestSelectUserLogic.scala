@@ -18,7 +18,7 @@ import controllers.domain.app.quest._
 trait QuestSelectUserLogic { this: UserLogic =>
 
   import scala.language.implicitConversions
-  
+
   object QuestGetReason extends Enumeration {
     type QuestGetReason = QuestGetReason.Value
     val ForVoting, ForSolving = Value
@@ -30,22 +30,11 @@ trait QuestSelectUserLogic { this: UserLogic =>
       () => getQuestsWithSuperAlgorithm(reason),
       () => getOtherQuests(reason).getOrElse(List().iterator),
       () => {
-        reason match {
-          case ForSolving => {
-            api.allQuestsWithStatus(
-              AllQuestsRequest(
-                QuestStatus.InRotation,
-                user.profile.publicProfile.level - questLevelToleranceDown,
-                user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
-          }
-          case ForVoting => {
-            api.allQuestsWithStatus( 
-              AllQuestsRequest(
-                QuestStatus.OnVoting, 
-                0, // No level filtering on proposal voting.
-                constants.maxLevel)).body.get.quests
-          }
-        }
+        api.allQuestsWithStatus(
+          AllQuestsRequest(
+            reason,
+            levelFrom(reason),
+            levelTo(reason))).body.get.quests
       }).
       foldLeft[Option[Quest]](None)((run, fun) => {
         if (run == None) {
@@ -126,8 +115,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some(api.getFriendsQuests(GetFriendsQuestsRequest(
       user,
       reason,
-      user.profile.publicProfile.level - questLevelToleranceDown,
-      user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+      levelFrom(reason),
+      levelTo(reason))).body.get.quests)
   }
 
   private[user] def getShortlistQuests(reason: QuestGetReason) = {
@@ -135,8 +124,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some(api.getShortlistQuests(GetShortlistQuestsRequest(
       user,
       reason,
-      user.profile.publicProfile.level - questLevelToleranceDown,
-      user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+      levelFrom(reason),
+      levelTo(reason))).body.get.quests)
   }
 
   private[user] def getLikedQuests(reason: QuestGetReason) = {
@@ -144,8 +133,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some(api.getLikedQuests(GetLikedQuestsRequest(
       user,
       reason,
-      user.profile.publicProfile.level - questLevelToleranceDown,
-      user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests)
+      levelFrom(reason),
+      levelTo(reason))).body.get.quests)
   }
 
   private[user] def getVIPQuests(reason: QuestGetReason) = {
@@ -157,8 +146,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some(api.getVIPQuests(GetVIPQuestsRequest(
       user,
       reason,
-      user.profile.publicProfile.level - questLevelToleranceDown,
-      user.profile.publicProfile.level + questLevelToleranceUp,
+      levelFrom(reason),
+      levelTo(reason),
       themeIds)).body.get.quests)
   }
 
@@ -171,18 +160,38 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some(api.getAllQuests(GetAllQuestsRequest(
       user,
       reason,
-      user.profile.publicProfile.level - questLevelToleranceDown,
-      user.profile.publicProfile.level + questLevelToleranceUp,
+      levelFrom(reason),
+      levelTo(reason),
       themeIds)).body.get.quests)
   }
 
-  implicit private def statusForReason(reason: QuestGetReason): QuestStatus.Value = {
+  /**
+   * Tells starting from what level we should give quests based on reason of getting quest.
+   */
+  private def levelFrom(reason: QuestGetReason) = {
+    reason match {
+      case ForSolving => user.profile.publicProfile.level - questForSolveLevelToleranceDown
+      case ForVoting => 0
+    }
+  }
+
+  /**
+   * Tells starting to what level we should give quests based on reason of getting quest.
+   */
+  private def levelTo(reason: QuestGetReason) = {
+    reason match {
+      case ForSolving => user.profile.publicProfile.level + questForSolveLevelToleranceUp
+      case ForVoting => constants.maxQuestLevel
+    }
+  }
+
+  implicit private def reasonToStatus(reason: QuestGetReason): QuestStatus.Value = {
     reason match {
       case ForSolving => QuestStatus.InRotation
       case ForVoting => QuestStatus.OnVoting
     }
   }
-  
+
   private def selectRandomThemes(count: Int): List[String] = {
     if (user.history.themesOfSelectedQuests.length > 0) {
       for (i <- (1 to count).toList) yield {
