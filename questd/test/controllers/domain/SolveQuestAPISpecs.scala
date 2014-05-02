@@ -15,6 +15,7 @@ import models.store.mongo._
 import models.store.dao.UserDAO
 import controllers.domain.libs.facebook.UserFB
 import components.random.RandomComponent
+import controllers.domain.app.quest._
 
 class SolveQuestAPISpecs extends BaseAPISpecs {
 

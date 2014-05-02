@@ -42,21 +42,6 @@ case class RewardQuestSolutionAuthorResult()
 case class TryFightQuestRequest(solution: QuestSolution)
 case class TryFightQuestResult()
 
-case class GetFriendsQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
-case class GetFriendsQuestsResult(quests: Iterator[Quest])
-
-case class GetShortlistQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
-case class GetShortlistQuestsResult(quests: Iterator[Quest])
-
-case class GetVIPQuestsRequest(user: User, fromLevel: Int, toLevel: Int, themeIds: List[String])
-case class GetVIPQuestsResult(quests: Iterator[Quest])
-
-case class GetLikedQuestsRequest(user: User, fromLevel: Int, toLevel: Int)
-case class GetLikedQuestsResult(quests: Iterator[Quest])
-
-case class GetAllQuestsRequest(user: User, fromLevel: Int, toLevel: Int, themeIds: List[String])
-case class GetAllQuestsResult(quests: Iterator[Quest])
-
 
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -385,41 +370,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     }
   }
 
-  def getFriendsQuests(request: GetFriendsQuestsRequest): ApiResult[GetFriendsQuestsResult] = handleDbException {
-    OkApiResult(Some(GetFriendsQuestsResult(db.quest.allWithParams(
-      Some(QuestStatus.InRotation.toString),
-      request.user.friends.filter(_.status == FriendshipStatus.Accepted.toString).map(_.friendId),
-      Some(request.fromLevel, request.toLevel)))))
-  }
-
-  def getShortlistQuests(request: GetShortlistQuestsRequest): ApiResult[GetShortlistQuestsResult] = handleDbException {
-    OkApiResult(Some(GetShortlistQuestsResult(db.quest.allWithParams(
-      Some(QuestStatus.InRotation.toString),
-      request.user.shortlist,
-      Some(request.fromLevel, request.toLevel)))))
-  }
-  
-  def getLikedQuests(request: GetLikedQuestsRequest): ApiResult[GetLikedQuestsResult] = handleDbException {
-    OkApiResult(Some(GetLikedQuestsResult(db.quest.allWithParams(
-      status = Some(QuestStatus.InRotation.toString),
-      levels = Some(request.fromLevel, request.toLevel),
-      ids = request.user.history.likedQuestProposalIds.flatten))))
-  }
-  
-  def getVIPQuests(request: GetVIPQuestsRequest): ApiResult[GetVIPQuestsResult] = handleDbException {
-    OkApiResult(Some(GetVIPQuestsResult(db.quest.allWithParams(
-      status = Some(QuestStatus.InRotation.toString),
-      levels = Some(request.fromLevel, request.toLevel),
-      vip = Some(true),
-      themeIds = request.themeIds))))
-  }
-
-  def getAllQuests(request: GetAllQuestsRequest): ApiResult[GetAllQuestsResult] = handleDbException {
-    OkApiResult(Some(GetAllQuestsResult(db.quest.allWithParams(
-      status = Some(QuestStatus.InRotation.toString),
-      levels = Some(request.fromLevel, request.toLevel),
-      themeIds = request.themeIds))))
-  }
   
 }
 

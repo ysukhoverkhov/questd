@@ -13,6 +13,7 @@ import models.domain.User
 import logic.UserLogic
 import logic.LogicBootstrapper
 import components.random.RandomComponent
+import controllers.domain.app.quest.QuestsFetchAPI
 
 trait DomainAPIComponent { component: DatabaseComponent with RandomComponent =>
 
@@ -41,7 +42,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent =>
     with QuestSolutionAPI
 
     with ThemesAdminAPI
-    with QuestsAdminAPI
+    with QuestsFetchAPI
     with ConfigAdminAPI 
     
     with ApiConfigHolder 

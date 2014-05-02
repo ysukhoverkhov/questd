@@ -24,6 +24,7 @@ import com.github.nscala_time.time.Imports.DateTime
 import com.github.nscala_time.time.Imports.richDateTime
 import logic.LogicBootstrapper
 import java.util.Date
+import controllers.domain.app.quest.AllQuestsRequest
 
 class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 

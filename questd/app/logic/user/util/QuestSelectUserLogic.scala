@@ -9,11 +9,11 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
 import models.domain.base._
 import models.domain.ContentType._
-import controllers.domain.admin._
 import controllers.domain._
 import logic.UserLogic
 import play.Logger
 import controllers.domain.app.user._
+import controllers.domain.app.quest._
 
 trait QuestSelectUserLogic { this: UserLogic =>
 
