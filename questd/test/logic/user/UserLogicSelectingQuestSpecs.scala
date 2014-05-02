@@ -257,14 +257,14 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List().iterator)))
       api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List().iterator)))
-      api.allQuestsInRotation(any[AllQuestsRequest]) returns OkApiResult(Some(AllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.allQuestsWithStatus(any[AllQuestsRequest]) returns OkApiResult(Some(AllQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       u.getRandomQuestForSolution
 
       there was one(rand).nextDouble
       there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
       there was one(api).getAllQuests(any[GetAllQuestsRequest])
-      there was one(api).allQuestsInRotation(any[AllQuestsRequest])
+      there was one(api).allQuestsWithStatus(any[AllQuestsRequest])
     }
     
   }

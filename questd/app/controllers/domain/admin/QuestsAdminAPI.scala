@@ -8,7 +8,7 @@ import models.domain._
 import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 
-case class AllQuestsRequest(fromLevel: Int, toLevel: Int)
+case class AllQuestsRequest(status: QuestStatus.Value, fromLevel: Int, toLevel: Int)
 case class AllQuestsResult(quests: Iterator[Quest])
 
 
@@ -17,23 +17,13 @@ case class AllQuestSolutionsResult(quests: Iterator[QuestSolution])
 
 private [domain] trait QuestsAdminAPI { this: DBAccessor => 
 
-
   /**
-   * List all Quests with approved status.
+   * List all Quests with specified status.
    */
-  def allQuestsInRotation(request: AllQuestsRequest): ApiResult[AllQuestsResult] = handleDbException {
+  def allQuestsWithStatus(request: AllQuestsRequest): ApiResult[AllQuestsResult] = handleDbException {
     OkApiResult(Some(AllQuestsResult(db.quest.allWithParams(
-        status = Some(QuestStatus.InRotation.toString),
+        status = Some(request.status.toString),
         levels = Some(request.fromLevel, request.toLevel)))))
-  }
-
-  /**
-   * List all Quests with OnVoting status.
-   */
-  def allQuestsOnVoting: ApiResult[AllQuestsResult] = handleDbException {
-    OkApiResult(Some(AllQuestsResult(db.quest.allWithParams(
-        status = Some(QuestStatus.OnVoting.toString),
-        levels = Some(0, logic.constants.maxLevel)))))
   }
 
   /**

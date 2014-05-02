@@ -22,8 +22,39 @@ trait QuestSelectUserLogic { this: UserLogic =>
     val ForVoting, ForSolving = Value
   }
   import QuestGetReason._
-  
-  private[user] def getQuests(reason: QuestGetReason) = {
+
+  def getRandomQuest(reason: QuestGetReason): Option[Quest] = {
+    List(
+      () => getQuestsWithSuperAlgorithm(reason),
+      () => getOtherQuests(reason).getOrElse(List().iterator),
+      () => {
+        reason match {
+          case ForSolving => {
+            api.allQuestsWithStatus(
+              AllQuestsRequest(
+                QuestStatus.InRotation,
+                user.profile.publicProfile.level - questLevelToleranceDown,
+                user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
+          }
+          case ForVoting => {
+            api.allQuestsWithStatus( 
+              AllQuestsRequest(
+                QuestStatus.OnVoting, // TODO: find out correct level boundaries here.
+                user.profile.publicProfile.level - questLevelToleranceDown,
+                user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests
+          }
+        }
+      }).
+      foldLeft[Option[Quest]](None)((run, fun) => {
+        if (run == None) {
+          selectQuest(fun(), user.history.solvedQuestIds)
+        } else {
+          run
+        }
+      })
+  }
+
+  def getQuestsWithSuperAlgorithm(reason: QuestGetReason) = {
     List(
       () => getTutorialQuests(reason),
       () => getStartingQuests(reason),

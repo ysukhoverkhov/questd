@@ -58,22 +58,8 @@ trait SolvingQuests { this: UserLogic =>
    * Takes everything into account and returns possible quest to be solved by user.
    */
   def getRandomQuestForSolution: Option[Quest] = {
-    List(
-      () => getQuests(QuestGetReason.ForSolving),
-      () => getOtherQuests(QuestGetReason.ForSolving).getOrElse(List().iterator),
-      () => api.allQuestsInRotation(
-        AllQuestsRequest(
-          user.profile.publicProfile.level - questLevelToleranceDown,
-          user.profile.publicProfile.level + questLevelToleranceUp)).body.get.quests).
-      foldLeft[Option[Quest]](None)((run, fun) => {
-        if (run == None) {
-          selectQuest(fun(), user.history.solvedQuestIds)
-        } else {
-          run
-        }
-      })
+    getRandomQuest(QuestGetReason.ForSolving)
   }
-
 
   /**
    * Check are we able to take quest.
