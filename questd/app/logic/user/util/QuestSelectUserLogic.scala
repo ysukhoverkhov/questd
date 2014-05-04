@@ -29,12 +29,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     List(
       () => getQuestsWithSuperAlgorithm(reason),
       () => getOtherQuests(reason).getOrElse(List().iterator),
-      () => {
-        api.getAllQuests(GetAllQuestsRequest(
-          reason,
-          levelFrom(reason),
-          levelTo(reason))).body.get.quests
-      }).
+      () => getAllQuests(reason).getOrElse(List().iterator)).
       foldLeft[Option[Quest]](None)((run, fun) => {
         if (run == None) {
           selectQuest(fun(), user.history.solvedQuestIds)
@@ -110,7 +105,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private[user] def getFriendsQuests(reason: QuestGetReason) = {
-    Logger.trace("Returning quest from friends")
+    Logger.trace("  Returning quest from friends")
     Some(api.getFriendsQuests(GetFriendsQuestsRequest(
       user,
       reason,
@@ -119,7 +114,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private[user] def getShortlistQuests(reason: QuestGetReason) = {
-    Logger.trace("Returning quest from shortlist")
+    Logger.trace("  Returning quest from shortlist")
     Some(api.getShortlistQuests(GetShortlistQuestsRequest(
       user,
       reason,
@@ -128,7 +123,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private[user] def getLikedQuests(reason: QuestGetReason) = {
-    Logger.trace("Returning quests we liked recently")
+    Logger.trace("  Returning quests we liked recently")
     Some(api.getLikedQuests(GetLikedQuestsRequest(
       user,
       reason,
@@ -137,10 +132,10 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private[user] def getVIPQuests(reason: QuestGetReason) = {
-    Logger.trace("Returning VIP quests")
+    Logger.trace("  Returning VIP quests")
 
     val themeIds = selectRandomThemes(numberOfFavoriteThemesForVIPQuests)
-    Logger.trace("Selected themes of vip's quests: " + themeIds.mkString(", "))
+    Logger.trace("    Selected themes of vip's quests: " + themeIds.mkString(", "))
 
     Some(api.getVIPQuests(GetVIPQuestsRequest(
       user,
@@ -151,10 +146,10 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private[user] def getOtherQuests(reason: QuestGetReason) = {
-    Logger.trace("getOtherQuests")
+    Logger.trace("  Returning from all quests with favorite themes")
 
     val themeIds = selectRandomThemes(numberOfFavoriteThemesForOtherQuests)
-    Logger.trace("Selected themes of other quests: " + themeIds.mkString(", "))
+    Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
 
     Some(api.getAllQuests(GetAllQuestsRequest(
       reason,
@@ -163,13 +158,22 @@ trait QuestSelectUserLogic { this: UserLogic =>
       themeIds)).body.get.quests)
   }
 
+  private[user] def getAllQuests(reason: QuestGetReason) = {
+    Logger.trace("  Returning from all quests")
+
+    Some(api.getAllQuests(GetAllQuestsRequest(
+      reason,
+      levelFrom(reason),
+      levelTo(reason))).body.get.quests)
+  }
+
   /**
    * Tells starting from what level we should give quests based on reason of getting quest.
    */
   private def levelFrom(reason: QuestGetReason) = {
     reason match {
       case ForSolving => user.profile.publicProfile.level - questForSolveLevelToleranceDown
-      case ForVoting => constants.minQuestLevel
+      case ForVoting => -1//constants.minQuestLevel TODO:
     }
   }
 

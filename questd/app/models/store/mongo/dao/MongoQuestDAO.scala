@@ -65,6 +65,8 @@ private[mongo] class MongoQuestDAO
       queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
     }
 
+    Logger.trace("DB - allWithParams - " + queryBuilder.result);
+    
     findByExample(
       queryBuilder.result,
       MongoDBObject("lastModDate" -> 1),
