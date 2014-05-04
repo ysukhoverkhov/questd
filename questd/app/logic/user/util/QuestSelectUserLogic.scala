@@ -109,8 +109,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some(api.getFriendsQuests(GetFriendsQuestsRequest(
       user,
       reason,
-      levelFrom(reason),
-      levelTo(reason))).body.get.quests)
+      levels(reason))).body.get.quests)
   }
 
   private[user] def getShortlistQuests(reason: QuestGetReason) = {
@@ -118,8 +117,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some(api.getShortlistQuests(GetShortlistQuestsRequest(
       user,
       reason,
-      levelFrom(reason),
-      levelTo(reason))).body.get.quests)
+      levels(reason))).body.get.quests)
   }
 
   private[user] def getLikedQuests(reason: QuestGetReason) = {
@@ -127,8 +125,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some(api.getLikedQuests(GetLikedQuestsRequest(
       user,
       reason,
-      levelFrom(reason),
-      levelTo(reason))).body.get.quests)
+      levels(reason))).body.get.quests)
   }
 
   private[user] def getVIPQuests(reason: QuestGetReason) = {
@@ -140,8 +137,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some(api.getVIPQuests(GetVIPQuestsRequest(
       user,
       reason,
-      levelFrom(reason),
-      levelTo(reason),
+      levels(reason),
       themeIds)).body.get.quests)
   }
 
@@ -153,8 +149,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
     Some(api.getAllQuests(GetAllQuestsRequest(
       reason,
-      levelFrom(reason),
-      levelTo(reason),
+      levels(reason),
       themeIds)).body.get.quests)
   }
 
@@ -163,27 +158,16 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
     Some(api.getAllQuests(GetAllQuestsRequest(
       reason,
-      levelFrom(reason),
-      levelTo(reason))).body.get.quests)
+      levels(reason))).body.get.quests)
   }
 
   /**
-   * Tells starting from what level we should give quests based on reason of getting quest.
+   * Tells what level we should give quests based on reason of getting quest.
    */
-  private def levelFrom(reason: QuestGetReason) = {
+  private def levels(reason: QuestGetReason) = {
     reason match {
-      case ForSolving => user.profile.publicProfile.level - questForSolveLevelToleranceDown
-      case ForVoting => -1//constants.minQuestLevel TODO:
-    }
-  }
-
-  /**
-   * Tells starting to what level we should give quests based on reason of getting quest.
-   */
-  private def levelTo(reason: QuestGetReason) = {
-    reason match {
-      case ForSolving => user.profile.publicProfile.level + questForSolveLevelToleranceUp
-      case ForVoting => constants.maxQuestLevel
+      case ForSolving => Some(user.profile.publicProfile.level - questForSolveLevelToleranceDown, user.profile.publicProfile.level + questForSolveLevelToleranceUp) 
+      case ForVoting => None
     }
   }
 

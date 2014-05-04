@@ -165,13 +165,13 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.75
       rand.nextInt(4) returns 0 thenReturns 1 thenReturns 2
 
-      api.getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, -10, 11, List("1", "2", "3"))) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, Some((-10, 11)), List("1", "2", "3"))) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       val q = u.getRandomQuestForSolution
 
       there was one(rand).nextDouble
       there were three(rand).nextInt(4)
-      there was one(api).getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, -10, 11, List("1", "2", "3")))
+      there was one(api).getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, Some((-10, 11)), List("1", "2", "3")))
 
       q must beSome.which(q => q.id == qid)
     }
@@ -186,13 +186,13 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.95
       rand.nextInt(4) returns 1
 
-      api.getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, -2, 19, List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, Some((-2, 19)), List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       val q = u.getRandomQuestForSolution
 
       there was one(rand).nextDouble
       there was one(rand).nextInt(4)
-      there was one(api).getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, -2, 19, List("2")))
+      there was one(api).getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, Some((-2, 19)), List("2")))
 
       q must beSome.which(q => q.id == qid)
     }
@@ -277,8 +277,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       api.getAllQuests(GetAllQuestsRequest(
           QuestStatus.OnVoting, 
-          constants.minQuestLevel, 
-          constants.maxQuestLevel,
+          None,
           List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       val q = u.getQuestProposalToVote
@@ -287,8 +286,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       there was one(rand).nextInt(4)
       there was one(api).getAllQuests(GetAllQuestsRequest(
           QuestStatus.OnVoting, 
-          constants.minQuestLevel, 
-          constants.maxQuestLevel,
+          None,
           List("2")))
 
       q must beSome.which(q => q.id == qid)
