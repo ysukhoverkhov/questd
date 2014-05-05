@@ -29,26 +29,75 @@ private[mongo] class MongoQuestSolutionDAO
     status: Option[String],
     questId: String,
     skip: Int = 0): Iterator[QuestSolution] = {
-    
+
     val queryBuilder = MongoDBObject.newBuilder
     queryBuilder += ("questId" -> questId)
     if (status != None) {
       queryBuilder += ("status" -> status.get)
     }
-        
+
     findByExample(
       queryBuilder.result,
       MongoDBObject("lastModDate" -> 1),
       skip)
   }
-  
+
   def allWithStatusAndUser(status: Option[String], userId: String, skip: Int = 0): Iterator[QuestSolution] = {
     val queryBuilder = MongoDBObject.newBuilder
     queryBuilder += ("userId" -> userId)
     if (status != None) {
       queryBuilder += ("status" -> status.get)
     }
-        
+
+    findByExample(
+      queryBuilder.result,
+      MongoDBObject("lastModDate" -> 1),
+      skip)
+  }
+
+  def allWithParams(
+    status: Option[String] = None,
+    userIds: List[String] = List(),
+    levels: Option[(Int, Int)] = None,
+    skip: Int = 0,
+    vip: Option[Boolean] = None,
+    ids: List[String] = List(),
+    questIds: List[String] = List()): Iterator[QuestSolution] = {
+
+    val queryBuilder = MongoDBObject.newBuilder
+
+    if (status != None) {
+      queryBuilder += ("status" -> status.get)
+    }
+
+    if (userIds.length > 0) {
+      queryBuilder += ("userId" -> MongoDBObject("$in" -> userIds))
+    }
+
+    if (levels != None) {
+      queryBuilder += ("$and" -> Array(
+        MongoDBObject("questLevel" -> MongoDBObject("$gte" -> levels.get._1)),
+        MongoDBObject("questLevel" -> MongoDBObject("$lte" -> levels.get._2))))
+    }
+
+    if (vip != None) {
+      // TODO: !!! add flag "vip" to solution info.
+      // TODO: test DAO works well with VIP solutions.
+      // TODO: create tasks fro creating VIP solutions by VIP people.
+      queryBuilder += ("info.vip" -> vip.get)
+    }
+
+    if (ids.length > 0) {
+      queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
+    }
+// TODO: test each filter is working in the function.
+    if (questIds.length > 0) {
+      queryBuilder += ("questId" -> MongoDBObject("$in" -> questIds))
+    }
+
+    Logger.trace("DB - allWithParams - " + queryBuilder.result);
+
+    // TODO: test lastmoddate is used correctly.
     findByExample(
       queryBuilder.result,
       MongoDBObject("lastModDate" -> 1),
