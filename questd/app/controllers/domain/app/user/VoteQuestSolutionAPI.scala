@@ -39,7 +39,7 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
           case None => OkApiResult(Some(GetQuestSolutionToVoteResult(OutOfContent)))
           case Some(a) => {
             val qsi = QuestSolutionInfoWithID(a.id, a.info)
-            val questInfo = db.quest.readByID(a.questID).map(_.info)
+            val questInfo = db.quest.readById(a.questId).map(_.info)
 
             if (questInfo == None) {
               Logger.error("API - getQuestSolutionToVote. Unable to find quest for solution.")
@@ -70,7 +70,7 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
         // 4. save quest in db.
         val reward = request.user.getQuestSolutionVoteReward
 
-        db.solution.readByID(request.user.profile.questSolutionVoteContext.reviewingQuestSolution.get.id) match {
+        db.solution.readById(request.user.profile.questSolutionVoteContext.reviewingQuestSolution.get.id) match {
           case None => {
             Logger.error("Unable to find quest solution with id for voting " + request.user.profile.questSolutionVoteContext.reviewingQuestSolution.get.id)
             InternalErrorApiResult()
@@ -95,7 +95,7 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
                 val u = db.user.recordQuestSolutionVote(r.user.id)
 
                 val solver = if (request.vote == QuestSolutionVote.Cool) {
-                  db.user.readByID(q.userID).map(_.profile.publicProfile)
+                  db.user.readById(q.userId).map(_.profile.publicProfile)
                 } else {
                   None
                 }

@@ -12,7 +12,7 @@ import controllers.domain.libs.facebook.UserFB
 case class LoginFBRequest(userfb: UserFB)
 case class LoginFBResult(session: String)
 
-case class UserRequest(userID: Option[String] = None, sessionID: Option[String] = None)
+case class UserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
 case class UserResult(user: User)
 
 private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -24,7 +24,7 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
 
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString()
-      db.user.updateSessionID(user.id, uuid)
+      db.user.updateSessionId(user.id, uuid)
 
       // API Test place
 //      shiftStats(ShiftStatsRequest(user))
@@ -92,15 +92,15 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
    */
   def getUser(params: UserRequest): ApiResult[UserResult] = handleDbException {
 
-    if (params.sessionID != None) {
-      db.user.readBySessionID(params.sessionID.get) match {
+    if (params.sessionId != None) {
+      db.user.readBySessionId(params.sessionId.get) match {
         case None => NotAuthorisedApiResult()
 
         case Some(user: User) => OkApiResult(
           Some(UserResult(user)))
       }
-    } else if (params.userID != null) {
-      db.user.readByID(params.userID.get) match {
+    } else if (params.userId != null) {
+      db.user.readById(params.userId.get) match {
         case None => NotFoundApiResult()
 
         case Some(user: User) => OkApiResult(

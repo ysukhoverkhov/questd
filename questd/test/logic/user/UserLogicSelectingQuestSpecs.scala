@@ -71,7 +71,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
   private def createQuest(newid: String, authorid: String) = {
     Quest(
       id = newid,
-      authorUserID = authorid,
+      authorUserId = authorid,
       approveReward = Assets(1, 2, 3),
       info = QuestInfo(
         themeId = "theme_id",
@@ -222,7 +222,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       api.config returns createStubConfig
       rand.nextDouble returns 1.0
- 
+
       api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       u.getRandomQuestForSolution
@@ -264,7 +264,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
       there were two(api).getAllQuests(any[GetAllQuestsRequest])
     }
-    
+
     "Quests for voting are worked out correctly" in {
       val qid = "qid"
       val u = User(
@@ -276,22 +276,22 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextInt(4) returns 1
 
       api.getAllQuests(GetAllQuestsRequest(
-          QuestStatus.OnVoting, 
-          None,
-          List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+        QuestStatus.OnVoting,
+        None,
+        List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
 
       val q = u.getQuestProposalToVote
 
       there was one(rand).nextDouble
       there was one(rand).nextInt(4)
       there was one(api).getAllQuests(GetAllQuestsRequest(
-          QuestStatus.OnVoting, 
-          None,
-          List("2")))
+        QuestStatus.OnVoting,
+        None,
+        List("2")))
 
       q must beSome.which(q => q.id == qid)
     }
-    
+
   }
 }
 

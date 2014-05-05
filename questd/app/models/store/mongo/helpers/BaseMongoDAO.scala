@@ -76,7 +76,7 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
   /**
    * Searches for object by query object.
    */
-  def readByID(key: String): Option[T] = wrapMongoException {
+  def readById(key: String): Option[T] = wrapMongoException {
     findOne(makeKeyDbObject(key))
   }
 

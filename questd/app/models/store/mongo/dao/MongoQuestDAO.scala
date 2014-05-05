@@ -20,11 +20,11 @@ private[mongo] class MongoQuestDAO
       MongoDBObject(("status" -> status)))
   }
 
-  def allWithStatusAndThemeByPoints(status: String, themeID: String): Iterator[Quest] = {
+  def allWithStatusAndThemeByPoints(status: String, themeId: String): Iterator[Quest] = {
     findByExample(
       MongoDBObject(
         ("status" -> status),
-        ("info.themeId" -> themeID)),
+        ("info.themeId" -> themeId)),
       MongoDBObject("rating.points" -> -1))
   }
 
@@ -44,7 +44,7 @@ private[mongo] class MongoQuestDAO
     }
 
     if (userIds.length > 0) {
-      queryBuilder += ("authorUserID" -> MongoDBObject("$in" -> userIds))
+      queryBuilder += ("authorUserId" -> MongoDBObject("$in" -> userIds))
     }
 
     if (levels != None) {

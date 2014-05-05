@@ -60,7 +60,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
    */
   def costToRequestFriendship(request: CostToRequestFriendshipRequest): ApiResult[CostToRequestFriendshipResult] = handleDbException {
 
-    db.user.readByID(request.friendId) match {
+    db.user.readById(request.friendId) match {
       case Some(u) => {
         OkApiResult(Some(CostToRequestFriendshipResult(
           allowed = OK,
@@ -84,7 +84,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
       OkApiResult(Some(AskFriendshipResult(
         allowed = OutOfContent)))
     } else {
-      db.user.readByID(request.friendId) match {
+      db.user.readById(request.friendId) match {
         case Some(u) => {
           request.user.canAddFriend(u) match {
             case OK => {
@@ -133,7 +133,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
           FriendshipStatus.Accepted.toString)
 
         // Sending message about good response on friendship.
-        db.user.readByID(request.friendId) match {
+        db.user.readById(request.friendId) match {
           case Some(f) => sendMessage(SendMessageRequest(f, Message(text = Messages("friends.accepted", request.user.id))))
           case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
         }
@@ -143,7 +143,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
         db.user.removeFriendship(request.user.id, request.friendId)
 
         // sending message for rejected response.
-        db.user.readByID(request.friendId) match {
+        db.user.readById(request.friendId) match {
           case Some(f) => sendMessage(SendMessageRequest(f, Message(text = Messages("friends.rejected", request.user.id))))
           case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
         }
@@ -169,7 +169,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
       // Sending message about removed friend to friend.
       if (request.user.friends.find(_.friendId == request.friendId).get.status == FriendshipStatus.Accepted.toString()) {
-        db.user.readByID(request.friendId) match {
+        db.user.readById(request.friendId) match {
           case Some(f) => sendMessage(SendMessageRequest(f, Message(text = Messages("friends.removed", request.user.id))))
           case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
         }

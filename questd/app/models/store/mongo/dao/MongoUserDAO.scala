@@ -22,7 +22,7 @@ private[mongo] class MongoUserDAO
   /**
    * Read by session id
    */
-  def readBySessionID(sessid: String): Option[User] = {
+  def readBySessionId(sessid: String): Option[User] = {
     readByExample("auth.session", sessid)
   }
 
@@ -49,7 +49,7 @@ private[mongo] class MongoUserDAO
   /**
    * Update user's session id
    */
-  def updateSessionID(id: String, sessionid: String): Option[User] = {
+  def updateSessionId(id: String, sessionid: String): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(

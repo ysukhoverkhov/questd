@@ -37,7 +37,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
           case None => OkApiResult(Some(GetQuestProposalToVoteResult(OutOfContent)))
           case Some(a) => {
             val qi = QuestInfoWithID(a.id, a.info)
-            val theme = db.theme.readByID(a.info.themeId)
+            val theme = db.theme.readById(a.info.themeId)
 
             if (theme == None) {
               Logger.error("API - getQuestProposalToVote. Unable to find theme for quest.")
@@ -65,7 +65,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
         // 2. vote it.
         val reward = request.user.getQuestProposalVoteReward
 
-        db.quest.readByID(request.user.profile.questProposalVoteContext.reviewingQuest.get.id) match {
+        db.quest.readById(request.user.profile.questProposalVoteContext.reviewingQuest.get.id) match {
           case None => {
             Logger.error("Unable to find quest with id for voting " + request.user.profile.questProposalVoteContext.reviewingQuest.get.id)
             InternalErrorApiResult()
@@ -87,7 +87,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
               val u = db.user.recordQuestProposalVote(r.user.id, liked)
 
               val author = if (liked) {
-                db.user.readByID(q.authorUserID).map(_.profile.publicProfile)
+                db.user.readById(q.authorUserId).map(_.profile.publicProfile)
               } else {
                 None
               }

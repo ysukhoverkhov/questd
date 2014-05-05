@@ -84,10 +84,10 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
 
     val authorUpdateResult =
       if (updatedSolution.status != solution.status) {
-        val authorID = solution.userID
-        db.user.readByID(authorID) match {
+        val authorId = solution.userId
+        db.user.readById(authorId) match {
           case None => {
-            Logger.error("Unable to find author of quest solution user " + authorID)
+            Logger.error("Unable to find author of quest solution user " + authorId)
             InternalErrorApiResult()
           }
           case Some(author) => {

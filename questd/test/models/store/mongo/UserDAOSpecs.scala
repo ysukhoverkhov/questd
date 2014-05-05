@@ -28,7 +28,7 @@ class UserDAOSpecs
     "Create new User in DB and find it by userid" in new WithApplication(appWithTestDatabase) {
       val userid = "lalala"
       db.user.create(User(userid))
-      val u = db.user.readByID(userid)
+      val u = db.user.readById(userid)
       u must beSome.which((u: User) => u.id.toString == userid)
     }
 
@@ -45,7 +45,7 @@ class UserDAOSpecs
       val sessid = "idid"
       val testsess = "session name"
       db.user.create(User(testsess, AuthInfo(session = Some(sessid))))
-      val u = db.user.readBySessionID(sessid)
+      val u = db.user.readBySessionId(sessid)
       u must beSome.which((u: User) => u.id.toString == testsess) and
         beSome.which((u: User) => u.auth.fbid == None) and
         beSome.which((u: User) => u.auth.session == Some(sessid))
@@ -56,7 +56,7 @@ class UserDAOSpecs
       val id = "id for test of update"
 
       db.user.create(User(id, AuthInfo(session = Some(sessid))))
-      val u1 = db.user.readBySessionID(sessid)
+      val u1 = db.user.readBySessionId(sessid)
       val u1unlifted = u1 match {
         case Some(z) => z
         case _ => failure("User not found in database")
@@ -64,7 +64,7 @@ class UserDAOSpecs
 
       val newsessid = "very new session id"
       db.user.update(u1unlifted.copy(auth = u1unlifted.auth.copy(session = Some(newsessid))))
-      val u2 = db.user.readByID(u1unlifted.id)
+      val u2 = db.user.readById(u1unlifted.id)
 
       u1 must beSome.which((u: User) => u.id.toString == id) and
         beSome.which((u: User) => u.auth.fbid == None) and
@@ -78,9 +78,9 @@ class UserDAOSpecs
       val userid = "id to test delete"
 
       db.user.create(User(userid))
-      db.user.readByID(userid)
+      db.user.readById(userid)
       db.user.delete(userid)
-      val u = db.user.readByID(userid)
+      val u = db.user.readById(userid)
 
       u must beNone
     }
@@ -108,7 +108,7 @@ class UserDAOSpecs
     }
 
     """Return "None" in search for not existing user""" in new WithApplication(appWithTestDatabase) {
-      val u = db.user.readBySessionID("Another id of another never existign user")
+      val u = db.user.readBySessionId("Another id of another never existign user")
       u must beNone
     }
 
@@ -125,7 +125,7 @@ class UserDAOSpecs
         Some(QuestInfo("themeId", QuestInfoContent(ContentReference("type", "storage", "reference"), None, questdescr))),
         rew)
 
-      val ou = db.user.readByID(userid)
+      val ou = db.user.readById(userid)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
 
@@ -159,7 +159,7 @@ class UserDAOSpecs
         None,
         rew)
 
-      val ou = db.user.readByID(userid)
+      val ou = db.user.readById(userid)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
 
@@ -185,7 +185,7 @@ class UserDAOSpecs
       db.user.rememberProposalVotingInHistory(userid, q1id, true)
       db.user.rememberProposalVotingInHistory(userid, q2id, false)
 
-      val ou = db.user.readByID(userid)
+      val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
 
       val arr1 = ou.get.history.likedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray().collect { case s: String => s }
@@ -220,7 +220,7 @@ class UserDAOSpecs
               new Date(),
               new Date())
 
-      val ou = db.user.readByID(userid)
+      val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.history.themesOfSelectedQuests.contains(themeId))
     }

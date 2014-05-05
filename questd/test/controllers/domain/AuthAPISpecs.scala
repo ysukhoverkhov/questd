@@ -76,9 +76,9 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       val sesid = "session id"
 
-      db.user.readBySessionID(sesid) returns Some(User("", AuthInfo(session = Some(sesid))))
+      db.user.readBySessionId(sesid) returns Some(User("", AuthInfo(session = Some(sesid))))
 
-      val rv = api.getUser(UserRequest(sessionID = Some(sesid)))
+      val rv = api.getUser(UserRequest(sessionId = Some(sesid)))
 
       rv must beAnInstanceOf[OkApiResult[UserResult]]
       rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
@@ -89,9 +89,9 @@ class AuthAPISpecs extends BaseAPISpecs {
     "Do not return none existing user" in context {
       val sesid = "session id"
 
-      db.user.readBySessionID(sesid) returns None
+      db.user.readBySessionId(sesid) returns None
 
-      val rv = api.getUser(UserRequest(sessionID = Some(sesid)))
+      val rv = api.getUser(UserRequest(sessionId = Some(sesid)))
 
       rv must beAnInstanceOf[NotAuthorisedApiResult]
       rv.body must beNone

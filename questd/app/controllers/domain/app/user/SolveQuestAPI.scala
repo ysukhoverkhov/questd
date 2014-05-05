@@ -66,7 +66,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
         // Updating quest info.
         val v = if ((user.profile.questSolutionContext.purchasedQuest != None) && (user.stats.questsAcceptedPast > 0)) {
-          val quest = db.quest.readByID(user.profile.questSolutionContext.purchasedQuest.get.id)
+          val quest = db.quest.readById(user.profile.questSolutionContext.purchasedQuest.get.id)
 
           quest match {
             case None => {
@@ -90,7 +90,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 rememberQuestSolvingInHistory(RememberQuestSolvingRequest(user, q.id))
               } map {
                 val questCost = user.costOfPurchasingQuest
-                val author = db.user.readByID(q.authorUserID).map(x => PublicProfileWithID(q.authorUserID, x.profile.publicProfile))
+                val author = db.user.readById(q.authorUserId).map(x => PublicProfileWithID(q.authorUserId, x.profile.publicProfile))
 
                 if (author == None) {
                   Logger.error("API - purchaseQuest. Unable to find quest author")
@@ -137,7 +137,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
         // Updating quest info.
         val v = if (request.user.stats.questsAcceptedPast > 0) {
-          val quest = db.quest.readByID(request.user.profile.questSolutionContext.purchasedQuest.get.id)
+          val quest = db.quest.readById(request.user.profile.questSolutionContext.purchasedQuest.get.id)
 
           quest match {
             case None => {
@@ -192,8 +192,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         db.solution.create(
           QuestSolution(
             info = request.solution,
-            userID = user.id,
-            questID = user.profile.questSolutionContext.takenQuest.get.id,
+            userId = user.id,
+            questId = user.profile.questSolutionContext.takenQuest.get.id,
             questLevel = user.profile.questSolutionContext.takenQuest.get.obj.level))
 
         val u = db.user.resetQuestSolution(user.id)
@@ -249,7 +249,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     Logger.debug("API - rewardQuestSolutionAuthor")
 
-    db.quest.readByID(solution.questID) match {
+    db.quest.readById(solution.questId) match {
       case Some(q) => {
 
         val r = QuestSolutionStatus.withName(solution.status) match {
@@ -293,7 +293,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     val solutionsForQuest = db.solution.allWithStatusAndQuest(
       Some(QuestSolutionStatus.WaitingForCompetitor.toString),
-      request.solution.questID)
+      request.solution.questId)
 
     def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {
       if (s1.calculatePoints == s2.calculatePoints)
@@ -308,7 +308,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       if (solutions.hasNext) {
         val other = solutions.next
 
-        if (other.userID != request.solution.userID) {
+        if (other.userId != request.solution.userId) {
 
           Logger.debug("Found fight pair for quest " + request.solution + ":")
           Logger.debug("  s1.id=" + request.solution.id)
@@ -327,7 +327,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
             val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString)
 
-            val u = db.user.readByID(curSol.userID)
+            val u = db.user.readById(curSol.userId)
             if (u != None) {
               rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s.get, author = u.get))
             }
@@ -339,7 +339,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
             val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString)
 
-            val u = db.user.readByID(curSol.userID)
+            val u = db.user.readById(curSol.userId)
             if (u != None) {
               rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s.get, author = u.get))
             }

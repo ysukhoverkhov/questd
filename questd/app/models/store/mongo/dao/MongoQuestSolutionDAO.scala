@@ -31,7 +31,7 @@ private[mongo] class MongoQuestSolutionDAO
     skip: Int = 0): Iterator[QuestSolution] = {
     
     val queryBuilder = MongoDBObject.newBuilder
-    queryBuilder += ("questID" -> questId)
+    queryBuilder += ("questId" -> questId)
     if (status != None) {
       queryBuilder += ("status" -> status.get)
     }
@@ -44,7 +44,7 @@ private[mongo] class MongoQuestSolutionDAO
   
   def allWithStatusAndUser(status: Option[String], userId: String, skip: Int = 0): Iterator[QuestSolution] = {
     val queryBuilder = MongoDBObject.newBuilder
-    queryBuilder += ("userID" -> userId)
+    queryBuilder += ("userId" -> userId)
     if (status != None) {
       queryBuilder += ("status" -> status.get)
     }

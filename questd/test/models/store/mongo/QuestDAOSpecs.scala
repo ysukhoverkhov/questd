@@ -31,7 +31,7 @@ class QuestDAOSpecs extends Specification
       db.quest.create(Quest(
         id = id,
 
-        authorUserID = "user id",
+        authorUserId = "user id",
         approveReward = Assets(),
         info = QuestInfo(
           themeId = "theme_id",
@@ -41,7 +41,7 @@ class QuestDAOSpecs extends Specification
             icon = None,
             description = "The description"))))
 
-      val q = db.quest.readByID(id)
+      val q = db.quest.readById(id)
 
       q must beSome[Quest]
       q.get.id must beEqualTo(id)
@@ -53,7 +53,7 @@ class QuestDAOSpecs extends Specification
 
       db.quest.create(Quest(
         id = id,
-        authorUserID = "user id",
+        authorUserId = "user id",
         approveReward = Assets(),
         info = QuestInfo(
           themeId = "theme_id",
@@ -63,14 +63,14 @@ class QuestDAOSpecs extends Specification
             icon = None,
             description = "The description"))))
 
-      val q = db.quest.readByID(id)
+      val q = db.quest.readById(id)
       q.get.info.content.media.reference must beEqualTo("")
 
       db.quest.update(q.get.copy(info = q.get.info.copy(
         content = q.get.info.content.copy(
           media = ContentReference(ContentType.Video.toString, "2", "3")))))
 
-      val q2 = db.quest.readByID(id)
+      val q2 = db.quest.readById(id)
 
       q2 must beSome[Quest]
       q2.get.id must beEqualTo(id)
@@ -84,7 +84,7 @@ class QuestDAOSpecs extends Specification
 
       db.quest.create(Quest(
         id = id,
-        authorUserID = "user id",
+        authorUserId = "user id",
         approveReward = Assets(),
         info = QuestInfo(
           themeId = "theme_id",
@@ -93,13 +93,13 @@ class QuestDAOSpecs extends Specification
             icon = None,
             description = "The description"))))
 
-      val q = db.quest.readByID(id)
+      val q = db.quest.readById(id)
 
       q must beSome[Quest]
       q.get.id must beEqualTo(id)
 
       db.quest.delete(id)
-      db.quest.readByID(id) must beNone
+      db.quest.readById(id) must beNone
     }
 
     "Get all quests" in new WithApplication(appWithTestDatabase) {
@@ -109,7 +109,7 @@ class QuestDAOSpecs extends Specification
       val qs = List(
         Quest(
           id = "q1",
-          authorUserID = "q1_author id",
+          authorUserId = "q1_author id",
           approveReward = Assets(),
           info = QuestInfo(
             themeId = "t1",
@@ -123,7 +123,7 @@ class QuestDAOSpecs extends Specification
 
         Quest(
           id = "q2",
-          authorUserID = "q2_author id",
+          authorUserId = "q2_author id",
           approveReward = Assets(),
           info = QuestInfo(
             themeId = "t2",
@@ -137,7 +137,7 @@ class QuestDAOSpecs extends Specification
 
         Quest(
           id = "q3",
-          authorUserID = "q3_author id",
+          authorUserId = "q3_author id",
           approveReward = Assets(),
           info = QuestInfo(
             themeId = "t3",

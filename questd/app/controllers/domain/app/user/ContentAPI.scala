@@ -82,9 +82,9 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def getQuest(request: GetQuestRequest): ApiResult[GetQuestResult] = handleDbException {
     import request._
 
-    db.quest.readByID(questId) match {
+    db.quest.readById(questId) match {
       case Some(q) => {
-        db.theme.readByID(q.info.themeId) match {
+        db.theme.readById(q.info.themeId) match {
           case Some(t) => {
             OkApiResult(Some(GetQuestResult(OK, Some(q.info), Some(t))))
           }
@@ -109,16 +109,16 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def getSolution(request: GetSolutionRequest): ApiResult[GetSolutionResult] = handleDbException {
     import request._
 
-    db.solution.readByID(solutionId).fold[ApiResult[GetSolutionResult]] {
+    db.solution.readById(solutionId).fold[ApiResult[GetSolutionResult]] {
       Logger.error("API - getSolution. Unable to find solution in db with id = " + solutionId)
       InternalErrorApiResult()
     } { s =>
 
-      val quest = db.quest.readByID(s.questID).map(q => q.info)
-      val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readByID(id))
+      val quest = db.quest.readById(s.questId).map(q => q.info)
+      val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readById(id))
       val rivalSolutionInfo = rivalSolution.map(rs => rs.info)
       val rivalRating = rivalSolution.map(rs => rs.rating)
-      val rivalProfile = rivalSolution.flatMap(rs => db.user.readByID(rs.userID)).map(ru => ru.profile)
+      val rivalProfile = rivalSolution.flatMap(rs => db.user.readById(rs.userId)).map(ru => ru.profile)
 
       OkApiResult(Some(GetSolutionResult(
         allowed = OK,
@@ -136,7 +136,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    */
   def getPublicProfile(request: GetPublicProfileRequest): ApiResult[GetPublicProfileResult] = handleDbException {
 
-    getUser(UserRequest(userID = Some(request.userId))) map { r =>
+    getUser(UserRequest(userId = Some(request.userId))) map { r =>
       OkApiResult(Some(GetPublicProfileResult(
         allowed = OK,
         publicProfile = Some(r.user.profile.publicProfile))))

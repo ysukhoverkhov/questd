@@ -92,9 +92,9 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
                 capPoints(quest))))))
 
     if (updatedQuest.status != quest.status) {
-      val authorID = quest.authorUserID
-      db.user.readByID(authorID) match {
-        case None => Logger.error("Unable to find author of quest user " + authorID)
+      val authorId = quest.authorUserId
+      db.user.readById(authorId) match {
+        case None => Logger.error("Unable to find author of quest user " + authorId)
         case Some(author) => {
           rewardQuestProposalAuthor(RewardQuestProposalAuthorRequest(updatedQuest, author))
         }

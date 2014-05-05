@@ -10,8 +10,8 @@ object QuestSolutionStatus extends Enumeration {
 case class QuestSolution(
   id: String = ID.generateUUID(),
   lastModDate: Date = new Date(),
-  questID: String,
-  userID: String,
+  questId: String,
+  userId: String,
   rivalSolutionId: Option[String] = None,
   questLevel: Int,
   info: QuestSolutionInfo,

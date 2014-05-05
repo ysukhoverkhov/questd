@@ -17,7 +17,7 @@ trait CommonUtil { this: UserLogic =>
     selectObject[Quest, String](
         i,
         (_.id),
-        (_.authorUserID),
+        (_.authorUserId),
         usedQuests,
         ((x: String) => x))
   }
@@ -29,7 +29,7 @@ trait CommonUtil { this: UserLogic =>
     selectObject[QuestSolution, String](
         i,
         (_.id),
-        (_.userID),
+        (_.userId),
         usedQuests,
         ((x: String) => x))
   }
