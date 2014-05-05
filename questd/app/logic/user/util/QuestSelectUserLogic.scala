@@ -32,12 +32,21 @@ trait QuestSelectUserLogic { this: UserLogic =>
       () => getAllQuests(reason).getOrElse(List().iterator)).
       foldLeft[Option[Quest]](None)((run, fun) => {
         if (run == None) {
-          selectQuest(fun(), user.history.solvedQuestIds)
+          selectQuest(fun(), questIdsToExclude(reason))
         } else {
           run
         }
       })
   }
+  
+  // TODO: write test for selecting correct list for voting and solving.
+  private def questIdsToExclude(reason: QuestGetReason) = {
+    reason match {
+      case ForSolving => user.history.solvedQuestIds
+      case ForVoting => user.history.votedQuestProposalIds
+    }
+  }
+  
 
   def getQuestsWithSuperAlgorithm(reason: QuestGetReason) = {
     List(
