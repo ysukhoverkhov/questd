@@ -36,6 +36,7 @@ class UserLogic(
     with Friends
     with MiscUserLogic
     with QuestSelectUserLogic
+    with SolutionSelectUserLogic
     
     with CommonUtil {
 }

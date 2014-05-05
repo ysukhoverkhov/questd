@@ -35,18 +35,9 @@ trait VotingQuestSolutions { this: UserLogic =>
    * @return None if no more quests to vote for today.
    */
   def getQuestSolutionToVote: Option[QuestSolution] = {
-    val solutions = api.allQuestSolutionsOnVoting(
-      AllQuestSolutionsRequest(user.profile.publicProfile.level - constants.solutionLevelDownTolerance, user.profile.publicProfile.level + constants.solutionLevelUpTolerance)).body.get.quests
-
-    selectQuestSolution(solutions, user.history.votedQuestSolutionIds)
+    getRandomSolution
   }
 
-  
-  
-  
-  
-  
-  
   /**
    *
    */

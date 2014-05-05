@@ -64,5 +64,6 @@ trait VotingQuestProposals { this: UserLogic =>
     else
       Assets()
   }
-
 }
+
+// TODO: write test for API calling db correctly for getting quest for reason OnVoting. 

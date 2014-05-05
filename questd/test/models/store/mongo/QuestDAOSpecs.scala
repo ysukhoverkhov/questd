@@ -103,6 +103,7 @@ class QuestDAOSpecs extends Specification
     }
 
     "Get all quests" in new WithApplication(appWithTestDatabase) {
+      clearDB()
 
       // Preparing quests to store in db.
 
