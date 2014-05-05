@@ -81,21 +81,18 @@ private[mongo] class MongoQuestSolutionDAO
     }
 
     if (vip != None) {
-      // TODO: !!! add flag "vip" to solution info.
-      // TODO: test DAO works well with VIP solutions.
-      // TODO: create tasks fro creating VIP solutions by VIP people.
       queryBuilder += ("info.vip" -> vip.get)
     }
 
     if (ids.length > 0) {
       queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
     }
-// TODO: test each filter is working in the function.
+
     if (questIds.length > 0) {
       queryBuilder += ("questId" -> MongoDBObject("$in" -> questIds))
     }
 
-    Logger.trace("DB - allWithParams - " + queryBuilder.result);
+    Logger.trace("MongoQuestSolutionDAO - allWithParams - " + queryBuilder.result);
 
     // TODO: test lastmoddate is used correctly.
     findByExample(
