@@ -14,15 +14,7 @@ case class AllQuestSolutionsResult(quests: Iterator[QuestSolution])
 private [domain] trait QuestsSolutionFetchAPI { this: DBAccessor => 
 
 
-  /**
-   * List all Quests solution s with OnVoting status.
-   * 
-   */
-  // TODO: remove me in favor to modern API.
-  def allQuestSolutionsOnVoting(request: AllQuestSolutionsRequest): ApiResult[AllQuestSolutionsResult] = handleDbException {
-    OkApiResult(Some(AllQuestSolutionsResult(db.solution.allWithStatusAndLevels(QuestSolutionStatus.OnVoting.toString, request.minLevel, request.maxLevel))))
-  }
-  
+ 
 }
 
 

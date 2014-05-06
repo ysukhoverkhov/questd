@@ -4,8 +4,6 @@ import models.domain._
 
 trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
 
-  // TODO: remove these three functions.
-  def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[QuestSolution]
 
   /**
    * Get solutions what meets following optional parameters.

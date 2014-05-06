@@ -15,17 +15,6 @@ private[mongo] class MongoQuestSolutionDAO
   extends BaseMongoDAO[QuestSolution](collectionName = "solutions")
   with QuestSolutionDAO {
 
-  // TODO: remove these 3 functions.
-  def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[QuestSolution] = {
-    findByExample(
-      MongoDBObject(
-        ("status" -> status),
-        ("$and" -> Array(
-          MongoDBObject("questLevel" -> MongoDBObject("$gte" -> minLevel)),
-          MongoDBObject("questLevel" -> MongoDBObject("$lte" -> maxLevel))))),
-      MongoDBObject("lastModDate" -> 1))
-  }
-
   def allWithParams(
     status: Option[String] = None,
     userIds: List[String] = List(),
