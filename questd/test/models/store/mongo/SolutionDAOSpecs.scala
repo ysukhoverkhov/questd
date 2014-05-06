@@ -11,6 +11,7 @@ import play.Logger
 import com.mongodb.casbah.commons.MongoDBObject
 import models.store._
 import models.domain._
+import java.util.Date
 
 //@RunWith(classOf[JUnitRunner])
 class SolutionDAOSpecs extends Specification
@@ -27,7 +28,8 @@ class SolutionDAOSpecs extends Specification
     userId: String = "user id",
     questLevel: Int = 5,
     vip: Boolean = false,
-    status: String = QuestSolutionStatus.OnVoting.toString) = {
+    status: String = QuestSolutionStatus.OnVoting.toString,
+    lastModDate: Date = new Date()) = {
 
     QuestSolution(
       id = id,
@@ -37,7 +39,8 @@ class SolutionDAOSpecs extends Specification
       info = QuestSolutionInfo(
         content = ContentReference(ContentType.Video.toString, "", ""),
         vip = vip),
-      status = status)
+      status = status,
+      lastModDate = lastModDate)
   }
 
   private def createSolutionInDB(
@@ -103,14 +106,16 @@ class SolutionDAOSpecs extends Specification
       // Preparing quests to store in db.
 
       val qs = List(
-        createSolution("q1", "t1", "q1_author id", 3, false, QuestStatus.OnVoting.toString),
-        createSolution("q2", "t2", "q2_author id", 13, true, QuestStatus.InRotation.toString),
-        createSolution("q3", "t3", "q3_author id", 7, true, QuestStatus.OnVoting.toString))
+        createSolution("q1", "t1", "q1_author id", 3, false, QuestStatus.OnVoting.toString, new Date(5)),
+        createSolution("q2", "t2", "q2_author id", 13, true, QuestStatus.InRotation.toString, new Date(3)),
+        createSolution("q3", "t3", "q3_author id", 7, true, QuestStatus.OnVoting.toString, new Date(4)))
 
       qs.foreach(db.solution.create)
 
-      val all = db.solution.allWithParams()
+      val all = db.solution.allWithParams().toList
       all.size must beEqualTo(qs.size)
+      // Checking order with lastModDate
+      all must beEqualTo(List(qs(1), qs(2), qs(0)))
 
       val status = db.solution.allWithParams(status = Some(QuestStatus.OnVoting.toString)).toList
       status.map(_.id).size must beEqualTo(2)
