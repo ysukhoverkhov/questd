@@ -1,10 +1,9 @@
-package controllers.domain
+package controllers.domain.app.user
 
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.specs2.mock.Mockito
 import org.junit.runner._
-import play.Logger
 import play.api.test._
 import play.api.test.Helpers._
 import controllers.domain._

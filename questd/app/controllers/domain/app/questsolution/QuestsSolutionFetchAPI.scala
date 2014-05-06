@@ -7,10 +7,6 @@ import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 
 
-case class AllQuestSolutionsRequest(minLevel: Int, maxLevel: Int)
-case class AllQuestSolutionsResult(quests: Iterator[QuestSolution])
-
-
 private [domain] trait QuestsSolutionFetchAPI { this: DBAccessor => 
 
 
