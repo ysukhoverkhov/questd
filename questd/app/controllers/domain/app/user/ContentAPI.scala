@@ -154,8 +154,6 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         questIds = List(request.questId),
         skip = request.pageNumber * pageSize)
         
-        Logger.error(solutionsForQuest.toString)
-    
     OkApiResult(Some(GetSolutionsForQuestResult(
       allowed = OK,
       solutions = solutionsForQuest.take(pageSize).toList,
@@ -166,16 +164,13 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   /**
    * Get all solutions for a user.
    */
-  // TODO: test me.
-  // TODO: rewrite me with modern db api
   def getSolutionsForUser(request: GetSolutionsForUserRequest): ApiResult[GetSolutionsForUserResult] = handleDbException {
     val pageSize = if (request.pageSize > 50) 50 else request.pageSize
+    val solutionsForUser = db.solution.allWithParams(
+        status = request.status.map(_.toString), 
+        userIds = List(request.userId),
+        skip = request.pageNumber * pageSize)
     
-    val solutionsForUser = db.solution.allWithStatusAndUser(
-        request.status.map(_.toString), 
-        request.userId,
-        request.pageNumber * pageSize)
-
     OkApiResult(Some(GetSolutionsForUserResult(
       allowed = OK,
       solutions = solutionsForUser.take(pageSize).toList,

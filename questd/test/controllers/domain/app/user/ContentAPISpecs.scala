@@ -38,6 +38,23 @@ class ContentAPISpecs extends BaseAPISpecs {
       result.body must beSome[GetSolutionsForQuestResult].which(_.solutions == List())
     }
 
+    "Make correct db call in getSolutionsForUser" in context {
+      db.solution.allWithParams(Some(QuestSolutionStatus.OnVoting.toString), List("qid"), null, 10, null, null, null) returns List[QuestSolution]().iterator
+
+      val result = api.getSolutionsForUser(GetSolutionsForUserRequest(User(), "qid", Some(QuestSolutionStatus.OnVoting), 2, 5))
+
+      there was one(solution).allWithParams(
+        Some(QuestSolutionStatus.OnVoting.toString),
+        List("qid"),
+        null,
+        10,
+        null,
+        null,
+        null)
+
+      result.body must beSome[GetSolutionsForUserResult].which(_.solutions == List())
+    }
+    
     "getLikedQuests calls db correctly" in context {
 
       db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator

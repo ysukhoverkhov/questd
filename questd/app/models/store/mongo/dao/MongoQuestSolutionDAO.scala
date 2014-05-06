@@ -26,36 +26,6 @@ private[mongo] class MongoQuestSolutionDAO
       MongoDBObject("lastModDate" -> 1))
   }
 
-  def allWithStatusAndQuest(
-    status: Option[String],
-    questId: String,
-    skip: Int = 0): Iterator[QuestSolution] = {
-
-    val queryBuilder = MongoDBObject.newBuilder
-    queryBuilder += ("questId" -> questId)
-    if (status != None) {
-      queryBuilder += ("status" -> status.get)
-    }
-
-    findByExample(
-      queryBuilder.result,
-      MongoDBObject("lastModDate" -> 1),
-      skip)
-  }
-
-  def allWithStatusAndUser(status: Option[String], userId: String, skip: Int = 0): Iterator[QuestSolution] = {
-    val queryBuilder = MongoDBObject.newBuilder
-    queryBuilder += ("userId" -> userId)
-    if (status != None) {
-      queryBuilder += ("status" -> status.get)
-    }
-
-    findByExample(
-      queryBuilder.result,
-      MongoDBObject("lastModDate" -> 1),
-      skip)
-  }
-
   def allWithParams(
     status: Option[String] = None,
     userIds: List[String] = List(),
