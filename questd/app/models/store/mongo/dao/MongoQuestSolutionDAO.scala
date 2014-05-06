@@ -15,6 +15,7 @@ private[mongo] class MongoQuestSolutionDAO
   extends BaseMongoDAO[QuestSolution](collectionName = "solutions")
   with QuestSolutionDAO {
 
+  // TODO: remove these 3 functions.
   def allWithStatusAndLevels(status: String, minLevel: Int, maxLevel: Int): Iterator[QuestSolution] = {
     findByExample(
       MongoDBObject(
@@ -94,7 +95,6 @@ private[mongo] class MongoQuestSolutionDAO
 
     Logger.trace("MongoQuestSolutionDAO - allWithParams - " + queryBuilder.result);
 
-    // TODO: test lastmoddate is used correctly.
     findByExample(
       queryBuilder.result,
       MongoDBObject("lastModDate" -> 1),

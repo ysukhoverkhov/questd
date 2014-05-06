@@ -146,6 +146,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   /**
    * Get solutions for a quest.
    */
+  // TODO: test me.
+  // TODO: rewrite me with modern db api
   def getSolutionsForQuest(request: GetSolutionsForQuestRequest): ApiResult[GetSolutionsForQuestResult] = handleDbException {
     val pageSize = if (request.pageSize > 50) 50 else request.pageSize
     
@@ -164,6 +166,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   /**
    * Get all solutions for a user.
    */
+  // TODO: test me.
+  // TODO: rewrite me with modern db api
   def getSolutionsForUser(request: GetSolutionsForUserRequest): ApiResult[GetSolutionsForUserResult] = handleDbException {
     val pageSize = if (request.pageSize > 50) 50 else request.pageSize
     
