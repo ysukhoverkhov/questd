@@ -21,6 +21,7 @@ private[domain] abstract class BaseAPISpecs extends Specification
   val db = mock[Database]
   val user = mock[UserDAO]
   val quest = mock[QuestDAO]
+  val solution = mock[QuestSolutionDAO]
   
   val rand = mock[Random]
   
@@ -31,6 +32,7 @@ private[domain] abstract class BaseAPISpecs extends Specification
     def before = {
       db.user returns user
       db.quest returns quest
+      db.solution returns solution
     } 
   }
   
