@@ -47,25 +47,20 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
   }
 
   def getVIPSolutions(request: GetVIPSolutionsRequest): ApiResult[GetVIPSolutionsResult] = handleDbException {
-    
-    // TODO: use theme ids here as well.
-    // request.themeIds
-    
     OkApiResult(Some(GetVIPSolutionsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
       levels = request.levels,
-      vip = Some(true)))))
+      vip = Some(true),
+      themeIds = request.themeIds))))
   }
   
   def getAllSolutions(request: GetAllSolutionsRequest): ApiResult[GetAllSolutionsResult] = handleDbException {
     Logger.trace("getAllSolutions - " + request.toString)
 
-    // TODO: use theme ids here as well.
-    // request.themeIds
-    
     OkApiResult(Some(GetAllSolutionsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
-      levels = request.levels))))
+      levels = request.levels,
+      themeIds = request.themeIds))))
   }
 }
 

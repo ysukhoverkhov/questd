@@ -22,7 +22,7 @@ class ContentAPISpecs extends BaseAPISpecs {
   "Content API" should {
 
     "Make correct db call in getSolutionsForQuest" in context {
-      db.solution.allWithParams(Some(QuestSolutionStatus.OnVoting.toString), null, null, 10, null, null, List("qid")) returns List[QuestSolution]().iterator
+      db.solution.allWithParams(Some(QuestSolutionStatus.OnVoting.toString), null, null, 10, null, null, List("qid"), null) returns List[QuestSolution]().iterator
 
       val result = api.getSolutionsForQuest(GetSolutionsForQuestRequest(User(), "qid", Some(QuestSolutionStatus.OnVoting), 2, 5))
 
@@ -33,7 +33,8 @@ class ContentAPISpecs extends BaseAPISpecs {
         10,
         null,
         null,
-        List("qid"))
+        List("qid"), 
+        null)
 
       result.body must beSome[GetSolutionsForQuestResult].which(_.solutions == List())
     }
@@ -48,6 +49,7 @@ class ContentAPISpecs extends BaseAPISpecs {
         List("qid"),
         null,
         10,
+        null,
         null,
         null,
         null)

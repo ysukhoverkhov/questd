@@ -2,7 +2,12 @@ package models.domain
 
 import models.domain.base.ID
 
+case class QuestSolutionInfoContent(
+  media: ContentReference,
+  icon: Option[ContentReference] = None)
+
 case class QuestSolutionInfo(
-  content: ContentReference,
-  icon: Option[ContentReference] = None,
-  vip: Boolean = false)
+  content: QuestSolutionInfoContent,
+  vip: Boolean = false,
+  themeId: String,
+  questId: String)

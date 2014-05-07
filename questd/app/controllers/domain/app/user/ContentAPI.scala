@@ -114,7 +114,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       InternalErrorApiResult()
     } { s =>
 
-      val quest = db.quest.readById(s.questId).map(q => q.info)
+      val quest = db.quest.readById(s.info.questId).map(q => q.info)
       val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readById(id))
       val rivalSolutionInfo = rivalSolution.map(rs => rs.info)
       val rivalRating = rivalSolution.map(rs => rs.rating)

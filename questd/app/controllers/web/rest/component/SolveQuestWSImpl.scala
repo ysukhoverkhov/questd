@@ -29,10 +29,10 @@ trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFu
   }
 
   def proposeSolution = wrapJsonApiCallReturnBody[WSProposeSolutionResult] { (js, r) =>
-    val v = Json.read[QuestSolutionInfo](js.toString)
+    val v = Json.read[QuestSolutionInfoContent](js.toString)
 
     // Check for existing content type.
-    ContentType.withName(v.content.contentType)
+    ContentType.withName(v.media.contentType)
 
     api.proposeSolution(ProposeSolutionRequest(r.user, v))
   }

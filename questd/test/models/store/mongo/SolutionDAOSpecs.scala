@@ -26,6 +26,7 @@ class SolutionDAOSpecs extends Specification
     id: String,
     questId: String = "quest id",
     userId: String = "user id",
+    themeId: String = "theme id",
     questLevel: Int = 5,
     vip: Boolean = false,
     status: String = QuestSolutionStatus.OnVoting.toString,
@@ -33,12 +34,13 @@ class SolutionDAOSpecs extends Specification
 
     QuestSolution(
       id = id,
-      questId = questId,
       userId = userId,
       questLevel = questLevel,
       info = QuestSolutionInfo(
-        content = ContentReference(ContentType.Video.toString, "", ""),
-        vip = vip),
+        content = QuestSolutionInfoContent(media = ContentReference(ContentType.Video.toString, "", "")),
+        vip = vip,
+        questId = questId,
+        themeId = themeId),
       status = status,
       lastModDate = lastModDate)
   }
@@ -47,11 +49,12 @@ class SolutionDAOSpecs extends Specification
     id: String,
     questId: String = "quest id",
     userId: String = "user id",
+    themeId: String = "theme id",
     questLevel: Int = 5,
     vip: Boolean = false,
     status: String = QuestSolutionStatus.OnVoting.toString) = {
 
-    db.solution.create(createSolution(id, questId, userId, questLevel, vip, status))
+    db.solution.create(createSolution(id, questId, userId, themeId, questLevel, vip, status))
   }
 
   "Mongo Quest Solution DAO" should {
@@ -75,14 +78,15 @@ class SolutionDAOSpecs extends Specification
       createSolutionInDB(id)
 
       val q = db.solution.readById(id)
-      q.get.info.content.reference must beEqualTo("")
+      q.get.info.content.media.reference must beEqualTo("")
 
       db.solution.update(q.get.copy(info = q.get.info.copy(
-        content = ContentReference(ContentType.Video.toString, "2", "3"))))
+        content = q.get.info.content.copy(
+          media = ContentReference(ContentType.Video.toString, "2", "3")))))
 
       val q2 = db.solution.readById(id)
 
-      q2 must beSome[QuestSolution].which(_.id == id) and beSome[QuestSolution].which(_.info.content.reference == "3")
+      q2 must beSome[QuestSolution].which(_.id == id) and beSome[QuestSolution].which(_.info.content.media.reference == "3")
     }
 
     "Delete quest solution" in new WithApplication(appWithTestDatabase) {
@@ -104,11 +108,10 @@ class SolutionDAOSpecs extends Specification
       clearDB()
 
       // Preparing quests to store in db.
-
       val qs = List(
-        createSolution("q1", "t1", "q1_author id", 3, false, QuestStatus.OnVoting.toString, new Date(5)),
-        createSolution("q2", "t2", "q2_author id", 13, true, QuestStatus.InRotation.toString, new Date(3)),
-        createSolution("q3", "t3", "q3_author id", 7, true, QuestStatus.OnVoting.toString, new Date(4)))
+        createSolution("q1", "t1", "q1_author id", "q1_theme_id", 3, false, QuestStatus.OnVoting.toString, new Date(5)),
+        createSolution("q2", "t2", "q2_author id", "q2_theme_id", 13, true, QuestStatus.InRotation.toString, new Date(3)),
+        createSolution("q3", "t3", "q3_author id", "q3_theme_id", 7, true, QuestStatus.OnVoting.toString, new Date(4)))
 
       qs.foreach(db.solution.create)
 
@@ -144,10 +147,14 @@ class SolutionDAOSpecs extends Specification
       ids.map(_.id).size must beEqualTo(1)
       ids.map(_.id) must beEqualTo(List(qs(1).id))
 
-      val themeIds = db.solution.allWithParams(questIds = List("t1", "t3")).toList
-      themeIds.map(_.id).size must beEqualTo(2)
-      themeIds.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
+      val questIds = db.solution.allWithParams(questIds = List("t1", "t3")).toList
+      questIds.map(_.id).size must beEqualTo(2)
+      questIds.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
 
+      val themeIds = db.solution.allWithParams(themeIds = List("q1_theme_id", "q2_theme_id")).toList
+      themeIds.map(_.id).size must beEqualTo(2)
+      themeIds.map(_.id) must contain(qs(0).id) and contain(qs(1).id)
+      
       val themeIdsAndIds = db.solution.allWithParams(ids = List("q1", "q2"), questIds = List("t1", "t3")).toList
       themeIdsAndIds.map(_.id).size must beEqualTo(1)
       themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))

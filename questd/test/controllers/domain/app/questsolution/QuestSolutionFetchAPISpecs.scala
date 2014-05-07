@@ -43,6 +43,7 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
         0,
         null,
         null,
+        null,
         null)
 
       there was no(solution).allWithParams(
@@ -52,6 +53,7 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
         0,
         null,
         null,
+        null,
         null)
         
       there was no(solution).allWithParams(
@@ -59,6 +61,7 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
         List(f1.id, f2.id),
         Some(1, 2),
         0,
+        null,
         null,
         null,
         null)
@@ -82,7 +85,8 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
         0,
         null,
         null,
-        List("1", "2", "3", "4"))
+        List("1", "2", "3", "4"),
+        null)
     }
     
     "getVIPSolutions calls db correctly" in context {
@@ -98,7 +102,8 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
         0,
         Some(true),
         null,
-        null)
+        null,
+        List("a"))
     }
 
     "getAllSolutions calls db correctly" in context {
@@ -114,7 +119,8 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
         0,
         null,
         null,
-        null)
+        null,
+        List("a"))
     }
   }
 }

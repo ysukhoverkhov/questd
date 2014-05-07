@@ -24,7 +24,7 @@ case class TakeQuestResult(allowed: ProfileModificationResult, profile: Option[P
 case class GetTakeQuestCostRequest(user: User)
 case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Assets)
 
-case class ProposeSolutionRequest(user: User, solution: QuestSolutionInfo)
+case class ProposeSolutionRequest(user: User, solution: QuestSolutionInfoContent)
 case class ProposeSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetQuestGiveUpCostRequest(user: User)
@@ -186,15 +186,17 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     val user = ensureNoDeadlineQuest(request.user)
 
-    user.canResolveQuest(ContentType.withName(request.solution.content.contentType)) match {
+    user.canResolveQuest(ContentType.withName(request.solution.media.contentType)) match {
       case OK => {
 
         db.solution.create(
           QuestSolution(
-            info = request.solution,
             userId = user.id,
-            questId = user.profile.questSolutionContext.takenQuest.get.id,
-            questLevel = user.profile.questSolutionContext.takenQuest.get.obj.level))
+            questLevel = user.profile.questSolutionContext.takenQuest.get.obj.level,
+            info = QuestSolutionInfo(
+                content = request.solution, 
+                themeId = user.profile.questSolutionContext.takenQuest.get.obj.themeId,
+                questId = user.profile.questSolutionContext.takenQuest.get.id)))
 
         val u = db.user.resetQuestSolution(user.id)
 
@@ -249,7 +251,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     Logger.debug("API - rewardQuestSolutionAuthor")
 
-    db.quest.readById(solution.questId) match {
+    db.quest.readById(solution.info.questId) match {
       case Some(q) => {
 
         val r = QuestSolutionStatus.withName(solution.status) match {
@@ -294,7 +296,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     val solutionsForQuest = db.solution.allWithParams(
       status = Some(QuestSolutionStatus.WaitingForCompetitor.toString),
-      questIds = List(request.solution.questId))
+      questIds = List(request.solution.info.questId))
       
     def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {
       if (s1.calculatePoints == s2.calculatePoints)
