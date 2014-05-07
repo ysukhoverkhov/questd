@@ -7,33 +7,33 @@ import controllers.domain.helpers.exceptionwrappers._
 import controllers.domain._
 import play.Logger
 
-case class GetFriendsSolutionRequest(user: User, status: QuestStatus.Value, levels: Option[(Int, Int)] = None)
-case class GetFriendsSolutionResult(quests: Iterator[QuestSolution])
+case class GetFriendsSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
+case class GetFriendsSolutionsResult(quests: Iterator[QuestSolution])
 
-case class GetShortlistSolutionRequest(user: User, status: QuestStatus.Value, levels: Option[(Int, Int)] = None)
-case class GetShortlistSolutionResult(quests: Iterator[QuestSolution])
+case class GetShortlistSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
+case class GetShortlistSolutionsResult(quests: Iterator[QuestSolution])
 
-case class GetSolutionsForLikedQuestsRequest(user: User, status: QuestStatus.Value, levels: Option[(Int, Int)] = None)
+case class GetSolutionsForLikedQuestsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
 case class GetSolutionsForLikedQuestsResult(quests: Iterator[QuestSolution])
 
-case class GetVIPSolutionsRequest(user: User, status: QuestStatus.Value, levels: Option[(Int, Int)] = None, themeIds: List[String])
+case class GetVIPSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None, themeIds: List[String])
 case class GetVIPSolutionsResult(quests: Iterator[QuestSolution])
 
-case class GetAllSolutionsRequest(status: QuestStatus.Value, levels: Option[(Int, Int)] = None, themeIds: List[String] = List())
+case class GetAllSolutionsRequest(status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None, themeIds: List[String] = List())
 case class GetAllSolutionsResult(quests: Iterator[QuestSolution])
 
 
 private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
 
-  def getFriendsSolutions(request: GetFriendsSolutionRequest): ApiResult[GetFriendsSolutionResult] = handleDbException {
-    OkApiResult(Some(GetFriendsSolutionResult(db.solution.allWithParams(
+  def getFriendsSolutions(request: GetFriendsSolutionsRequest): ApiResult[GetFriendsSolutionsResult] = handleDbException {
+    OkApiResult(Some(GetFriendsSolutionsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
       userIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted.toString).map(_.friendId),
       levels = request.levels))))
   }
 
-  def getShortlistSolutions(request: GetShortlistSolutionRequest): ApiResult[GetShortlistSolutionResult] = handleDbException {
-    OkApiResult(Some(GetShortlistSolutionResult(db.solution.allWithParams(
+  def getShortlistSolutions(request: GetShortlistSolutionsRequest): ApiResult[GetShortlistSolutionsResult] = handleDbException {
+    OkApiResult(Some(GetShortlistSolutionsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
       userIds = request.user.shortlist,
       levels = request.levels))))
