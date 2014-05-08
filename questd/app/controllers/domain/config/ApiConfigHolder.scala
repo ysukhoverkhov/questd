@@ -27,6 +27,17 @@ class _ConfigParams {
   val QuestProbabilityShortlist = "72 02 Probability of quests from shortlist"
   val QuestProbabilityLiked = "72 03 Probability of liked quests"
   val QuestProbabilityStar = "72 04 Probability of quests from stars"
+
+
+  val SolutionProbabilityLevelsToGiveStartingSolutions = "91 01 Level to give starting Solutions"
+  val SolutionProbabilityStartingVIPSolutions = "91 02 Probability of selecting VIP Solutions in initial stage"
+
+  val SolutionProbabilityFriends = "92 01 Probability of Solutions from friends"
+  val SolutionProbabilityShortlist = "92 02 Probability of Solutions from shortlist"
+  val SolutionProbabilityLiked = "92 03 Probability of liked Solutions"
+  val SolutionProbabilityStar = "92 04 Probability of quests from Solutions"
+
+
 }
 
 object _ConfigParams extends _ConfigParams
@@ -59,6 +70,14 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.QuestProbabilityFriends -> "0.25",
       ConfigParams.QuestProbabilityShortlist -> "0.25",
       ConfigParams.QuestProbabilityLiked -> "0.20",
-      ConfigParams.QuestProbabilityStar -> "0.10"))
+      ConfigParams.QuestProbabilityStar -> "0.10",
+
+      ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions -> "5",
+      ConfigParams.SolutionProbabilityStartingVIPSolutions -> "0.5",
+
+      ConfigParams.SolutionProbabilityFriends -> "0.25",
+      ConfigParams.SolutionProbabilityShortlist -> "0.25",
+      ConfigParams.SolutionProbabilityLiked -> "0.20",
+      ConfigParams.SolutionProbabilityStar -> "0.10"))
 }
 

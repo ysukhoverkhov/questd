@@ -49,12 +49,12 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   }
 
   private[user] def getStartingSolutions: Option[Iterator[QuestSolution]] = {
-    Logger.trace("getStartingSolutions") // TODO: make seporate probabilities.
+    Logger.trace("getStartingSolutions")
 
-    if (user.profile.publicProfile.level > api.config(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
+    if (user.profile.publicProfile.level > api.config(api.ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions).toInt) {
       None
     } else {
-      if (rand.nextDouble < api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble) {
+      if (rand.nextDouble < api.config(api.ConfigParams.SolutionProbabilityStartingVIPSolutions).toDouble) {
         getVIPSolutions
       } else {
         getOtherSolutions
@@ -68,11 +68,11 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     val dice = rand.nextDouble
 
     List(
-      (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsSolutions),
-      (api.config(api.ConfigParams.QuestProbabilityShortlist).toDouble, () => getShortlistSolutions),
-      (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getSolutionsForLikedQuests),
-      (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPSolutions),
-      (1.00, () => getOtherSolutions) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
+      (api.config(api.ConfigParams.SolutionProbabilityFriends).toDouble, () => getFriendsSolutions),
+      (api.config(api.ConfigParams.SolutionProbabilityShortlist).toDouble, () => getShortlistSolutions),
+      (api.config(api.ConfigParams.SolutionProbabilityLiked).toDouble, () => getSolutionsForLikedQuests),
+      (api.config(api.ConfigParams.SolutionProbabilityStar).toDouble, () => getVIPSolutions),
+      (1.00, () => getOtherSolutions) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
       ).foldLeft[Either[Double, Option[Iterator[QuestSolution]]]](Left(0))((run, fun) => {
         run match {
           case Left(p) => {
@@ -91,7 +91,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
           case None => None
         }
         case Left(_) => {
-          Logger.error("getDefaultSolutions - None of quest selector functions were called. Check probabilities.")
+          Logger.error("getDefaultSolutions - None of solution selector functions were called. Check probabilities.")
           None
         }
       }
