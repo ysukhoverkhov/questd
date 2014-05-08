@@ -124,7 +124,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   private[user] def getVIPSolutions = {
     Logger.trace("  Returning VIP's solutions")
 
-    val themeIds = selectRandomThemes(numberOfFavoriteThemesForVIPQuests)
+    val themeIds = selectRandomThemes(numberOfFavoriteThemesForVIPSolutions)
     Logger.trace("    Selected themes of VIP's solutions: " + themeIds.mkString(", "))
 
     Some(api.getVIPSolutions(GetVIPSolutionsRequest(
@@ -137,7 +137,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   private[user] def getOtherSolutions = {
     Logger.trace("  Returning from all solutions with favorite themes")
 
-    val themeIds = selectRandomThemes(numberOfFavoriteThemesForOtherQuests) // TODO: use correct constant.
+    val themeIds = selectRandomThemes(numberOfFavoriteThemesForOtherSolutions)
     Logger.trace("    Selected themes of other solutions: " + themeIds.mkString(", "))
 
     Some(api.getAllSolutions(GetAllSolutionsRequest(

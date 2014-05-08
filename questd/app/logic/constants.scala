@@ -84,7 +84,9 @@ object constants {
 
   val invitedVoteMult = 2
 
-  
+  val numberOfFavoriteThemesForVIPSolutions = 3
+  val numberOfFavoriteThemesForOtherSolutions = 1
+
   
   /**
    * Messages
