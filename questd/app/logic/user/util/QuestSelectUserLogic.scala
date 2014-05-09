@@ -38,7 +38,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
         }
       })
   }
-  
+
   // TODO: write test for selecting correct list for voting and solving.
   private def questIdsToExclude(reason: QuestGetReason) = {
     reason match {
@@ -46,7 +46,6 @@ trait QuestSelectUserLogic { this: UserLogic =>
       case ForVoting => user.history.votedQuestProposalIds
     }
   }
-  
 
   def getQuestsWithSuperAlgorithm(reason: QuestGetReason) = {
     List(
@@ -131,10 +130,15 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
   private[user] def getLikedQuests(reason: QuestGetReason) = {
     Logger.trace("  Returning quests we liked recently")
-    Some(api.getLikedQuests(GetLikedQuestsRequest(
-      user,
-      reason,
-      levels(reason))).body.get.quests)
+
+    // If we already liked the quest we are unable to like it once again anymore.
+    if (reason == QuestGetReason.ForVoting)
+      None
+    else
+      Some(api.getLikedQuests(GetLikedQuestsRequest(
+        user,
+        reason,
+        levels(reason))).body.get.quests)
   }
 
   private[user] def getVIPQuests(reason: QuestGetReason) = {
@@ -175,7 +179,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
    */
   private def levels(reason: QuestGetReason) = {
     reason match {
-      case ForSolving => Some(user.profile.publicProfile.level - questForSolveLevelToleranceDown, user.profile.publicProfile.level + questForSolveLevelToleranceUp) 
+      case ForSolving => Some(user.profile.publicProfile.level - questForSolveLevelToleranceDown, user.profile.publicProfile.level + questForSolveLevelToleranceUp)
       case ForVoting => None
     }
   }

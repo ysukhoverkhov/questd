@@ -20,6 +20,7 @@ class _ConfigParams {
   val ProposalVotesToLeaveVoting = "50 06 Proposal Votes To Leave Voting (calculated)"
   val ProposalRatioToLeaveVoting = "50 07 Proposal Ratio To Leave Voting (calculated)"
 
+    
   val QuestProbabilityLevelsToGiveStartingQuests = "71 01 Level to give starting quests"
   val QuestProbabilityStartingVIPQuests = "71 02 Probability of selecting VIP quests in initial stage"
 
@@ -28,7 +29,7 @@ class _ConfigParams {
   val QuestProbabilityLiked = "72 03 Probability of liked quests"
   val QuestProbabilityStar = "72 04 Probability of quests from stars"
 
-
+    
   val SolutionProbabilityLevelsToGiveStartingSolutions = "91 01 Level to give starting Solutions"
   val SolutionProbabilityStartingVIPSolutions = "91 02 Probability of selecting VIP Solutions in initial stage"
 

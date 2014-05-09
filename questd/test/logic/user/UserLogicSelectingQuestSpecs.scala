@@ -119,7 +119,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
-    "Return liked quest if dice rolls so" in {
+    "Return liked quest if dice rolls so for solving" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.58
 
@@ -136,6 +136,24 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
+    "Do not return liked quest if dice rolls so for voting" in {
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.58
+
+      val qid = "qid"
+
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+
+      val u = User()
+      val q = u.getQuestProposalToVote
+
+      there was one(rand).nextDouble
+      there was no(api).getLikedQuests(any[GetLikedQuestsRequest])
+      there was one(api).getAllQuests(any[GetAllQuestsRequest])
+
+      q must beSome.which(q => q.id == qid)
+    }
+    
     "Return VIP quest if dice rolls so" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
