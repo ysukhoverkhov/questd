@@ -24,6 +24,8 @@ import com.github.nscala_time.time.Imports.DateTime
 import com.github.nscala_time.time.Imports.richDateTime
 import logic.LogicBootstrapper
 import java.util.Date
+import controllers.domain.app.questsolution._
+import models.domain.QuestSolution
 
 class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
@@ -32,11 +34,12 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
   /**
    * Creates 10 themes for mocking
    */
-  private def createStubThemes: List[Theme] = {
-    (for (i <- List.range(1, 11)) yield {
-      Theme(text = i.toString, comment = i.toString)
-    })
-  }
+  // TODO: remove me.
+//  private def createStubThemes: List[Theme] = {
+//    (for (i <- List.range(1, 11)) yield {
+//      Theme(text = i.toString, comment = i.toString)
+//    })
+//  }
 
   /**
    * Creates stub config for our tests.
@@ -46,13 +49,13 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
     val config = mock[ConfigSection]
 
-    config.apply(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests) returns "5"
-    config.apply(api.ConfigParams.QuestProbabilityStartingVIPQuests) returns "0.50"
+    config.apply(api.ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions) returns "5"
+    config.apply(api.ConfigParams.SolutionProbabilityStartingVIPSolutions) returns "0.50"
 
-    config.apply(api.ConfigParams.QuestProbabilityFriends) returns "0.25"
-    config.apply(api.ConfigParams.QuestProbabilityShortlist) returns "0.25"
-    config.apply(api.ConfigParams.QuestProbabilityLiked) returns "0.20"
-    config.apply(api.ConfigParams.QuestProbabilityStar) returns "0.10"
+    config.apply(api.ConfigParams.SolutionProbabilityFriends) returns "0.25"
+    config.apply(api.ConfigParams.SolutionProbabilityShortlist) returns "0.25"
+    config.apply(api.ConfigParams.SolutionProbabilityLiked) returns "0.20"
+    config.apply(api.ConfigParams.SolutionProbabilityStar) returns "0.10"
 
     config
   }
@@ -68,53 +71,52 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
     User(id = newid)
   }
 
-  private def createQuest(newid: String, authorid: String) = {
-    Quest(
+  private def createQuestSolution(newid: String, authorid: String) = {
+    QuestSolution(
       id = newid,
-      authorUserId = authorid,
-      approveReward = Assets(1, 2, 3),
-      info = QuestInfo(
+      userId = authorid,
+      questLevel = 10,
+      info = QuestSolutionInfo(
         themeId = "theme_id",
-        content = QuestInfoContent(
-
+        questId = "quest_id",
+        content = QuestSolutionInfoContent(
           media = ContentReference(ContentType.Video.toString, "", ""),
-          icon = None,
-          description = "The description")))
+          icon = None)))
   }
 
-  "User Logic" should {
+  "User Logic solution selector" should {
 
-    "Return quest from friends if dice rolls so" in {
+    "Return solution from friends if dice rolls so" in {
 
       api.config returns createStubConfig
       rand.nextDouble returns 0.13
 
       val qid = "qid"
 
-      api.getFriendsQuests(any[GetFriendsQuestsRequest]) returns OkApiResult(Some(GetFriendsQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getFriendsSolutions(any[GetFriendsSolutionsRequest]) returns OkApiResult(Some(GetFriendsSolutionsResult(List(createQuestSolution(qid, "author")).iterator)))
 
       val u = User()
-      val q = u.getRandomQuestForSolution
+      val q = u.getRandomSolution
 
       there was one(rand).nextDouble
-      there was one(api).getFriendsQuests(any[GetFriendsQuestsRequest])
+      there was one(api).getFriendsSolutions(any[GetFriendsSolutionsRequest])
 
       q must beSome.which(q => q.id == qid)
     }
 
-    "Return quest from shortlist if dice rolls so" in {
+    "Return solution from shortlist if dice rolls so" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.38
 
       val qid = "qid"
 
-      api.getShortlistQuests(any[GetShortlistQuestsRequest]) returns OkApiResult(Some(GetShortlistQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getShortlistSolutions(any[GetShortlistSolutionsRequest]) returns OkApiResult(Some(GetShortlistSolutionsResult(List(createQuestSolution(qid, "author")).iterator)))
 
       val u = User()
-      val q = u.getRandomQuestForSolution
+      val q = u.getRandomSolution
 
       there was one(rand).nextDouble
-      there was one(api).getShortlistQuests(any[GetShortlistQuestsRequest])
+      there was one(api).getShortlistSolutions(any[GetShortlistSolutionsRequest])
 
       q must beSome.which(q => q.id == qid)
     }
@@ -125,35 +127,35 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
-      api.getLikedQuests(any[GetLikedQuestsRequest]) returns OkApiResult(Some(GetLikedQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getSolutionsForLikedQuests(any[GetSolutionsForLikedQuestsRequest]) returns OkApiResult(Some(GetSolutionsForLikedQuestsResult(List(createQuestSolution(qid, "author")).iterator)))
 
       val u = User()
-      val q = u.getRandomQuestForSolution
+      val q = u.getRandomSolution
 
       there was one(rand).nextDouble
-      there was one(api).getLikedQuests(any[GetLikedQuestsRequest])
+      there was one(api).getSolutionsForLikedQuests(any[GetSolutionsForLikedQuestsRequest])
 
       q must beSome.which(q => q.id == qid)
     }
 
-    "Return VIP quest if dice rolls so" in {
+    "Return VIP solutions if dice rolls so" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
       val qid = "qid"
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(Some(GetVIPSolutionsResult(List(createQuestSolution(qid, "author")).iterator)))
 
       val u = User()
-      val q = u.getRandomQuestForSolution
+      val q = u.getRandomSolution
 
       there was one(rand).nextDouble
-      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
+      there was one(api).getVIPSolutions(any[GetVIPSolutionsRequest])
 
       q must beSome.which(q => q.id == qid)
     }
 
-    "Return VIP quest with favorite theme ids if dice rolls so" in {
+    "Return VIP solutions with favorite theme ids if dice rolls so" in {
       val qid = "qid"
       val u = User(
         profile = Profile(
@@ -165,18 +167,18 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.75
       rand.nextInt(4) returns 0 thenReturns 1 thenReturns 2
 
-      api.getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, Some((-10, 11)), List("1", "2", "3"))) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPSolutions(GetVIPSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-20, 12)), List("1", "2", "3"))) returns OkApiResult(Some(GetVIPSolutionsResult(List(createQuestSolution(qid, "author")).iterator)))
 
-      val q = u.getRandomQuestForSolution
+      val q = u.getRandomSolution
 
       there was one(rand).nextDouble
       there were three(rand).nextInt(4)
-      there was one(api).getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, Some((-10, 11)), List("1", "2", "3")))
+      there was one(api).getVIPSolutions(GetVIPSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-20, 12)), List("1", "2", "3")))
 
       q must beSome.which(q => q.id == qid)
     }
 
-    "Return All quest with favorite theme ids if dice rolls so" in {
+    "Return All solutions with favorite theme ids if dice rolls so" in {
       val qid = "qid"
       val u = User(
         history = UserHistory(
@@ -186,18 +188,18 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.95
       rand.nextInt(4) returns 1
 
-      api.getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, Some((-2, 19)), List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getAllSolutions(GetAllSolutionsRequest(QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2"))) returns OkApiResult(Some(GetAllSolutionsResult(List(createQuestSolution(qid, "author")).iterator)))
 
-      val q = u.getRandomQuestForSolution
+      val q = u.getRandomSolution
 
       there was one(rand).nextDouble
       there was one(rand).nextInt(4)
-      there was one(api).getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, Some((-2, 19)), List("2")))
+      there was one(api).getAllSolutions(GetAllSolutionsRequest(QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2")))
 
       q must beSome.which(q => q.id == qid)
     }
 
-    "Starting quests return vip quests" in {
+    "Starting solutions return vip solutions" in {
       val qid = "qid"
       val u = User(
         profile = Profile(
@@ -206,15 +208,15 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.0
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(Some(GetVIPSolutionsResult(List(createQuestSolution(qid, "author")).iterator)))
 
-      u.getRandomQuestForSolution
+      u.getRandomSolution
 
       there was one(rand).nextDouble
-      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
+      there was one(api).getVIPSolutions(any[GetVIPSolutionsRequest])
     }
 
-    "Starting quests return other quests" in {
+    "Starting solutions return other solutions" in {
       val qid = "qid"
       val u = User(
         profile = Profile(
@@ -223,12 +225,12 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 1.0
 
-      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(Some(GetAllSolutionsResult(List(createQuestSolution(qid, "author")).iterator)))
 
-      u.getRandomQuestForSolution
+      u.getRandomSolution
 
       there was one(rand).nextDouble
-      there was one(api).getAllQuests(any[GetAllQuestsRequest])
+      there was one(api).getAllSolutions(any[GetAllSolutionsRequest])
     }
 
     "Other quests are used if vip quests are unavailable" in {
@@ -238,60 +240,32 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List().iterator)))
-      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(Some(GetVIPSolutionsResult(List().iterator)))
+      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(Some(GetAllSolutionsResult(List(createQuestSolution(qid, "author")).iterator)))
 
-      u.getRandomQuestForSolution
+      u.getRandomSolution
 
       there was one(rand).nextDouble
-      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
-      there was one(api).getAllQuests(any[GetAllQuestsRequest])
+      there was one(api).getVIPSolutions(any[GetVIPSolutionsRequest])
+      there was one(api).getAllSolutions(any[GetAllSolutionsRequest])
     }
 
-    "All quests are used if vip and Other quests are unavailable" in {
+    "All solutions are used if vip and Other solutions are unavailable" in {
       val qid = "qid"
       val u = User()
 
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List().iterator)))
-      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List().iterator))) thenReturns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(Some(GetVIPSolutionsResult(List().iterator)))
+      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(Some(GetAllSolutionsResult(List().iterator))) thenReturns OkApiResult(Some(GetAllSolutionsResult(List(createQuestSolution(qid, "author")).iterator)))
 
-      u.getRandomQuestForSolution
-
-      there was one(rand).nextDouble
-      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
-      there were two(api).getAllQuests(any[GetAllQuestsRequest])
-    }
-
-    "Quests for voting are worked out correctly" in {
-      val qid = "qid"
-      val u = User(
-        history = UserHistory(
-          themesOfSelectedQuests = List("1", "2", "3", "4")))
-
-      api.config returns createStubConfig
-      rand.nextDouble returns 0.95
-      rand.nextInt(4) returns 1
-
-      api.getAllQuests(GetAllQuestsRequest(
-        QuestStatus.OnVoting,
-        None,
-        List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
-
-      val q = u.getQuestProposalToVote
+      u.getRandomSolution
 
       there was one(rand).nextDouble
-      there was one(rand).nextInt(4)
-      there was one(api).getAllQuests(GetAllQuestsRequest(
-        QuestStatus.OnVoting,
-        None,
-        List("2")))
-
-      q must beSome.which(q => q.id == qid)
+      there was one(api).getVIPSolutions(any[GetVIPSolutionsRequest])
+      there were two(api).getAllSolutions(any[GetAllSolutionsRequest])
     }
-
   }
 }
 

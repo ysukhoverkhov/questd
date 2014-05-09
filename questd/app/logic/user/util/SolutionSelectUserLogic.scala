@@ -29,7 +29,6 @@ trait SolutionSelectUserLogic { this: UserLogic =>
           run
         }
       })
-    None
   }
 
   def getSolutionsWithSuperAlgorithm = {
