@@ -74,17 +74,13 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
             {
               voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
             } map {
-              // TODO: this do the same as bellow.
-              rememberProposalVotingInHistory(RememberProposalVotingRequest(request.user, q.id, request.vote == QuestProposalVote.Cool))
-            } map {
 
               adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))
             } map { r =>
               // 3. update user profile.
               // 4. save profile in db.
               val liked = (request.vote == QuestProposalVote.Cool)
-              // TODO: this do the same as above.
-              val u = db.user.recordQuestProposalVote(r.user.id, liked)
+              val u = db.user.recordQuestProposalVote(r.user.id, q.id, liked)
 
               val author = if (liked) {
                 db.user.readById(q.authorUserId).map(_.profile.publicProfile)

@@ -175,15 +175,15 @@ class UserDAOSpecs
       ou.get.profile.questProposalContext.todayReviewedThemeIds must contain(themeid)
     }
 
-    "rememberProposalVotingInHistory should remember liked proposals" in new WithApplication(appWithTestDatabase) {
+    "recordQuestProposalVote should remember liked proposals" in new WithApplication(appWithTestDatabase) {
       val userid = "rememberProposalVotingInHistory"
       val q1id = "q1id"
       val q2id = "q2id"
 
       db.user.create(User(userid))
 
-      db.user.rememberProposalVotingInHistory(userid, q1id, true)
-      db.user.rememberProposalVotingInHistory(userid, q2id, false)
+      db.user.recordQuestProposalVote(userid, q1id, true)
+      db.user.recordQuestProposalVote(userid, q2id, false)
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)

@@ -86,12 +86,6 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
               // 6. save profile in db.
               adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward))) map { r =>
 
-                //                val u = r.user.copy(
-                //                  profile = r.user.profile.copy(
-                //                    questSolutionVoteContext = r.user.profile.questSolutionVoteContext.copy(
-                //                      numberOfReviewedSolutions = r.user.profile.questSolutionVoteContext.numberOfReviewedSolutions + 1,
-                //                      reviewingQuestSolution = None)))
-
                 val u = db.user.recordQuestSolutionVote(r.user.id)
 
                 val solver = if (request.vote == QuestSolutionVote.Cool) {

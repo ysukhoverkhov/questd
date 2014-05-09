@@ -101,16 +101,29 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def recordQuestProposalVote(id: String, liked: Boolean): Option[User] = {
+  def recordQuestProposalVote(id: String, questId: String, liked: Boolean): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    if (liked) {
+      queryBuilder += ("$push" -> MongoDBObject(
+        "history.votedQuestProposalIds.0" -> questId,
+        "history.likedQuestProposalIds.0" -> questId))
+    } else {
+      queryBuilder += ("$push" -> MongoDBObject(
+        "history.votedQuestProposalIds.0" -> questId))
+    }
+
+    queryBuilder += ("$inc" -> MongoDBObject(
+      "profile.questProposalVoteContext.numberOfReviewedQuests" -> 1,
+      "stats.proposalsLiked" -> (if (liked) 1 else 0)))
+
+    queryBuilder += ("$unset" -> MongoDBObject(
+      "profile.questProposalVoteContext.reviewingQuest" -> "",
+      "profile.questProposalVoteContext.themeOfQuest" -> ""))
+
     findAndModify(
       id,
-      MongoDBObject(
-        ("$inc" -> MongoDBObject(
-          "profile.questProposalVoteContext.numberOfReviewedQuests" -> 1,
-          "stats.proposalsLiked" -> (if (liked) 1 else 0))),
-        ("$unset" -> MongoDBObject(
-          "profile.questProposalVoteContext.reviewingQuest" -> "",
-          "profile.questProposalVoteContext.themeOfQuest" -> ""))))
+      queryBuilder.result)
   }
 
   /**
@@ -131,7 +144,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User] = {
     findAndModify(
@@ -402,7 +415,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def removeLastQuestThemesFromHistory(id: String, themesToRemove: Int): Option[User] = {
     (1 to themesToRemove) map { a: Int =>
@@ -414,26 +427,6 @@ private[mongo] class MongoUserDAO
     } reduce { (r, c) =>
       r
     }
-  }
-
-  /**
-   *
-   */
-  def rememberProposalVotingInHistory(id: String, questId: String, liked: Boolean): Option[User] = {
-    val queryBuilder = MongoDBObject.newBuilder
-
-    if (liked) {
-      queryBuilder += ("$push" -> MongoDBObject(
-        "history.votedQuestProposalIds.0" -> questId,
-        "history.likedQuestProposalIds.0" -> questId))
-    } else {
-      queryBuilder += ("$push" -> MongoDBObject(
-        "history.votedQuestProposalIds.0" -> questId))
-    }
-
-    findAndModify(
-      id,
-      queryBuilder.result)
   }
 
   /**

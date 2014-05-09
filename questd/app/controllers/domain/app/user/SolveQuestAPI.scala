@@ -290,7 +290,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   /**
    * Tries to find competitor to us on quest and resolve our battle. Updates db after that.
    */
-  // TODO: test the function.
   def tryFightQuest(request: TryFightQuestRequest): ApiResult[TryFightQuestResult] = handleDbException {
     // 1. find all solutions with the same quest id with status waiting for competitor.
 

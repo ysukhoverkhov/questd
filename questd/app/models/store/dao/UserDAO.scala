@@ -17,7 +17,7 @@ trait UserDAO extends BaseDAO[User] {
   def recordQuestSolutionVote(id: String): Option[User]
 
   def selectQuestProposalVote(id: String, qi: QuestInfoWithID, theme: Theme): Option[User]
-  def recordQuestProposalVote(id: String, liked: Boolean): Option[User]
+  def recordQuestProposalVote(id: String, questId: String, liked: Boolean): Option[User]
   
   def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: PublicProfileWithID, defeatReward: Assets, victoryReward: Assets): Option[User]
   def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User]
@@ -43,7 +43,6 @@ trait UserDAO extends BaseDAO[User] {
   def removeLastDayFromHistory(id: String): Option[User]
   def removeLastThemesFromHistory(id: String, themesToRemove: Int): Option[User]
   def removeLastQuestThemesFromHistory(id: String, themesToRemove: Int): Option[User]
-  def rememberProposalVotingInHistory(id: String, questId: String, liked: Boolean): Option[User]
   def rememberQuestSolvingInHistory(id: String, questId: String): Option[User]
   def rememberSolutionVotingInHistory(id: String, solutionId: String): Option[User]
   

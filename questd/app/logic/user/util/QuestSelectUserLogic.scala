@@ -39,7 +39,6 @@ trait QuestSelectUserLogic { this: UserLogic =>
       })
   }
 
-  // TODO: write test for selecting correct list for voting and solving.
   private def questIdsToExclude(reason: QuestGetReason) = {
     reason match {
       case ForSolving => user.history.solvedQuestIds
