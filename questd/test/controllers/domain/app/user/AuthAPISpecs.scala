@@ -26,7 +26,12 @@ class AuthAPISpecs extends BaseAPISpecs {
       userfb.getId returns fbid
         
       db.user.readByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(fbid = Some(fbid))))
-
+      db.user.levelup(anyString, anyInt) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+      db.user.setNextLevelRatingAndRights(
+        anyString,
+        anyInt,
+        any) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+      
       val rv = api.loginfb(LoginFBRequest(userfb))
 
       // Update allowed.
