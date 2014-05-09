@@ -75,21 +75,19 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
             Logger.error("Unable to find quest solution with id for voting " + request.user.profile.questSolutionVoteContext.reviewingQuestSolution.get.id)
             InternalErrorApiResult()
           }
-          case Some(q) => {
+          case Some(s) => {
             {
-              voteQuestSolutionUpdate(VoteQuestSolutionUpdateRequest(q, request.vote))
-            } map {
-              rememberSolutionVotingInHistory(RememberSolutionVotingRequest(request.user, q.id))
+              voteQuestSolutionUpdate(VoteQuestSolutionUpdateRequest(s, request.vote))
             } map {
 
               // 5. update user profile.
               // 6. save profile in db.
               adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward))) map { r =>
 
-                val u = db.user.recordQuestSolutionVote(r.user.id)
+                val u = db.user.recordQuestSolutionVote(r.user.id, s.id)
 
                 val solver = if (request.vote == QuestSolutionVote.Cool) {
-                  db.user.readById(q.userId).map(_.profile.publicProfile)
+                  db.user.readById(s.userId).map(_.profile.publicProfile)
                 } else {
                   None
                 }

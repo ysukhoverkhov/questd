@@ -93,31 +93,5 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     OkApiResult(Some(ShiftHistoryResult()))
   }
   
-  // TODO: remove the rememberXIn history functions.
-  
-  /**
-   * Remember solved quest
-   */
-  def rememberQuestSolvingInHistory(request: RememberQuestSolvingRequest): ApiResult[RememberQuestSolvingResult] = handleDbException {
-    import request._
-    
-    db.user.rememberQuestSolvingInHistory(user.id, request.questId)
-    
-    OkApiResult(Some(RememberQuestSolvingResult()))
-  }
-  
-  /**
-   * Remember voted solution
-   */
-  def rememberSolutionVotingInHistory(request: RememberSolutionVotingRequest): ApiResult[RememberSolutionVotingResult] = handleDbException {
-    import request._
-    
-    db.user.rememberSolutionVotingInHistory(user.id, request.solutionId)
-    
-    OkApiResult(Some(RememberSolutionVotingResult()))
-  }
-  
-  
-  
 }
 

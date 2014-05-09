@@ -196,8 +196,6 @@ class UserDAOSpecs
       arr2.size must beEqualTo(4) // 2 is "", "" stub in list of lists.
       arr2(2).asInstanceOf[String] must beEqualTo(q1id)
       arr2(3).asInstanceOf[String] must beEqualTo(q2id)
-      
-      
     }
 
     "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {

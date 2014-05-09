@@ -73,7 +73,7 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def recordQuestSolutionVote(id: String): Option[User] = {
+  def recordQuestSolutionVote(id: String, solutionId: String): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
@@ -81,7 +81,9 @@ private[mongo] class MongoUserDAO
           "profile.questSolutionVoteContext.numberOfReviewedSolutions" -> 1)),
         ("$unset" -> MongoDBObject(
           "profile.questSolutionVoteContext.reviewingQuestSolution" -> "",
-          "profile.questSolutionVoteContext.questOfSolution" -> ""))))
+          "profile.questSolutionVoteContext.questOfSolution" -> "")),
+        ("$push" -> MongoDBObject(
+          "history.votedQuestSolutionIds.0" -> solutionId))))
   }
 
   /**
@@ -140,7 +142,9 @@ private[mongo] class MongoUserDAO
           "profile.questSolutionContext.victoryReward" -> grater[Assets].asDBObject(victoryReward))),
         ("$inc" -> MongoDBObject(
           "profile.questSolutionContext.numberOfPurchasedQuests" -> 1,
-          "stats.questsReviewed" -> 1))))
+          "stats.questsReviewed" -> 1)),
+        ("$push" -> MongoDBObject(
+          "history.solvedQuestIds.0" -> purchasedQuest.id))))
   }
 
   /**
@@ -427,28 +431,6 @@ private[mongo] class MongoUserDAO
     } reduce { (r, c) =>
       r
     }
-  }
-
-  /**
-   *
-   */
-  def rememberQuestSolvingInHistory(id: String, questId: String): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        ("$push" -> MongoDBObject(
-          "history.solvedQuestIds.0" -> questId))))
-  }
-
-  /**
-   *
-   */
-  def rememberSolutionVotingInHistory(id: String, solutionId: String): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        ("$push" -> MongoDBObject(
-          "history.votedQuestSolutionIds.0" -> solutionId))))
   }
 
   /**

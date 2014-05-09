@@ -42,7 +42,6 @@ case class RewardQuestSolutionAuthorResult()
 case class TryFightQuestRequest(solution: QuestSolution)
 case class TryFightQuestResult()
 
-
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -87,8 +86,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             case None => OkApiResult(Some(PurchaseQuestResult(OutOfContent)))
             case Some(q) => {
               {
-                rememberQuestSolvingInHistory(RememberQuestSolvingRequest(user, q.id))
-              } map {
                 val questCost = user.costOfPurchasingQuest
                 val author = db.user.readById(q.authorUserId).map(x => PublicProfileWithID(q.authorUserId, x.profile.publicProfile))
 
@@ -166,10 +163,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             InternalErrorApiResult()
           } else {
             val u = db.user.takeQuest(
-                r.user.id, 
-                pq.get, 
-                r.user.getCooldownForTakeQuest(pq.get.obj), 
-                r.user.getDeadlineForTakeQuest(pq.get.obj))
+              r.user.id,
+              pq.get,
+              r.user.getCooldownForTakeQuest(pq.get.obj),
+              r.user.getDeadlineForTakeQuest(pq.get.obj))
             OkApiResult(Some(TakeQuestResult(OK, u.map(_.profile))))
           }
         }
@@ -194,9 +191,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             userId = user.id,
             questLevel = user.profile.questSolutionContext.takenQuest.get.obj.level,
             info = QuestSolutionInfo(
-                content = request.solution, 
-                themeId = user.profile.questSolutionContext.takenQuest.get.obj.themeId,
-                questId = user.profile.questSolutionContext.takenQuest.get.id)))
+              content = request.solution,
+              themeId = user.profile.questSolutionContext.takenQuest.get.obj.themeId,
+              questId = user.profile.questSolutionContext.takenQuest.get.id)))
 
         val u = db.user.resetQuestSolution(user.id)
 
@@ -296,7 +293,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     val solutionsForQuest = db.solution.allWithParams(
       status = Some(QuestSolutionStatus.WaitingForCompetitor.toString),
       questIds = List(request.solution.info.questId))
-      
+
     def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {
       if (s1.calculatePoints == s2.calculatePoints)
         (List(s1, s2), List())
@@ -372,6 +369,5 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     }
   }
 
-  
 }
 
