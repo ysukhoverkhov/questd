@@ -32,16 +32,6 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
   isolated
 
   /**
-   * Creates 10 themes for mocking
-   */
-  // TODO: remove me.
-//  private def createStubThemes: List[Theme] = {
-//    (for (i <- List.range(1, 11)) yield {
-//      Theme(text = i.toString, comment = i.toString)
-//    })
-//  }
-
-  /**
    * Creates stub config for our tests.
    */
   private def createStubConfig = {
