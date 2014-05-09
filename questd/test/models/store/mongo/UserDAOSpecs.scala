@@ -186,7 +186,7 @@ class UserDAOSpecs
       db.user.recordQuestProposalVote(userid, q2id, false)
 
       val ou = db.user.readById(userid)
-      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.id.toString == userid && u.profile.questProposalVoteContext.numberOfReviewedQuests == 2)
 
       val arr1 = ou.get.history.likedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray().collect { case s: String => s }
       arr1.size must beEqualTo(3) // 2 is "", "" stub in list of lists.
@@ -196,6 +196,8 @@ class UserDAOSpecs
       arr2.size must beEqualTo(4) // 2 is "", "" stub in list of lists.
       arr2(2).asInstanceOf[String] must beEqualTo(q1id)
       arr2(3).asInstanceOf[String] must beEqualTo(q2id)
+      
+      
     }
 
     "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {
