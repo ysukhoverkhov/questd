@@ -40,10 +40,12 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
   }
 
   def getSolutionsForLikedQuests(request: GetSolutionsForLikedQuestsRequest): ApiResult[GetSolutionsForLikedQuestsResult] = handleDbException {
+    import models.store.mongo.helpers._
+    
     OkApiResult(Some(GetSolutionsForLikedQuestsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
       levels = request.levels,
-      questIds = request.user.history.likedQuestProposalIds.flatten))))
+      questIds = request.user.history.likedQuestProposalIds.mongoFlatten))))
   }
 
   def getVIPSolutions(request: GetVIPSolutionsRequest): ApiResult[GetVIPSolutionsResult] = handleDbException {

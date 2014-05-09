@@ -5,12 +5,30 @@ import models.store.exceptions.DatabaseException
 
 package object helpers {
 
-  private[mongo] def unlift(o: Option[String]): String = unlift(o, "")
+  import scala.language.implicitConversions
 
-  private[mongo] def unlift[T](o: Option[T], default: T): T = {
-    o match {
-      case Some(v) => v
-      case _ => default
+  implicit def listToSuperFlattenList[T](_l: List[List[T]]) = {
+    SuperFlattenList(_l)
+  }
+
+  object SuperFlattenList {
+    def apply[T](_l: List[List[T]]) = new SuperFlattenList(_l)
+  }
+  class SuperFlattenList[T](val _l: List[List[T]]) {
+    def mongoFlatten: List[T] = {
+      import com.mongodb._
+
+      if (_l.size > 0 && _l.head.getClass() == classOf[BasicDBList]) {
+        val rv = for (
+          out <- _l.asInstanceOf[List[BasicDBList]];
+          in <- out.toArray().asInstanceOf[Array[Object]]
+        ) yield {
+          in
+        }
+        rv.asInstanceOf[List[T]]
+      } else {
+        _l.flatten
+      }
     }
   }
 
