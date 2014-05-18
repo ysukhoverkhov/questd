@@ -13,104 +13,72 @@ import models.domain._
 import models.store.mongo._
 import models.store.dao.UserDAO
 import components.componentregistry.ComponentRegistry
+import models.domain.base.ThemeWithID
+import java.util.Date
+import controllers.domain.app.protocol.ProfileModificationResult
 
-class ProposeQuestAPISpecs extends Specification
-  with ComponentRegistry
-  with Mockito {
+class ProposeQuestAPISpecs extends BaseAPISpecs {
 
-  isolated
-
-  override lazy val db = mock[Database]
-  val user = mock[UserDAO]
-
-  object context extends org.specs2.mutable.Before {
-    def before =  db.user returns user
+  def createUser(vip: Boolean) = {
+    User(
+        id = "user_id",
+        profile = Profile(
+          questProposalContext = QuestProposalConext(
+            approveReward = Assets(1, 2, 3),
+            takenTheme = Some(ThemeWithID("theme_id", Theme(id = "theme_id", text = "", comment = ""))),
+            questProposalCooldown = new Date(Long.MaxValue)),
+          publicProfile = PublicProfile(vip = vip),
+          rights = Rights.full))
   }
 
+  def createQuest = {
+    QuestInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None, "")
+  }
   
   "Propose Quest API" should {
-    "Do something" in context {
-      success
-    }
-/*
-    "Register user with new FB id" in context {
 
-      val fbid = "fbid"
-        
-      db.user.readUserByFBid(anyString) returns None thenReturns Some(User("", Some(fbid), None, Profile()))
-      //    db.createUser(newUser)
-      //    db.readUserByFBid(fbid) returns 
-      //    db.updateUser(user.replaceSessionID(uuid))
+    "Create regular quests for regular users" in context {
 
-      val rv = api.loginfb(LoginFBRequest(fbid))
+      val u = createUser(false)
+      val q = createQuest
 
-      there was one(user).readUserByFBid(fbid) andThen 
-        one(user).createUser(any[User]) andThen
-        one(user).readUserByFBid(fbid) andThen
-        one(user).updateUser(any[User])
+      user.resetQuestProposal(any) returns Some(u)      
+      
+      val result = api.proposeQuest(ProposeQuestRequest(u, q))
 
-      rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
-      rv.body must beSome[LoginFBResult]
-    }
-
-    "Login existing user with new FB id" in context {
-
-      val fbid = "fbid"
-
-      db.user.readUserByFBid(anyString) returns Some(User("", Some(fbid), None, Profile()))
-      //    db.updateUser(user.replaceSessionID(uuid))
-
-      val rv = api.loginfb(LoginFBRequest(fbid))
-
-      there was one(user).readUserByFBid(fbid) andThen one(user).createUser(any[User])
-
-      rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
-      rv.body must beSome[LoginFBResult]
+      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
+      
+      there was one(quest).create(
+        Quest(
+          id = anyString,
+          authorUserId = u.id,
+          approveReward = u.profile.questProposalContext.approveReward,
+          info = QuestInfo(
+            themeId = u.profile.questProposalContext.takenTheme.get.id,
+            content = q,
+            vip = false)))
     }
 
-    "Behaves well with DB exception" in context {
+    "Create VIP quests for VIP users" in context {
+      val u = createUser(true)
+      val q = createQuest
 
-      db.user.readUserByFBid(anyString) throws new DatabaseException("Test exception")
+      user.resetQuestProposal(any) returns Some(u)      
+      
+      val result = api.proposeQuest(ProposeQuestRequest(u, q))
 
-      val rv = api.loginfb(LoginFBRequest("any id"))
-
-      there was one(user).readUserByFBid(anyString)
-
-      rv must beAnInstanceOf[InternalErrorApiResult[LoginFBResult]]
-      rv.body must beNone
+      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
+      
+      there was one(quest).create(
+        Quest(
+          id = anyString,
+          authorUserId = u.id,
+          approveReward = u.profile.questProposalContext.approveReward,
+          info = QuestInfo(
+            themeId = u.profile.questProposalContext.takenTheme.get.id,
+            content = q,
+            vip = true)))
     }
-
-    //    case class UserParams(sessionID: SessionID)
-    //case class UserResult(user: User)
-
-    "Return logged in user" in context {
-
-      val sesid = "session id"
-
-      db.user.readUserBySessionID(SessionID(sesid)) returns Some(User("", None, Some(SessionID(sesid))))
-
-      val rv = api.user(UserRequest(sesid))
-
-      rv must beAnInstanceOf[OkApiResult[UserResult]]
-      rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
-        u.user.session == Some(SessionID(sesid)))
-
-    }
-
-    "Do not return none existing user" in context {
-      val sesid = "session id"
-
-      db.user.readUserBySessionID(SessionID(sesid)) returns None
-
-      val rv = api.user(UserRequest(sesid))
-
-      rv must beAnInstanceOf[NotAuthorisedApiResult[UserResult]]
-      rv.body must beNone
-    }
-    * 
-    */
   }
-
 }
-
 

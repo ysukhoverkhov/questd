@@ -36,10 +36,10 @@ class QuestDAOSpecs extends Specification
         info = QuestInfo(
           themeId = "theme_id",
           content = QuestInfoContent(
-
             media = ContentReference(ContentType.Video.toString, "", ""),
             icon = None,
-            description = "The description"))))
+            description = "The description"),
+          vip = true)))
 
       val q = db.quest.readById(id)
 
@@ -58,10 +58,10 @@ class QuestDAOSpecs extends Specification
         info = QuestInfo(
           themeId = "theme_id",
           content = QuestInfoContent(
-
             media = ContentReference(ContentType.Video.toString, "", ""),
             icon = None,
-            description = "The description"))))
+            description = "The description"),
+          vip = true)))
 
       val q = db.quest.readById(id)
       q.get.info.content.media.reference must beEqualTo("")
@@ -91,7 +91,8 @@ class QuestDAOSpecs extends Specification
           content = QuestInfoContent(
             media = ContentReference(ContentType.Video.toString, "", ""),
             icon = None,
-            description = "The description"))))
+            description = "The description"),
+          vip = true)))
 
       val q = db.quest.readById(id)
 

@@ -140,7 +140,8 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
             approveReward = user.profile.questProposalContext.approveReward,
             info = QuestInfo(
               themeId = user.profile.questProposalContext.takenTheme.get.id,
-              content = request.quest)))
+              content = request.quest,
+              vip = request.user.profile.publicProfile.vip)))
 
         val u = db.user.resetQuestProposal(user.id)
 

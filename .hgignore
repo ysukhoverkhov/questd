@@ -10,3 +10,5 @@ questd/logs/*
 questd/target/*
 questd/project/target
 questd/project/project/target
+syntax: glob
+questd/RUNNING_PID

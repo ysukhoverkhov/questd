@@ -32,7 +32,7 @@ object Rights {
   /**
    * All rights given.
    */
-  val all: Rights = Rights(Set(
+  val full: Rights = Rights(Set(
     VoteQuestSolutions.toString,
     SubmitPhotoResults.toString,
     SubmitVideoResults.toString,

@@ -122,7 +122,7 @@ class UserDAOSpecs
       db.user.purchaseQuestTheme(
         userid,
         ThemeWithID(themeid, Theme(text = "text", comment = "comment")),
-        Some(QuestInfo("themeId", QuestInfoContent(ContentReference("type", "storage", "reference"), None, questdescr))),
+        Some(QuestInfo("themeId", QuestInfoContent(ContentReference("type", "storage", "reference"), None, questdescr), vip = false)),
         rew)
 
       val ou = db.user.readById(userid)
@@ -151,7 +151,7 @@ class UserDAOSpecs
       db.user.purchaseQuestTheme(
         userid,
         ThemeWithID(themeid, Theme(text = "text", comment = "comment")),
-        Some(QuestInfo("themeId", QuestInfoContent(ContentReference("type", "storage", "reference"), None, questdescr))),
+        Some(QuestInfo("themeId", QuestInfoContent(ContentReference("type", "storage", "reference"), None, questdescr), vip = false)),
         rew)
       db.user.purchaseQuestTheme(
         userid,
@@ -216,9 +216,10 @@ class UserDAOSpecs
                 storage = "",
                 reference = ""),
               icon = None,
-              description = ""))),
-              new Date(),
-              new Date())
+              description = ""),
+            vip = false)),
+        new Date(),
+        new Date())
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)

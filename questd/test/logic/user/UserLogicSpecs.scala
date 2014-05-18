@@ -29,7 +29,7 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
 
     "Do not allow user without coins purchase themes" in {
       val u = User(id = "",
-        profile = Profile(publicProfile = PublicProfile(level = 20), assets = Assets(0, 0, 0), rights = Rights.all))
+        profile = Profile(publicProfile = PublicProfile(level = 20), assets = Assets(0, 0, 0), rights = Rights.full))
 
       u.canPurchaseQuestProposals must beEqualTo(NotEnoughAssets)
     }
@@ -43,7 +43,7 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
 
     "Allow user with level and money purchase themes" in {
       val u = User(id = "",
-        profile = Profile(publicProfile = PublicProfile(level = 12), assets = Assets(100000, 100000, 1000000), rights = Rights.all))
+        profile = Profile(publicProfile = PublicProfile(level = 12), assets = Assets(100000, 100000, 1000000), rights = Rights.full))
 
       u.canPurchaseQuestProposals must beEqualTo(OK)
     }
@@ -57,7 +57,7 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
         profile = Profile(
           publicProfile = PublicProfile(level = 12),
           assets = Assets(100000, 100000, 1000000),
-          rights = Rights.all,
+          rights = Rights.full,
           questProposalContext = QuestProposalConext(questProposalCooldown = (DateTime.now + Hours.hours(1)).toDate)))
 
       u.canPurchaseQuestProposals must beEqualTo(CoolDown)
@@ -73,7 +73,7 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
         profile = Profile(
           publicProfile = PublicProfile(level = 12, bio = Bio(timezone = 0)),
           assets = Assets(100000, 100000, 1000000),
-          rights = Rights.all))
+          rights = Rights.full))
 
       val t1 = u1.getCooldownForTakeTheme
 
@@ -82,7 +82,7 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
         profile = Profile(
           publicProfile = PublicProfile(level = 12, bio = Bio(timezone = 1)),
           assets = Assets(100000, 100000, 1000000),
-          rights = Rights.all))
+          rights = Rights.full))
 
       val t2 = u2.getCooldownForTakeTheme
       

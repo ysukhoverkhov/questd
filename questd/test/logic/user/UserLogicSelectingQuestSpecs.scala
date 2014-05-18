@@ -76,10 +76,10 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       info = QuestInfo(
         themeId = "theme_id",
         content = QuestInfoContent(
-
           media = ContentReference(ContentType.Video.toString, "", ""),
           icon = None,
-          description = "The description")))
+          description = "The description"),
+        vip = false))
   }
 
   "User Logic" should {
@@ -153,7 +153,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       q must beSome.which(q => q.id == qid)
     }
-    
+
     "Return VIP quest if dice rolls so" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
