@@ -21,6 +21,11 @@ trait DailyResultWSImpl extends QuestController with SecurityWSImpl with CommonF
     api.getRightsAtLevels(GetRightsAtLevelsRequest(r.user, v.levelFrom, v.levelTo))
   }
 
+  def getLevelsForRights = wrapJsonApiCallReturnBody[WSGetLevelsForRightsResult] { (js, r) =>
+    val v = Json.read[WSGetLevelsForRightsRequest](js)
+    api.getLevelsForRights(GetLevelsForRightsRequest(r.user, v.functionality))
+  }
+  
   def shiftDailyResult = wrapApiCallReturnBody[WSShiftDailyResultResult] { r =>
     api.shiftDailyResult(ShiftDailyResultRequest(r.user))
   }

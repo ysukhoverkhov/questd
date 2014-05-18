@@ -50,6 +50,7 @@ POST	/rest/voteQuestSolution				controllers.web.rest.VoteQuestSolutionWS.voteQue
 # Daily result
 POST	/rest/getDailyResult				controllers.web.rest.DailyResultWS.getDailyResult
 POST	/rest/getRightsAtLevel				controllers.web.rest.DailyResultWS.getRightsAtLevel
+POST	/rest/getLevelsForRights			controllers.web.rest.DailyResultWS.getLevelsForRights
 
 # Content requests
 POST	/rest/getQuest						controllers.web.rest.ContentWS.getQuest

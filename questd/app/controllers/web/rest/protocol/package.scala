@@ -165,6 +165,11 @@ package object protocol {
 
   type WSGetRightsAtLevelsResult = GetRightsAtLevelsResult
 
+  type WSGetLevelsForRightsResult = GetLevelsForRightsResult
+  
+  case class WSGetLevelsForRightsRequest(
+      functionality: List[String])
+  
   /**
    * ********************
    * Content

@@ -24,7 +24,7 @@ case class CheckIncreaseLevelResult(user: User)
 case class GetRightsAtLevelsRequest(user: User, levelFrom: Int, levelTo: Int)
 case class GetRightsAtLevelsResult(rights: List[Rights])
 
-case class GetLevelsForRightsRequest(user: User, rights: List[String])
+case class GetLevelsForRightsRequest(user: User, functionality: List[String])
 case class GetLevelsForRightsResult(levels: Map[String, Int])
 
 private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -114,7 +114,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def getLevelsForRights(request: GetLevelsForRightsRequest): ApiResult[GetLevelsForRightsResult] = handleDbException {
     import request._
     
-    val rv = constants.restrictions.filterKeys(request.rights.contains(_))
+    val rv = constants.restrictions.filterKeys(request.functionality.contains(_))
 
     OkApiResult(Some(GetLevelsForRightsResult(rv)))
   }
