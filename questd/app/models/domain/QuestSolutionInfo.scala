@@ -8,6 +8,6 @@ case class QuestSolutionInfoContent(
 
 case class QuestSolutionInfo(
   content: QuestSolutionInfoContent,
-  vip: Boolean = false,
+  vip: Boolean,
   themeId: String,
   questId: String)

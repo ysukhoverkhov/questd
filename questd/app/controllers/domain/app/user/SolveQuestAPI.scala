@@ -193,7 +193,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             info = QuestSolutionInfo(
               content = request.solution,
               themeId = user.profile.questSolutionContext.takenQuest.get.obj.themeId,
-              questId = user.profile.questSolutionContext.takenQuest.get.id)))
+              questId = user.profile.questSolutionContext.takenQuest.get.id,
+              vip = user.profile.publicProfile.vip)))
 
         val u = db.user.resetQuestSolution(user.id)
 

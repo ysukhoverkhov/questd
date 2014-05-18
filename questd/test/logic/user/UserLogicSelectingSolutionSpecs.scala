@@ -71,7 +71,8 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
         questId = "quest_id",
         content = QuestSolutionInfoContent(
           media = ContentReference(ContentType.Video.toString, "", ""),
-          icon = None)))
+          icon = None),
+        vip = false))
   }
 
   "User Logic solution selector" should {
