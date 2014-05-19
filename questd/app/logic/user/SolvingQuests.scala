@@ -148,14 +148,14 @@ trait SolvingQuests { this: UserLogic =>
    * Reward for lost quest.
    */
   def rewardForLosingQuest(quest: Quest) = {
-    Assets(rating = ratingToLoseQuest(user.profile.publicProfile.level, quest.info.daysDuration))
+    Assets(rating = ratingToLoseQuest(user.profile.publicProfile.level, quest.info.daysDuration)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
   }
 
   /**
    * Reward for won quest.
    */
   def rewardForWinningQuest(quest: Quest) = {
-    Assets(rating = ratingToWinQuest(user.profile.publicProfile.level, quest.info.daysDuration))
+    Assets(rating = ratingToWinQuest(user.profile.publicProfile.level, quest.info.daysDuration)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
   }
 
   /**

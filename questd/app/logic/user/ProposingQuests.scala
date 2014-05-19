@@ -156,7 +156,7 @@ trait ProposingQuests { this: UserLogic =>
    * Reward for approving quest.
    */
   def rewardForMakingApprovedQuest = {
-    Assets(rating = ratingForProposalAtLevel(user.profile.publicProfile.level))
+    Assets(rating = ratingForProposalAtLevel(user.profile.publicProfile.level)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
   }
 
   def penaltyForCheatingQuest = {

@@ -5,6 +5,9 @@ import components.APIAccessor
 import models.domain.admin.ConfigSection
 
 class _ConfigParams {
+
+  val DebugExpMultiplier = "01 01 Debug Exp Multiplier"
+  
   val ActiveUserDays = "10 01 Active User Days"
 
   val UserHistoryDays = "20 01 User History Days"
@@ -51,6 +54,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
   val defaultConfiguration = ConfigSection(
     configSectionName,
     Map(
+      ConfigParams.DebugExpMultiplier -> "1",
+        
       ConfigParams.ActiveUserDays -> "7",
       ConfigParams.UserHistoryDays -> "15",
 

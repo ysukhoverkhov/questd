@@ -4,9 +4,9 @@ package models.domain
  * Represents cost of everything in the game.
  */
 case class Assets(
-  val coins: Int = 0,
-  val money: Int = 0,
-  val rating: Int = 0) {
+  val coins: Long = 0,
+  val money: Long = 0,
+  val rating: Long = 0) {
 
   def -(o: Assets): Assets =
     Assets(this.coins - o.coins,
@@ -23,6 +23,11 @@ case class Assets(
       this.money * m,
       this.rating * m)
 
+  def *(m: Double): Assets =
+    Assets(Math.round(this.coins * m),
+      Math.round(this.money * m),
+      Math.round(this.rating * m))
+      
   def canAfford(o: Assets): Boolean =
     this.coins >= o.coins && this.money >= o.money && this.rating >= o.rating
 
