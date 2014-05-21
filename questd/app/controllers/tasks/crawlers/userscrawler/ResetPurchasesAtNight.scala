@@ -11,23 +11,24 @@ import models.domain._
 import java.util.Date
 import components.random.RandomComponent
 
-object ResetCountersAtNight {
+object ResetPurchasesAtNight {
   def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
-    Props(classOf[ResetCountersAtNight], api, rand)
+    Props(classOf[ResetPurchasesAtNight], api, rand)
   }
   
-  def name = "ResetCountersAtNight"
+  def name = "ResetPurchasesAtNight"
 }
 
-class ResetCountersAtNight(
+class ResetPurchasesAtNight(
     apiPar: DomainAPIComponent#DomainAPI,
     randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
 
   protected def check(user: User) = {
     if (user.schedules.purchases.before(new Date())) {
-      api.resetCounters(ResetCountersRequest(user))
+      api.resetPurchases(ResetPurchasesRequest(user))
     }
   }
 
 }
 
+// TODO: implement ResetTasksAtNight as copy of it.

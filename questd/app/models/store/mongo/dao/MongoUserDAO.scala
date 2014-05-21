@@ -248,7 +248,7 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def resetCounters(id: String, resetPurchasesTimeout: Date): Option[User] = {
+  def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
