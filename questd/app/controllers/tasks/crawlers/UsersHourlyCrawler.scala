@@ -27,5 +27,6 @@ class UsersHourlyCrawler(api: DomainAPIComponent#DomainAPI, rand: RandomComponen
       classOf[CheckProposalDeadline],
       classOf[CheckQuestDeadline],
       classOf[ResetPurchasesAtNight],
+      classOf[ResetTasksAtNight],
       classOf[CheckShiftDailyResult])
 }
