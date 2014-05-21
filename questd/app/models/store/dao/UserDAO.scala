@@ -56,5 +56,7 @@ trait UserDAO extends BaseDAO[User] {
   def addMessage(id: String, message: Message): Option[User]
   def removeOldestMessage(id: String): Option[User]
   def removeMessage(id: String, messageId: String): Option[User]
+  
+  def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User]
 }
 

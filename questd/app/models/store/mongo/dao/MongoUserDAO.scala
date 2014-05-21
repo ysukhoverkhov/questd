@@ -554,6 +554,17 @@ private[mongo] class MongoUserDAO
           "messages" -> MongoDBObject("id" -> messageId)))))
   }
 
+  /**
+   * 
+   */
+  def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.dailyTasks" -> grater[DailyTasks].asDBObject(newTasks),
+          "schedules.dailyTasks" -> resetTasksTimeout))))
+  }
 }
 
 /**

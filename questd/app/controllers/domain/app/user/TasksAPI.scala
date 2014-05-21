@@ -21,7 +21,7 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     import request._
 
     // TODO: pass new tasks here.
- //   db.user.resetTasks(user.id, user.getResetTasksTimeout)
+    db.user.resetTasks(user.id, DailyTasks(), user.getResetTasksTimeout)
 
     OkApiResult(Some(ResetDailyTasksResult()))
   }
