@@ -139,11 +139,7 @@ trait SolvingQuests { this: UserLogic =>
   /**
    * Cooldown for reseting purchases. Purchases should be reset in nearest 5am at user's time.
    */
-  // TODO: move the function to more correct place.
-  def getResetPurchasesTimeout = {
-    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + 1.day).hour(constants.flipHour).minute(0).second(0) toDate ()
-  }
+  def getResetPurchasesTimeout = getNextFlipHourDate
 
   /**
    * Reward for lost quest.
