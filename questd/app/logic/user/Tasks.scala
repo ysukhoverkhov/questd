@@ -25,8 +25,6 @@ trait Tasks { this: UserLogic =>
    * List of tasks to give user for next day.
    */
   def getTasksForTomorrow = {
-
-    // TODO: implement me.
     // TODO: test me.
 
     val taskGenerationAlgorithms = getTaskGenerationAlgorithms
@@ -58,70 +56,87 @@ trait Tasks { this: UserLogic =>
 
   }
 
-  private def getVoteQuestSolutionsTask(user: User) = {
-    Some(Task(
-      taskType = TaskType.VoteQuestSolutions,
-      description = "",
-      requiredCount = 10))
+  private def ifHasRightTo(f: Functionality.Value)(body: => Option[Task]): Option[Task] = {
+    if (calculateRights.unlockedFunctionality.contains(f.toString))
+      body
+    else
+      None
   }
 
-  private def getSubmitQuestResultTask(user: User) = {
+  // TODO: implement me.
+  private def getVoteQuestSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
+      Some(Task(
+        taskType = TaskType.VoteQuestSolutions,
+        description = "",
+        requiredCount = 10))
+  }
+
+  // TODO: implement me.
+  private def getSubmitQuestResultTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoResults) {
     Some(Task(
       taskType = TaskType.SubmitQuestResult,
       description = "",
       requiredCount = 10))
   }
 
-  private def getAddToShortListTask(user: User) = {
+  // TODO: implement me.
+  private def getAddToShortListTask(user: User) = ifHasRightTo(Functionality.AddToShortList) {
     Some(Task(
       taskType = TaskType.AddToShortList,
       description = "",
       requiredCount = 10))
   }
 
-  private def getVoteQuestProposalsTask(user: User) = {
+  // TODO: implement me.
+  private def getVoteQuestProposalsTask(user: User) = ifHasRightTo(Functionality.VoteQuestProposals) {
     Some(Task(
       taskType = TaskType.VoteQuestProposals,
       description = "",
       requiredCount = 10))
   }
 
-  private def getSubmitQuestProposalTask(user: User) = {
+  // TODO: implement me.
+  private def getSubmitQuestProposalTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
     Some(Task(
       taskType = TaskType.SubmitQuestProposal,
       description = "",
       requiredCount = 10))
   }
 
-  private def getVoteReviewsTask(user: User) = {
+  // TODO: implement me.
+  private def getVoteReviewsTask(user: User) = ifHasRightTo(Functionality.VoteReviews) {
     Some(Task(
       taskType = TaskType.VoteReviews,
       description = "",
       requiredCount = 10))
   }
 
-  private def getSubmitReviewsForResultsTask(user: User) = {
+  // TODO: implement me.
+  private def getSubmitReviewsForResultsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForResults) {
     Some(Task(
       taskType = TaskType.SubmitReviewsForResults,
       description = "",
       requiredCount = 10))
   }
 
-  private def getSubmitReviewsForProposalsTask(user: User) = {
+  // TODO: implement me.
+  private def getSubmitReviewsForProposalsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForProposals) {
     Some(Task(
       taskType = TaskType.SubmitReviewsForProposals,
       description = "",
       requiredCount = 10))
   }
 
-  private def getGiveRewardsTask(user: User) = {
+  // TODO: implement me.
+  private def getGiveRewardsTask(user: User) = ifHasRightTo(Functionality.GiveRewards) {
     Some(Task(
       taskType = TaskType.GiveRewards,
       description = "",
       requiredCount = 10))
   }
 
-  private def getLookThroughWinnersOfMyQuestsTask(user: User) = {
+  // TODO: implement me.
+  private def getLookThroughWinnersOfMyQuestsTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
     Some(Task(
       taskType = TaskType.LookThroughWinnersOfMyQuests,
       description = "",
