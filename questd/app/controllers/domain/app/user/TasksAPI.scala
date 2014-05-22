@@ -20,8 +20,7 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def resetDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
     import request._
 
-    // TODO: pass new tasks here.
-    db.user.resetTasks(user.id, DailyTasks(), user.getResetTasksTimeout)
+    db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout)
 
     OkApiResult(Some(ResetDailyTasksResult()))
   }
