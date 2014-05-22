@@ -23,7 +23,7 @@ object functions {
   def ratingForProposalAtLevel(level: Int): Int = {
     val proposalPeriodAtMaxLevel = 2
 
-    (proposalPeriodAtMaxLevel * ratingForSubmitProposal(level) * math.pow(maxLevel.toDouble / level, 3)).toInt
+    (proposalPeriodAtMaxLevel * ratingForSubmitProposal(level) * math.pow(MaxLevel.toDouble / level, 3)).toInt
   }
 
   /**
@@ -41,7 +41,7 @@ object functions {
     }
 
     def kf(level: Int) = {
-      coinsShuffleTheme(level) / (1 to numberOfThemesSkipsForCoins).map(x => costToSkipProposalInt(level, x, 1)).sum
+      coinsShuffleTheme(level) / (1 to NumberOfThemesSkipsForCoins).map(x => costToSkipProposalInt(level, x, 1)).sum
     }
 
     math.round(costToSkipProposalInt(level, skipNumber, kf(level)) * questProposalPeriod(level)).toInt
@@ -58,7 +58,7 @@ object functions {
    * Cost to give up quest proposal.
    */
   def ratingToGiveUpQuestProposal(level: Int): Int = {
-    math.round(ratingForSubmitProposal(level) * questProposalPeriod(level) * questProposalGiveUpPenalty).toInt
+    math.round(ratingForSubmitProposal(level) * questProposalPeriod(level) * QuestProposalGiveUpPenalty).toInt
   }
 
   /**
@@ -77,7 +77,7 @@ object functions {
     }
 
     def kf(level: Int) = {
-      coinShuffleQuest(level) / (1 to numberOfQuestsSkipsForCoins).map(x => costToSkipQuestInt(level, x, 1)).sum
+      coinShuffleQuest(level) / (1 to NumberOfQuestsSkipsForCoins).map(x => costToSkipQuestInt(level, x, 1)).sum
     }
 
     math.round(costToSkipQuestInt(level, skipNumber, kf(level)) * currentQuestDuration).toInt
@@ -94,21 +94,21 @@ object functions {
    * How much in rating we will lose in case of giving quest up.
    */
   def ratingToGiveUpQuest(level: Int, questDuration: Int): Int = {
-    math.round(ratingForSubmitResult(level) * questDuration * questSolutionGiveUpPenalty).toInt
+    math.round(ratingForSubmitResult(level) * questDuration * QuestSolutionGiveUpPenalty).toInt
   }
 
   /**
    * How much rating we will receive for losing quest.
    */
   def ratingToLoseQuest(level: Int, questDuration: Int): Int = {
-    math.round(ratingForSubmitResult(level) * questDuration * questLosingMultiplier).toInt
+    math.round(ratingForSubmitResult(level) * questDuration * QuestLosingMultiplier).toInt
   }
 
   /**
    * How much rating we will receive for winning quest.
    */
   def ratingToWinQuest(level: Int, questDuration: Int): Int = {
-    ratingToLoseQuest(level, questDuration) * questVictoryMultiplier
+    ratingToLoseQuest(level, questDuration) * QuestVictoryMultiplier
   }
 
   /**
@@ -199,7 +199,7 @@ object functions {
    */
 
   def maxNumberOfFriendsOnLevel(level: Int): Int = {
-    math.round((numberOfFreindsOnLastLevel / coinToSpentDailyFriendsOnly(maxLevel)) * coinToSpentDailyFriendsOnly(level)).toInt
+    math.round((NumberOfFreindsOnLastLevel / coinToSpentDailyFriendsOnly(MaxLevel)) * coinToSpentDailyFriendsOnly(level)).toInt
   }
   
   def costToInviteFriend(level: Int, levelDifference: Int): Int = {

@@ -28,7 +28,7 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
     import request._
 
     def capMessages(u: User): User = {
-      if (u.messages.length >= logic.constants.numberOfStoredMessages) {
+      if (u.messages.length >= logic.constants.NumberOfStoredMessages) {
         db.user.removeOldestMessage(u.id) match {
           case Some(us) => capMessages(us)
           case None => {

@@ -17,4 +17,3 @@ class TasksSpecs extends BaseUserLogicSpecs {
 
 }
 
-// TODO: capitalize all constants

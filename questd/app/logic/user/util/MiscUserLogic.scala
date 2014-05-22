@@ -40,6 +40,6 @@ trait MiscUserLogic { this: UserLogic =>
    */
   def getNextFlipHourDate = {
     val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + 1.day).hour(constants.flipHour).minute(0).second(0) toDate ()
+    (DateTime.now(tz) + 1.day).hour(constants.FlipHour).minute(0).second(0) toDate ()
   }
 }
