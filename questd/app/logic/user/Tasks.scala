@@ -40,8 +40,7 @@ trait Tasks { this: UserLogic =>
     DailyTasks(tasks = tasks, reward = reward)
   }
 
-  // TODO: calculate me.
-  private def getTasksReward = Assets(0, 0, 0)
+  private def getTasksReward = Assets(0, 0, RatingForCompletingDailyTasks)
 
   private def getTaskGenerationAlgorithms: Map[TaskType.Value, (User) => Option[Task]] = {
 

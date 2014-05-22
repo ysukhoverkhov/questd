@@ -111,5 +111,11 @@ object constants {
    */
   val numberOfFreindsOnLastLevel = 100
   
+  
+  /**
+   * Tasks
+   */
+  val RatingForCompletingDailyTasks = 500
+  
 }
 
