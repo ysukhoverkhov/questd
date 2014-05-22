@@ -25,8 +25,6 @@ trait Tasks { this: UserLogic =>
    * List of tasks to give user for next day.
    */
   def getTasksForTomorrow = {
-    // TODO: test me.
-
     val taskGenerationAlgorithms = getTaskGenerationAlgorithms
     val reward = getTasksReward
 

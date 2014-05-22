@@ -29,8 +29,6 @@ import models.domain.QuestSolution
 
 class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
-  isolated
-
   /**
    * Creates stub config for our tests.
    */

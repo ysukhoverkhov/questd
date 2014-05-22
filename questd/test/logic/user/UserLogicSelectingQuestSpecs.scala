@@ -27,8 +27,6 @@ import java.util.Date
 
 class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
-  isolated
-
   /**
    * Creates 10 themes for mocking
    */
