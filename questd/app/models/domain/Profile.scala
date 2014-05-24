@@ -1,9 +1,12 @@
 package models.domain
 
+import models.domain.base.ID
+
 /**
  * This can be given to client as is, thus contains only public information.
  */
 case class Profile(
+  profileId: String = ID.generateUUID(),
   profileVersion: Int = 1,
   publicProfile: PublicProfile = PublicProfile(),
   ratingToNextLevel: Int = 0,
