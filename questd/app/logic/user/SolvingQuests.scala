@@ -35,6 +35,14 @@ trait SolvingQuests { this: UserLogic =>
     else
       OK
   }
+  
+  /**
+   * Checks is user potentially able to solve quests today (disregarding coins and other things).
+   */
+  def canSolveQuestToday = {
+    user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults.toString()) &&
+    user.profile.questSolutionContext.questCooldown.before(new Date())
+  }
 
   /**
    * Tells cost of next theme purchase

@@ -36,8 +36,14 @@ trait Tasks { this: UserLogic =>
     DailyTasks(tasks = tasks, reward = reward)
   }
 
+  /**
+   * Calculates reward for today's tasks. 
+   */
   private def getTasksReward = Assets(0, 0, RatingForCompletingDailyTasks)
 
+  /**
+   * Returns list of algorithms for generating all tasks.
+   */
   private def getTaskGenerationAlgorithms: Map[TaskType.Value, (User) => Option[Task]] = {
 
     Map(TaskType.VoteQuestSolutions -> getVoteQuestSolutionsTask,
@@ -54,6 +60,9 @@ trait Tasks { this: UserLogic =>
 
   }
 
+  /**
+   * Wrapper what returns None if user as no rights.
+   */
   private def ifHasRightTo(f: Functionality.Value)(body: => Option[Task]): Option[Task] = {
     if (calculateRights.unlockedFunctionality.contains(f.toString))
       body
@@ -61,20 +70,32 @@ trait Tasks { this: UserLogic =>
       None
   }
 
-  // TODO: implement me.
+  /**
+   * Algorithm for generating task for voting quests.
+   */
   private def getVoteQuestSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
-      Some(Task(
-        taskType = TaskType.VoteQuestSolutions,
-        description = "",
-        requiredCount = 10))
+    def calculateCount = {
+      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * 0.9).toFloat)
+    }
+
+    Some(Task(
+      taskType = TaskType.VoteQuestSolutions,
+      description = "",
+      requiredCount = calculateCount))
+
   }
 
-  // TODO: implement me.
+  /**
+   * Algorithm for generating task for submitting quest.
+   */
   private def getSubmitQuestResultTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoResults) {
-    Some(Task(
-      taskType = TaskType.SubmitQuestResult,
-      description = "",
-      requiredCount = 10))
+    if (canSolveQuestToday)
+      Some(Task(
+        taskType = TaskType.SubmitQuestResult,
+        description = "",
+        requiredCount = 1))
+    else
+      None
   }
 
   // TODO: implement me.
@@ -141,8 +162,9 @@ trait Tasks { this: UserLogic =>
       requiredCount = 10))
   }
 
-  private def getClientTask(user: User) = {
-    None
-  }
+  /**
+   * Algorithm for generating Client's custom tasks.
+   */
+  private def getClientTask(user: User) = None
 
 }
