@@ -45,6 +45,14 @@ trait ProposingQuests { this: UserLogic =>
     else
       OK
   }
+  
+  /**
+   * Is user potentially eligible for proposing quest today.
+   */
+  def canProposeQuestToday = {
+    user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString()) &&
+    user.profile.questProposalContext.questProposalCooldown.before(new Date())
+  }
 
   /**
    * Is user can propose quest of given type.

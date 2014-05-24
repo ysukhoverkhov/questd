@@ -75,7 +75,7 @@ trait Tasks { this: UserLogic =>
    */
   private def getVoteQuestSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
     def calculateCount = {
-      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * 0.9).toFloat)// TODO: move probability to config.
+      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * 0.9).toFloat) // TODO: move probability to config.
     }
 
     Some(Task(
@@ -115,7 +115,7 @@ trait Tasks { this: UserLogic =>
    */
   private def getVoteQuestProposalsTask(user: User) = ifHasRightTo(Functionality.VoteQuestProposals) {
     def calculateCount = {
-      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * 0.9).toFloat)// TODO: move probability to config.
+      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * 0.9).toFloat) // TODO: move probability to config.
     }
 
     Some(Task(
@@ -124,44 +124,62 @@ trait Tasks { this: UserLogic =>
       requiredCount = calculateCount))
   }
 
-  // TODO: implement me. 1 each day we are eligible for solving a quest.
+  /**
+   * Algorithm for generating task for submitting quest proposal.
+   */
   private def getSubmitQuestProposalTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
-    Some(Task(
-      taskType = TaskType.SubmitQuestProposal,
-      description = "",
-      requiredCount = 10))
+    if (canProposeQuestToday)
+      Some(Task(
+        taskType = TaskType.SubmitQuestProposal,
+        description = "",
+        requiredCount = 1))
+    else
+      None
   }
 
-  // TODO: implement me.
+  /**
+   * Algorithm for selecting task for voting reviews.
+   */
   private def getVoteReviewsTask(user: User) = ifHasRightTo(Functionality.VoteReviews) {
-    Some(Task(
-      taskType = TaskType.VoteReviews,
-      description = "",
-      requiredCount = 10))
+    //    Some(Task(
+    //      taskType = TaskType.VoteReviews,
+    //      description = "",
+    //      requiredCount = 10))
+    None
   }
 
-  // TODO: implement me.
+  /**
+   * Algorithm for generating tasks for submiting reviews for solutions.
+   */
   private def getSubmitReviewsForResultsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForResults) {
-    Some(Task(
-      taskType = TaskType.SubmitReviewsForResults,
-      description = "",
-      requiredCount = 10))
+    //    Some(Task(
+    //      taskType = TaskType.SubmitReviewsForResults,
+    //      description = "",
+    //      requiredCount = 10))
+    None
   }
 
-  // TODO: implement me.
+  /**
+   * Algorithm for generating tasks for submiting reviews for proposals.
+   */
   private def getSubmitReviewsForProposalsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForProposals) {
-    Some(Task(
-      taskType = TaskType.SubmitReviewsForProposals,
-      description = "",
-      requiredCount = 10))
+    //    Some(Task(
+    //      taskType = TaskType.SubmitReviewsForProposals,
+    //      description = "",
+    //      requiredCount = 10))
+    None
   }
 
-  // TODO: implement me.  - 20% chance each day.
+  /**
+   * Algorithm for generating task about giving reward.
+   */
   private def getGiveRewardsTask(user: User) = ifHasRightTo(Functionality.GiveRewards) {
-    Some(Task(
-      taskType = TaskType.GiveRewards,
-      description = "",
-      requiredCount = 10))
+  // implement me.  - 20% chance each day.
+//    Some(Task(
+//      taskType = TaskType.GiveRewards,
+//      description = "",
+//      requiredCount = 10))
+    None
   }
 
   // TODO: implement me.
@@ -171,6 +189,8 @@ trait Tasks { this: UserLogic =>
       description = "",
       requiredCount = 10))
   }
+
+  // TODO:Review friendship requests - if there are pending friendship requests.
 
   /**
    * Algorithm for generating Client's custom tasks.

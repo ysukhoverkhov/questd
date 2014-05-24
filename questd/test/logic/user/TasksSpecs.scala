@@ -89,6 +89,18 @@ class TasksSpecs extends BaseUserLogicSpecs {
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(3) // 90% from 4
     }
+
+    "Generate tasks for submitting proposals" in {
+
+      val u = createUser(12)
+      val dailyResult = u.getTasksForTomorrow
+
+      u.canSolveQuestToday must beEqualTo(true)
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.SubmitQuestProposal)
+      t must beSome[Task]
+      t.get.requiredCount must beEqualTo(1)
+    }
     
   }
 
