@@ -14,7 +14,8 @@ object TaskType extends Enumeration {
   val SubmitReviewsForProposals = Value
   val GiveRewards = Value
   val LookThroughWinnersOfMyQuests = Value
-  val Client = Value
+  val LookThroughFriendshipProposals = Value
+  val Client = Value(1000)
 }
 
 case class Task(

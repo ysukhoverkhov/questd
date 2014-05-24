@@ -101,8 +101,28 @@ class TasksSpecs extends BaseUserLogicSpecs {
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(1)
     }
-    
-  }
 
+    "Generate tasks for reviewing friendship" in {
+      val u = createUser(12).copy(friends = List(Friendship(friendId = "", status = FriendshipStatus.Invites.toString)))
+      val dailyResult = u.getTasksForTomorrow
+
+      u.canSolveQuestToday must beEqualTo(true)
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.LookThroughFriendshipProposals)
+      t must beSome[Task]
+      t.get.requiredCount must beEqualTo(1)
+    }
+    
+    "Generate tasks for reviewing friendship if there are no requests" in {
+      val u = createUser(12)
+      val dailyResult = u.getTasksForTomorrow
+
+      u.canSolveQuestToday must beEqualTo(true)
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.LookThroughFriendshipProposals)
+      t must beNone
+    }
+  }
 }
+
 

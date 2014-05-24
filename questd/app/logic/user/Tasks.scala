@@ -56,8 +56,8 @@ trait Tasks { this: UserLogic =>
       TaskType.SubmitReviewsForProposals -> getSubmitReviewsForProposalsTask,
       TaskType.GiveRewards -> getGiveRewardsTask,
       TaskType.LookThroughWinnersOfMyQuests -> getLookThroughWinnersOfMyQuestsTask,
+      TaskType.LookThroughFriendshipProposals -> getReviewFriendshipRequestsTask,
       TaskType.Client -> getClientTask)
-
   }
 
   /**
@@ -174,23 +174,34 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating task about giving reward.
    */
   private def getGiveRewardsTask(user: User) = ifHasRightTo(Functionality.GiveRewards) {
-  // implement me.  - 20% chance each day.
-//    Some(Task(
-//      taskType = TaskType.GiveRewards,
-//      description = "",
-//      requiredCount = 10))
+    // implement me.  - 20% chance each day.
+    //    Some(Task(
+    //      taskType = TaskType.GiveRewards,
+    //      description = "",
+    //      requiredCount = 10))
     None
   }
 
-  // TODO: implement me.
   private def getLookThroughWinnersOfMyQuestsTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
-    Some(Task(
-      taskType = TaskType.LookThroughWinnersOfMyQuests,
-      description = "",
-      requiredCount = 10))
+    //    Some(Task(
+    //      taskType = TaskType.LookThroughWinnersOfMyQuests,
+    //      description = "",
+    //      requiredCount = 10))
+    None
   }
 
-  // TODO:Review friendship requests - if there are pending friendship requests.
+  /**
+   * Algorithm for generating tasks to review friendship request.
+   */
+  private def getReviewFriendshipRequestsTask(user: User): Option[Task] = {
+    if (user.friends.exists(_.status == FriendshipStatus.Invites.toString))
+      Some(Task(
+        taskType = TaskType.LookThroughFriendshipProposals,
+        description = "",
+        requiredCount = 1))
+    else
+      None
+  }
 
   /**
    * Algorithm for generating Client's custom tasks.
