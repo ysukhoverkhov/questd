@@ -37,7 +37,7 @@ trait Tasks { this: UserLogic =>
   }
 
   /**
-   * Calculates reward for today's tasks. 
+   * Calculates reward for today's tasks.
    */
   private def getTasksReward = Assets(0, 0, RatingForCompletingDailyTasks)
 
@@ -75,14 +75,13 @@ trait Tasks { this: UserLogic =>
    */
   private def getVoteQuestSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
     def calculateCount = {
-      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * 0.9).toFloat)
+      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * 0.9).toFloat)// TODO: move probability to config.
     }
 
     Some(Task(
       taskType = TaskType.VoteQuestSolutions,
       description = "",
       requiredCount = calculateCount))
-
   }
 
   /**
@@ -98,23 +97,34 @@ trait Tasks { this: UserLogic =>
       None
   }
 
-  // TODO: implement me.
+  /**
+   * Algorithm for generating tasks for shortlist.
+   */
   private def getAddToShortListTask(user: User) = ifHasRightTo(Functionality.AddToShortList) {
-    Some(Task(
-      taskType = TaskType.AddToShortList,
-      description = "",
-      requiredCount = 10))
+    if (rand.nextDouble < 0.3) // TODO: move probability to config.
+      Some(Task(
+        taskType = TaskType.AddToShortList,
+        description = "",
+        requiredCount = 1))
+    else
+      None
   }
 
-  // TODO: implement me.
+  /**
+   * Algorithm for creating task for votes for proposals.
+   */
   private def getVoteQuestProposalsTask(user: User) = ifHasRightTo(Functionality.VoteQuestProposals) {
+    def calculateCount = {
+      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * 0.9).toFloat)// TODO: move probability to config.
+    }
+
     Some(Task(
       taskType = TaskType.VoteQuestProposals,
       description = "",
-      requiredCount = 10))
+      requiredCount = calculateCount))
   }
 
-  // TODO: implement me.
+  // TODO: implement me. 1 each day we are eligible for solving a quest.
   private def getSubmitQuestProposalTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
     Some(Task(
       taskType = TaskType.SubmitQuestProposal,
@@ -146,7 +156,7 @@ trait Tasks { this: UserLogic =>
       requiredCount = 10))
   }
 
-  // TODO: implement me.
+  // TODO: implement me.  - 20% chance each day.
   private def getGiveRewardsTask(user: User) = ifHasRightTo(Functionality.GiveRewards) {
     Some(Task(
       taskType = TaskType.GiveRewards,
