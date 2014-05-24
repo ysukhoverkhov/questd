@@ -33,7 +33,8 @@ class TasksSpecs extends BaseUserLogicSpecs {
     }
     
     "Generate tasks SubmitQuestResult for low level users" in {
-      val u = User(profile = Profile(publicProfile = PublicProfile(level = 13)))
+      // TODO: make common function for creating user with rights.
+      val u = User(profile = Profile(publicProfile = PublicProfile(level = 3)))
       val u2 = User(profile = u.profile.copy(rights = u.calculateRights))
       
       val dailyResult = u2.getTasksForTomorrow
