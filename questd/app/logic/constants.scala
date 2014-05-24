@@ -4,7 +4,7 @@ import models.domain._
 
 object constants {
 
-  val maxLevel = 20
+  val MaxLevel = 20
 
   // user level restriction constants.
   val restrictions: Map[String, Int] = Map(
@@ -26,72 +26,72 @@ object constants {
     restrictions(f.toString())
   }
 
-  val flipHour = 5
+  val FlipHour = 5
 
   /**
    * Quest proposing.
    */
-  val questProposalGiveUpPenalty = 2
+  val QuestProposalGiveUpPenalty = 2
 
-  val questProposalCheatingPenalty = 10
+  val QuestProposalCheatingPenalty = 10
 
-  val questProposalIACPenalty = 10
+  val QuestProposalIACPenalty = 10
 
-  val minQuestLevel = 2
+  val MinQuestLevel = 2
 
-  val maxQuestLevel = 21
+  val MaxQuestLevel = 21
 
-  val easyWeight = 0
-  val normalWeight = 8
-  val hardWeight = 15
-  val extremeWeight = 22
+  val EasyWeight = 0
+  val NormalWeight = 8
+  val HardWeight = 15
+  val ExtremeWeight = 22
 
   /**
    * Quest resolving.
    */
 
-  val questForSolveLevelToleranceUp = 1
-  val questForSolveLevelToleranceDown = 20
+  val QuestForSolveLevelToleranceUp = 1
+  val QuestForSolveLevelToleranceDown = 20
 
-  val questSolutionGiveUpPenalty = 2
+  val QuestSolutionGiveUpPenalty = 2
 
-  val numberOfFavoriteThemesForVIPQuests = 3
-  val numberOfFavoriteThemesForOtherQuests = 1
+  val NumberOfFavoriteThemesForVIPQuests = 3
+  val NumberOfFavoriteThemesForOtherQuests = 1
 
   /**
    * Multiplier is relative to base (average) rating for resolving quests per day.
    */
-  val questLosingMultiplier = 0.6666667
+  val QuestLosingMultiplier = 0.6666667
 
   /**
    * Multiplier is relative to quest losing
    */
-  val questVictoryMultiplier = 2
+  val QuestVictoryMultiplier = 2
 
-  val questSolutionCheatingPenalty = 10
+  val QuestSolutionCheatingPenalty = 10
 
-  val questSolutionIACPenalty = 10
+  val QuestSolutionIACPenalty = 10
 
   /**
    * Voting quest solutions.
    */
 
-  val solutionLevelDownTolerance = 30
+  val SolutionLevelDownTolerance = 30
 
-  val solutionLevelUpTolerance = 2
+  val SolutionLevelUpTolerance = 2
 
-  val friendsVoteMult = 2
+  val FriendsVoteMult = 2
 
-  val invitedVoteMult = 2
+  val InvitedVoteMult = 2
 
-  val numberOfFavoriteThemesForVIPSolutions = 3
-  val numberOfFavoriteThemesForOtherSolutions = 1
+  val NumberOfFavoriteThemesForVIPSolutions = 3
+  val NumberOfFavoriteThemesForOtherSolutions = 1
 
   
   /**
    * Messages
    */
-  val numberOfStoredMessages = 100
+  val NumberOfStoredMessages = 100
   
   
   // Constants bellow are used in algorithms and should not be changed.
@@ -99,17 +99,23 @@ object constants {
   /**
    * Number of themes skips for coins.
    */
-  def numberOfThemesSkipsForCoins = 4
+  def NumberOfThemesSkipsForCoins = 4
 
   /**
    * Number of quests skip for coins.
    */
-  val numberOfQuestsSkipsForCoins = 8
+  val NumberOfQuestsSkipsForCoins = 8
 
   /**
    * Friends
    */
-  val numberOfFreindsOnLastLevel = 100
+  val NumberOfFreindsOnLastLevel = 100
+  
+  
+  /**
+   * Tasks
+   */
+  val RatingForCompletingDailyTasks = 500
   
 }
 

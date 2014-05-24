@@ -40,7 +40,7 @@ trait SolvingQuests { this: UserLogic =>
    * Tells cost of next theme purchase
    */
   def costOfPurchasingQuest = {
-    if (user.profile.questSolutionContext.numberOfPurchasedQuests < numberOfQuestsSkipsForCoins) {
+    if (user.profile.questSolutionContext.numberOfPurchasedQuests < NumberOfQuestsSkipsForCoins) {
 
       val questDuration = user.profile.questSolutionContext.purchasedQuest match {
         case Some(QuestInfoWithID(_, q)) => q.daysDuration
@@ -123,7 +123,7 @@ trait SolvingQuests { this: UserLogic =>
     val daysToSkipt = qi.daysDuration
 
     val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate ()
+    (DateTime.now(tz) + daysToSkipt.days).hour(constants.FlipHour).minute(0).second(0) toDate ()
   }
 
   /**
@@ -139,10 +139,7 @@ trait SolvingQuests { this: UserLogic =>
   /**
    * Cooldown for reseting purchases. Purchases should be reset in nearest 5am at user's time.
    */
-  def getResetPurchasesTimeout = {
-    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + 1.day).hour(constants.flipHour).minute(0).second(0) toDate ()
-  }
+  def getResetPurchasesTimeout = getNextFlipHourDate
 
   /**
    * Reward for lost quest.
@@ -162,14 +159,14 @@ trait SolvingQuests { this: UserLogic =>
    * Penalty for cheating solution
    */
   def penaltyForCheatingSolution(quest: Quest) = {
-    (rewardForLosingQuest(quest) * questSolutionCheatingPenalty) clampTop user.profile.assets
+    (rewardForLosingQuest(quest) * QuestSolutionCheatingPenalty) clampTop user.profile.assets
   }
 
   /**
    * Penalty for IAC solution
    */
   def penaltyForIACSolution(quest: Quest) = {
-    (rewardForLosingQuest(quest) * questSolutionIACPenalty) clampTop user.profile.assets
+    (rewardForLosingQuest(quest) * QuestSolutionIACPenalty) clampTop user.profile.assets
   }
 
   /**

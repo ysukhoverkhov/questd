@@ -67,7 +67,7 @@ trait ProposingQuests { this: UserLogic =>
    * Tells cost of next theme purchase
    */
   def costOfPurchasingQuestProposal = {
-    if (user.profile.questProposalContext.numberOfPurchasedThemes < numberOfThemesSkipsForCoins) {
+    if (user.profile.questProposalContext.numberOfPurchasedThemes < NumberOfThemesSkipsForCoins) {
       val c = costToSkipProposal(user.profile.publicProfile.level, user.profile.questProposalContext.numberOfPurchasedThemes + 1)
       Assets(coins = c)
     } else {
@@ -139,7 +139,7 @@ trait ProposingQuests { this: UserLogic =>
     val daysToSkipt = questProposalPeriod(user.profile.publicProfile.level)
 
     val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate ()
+    (DateTime.now(tz) + daysToSkipt.days).hour(constants.FlipHour).minute(0).second(0) toDate ()
   }
 
   /**
@@ -160,11 +160,11 @@ trait ProposingQuests { this: UserLogic =>
   }
 
   def penaltyForCheatingQuest = {
-    (rewardForMakingApprovedQuest * questProposalCheatingPenalty) clampTop user.profile.assets
+    (rewardForMakingApprovedQuest * QuestProposalCheatingPenalty) clampTop user.profile.assets
   }
 
   def penaltyForIACQuest = {
-    (rewardForMakingApprovedQuest * questProposalIACPenalty) clampTop user.profile.assets
+    (rewardForMakingApprovedQuest * QuestProposalIACPenalty) clampTop user.profile.assets
   }
 
   /**

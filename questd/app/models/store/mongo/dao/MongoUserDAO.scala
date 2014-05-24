@@ -248,7 +248,7 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def resetCounters(id: String, resetPurchasesTimeout: Date): Option[User] = {
+  def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
@@ -554,6 +554,17 @@ private[mongo] class MongoUserDAO
           "messages" -> MongoDBObject("id" -> messageId)))))
   }
 
+  /**
+   * 
+   */
+  def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.dailyTasks" -> grater[DailyTasks].asDBObject(newTasks),
+          "schedules.dailyTasks" -> resetTasksTimeout))))
+  }
 }
 
 /**

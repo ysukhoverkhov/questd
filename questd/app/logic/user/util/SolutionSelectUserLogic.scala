@@ -123,7 +123,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   private[user] def getVIPSolutions = {
     Logger.trace("  Returning VIP's solutions")
 
-    val themeIds = selectRandomThemes(numberOfFavoriteThemesForVIPSolutions)
+    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPSolutions)
     Logger.trace("    Selected themes of VIP's solutions: " + themeIds.mkString(", "))
 
     Some(api.getVIPSolutions(GetVIPSolutionsRequest(
@@ -136,7 +136,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   private[user] def getOtherSolutions = {
     Logger.trace("  Returning from all solutions with favorite themes")
 
-    val themeIds = selectRandomThemes(numberOfFavoriteThemesForOtherSolutions)
+    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherSolutions)
     Logger.trace("    Selected themes of other solutions: " + themeIds.mkString(", "))
 
     Some(api.getAllSolutions(GetAllSolutionsRequest(
@@ -156,10 +156,10 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   /**
    * Tells what level we should give quests based on reason of getting quest.
    */
-  private def levels = {
-    Some(
-      user.profile.publicProfile.level - solutionLevelDownTolerance,
-      user.profile.publicProfile.level + solutionLevelUpTolerance)
+  private def levels: Option[(Int, Int)] = {
+    Some((
+      user.profile.publicProfile.level - SolutionLevelDownTolerance,
+      user.profile.publicProfile.level + SolutionLevelUpTolerance))
   }
 
   private def selectRandomThemes(count: Int): List[String] = {

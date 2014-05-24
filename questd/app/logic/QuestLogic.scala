@@ -19,12 +19,12 @@ class QuestLogic(
   def calculateQuestLevel = {
     
     val totalVotes = quest.rating.difficultyRating.easy + quest.rating.difficultyRating.normal + quest.rating.difficultyRating.hard + quest.rating.difficultyRating.extreme
-    val l: Int = (quest.rating.difficultyRating.easy * constants.easyWeight 
-        + quest.rating.difficultyRating.normal * constants.normalWeight 
-        + quest.rating.difficultyRating.hard * constants.hardWeight 
-        + quest.rating.difficultyRating.extreme * constants.extremeWeight) / totalVotes
+    val l: Int = (quest.rating.difficultyRating.easy * constants.EasyWeight 
+        + quest.rating.difficultyRating.normal * constants.NormalWeight 
+        + quest.rating.difficultyRating.hard * constants.HardWeight 
+        + quest.rating.difficultyRating.extreme * constants.ExtremeWeight) / totalVotes
     
-    math.min(constants.maxQuestLevel, math.max(constants.minQuestLevel, l))
+    math.min(constants.MaxQuestLevel, math.max(constants.MinQuestLevel, l))
 
   }
 

@@ -12,8 +12,8 @@ import play.Logger
 case class GetAllUsersRequest()
 case class GetAllUsersResult(users: Iterator[User])
 
-case class ResetCountersRequest(user: User)
-case class ResetCountersResult()
+case class ResetPurchasesRequest(user: User)
+case class ResetPurchasesResult()
 
 case class AdjustAssetsRequest(user: User, reward: Option[Assets] = None, cost: Option[Assets] = None)
 case class AdjustAssetsResult(user: User)
@@ -41,13 +41,13 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   /**
    * Reset all purchases (quests and themes) overnight.
    */
-  def resetCounters(request: ResetCountersRequest): ApiResult[ResetCountersResult] = handleDbException {
+  def resetPurchases(request: ResetPurchasesRequest): ApiResult[ResetPurchasesResult] = handleDbException ({
     import request._
 
-    db.user.resetCounters(user.id, user.getResetPurchasesTimeout)
+    db.user.resetPurchases(user.id, user.getResetPurchasesTimeout)
 
-    OkApiResult(Some(ResetCountersResult()))
-  }
+    OkApiResult(Some(ResetPurchasesResult()))
+  })
 
   /**
    * Adjust assets value and performs other modifications on profile because of this.
