@@ -75,9 +75,10 @@ trait Tasks { this: UserLogic =>
    */
   private def getVoteQuestSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
     def calculateCount = {
-      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * 0.9).toFloat) // TODO: move probability to config.
+      val share = api.config(api.ConfigParams.SolutionVoteTaskShare).toDouble
+      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
     }
-
+    
     Some(Task(
       taskType = TaskType.VoteQuestSolutions,
       description = "",
@@ -101,7 +102,8 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating tasks for shortlist.
    */
   private def getAddToShortListTask(user: User) = ifHasRightTo(Functionality.AddToShortList) {
-    if (rand.nextDouble < 0.3) // TODO: move probability to config.
+    val prob = api.config(api.ConfigParams.AddToShortlistTaskProbability).toDouble
+    if (rand.nextDouble < prob)
       Some(Task(
         taskType = TaskType.AddToShortList,
         description = "",
@@ -115,7 +117,8 @@ trait Tasks { this: UserLogic =>
    */
   private def getVoteQuestProposalsTask(user: User) = ifHasRightTo(Functionality.VoteQuestProposals) {
     def calculateCount = {
-      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * 0.9).toFloat) // TODO: move probability to config.
+      val share = api.config(api.ConfigParams.QuestVoteTaskShare).toDouble
+      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
     }
 
     Some(Task(

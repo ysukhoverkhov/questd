@@ -1,6 +1,8 @@
 package logic.user
 
 import models.domain._
+import controllers.domain.config._ConfigParams
+import models.domain.admin.ConfigSection
 
 class TasksSpecs extends BaseUserLogicSpecs {
 
@@ -9,9 +11,25 @@ class TasksSpecs extends BaseUserLogicSpecs {
     User(profile = u.profile.copy(rights = u.calculateRights))
   }
 
+  /**
+   * Creates stub config for our tests.
+   */
+  private def createStubConfig = {
+    api.ConfigParams returns _ConfigParams
+
+    val config = mock[ConfigSection]
+
+    config.apply(api.ConfigParams.SolutionVoteTaskShare) returns "0.9"
+    config.apply(api.ConfigParams.AddToShortlistTaskProbability) returns "0.3"
+    config.apply(api.ConfigParams.QuestVoteTaskShare) returns "0.9"
+
+    config
+  }
+
   "Tasks Logic" should {
 
     "Generate DailyTasks on request" in {
+      api.config returns createStubConfig
 
       val u = User()
       val dailyResult = u.getTasksForTomorrow
@@ -20,6 +38,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
     }
 
     "Generate tasks for voting for soluions" in {
+      api.config returns createStubConfig
 
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
       val dailyResult = u.getTasksForTomorrow
@@ -31,6 +50,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
     }
 
     "Do not Generate tasks SubmitQuestResult for low level users" in {
+      api.config returns createStubConfig
 
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 1)))
       val dailyResult = u.getTasksForTomorrow
@@ -40,6 +60,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
     }
 
     "Generate tasks SubmitQuestResult" in {
+      api.config returns createStubConfig
 
       val u = createUser(3)
       val dailyResult = u.getTasksForTomorrow
@@ -52,6 +73,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
     }
 
     "Generate tasks AddToShortList" in {
+      api.config returns createStubConfig
       rand.nextDouble returns 0.2
 
       val u = createUser(8)
@@ -67,6 +89,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
     }
 
     "Do not generate tasks AddToShortList" in {
+      api.config returns createStubConfig
       rand.nextDouble returns 0.5
 
       val u = createUser(8)
@@ -81,6 +104,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
     }
 
     "Generate tasks for voting for proposals" in {
+      api.config returns createStubConfig
 
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
       val dailyResult = u.getTasksForTomorrow
@@ -91,6 +115,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
     }
 
     "Generate tasks for submitting proposals" in {
+      api.config returns createStubConfig
 
       val u = createUser(12)
       val dailyResult = u.getTasksForTomorrow
@@ -103,6 +128,8 @@ class TasksSpecs extends BaseUserLogicSpecs {
     }
 
     "Generate tasks for reviewing friendship" in {
+      api.config returns createStubConfig
+
       val u = createUser(12).copy(friends = List(Friendship(friendId = "", status = FriendshipStatus.Invites.toString)))
       val dailyResult = u.getTasksForTomorrow
 
@@ -114,6 +141,8 @@ class TasksSpecs extends BaseUserLogicSpecs {
     }
     
     "Generate tasks for reviewing friendship if there are no requests" in {
+      api.config returns createStubConfig
+
       val u = createUser(12)
       val dailyResult = u.getTasksForTomorrow
 

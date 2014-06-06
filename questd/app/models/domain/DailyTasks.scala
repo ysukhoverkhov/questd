@@ -1,6 +1,5 @@
 package models.domain
 
-
 /**
  * Tasks for a day for user.
  */
