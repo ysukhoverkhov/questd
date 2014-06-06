@@ -14,6 +14,16 @@ trait ProfileWSImpl extends QuestController with SecurityWSImpl { this: WSCompon
       Ok(Json.write[WSProfileResult](request.user.profile)).as(JSON) 
     }
   }
+  
+  def setGender = TODO 
+    //wrapJsonApiCallReturnBody[WSRemoveMessageResult] { (js, r) =>
+//    val v = Json.read[WSRemoveMessageRequest](js.toString)
+//
+//    api.setGender(RemoveMessageRequest(r.user, v.id))
+//  }
+  
+  def setDebug = TODO
+  
 
 }
 
