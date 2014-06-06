@@ -565,6 +565,29 @@ private[mongo] class MongoUserDAO
           "profile.dailyTasks" -> grater[DailyTasks].asDBObject(newTasks),
           "schedules.dailyTasks" -> resetTasksTimeout))))
   }
+  
+  /**
+   * 
+   */
+  def setGender(id: String, gender: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.publicProfile.bio.gender" -> gender))))
+  }
+  
+  /**
+   * 
+   */
+  def setDebug(id: String, debug: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.debug" -> debug))))
+  }
+  
 }
 
 /**

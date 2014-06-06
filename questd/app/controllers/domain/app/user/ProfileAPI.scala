@@ -27,6 +27,13 @@ case class GetRightsAtLevelsResult(rights: List[Rights])
 case class GetLevelsForRightsRequest(user: User, functionality: List[String])
 case class GetLevelsForRightsResult(levels: Map[String, Int])
 
+case class SetDebugRequest(user: User, debug: String)
+case class SetDebugResult(user: User)
+
+case class SetGenderRequest(user: User, gender: Gender.Value)
+case class SetGenderResult(user: User)
+
+
 private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -119,5 +126,27 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     OkApiResult(Some(GetLevelsForRightsResult(rv)))
   }
 
+  /**
+   * Updates debug string in user profile.
+   */
+  def setDebug(request: SetDebugRequest): ApiResult[SetDebugResult] = handleDbException {
+    import request._
+    
+    val rv = db.user.setDebug(user.id, debug)
+
+    OkApiResult(Some(SetDebugResult(rv.get)))
+  }
+
+  /**
+   * Updates user gender.
+   */
+  def setGender(request: SetGenderRequest): ApiResult[SetGenderResult] = handleDbException {
+    import request._
+    
+    val rv = db.user.setGender(user.id, gender.toString())
+
+    OkApiResult(Some(SetGenderResult(rv.get)))
+  }
+  
 }
 
