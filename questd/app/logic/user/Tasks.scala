@@ -197,7 +197,7 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating tasks to review friendship request.
    */
   private def getReviewFriendshipRequestsTask(user: User): Option[Task] = {
-    if (user.friends.exists(_.status == FriendshipStatus.Invites.toString))
+    if (user.friends.exists(_.status == FriendshipStatus.Invites))
       Some(Task(
         taskType = TaskType.LookThroughFriendshipProposals,
         description = "",

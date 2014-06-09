@@ -130,7 +130,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
     "Generate tasks for reviewing friendship" in {
       api.config returns createStubConfig
 
-      val u = createUser(12).copy(friends = List(Friendship(friendId = "", status = FriendshipStatus.Invites.toString)))
+      val u = createUser(12).copy(friends = List(Friendship(friendId = "", status = FriendshipStatus.Invites)))
       val dailyResult = u.getTasksForTomorrow
 
       u.canSolveQuestToday must beEqualTo(true)

@@ -95,8 +95,8 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
                 db.user.askFriendship(
                   r.user.id,
                   request.friendId,
-                  Friendship(request.friendId, FriendshipStatus.Invited.toString()),
-                  Friendship(r.user.id, FriendshipStatus.Invites.toString()))
+                  Friendship(request.friendId, FriendshipStatus.Invited),
+                  Friendship(r.user.id, FriendshipStatus.Invites))
 
                 OkApiResult(Some(AskFriendshipResult(OK, Some(r.user.profile.assets))))
               }

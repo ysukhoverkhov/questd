@@ -28,7 +28,7 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
   def getFriendsSolutions(request: GetFriendsSolutionsRequest): ApiResult[GetFriendsSolutionsResult] = handleDbException {
     OkApiResult(Some(GetFriendsSolutionsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
-      userIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted.toString).map(_.friendId),
+      userIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
       levels = request.levels))))
   }
 
