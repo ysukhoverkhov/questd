@@ -24,4 +24,3 @@ case class Task(
   requiredCount: Int,
   currentCount: Int = 0)
 
-// TODO: check how is enums being saved and read with salat.

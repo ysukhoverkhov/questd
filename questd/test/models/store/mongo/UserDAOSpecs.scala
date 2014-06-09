@@ -243,7 +243,6 @@ class UserDAOSpecs
 
       db.user.resetTasks(userid, tasks, new Date())
 
-      // TODO: perhaps we can pass here not string but enum value itself.
       db.user.incTask(userid, TaskType.Client.toString());
       db.user.incTask(userid, TaskType.GiveRewards.toString());
       db.user.incTask(userid, TaskType.GiveRewards.toString());
