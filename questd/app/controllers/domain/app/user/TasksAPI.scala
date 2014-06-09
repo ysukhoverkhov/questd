@@ -15,7 +15,7 @@ case class ResetDailyTasksResult()
 private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
-   * Shifts daily result.
+   * Resets daily tasks.
    */
   def resetDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
     import request._
@@ -24,5 +24,9 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     OkApiResult(Some(ResetDailyTasksResult()))
   }
+  
+  
+  
+  
 }
 

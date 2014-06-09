@@ -225,6 +225,34 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.history.themesOfSelectedQuests.contains(themeId))
     }
+
+    "incTask should increase number of times task was completed by one" in new WithApplication(appWithTestDatabase) {
+      val userid = "incTasks"
+      db.user.create(User(userid))
+
+      val tasks = DailyTasks(
+        tasks = List(
+          Task(
+            taskType = TaskType.Client,
+            description = "",
+            requiredCount = 10),
+          Task(
+            taskType = TaskType.GiveRewards,
+            description = "",
+            requiredCount = 10)))
+
+      db.user.resetTasks(userid, tasks, new Date())
+
+      // TODO: perhaps we can pass here not string but enum value itself.
+      db.user.incTask(userid, TaskType.Client.toString());
+      db.user.incTask(userid, TaskType.GiveRewards.toString());
+      db.user.incTask(userid, TaskType.GiveRewards.toString());
+
+      val ou = db.user.readById(userid)
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client)(0).currentCount == 1)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards)(0).currentCount == 2)
+    }
   }
 
 }

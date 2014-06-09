@@ -569,6 +569,19 @@ private[mongo] class MongoUserDAO
   /**
    * 
    */
+  def incTask(id: String, taskId: String): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "profile.dailyTasks.tasks.taskType" -> taskId),
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.tasks.$.currentCount" -> 1))))
+  }
+  
+  /**
+   * 
+   */
   def setGender(id: String, gender: String): Option[User] = {
     findAndModify(
       id,
