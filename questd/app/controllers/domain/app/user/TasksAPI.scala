@@ -35,46 +35,40 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def makeTask(request: MakeTaskRequest): ApiResult[MakeTaskResult] = handleDbException {
     import request._
 
-    // TODO: test doing nothing if nothing to do.
     if (user.profile.dailyTasks.tasks.count(t => t.taskType == request.taskType && t.currentCount < t.requiredCount) <= 0) {
+    
       // Nothing to do.
       OkApiResult(Some(MakeTaskResult(user)))
-    }
-
-    // Creating copy of our results for future calculations.
-    val nt: DailyTasks = user.profile.dailyTasks.copy(
-      tasks = user.profile.dailyTasks.tasks.map(t => if (t.taskType == request.taskType) t.copy(currentCount = t.currentCount + 1) else t));
-
-    def calculatePercent(dt: DailyTasks): Float = {
-      // TODO: implement me.
-      0
-    }
     
-    def isCompleted(dt: DailyTasks): Boolean = {
-      // TODO: implement me.
-      false
-    }
-
-    val newPercent = calculatePercent(nt)
-    val completed = isCompleted(nt)
-
-    val r1 = if (completed) {
-      adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(nt.reward)))
     } else {
-      OkApiResult(Some(AdjustAssetsResult(user)))
-    } 
-    
-    r1 map { r =>
 
-      // TODO test percent and completed.
-      // TODO: test in db test percent and completed.
-      val u = db.user.incTask(user.id, taskType.toString, newPercent, completed)
+      // Creating copy of our results for future calculations.
+      val nt: DailyTasks = user.profile.dailyTasks.copy(
+        tasks = user.profile.dailyTasks.tasks.map(t => if (t.taskType == request.taskType) t.copy(currentCount = t.currentCount + 1) else t));
 
-      // TODO: check return internal error if it's None.
-      OkApiResult(Some(MakeTaskResult(u.get)))
+      def calculatePercent(dt: DailyTasks): Float = {
+        dt.tasks.map(t => t.currentCount.toFloat / t.requiredCount).sum / dt.tasks.size
+      }
+
+      def isCompleted(dt: DailyTasks): Boolean = {
+        dt.tasks.foldLeft(true)((r, v) => if (v.currentCount >= v.requiredCount) r else false)
+      }
+
+      val newPercent = calculatePercent(nt)
+      val completed = isCompleted(nt)
+
+      val r1 = if (completed) {
+        adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(nt.reward)))
+      } else {
+        OkApiResult(Some(AdjustAssetsResult(user)))
+      }
+
+      r1 map { r =>
+        val u = db.user.incTask(user.id, taskType.toString, newPercent, completed)
+
+        OkApiResult(Some(MakeTaskResult(u.get)))
+      }
     }
-
   }
-
 }
 
