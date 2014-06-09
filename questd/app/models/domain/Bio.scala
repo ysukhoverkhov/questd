@@ -10,6 +10,6 @@ object Gender extends Enumeration {
 case class Bio(
   avatar: Option[ContentReference] = None,
   name: String = "",
-  gender: String = Gender.Unknown.toString,
+  gender: Gender.Value = Gender.Unknown,
   timezone: Int = 0)
     

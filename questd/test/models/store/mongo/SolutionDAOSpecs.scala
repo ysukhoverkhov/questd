@@ -37,7 +37,7 @@ class SolutionDAOSpecs extends Specification
       userId = userId,
       questLevel = questLevel,
       info = QuestSolutionInfo(
-        content = QuestSolutionInfoContent(media = ContentReference(ContentType.Video.toString, "", "")),
+        content = QuestSolutionInfoContent(media = ContentReference(ContentType.Video, "", "")),
         vip = vip,
         questId = questId,
         themeId = themeId),
@@ -82,7 +82,7 @@ class SolutionDAOSpecs extends Specification
 
       db.solution.update(q.get.copy(info = q.get.info.copy(
         content = q.get.info.content.copy(
-          media = ContentReference(ContentType.Video.toString, "2", "3")))))
+          media = ContentReference(ContentType.Video, "2", "3")))))
 
       val q2 = db.solution.readById(id)
 

@@ -74,7 +74,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       info = QuestInfo(
         themeId = "theme_id",
         content = QuestInfoContent(
-          media = ContentReference(ContentType.Video.toString, "", ""),
+          media = ContentReference(ContentType.Video, "", ""),
           icon = None,
           description = "The description"),
         vip = false))

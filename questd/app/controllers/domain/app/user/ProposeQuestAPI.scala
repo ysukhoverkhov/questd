@@ -131,7 +131,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
     val user = ensureNoDeadlineProposal(request.user)
 
-    user.canProposeQuest(ContentType.withName(request.quest.media.contentType)) match {
+    user.canProposeQuest(request.quest.media.contentType) match {
       case OK => {
 
         db.quest.create(

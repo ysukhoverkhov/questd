@@ -183,7 +183,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     val user = ensureNoDeadlineQuest(request.user)
 
-    user.canResolveQuest(ContentType.withName(request.solution.media.contentType)) match {
+    user.canResolveQuest(request.solution.media.contentType) match {
       case OK => {
 
         db.solution.create(

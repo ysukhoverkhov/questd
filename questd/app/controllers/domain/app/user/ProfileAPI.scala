@@ -143,7 +143,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def setGender(request: SetGenderRequest): ApiResult[SetGenderResult] = handleDbException {
     import request._
     
-    val rv = db.user.setGender(user.id, gender.toString())
+    val rv = db.user.setGender(user.id, gender.toString)
 
     OkApiResult(Some(SetGenderResult(rv.get)))
   }

@@ -13,7 +13,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       id = "user_id",
       profile = Profile(
         questSolutionContext = QuestSolutionContext(
-          takenQuest = Some(QuestInfoWithID("quest_id", QuestInfo(themeId = "theme_id", vip = false, content = QuestInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None, "")))),
+          takenQuest = Some(QuestInfoWithID("quest_id", QuestInfo(themeId = "theme_id", vip = false, content = QuestInfoContent(ContentReference(ContentType.Photo, "", ""), None, "")))),
           questDeadline = new Date(Long.MaxValue)),
         publicProfile = PublicProfile(vip = vip),
         rights = Rights.full))
@@ -21,7 +21,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
   
   def createSolution = {
-    QuestSolutionInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None)
+    QuestSolutionInfoContent(ContentReference(ContentType.Photo, "", ""), None)
   }
 
   "Solve Quest API" should {

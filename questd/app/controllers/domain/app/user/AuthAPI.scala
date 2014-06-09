@@ -57,10 +57,10 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
             publicProfile = PublicProfile(
               bio = Bio(
                 name = params.userfb.getFirstName(),
-                gender = genderFromFBUser(params.userfb).toString,
+                gender = genderFromFBUser(params.userfb),
                 timezone = params.userfb.getTimezone().toInt,
                 avatar = Some(
-                  ContentReference(contentType = ContentType.Photo.toString, storage = "fb_avatar", reference = params.userfb.getId()))))))
+                  ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = params.userfb.getId()))))))
 
         db.user.create(newUser)
         checkIncreaseLevel(CheckIncreaseLevelRequest(newUser))
