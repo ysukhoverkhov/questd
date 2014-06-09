@@ -32,7 +32,7 @@ class QuestLogic(
    * Are we able to add quest to rotation.
    */
   def shouldAddToRotation = {
-    if ((quest.rating.points > api.config(api.ConfigParams.ProposalLikesToEnterRotation).toLong) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
+    if ((quest.rating.points > api.config(api.ConfigParams.ProposalLikesToEnterRotation).toLong) && (quest.status == QuestStatus.OnVoting))
       true
     else
       false
@@ -42,7 +42,7 @@ class QuestLogic(
    * Should we remove quest from rotation.
    */
   def shouldRemoveFromRotation = {
-    if ((quest.rating.points < api.config(api.ConfigParams.ProposalLikesToEnterRotation).toLong / 2) && (QuestStatus.withName(quest.status) == QuestStatus.InRotation))
+    if ((quest.rating.points < api.config(api.ConfigParams.ProposalLikesToEnterRotation).toLong / 2) && (quest.status == QuestStatus.InRotation))
       true
     else
       false
@@ -62,14 +62,14 @@ class QuestLogic(
 
   def shouldCheatingQuest = {
     val maxCheatingVotes = api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
-    if ((quest.rating.cheating > maxCheatingVotes) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
+    if ((quest.rating.cheating > maxCheatingVotes) && (quest.status == QuestStatus.OnVoting))
       true else false
   }
 
   def shouldRemoveQuestFromVotingByTime = {
     if ((quest.rating.votersCount > api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong) &&
         ((quest.rating.points / quest.rating.votersCount) < api.config(api.ConfigParams.ProposalRatioToLeaveVoting).toDouble) &&
-        (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
+        (quest.status == QuestStatus.OnVoting))
       true
     else
       false

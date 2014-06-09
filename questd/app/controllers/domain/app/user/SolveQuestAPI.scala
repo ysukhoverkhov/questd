@@ -252,7 +252,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     db.quest.readById(solution.info.questId) match {
       case Some(q) => {
 
-        val r = QuestSolutionStatus.withName(solution.status) match {
+        val r = solution.status match {
           case QuestSolutionStatus.OnVoting => {
             Logger.error("We are rewarding player for solution what is on voting.")
             InternalErrorApiResult()

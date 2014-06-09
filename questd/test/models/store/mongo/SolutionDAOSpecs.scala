@@ -29,7 +29,7 @@ class SolutionDAOSpecs extends Specification
     themeId: String = "theme id",
     questLevel: Int = 5,
     vip: Boolean = false,
-    status: String = QuestSolutionStatus.OnVoting.toString,
+    status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting,
     lastModDate: Date = new Date()) = {
 
     QuestSolution(
@@ -52,7 +52,7 @@ class SolutionDAOSpecs extends Specification
     themeId: String = "theme id",
     questLevel: Int = 5,
     vip: Boolean = false,
-    status: String = QuestSolutionStatus.OnVoting.toString) = {
+    status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting) = {
 
     db.solution.create(createSolution(id, questId, userId, themeId, questLevel, vip, status))
   }
@@ -109,9 +109,9 @@ class SolutionDAOSpecs extends Specification
 
       // Preparing quests to store in db.
       val qs = List(
-        createSolution("q1", "t1", "q1_author id", "q1_theme_id", 3, false, QuestStatus.OnVoting.toString, new Date(5)),
-        createSolution("q2", "t2", "q2_author id", "q2_theme_id", 13, true, QuestStatus.InRotation.toString, new Date(3)),
-        createSolution("q3", "t3", "q3_author id", "q3_theme_id", 7, true, QuestStatus.OnVoting.toString, new Date(4)))
+        createSolution("q1", "t1", "q1_author id", "q1_theme_id", 3, false, QuestSolutionStatus.OnVoting, new Date(5)),
+        createSolution("q2", "t2", "q2_author id", "q2_theme_id", 13, true, QuestSolutionStatus.Won, new Date(3)),
+        createSolution("q3", "t3", "q3_author id", "q3_theme_id", 7, true, QuestSolutionStatus.OnVoting, new Date(4)))
 
       qs.foreach(db.solution.create)
 

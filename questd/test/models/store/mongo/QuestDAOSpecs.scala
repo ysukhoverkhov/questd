@@ -39,7 +39,8 @@ class QuestDAOSpecs extends Specification
             media = ContentReference(ContentType.Video, "", ""),
             icon = None,
             description = "The description"),
-          vip = true)))
+          vip = true),
+        status = QuestStatus.OnVoting))
 
       val q = db.quest.readById(id)
 
@@ -121,7 +122,7 @@ class QuestDAOSpecs extends Specification
               description = "The description"),
             level = 3,
             vip = false),
-          status = QuestStatus.OnVoting.toString),
+          status = QuestStatus.OnVoting),
 
         Quest(
           id = "q2",
@@ -135,7 +136,7 @@ class QuestDAOSpecs extends Specification
               description = "The description"),
             level = 13,
             vip = true),
-          status = QuestStatus.InRotation.toString),
+          status = QuestStatus.InRotation),
 
         Quest(
           id = "q3",
@@ -149,7 +150,7 @@ class QuestDAOSpecs extends Specification
               description = "The description"),
             level = 7,
             vip = true),
-          status = QuestStatus.OnVoting.toString))
+          status = QuestStatus.OnVoting))
 
       qs.foreach(db.quest.create)
 

@@ -196,7 +196,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
   def rewardQuestProposalAuthor(request: RewardQuestProposalAuthorRequest): ApiResult[RewardQuestProposalAuthorResult] = handleDbException {
     import request._
 
-    val r = QuestStatus.withName(quest.status) match {
+    val r = quest.status match {
       case QuestStatus.OnVoting => {
         Logger.error("We are rewarding player for proposal what is on voting.")
         InternalErrorApiResult()
