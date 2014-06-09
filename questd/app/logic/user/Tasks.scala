@@ -64,7 +64,7 @@ trait Tasks { this: UserLogic =>
    * Wrapper what returns None if user as no rights.
    */
   private def ifHasRightTo(f: Functionality.Value)(body: => Option[Task]): Option[Task] = {
-    if (calculateRights.unlockedFunctionality.contains(f.toString))
+    if (calculateRights.unlockedFunctionality.contains(f))
       body
     else
       None

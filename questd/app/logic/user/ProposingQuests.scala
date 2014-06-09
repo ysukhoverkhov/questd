@@ -20,7 +20,7 @@ trait ProposingQuests { this: UserLogic =>
    * Check is the user can purchase quest proposals.
    */
   def canPurchaseQuestProposals = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costOfPurchasingQuestProposal))
       NotEnoughAssets
@@ -36,7 +36,7 @@ trait ProposingQuests { this: UserLogic =>
    * Is user can propose quest of given type.
    */
   def canTakeQuestTheme = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests))
       NotEnoughRights
     else if (user.profile.questProposalContext.purchasedTheme == None)
       InvalidState
@@ -50,7 +50,7 @@ trait ProposingQuests { this: UserLogic =>
    * Is user potentially eligible for proposing quest today.
    */
   def canProposeQuestToday = {
-    user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString()) &&
+    user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests) &&
     user.profile.questProposalContext.questProposalCooldown.before(new Date())
   }
 
@@ -59,8 +59,8 @@ trait ProposingQuests { this: UserLogic =>
    */
   def canProposeQuest(conentType: ContentType) = {
     val content = conentType match {
-      case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString())
-      case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoQuests.toString())
+      case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests)
+      case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoQuests)
     }
 
     if (!content)

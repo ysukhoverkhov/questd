@@ -25,7 +25,7 @@ trait VotingQuestProposals { this: UserLogic =>
    *
    */
   def canGetQuestProposalForVote = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestProposals.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestProposals))
       NotEnoughRights
     else if (user.profile.questProposalVoteContext.reviewingQuest != None)
       InvalidState
@@ -37,7 +37,7 @@ trait VotingQuestProposals { this: UserLogic =>
    *
    */
   def canVoteQuestProposal = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestProposals.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestProposals))
       NotEnoughRights
     else if (user.profile.questProposalVoteContext.reviewingQuest == None)
       InvalidState

@@ -25,7 +25,7 @@ case class GetRightsAtLevelsRequest(user: User, levelFrom: Int, levelTo: Int)
 case class GetRightsAtLevelsResult(rights: List[Rights])
 
 case class GetLevelsForRightsRequest(user: User, functionality: List[String])
-case class GetLevelsForRightsResult(levels: Map[String, Int])
+case class GetLevelsForRightsResult(levels: Map[Functionality.Value, Int])
 
 case class SetDebugRequest(user: User, debug: String)
 case class SetDebugResult(user: User)

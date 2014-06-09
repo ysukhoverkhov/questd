@@ -7,23 +7,23 @@ object constants {
   val MaxLevel = 20
 
   // user level restriction constants.
-  val restrictions: Map[String, Int] = Map(
-    Functionality.VoteQuestSolutions.toString() -> 1,
-    Functionality.SubmitPhotoResults.toString() -> 3,
-    Functionality.SubmitVideoResults.toString() -> 4,
-    Functionality.Report.toString() -> 5,
-    Functionality.InviteFriends.toString() -> 6,
-    Functionality.AddToShortList.toString() -> 8,
-    Functionality.VoteQuestProposals.toString() -> 10,
-    Functionality.SubmitPhotoQuests.toString() -> 12,
-    Functionality.SubmitVideoQuests.toString() -> 13,
-    Functionality.VoteReviews.toString() -> 14,
-    Functionality.SubmitReviewsForResults.toString() -> 16,
-    Functionality.SubmitReviewsForProposals.toString() -> 18,
-    Functionality.GiveRewards.toString() -> 20)
+  val restrictions: Map[Functionality.Value, Int] = Map(
+    Functionality.VoteQuestSolutions -> 1,
+    Functionality.SubmitPhotoResults -> 3,
+    Functionality.SubmitVideoResults -> 4,
+    Functionality.Report -> 5,
+    Functionality.InviteFriends -> 6,
+    Functionality.AddToShortList -> 8,
+    Functionality.VoteQuestProposals -> 10,
+    Functionality.SubmitPhotoQuests -> 12,
+    Functionality.SubmitVideoQuests -> 13,
+    Functionality.VoteReviews -> 14,
+    Functionality.SubmitReviewsForResults -> 16,
+    Functionality.SubmitReviewsForProposals -> 18,
+    Functionality.GiveRewards -> 20)
 
   def levelFor(f: Functionality.Value): Int = {
-    restrictions(f.toString())
+    restrictions(f)
   }
 
   val FlipHour = 5
