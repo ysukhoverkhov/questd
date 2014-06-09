@@ -7,6 +7,6 @@ case class DailyTasks(
   tasks: List[Task] = List(),
   completed: Float = 0f,
   reward: Assets = Assets(),
-  rewardreceived: Boolean = false
+  rewardReceived: Boolean = false
   )
 

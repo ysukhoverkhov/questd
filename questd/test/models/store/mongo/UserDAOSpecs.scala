@@ -243,17 +243,37 @@ class UserDAOSpecs
 
       db.user.resetTasks(userid, tasks, new Date())
 
-      db.user.incTask(userid, TaskType.Client.toString());
-      db.user.incTask(userid, TaskType.GiveRewards.toString());
-      db.user.incTask(userid, TaskType.GiveRewards.toString());
+      db.user.incTask(userid, TaskType.Client.toString(), 0.4f, true);
+      db.user.incTask(userid, TaskType.GiveRewards.toString(), 0.4f, true);
+      db.user.incTask(userid, TaskType.GiveRewards.toString(), 0.4f, true);
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client)(0).currentCount == 1)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards)(0).currentCount == 2)
     }
-  }
 
+    "incTask should change percentage completed" in new WithApplication(appWithTestDatabase) {
+      val userid = "incTasks2"
+      db.user.create(User(userid))
+
+      val tasks = DailyTasks(
+        tasks = List(
+          Task(
+            taskType = TaskType.Client,
+            description = "",
+            requiredCount = 10)))
+
+      db.user.resetTasks(userid, tasks, new Date())
+
+      db.user.incTask(userid, TaskType.Client.toString(), 0.4f, true);
+
+      val ou = db.user.readById(userid)
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou.get.profile.dailyTasks.completed must beEqualTo(0.4f)
+      ou.get.profile.dailyTasks.rewardReceived must beEqualTo(true)
+    }
+  }
 }
 
 /**
