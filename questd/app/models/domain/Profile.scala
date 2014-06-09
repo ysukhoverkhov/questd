@@ -18,5 +18,6 @@ case class Profile(
   questSolutionContext: QuestSolutionContext = QuestSolutionContext(),
   questProposalVoteContext: QuestProposalVoteContext = QuestProposalVoteContext(),
   questSolutionVoteContext: QuestSolutionVoteContext = QuestSolutionVoteContext(),
+  analytics: Analytics = Analytics(),
   debug: String = "")
 
