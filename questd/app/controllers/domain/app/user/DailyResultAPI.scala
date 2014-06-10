@@ -149,7 +149,6 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
   }
 
-  // TODO: refactor me.
   private def ensurePrivateDailyResultExists(user: User): User = {
     if (user.privateDailyResults.length == 0) {
       shiftDailyResult(ShiftDailyResultRequest(user)).body.get.user

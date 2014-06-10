@@ -106,15 +106,14 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     request.user.canTakeQuestTheme match {
 
       case OK => {
+        {
+          adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuestTheme)))
+        } map { r =>
 
-        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuestTheme))) map { r =>
-          val pt = r.user.profile.questProposalContext.purchasedTheme
-          if (pt == None) {
-            Logger.error("API - takeQuestTheme. Purchased theme is None")
-            InternalErrorApiResult()
-          } else {
-            val u = db.user.takeQuestTheme(r.user.id, pt.get, r.user.getCooldownForTakeTheme)
-            db.theme.updateLastUseDate(pt.get.id)
+          r.user.profile.questProposalContext.purchasedTheme ifSome { v =>
+
+            val u = db.user.takeQuestTheme(r.user.id, v, r.user.getCooldownForTakeTheme)
+            db.theme.updateLastUseDate(v.id)
             OkApiResult(Some(TakeQuestThemeResult(OK, u.map(_.profile))))
           }
         }
@@ -140,19 +139,22 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
         } map { r =>
 
-          db.quest.create(
-            Quest(
-              authorUserId = r.user.id,
-              approveReward = r.user.profile.questProposalContext.approveReward,
-              info = QuestInfo(
-                themeId = r.user.profile.questProposalContext.takenTheme.get.id,
-                content = request.quest,
-                vip = r.user.profile.publicProfile.vip)))
+          r.user.profile.questProposalContext.takenTheme ifSome { v =>
+            
+            db.quest.create(
+              Quest(
+                authorUserId = r.user.id,
+                approveReward = r.user.profile.questProposalContext.approveReward,
+                info = QuestInfo(
+                  themeId = v.id,
+                  content = request.quest,
+                  vip = r.user.profile.publicProfile.vip)))
 
-          val u = db.user.resetQuestProposal(user.id)
+            val u = db.user.resetQuestProposal(user.id)
 
-          OkApiResult(Some(ProposeQuestResult(OK, u.map(_.profile))))
+            OkApiResult(Some(ProposeQuestResult(OK, u.map(_.profile))))
 
+          }
         }
       }
       case (a: ProfileModificationResult) => OkApiResult(Some(ProposeQuestResult(a)))
@@ -211,18 +213,15 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
       }
       case QuestStatus.InRotation =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, reward = Some(quest.approveReward)))
-      //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(quest.approveReward)))
 
       case QuestStatus.RatingBanned =>
         OkApiResult(Some(StoreProposalInDailyResultResult(author)))
 
       case QuestStatus.CheatingBanned =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, penalty = Some(author.penaltyForCheatingQuest)))
-      //adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingQuest)))
 
       case QuestStatus.IACBanned =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, penalty = Some(author.penaltyForIACQuest)))
-      //adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACQuest)))
 
       case QuestStatus.OldBanned =>
         OkApiResult(Some(StoreProposalInDailyResultResult(author)))
