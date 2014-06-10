@@ -29,7 +29,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
       case OK => {
 
         Logger.trace("getQuestProposalToVote - we are eligable to vote quest.")
-        
+
         // Updating user profile.
         val q = user.getQuestProposalToVote
 
@@ -72,13 +72,19 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
           }
           case Some(q) => {
             {
+              
               voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
+              
+            } map { r =>
+              
+              makeTask(MakeTaskRequest(request.user, TaskType.VoteQuestProposals))
+              
             } map {
 
               adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))
+
             } map { r =>
-              // 3. update user profile.
-              // 4. save profile in db.
+
               val liked = (request.vote == QuestProposalVote.Cool)
               val u = db.user.recordQuestProposalVote(r.user.id, q.id, liked)
 

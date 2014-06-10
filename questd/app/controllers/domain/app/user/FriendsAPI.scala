@@ -47,12 +47,22 @@ case class RemoveFromFriendsResult(
 private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#DomainAPI =>
 
   /**
-   * Get ids of users from our shortlist.
+   * Get ids of users from our friends list.
    */
   def getFriends(request: GetFriendsRequest): ApiResult[GetFriendsResult] = handleDbException {
-    OkApiResult(Some(GetFriendsResult(
-      allowed = OK,
-      userIds = request.user.friends)))
+
+    {
+      
+      makeTask(MakeTaskRequest(request.user, TaskType.LookThroughFriendshipProposals))
+
+    } map { r =>
+      
+      OkApiResult(Some(GetFriendsResult(
+        allowed = OK,
+        userIds = r.user.friends)))
+        
+    }
+
   }
 
   /**

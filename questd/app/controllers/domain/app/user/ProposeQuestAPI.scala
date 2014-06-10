@@ -134,18 +134,26 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     user.canProposeQuest(request.quest.media.contentType) match {
       case OK => {
 
-        db.quest.create(
-          Quest(
-            authorUserId = user.id,
-            approveReward = user.profile.questProposalContext.approveReward,
-            info = QuestInfo(
-              themeId = user.profile.questProposalContext.takenTheme.get.id,
-              content = request.quest,
-              vip = request.user.profile.publicProfile.vip)))
+        {
 
-        val u = db.user.resetQuestProposal(user.id)
+          makeTask(MakeTaskRequest(user, TaskType.SubmitQuestProposal))
 
-        OkApiResult(Some(ProposeQuestResult(OK, u.map(_.profile))))
+        } map { r =>
+
+          db.quest.create(
+            Quest(
+              authorUserId = r.user.id,
+              approveReward = r.user.profile.questProposalContext.approveReward,
+              info = QuestInfo(
+                themeId = r.user.profile.questProposalContext.takenTheme.get.id,
+                content = request.quest,
+                vip = r.user.profile.publicProfile.vip)))
+
+          val u = db.user.resetQuestProposal(user.id)
+
+          OkApiResult(Some(ProposeQuestResult(OK, u.map(_.profile))))
+
+        }
       }
       case (a: ProfileModificationResult) => OkApiResult(Some(ProposeQuestResult(a)))
     }

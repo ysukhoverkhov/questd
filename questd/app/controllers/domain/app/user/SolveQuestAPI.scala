@@ -186,19 +186,24 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     user.canResolveQuest(request.solution.media.contentType) match {
       case OK => {
 
-        db.solution.create(
-          QuestSolution(
-            userId = user.id,
-            questLevel = user.profile.questSolutionContext.takenQuest.get.obj.level,
-            info = QuestSolutionInfo(
-              content = request.solution,
-              themeId = user.profile.questSolutionContext.takenQuest.get.obj.themeId,
-              questId = user.profile.questSolutionContext.takenQuest.get.id,
-              vip = user.profile.publicProfile.vip)))
+        makeTask(MakeTaskRequest(user, TaskType.SubmitQuestResult)) map { r =>
 
-        val u = db.user.resetQuestSolution(user.id)
+          val takenQuest = r.user.profile.questSolutionContext.takenQuest.get
 
-        OkApiResult(Some(ProposeSolutionResult(OK, u.map(_.profile))))
+          db.solution.create(
+            QuestSolution(
+              userId = r.user.id,
+              questLevel = takenQuest.obj.level,
+              info = QuestSolutionInfo(
+                content = request.solution,
+                themeId = takenQuest.obj.themeId,
+                questId = takenQuest.id,
+                vip = r.user.profile.publicProfile.vip)))
+
+          val u = db.user.resetQuestSolution(user.id)
+
+          OkApiResult(Some(ProposeSolutionResult(OK, u.map(_.profile))))
+        }
       }
 
       case (a: ProfileModificationResult) => OkApiResult(Some(ProposeSolutionResult(a)))
@@ -362,7 +367,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     compete(solutionsForQuest)
   }
 
+  // it should return not user but its option.
   private def ensureNoDeadlineQuest(user: User): User = {
+    // TODO: remove this set of gets.
     if (user.questDeadlineReached) {
       deadlineQuest(DeadlineQuestRequest(user)).body.get.user.get
     } else {

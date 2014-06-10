@@ -67,12 +67,20 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
     } else {
       request.user.canShortlist match {
         case OK => {
+          {
 
-          val cost = request.user.costToShortlist
-          adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) map { r =>
+            makeTask(MakeTaskRequest(request.user, TaskType.AddToShortList))
+
+          } map { r =>
+
+            val cost = request.user.costToShortlist
+            adjustAssets(AdjustAssetsRequest(user = r.user, cost = Some(cost)))
+
+          } map { r =>
 
             db.user.addToShortlist(r.user.id, request.userIdToAdd)
             OkApiResult(Some(AddToShortlistResult(OK, Some(r.user.profile.assets))))
+            
           }
         }
         case a => OkApiResult(Some(AddToShortlistResult(a)))

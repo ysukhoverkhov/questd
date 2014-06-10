@@ -78,22 +78,26 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
           case Some(s) => {
             {
               voteQuestSolutionUpdate(VoteQuestSolutionUpdateRequest(s, request.vote))
-            } map {
+              
+            } map { r =>
+              
+              makeTask(MakeTaskRequest(request.user, TaskType.VoteQuestSolutions))
+              
+            } map { r =>
+              
+              adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(reward)))
+              
+            } map { r =>
 
-              // 5. update user profile.
-              // 6. save profile in db.
-              adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward))) map { r =>
+              val u = db.user.recordQuestSolutionVote(r.user.id, s.id)
 
-                val u = db.user.recordQuestSolutionVote(r.user.id, s.id)
-
-                val solver = if (request.vote == QuestSolutionVote.Cool) {
-                  db.user.readById(s.userId).map(_.profile.publicProfile)
-                } else {
-                  None
-                }
-
-                OkApiResult(Some(VoteQuestSolutionResult(OK, u.map(_.profile), Some(reward), solver)))
+              val solver = if (request.vote == QuestSolutionVote.Cool) {
+                db.user.readById(s.userId).map(_.profile.publicProfile)
+              } else {
+                None
               }
+
+              OkApiResult(Some(VoteQuestSolutionResult(OK, u.map(_.profile), Some(reward), solver)))
             }
           }
         }
