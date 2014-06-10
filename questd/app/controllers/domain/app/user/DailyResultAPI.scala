@@ -122,9 +122,10 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val u = ensurePrivateDailyResultExists(user)
 
     val qpr = QuestSolutionResult(questSolutionId = request.solutionId, reward = request.reward, penalty = request.penalty)
-    val u2 = db.user.storeSolutionInDailyResult(user.id, qpr)
+    db.user.storeSolutionInDailyResult(user.id, qpr) ifSome { v =>
+      OkApiResult(Some(StoreSolutionInDailyResultResult(v)))
+    }
 
-    OkApiResult(Some(StoreSolutionInDailyResultResult(u2.get)))
   }
 
   def storeProposalOutOfTimePenalty(request: StoreProposalOutOfTimePenaltyReqest): ApiResult[StoreProposalOutOfTimePenaltyResult] = handleDbException {
@@ -132,8 +133,9 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val u = ensurePrivateDailyResultExists(user)
 
-    val u2 = db.user.storeProposalOutOfTimePenalty(user.id, penalty)
-    OkApiResult(Some(StoreProposalOutOfTimePenaltyResult(u2.get)))
+    db.user.storeProposalOutOfTimePenalty(user.id, penalty) ifSome { v =>
+      OkApiResult(Some(StoreProposalOutOfTimePenaltyResult(v)))
+    }
   }
 
   def storeSolutionOutOfTimePenalty(request: StoreSolutionOutOfTimePenaltyReqest): ApiResult[StoreSolutionOutOfTimePenaltyResult] = handleDbException {
@@ -141,10 +143,13 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val u = ensurePrivateDailyResultExists(user)
 
-    val u2 = db.user.storeSolutionOutOfTimePenalty(user.id, penalty)
-    OkApiResult(Some(StoreSolutionOutOfTimePenaltyResult(u2.get)))
+    db.user.storeSolutionOutOfTimePenalty(user.id, penalty) ifSome { v =>
+      OkApiResult(Some(StoreSolutionOutOfTimePenaltyResult(v)))
+    }
+
   }
 
+  // TODO: refactor me.
   private def ensurePrivateDailyResultExists(user: User): User = {
     if (user.privateDailyResults.length == 0) {
       shiftDailyResult(ShiftDailyResultRequest(user)).body.get.user

@@ -52,15 +52,15 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
   def getFriends(request: GetFriendsRequest): ApiResult[GetFriendsResult] = handleDbException {
 
     {
-      
+
       makeTask(MakeTaskRequest(request.user, TaskType.LookThroughFriendshipProposals))
 
     } map { r =>
-      
+
       OkApiResult(Some(GetFriendsResult(
         allowed = OK,
         userIds = r.user.friends)))
-        
+
     }
 
   }
@@ -177,16 +177,17 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
       db.user.removeFriendship(request.user.id, request.friendId)
 
-      // Sending message about removed friend to friend.
-      if (request.user.friends.find(_.friendId == request.friendId).get.status == FriendshipStatus.Accepted.toString()) {
-        db.user.readById(request.friendId) match {
-          case Some(f) => sendMessage(SendMessageRequest(f, Message(text = Messages("friends.removed", request.user.id))))
-          case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
+      request.user.friends.find(_.friendId == request.friendId) ifSome { v =>
+        // Sending message about removed friend to friend.
+        if (v.status == FriendshipStatus.Accepted.toString()) {
+          db.user.readById(request.friendId) match {
+            case Some(f) => sendMessage(SendMessageRequest(f, Message(text = Messages("friends.removed", request.user.id))))
+            case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
+          }
         }
+
+        OkApiResult(Some(RemoveFromFriendsResult(OK)))
       }
-
-      OkApiResult(Some(RemoveFromFriendsResult(OK)))
-
     }
   }
 }
