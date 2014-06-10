@@ -63,7 +63,7 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         OkApiResult(Some(AdjustAssetsResult(user)))
       }
 
-      r1 map { r =>
+      r1 ifOk { r =>
         val u = db.user.incTask(user.id, taskType.toString, newPercent, completed)
 
         OkApiResult(Some(MakeTaskResult(u.get)))

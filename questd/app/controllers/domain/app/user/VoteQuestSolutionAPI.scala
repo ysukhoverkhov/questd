@@ -74,15 +74,15 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
             {
               voteQuestSolutionUpdate(VoteQuestSolutionUpdateRequest(s, request.vote))
               
-            } map { r =>
+            } ifOk { r =>
               
               makeTask(MakeTaskRequest(request.user, TaskType.VoteQuestSolutions))
               
-            } map { r =>
+            } ifOk { r =>
               
               adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(reward)))
               
-            } map { r =>
+            } ifOk { r =>
 
               val u = db.user.recordQuestSolutionVote(r.user.id, s.id)
 

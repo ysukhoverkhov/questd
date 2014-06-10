@@ -55,7 +55,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
       makeTask(MakeTaskRequest(request.user, TaskType.LookThroughFriendshipProposals))
 
-    } map { r =>
+    } ifOk { r =>
 
       OkApiResult(Some(GetFriendsResult(
         allowed = OK,
@@ -100,7 +100,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
             case OK => {
 
               val cost = request.user.costToAddFriend(u)
-              adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) map { r =>
+              adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) ifOk { r =>
 
                 db.user.askFriendship(
                   r.user.id,

@@ -136,7 +136,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    */
   def getPublicProfile(request: GetPublicProfileRequest): ApiResult[GetPublicProfileResult] = handleDbException {
 
-    getUser(UserRequest(userId = Some(request.userId))) map { r =>
+    getUser(UserRequest(userId = Some(request.userId))) ifOk { r =>
       OkApiResult(Some(GetPublicProfileResult(
         allowed = OK,
         publicProfile = Some(r.user.profile.publicProfile))))

@@ -62,7 +62,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
         val themeCost = user.costOfPurchasingQuestProposal
 
-        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) map { r =>
+        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) ifOk { r =>
           val user = r.user
           val reward = r.user.rewardForMakingApprovedQuest
           r.user.getRandomThemeForQuestProposal(db.theme.count) match {
@@ -108,7 +108,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
       case OK => {
         {
           adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuestTheme)))
-        } map { r =>
+        } ifOk { r =>
 
           r.user.profile.questProposalContext.purchasedTheme ifSome { v =>
 
@@ -137,7 +137,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
           makeTask(MakeTaskRequest(user, TaskType.SubmitQuestProposal))
 
-        } map { r =>
+        } ifOk { r =>
 
           r.user.profile.questProposalContext.takenTheme ifSome { v =>
             
@@ -170,7 +170,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     user.canGiveUpQuestProposal match {
       case OK => {
 
-        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(user.costOfGivingUpQuestProposal))) map { r =>
+        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(user.costOfGivingUpQuestProposal))) ifOk { r =>
           val u = db.user.resetQuestProposal(r.user.id)
           OkApiResult(Some(GiveUpQuestProposalResult(OK, u.map(_.profile))))
         }
@@ -185,7 +185,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    * Stop from solving quests because its deadline reached.
    */
   def deadlineQuestProposal(request: DeadlineQuestProposalRequest): ApiResult[DeadlineQuestProposalResult] = handleDbException {
-    storeProposalOutOfTimePenalty(StoreProposalOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuestProposal)) map { r =>
+    storeProposalOutOfTimePenalty(StoreProposalOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuestProposal)) ifOk { r =>
       val u = db.user.resetQuestProposal(r.user.id)
       OkApiResult(Some(DeadlineQuestProposalResult(u)))
     }
@@ -227,7 +227,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         OkApiResult(Some(StoreProposalInDailyResultResult(author)))
     }
 
-    r map {
+    r ifOk {
       OkApiResult(Some(RewardQuestProposalAuthorResult()))
     }
   }

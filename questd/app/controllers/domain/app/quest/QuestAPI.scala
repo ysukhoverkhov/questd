@@ -114,7 +114,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       db.quest.updatePoints(quest.id, -1, 1)
     } ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
-    } map { // TODO: rename this map to "ifOk"
+    } ifOk {
       OkApiResult(Some(SkipQuestResult()))
     }
 
@@ -130,7 +130,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       db.quest.updatePoints(quest.id, ratio, 1)
     } ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
-    } map {
+    } ifOk {
       OkApiResult(Some(TakeQuestUpdateResult()))
     }
 
@@ -181,7 +181,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     
     q ifSome { v => 
       updateQuestStatus(UpdateQuestStatusRequest(v))
-    } map {
+    } ifOk {
       OkApiResult(Some(VoteQuestUpdateResult()))
     }
   }

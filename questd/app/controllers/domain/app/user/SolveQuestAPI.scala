@@ -79,7 +79,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           OkApiResult(Some(SkipQuestResult()))
         }
 
-        v map {
+        v ifOk {
 
           // Updating user profile.
           user.getRandomQuestForSolution match {
@@ -93,7 +93,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                   Logger.error("API - purchaseQuest. Unable to find quest author")
                   InternalErrorApiResult()
                 } else {
-                  adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) map { r =>
+                  adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) ifOk { r =>
 
                     val u = db.user.purchaseQuest(
                       r.user.id,
@@ -152,9 +152,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           OkApiResult(Some(TakeQuestUpdateResult))
         }
 
-        v map {
+        v ifOk {
           adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuest)))
-        } map { r =>
+        } ifOk { r =>
 
           // Updating user profile.
           r.user.profile.questSolutionContext.purchasedQuest ifSome { pq =>
@@ -188,7 +188,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
         {
           makeTask(MakeTaskRequest(user, TaskType.SubmitQuestResult))
-        } map { r =>
+        } ifOk { r =>
 
           r.user.profile.questSolutionContext.takenQuest ifSome { takenQuest =>
             db.solution.create(
@@ -231,7 +231,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     request.user.canGiveUpQuest match {
       case OK => {
 
-        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) map { r =>
+        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) ifOk { r =>
           val u = db.user.resetQuestSolution(r.user.id)
           OkApiResult(Some(GiveUpQuestResult(OK, u.map(_.profile))))
         }
@@ -245,7 +245,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    * Stop from solving quests because its deadline reached.
    */
   def deadlineQuest(request: DeadlineQuestRequest): ApiResult[DeadlineQuestResult] = handleDbException {
-    storeSolutionOutOfTimePenalty(StoreSolutionOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuest)) map { r =>
+    storeSolutionOutOfTimePenalty(StoreSolutionOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuest)) ifOk { r =>
       val u = db.user.resetQuestSolution(r.user.id)
       OkApiResult(Some(DeadlineQuestResult(u)))
     }
@@ -269,7 +269,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           }
 
           case QuestSolutionStatus.WaitingForCompetitor =>
-            tryFightQuest(TryFightQuestRequest(solution)) map OkApiResult(Some(StoreSolutionInDailyResultResult(author)))
+            tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(Some(StoreSolutionInDailyResultResult(author)))
 
           case QuestSolutionStatus.Won =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
@@ -284,7 +284,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForIACSolution(q))))
         }
 
-        r map {
+        r ifOk {
           OkApiResult(Some(RewardQuestSolutionAuthorResult()))
         }
       }

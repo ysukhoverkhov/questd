@@ -44,7 +44,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         spamChange = checkInc(vote, IASpam),
         pornChange = checkInc(vote, IAPorn))
     } ifSome { o =>
-      updateQuestSolutionState(UpdateQuestSolutionStateRequest(o)) map
+      updateQuestSolutionState(UpdateQuestSolutionStateRequest(o)) ifOk
         OkApiResult(Some(VoteQuestSolutionUpdateResult()))
     }
 
@@ -101,7 +101,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         OkApiResult(None)
       }
 
-    authorUpdateResult map OkApiResult(Some(UpdateQuestSolutionStateResult()))
+    authorUpdateResult ifOk OkApiResult(Some(UpdateQuestSolutionStateResult()))
   }
 
 }

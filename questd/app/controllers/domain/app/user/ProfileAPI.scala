@@ -75,7 +75,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       user
     }
 
-    checkIncreaseLevel(CheckIncreaseLevelRequest(u)) map { r => OkApiResult(Some(AdjustAssetsResult(r.user))) }
+    checkIncreaseLevel(CheckIncreaseLevelRequest(u)) ifOk { r => OkApiResult(Some(AdjustAssetsResult(r.user))) }
   }
 
   /**
