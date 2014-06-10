@@ -14,7 +14,7 @@ import controllers.domain._
 case class GetQuestProposalToVoteRequest(user: User)
 case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: Option[QuestDuration.Value] = None, difficulty: Option[QuestDifficulty.Value] = None)
+case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: QuestDuration.Value, difficulty: QuestDifficulty.Value)
 case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, author: Option[PublicProfile] = None)
 
 private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>

@@ -131,12 +131,12 @@ package object protocol {
     /**
      * @see QuestDuration
      */
-    duration: Option[String],
+    duration: String,
 
     /**
      * @see QuestDifficulty
      */
-    difficulty: Option[String])
+    difficulty: String)
 
   type WSGetQuestProposalToVoteResult = GetQuestProposalToVoteResult
 
