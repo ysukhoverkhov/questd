@@ -5,7 +5,7 @@ import play.Logger
 import components.DBAccessor
 import models.store._
 import models.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import controllers.domain._
 
 case class AllThemesRequest(sorted: Boolean)

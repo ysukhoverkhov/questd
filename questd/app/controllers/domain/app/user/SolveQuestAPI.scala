@@ -5,7 +5,7 @@ import models.domain.base._
 import models.store._
 import play.Logger
 import helpers._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import controllers.domain._
 import components._
 import logic._
