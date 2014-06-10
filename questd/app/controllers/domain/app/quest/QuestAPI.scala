@@ -177,11 +177,13 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         checkInc(duration, QuestDuration.Week))
     } else {
       q
+    } 
+    
+    q ifSome { v => 
+      updateQuestStatus(UpdateQuestStatusRequest(v))
+    } map {
+      OkApiResult(Some(VoteQuestUpdateResult()))
     }
-
-    updateQuestStatus(UpdateQuestStatusRequest(q2.get))
-
-    OkApiResult(Some(VoteQuestUpdateResult()))
   }
 
   def calculateProposalThresholds(request: CalculateProposalThresholdsRequest): ApiResult[CalculateProposalThresholdsResult] = handleDbException {
