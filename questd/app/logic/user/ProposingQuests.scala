@@ -76,7 +76,7 @@ trait ProposingQuests { this: UserLogic =>
    */
   def costOfPurchasingQuestProposal = {
     if (user.profile.questProposalContext.numberOfPurchasedThemes < NumberOfThemesSkipsForCoins) {
-      val c = costToSkipProposal(user.profile.publicProfile.level, user.profile.questProposalContext.numberOfPurchasedThemes + 1)
+      val c = costToSkipTheme(user.profile.publicProfile.level, user.profile.questProposalContext.numberOfPurchasedThemes)
       Assets(coins = c)
     } else {
       Assets(money = 1)

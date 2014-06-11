@@ -45,17 +45,17 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   /**
-   * Tells cost of next theme purchase
+   * Tells cost of next quest purchase
    */
   def costOfPurchasingQuest = {
-    if (user.profile.questSolutionContext.numberOfPurchasedQuests < NumberOfQuestsSkipsForCoins) {
+    if (user.profile.questSolutionContext.numberOfPurchasedQuests <= NumberOfQuestsSkipsForCoins) {
 
       val questDuration = user.profile.questSolutionContext.purchasedQuest match {
         case Some(QuestInfoWithID(_, q)) => q.daysDuration
         case _ => 1
       }
 
-      val c = costToSkipQuest(user.profile.publicProfile.level, user.profile.questSolutionContext.numberOfPurchasedQuests + 1, questDuration)
+      val c = costToSkipQuest(user.profile.publicProfile.level, user.profile.questSolutionContext.numberOfPurchasedQuests, questDuration)
       Assets(coins = c)
     } else {
       Assets(money = 1)

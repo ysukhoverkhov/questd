@@ -32,19 +32,22 @@ object functions {
   def questProposalPeriod(level: Int): Int = math.round(ratingForProposalAtLevel(level).toFloat / ratingForSubmitProposal(level).toFloat)
 
   /**
-   * Cost to skip a single proposal
+   * Cost to skip a single theme for proposal.
    */
-  def costToSkipProposal(level: Int, skipNumber: Int): Int = {
+  def costToSkipTheme(level: Int, skipNumber: Int): Int = {
+    if (skipNumber == 0) {
+      0
+    } else {
+      def costToSkipProposalInt(level: Int, skipNumber: Int, k: Double) = {
+        k * math.pow(5.0 / 3.0, skipNumber)
+      }
 
-    def costToSkipProposalInt(level: Int, skipNumber: Int, k: Double) = {
-      k * math.pow(5.0 / 3.0, skipNumber)
+      def kf(level: Int) = {
+        coinsShuffleTheme(level) / (1 to NumberOfThemesSkipsForCoins).map(x => costToSkipProposalInt(level, x, 1)).sum
+      }
+
+      math.round(costToSkipProposalInt(level, skipNumber, kf(level)) * questProposalPeriod(level)).toInt
     }
-
-    def kf(level: Int) = {
-      coinsShuffleTheme(level) / (1 to NumberOfThemesSkipsForCoins).map(x => costToSkipProposalInt(level, x, 1)).sum
-    }
-
-    math.round(costToSkipProposalInt(level, skipNumber, kf(level)) * questProposalPeriod(level)).toInt
   }
 
   /**
@@ -71,16 +74,21 @@ object functions {
    * Cost to skip a single proposal
    */
   def costToSkipQuest(level: Int, skipNumber: Int, currentQuestDuration: Int): Int = {
+    assert(skipNumber >= 0)
 
-    def costToSkipQuestInt(level: Int, skipNumber: Int, k: Double) = {
-      k * math.pow(4.0 / 3.0, skipNumber)
+    if (skipNumber == 0) {
+      0
+    } else {
+      def costToSkipQuestInt(level: Int, skipNumber: Int, k: Double) = {
+        k * math.pow(4.0 / 3.0, skipNumber)
+      }
+
+      def kf(level: Int) = {
+        coinShuffleQuest(level) / (1 to NumberOfQuestsSkipsForCoins).map(x => costToSkipQuestInt(level, x, 1)).sum
+      }
+
+      math.round(costToSkipQuestInt(level, skipNumber, kf(level)) * currentQuestDuration).toInt
     }
-
-    def kf(level: Int) = {
-      coinShuffleQuest(level) / (1 to NumberOfQuestsSkipsForCoins).map(x => costToSkipQuestInt(level, x, 1)).sum
-    }
-
-    math.round(costToSkipQuestInt(level, skipNumber, kf(level)) * currentQuestDuration).toInt
   }
 
   /**
@@ -201,17 +209,16 @@ object functions {
   def maxNumberOfFriendsOnLevel(level: Int): Int = {
     math.round((NumberOfFreindsOnLastLevel / coinToSpentDailyFriendsOnly(MaxLevel)) * coinToSpentDailyFriendsOnly(level)).toInt
   }
-  
+
   def costToInviteFriend(level: Int, levelDifference: Int): Int = {
-    
+
     def costToInviteFriendCoef(levelDif: Int) = {
       math.pow(0.78475, levelDif)
     }
-    
-    math.round(costToInviteFriendCoef (levelDifference) * coinAddFriend(level)).toInt
+
+    math.round(costToInviteFriendCoef(levelDifference) * coinAddFriend(level)).toInt
   }
 
-  
   /**
    * ********************
    * Shortlist
@@ -220,7 +227,6 @@ object functions {
   def costToShortlistPerson(level: Int): Int = {
     math.round(coinAddShort(level) / 3).toInt
   }
-  
-  
+
 }
 
