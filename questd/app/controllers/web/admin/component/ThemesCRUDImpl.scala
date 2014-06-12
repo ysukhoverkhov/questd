@@ -44,8 +44,9 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
     api.allThemes(AllThemesRequest(sorted = false)) match {
 
       case OkApiResult(Some(a: AllThemesResult)) => Ok(
-        views.html.admin.themes(Menu(request),
-          List() ++ a.themes,
+        views.html.admin.themes(
+          Menu(request),
+          a.themes.toList,
           form))
 
       case _ => Ok("Internal server error - themes not received.")
@@ -81,7 +82,7 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
           val theme = Theme(id = "", text = themeForm.text, comment = themeForm.comment)
           api.createTheme(CreateThemeRequest(theme))
         } else {
-          
+
           val theme = Theme(id = themeForm.id, text = themeForm.text, comment = themeForm.comment)
           api.updateTheme(UpdateThemeRequest(theme))
         }

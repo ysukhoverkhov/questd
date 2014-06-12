@@ -12,6 +12,7 @@ trait AdminComponent { component: DomainAPIComponent =>
   class Admin
     extends AdminAppImpl
     with ThemesCRUDImpl 
+    with UsersCRUDImpl
     with ConfigImpl
     with APIAccessor {
 
