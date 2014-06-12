@@ -17,6 +17,7 @@ import org.specs2.matcher.BeEqualTo
 import com.mongodb.BasicDBList
 import models.domain.base.QuestInfoWithID
 import java.util.Date
+import models.domain.stubCreators._
 
 //@RunWith(classOf[JUnitRunner])
 class UserDAOSpecs
@@ -26,6 +27,7 @@ class UserDAOSpecs
 
   "Mongo User DAO" should {
     "Create new User in DB and find it by userid" in new WithApplication(appWithTestDatabase) {
+      db.user.clear
       val userid = "lalala"
       db.user.create(User(userid))
       val u = db.user.readById(userid)
@@ -121,7 +123,7 @@ class UserDAOSpecs
       db.user.create(User(userid))
       db.user.purchaseQuestTheme(
         userid,
-        ThemeWithID(themeid, Theme(text = "text", comment = "comment")),
+        ThemeWithID(themeid, createThemeStub().info),
         Some(QuestInfo("themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
         rew)
 
@@ -129,7 +131,7 @@ class UserDAOSpecs
 
       ou must beSome.which((u: User) => u.id.toString == userid)
 
-      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.obj.id == themeid) and
+      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.id == themeid) and
         beSome.which((t: ThemeWithID) => t.id == themeid)
 
       ou.get.profile.questProposalContext.sampleQuest must beSome.which((q: QuestInfo) => q.content.description == questdescr)
@@ -150,12 +152,12 @@ class UserDAOSpecs
       db.user.create(User(userid))
       db.user.purchaseQuestTheme(
         userid,
-        ThemeWithID(themeid, Theme(text = "text", comment = "comment")),
+        ThemeWithID(themeid, createThemeStub().info),
         Some(QuestInfo("themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
         rew)
       db.user.purchaseQuestTheme(
         userid,
-        ThemeWithID(themeid, Theme(text = "text", comment = "comment")),
+        ThemeWithID(themeid, createThemeStub().info),
         None,
         rew)
 
@@ -163,7 +165,7 @@ class UserDAOSpecs
 
       ou must beSome.which((u: User) => u.id.toString == userid)
 
-      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.obj.id == themeid) and
+      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.id == themeid) and
         beSome.which((t: ThemeWithID) => t.id == themeid)
 
       ou.get.profile.questProposalContext.sampleQuest must beNone

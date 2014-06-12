@@ -28,15 +28,6 @@ import java.util.Date
 class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
   /**
-   * Creates 10 themes for mocking
-   */
-  private def createStubThemes: List[Theme] = {
-    (for (i <- List.range(1, 11)) yield {
-      Theme(text = i.toString, comment = i.toString)
-    })
-  }
-
-  /**
    * Creates stub config for our tests.
    */
   private def createStubConfig = {
