@@ -20,7 +20,7 @@ trait ProposingQuests { this: UserLogic =>
    * Check is the user can purchase quest proposals.
    */
   def canPurchaseQuestProposals = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costOfPurchasingQuestProposal))
       NotEnoughAssets
@@ -36,7 +36,7 @@ trait ProposingQuests { this: UserLogic =>
    * Is user can propose quest of given type.
    */
   def canTakeQuestTheme = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests))
       NotEnoughRights
     else if (user.profile.questProposalContext.purchasedTheme == None)
       InvalidState
@@ -45,14 +45,22 @@ trait ProposingQuests { this: UserLogic =>
     else
       OK
   }
+  
+  /**
+   * Is user potentially eligible for proposing quest today.
+   */
+  def canProposeQuestToday = {
+    user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests) &&
+    user.profile.questProposalContext.questProposalCooldown.before(new Date())
+  }
 
   /**
    * Is user can propose quest of given type.
    */
   def canProposeQuest(conentType: ContentType) = {
     val content = conentType match {
-      case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests.toString())
-      case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoQuests.toString())
+      case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests)
+      case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoQuests)
     }
 
     if (!content)
@@ -67,8 +75,8 @@ trait ProposingQuests { this: UserLogic =>
    * Tells cost of next theme purchase
    */
   def costOfPurchasingQuestProposal = {
-    if (user.profile.questProposalContext.numberOfPurchasedThemes < numberOfThemesSkipsForCoins) {
-      val c = costToSkipProposal(user.profile.publicProfile.level, user.profile.questProposalContext.numberOfPurchasedThemes + 1)
+    if (user.profile.questProposalContext.numberOfPurchasedThemes < NumberOfThemesSkipsForCoins) {
+      val c = costToSkipTheme(user.profile.publicProfile.level, user.profile.questProposalContext.numberOfPurchasedThemes)
       Assets(coins = c)
     } else {
       Assets(money = 1)
@@ -139,7 +147,7 @@ trait ProposingQuests { this: UserLogic =>
     val daysToSkipt = questProposalPeriod(user.profile.publicProfile.level)
 
     val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate ()
+    (DateTime.now(tz) + daysToSkipt.days).hour(constants.FlipHour).minute(0).second(0) toDate ()
   }
 
   /**
@@ -160,11 +168,11 @@ trait ProposingQuests { this: UserLogic =>
   }
 
   def penaltyForCheatingQuest = {
-    (rewardForMakingApprovedQuest * questProposalCheatingPenalty) clampTop user.profile.assets
+    (rewardForMakingApprovedQuest * QuestProposalCheatingPenalty) clampTop user.profile.assets
   }
 
   def penaltyForIACQuest = {
-    (rewardForMakingApprovedQuest * questProposalIACPenalty) clampTop user.profile.assets
+    (rewardForMakingApprovedQuest * QuestProposalIACPenalty) clampTop user.profile.assets
   }
 
   /**

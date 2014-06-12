@@ -5,7 +5,7 @@ import models.domain.base._
 import models.store._
 import play.Logger
 import helpers._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import controllers.domain._
 import components._
 import logic._
@@ -62,7 +62,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
         val themeCost = user.costOfPurchasingQuestProposal
 
-        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) map { r =>
+        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) ifOk { r =>
           val user = r.user
           val reward = r.user.rewardForMakingApprovedQuest
           r.user.getRandomThemeForQuestProposal(db.theme.count) match {
@@ -76,7 +76,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                 }
               }
 
-              val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t), sampleQuest, reward)
+              val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t.info), sampleQuest, reward)
               OkApiResult(Some(PurchaseQuestThemeResult(OK, u.map(_.profile))))
             }
 
@@ -106,15 +106,14 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     request.user.canTakeQuestTheme match {
 
       case OK => {
+        {
+          adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuestTheme)))
+        } ifOk { r =>
 
-        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuestTheme))) map { r =>
-          val pt = r.user.profile.questProposalContext.purchasedTheme
-          if (pt == None) {
-            Logger.error("API - takeQuestTheme. Purchased theme is None")
-            InternalErrorApiResult()
-          } else {
-            val u = db.user.takeQuestTheme(r.user.id, pt.get, r.user.getCooldownForTakeTheme)
-            db.theme.updateLastUseDate(pt.get.id)
+          r.user.profile.questProposalContext.purchasedTheme ifSome { v =>
+
+            val u = db.user.takeQuestTheme(r.user.id, v, r.user.getCooldownForTakeTheme)
+            db.theme.updateLastUseDate(v.id)
             OkApiResult(Some(TakeQuestThemeResult(OK, u.map(_.profile))))
           }
         }
@@ -131,21 +130,32 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
     val user = ensureNoDeadlineProposal(request.user)
 
-    user.canProposeQuest(ContentType.withName(request.quest.media.contentType)) match {
+    user.canProposeQuest(request.quest.media.contentType) match {
       case OK => {
 
-        db.quest.create(
-          Quest(
-            authorUserId = user.id,
-            approveReward = user.profile.questProposalContext.approveReward,
-            info = QuestInfo(
-              themeId = user.profile.questProposalContext.takenTheme.get.id,
-              content = request.quest,
-              vip = request.user.profile.publicProfile.vip)))
+        {
 
-        val u = db.user.resetQuestProposal(user.id)
+          makeTask(MakeTaskRequest(user, TaskType.SubmitQuestProposal))
 
-        OkApiResult(Some(ProposeQuestResult(OK, u.map(_.profile))))
+        } ifOk { r =>
+
+          r.user.profile.questProposalContext.takenTheme ifSome { v =>
+            
+            db.quest.create(
+              Quest(
+                authorUserId = r.user.id,
+                approveReward = r.user.profile.questProposalContext.approveReward,
+                info = QuestInfo(
+                  themeId = v.id,
+                  content = request.quest,
+                  vip = r.user.profile.publicProfile.vip)))
+
+            val u = db.user.resetQuestProposal(user.id)
+
+            OkApiResult(Some(ProposeQuestResult(OK, u.map(_.profile))))
+
+          }
+        }
       }
       case (a: ProfileModificationResult) => OkApiResult(Some(ProposeQuestResult(a)))
     }
@@ -160,7 +170,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     user.canGiveUpQuestProposal match {
       case OK => {
 
-        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(user.costOfGivingUpQuestProposal))) map { r =>
+        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(user.costOfGivingUpQuestProposal))) ifOk { r =>
           val u = db.user.resetQuestProposal(r.user.id)
           OkApiResult(Some(GiveUpQuestProposalResult(OK, u.map(_.profile))))
         }
@@ -175,7 +185,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    * Stop from solving quests because its deadline reached.
    */
   def deadlineQuestProposal(request: DeadlineQuestProposalRequest): ApiResult[DeadlineQuestProposalResult] = handleDbException {
-    storeProposalOutOfTimePenalty(StoreProposalOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuestProposal)) map { r =>
+    storeProposalOutOfTimePenalty(StoreProposalOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuestProposal)) ifOk { r =>
       val u = db.user.resetQuestProposal(r.user.id)
       OkApiResult(Some(DeadlineQuestProposalResult(u)))
     }
@@ -196,31 +206,28 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
   def rewardQuestProposalAuthor(request: RewardQuestProposalAuthorRequest): ApiResult[RewardQuestProposalAuthorResult] = handleDbException {
     import request._
 
-    val r = QuestStatus.withName(quest.status) match {
+    val r = quest.status match {
       case QuestStatus.OnVoting => {
         Logger.error("We are rewarding player for proposal what is on voting.")
         InternalErrorApiResult()
       }
       case QuestStatus.InRotation =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, reward = Some(quest.approveReward)))
-      //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(quest.approveReward)))
 
       case QuestStatus.RatingBanned =>
         OkApiResult(Some(StoreProposalInDailyResultResult(author)))
 
       case QuestStatus.CheatingBanned =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, penalty = Some(author.penaltyForCheatingQuest)))
-      //adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingQuest)))
 
       case QuestStatus.IACBanned =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, penalty = Some(author.penaltyForIACQuest)))
-      //adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACQuest)))
 
       case QuestStatus.OldBanned =>
         OkApiResult(Some(StoreProposalInDailyResultResult(author)))
     }
 
-    r map {
+    r ifOk {
       OkApiResult(Some(RewardQuestProposalAuthorResult()))
     }
   }

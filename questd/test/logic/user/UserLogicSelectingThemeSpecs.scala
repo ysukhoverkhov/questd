@@ -24,17 +24,16 @@ import com.github.nscala_time.time.Imports.DateTime
 import com.github.nscala_time.time.Imports.richDateTime
 import logic.LogicBootstrapper
 import java.util.Date
+import models.domain.stubCreators._
 
 class UserLogicSpecs extends BaseUserLogicSpecs {
-
-  isolated
 
   /**
    * Creates 10 themes for mocking
    */
   private def createStubThemes: List[Theme] = {
     (for (i <- List.range(1, 11)) yield {
-      Theme(text = i.toString, comment = i.toString)
+      createThemeStub(name = i.toString, desc = i.toString)
     })
   }
 

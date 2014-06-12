@@ -17,11 +17,11 @@ case class QuestInfo(
   themeId: String,
   content: QuestInfoContent,
   level: Int = 0,
-  duration: String = QuestDuration.Minutes.toString,
-  difficulty: String = QuestDifficulty.Easy.toString,
+  duration: QuestDuration.Value = QuestDuration.Minutes,
+  difficulty: QuestDifficulty.Value = QuestDifficulty.Easy,
   vip: Boolean) {
 
-  def daysDuration = QuestDuration.withName(duration) match {
+  def daysDuration = duration match {
     case QuestDuration.Minutes => 1
     case QuestDuration.Hours => 1
     case QuestDuration.Day => 1
@@ -29,8 +29,8 @@ case class QuestInfo(
     case QuestDuration.Week => 7
   }
 
-  def minutesDuration = QuestDuration.withName(duration) match {
-    case QuestDuration.Minutes => 20
+  def minutesDuration = duration match {
+    case QuestDuration.Minutes => 40
     case QuestDuration.Hours => 120
     case QuestDuration.Day => 60 * 24
     case QuestDuration.TwoDays => 60 * 48

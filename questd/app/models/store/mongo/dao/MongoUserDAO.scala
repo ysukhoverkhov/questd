@@ -248,7 +248,7 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def resetCounters(id: String, resetPurchasesTimeout: Date): Option[User] = {
+  def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
@@ -552,6 +552,57 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         ("$pull" -> MongoDBObject(
           "messages" -> MongoDBObject("id" -> messageId)))))
+  }
+
+  /**
+   *
+   */
+  def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.dailyTasks" -> grater[DailyTasks].asDBObject(newTasks),
+          "schedules.dailyTasks" -> resetTasksTimeout))))
+  }
+
+  /**
+   *
+   */
+  def incTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "profile.dailyTasks.tasks.taskType" -> taskId),
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.tasks.$.currentCount" -> 1)),
+        ("$set" -> MongoDBObject(
+          "profile.dailyTasks.completed" -> completed,
+          "profile.dailyTasks.rewardReceived" -> rewardReceived))
+          ))
+  }
+
+  /**
+   *
+   */
+  def setGender(id: String, gender: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.publicProfile.bio.gender" -> gender))))
+  }
+
+  /**
+   *
+   */
+  def setDebug(id: String, debug: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.debug" -> debug))))
   }
 
 }

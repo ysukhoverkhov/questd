@@ -1,19 +1,14 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.ApiResult
-import controllers.domain.OkApiResult
-import controllers.domain.helpers.exceptionwrappers.handleDbException
+import controllers.domain.helpers._
 import logic._
 import models.domain._
-import models.domain.base.QuestInfoWithID
 import controllers.domain.app.protocol.ProfileModificationResult._
 import play.Logger
 import models.domain.base._
-import controllers.domain.DomainAPIComponent
-import controllers.domain.InternalErrorApiResult
+import controllers.domain._
 import controllers.domain.app.questsolution.VoteQuestSolutionUpdateRequest
-import controllers.domain.InternalErrorApiResult
 
 case class GetQuestSolutionToVoteRequest(user: User)
 case class GetQuestSolutionToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -78,22 +73,26 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
           case Some(s) => {
             {
               voteQuestSolutionUpdate(VoteQuestSolutionUpdateRequest(s, request.vote))
-            } map {
+              
+            } ifOk { r =>
+              
+              makeTask(MakeTaskRequest(request.user, TaskType.VoteQuestSolutions))
+              
+            } ifOk { r =>
+              
+              adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(reward)))
+              
+            } ifOk { r =>
 
-              // 5. update user profile.
-              // 6. save profile in db.
-              adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward))) map { r =>
+              val u = db.user.recordQuestSolutionVote(r.user.id, s.id)
 
-                val u = db.user.recordQuestSolutionVote(r.user.id, s.id)
-
-                val solver = if (request.vote == QuestSolutionVote.Cool) {
-                  db.user.readById(s.userId).map(_.profile.publicProfile)
-                } else {
-                  None
-                }
-
-                OkApiResult(Some(VoteQuestSolutionResult(OK, u.map(_.profile), Some(reward), solver)))
+              val solver = if (request.vote == QuestSolutionVote.Cool) {
+                db.user.readById(s.userId).map(_.profile.publicProfile)
+              } else {
+                None
               }
+
+              OkApiResult(Some(VoteQuestSolutionResult(OK, u.map(_.profile), Some(reward), solver)))
             }
           }
         }
