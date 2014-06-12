@@ -1,0 +1,29 @@
+@(menuItems: Map[String, String], quests: List[models.domain.Quest])
+
+@import helper._
+
+@main("Users")(menuItems, Map()) {
+
+	<p>
+	<table border="1">
+	    	<tr>
+	    		<td>description</td>
+	    		<td>status</td>
+	    		<td>points</td>
+	    		<td>votersCount</td>
+	    		<td>level</td>
+	    	</tr>
+		@for(q <- quests) {
+	    	<tr>
+	    		<td>@q.info.content.description</td>
+	    		<td>@q.status</td>
+	    		<td>@q.rating.points</td>
+	    		<td>@q.rating.votersCount</td>
+	    		<td>@q.info.level</td>
+	    	</tr>
+	    }
+	</table>
+	</p>
+	
+}
+

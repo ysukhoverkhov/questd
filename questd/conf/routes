@@ -100,6 +100,7 @@ POST	/admin/themes/createTheme			controllers.web.admin.ThemesCRUD.createThemeCB
 GET		/admin/themes/deleteTheme/:id		controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
 
 GET		/admin/users						controllers.web.admin.UsersCRUD.users(id = "")
+GET		/admin/quests						controllers.web.admin.QuestsCRUD.quests(id = "")
 
 GET		/admin/config						controllers.web.admin.Config.config(name = "")
 GET		/admin/config/byname/:name			controllers.web.admin.Config.config(name)
