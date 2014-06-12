@@ -3,7 +3,7 @@ package controllers.domain.app.questsolution
 import components.DBAccessor
 import models.store._
 import models.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import controllers.domain._
 import play.Logger
 
@@ -28,7 +28,7 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
   def getFriendsSolutions(request: GetFriendsSolutionsRequest): ApiResult[GetFriendsSolutionsResult] = handleDbException {
     OkApiResult(Some(GetFriendsSolutionsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
-      userIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted.toString).map(_.friendId),
+      userIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
       levels = request.levels))))
   }
 

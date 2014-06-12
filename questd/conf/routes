@@ -14,6 +14,8 @@ POST	/rest/loginfb						controllers.web.rest.LoginWS.loginfb
 
 # Requesting profile
 POST	/rest/getProfile					controllers.web.rest.ProfileWS.getProfile
+POST	/rest/setGender						controllers.web.rest.ProfileWS.setGender
+POST	/rest/setDebug						controllers.web.rest.ProfileWS.setDebug
 
 # Generating quests 
 POST	/rest/getQuestThemeCost				controllers.web.rest.ProposeQuestWS.getQuestThemeCost

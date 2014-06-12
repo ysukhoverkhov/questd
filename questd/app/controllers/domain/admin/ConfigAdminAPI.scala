@@ -6,7 +6,7 @@ import models.store._
 import models.domain.admin._
 
 import controllers.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 
 import components._
 

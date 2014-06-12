@@ -15,4 +15,4 @@ case class QuestSolution(
   questLevel: Int,
   info: QuestSolutionInfo,
   rating: QuestSolutionRating = QuestSolutionRating(),
-  status: String = QuestSolutionStatus.OnVoting.toString) extends ID
+  status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting) extends ID

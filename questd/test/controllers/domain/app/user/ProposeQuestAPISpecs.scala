@@ -32,7 +32,7 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
   }
 
   def createQuest = {
-    QuestInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None, "")
+    QuestInfoContent(ContentReference(ContentType.Photo, "", ""), None, "")
   }
   
   "Propose Quest API" should {
