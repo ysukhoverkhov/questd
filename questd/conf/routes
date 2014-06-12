@@ -101,6 +101,7 @@ GET		/admin/themes/deleteTheme/:id		controllers.web.admin.ThemesCRUD.deleteTheme
 
 GET		/admin/users						controllers.web.admin.UsersCRUD.users(id = "")
 GET		/admin/quests						controllers.web.admin.QuestsCRUD.quests(id = "")
+GET		/admin/solutions					controllers.web.admin.SolutionsCRUD.solutions(id = "")
 
 GET		/admin/config						controllers.web.admin.Config.config(name = "")
 GET		/admin/config/byname/:name			controllers.web.admin.Config.config(name)

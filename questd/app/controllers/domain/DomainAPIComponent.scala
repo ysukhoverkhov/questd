@@ -46,7 +46,9 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent =>
     with ThemesAdminAPI
     with UsersAdminAPI
     with QuestsAdminAPI
+    with SolutionsAdminAPI
     with ConfigAdminAPI 
+    
     
     with ApiConfigHolder 
     
