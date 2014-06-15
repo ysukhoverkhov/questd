@@ -20,13 +20,13 @@ class _ConfigParams {
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
 
   val ProposalNormalDaysToEnterRotation = "50 01 Proposal Normal Days To Enter Rotation"
-  val ProposalWorstLikesRatio = "50 02 Proposal Worst Likes Ratio"
-  val ProposalCheatingRatio = "50 03 Proposal Cheating to Votes Ratio"
-  val ProposalIACRatio = "50 04 Proposal IAC to Votes Ratio"
-  val ProposalLikesToEnterRotation = "50 05 Proposal Likes To Enter Rotation (calculated)"
-  val ProposalVotesToLeaveVoting = "50 06 Proposal Votes To Leave Voting (calculated)"
-  val ProposalRatioToLeaveVoting = "50 07 Proposal Ratio To Leave Voting (calculated)"
-
+  val ProposalMinVotesToTakeRemovalDecision = "50 02 Min Votes To Take Removal Decision"
+  val ProposalWorstLikesRatio = "50 11 Proposal Worst Likes Ratio" // If proposal has fewer than current ration multiplied by average votes/likes ratio and more than min votes count is reached it is removed from voting.
+  val ProposalCheatingRatio = "50 12 Proposal Cheating to Votes Ratio"
+  val ProposalIACRatio = "50 13 Proposal IAC to Votes Ratio"
+  val ProposalLikesToEnterRotation = "50 21 Proposal Likes To Enter Rotation (calculated)"
+  val ProposalVotesToLeaveVoting = "50 22 Proposal Votes To Leave Voting (calculated)"
+  val ProposalRatioToLeaveVoting = "50 23 Proposal Ratio To Leave Voting (calculated)"
     
   val QuestProbabilityLevelsToGiveStartingQuests = "71 01 Level to give starting quests"
   val QuestProbabilityStartingVIPQuests = "71 02 Probability of selecting VIP quests in initial stage"
@@ -72,6 +72,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.FavoriteThemesProbability -> "0.75",
 
       ConfigParams.ProposalNormalDaysToEnterRotation -> "7",
+      ConfigParams.ProposalMinVotesToTakeRemovalDecision -> "10",
+      
       ConfigParams.ProposalWorstLikesRatio -> "0.1",
       ConfigParams.ProposalCheatingRatio -> "0.1",
       ConfigParams.ProposalIACRatio -> "0.03",

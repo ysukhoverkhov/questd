@@ -184,16 +184,25 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       OkApiResult(Some(VoteQuestUpdateResult()))
     }
   }
-
+  
   def calculateProposalThresholds(request: CalculateProposalThresholdsRequest): ApiResult[CalculateProposalThresholdsResult] = handleDbException {
 
-    val proposalsOnVoting = db.quest.countWithStatus(QuestStatus.OnVoting.toString)
+    val proposalsOnVoting = Math.max(1, db.quest.countWithStatus(QuestStatus.OnVoting.toString))
     val daysForQuestToEnter: Long = config(ConfigParams.ProposalNormalDaysToEnterRotation).toInt
     val likesToAddToRotation: Long = Math.round(request.proposalsLiked / proposalsOnVoting * daysForQuestToEnter)
-    val votesToRemoveFromRotation: Long = Math.round(request.proposalsVoted / proposalsOnVoting * daysForQuestToEnter)
+    val votesToRemoveFromRotation: Long = Math.max(
+      Math.round(request.proposalsVoted / proposalsOnVoting * daysForQuestToEnter),
+      config(ConfigParams.ProposalMinVotesToTakeRemovalDecision).toInt)
     val ratioToRemoveFromRotation: Double = request.proposalsLiked / request.proposalsVoted * config(ConfigParams.ProposalWorstLikesRatio).toDouble
-    Logger.error(ratioToRemoveFromRotation.toString + " ")
-
+    
+    Logger.info("Calculating proposals threshold")
+    Logger.info(
+        s"  likesToAddToRotation = $likesToAddToRotation, proposalsLiked during last week = ${request.proposalsLiked}, proposalsOnVoting now = $proposalsOnVoting, daysForQuestToEnter = $daysForQuestToEnter") 
+    Logger.info(
+        s"  votesToRemoveFromRotation = $votesToRemoveFromRotation")
+    Logger.info(
+        s"  ratioToRemoveFromRotation = $ratioToRemoveFromRotation")
+    
     updateConfig(ConfigParams.ProposalLikesToEnterRotation -> likesToAddToRotation.toString)
     updateConfig(ConfigParams.ProposalVotesToLeaveVoting -> votesToRemoveFromRotation.toString)
     updateConfig(ConfigParams.ProposalRatioToLeaveVoting -> ratioToRemoveFromRotation.toString)

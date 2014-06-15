@@ -26,17 +26,28 @@ trait QuestSelectUserLogic { this: UserLogic =>
   import QuestGetReason._
 
   def getRandomQuest(reason: QuestGetReason): Option[Quest] = {
-    List(
+    val algorithms = List(
       () => getQuestsWithSuperAlgorithm(reason),
       () => getOtherQuests(reason).getOrElse(List().iterator),
-      () => getAllQuests(reason).getOrElse(List().iterator)).
-      foldLeft[Option[Quest]](None)((run, fun) => {
+      () => getAllQuests(reason).getOrElse(List().iterator))
+
+    {
+      algorithms.foldLeft[Option[Quest]](None)((run, fun) => {
         if (run == None) {
           selectQuest(fun(), questIdsToExclude(reason))
         } else {
           run
         }
       })
+    } orElse {
+      algorithms.foldLeft[Option[Quest]](None)((run, fun) => {
+        if (run == None) {
+          selectQuest(fun(), List())
+        } else {
+          run
+        }
+      })
+    }
   }
 
   private def questIdsToExclude(reason: QuestGetReason) = {
