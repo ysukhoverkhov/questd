@@ -27,8 +27,6 @@ import java.util.Date
 
 class UserLogicSpecs extends BaseUserLogicSpecs {
 
-  isolated
-
   /**
    * Creates 10 themes for mocking
    */

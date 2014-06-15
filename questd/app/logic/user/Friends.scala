@@ -22,7 +22,7 @@ import controllers.domain._
 trait Friends { this: UserLogic =>
 
   def canShortlist = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.AddToShortList.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.AddToShortList))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costToShortlist))
       NotEnoughAssets
@@ -35,7 +35,7 @@ trait Friends { this: UserLogic =>
   }
 
   def canAddFriend(potentialFriend: User) = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
       NotEnoughAssets

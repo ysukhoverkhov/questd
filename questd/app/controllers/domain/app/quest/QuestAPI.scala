@@ -6,7 +6,7 @@ import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.app.user._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import logic._
 import play.Logger
 
@@ -22,8 +22,8 @@ case class TakeQuestUpdateResult()
 case class VoteQuestUpdateRequest(
   quest: Quest,
   vote: QuestProposalVote.Value,
-  duration: Option[QuestDuration.Value],
-  difficulty: Option[QuestDifficulty.Value])
+  duration: QuestDuration.Value,
+  difficulty: QuestDifficulty.Value)
 case class VoteQuestUpdateResult()
 
 case class CalculateProposalThresholdsRequest(proposalsVoted: Double, proposalsLiked: Double)
@@ -110,10 +110,14 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def skipQuest(request: SkipQuestRequest): ApiResult[SkipQuestResult] = handleDbException {
     import request._
 
-    val nq = db.quest.updatePoints(quest.id, -1, 1)
-    updateQuestStatus(UpdateQuestStatusRequest(nq.get))
+    {
+      db.quest.updatePoints(quest.id, -1, 1)
+    } ifSome { v =>
+      updateQuestStatus(UpdateQuestStatusRequest(v))
+    } ifOk {
+      OkApiResult(Some(SkipQuestResult()))
+    }
 
-    OkApiResult(Some(SkipQuestResult()))
   }
 
   /**
@@ -122,10 +126,14 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def takeQuestUpdate(request: TakeQuestUpdateRequest): ApiResult[TakeQuestUpdateResult] = handleDbException {
     import request._
 
-    val nq = db.quest.updatePoints(quest.id, ratio, 1)
-    updateQuestStatus(UpdateQuestStatusRequest(nq.get))
+    {
+      db.quest.updatePoints(quest.id, ratio, 1)
+    } ifSome { v =>
+      updateQuestStatus(UpdateQuestStatusRequest(v))
+    } ifOk {
+      OkApiResult(Some(TakeQuestUpdateResult()))
+    }
 
-    OkApiResult(Some(TakeQuestUpdateResult()))
   }
 
   /**
@@ -157,38 +165,39 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         0,
         0,
 
-        checkInc(difficulty.get, QuestDifficulty.Easy),
-        checkInc(difficulty.get, QuestDifficulty.Normal),
-        checkInc(difficulty.get, QuestDifficulty.Hard),
-        checkInc(difficulty.get, QuestDifficulty.Extreme),
+        checkInc(difficulty, QuestDifficulty.Easy),
+        checkInc(difficulty, QuestDifficulty.Normal),
+        checkInc(difficulty, QuestDifficulty.Hard),
+        checkInc(difficulty, QuestDifficulty.Extreme),
 
-        checkInc(duration.get, QuestDuration.Minutes),
-        checkInc(duration.get, QuestDuration.Hour),
-        checkInc(duration.get, QuestDuration.Day),
-        checkInc(duration.get, QuestDuration.Week))
+        checkInc(duration, QuestDuration.Minutes),
+        checkInc(duration, QuestDuration.Hour),
+        checkInc(duration, QuestDuration.Day),
+        checkInc(duration, QuestDuration.Week))
     } else {
       q
+    } 
+    
+    q ifSome { v => 
+      updateQuestStatus(UpdateQuestStatusRequest(v))
+    } ifOk {
+      OkApiResult(Some(VoteQuestUpdateResult()))
     }
-
-    updateQuestStatus(UpdateQuestStatusRequest(q2.get))
-
-    OkApiResult(Some(VoteQuestUpdateResult()))
   }
 
-  
   def calculateProposalThresholds(request: CalculateProposalThresholdsRequest): ApiResult[CalculateProposalThresholdsResult] = handleDbException {
-    
+
     val proposalsOnVoting = db.quest.countWithStatus(QuestStatus.OnVoting.toString)
     val daysForQuestToEnter: Long = config(ConfigParams.ProposalNormalDaysToEnterRotation).toInt
     val likesToAddToRotation: Long = Math.round(request.proposalsLiked / proposalsOnVoting * daysForQuestToEnter)
-    val votesToRemoveFromRotation: Long = Math.round(request.proposalsVoted / proposalsOnVoting * daysForQuestToEnter) 
+    val votesToRemoveFromRotation: Long = Math.round(request.proposalsVoted / proposalsOnVoting * daysForQuestToEnter)
     val ratioToRemoveFromRotation: Double = request.proposalsLiked / request.proposalsVoted * config(ConfigParams.ProposalWorstLikesRatio).toDouble
     Logger.error(ratioToRemoveFromRotation.toString + " ")
-    
+
     updateConfig(ConfigParams.ProposalLikesToEnterRotation -> likesToAddToRotation.toString)
     updateConfig(ConfigParams.ProposalVotesToLeaveVoting -> votesToRemoveFromRotation.toString)
     updateConfig(ConfigParams.ProposalRatioToLeaveVoting -> ratioToRemoveFromRotation.toString)
-    
+
     OkApiResult(Some(CalculateProposalThresholdsResult()))
   }
 }

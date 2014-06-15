@@ -5,7 +5,7 @@ import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
@@ -67,12 +67,20 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
     } else {
       request.user.canShortlist match {
         case OK => {
+          {
 
-          val cost = request.user.costToShortlist
-          adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) map { r =>
+            makeTask(MakeTaskRequest(request.user, TaskType.AddToShortList))
+
+          } ifOk { r =>
+
+            val cost = request.user.costToShortlist
+            adjustAssets(AdjustAssetsRequest(user = r.user, cost = Some(cost)))
+
+          } ifOk { r =>
 
             db.user.addToShortlist(r.user.id, request.userIdToAdd)
             OkApiResult(Some(AddToShortlistResult(OK, Some(r.user.profile.assets))))
+            
           }
         }
         case a => OkApiResult(Some(AddToShortlistResult(a)))

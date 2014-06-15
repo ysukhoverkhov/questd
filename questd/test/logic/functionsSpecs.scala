@@ -25,11 +25,12 @@ class FunctionsSpecs extends Specification {
       questProposalPeriod(20) must beEqualTo(2)
     }
 
-    "costToSkipProposal" in {
-      costToSkipProposal(12, 1) must beEqualTo(19)
-      costToSkipProposal(12, 4) must beEqualTo(86)
-      costToSkipProposal(20, 1) must beEqualTo(32 * 2)
-      costToSkipProposal(20, 4) must beEqualTo(297)
+    "costToSkipTheme" in {
+      costToSkipTheme(12, 0) must beEqualTo(0)
+      costToSkipTheme(12, 1) must beEqualTo(19)
+      costToSkipTheme(12, 4) must beEqualTo(86)
+      costToSkipTheme(20, 1) must beEqualTo(32 * 2)
+      costToSkipTheme(20, 4) must beEqualTo(297)
     }
     
     "costToTakeQuestTheme" in {
@@ -45,6 +46,7 @@ class FunctionsSpecs extends Specification {
     
     
     "costToSkipQuest" in {
+      costToSkipQuest(3, 0, 1) must beEqualTo(0)
       costToSkipQuest(3, 1, 1) must beEqualTo(4)
       costToSkipQuest(3, 8, 1) must beEqualTo(28)
       costToSkipQuest(20, 1, 1) must beEqualTo(12)

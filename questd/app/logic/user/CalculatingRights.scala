@@ -12,7 +12,7 @@ trait CalculatingRights { this: UserLogic =>
 
   def calculateRights: Rights = {
     Rights(
-      unlockedFunctionality = restrictions.foldLeft(Set[String]()) { case (c, (right, level)) => if (level <= user.profile.publicProfile.level) c + right else c },
+      unlockedFunctionality = restrictions.foldLeft(Set[Functionality.Value]()) { case (c, (right, level)) => if (level <= user.profile.publicProfile.level) c + right else c },
       maxFriendsCount = maxNumberOfFriendsOnLevel(user.profile.publicProfile.level))
   }
   

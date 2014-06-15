@@ -3,7 +3,7 @@ package controllers.domain.app.user
 import components._
 import controllers.domain._
 import controllers.domain.app.quest._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import logic._
 import models.domain._
 import models.domain.base.QuestInfoWithID
@@ -14,7 +14,7 @@ import controllers.domain._
 case class GetQuestProposalToVoteRequest(user: User)
 case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: Option[QuestDuration.Value] = None, difficulty: Option[QuestDifficulty.Value] = None)
+case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: QuestDuration.Value, difficulty: QuestDifficulty.Value)
 case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, author: Option[PublicProfile] = None)
 
 private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -29,7 +29,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
       case OK => {
 
         Logger.trace("getQuestProposalToVote - we are eligable to vote quest.")
-        
+
         // Updating user profile.
         val q = user.getQuestProposalToVote
 
@@ -72,13 +72,19 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
           }
           case Some(q) => {
             {
+              
               voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
-            } map {
+              
+            } ifOk { r =>
+              
+              makeTask(MakeTaskRequest(request.user, TaskType.VoteQuestProposals))
+              
+            } ifOk {
 
               adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))
-            } map { r =>
-              // 3. update user profile.
-              // 4. save profile in db.
+
+            } ifOk { r =>
+
               val liked = (request.vote == QuestProposalVote.Cool)
               val u = db.user.recordQuestProposalVote(r.user.id, q.id, liked)
 

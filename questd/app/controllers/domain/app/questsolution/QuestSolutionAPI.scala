@@ -4,7 +4,7 @@ import models.domain._
 import models.store._
 import components._
 import controllers.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import controllers.domain.app.user._
 import logic._
 import play.Logger
@@ -31,20 +31,23 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
-    val q = db.solution.updatePoints(
-      solution.id,
+    {
+      db.solution.updatePoints(
+        solution.id,
 
-      reviewsCountChange = 1,
-      pointsRandomChange = checkInc(vote, Cool),
-      pointsFriendsChange = 0,
-      pointsInvitedChange = 0,
-      cheatingChange = checkInc(vote, Cheating),
+        reviewsCountChange = 1,
+        pointsRandomChange = checkInc(vote, Cool),
+        pointsFriendsChange = 0,
+        pointsInvitedChange = 0,
+        cheatingChange = checkInc(vote, Cheating),
 
-      spamChange = checkInc(vote, IASpam),
-      pornChange = checkInc(vote, IAPorn))
+        spamChange = checkInc(vote, IASpam),
+        pornChange = checkInc(vote, IAPorn))
+    } ifSome { o =>
+      updateQuestSolutionState(UpdateQuestSolutionStateRequest(o)) ifOk
+        OkApiResult(Some(VoteQuestSolutionUpdateResult()))
+    }
 
-    updateQuestSolutionState(UpdateQuestSolutionStateRequest(q.get)) map
-      OkApiResult(Some(VoteQuestSolutionUpdateResult()))
   }
 
   /**
@@ -98,7 +101,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         OkApiResult(None)
       }
 
-    authorUpdateResult map OkApiResult(Some(UpdateQuestSolutionStateResult()))
+    authorUpdateResult ifOk OkApiResult(Some(UpdateQuestSolutionStateResult()))
   }
 
 }

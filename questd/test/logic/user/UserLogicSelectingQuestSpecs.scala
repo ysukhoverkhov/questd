@@ -27,8 +27,6 @@ import java.util.Date
 
 class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
-  isolated
-
   /**
    * Creates 10 themes for mocking
    */
@@ -76,7 +74,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       info = QuestInfo(
         themeId = "theme_id",
         content = QuestInfoContent(
-          media = ContentReference(ContentType.Video.toString, "", ""),
+          media = ContentReference(ContentType.Video, "", ""),
           icon = None,
           description = "The description"),
         vip = false))
