@@ -90,7 +90,7 @@ class QuestLogic(
 
   def shouldRemoveQuestFromVotingByTime = {
     if ((quest.rating.votersCount > api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong) &&
-        ((quest.rating.points / quest.rating.votersCount) < api.config(api.ConfigParams.ProposalRatioToLeaveVoting).toDouble) &&
+        ((quest.rating.points.toDouble / quest.rating.votersCount.toDouble) < api.config(api.ConfigParams.ProposalRatioToLeaveVoting).toDouble) &&
         (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
       true
     else
