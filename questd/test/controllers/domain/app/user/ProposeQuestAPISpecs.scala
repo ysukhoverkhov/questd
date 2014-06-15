@@ -18,7 +18,6 @@ import java.util.Date
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.stubCreators._
 
-// TODO: ThemeWithID should hold info and not theme.
 
 class ProposeQuestAPISpecs extends BaseAPISpecs {
 
