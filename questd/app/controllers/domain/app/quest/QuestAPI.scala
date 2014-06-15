@@ -175,7 +175,6 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     OkApiResult(Some(VoteQuestUpdateResult()))
   }
 
-  // TODO: describe quest voting algorithm in desdoc.
   def calculateProposalThresholds(request: CalculateProposalThresholdsRequest): ApiResult[CalculateProposalThresholdsResult] = handleDbException {
     
     val proposalsOnVoting = Math.max(1, db.quest.countWithStatus(QuestStatus.OnVoting.toString))
