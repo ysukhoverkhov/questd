@@ -47,11 +47,10 @@ trait QuestDAO extends BaseDAO[Quest] {
     minsChange: Int = 0,
     hourChange: Int = 0,
     dayChange: Int = 0,
-    daysChange: Int = 0,
     weekChange: Int = 0): Option[Quest]
 
   def updateStatus(id: String, newStatus: String): Option[Quest]
-  def updateLevel(id: String, newLevel: Int): Option[Quest]
+  def updateInfo(id: String, newLevel: Int, duration: String, difficulty: String): Option[Quest]
 
 }
 

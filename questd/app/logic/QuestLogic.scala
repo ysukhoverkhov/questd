@@ -17,7 +17,6 @@ class QuestLogic(
    * Calculate level of a quest with current votes.
    */
   def calculateQuestLevel = {
-    
     val totalVotes = quest.rating.difficultyRating.easy + quest.rating.difficultyRating.normal + quest.rating.difficultyRating.hard + quest.rating.difficultyRating.extreme
     val l: Int = (quest.rating.difficultyRating.easy * constants.easyWeight 
         + quest.rating.difficultyRating.normal * constants.normalWeight 
@@ -25,9 +24,32 @@ class QuestLogic(
         + quest.rating.difficultyRating.extreme * constants.extremeWeight) / totalVotes
     
     math.min(constants.maxQuestLevel, math.max(constants.minQuestLevel, l))
-
   }
 
+  /**
+   * Calculate difficulty of a quest.
+   */
+  def calculateDifficulty = {
+    List(
+        (QuestDifficulty.Easy,		quest.rating.difficultyRating.easy),
+        (QuestDifficulty.Normal,	quest.rating.difficultyRating.normal),
+        (QuestDifficulty.Hard,		quest.rating.difficultyRating.hard),
+        (QuestDifficulty.Extreme,	quest.rating.difficultyRating.extreme)
+        ).reduce((l, r) => if (l._2 > r._2) l else r)
+  }
+  
+  /**
+   * Calculate duration of a quest.
+   */
+  def calculateDuration = {
+    List(
+        (QuestDuration.Minutes,		quest.rating.durationRating.mins),
+        (QuestDuration.Hour,		quest.rating.durationRating.hour),
+        (QuestDuration.Day,			quest.rating.durationRating.day),
+        (QuestDuration.Week,		quest.rating.durationRating.week)
+        ).reduce((l, r) => if (l._2 > r._2) l else r)
+  }
+  
   /**
    * Are we able to add quest to rotation.
    */

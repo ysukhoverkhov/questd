@@ -48,7 +48,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     def checkAddToRotation(quest: Quest): Quest = {
       if (quest.shouldAddToRotation) {
         db.quest.updateStatus(quest.id, QuestStatus.InRotation.toString)
-        db.quest.updateLevel(quest.id, quest.calculateQuestLevel)
+        db.quest.updateInfo(quest.id, quest.calculateQuestLevel, quest.calculateDuration.toString, quest.calculateDifficulty.toString)
       }
 
       quest
@@ -163,9 +163,8 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         checkInc(difficulty.get, QuestDifficulty.Extreme),
 
         checkInc(duration.get, QuestDuration.Minutes),
-        checkInc(duration.get, QuestDuration.Hours),
+        checkInc(duration.get, QuestDuration.Hour),
         checkInc(duration.get, QuestDuration.Day),
-        checkInc(duration.get, QuestDuration.TwoDays),
         checkInc(duration.get, QuestDuration.Week))
     } else {
       q

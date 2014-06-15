@@ -90,7 +90,6 @@ private[mongo] class MongoQuestDAO
     minsChange: Int = 0,
     hourChange: Int = 0,
     dayChange: Int = 0,
-    daysChange: Int = 0,
     weekChange: Int = 0): Option[Quest] = {
 
     findAndModify(
@@ -112,7 +111,6 @@ private[mongo] class MongoQuestDAO
           "rating.durationRating.mins" -> minsChange,
           "rating.durationRating.hour" -> hourChange,
           "rating.durationRating.day" -> dayChange,
-          "rating.durationRating.days" -> daysChange,
           "rating.durationRating.week" -> weekChange)),
         ("$set" -> MongoDBObject(
           "lastModDate" -> new Date()))))
@@ -133,12 +131,14 @@ private[mongo] class MongoQuestDAO
   /**
    *
    */
-  def updateLevel(id: String, newLevel: Int): Option[Quest] = {
+  def updateInfo(id: String, newLevel: Int, duration: String, difficulty: String): Option[Quest] = {
     findAndModify(
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
           "info.level" -> newLevel,
+          "info.duration" -> duration,
+          "info.difficulty" -> difficulty,
           "lastModDate" -> new Date()))))
   }
 }
