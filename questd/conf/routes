@@ -99,8 +99,10 @@ GET		/admin/themes/byid/:id				controllers.web.admin.ThemesCRUD.themes(id)
 POST	/admin/themes/createTheme			controllers.web.admin.ThemesCRUD.createThemeCB
 GET		/admin/themes/deleteTheme/:id		controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
 
-GET		/admin/users						controllers.web.admin.UsersCRUD.users(id = "")
 GET		/admin/quests						controllers.web.admin.QuestsCRUD.quests(id = "")
+POST	/admin/updateQuest/:id				controllers.web.admin.QuestsCRUD.updateQuest(id)
+
+GET		/admin/users						controllers.web.admin.UsersCRUD.users(id = "")
 GET		/admin/solutions					controllers.web.admin.SolutionsCRUD.solutions(id = "")
 
 GET		/admin/config						controllers.web.admin.Config.config(name = "")

@@ -31,5 +31,25 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
     }
   }
 
+  /**
+   * Updates quest status by request from CRUD
+   */
+  def updateQuest(id: String) = Action { implicit request =>
+
+    val values: Map[String, String] = request.body.asFormUrlEncoded match {
+      case Some(m) => {
+        m.map((e) => e match {
+          case (k, v) => (k -> v.head)
+        })
+      }
+      case _ => Map()
+    }
+    
+    Logger.error(values.toString)
+
+    Redirect(controllers.web.admin.routes.QuestsCRUD.quests())
+  }
+ 
+  
 }
 

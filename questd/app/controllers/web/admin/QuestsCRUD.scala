@@ -12,5 +12,6 @@ object QuestsCRUD extends Controller {
 
   def quests(id: String) = admin.quests(id)
 
+  def updateQuest(id: String) = admin.updateQuest(id)
 }
 

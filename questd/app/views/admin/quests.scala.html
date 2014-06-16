@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main("Users")(menuItems, Map()) {
+@main("Quests")(menuItems, Map()) {
 
 	<p>
 	<table border="1">
@@ -15,11 +15,20 @@
 	    	</tr>
 		@for(q <- quests) {
 	    	<tr>
-	    		<td>@q.info.content.description</td>
-	    		<td>@q.status</td>
-	    		<td>@q.rating.points</td>
-	    		<td>@q.rating.votersCount</td>
-	    		<td>@q.info.level</td>
+	    	
+				@helper.form(action=controllers.web.admin.routes.QuestsCRUD.updateQuest(q.id)) {       
+		    		<td>@q.info.content.description</td>
+		    		<td>@q.status</td>
+		    		<td>@q.rating.points</td>
+		    		<td>@q.rating.votersCount</td>
+		    		<td>@q.info.level</td>
+
+	            	<td>@helper.select</td>
+	            	<td><input type='text' name='@q.id' value='@q.status'/></td>
+					
+					<td><input type='submit' value='Update' /></td>    
+				}
+	    	
 	    	</tr>
 	    }
 	</table>
