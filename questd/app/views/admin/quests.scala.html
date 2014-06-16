@@ -1,29 +1,63 @@
-@(menuItems: Map[String, String], quests: List[models.domain.Quest])
-
+@(menuItems: Map[String, String], quests: List[models.domain.Quest], newQuestForm: Form[controllers.web.admin.component.QuestForm])
+ 
 @import helper._
 
-@main("Users")(menuItems, Map()) {
+@main("Quests")(menuItems, Map()) {
 
-	<p>
-	<table border="1">
-	    	<tr>
-	    		<td>description</td>
-	    		<td>status</td>
-	    		<td>points</td>
-	    		<td>votersCount</td>
-	    		<td>level</td>
-	    	</tr>
-		@for(q <- quests) {
-	    	<tr>
-	    		<td>@q.info.content.description</td>
-	    		<td>@q.status</td>
-	    		<td>@q.rating.points</td>
-	    		<td>@q.rating.votersCount</td>
-	    		<td>@q.info.level</td>
-	    	</tr>
-	    }
+	<table border="0">
+    	<tr>
+    		<td>
+				<table border="1">
+			
+			    	<tr>
+			    		<td>description</td>
+			    		<td>status</td>
+			    		<td>points</td>
+			    		<td>cheating</td>
+			    		<td>votersCount</td>
+			    		<td>level</td>
+			    		<td>difficulty</td>
+			    		<td>duration</td>
+			    		<td>action</td>
+			    	</tr>
+			
+					@for(q <- quests) {
+				    	<tr>
+				    	
+				    		<td>@q.info.content.description</td>
+				    		<td>@q.status</td>
+				    		<td>@q.rating.points</td>
+				    		<td>@q.rating.cheating</td>
+				    		<td>@q.rating.votersCount</td>
+				    		<td>@q.info.level</td>
+				    		<td>@q.info.difficulty</td>
+				    		<td>@q.info.duration</td>
+							<td><a href="@controllers.web.admin.routes.QuestsCRUD.quests(q.id)">edit</a></td>
+							
+	    				</tr>
+	   				}
+				</table>
+    		</td>
+    		<td>
+				@form(action = controllers.web.admin.routes.QuestsCRUD.updateQuest()) {
+					@inputText(newQuestForm("id"), 'size -> 18, 'readonly -> "readonly")
+					@select(newQuestForm("status"), options(List("OnVoting", "InRotation", "RatingBanned", "CheatingBanned", "IACBanned", "OldBanned")))
+					@inputText(newQuestForm("level"), 'size -> 5)
+					@select(newQuestForm("difficulty"), options(List("Easy", "Normal", "Hard", "Extreme")))
+					@select(newQuestForm("duration"), options(List("Minutes", "Hour", "Day", "Week")))
+					@inputText(newQuestForm("points"), 'size -> 5)
+					@inputText(newQuestForm("cheating"), 'size -> 5)
+					@inputText(newQuestForm("votersCount"), 'size -> 5)
+					@if(newQuestForm("id").value == None) {
+		<!-- 			<input type="submit" value="Create">  -->
+					} else {
+						<input type="submit" value="Update">
+					}
+		   		}
+    		</td>
+    	</tr>
 	</table>
-	</p>
+	
 	
 }
 
