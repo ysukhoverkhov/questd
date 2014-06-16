@@ -17,7 +17,10 @@ case class QuestForm(
   status: String,
   level: Int,
   difficulty: String,
-  duration: String)
+  duration: String,
+  points: Int,
+  cheating: Int,
+  votersCount: Int)
 
 trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
 
@@ -27,7 +30,10 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
       "status" -> nonEmptyText,
       "level" -> number,
       "difficulty" -> nonEmptyText,
-      "duration" -> nonEmptyText)(QuestForm.apply)(QuestForm.unapply))
+      "duration" -> nonEmptyText,
+      "points" -> number,
+      "cheating" -> number,
+      "votersCount" -> number)(QuestForm.apply)(QuestForm.unapply))
 
   /**
    * Get all quests
@@ -45,7 +51,10 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
             status = quest.status.toString,
             level = quest.info.level,
             difficulty = quest.info.difficulty.toString,
-            duration = quest.info.duration.toString))
+            duration = quest.info.duration.toString,
+            points = quest.rating.points,
+            cheating = quest.rating.cheating,
+            votersCount = quest.rating.votersCount))
         }
         case _ => form
       }
@@ -71,9 +80,9 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
     form.bindFromRequest.fold(
 
       formWithErrors => {
-        
+
         Logger.error(formWithErrors.errors.toString)
-        
+
         BadRequest(views.html.admin.quests(
           Menu(request),
           List(),
@@ -87,11 +96,14 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
           //          api.createTheme(CreateThemeRequest(theme))
         } else {
           api.updateQuestAdmin(UpdateQuestAdminRequest(
-              questForm.id,
-              questForm.status, 
-              questForm.level,
-              questForm.difficulty,
-              questForm.duration))
+            questForm.id,
+            questForm.status,
+            questForm.level,
+            questForm.difficulty,
+            questForm.duration,
+            questForm.points,
+            questForm.cheating,
+            questForm.votersCount))
         }
 
         Redirect(controllers.web.admin.routes.QuestsCRUD.quests(questForm.id))
