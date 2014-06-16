@@ -22,8 +22,8 @@
 		@for(t <- themes) {
 	    	<tr>
 	    		<td>@t.id.toString</td>
-	    		<td>@t.text</td>
-	    		<td>@t.comment</td>
+	    		<td>@t.info.name</td>
+	    		<td>@t.info.description</td>
 				<td><a href="@controllers.web.admin.routes.ThemesCRUD.themes(t.id.toString)">edit</a></td>
 				<td><a href="@controllers.web.admin.routes.ThemesCRUD.deleteThemeCB(t.id.toString)">delete</a></td>
 	    	</tr>
