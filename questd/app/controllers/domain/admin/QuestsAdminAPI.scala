@@ -68,11 +68,11 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
       case Some(q) => {
         db.quest.update(
           q.copy(
-            status = QuestStatus.withName(request.status).toString,
+            status = QuestStatus.withName(request.status),
             info = q.info.copy(
               level = request.level,
-              difficulty = QuestDifficulty.withName(request.difficulty).toString,
-              duration = QuestDuration.withName(request.duration).toString),
+              difficulty = QuestDifficulty.withName(request.difficulty),
+              duration = QuestDuration.withName(request.duration)),
           rating = q.rating.copy(
             points = request.points,
             cheating = request.cheating,
