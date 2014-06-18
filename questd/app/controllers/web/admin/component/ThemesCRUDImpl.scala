@@ -12,7 +12,13 @@ import controllers.domain._
 import controllers.domain.admin._
 import components._
 
-case class ThemeForm(id: String, text: String, comment: String)
+case class ThemeForm(
+  id: String,
+  text: String,
+  comment: String,
+  iconType: String,
+  iconStorage: String,
+  iconReference: String)
 
 trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
 
@@ -20,7 +26,10 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
     mapping(
       "id" -> text,
       "text" -> nonEmptyText,
-      "comment" -> nonEmptyText)(ThemeForm.apply)(ThemeForm.unapply))
+      "comment" -> nonEmptyText,
+      "iconType" -> nonEmptyText,
+      "iconStorage" -> nonEmptyText,
+      "iconReference" -> nonEmptyText)(ThemeForm.apply)(ThemeForm.unapply))
 
   /**
    * Get all themes action
@@ -34,7 +43,13 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
       api.getTheme(GetThemeRequest(id)) match {
         case OkApiResult(Some(GetThemeResult(theme))) => {
 
-          newThemeForm.fill(ThemeForm(id = theme.id.toString, text = theme.text, comment = theme.comment))
+          newThemeForm.fill(ThemeForm(
+            id = theme.id.toString,
+            text = theme.text,
+            comment = theme.comment,
+            iconType = theme.icon.contentType.toString,
+            iconStorage = theme.icon.storage,
+            iconReference = theme.icon.reference))
         }
         case _ => newThemeForm
       }
@@ -79,11 +94,25 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
       themeForm => {
 
         if (themeForm.id == "") {
-          val theme = Theme(id = "", text = themeForm.text, comment = themeForm.comment)
+          val theme = Theme(
+            id = "",
+            text = themeForm.text,
+            comment = themeForm.comment,
+            icon = ContentReference(
+              contentType = ContentType.withName(themeForm.iconType).toString,
+              storage = themeForm.iconStorage,
+              reference = themeForm.iconReference))
           api.createTheme(CreateThemeRequest(theme))
         } else {
 
-          val theme = Theme(id = themeForm.id, text = themeForm.text, comment = themeForm.comment)
+          val theme = Theme(
+            id = themeForm.id,
+            text = themeForm.text,
+            comment = themeForm.comment,
+            icon = ContentReference(
+              contentType = ContentType.withName(themeForm.iconType).toString,
+              storage = themeForm.iconStorage,
+              reference = themeForm.iconReference))
           api.updateTheme(UpdateThemeRequest(theme))
         }
 
