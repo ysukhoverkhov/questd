@@ -5,7 +5,7 @@ import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
@@ -47,12 +47,22 @@ case class RemoveFromFriendsResult(
 private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#DomainAPI =>
 
   /**
-   * Get ids of users from our shortlist.
+   * Get ids of users from our friends list.
    */
   def getFriends(request: GetFriendsRequest): ApiResult[GetFriendsResult] = handleDbException {
-    OkApiResult(Some(GetFriendsResult(
-      allowed = OK,
-      userIds = request.user.friends)))
+
+    {
+
+      makeTask(MakeTaskRequest(request.user, TaskType.LookThroughFriendshipProposals))
+
+    } ifOk { r =>
+
+      OkApiResult(Some(GetFriendsResult(
+        allowed = OK,
+        userIds = r.user.friends)))
+
+    }
+
   }
 
   /**
@@ -90,13 +100,13 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
             case OK => {
 
               val cost = request.user.costToAddFriend(u)
-              adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) map { r =>
+              adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) ifOk { r =>
 
                 db.user.askFriendship(
                   r.user.id,
                   request.friendId,
-                  Friendship(request.friendId, FriendshipStatus.Invited.toString()),
-                  Friendship(r.user.id, FriendshipStatus.Invites.toString()))
+                  Friendship(request.friendId, FriendshipStatus.Invited),
+                  Friendship(r.user.id, FriendshipStatus.Invites))
 
                 OkApiResult(Some(AskFriendshipResult(OK, Some(r.user.profile.assets))))
               }
@@ -167,16 +177,17 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
       db.user.removeFriendship(request.user.id, request.friendId)
 
-      // Sending message about removed friend to friend.
-      if (request.user.friends.find(_.friendId == request.friendId).get.status == FriendshipStatus.Accepted.toString()) {
-        db.user.readById(request.friendId) match {
-          case Some(f) => sendMessage(SendMessageRequest(f, Message(text = Messages("friends.removed", request.user.id))))
-          case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
+      request.user.friends.find(_.friendId == request.friendId) ifSome { v =>
+        // Sending message about removed friend to friend.
+        if (v.status == FriendshipStatus.Accepted.toString()) {
+          db.user.readById(request.friendId) match {
+            case Some(f) => sendMessage(SendMessageRequest(f, Message(text = Messages("friends.removed", request.user.id))))
+            case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
+          }
         }
+
+        OkApiResult(Some(RemoveFromFriendsResult(OK)))
       }
-
-      OkApiResult(Some(RemoveFromFriendsResult(OK)))
-
     }
   }
 }
