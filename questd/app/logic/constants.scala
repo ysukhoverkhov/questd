@@ -99,7 +99,7 @@ object constants {
   /**
    * Number of themes skips for coins.
    */
-  def numberOfThemesSkipsForCoins = 12
+  def NumberOfThemesSkipsForCoins = 12
 
   /**
    * Number of quests skip for coins.
