@@ -37,7 +37,7 @@ object functions {
   def costToSkipProposal(level: Int, skipNumber: Int): Int = {
 
     def costToSkipProposalInt(level: Int, skipNumber: Int, k: Double) = {
-      k * math.pow(5.0 / 3.0, skipNumber)
+      k * math.pow(40.0 / 32.0, skipNumber)
     }
 
     def kf(level: Int) = {
