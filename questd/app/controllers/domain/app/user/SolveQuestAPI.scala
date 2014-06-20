@@ -202,16 +202,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                   questId = takenQuest.id,
                   vip = r.user.profile.publicProfile.vip)))
 
-        val u = db.user.resetQuestSolution(user.id)
-            db.user.resetQuestSolution(user.id) ifSome { u =>
-        val u = db.user.resetQuestSolution(
-            user.id,
-            config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
+            db.user.resetQuestSolution(
+              user.id,
+              config(api.ConfigParams.DebugDisableSolutionCooldown) == "1") ifSome { u =>
 
-              OkApiResult(Some(ProposeSolutionResult(OK, Some(u.profile))))
+                OkApiResult(Some(ProposeSolutionResult(OK, Some(u.profile))))
 
-            }
-
+              }
           }
         }
       }
@@ -238,8 +235,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
         adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) ifOk { r =>
           val u = db.user.resetQuestSolution(
-              r.user.id,
-              config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
+            r.user.id,
+            config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
           OkApiResult(Some(GiveUpQuestResult(OK, u.map(_.profile))))
         }
       }
@@ -254,8 +251,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def deadlineQuest(request: DeadlineQuestRequest): ApiResult[DeadlineQuestResult] = handleDbException {
     storeSolutionOutOfTimePenalty(StoreSolutionOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuest)) ifOk { r =>
       val u = db.user.resetQuestSolution(
-          r.user.id,
-          config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
+        r.user.id,
+        config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
       OkApiResult(Some(DeadlineQuestResult(u)))
     }
   }

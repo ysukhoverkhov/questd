@@ -229,9 +229,6 @@ class UserDAOSpecs
     "incTask should increase number of times task was completed by one" in new WithApplication(appWithTestDatabase) {
       val userid = "incTasks"
       db.user.create(User(userid))
-    "resetQuestProposal should reset cooldown if required" in new WithApplication(appWithTestDatabase) {
-      val userid = "resetQuestProposal"
-      val date = new Date(3)
 
       val tasks = DailyTasks(
         tasks = List(
@@ -254,34 +251,6 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client)(0).currentCount == 1)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards)(0).currentCount == 2)
-      db.user.create(User(
-        id = userid,
-        profile = Profile(
-          questProposalContext = QuestProposalConext(
-            questProposalCooldown = date))))
-
-      val ou = db.user.resetQuestProposal(userid, true)
-
-      ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown != date)
-    }
-
-    "resetQuestProposal should reset cooldown if not required" in new WithApplication(appWithTestDatabase) {
-      val userid = "resetQuestProposal"
-      val date = new Date(1000)
-
-      db.user.delete(userid)
-      db.user.create(User(
-        id = userid,
-        profile = Profile(
-          questProposalContext = QuestProposalConext(
-            questProposalCooldown = date))))
-
-      val ou = db.user.resetQuestProposal(userid, false)
-
-      ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown == date)
-    }
     }
 
     "incTask should change percentage completed" in new WithApplication(appWithTestDatabase) {
@@ -304,6 +273,41 @@ class UserDAOSpecs
       ou.get.profile.dailyTasks.completed must beEqualTo(0.4f)
       ou.get.profile.dailyTasks.rewardReceived must beEqualTo(true)
     }
+    
+    "resetQuestProposal should reset cooldown if required" in new WithApplication(appWithTestDatabase) {
+      val userid = "resetQuestProposal"
+      val date = new Date(1000)
+    
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid,
+        profile = Profile(
+          questProposalContext = QuestProposalConext(
+            questProposalCooldown = date))))
+
+      val ou = db.user.resetQuestProposal(userid, true)
+    
+          ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown != date)
+    }
+
+    "resetQuestProposal should reset cooldown if not required" in new WithApplication(appWithTestDatabase) {
+      val userid = "resetQuestProposal"
+      val date = new Date(1000)
+
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid,
+        profile = Profile(
+          questProposalContext = QuestProposalConext(
+            questProposalCooldown = date))))
+
+      val ou = db.user.resetQuestProposal(userid, false)
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown == date)
+    }
+    
   }
 }
 
