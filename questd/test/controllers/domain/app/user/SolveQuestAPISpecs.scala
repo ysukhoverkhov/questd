@@ -31,7 +31,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val u = createUser(false)
       val s = createSolution
 
-      user.resetQuestSolution(any) returns Some(u)
+      user.resetQuestSolution(any, any) returns Some(u)
 
       val result = api.proposeSolution(ProposeSolutionRequest(u, s))
 
@@ -55,7 +55,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val u = createUser(true)
       val s = createSolution
 
-      user.resetQuestSolution(any) returns Some(u)
+      user.resetQuestSolution(any, any) returns Some(u)
 
       val result = api.proposeSolution(ProposeSolutionRequest(u, s))
 

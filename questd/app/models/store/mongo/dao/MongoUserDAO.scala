@@ -170,16 +170,29 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def resetQuestSolution(id: String): Option[User] = {
+  def resetQuestSolution(id: String, shouldResetCooldown: Boolean): Option[User] = {
+
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$set" -> MongoDBObject(
+      "profile.questSolutionContext.numberOfPurchasedQuests" -> 0))
+
+    if (shouldResetCooldown) {
+      queryBuilder += ("$unset" -> MongoDBObject(
+        "profile.questSolutionContext.purchasedQuest" -> "",
+        "profile.questSolutionContext.takenQuest" -> "",
+        "profile.questSolutionContext.questAuthor" -> "",
+        "profile.questSolutionContext.questCooldown" -> ""))
+    } else {
+      queryBuilder += ("$unset" -> MongoDBObject(
+        "profile.questSolutionContext.purchasedQuest" -> "",
+        "profile.questSolutionContext.takenQuest" -> "",
+        "profile.questSolutionContext.questAuthor" -> ""))
+    }
+
     findAndModify(
       id,
-      MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "profile.questSolutionContext.numberOfPurchasedQuests" -> 0)),
-        ("$unset" -> MongoDBObject(
-          "profile.questSolutionContext.purchasedQuest" -> "",
-          "profile.questSolutionContext.takenQuest" -> "",
-          "profile.questSolutionContext.questAuthor" -> ""))))
+      queryBuilder.result)
   }
 
   /**
@@ -231,7 +244,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * 
+   *
    */
   def resetQuestProposal(id: String, shouldResetCooldown: Boolean): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder

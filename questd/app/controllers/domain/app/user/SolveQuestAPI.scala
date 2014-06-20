@@ -11,6 +11,7 @@ import components._
 import logic._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.quest._
+import java.util.Date
 
 case class GetQuestCostRequest(user: User)
 case class GetQuestCostResult(allowed: ProfileModificationResult, cost: Assets)
@@ -163,10 +164,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             InternalErrorApiResult()
           } else {
             val u = db.user.takeQuest(
-              r.user.id,
-              pq.get,
-              r.user.getCooldownForTakeQuest(pq.get.obj),
-              r.user.getDeadlineForTakeQuest(pq.get.obj))
+              id = r.user.id,
+              takenQuest = pq.get,
+              cooldown = r.user.getCooldownForTakeQuest(pq.get.obj),
+              deadline = r.user.getDeadlineForTakeQuest(pq.get.obj))
             OkApiResult(Some(TakeQuestResult(OK, u.map(_.profile))))
           }
         }
@@ -196,7 +197,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               questId = user.profile.questSolutionContext.takenQuest.get.id,
               vip = user.profile.publicProfile.vip)))
 
-        val u = db.user.resetQuestSolution(user.id)
+        val u = db.user.resetQuestSolution(
+            user.id,
+            config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
 
         OkApiResult(Some(ProposeSolutionResult(OK, u.map(_.profile))))
       }
@@ -222,7 +225,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       case OK => {
 
         adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) map { r =>
-          val u = db.user.resetQuestSolution(r.user.id)
+          val u = db.user.resetQuestSolution(
+              r.user.id,
+              config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
           OkApiResult(Some(GiveUpQuestResult(OK, u.map(_.profile))))
         }
       }
@@ -236,7 +241,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    */
   def deadlineQuest(request: DeadlineQuestRequest): ApiResult[DeadlineQuestResult] = handleDbException {
     storeSolutionOutOfTimePenalty(StoreSolutionOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuest)) map { r =>
-      val u = db.user.resetQuestSolution(r.user.id)
+      val u = db.user.resetQuestSolution(
+          r.user.id,
+          config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
       OkApiResult(Some(DeadlineQuestResult(u)))
     }
   }
