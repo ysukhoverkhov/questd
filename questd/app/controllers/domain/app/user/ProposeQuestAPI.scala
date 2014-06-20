@@ -76,7 +76,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                 }
               }
 
-              val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t), sampleQuest, reward)
+              val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t.info), sampleQuest, reward)
               OkApiResult(Some(PurchaseQuestThemeResult(OK, u.map(_.profile))))
             }
 

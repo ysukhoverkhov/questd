@@ -19,7 +19,7 @@ class SolutionDAOSpecs extends Specification
   with BaseDAOSpecs {
 
   private[this] def clearDB() = {
-    db.solution.all.foreach((x) => db.solution.delete(x.id))
+    db.solution.clear
   }
 
   private def createSolution(
