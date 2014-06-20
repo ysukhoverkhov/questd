@@ -25,7 +25,7 @@ trait UserDAO extends BaseDAO[User] {
   
   def purchaseQuestTheme(id: String, purchasedTheme: ThemeWithID, sampleQuest: Option[QuestInfo], approveReward: Assets): Option[User]
   def takeQuestTheme(id: String, takenTheme: ThemeWithID, cooldown: Date): Option[User]
-  def resetQuestProposal(id: String): Option[User]
+  def resetQuestProposal(id: String, shouldResetCooldown: Boolean): Option[User]
   
   def resetCounters(id: String, resetPurchasesTimeout: Date): Option[User]
   

@@ -42,7 +42,7 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
       val u = createUser(false)
       val q = createQuest
 
-      user.resetQuestProposal(any) returns Some(u)      
+      user.resetQuestProposal(any, any) returns Some(u)      
       
       val result = api.proposeQuest(ProposeQuestRequest(u, q))
 
@@ -63,7 +63,7 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
       val u = createUser(true)
       val q = createQuest
 
-      user.resetQuestProposal(any) returns Some(u)      
+      user.resetQuestProposal(any, any) returns Some(u)      
       
       val result = api.proposeQuest(ProposeQuestRequest(u, q))
 

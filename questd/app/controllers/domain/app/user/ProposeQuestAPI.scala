@@ -143,7 +143,9 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
               content = request.quest,
               vip = request.user.profile.publicProfile.vip)))
 
-        val u = db.user.resetQuestProposal(user.id)
+        val u = db.user.resetQuestProposal(
+          user.id,
+          config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
 
         OkApiResult(Some(ProposeQuestResult(OK, u.map(_.profile))))
       }
@@ -161,7 +163,9 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
       case OK => {
 
         adjustAssets(AdjustAssetsRequest(user = user, cost = Some(user.costOfGivingUpQuestProposal))) map { r =>
-          val u = db.user.resetQuestProposal(r.user.id)
+          val u = db.user.resetQuestProposal(
+            r.user.id,
+            config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
           OkApiResult(Some(GiveUpQuestProposalResult(OK, u.map(_.profile))))
         }
 
@@ -176,7 +180,9 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    */
   def deadlineQuestProposal(request: DeadlineQuestProposalRequest): ApiResult[DeadlineQuestProposalResult] = handleDbException {
     storeProposalOutOfTimePenalty(StoreProposalOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuestProposal)) map { r =>
-      val u = db.user.resetQuestProposal(r.user.id)
+      val u = db.user.resetQuestProposal(
+        r.user.id,
+        config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
       OkApiResult(Some(DeadlineQuestProposalResult(u)))
     }
   }

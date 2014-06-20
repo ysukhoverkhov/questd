@@ -7,7 +7,9 @@ import models.domain.admin.ConfigSection
 class _ConfigParams {
 
   val DebugExpMultiplier = "01 01 Debug Exp Multiplier"
-  
+  val DebugDisableProposalCooldown = "01 02 Debug Disable Proposal Cooldown"
+  val DebugDisableSolutionCooldown = "01 03 Debug Disable Solution Cooldown"
+
   val ActiveUserDays = "10 01 Active User Days"
 
   val UserHistoryDays = "20 01 User History Days"
@@ -23,7 +25,7 @@ class _ConfigParams {
   val ProposalLikesToEnterRotation = "50 21 Proposal Likes To Enter Rotation (calculated)"
   val ProposalVotesToLeaveVoting = "50 22 Proposal Votes To Leave Voting (calculated)"
   val ProposalRatioToLeaveVoting = "50 23 Proposal Ratio To Leave Voting (calculated)"
-    
+
   val QuestProbabilityLevelsToGiveStartingQuests = "71 01 Level to give starting quests"
   val QuestProbabilityStartingVIPQuests = "71 02 Probability of selecting VIP quests in initial stage"
 
@@ -32,7 +34,6 @@ class _ConfigParams {
   val QuestProbabilityLiked = "72 03 Probability of liked quests"
   val QuestProbabilityStar = "72 04 Probability of quests from stars"
 
-    
   val SolutionProbabilityLevelsToGiveStartingSolutions = "91 01 Level to give starting Solutions"
   val SolutionProbabilityStartingVIPSolutions = "91 02 Probability of selecting VIP Solutions in initial stage"
 
@@ -40,7 +41,6 @@ class _ConfigParams {
   val SolutionProbabilityShortlist = "92 02 Probability of Solutions from shortlist"
   val SolutionProbabilityLiked = "92 03 Probability of liked Solutions"
   val SolutionProbabilityStar = "92 04 Probability of quests from Solutions"
-
 
 }
 
@@ -55,7 +55,9 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     configSectionName,
     Map(
       ConfigParams.DebugExpMultiplier -> "1",
-        
+      ConfigParams.DebugDisableProposalCooldown -> "0",
+      ConfigParams.DebugDisableSolutionCooldown -> "0",
+
       ConfigParams.ActiveUserDays -> "7",
       ConfigParams.UserHistoryDays -> "15",
 
@@ -64,7 +66,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
 
       ConfigParams.ProposalNormalDaysToEnterRotation -> "7",
       ConfigParams.ProposalMinVotesToTakeRemovalDecision -> "10",
-      
+
       ConfigParams.ProposalWorstLikesRatio -> "0.1",
       ConfigParams.ProposalCheatingRatio -> "0.1",
       ConfigParams.ProposalIACRatio -> "0.03",

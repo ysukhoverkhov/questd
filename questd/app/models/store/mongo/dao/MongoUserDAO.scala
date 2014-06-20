@@ -231,18 +231,30 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * 
    */
-  def resetQuestProposal(id: String): Option[User] = {
+  def resetQuestProposal(id: String, shouldResetCooldown: Boolean): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$set" -> MongoDBObject(
+      "profile.questProposalContext.numberOfPurchasedThemes" -> 0))
+
+    if (shouldResetCooldown) {
+      queryBuilder += ("$unset" -> MongoDBObject(
+        "profile.questProposalContext.purchasedTheme" -> "",
+        "profile.questProposalContext.takenTheme" -> "",
+        "profile.questProposalContext.sampleQuest" -> "",
+        "profile.questProposalContext.questProposalCooldown" -> ""))
+    } else {
+      queryBuilder += ("$unset" -> MongoDBObject(
+        "profile.questProposalContext.purchasedTheme" -> "",
+        "profile.questProposalContext.takenTheme" -> "",
+        "profile.questProposalContext.sampleQuest" -> ""))
+    }
+
     findAndModify(
       id,
-      MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "profile.questProposalContext.numberOfPurchasedThemes" -> 0)),
-        ("$unset" -> MongoDBObject(
-          "profile.questProposalContext.purchasedTheme" -> "",
-          "profile.questProposalContext.takenTheme" -> "",
-          "profile.questProposalContext.sampleQuest" -> ""))))
+      queryBuilder.result)
   }
 
   /**
