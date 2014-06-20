@@ -51,6 +51,19 @@ package object protocol {
    */
   type WSProfileResult = Profile
 
+
+  /**
+   * Set Gender protocol.
+   */
+  type WSSetGenderResult = SetGenderResult
+  case class WSSetGenderRequest(gender: String)
+
+  /**
+   * Set debug protocol.
+   */
+  type WSSetDebugResult = SetDebugResult
+  case class WSSetDebugRequest(debug: String)
+
   /**
    * Get Quest theme cost result
    */
@@ -67,11 +80,6 @@ package object protocol {
   type WSTakeQuestThemeResult = TakeQuestThemeResult
 
   type WSGetQuestThemeTakeCostResult = GetQuestThemeTakeCostResult
-
-  /**
-   *
-   */
-  type WSProposeQuestRequest = ProposeQuestRequest
 
   /**
    *
@@ -123,12 +131,12 @@ package object protocol {
     /**
      * @see QuestDuration
      */
-    duration: Option[String],
+    duration: String,
 
     /**
      * @see QuestDifficulty
      */
-    difficulty: Option[String])
+    difficulty: String)
 
   type WSGetQuestProposalToVoteResult = GetQuestProposalToVoteResult
 

@@ -154,7 +154,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   private[user] def getVIPQuests(reason: QuestGetReason) = {
     Logger.trace("  Returning VIP quests")
 
-    val themeIds = selectRandomThemes(numberOfFavoriteThemesForVIPQuests)
+    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPQuests)
     Logger.trace("    Selected themes of vip's quests: " + themeIds.mkString(", "))
 
     Some(api.getVIPQuests(GetVIPQuestsRequest(
@@ -167,7 +167,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   private[user] def getOtherQuests(reason: QuestGetReason) = {
     Logger.trace("  Returning from all quests with favorite themes")
 
-    val themeIds = selectRandomThemes(numberOfFavoriteThemesForOtherQuests)
+    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
     Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
 
     Some(api.getAllQuests(GetAllQuestsRequest(
@@ -187,9 +187,9 @@ trait QuestSelectUserLogic { this: UserLogic =>
   /**
    * Tells what level we should give quests based on reason of getting quest.
    */
-  private def levels(reason: QuestGetReason) = {
+  private def levels(reason: QuestGetReason): Option[(Int, Int)] = {
     reason match {
-      case ForSolving => Some(user.profile.publicProfile.level - questForSolveLevelToleranceDown, user.profile.publicProfile.level + questForSolveLevelToleranceUp)
+      case ForSolving => Some((user.profile.publicProfile.level - QuestForSolveLevelToleranceDown, user.profile.publicProfile.level + QuestForSolveLevelToleranceUp))
       case ForVoting => None
     }
   }

@@ -99,7 +99,7 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
             text = themeForm.text,
             comment = themeForm.comment,
             icon = ContentReference(
-              contentType = ContentType.withName(themeForm.iconType).toString,
+              contentType = ContentType.withName(themeForm.iconType),
               storage = themeForm.iconStorage,
               reference = themeForm.iconReference))
           api.createTheme(CreateThemeRequest(theme))
@@ -110,7 +110,7 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
             text = themeForm.text,
             comment = themeForm.comment,
             icon = ContentReference(
-              contentType = ContentType.withName(themeForm.iconType).toString,
+              contentType = ContentType.withName(themeForm.iconType),
               storage = themeForm.iconStorage,
               reference = themeForm.iconReference))
           api.updateTheme(UpdateThemeRequest(theme))

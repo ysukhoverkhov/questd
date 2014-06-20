@@ -29,8 +29,6 @@ import models.domain.QuestSolution
 
 class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
-  isolated
-
   /**
    * Creates stub config for our tests.
    */
@@ -70,7 +68,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
         themeId = "theme_id",
         questId = "quest_id",
         content = QuestSolutionInfoContent(
-          media = ContentReference(ContentType.Video.toString, "", ""),
+          media = ContentReference(ContentType.Video, "", ""),
           icon = None),
         vip = false))
   }

@@ -21,14 +21,8 @@ trait VoteQuestProposalWSImpl extends QuestController with SecurityWSImpl with C
     val v = Json.read[WSQuestProposalVoteRequest](js)
     val vote = QuestProposalVote.withName(v.vote)
 
-    val duration = v.duration match {
-      case None => None
-      case Some(d) => Some(QuestDuration.withName(d))
-    }
-    val difficulty = v.difficulty match {
-      case None => None
-      case Some(d) => Some(QuestDifficulty.withName(d))
-    }
+    val duration = QuestDuration.withName(v.duration)
+    val difficulty = QuestDifficulty.withName(v.difficulty)
 
     api.voteQuestProposal(VoteQuestProposalRequest(r.user, vote, duration, difficulty))
   }

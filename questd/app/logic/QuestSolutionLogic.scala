@@ -28,7 +28,7 @@ class QuestSolutionLogic(
    * Calculate points for quest solution voting.
    */
   def calculatePoints = {
-    qs.rating.pointsRandom + qs.rating.pointsFriends * constants.friendsVoteMult + qs.rating.pointsInvited * constants.invitedVoteMult
+    qs.rating.pointsRandom + qs.rating.pointsFriends * constants.FriendsVoteMult + qs.rating.pointsInvited * constants.InvitedVoteMult
   }
 
   private def reviewsToFinishVoting = 3

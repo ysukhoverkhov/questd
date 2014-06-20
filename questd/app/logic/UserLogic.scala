@@ -20,6 +20,7 @@ import models.store.dao.ThemeDAO
 import components.random.RandomComponent
 import logic.user._
 import logic.user.util._
+import logic.user.util.QuestSolutionSelection
 
 // This should not go to DB directly since API may have cache layer.
 class UserLogic(
@@ -34,10 +35,11 @@ class UserLogic(
     with VotingQuestSolutions
     with DailyResults
     with Friends
+    with Tasks
     with MiscUserLogic
     with QuestSelectUserLogic
     with SolutionSelectUserLogic
     
-    with CommonUtil {
+    with QuestSolutionSelection {
 }
 

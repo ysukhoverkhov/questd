@@ -5,7 +5,7 @@ import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
@@ -136,7 +136,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    */
   def getPublicProfile(request: GetPublicProfileRequest): ApiResult[GetPublicProfileResult] = handleDbException {
 
-    getUser(UserRequest(userId = Some(request.userId))) map { r =>
+    getUser(UserRequest(userId = Some(request.userId))) ifOk { r =>
       OkApiResult(Some(GetPublicProfileResult(
         allowed = OK,
         publicProfile = Some(r.user.profile.publicProfile))))
