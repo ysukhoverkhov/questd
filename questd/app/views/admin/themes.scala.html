@@ -29,6 +29,7 @@
     		<td>icon.contentType</td>
     		<td>icon.storage</td>
     		<td>icon.reference</td>
+    		<td>icon</td>
     	</tr>
 
 		@for(t <- themes) {
@@ -39,13 +40,21 @@
 	    		<td>@t.icon.contentType.toString</td>
 	    		<td>@t.icon.storage</td>
 	    		<td>@t.icon.reference</td>
-
+	    		<td><img src="@t.icon.reference" alt="@t.icon.reference" width="102" height="77"></td>
+	    		
 				<td><a href="@controllers.web.admin.routes.ThemesCRUD.themes(t.id.toString)">edit</a></td>
-				<td><a href="@controllers.web.admin.routes.ThemesCRUD.deleteThemeCB(t.id.toString)">delete</a></td>
+				<td><a onClick='deleteFun("@controllers.web.admin.routes.ThemesCRUD.deleteThemeCB(t.id.toString)")' >delete</a></td>
 	    	</tr>
 	    }
 	</table>
 	</p>
 	
+	<script>
+		function deleteFun(url) {
+			if (confirm("Are you sure want to delete it?")) {
+				window.open(url, "_self");
+			}
+		}
+	</script>
 }
 
