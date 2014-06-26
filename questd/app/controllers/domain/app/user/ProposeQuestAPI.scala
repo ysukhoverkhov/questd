@@ -140,7 +140,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         } ifOk { r =>
 
           r.user.profile.questProposalContext.takenTheme ifSome { v =>
-            
+
             db.quest.create(
               Quest(
                 authorUserId = r.user.id,
@@ -150,9 +150,9 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                   content = request.quest,
                   vip = r.user.profile.publicProfile.vip)))
 
-        val u = db.user.resetQuestProposal(
-          user.id,
-          config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
+            val u = db.user.resetQuestProposal(
+              user.id,
+              config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
 
             OkApiResult(Some(ProposeQuestResult(OK, u.map(_.profile))))
 
