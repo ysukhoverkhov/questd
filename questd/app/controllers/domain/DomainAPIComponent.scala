@@ -38,6 +38,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent =>
     with MessagesAPI 
     with MiscAPI
     with TasksAPI
+    with TutorialAPI
     
     with QuestAPI
     with QuestsFetchAPI

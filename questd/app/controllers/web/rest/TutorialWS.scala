@@ -6,8 +6,8 @@ import controllers.web.rest.component.helpers.AccessToWSInstance
 
 object TutorialWS extends Controller with AccessToWSInstance {
 
-  def getTutorialState = TODO
-  def setTutorialState = TODO
+  def getTutorialState = ws.getTutorialState
+  def setTutorialState = ws.setTutorialState
   def assignTutorialTask = TODO
   def setTutorialTaskProgress = TODO
 }
