@@ -46,7 +46,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
   def getQuestThemeCost(request: GetQuestThemeCostRequest): ApiResult[GetQuestThemeCostResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetQuestThemeCostResult(OK, user.costOfPurchasingQuestProposal)))
+    OkApiResult(GetQuestThemeCostResult(OK, user.costOfPurchasingQuestProposal))
   }
 
   /**
@@ -77,15 +77,15 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
               }
 
               val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t.info), sampleQuest, reward)
-              OkApiResult(Some(PurchaseQuestThemeResult(OK, u.map(_.profile))))
+              OkApiResult(PurchaseQuestThemeResult(OK, u.map(_.profile)))
             }
 
-            case None => OkApiResult(Some(PurchaseQuestThemeResult(OutOfContent)))
+            case None => OkApiResult(PurchaseQuestThemeResult(OutOfContent))
           }
         }
 
       }
-      case a => OkApiResult(Some(PurchaseQuestThemeResult(a)))
+      case a => OkApiResult(PurchaseQuestThemeResult(a))
     }
   }
 
@@ -95,7 +95,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
   def getQuestThemeTakeCost(request: GetQuestThemeTakeCostRequest): ApiResult[GetQuestThemeTakeCostResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetQuestThemeTakeCostResult(OK, user.costOfTakingQuestTheme)))
+    OkApiResult(GetQuestThemeTakeCostResult(OK, user.costOfTakingQuestTheme))
   }
 
   /**
@@ -114,12 +114,12 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
             val u = db.user.takeQuestTheme(r.user.id, v, r.user.getCooldownForTakeTheme)
             db.theme.updateLastUseDate(v.id)
-            OkApiResult(Some(TakeQuestThemeResult(OK, u.map(_.profile))))
+            OkApiResult(TakeQuestThemeResult(OK, u.map(_.profile)))
           }
         }
       }
 
-      case (a: ProfileModificationResult) => OkApiResult(Some(TakeQuestThemeResult(a)))
+      case (a: ProfileModificationResult) => OkApiResult(TakeQuestThemeResult(a))
     }
   }
 
@@ -140,7 +140,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         } ifOk { r =>
 
           r.user.profile.questProposalContext.takenTheme ifSome { v =>
-            
+
             db.quest.create(
               Quest(
                 authorUserId = r.user.id,
@@ -150,14 +150,16 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                   content = request.quest,
                   vip = r.user.profile.publicProfile.vip)))
 
-            val u = db.user.resetQuestProposal(user.id)
+            val u = db.user.resetQuestProposal(
+              user.id,
+              config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
 
-            OkApiResult(Some(ProposeQuestResult(OK, u.map(_.profile))))
+            OkApiResult(ProposeQuestResult(OK, u.map(_.profile)))
 
           }
         }
       }
-      case (a: ProfileModificationResult) => OkApiResult(Some(ProposeQuestResult(a)))
+      case (a: ProfileModificationResult) => OkApiResult(ProposeQuestResult(a))
     }
   }
 
@@ -171,13 +173,15 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
       case OK => {
 
         adjustAssets(AdjustAssetsRequest(user = user, cost = Some(user.costOfGivingUpQuestProposal))) ifOk { r =>
-          val u = db.user.resetQuestProposal(r.user.id)
-          OkApiResult(Some(GiveUpQuestProposalResult(OK, u.map(_.profile))))
+          val u = db.user.resetQuestProposal(
+            r.user.id,
+            config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
+          OkApiResult(GiveUpQuestProposalResult(OK, u.map(_.profile)))
         }
 
       }
 
-      case (a: ProfileModificationResult) => OkApiResult(Some(GiveUpQuestProposalResult(a)))
+      case (a: ProfileModificationResult) => OkApiResult(GiveUpQuestProposalResult(a))
     }
   }
 
@@ -186,8 +190,10 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    */
   def deadlineQuestProposal(request: DeadlineQuestProposalRequest): ApiResult[DeadlineQuestProposalResult] = handleDbException {
     storeProposalOutOfTimePenalty(StoreProposalOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuestProposal)) ifOk { r =>
-      val u = db.user.resetQuestProposal(r.user.id)
-      OkApiResult(Some(DeadlineQuestProposalResult(u)))
+      val u = db.user.resetQuestProposal(
+        r.user.id,
+        config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
+      OkApiResult(DeadlineQuestProposalResult(u))
     }
   }
 
@@ -197,7 +203,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
   def getQuestProposalGiveUpCost(request: GetQuestProposalGiveUpCostRequest): ApiResult[GetQuestProposalGiveUpCostResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetQuestProposalGiveUpCostResult(OK, user.costOfGivingUpQuestProposal)))
+    OkApiResult(GetQuestProposalGiveUpCostResult(OK, user.costOfGivingUpQuestProposal))
   }
 
   /**
@@ -215,7 +221,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, reward = Some(quest.approveReward)))
 
       case QuestStatus.RatingBanned =>
-        OkApiResult(Some(StoreProposalInDailyResultResult(author)))
+        OkApiResult(StoreProposalInDailyResultResult(author))
 
       case QuestStatus.CheatingBanned =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, penalty = Some(author.penaltyForCheatingQuest)))
@@ -224,11 +230,11 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, penalty = Some(author.penaltyForIACQuest)))
 
       case QuestStatus.OldBanned =>
-        OkApiResult(Some(StoreProposalInDailyResultResult(author)))
+        OkApiResult(StoreProposalInDailyResultResult(author))
     }
 
     r ifOk {
-      OkApiResult(Some(RewardQuestProposalAuthorResult()))
+      OkApiResult(RewardQuestProposalAuthorResult())
     }
   }
 

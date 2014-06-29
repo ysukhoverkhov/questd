@@ -21,11 +21,11 @@ trait UserDAO extends BaseDAO[User] {
   
   def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: PublicProfileWithID, defeatReward: Assets, victoryReward: Assets): Option[User]
   def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User]
-  def resetQuestSolution(id: String): Option[User]
+  def resetQuestSolution(id: String, shouldResetCooldown: Boolean): Option[User]
   
   def purchaseQuestTheme(id: String, purchasedTheme: ThemeWithID, sampleQuest: Option[QuestInfo], approveReward: Assets): Option[User]
   def takeQuestTheme(id: String, takenTheme: ThemeWithID, cooldown: Date): Option[User]
-  def resetQuestProposal(id: String): Option[User]
+  def resetQuestProposal(id: String, shouldResetCooldown: Boolean): Option[User]
   
   def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User]
   
@@ -62,5 +62,7 @@ trait UserDAO extends BaseDAO[User] {
   
   def setGender(id: String, gender: String): Option[User]
   def setDebug(id: String, debug: String): Option[User]
+
+  def setTutorialState(id: String, platform: String, state: String): Option[User]
 }
 

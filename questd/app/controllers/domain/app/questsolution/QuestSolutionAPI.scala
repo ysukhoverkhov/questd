@@ -45,7 +45,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         pornChange = checkInc(vote, IAPorn))
     } ifSome { o =>
       updateQuestSolutionState(UpdateQuestSolutionStateRequest(o)) ifOk
-        OkApiResult(Some(VoteQuestSolutionUpdateResult()))
+        OkApiResult(VoteQuestSolutionUpdateResult())
     }
 
   }
@@ -101,7 +101,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         OkApiResult(None)
       }
 
-    authorUpdateResult ifOk OkApiResult(Some(UpdateQuestSolutionStateResult()))
+    authorUpdateResult ifOk OkApiResult(UpdateQuestSolutionStateResult())
   }
 
 }

@@ -99,7 +99,7 @@ object constants {
   /**
    * Number of themes skips for coins.
    */
-  def NumberOfThemesSkipsForCoins = 4
+  def NumberOfThemesSkipsForCoins = 12
 
   /**
    * Number of quests skip for coins.
@@ -117,5 +117,10 @@ object constants {
    */
   val RatingForCompletingDailyTasks = 500
   
+  /**
+   * Tutorial
+   */
+  val NumberOfStoredTutorialPlatforms = 10
+  val MaxLengthOfTutorialPlatformState = 256
 }
 

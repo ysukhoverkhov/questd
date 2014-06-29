@@ -170,16 +170,29 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def resetQuestSolution(id: String): Option[User] = {
+  def resetQuestSolution(id: String, shouldResetCooldown: Boolean): Option[User] = {
+
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$set" -> MongoDBObject(
+      "profile.questSolutionContext.numberOfPurchasedQuests" -> 0))
+
+    if (shouldResetCooldown) {
+      queryBuilder += ("$unset" -> MongoDBObject(
+        "profile.questSolutionContext.purchasedQuest" -> "",
+        "profile.questSolutionContext.takenQuest" -> "",
+        "profile.questSolutionContext.questAuthor" -> "",
+        "profile.questSolutionContext.questCooldown" -> ""))
+    } else {
+      queryBuilder += ("$unset" -> MongoDBObject(
+        "profile.questSolutionContext.purchasedQuest" -> "",
+        "profile.questSolutionContext.takenQuest" -> "",
+        "profile.questSolutionContext.questAuthor" -> ""))
+    }
+
     findAndModify(
       id,
-      MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "profile.questSolutionContext.numberOfPurchasedQuests" -> 0)),
-        ("$unset" -> MongoDBObject(
-          "profile.questSolutionContext.purchasedQuest" -> "",
-          "profile.questSolutionContext.takenQuest" -> "",
-          "profile.questSolutionContext.questAuthor" -> ""))))
+      queryBuilder.result)
   }
 
   /**
@@ -233,16 +246,28 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def resetQuestProposal(id: String): Option[User] = {
+  def resetQuestProposal(id: String, shouldResetCooldown: Boolean): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$set" -> MongoDBObject(
+      "profile.questProposalContext.numberOfPurchasedThemes" -> 0))
+
+    if (shouldResetCooldown) {
+      queryBuilder += ("$unset" -> MongoDBObject(
+        "profile.questProposalContext.purchasedTheme" -> "",
+        "profile.questProposalContext.takenTheme" -> "",
+        "profile.questProposalContext.sampleQuest" -> "",
+        "profile.questProposalContext.questProposalCooldown" -> ""))
+    } else {
+      queryBuilder += ("$unset" -> MongoDBObject(
+        "profile.questProposalContext.purchasedTheme" -> "",
+        "profile.questProposalContext.takenTheme" -> "",
+        "profile.questProposalContext.sampleQuest" -> ""))
+    }
+
     findAndModify(
       id,
-      MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "profile.questProposalContext.numberOfPurchasedThemes" -> 0)),
-        ("$unset" -> MongoDBObject(
-          "profile.questProposalContext.purchasedTheme" -> "",
-          "profile.questProposalContext.takenTheme" -> "",
-          "profile.questProposalContext.sampleQuest" -> ""))))
+      queryBuilder.result)
   }
 
   /**
@@ -603,6 +628,17 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         ("$set" -> MongoDBObject(
           "profile.debug" -> debug))))
+  }
+
+  /**
+   *
+   */
+  def setTutorialState(id: String, platform: String, state: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          s"tutorial.clientTutorialState.$platform" -> state))))
   }
 
 }

@@ -275,6 +275,41 @@ class UserDAOSpecs
       ou.get.profile.dailyTasks.completed must beEqualTo(0.4f)
       ou.get.profile.dailyTasks.rewardReceived must beEqualTo(true)
     }
+    
+    "resetQuestProposal should reset cooldown if required" in new WithApplication(appWithTestDatabase) {
+      val userid = "resetQuestProposal"
+      val date = new Date(1000)
+    
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid,
+        profile = Profile(
+          questProposalContext = QuestProposalConext(
+            questProposalCooldown = date))))
+
+      val ou = db.user.resetQuestProposal(userid, true)
+    
+          ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown != date)
+    }
+
+    "resetQuestProposal should reset cooldown if not required" in new WithApplication(appWithTestDatabase) {
+      val userid = "resetQuestProposal"
+      val date = new Date(1000)
+
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid,
+        profile = Profile(
+          questProposalContext = QuestProposalConext(
+            questProposalCooldown = date))))
+
+      val ou = db.user.resetQuestProposal(userid, false)
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown == date)
+    }
+    
   }
 }
 
