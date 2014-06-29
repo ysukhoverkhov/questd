@@ -106,7 +106,7 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
             questForm.votersCount))
         }
 
-        Redirect(controllers.web.admin.routes.QuestsCRUD.entries(questForm.id))
+        Redirect(controllers.web.admin.routes.QuestsCRUD.quests(questForm.id))
       })
   }
 

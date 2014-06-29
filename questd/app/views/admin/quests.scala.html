@@ -32,14 +32,14 @@
 				    		<td>@q.info.level</td>
 				    		<td>@q.info.difficulty</td>
 				    		<td>@q.info.duration</td>
-							<td><a href="@controllers.web.admin.routes.QuestsCRUD.entries(q.id)">edit</a></td>
+							<td><a href="@controllers.web.admin.routes.QuestsCRUD.quests(q.id)">edit</a></td>
 							
 	    				</tr>
 	   				}
 				</table>
     		</td>
     		<td>
-				@form(action = controllers.web.admin.routes.QuestsCRUD.update()) {
+				@form(action = controllers.web.admin.routes.QuestsCRUD.updateQuest()) {
 					@inputText(newQuestForm("id"), 'size -> 18, 'readonly -> "readonly")
 					@select(newQuestForm("status"), options(List("OnVoting", "InRotation", "RatingBanned", "CheatingBanned", "IACBanned", "OldBanned")))
 					@inputText(newQuestForm("level"), 'size -> 5)

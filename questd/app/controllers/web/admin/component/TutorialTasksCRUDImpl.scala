@@ -90,7 +90,7 @@ trait TutorialTasksCRUDImpl extends Controller { this: APIAccessor =>
                   requiredCount = taskForm.requiredCount)))
         }
 
-        Redirect(controllers.web.admin.routes.TutorialTasksCRUD.entries(taskForm.id))
+        Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(taskForm.id))
       })
   }
 

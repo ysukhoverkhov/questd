@@ -10,8 +10,8 @@ object QuestsCRUD extends Controller {
 
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
-  def entries(id: String) = admin.quests(id)
+  def quests(id: String) = admin.quests(id)
 
-  def update = admin.updateQuest
+  def updateQuest = admin.updateQuest
 }
 

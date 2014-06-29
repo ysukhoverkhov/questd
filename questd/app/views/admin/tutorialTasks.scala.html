@@ -23,14 +23,14 @@
 				    		<td>@t.description</td>
 				    		<td>@t.taskType.toString</td>
 				    		<td>@t.requiredCount</td>
-							<td><a href="@controllers.web.admin.routes.TutorialTasksCRUD.entries(t.id)">edit</a></td>
+							<td><a href="@controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(t.id)">edit</a></td>
 							
 	    				</tr>
 	   				}
 				</table>
     		</td>
     		<td>
-				@form(action = controllers.web.admin.routes.TutorialTasksCRUD.update()) {
+				@form(action = controllers.web.admin.routes.TutorialTasksCRUD.updateTutorialTask()) {
 					@inputText(newTaskForm("id"), 'size -> 18, 'readonly -> "readonly")
 					@inputText(newTaskForm("description"), 'size -> 40)
 					@inputText(newTaskForm("task type"), 'size -> 40)

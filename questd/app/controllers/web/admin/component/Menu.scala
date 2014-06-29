@@ -9,8 +9,8 @@ private[admin] object Menu {
       "Config" -> controllers.web.admin.routes.Config.config("").absoluteURL(false),
       "Themes" -> controllers.web.admin.routes.ThemesCRUD.themes("").absoluteURL(false),
       "Users" -> controllers.web.admin.routes.UsersCRUD.users().absoluteURL(false),
-      "Quests" -> controllers.web.admin.routes.QuestsCRUD.entries("").absoluteURL(false),
+      "Quests" -> controllers.web.admin.routes.QuestsCRUD.quests("").absoluteURL(false),
       "Solutions" -> controllers.web.admin.routes.SolutionsCRUD.solutions().absoluteURL(false),
-      "Tutorial Tasks" -> controllers.web.admin.routes.TutorialTasksCRUD.entries("").absoluteURL(false)
+      "Tutorial Tasks" -> controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks("").absoluteURL(false)
       )
 }
