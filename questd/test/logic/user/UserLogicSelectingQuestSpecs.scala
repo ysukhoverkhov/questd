@@ -80,7 +80,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
-      api.getFriendsQuests(any[GetFriendsQuestsRequest]) returns OkApiResult(Some(GetFriendsQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getFriendsQuests(any[GetFriendsQuestsRequest]) returns OkApiResult(GetFriendsQuestsResult(List(createQuest(qid, "author")).iterator))
 
       val u = User()
       val q = u.getRandomQuestForSolution
@@ -97,7 +97,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
-      api.getShortlistQuests(any[GetShortlistQuestsRequest]) returns OkApiResult(Some(GetShortlistQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getShortlistQuests(any[GetShortlistQuestsRequest]) returns OkApiResult(GetShortlistQuestsResult(List(createQuest(qid, "author")).iterator))
 
       val u = User()
       val q = u.getRandomQuestForSolution
@@ -114,7 +114,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
-      api.getLikedQuests(any[GetLikedQuestsRequest]) returns OkApiResult(Some(GetLikedQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getLikedQuests(any[GetLikedQuestsRequest]) returns OkApiResult(GetLikedQuestsResult(List(createQuest(qid, "author")).iterator))
 
       val u = User()
       val q = u.getRandomQuestForSolution
@@ -131,7 +131,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
-      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List(createQuest(qid, "author")).iterator))
 
       val u = User()
       val q = u.getQuestProposalToVote
@@ -149,7 +149,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator))
 
       val u = User()
       val q = u.getRandomQuestForSolution
@@ -172,7 +172,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.75
       rand.nextInt(4) returns 0 thenReturns 1 thenReturns 2
 
-      api.getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, Some((-10, 11)), List("1", "2", "3"))) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, Some((-10, 11)), List("1", "2", "3"))) returns OkApiResult(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator))
 
       val q = u.getRandomQuestForSolution
 
@@ -193,7 +193,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.95
       rand.nextInt(4) returns 1
 
-      api.getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, Some((-2, 19)), List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, Some((-2, 19)), List("2"))) returns OkApiResult(GetAllQuestsResult(List(createQuest(qid, "author")).iterator))
 
       val q = u.getRandomQuestForSolution
 
@@ -213,7 +213,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.0
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List(createQuest(qid, "author")).iterator))
 
       u.getRandomQuestForSolution
 
@@ -230,7 +230,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 1.0
 
-      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List(createQuest(qid, "author")).iterator))
 
       u.getRandomQuestForSolution
 
@@ -250,10 +250,10 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 1.0 thenReturns 1.0
 
       api.getAllQuests(any[GetAllQuestsRequest]) returns
-        OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator))) thenReturns
-        OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator))) thenReturns
-        OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator))) thenReturns
-        OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+        OkApiResult(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)) thenReturns
+        OkApiResult(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)) thenReturns
+        OkApiResult(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)) thenReturns
+        OkApiResult(GetAllQuestsResult(List(createQuest(qid, "author")).iterator))
 
       val q = u.getRandomQuestForSolution
 
@@ -269,8 +269,8 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List().iterator)))
-      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List().iterator))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List(createQuest(qid, "author")).iterator))
 
       u.getRandomQuestForSolution
 
@@ -286,8 +286,8 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(Some(GetVIPQuestsResult(List().iterator)))
-      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(Some(GetAllQuestsResult(List().iterator))) thenReturns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List().iterator))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List().iterator)) thenReturns OkApiResult(GetAllQuestsResult(List(createQuest(qid, "author")).iterator))
 
       u.getRandomQuestForSolution
 
@@ -309,7 +309,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       api.getAllQuests(GetAllQuestsRequest(
         QuestStatus.OnVoting,
         None,
-        List("2"))) returns OkApiResult(Some(GetAllQuestsResult(List(createQuest(qid, "author")).iterator)))
+        List("2"))) returns OkApiResult(GetAllQuestsResult(List(createQuest(qid, "author")).iterator))
 
       val q = u.getQuestProposalToVote
 

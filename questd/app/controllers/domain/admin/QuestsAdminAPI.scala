@@ -33,7 +33,7 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
   def allQuests(request: AllQuestsRequest): ApiResult[AllQuestsResult] = handleDbException {
     Logger.debug("Admin request for all Quests.")
 
-    OkApiResult(Some(AllQuestsResult(db.quest.all)))
+    OkApiResult(AllQuestsResult(db.quest.all))
   }
 
   /**
@@ -42,7 +42,7 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
   def getQuestAdmin(request: GetQuestAdminRequest): ApiResult[GetQuestAdminResult] = handleDbException {
     Logger.debug("Admin request for geting a quest.")
 
-    OkApiResult(Some(GetQuestAdminResult(db.quest.readById(request.id))))
+    OkApiResult(GetQuestAdminResult(db.quest.readById(request.id)))
   }
 
   /**
@@ -55,7 +55,7 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
 
     db.theme.create(request.theme.copy(id = ID.generateUUID()))
 
-    OkApiResult(Some(CreateThemeResult()))
+    OkApiResult(CreateThemeResult())
   }
 
   /**
@@ -82,7 +82,7 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
       case _ =>
     }
 
-    OkApiResult(Some(UpdateQuestAdminResult()))
+    OkApiResult(UpdateQuestAdminResult())
   }
 
 }

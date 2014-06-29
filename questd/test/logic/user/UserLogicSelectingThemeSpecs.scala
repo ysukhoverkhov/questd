@@ -64,8 +64,8 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
       val favTheme = 4
 
       def fillMocks = {
-        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(Some(AllThemesResult(themes.iterator)))
-        api.getTheme(GetThemeRequest(themes(favTheme).id)) returns OkApiResult(Some(GetThemeResult(themes(favTheme))))
+        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(AllThemesResult(themes.iterator))
+        api.getTheme(GetThemeRequest(themes(favTheme).id)) returns OkApiResult(GetThemeResult(themes(favTheme)))
 
         api.config returns createStubConfig
 
@@ -87,8 +87,8 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
       val themes = createStubThemes
 
       def fillMocks = {
-        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(Some(AllThemesResult(themes.iterator)))
-        api.getTheme(GetThemeRequest(themes(0).id)) returns OkApiResult(Some(GetThemeResult(themes(0))))
+        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(AllThemesResult(themes.iterator))
+        api.getTheme(GetThemeRequest(themes(0).id)) returns OkApiResult(GetThemeResult(themes(0)))
 
         api.config returns createStubConfig
 
@@ -107,7 +107,7 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
     "Return None if no themes in db" in {
 
       def fillMocks = {
-        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(Some(AllThemesResult(List[Theme]().iterator)))
+        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(AllThemesResult(List[Theme]().iterator))
         api.config returns createStubConfig
         rand.nextDouble returns 0.2
       }

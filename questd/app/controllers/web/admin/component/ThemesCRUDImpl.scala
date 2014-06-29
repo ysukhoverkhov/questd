@@ -51,7 +51,7 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
       newThemeForm
     } else {
       api.getTheme(GetThemeRequest(id)) match {
-        case OkApiResult(Some(GetThemeResult(theme))) => {
+        case OkApiResult(GetThemeResult(theme)) => {
 
           newThemeForm.fill(ThemeForm(
             id = theme.id.toString,
@@ -71,7 +71,7 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
     // Filling table.
     api.allThemes(AllThemesRequest(sorted = false)) match {
 
-      case OkApiResult(Some(a: AllThemesResult)) => Ok(
+      case OkApiResult(a: AllThemesResult) => Ok(
         views.html.admin.themes(
           Menu(request),
           a.themes.toList,

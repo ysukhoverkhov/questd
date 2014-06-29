@@ -24,7 +24,7 @@ private[domain] trait TutorialAPI { this: DBAccessor =>
   def getTutorialState(request: GetTutorialStateRequest): ApiResult[GetTutorialStateResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetTutorialStateResult(user.tutorial.clientTutorialState.get(platformId))))
+    OkApiResult(GetTutorialStateResult(user.tutorial.clientTutorialState.get(platformId)))
   }
 
   /**
@@ -35,17 +35,14 @@ private[domain] trait TutorialAPI { this: DBAccessor =>
 
     if (user.tutorial.clientTutorialState.size > logic.constants.NumberOfStoredTutorialPlatforms ||
       state.length > logic.constants.MaxLengthOfTutorialPlatformState) {
-      OkApiResult(Some(SetTutorialStateResult(LimitExceeded)))
+      OkApiResult(SetTutorialStateResult(LimitExceeded))
     } else {
 
       db.user.setTutorialState(user.id, platformId, state)
-      OkApiResult(Some(SetTutorialStateResult(OK)))
+      OkApiResult(SetTutorialStateResult(OK))
     }
 
   }
 
 }
 
-
-
-// TODO: remove option from OkApiResult
