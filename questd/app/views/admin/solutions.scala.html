@@ -1,0 +1,32 @@
+@(menuItems: Map[String, String], solutions: List[models.domain.QuestSolution])
+
+@import helper._
+
+@main("Solutions")(menuItems, Map()) {
+
+	<p>
+	<table border="1">
+	    	<tr>
+	    		<td>status</td>
+	    		<td>reviewsCount</td>
+	    		<td>pointsRandom</td>
+	    		<td>pointsFriends</td>
+	    		<td>pointsInvited</td>
+	    		<td>cheating</td>
+	    	</tr>
+		@for(s <- solutions) {
+	    	<tr>
+	    		<td>@s.status</td>
+	    		<td>@s.rating.reviewsCount</td>
+	    		<td>@s.rating.pointsRandom</td>
+	    		<td>@s.rating.pointsFriends</td>
+	    		<td>@s.rating.pointsInvited</td>
+	    		<td>@s.rating.cheating</td>
+	    	</tr>
+	    }
+	</table>
+	</p>
+	
+}
+
+
