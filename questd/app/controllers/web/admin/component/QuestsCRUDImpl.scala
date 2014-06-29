@@ -24,7 +24,7 @@ case class QuestForm(
 
 trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
 
-  val form = Form(
+  private val form = Form(
     mapping(
       "id" -> text,
       "status" -> nonEmptyText,
@@ -106,7 +106,7 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
             questForm.votersCount))
         }
 
-        Redirect(controllers.web.admin.routes.QuestsCRUD.quests(questForm.id))
+        Redirect(controllers.web.admin.routes.QuestsCRUD.entries(questForm.id))
       })
   }
 

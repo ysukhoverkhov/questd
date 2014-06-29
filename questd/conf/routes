@@ -106,9 +106,13 @@ GET		/admin/themes/byid/:id				controllers.web.admin.ThemesCRUD.themes(id)
 POST	/admin/themes/createTheme			controllers.web.admin.ThemesCRUD.createThemeCB
 GET		/admin/themes/deleteTheme/:id		controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
 
-GET		/admin/quests						controllers.web.admin.QuestsCRUD.quests(id = "")
-GET		/admin/quests/byid/:id				controllers.web.admin.QuestsCRUD.quests(id)
-POST	/admin/updateQuest					controllers.web.admin.QuestsCRUD.updateQuest
+GET		/admin/quests						controllers.web.admin.QuestsCRUD.entries(id = "")
+GET		/admin/quests/byid/:id				controllers.web.admin.QuestsCRUD.entries(id)
+POST	/admin/quests/update				controllers.web.admin.QuestsCRUD.update
+
+GET		/admin/tutorialTasks				controllers.web.admin.TutorialTasksCRUD.entries(id = "")
+GET		/admin/tutorialTasks/byid/:id		controllers.web.admin.TutorialTasksCRUD.entries(id)
+POST	/admin/tutorialTasks/update			controllers.web.admin.TutorialTasksCRUD.update
 
 GET		/admin/users						controllers.web.admin.UsersCRUD.users(id = "")
 GET		/admin/solutions					controllers.web.admin.SolutionsCRUD.solutions(id = "")

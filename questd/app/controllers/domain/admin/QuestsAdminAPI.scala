@@ -46,20 +46,7 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
   }
 
   /**
-   * Create new quest
-   */
-  def createQuestAdmin(request: CreateThemeRequest): ApiResult[CreateThemeResult] = handleDbException {
-    import models.domain.base.ID
-
-    Logger.debug("Admin request for create new quest.")
-
-    db.theme.create(request.theme.copy(id = ID.generateUUID()))
-
-    OkApiResult(CreateThemeResult())
-  }
-
-  /**
-   * Update new theme
+   * Update a quest
    */
   def updateQuestAdmin(request: UpdateQuestAdminRequest): ApiResult[UpdateQuestAdminResult] = handleDbException {
     Logger.debug("Admin request for update a quest " + request.id)

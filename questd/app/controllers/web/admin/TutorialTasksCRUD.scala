@@ -6,12 +6,12 @@ import play.api.mvc._
 import controllers.web.admin.component.AdminComponent
 import components.componentregistry.ComponentRegistrySingleton
 
-object QuestsCRUD extends Controller {
+object TutorialTasksCRUD extends Controller {
 
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
-  def entries(id: String) = admin.quests(id)
+  def entries(id: String) = admin.tutorialTasks(id)
 
-  def update = admin.updateQuest
+  def update = admin.updateTutorialTask
 }
 
