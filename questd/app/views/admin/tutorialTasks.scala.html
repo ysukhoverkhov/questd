@@ -33,7 +33,7 @@
 				@form(action = controllers.web.admin.routes.TutorialTasksCRUD.updateTutorialTask()) {
 					@inputText(newTaskForm("id"), 'size -> 18, 'readonly -> "readonly")
 					@inputText(newTaskForm("description"), 'size -> 40)
-					@inputText(newTaskForm("task type"), 'size -> 40)
+					@select(newTaskForm("taskType"), options(List("Client", "VoteQuestSolutions", "SubmitQuestResult", "AddToShortList", "VoteQuestProposals", "SubmitQuestProposal", "VoteReviews", "SubmitReviewsForResults", "SubmitReviewsForProposals", "GiveRewards", "LookThroughWinnersOfMyQuests", "LookThroughFriendshipProposals")))
 					@inputText(newTaskForm("requiredCount"), 'size -> 5)
 					@if(newTaskForm("id").value == None) {
 			 			<input type="submit" value="Create">
@@ -47,4 +47,3 @@
 	
 	
 }
-

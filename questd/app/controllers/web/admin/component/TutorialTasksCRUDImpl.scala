@@ -80,17 +80,21 @@ trait TutorialTasksCRUDImpl extends Controller { this: APIAccessor =>
       taskForm => {
 
         if (taskForm.id == "") {
-          //          val theme = Theme(id = "", text = themeForm.text, comment = themeForm.comment)
-          //          api.createTheme(CreateThemeRequest(theme))
+          api.createTutorialTaskAdmin(CreateTutorialTaskAdminRequest(
+            TutorialTask(
+              description = taskForm.description,
+              taskType = TaskType.withName(taskForm.taskType),
+              requiredCount = taskForm.requiredCount)))
         } else {
           api.updateTutorialTaskAdmin(UpdateTutorialTaskAdminRequest(
-              TutorialTask(
-                  description = taskForm.description,
-                  taskType = TaskType.withName(taskForm.taskType),
-                  requiredCount = taskForm.requiredCount)))
+            TutorialTask(
+              id = taskForm.id,
+              description = taskForm.description,
+              taskType = TaskType.withName(taskForm.taskType),
+              requiredCount = taskForm.requiredCount)))
         }
 
-        Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(taskForm.id))
+        Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
       })
   }
 
