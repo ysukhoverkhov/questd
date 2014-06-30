@@ -19,9 +19,26 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         rights = Rights.full))
   }
 
-  
-  def createSolution = {
+  def createSolutionInfoContent = {
     QuestSolutionInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None)
+  }
+
+  def createSolution(
+    userId: String,
+    questId: String,
+    status: String = QuestSolutionStatus.OnVoting.toString,
+    questLevel: Int = 1,
+    themeId: String = "tid") = {
+
+    QuestSolution(
+      userId = userId,
+      questLevel = questLevel,
+      info = QuestSolutionInfo(
+        content = createSolutionInfoContent,
+        vip = true,
+        themeId = themeId,
+        questId = questId),
+      status = status)
   }
 
   "Solve Quest API" should {
@@ -29,7 +46,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
     "Create regular solution for regular users" in context {
 
       val u = createUser(false)
-      val s = createSolution
+      val s = createSolutionInfoContent
 
       user.resetQuestSolution(any, any) returns Some(u)
 
@@ -48,12 +65,11 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
             questId = u.profile.questSolutionContext.takenQuest.get.id,
             vip = false)))
     }
-    
-    
+
     "Create VIP solution for VIP users" in context {
 
       val u = createUser(true)
-      val s = createSolution
+      val s = createSolutionInfoContent
 
       user.resetQuestSolution(any, any) returns Some(u)
 
@@ -71,6 +87,27 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
             themeId = u.profile.questSolutionContext.takenQuest.get.obj.themeId,
             questId = u.profile.questSolutionContext.takenQuest.get.id,
             vip = true)))
+    }
+
+    "Do not fight with himself in quest" in context {
+
+      val mySolution = createSolution("uid", "qid")
+
+      solution.allWithParams(
+        status = Some(QuestSolutionStatus.WaitingForCompetitor.toString),
+        questIds = List(mySolution.info.questId)) returns List(mySolution).iterator
+
+      api.tryFightQuest(TryFightQuestRequest(mySolution))
+      // db.solution.updateStatus was not called
+
+      success
+      
+    }
+
+    "receive reward for winning quest battle" in context {
+//      solution.allWithParams(any) returns List().iterator
+
+      todo
     }
   }
 
