@@ -6,5 +6,6 @@ case class TutorialTask (
   id: String = ID.generateUUID,
   taskType: TaskType.Value,
   description: String,
-  requiredCount: Int) extends ID 
+  requiredCount: Int,
+  reward: Assets) extends ID 
 

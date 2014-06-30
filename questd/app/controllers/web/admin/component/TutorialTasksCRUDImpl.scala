@@ -16,7 +16,10 @@ case class TutorialTaskForm(
   id: String,
   description: String,
   taskType: String,
-  requiredCount: Int)
+  requiredCount: Int,
+  rewardCoins: Int,
+  rewardMoney: Int,
+  rewardRating: Int)
 
 trait TutorialTasksCRUDImpl extends Controller { this: APIAccessor =>
 
@@ -25,7 +28,10 @@ trait TutorialTasksCRUDImpl extends Controller { this: APIAccessor =>
       "id" -> text,
       "description" -> nonEmptyText,
       "taskType" -> nonEmptyText,
-      "requiredCount" -> number)(TutorialTaskForm.apply)(TutorialTaskForm.unapply))
+      "requiredCount" -> number,
+      "rewardCoins" -> number,
+      "rewardMoney" -> number,
+      "rewardRating" -> number)(TutorialTaskForm.apply)(TutorialTaskForm.unapply))
 
   /**
    * Get all tutorial tasks
@@ -42,7 +48,10 @@ trait TutorialTasksCRUDImpl extends Controller { this: APIAccessor =>
             id = task.id,
             description = task.description,
             taskType = task.taskType.toString,
-            requiredCount = task.requiredCount))
+            requiredCount = task.requiredCount,
+            rewardCoins = task.reward.coins.toInt,
+            rewardMoney = task.reward.money.toInt,
+            rewardRating = task.reward.rating.toInt))
         }
         case _ => form
       }
@@ -79,19 +88,20 @@ trait TutorialTasksCRUDImpl extends Controller { this: APIAccessor =>
 
       taskForm => {
 
+        val tt = TutorialTask(
+          id = taskForm.id,
+          description = taskForm.description,
+          taskType = TaskType.withName(taskForm.taskType),
+          requiredCount = taskForm.requiredCount,
+          reward = Assets(
+            coins = taskForm.rewardCoins,
+            money = taskForm.rewardMoney,
+            rating = taskForm.rewardRating))
+
         if (taskForm.id == "") {
-          api.createTutorialTaskAdmin(CreateTutorialTaskAdminRequest(
-            TutorialTask(
-              description = taskForm.description,
-              taskType = TaskType.withName(taskForm.taskType),
-              requiredCount = taskForm.requiredCount)))
+          api.createTutorialTaskAdmin(CreateTutorialTaskAdminRequest(tt))
         } else {
-          api.updateTutorialTaskAdmin(UpdateTutorialTaskAdminRequest(
-            TutorialTask(
-              id = taskForm.id,
-              description = taskForm.description,
-              taskType = TaskType.withName(taskForm.taskType),
-              requiredCount = taskForm.requiredCount)))
+          api.updateTutorialTaskAdmin(UpdateTutorialTaskAdminRequest(tt))
         }
 
         Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
