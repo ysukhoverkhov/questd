@@ -5,7 +5,7 @@ import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
@@ -28,7 +28,7 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
     import request._
 
     def capMessages(u: User): User = {
-      if (u.messages.length >= logic.constants.numberOfStoredMessages) {
+      if (u.messages.length >= logic.constants.NumberOfStoredMessages) {
         db.user.removeOldestMessage(u.id) match {
           case Some(us) => capMessages(us)
           case None => {

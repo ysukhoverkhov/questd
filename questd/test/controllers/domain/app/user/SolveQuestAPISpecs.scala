@@ -17,14 +17,14 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         dailyAssetsDecrease = Assets())),
       profile = Profile(
         questSolutionContext = QuestSolutionContext(
-          takenQuest = Some(QuestInfoWithID("quest_id", QuestInfo(themeId = "theme_id", vip = false, content = QuestInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None, "")))),
+          takenQuest = Some(QuestInfoWithID("quest_id", QuestInfo(themeId = "theme_id", vip = false, content = QuestInfoContent(ContentReference(ContentType.Photo, "", ""), None, "")))),
           questDeadline = new Date(Long.MaxValue)),
         publicProfile = PublicProfile(vip = vip),
         rights = Rights.full))
   }
 
   def createSolutionInfoContent = {
-    QuestSolutionInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None)
+    QuestSolutionInfoContent(ContentReference(ContentType.Photo, "", ""), None)
   }
 
   def createSolution(

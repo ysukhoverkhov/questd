@@ -5,7 +5,7 @@ import play.Logger
 sealed abstract class ApiResult[+T] {
   def body: Option[T]
 
-  def map[T2](f: T => ApiResult[T2]): ApiResult[T2] = {
+  def ifOk[T2](f: T => ApiResult[T2]): ApiResult[T2] = {
     this match {
       case OkApiResult(Some(r)) => {
         f(r)
@@ -22,7 +22,7 @@ sealed abstract class ApiResult[+T] {
     }
   }
   
-  def map[T2](f: => ApiResult[T2]): ApiResult[T2] = {
+  def ifOk[T2](f: => ApiResult[T2]): ApiResult[T2] = {
     this match {
       case OkApiResult(_) => f
       case NotFoundApiResult() => NotFoundApiResult()

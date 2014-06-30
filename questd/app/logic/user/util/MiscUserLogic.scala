@@ -34,4 +34,12 @@ trait MiscUserLogic { this: UserLogic =>
       }
     }
   }
+  
+  /**
+   * Calculates time of next flip hour Date for user.
+   */
+  def getNextFlipHourDate = {
+    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
+    (DateTime.now(tz) + 1.day).hour(constants.FlipHour).minute(0).second(0) toDate ()
+  }
 }

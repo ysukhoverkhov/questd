@@ -27,7 +27,7 @@ trait UserDAO extends BaseDAO[User] {
   def takeQuestTheme(id: String, takenTheme: ThemeWithID, cooldown: Date): Option[User]
   def resetQuestProposal(id: String, shouldResetCooldown: Boolean): Option[User]
   
-  def resetCounters(id: String, resetPurchasesTimeout: Date): Option[User]
+  def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User]
   
   def addPrivateDailyResult(id: String, dailyResult: DailyResult): Option[User]
   def movePrivateDailyResultsToPublic(id: String, dailyResults: List[DailyResult]): Option[User]
@@ -56,5 +56,11 @@ trait UserDAO extends BaseDAO[User] {
   def addMessage(id: String, message: Message): Option[User]
   def removeOldestMessage(id: String): Option[User]
   def removeMessage(id: String, messageId: String): Option[User]
+  
+  def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User]
+  def incTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User]
+  
+  def setGender(id: String, gender: String): Option[User]
+  def setDebug(id: String, debug: String): Option[User]
 }
 
