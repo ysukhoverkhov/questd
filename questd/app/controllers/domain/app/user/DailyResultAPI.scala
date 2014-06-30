@@ -146,7 +146,6 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       user
     }
   }
-  
 }
 
 
