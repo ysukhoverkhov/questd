@@ -25,7 +25,7 @@ trait SolutionsCRUDImpl extends Controller { this: APIAccessor =>
       case OkApiResult(a: AllSolutionsResult) => Ok(
         views.html.admin.solutions(
           Menu(request),
-          a.solutions.toList))
+          a.solutions.toList.sortBy(_.info.questId)))
 
       case _ => Ok("Internal server error - themes not received.")
     }

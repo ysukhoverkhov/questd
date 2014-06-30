@@ -265,6 +265,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     Logger.debug("API - rewardQuestSolutionAuthor")
 
+    // TODO: read quest here only if this is required.
+    // TODO: test banned users are penalized correctly.
     db.quest.readById(solution.info.questId) match {
       case Some(q) => {
 

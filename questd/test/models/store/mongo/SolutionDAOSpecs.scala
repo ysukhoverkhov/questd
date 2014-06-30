@@ -158,6 +158,10 @@ class SolutionDAOSpecs extends Specification
       val themeIdsAndIds = db.solution.allWithParams(ids = List("q1", "q2"), questIds = List("t1", "t3")).toList
       themeIdsAndIds.map(_.id).size must beEqualTo(1)
       themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))
+
+      val statusWithQuestIds = db.solution.allWithParams(ids = List("q1", "q2"), status = Some(QuestStatus.OnVoting.toString)).toList
+      ids.map(_.id).size must beEqualTo(1)
+      ids.map(_.id) must beEqualTo(List(qs(1).id))
     }
 
   }
