@@ -14,6 +14,10 @@ class _ConfigParams {
 
   val UserHistoryDays = "20 01 User History Days"
 
+  val SolutionVoteTaskShare = "30 01 Solution Vote Task Share"
+  val AddToShortlistTaskProbability = "30 02 Add To Shortlist Task Probability"
+  val QuestVoteTaskShare = "30 03 Vote Quests task share"
+    
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
 
@@ -51,6 +55,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
   val configSectionName = "API"
 
   def ConfigParams = _ConfigParams
+  
   val defaultConfiguration = ConfigSection(
     configSectionName,
     Map(
@@ -61,6 +66,10 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.ActiveUserDays -> "7",
       ConfigParams.UserHistoryDays -> "15",
 
+      ConfigParams.SolutionVoteTaskShare -> "0.9",
+      ConfigParams.AddToShortlistTaskProbability -> "0.3",
+      ConfigParams.QuestVoteTaskShare -> "0.9",
+      
       ConfigParams.FavoriteThemesShare -> "0.2",
       ConfigParams.FavoriteThemesProbability -> "0.75",
 

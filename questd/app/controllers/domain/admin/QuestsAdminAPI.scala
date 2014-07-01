@@ -5,7 +5,7 @@ import play.Logger
 import components.DBAccessor
 import models.store._
 import models.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import controllers.domain._
 
 case class AllQuestsRequest()
@@ -68,11 +68,11 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
       case Some(q) => {
         db.quest.update(
           q.copy(
-            status = QuestStatus.withName(request.status).toString,
+            status = QuestStatus.withName(request.status),
             info = q.info.copy(
               level = request.level,
-              difficulty = QuestDifficulty.withName(request.difficulty).toString,
-              duration = QuestDuration.withName(request.duration).toString),
+              difficulty = QuestDifficulty.withName(request.difficulty),
+              duration = QuestDuration.withName(request.duration)),
           rating = q.rating.copy(
             points = request.points,
             cheating = request.cheating,

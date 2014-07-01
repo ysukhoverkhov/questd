@@ -19,6 +19,8 @@ private[user] abstract class BaseUserLogicSpecs extends Specification
   with RandomComponent
   with DatabaseComponent
   with DomainAPIComponent {
+
+  isolated
   
   val db = mock[Database]
   val api = mock[DomainAPI]

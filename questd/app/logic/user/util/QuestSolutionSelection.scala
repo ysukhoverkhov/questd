@@ -1,11 +1,9 @@
-package logic.user
-
-import logic.UserLogic
-import com.mongodb.BasicDBList
+package logic.user.util
 import models.domain._
-import com.mongodb.BasicDBObject
+import models.store.mongo.helpers.listToSuperFlattenList
+import logic.UserLogic
 
-trait CommonUtil { this: UserLogic =>
+trait QuestSolutionSelection { this: UserLogic =>
 
   /**
    * Select quest what is not or quest and not in given list.
@@ -60,7 +58,7 @@ trait CommonUtil { this: UserLogic =>
   /**
    * Check is string in list of dblists of strings.
    */
-  private[user] def listOfListsContainsString[C](l: List[List[C]], getQuestIdInReference: (C => String), s: String) = {
+  def listOfListsContainsString[C](l: List[List[C]], getQuestIdInReference: (C => String), s: String) = {
     import models.store.mongo.helpers._
     l.mongoFlatten.map(getQuestIdInReference).contains(s)
   }

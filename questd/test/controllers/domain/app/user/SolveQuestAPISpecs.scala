@@ -17,21 +17,21 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         dailyAssetsDecrease = Assets())),
       profile = Profile(
         questSolutionContext = QuestSolutionContext(
-          takenQuest = Some(QuestInfoWithID("quest_id", QuestInfo(themeId = "theme_id", vip = false, content = QuestInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None, "")))),
+          takenQuest = Some(QuestInfoWithID("quest_id", QuestInfo(themeId = "theme_id", vip = false, content = QuestInfoContent(ContentReference(ContentType.Photo, "", ""), None, "")))),
           questDeadline = new Date(Long.MaxValue)),
         publicProfile = PublicProfile(vip = vip),
         rights = Rights.full))
   }
 
   def createSolutionInfoContent = {
-    QuestSolutionInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None)
+    QuestSolutionInfoContent(ContentReference(ContentType.Photo, "", ""), None)
   }
 
   def createSolution(
     solutionId: String,
     userId: String,
     questId: String,
-    status: String = QuestSolutionStatus.WaitingForCompetitor.toString,
+    status: QuestSolutionStatus.Value = QuestSolutionStatus.WaitingForCompetitor,
     questLevel: Int = 1,
     themeId: String = "tid",
     points: Int = 0) = {
@@ -60,7 +60,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         vip = false,
         content = QuestInfoContent(
           media = ContentReference(
-            contentType = "type",
+            contentType = ContentType.Photo,
             storage = "la",
             reference = "tu"),
           icon = None,
@@ -144,8 +144,8 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         status = Some(QuestSolutionStatus.WaitingForCompetitor.toString),
         questIds = List(mySolution.info.questId)) returns List(mySolution, rivalSolution).iterator
 
-      solution.updateStatus(mySolution.id, QuestSolutionStatus.Won.toString) returns Some(mySolution.copy(status = QuestSolutionStatus.Won.toString))
-      solution.updateStatus(rivalSolution.id, QuestSolutionStatus.Lost.toString) returns Some(rivalSolution.copy(status = QuestSolutionStatus.Lost.toString))
+      solution.updateStatus(mySolution.id, QuestSolutionStatus.Won.toString) returns Some(mySolution.copy(status = QuestSolutionStatus.Won))
+      solution.updateStatus(rivalSolution.id, QuestSolutionStatus.Lost.toString) returns Some(rivalSolution.copy(status = QuestSolutionStatus.Lost))
 
       user.readById(mySolution.userId) returns Some(user1)
       user.readById(rivalSolution.userId) returns Some(user2)
