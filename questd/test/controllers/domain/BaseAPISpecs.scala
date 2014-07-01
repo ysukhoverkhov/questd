@@ -27,7 +27,7 @@ private[domain] abstract class BaseAPISpecs extends Specification
   
   val rand = mock[Random]
   
-  val api = spy(new DomainAPI)
+  val api = new DomainAPI
   // End constructing
 
   def mockConfiguration: Configuration = {

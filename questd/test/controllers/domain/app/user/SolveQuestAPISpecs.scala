@@ -126,7 +126,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
 
-      result must beEqualTo(OkApiResult(Some(TryFightQuestResult())))
+      result must beEqualTo(OkApiResult(TryFightQuestResult()))
 
       there were no(solution).updateStatus(any, any)
       there were no(user).storeSolutionInDailyResult(any, any)
@@ -154,7 +154,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
 
-      result must beEqualTo(OkApiResult(Some(TryFightQuestResult())))
+      result must beEqualTo(OkApiResult(TryFightQuestResult()))
 
       there were two(solution).updateStatus(any, any)
       there were two(user).readById(any)

@@ -62,5 +62,7 @@ trait UserDAO extends BaseDAO[User] {
   
   def setGender(id: String, gender: String): Option[User]
   def setDebug(id: String, debug: String): Option[User]
+
+  def setTutorialState(id: String, platform: String, state: String): Option[User]
 }
 

@@ -25,7 +25,7 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout)
 
-    OkApiResult(Some(ResetDailyTasksResult()))
+    OkApiResult(ResetDailyTasksResult())
   }
 
   /**
@@ -38,7 +38,7 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     if (user.profile.dailyTasks.tasks.count(t => t.taskType == request.taskType && t.currentCount < t.requiredCount) <= 0) {
     
       // Nothing to do.
-      OkApiResult(Some(MakeTaskResult(user)))
+      OkApiResult(MakeTaskResult(user))
     
     } else {
 
@@ -60,13 +60,13 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       val r1 = if (completed) {
         adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(nt.reward)))
       } else {
-        OkApiResult(Some(AdjustAssetsResult(user)))
+        OkApiResult(AdjustAssetsResult(user))
       }
 
       r1 ifOk { r =>
         val u = db.user.incTask(user.id, taskType.toString, newPercent, completed)
 
-        OkApiResult(Some(MakeTaskResult(u.get)))
+        OkApiResult(MakeTaskResult(u.get))
       }
     }
   }
