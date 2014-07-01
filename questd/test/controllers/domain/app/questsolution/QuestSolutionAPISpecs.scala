@@ -17,14 +17,14 @@ import logic.QuestSolutionLogic
 class QuestSolutionAPISpecs extends BaseAPISpecs {
 
   def createSolutionInfoContent = {
-    QuestSolutionInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None)
+    QuestSolutionInfoContent(ContentReference(ContentType.Photo, "", ""), None)
   }
 
   def createSolution(
     solutionId: String,
     userId: String,
     questId: String,
-    status: String = QuestSolutionStatus.OnVoting.toString,
+    status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting,
     questLevel: Int = 1,
     themeId: String = "tid",
     points: Int = 0) = {
@@ -53,7 +53,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
         vip = false,
         content = QuestInfoContent(
           media = ContentReference(
-            contentType = "type",
+            contentType = ContentType.Photo,
             storage = "la",
             reference = "tu"),
           icon = None,
@@ -72,7 +72,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       api.questSolution2Logic(sol) returns spiedQuestSolutionLogic
 
       spiedQuestSolutionLogic.shouldStopVoting returns true
-      solution.updateStatus(sol.id, QuestSolutionStatus.WaitingForCompetitor.toString) returns Some(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor.toString))      
+      solution.updateStatus(sol.id, QuestSolutionStatus.WaitingForCompetitor.toString) returns Some(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor))      
       user.readById(user1.id) returns Some(user1)
       quest.readById(q.id) returns Some(q)      
       
@@ -86,7 +86,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       
       there was one(solution).updateStatus(sol.id, QuestSolutionStatus.WaitingForCompetitor.toString)
       there was one(user).readById(user1.id)
-      there was one(api).rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor.toString), user1))
+      there was one(api).rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor), user1))
     }
   }
 }
