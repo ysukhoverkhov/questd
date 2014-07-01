@@ -37,82 +37,71 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def updateQuestStatus(request: UpdateQuestStatusRequest): ApiResult[UpdateQuestStatusResult] = handleDbException {
     import request._
 
-    def capPoints(quest: Quest): Option[Quest] = {
+    def capPoints(quest: Quest): Quest = {
       if (quest.rating.votersCount > Int.MaxValue / 2) {
         Logger.error("quest.rating.votersCount > Int.MaxValue / 2. this is the time to invent what to do with this.")
       }
-      
-      Some(quest)
+
+      quest
     }
 
-    def checkAddToRotation(quest: Quest): Option[Quest] = {
+    def checkAddToRotation(quest: Quest): Quest = {
       if (quest.shouldAddToRotation) {
         db.quest.updateStatus(quest.id, QuestStatus.InRotation.toString)
         db.quest.updateInfo(quest.id, quest.calculateQuestLevel, quest.calculateDuration.toString, quest.calculateDifficulty.toString)
-      } else
-        Some(quest)
+      }
+
+      quest
     }
 
-    def checkRemoveFromRotation(quest: Quest): Option[Quest] = {
+    def checkRemoveFromRotation(quest: Quest): Quest = {
       if (quest.shouldRemoveFromRotation)
         db.quest.updateStatus(quest.id, QuestStatus.RatingBanned.toString)
-      else
-        Some(quest)
+
+      quest
     }
 
-    def checkBanQuest(quest: Quest): Option[Quest] = {
+    def checkBanQuest(quest: Quest): Quest = {
       if (quest.shouldBanQuest)
         db.quest.updateStatus(quest.id, QuestStatus.IACBanned.toString)
-      else
-        Some(quest)
+
+      quest
     }
 
-    def checkCheatingQuest(quest: Quest): Option[Quest] = {
+    def checkCheatingQuest(quest: Quest): Quest = {
       if (quest.shouldCheatingQuest)
         db.quest.updateStatus(quest.id, QuestStatus.CheatingBanned.toString)
-      else
-        Some(quest)
+
+      quest
+
     }
 
-    def checkRemoveQuestFromVotingByTime(quest: Quest): Option[Quest] = {
+    def checkRemoveQuestFromVotingByTime(quest: Quest): Quest = {
       if (quest.shouldRemoveQuestFromVotingByTime)
         db.quest.updateStatus(quest.id, QuestStatus.OldBanned.toString)
-      else
-        Some(quest)
+
+      quest
     }
 
-    val funcs = List(
-      checkRemoveQuestFromVotingByTime _,
-      checkCheatingQuest _,
-      checkBanQuest _,
-      checkRemoveFromRotation _,
-      checkAddToRotation _,
-      capPoints _)
+    val updatedQuest =
+      checkRemoveQuestFromVotingByTime(
+        checkCheatingQuest(
+          checkBanQuest(
+            checkRemoveFromRotation(
+              checkAddToRotation(
+                capPoints(quest))))))
 
-    val updatedQuest = funcs.foldLeft[Option[Quest]](Some(quest))((r, f) => {
-      r.flatMap(f(_))
-    })
-
-    // TODO: change to ifSome
-    updatedQuest match {
-      case None => InternalErrorApiResult()
-      case Some(q) => {
-        if (q.status != quest.status) {
-          val authorId = quest.authorUserId
-          db.user.readById(authorId) match {
-            case None => {
-              Logger.error("Unable to find author of quest user " + authorId)
-              InternalErrorApiResult()
-            }
-            case Some(author) => {
-              rewardQuestProposalAuthor(RewardQuestProposalAuthorRequest(q, author))
-            }
-          }
+    if (updatedQuest.status != quest.status) {
+      val authorId = quest.authorUserId
+      db.user.readById(authorId) match {
+        case None => Logger.error("Unable to find author of quest user " + authorId)
+        case Some(author) => {
+          rewardQuestProposalAuthor(RewardQuestProposalAuthorRequest(updatedQuest, author))
         }
-
-        OkApiResult(Some(UpdateQuestStatusResult()))
       }
     }
+
+    OkApiResult(UpdateQuestStatusResult())
   }
 
   /**
@@ -126,7 +115,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     } ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } ifOk {
-      OkApiResult(Some(SkipQuestResult()))
+      OkApiResult(SkipQuestResult())
     }
 
   }
@@ -142,7 +131,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     } ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } ifOk {
-      OkApiResult(Some(TakeQuestUpdateResult()))
+      OkApiResult(TakeQuestUpdateResult())
     }
 
   }
@@ -192,7 +181,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     q ifSome { v => 
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } ifOk {
-      OkApiResult(Some(VoteQuestUpdateResult()))
+      OkApiResult(VoteQuestUpdateResult())
     }
   }
   
@@ -205,20 +194,20 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       Math.round(request.proposalsVoted / proposalsOnVoting * daysForQuestToEnter),
       config(ConfigParams.ProposalMinVotesToTakeRemovalDecision).toInt)
     val ratioToRemoveFromRotation: Double = request.proposalsLiked / request.proposalsVoted * config(ConfigParams.ProposalWorstLikesRatio).toDouble
-
+    
     Logger.info("Calculating proposals threshold")
     Logger.info(
-      s"  likesToAddToRotation = $likesToAddToRotation, proposalsLiked during last week = ${request.proposalsLiked}, proposalsOnVoting now = $proposalsOnVoting, daysForQuestToEnter = $daysForQuestToEnter")
+        s"  likesToAddToRotation = $likesToAddToRotation, proposalsLiked during last week = ${request.proposalsLiked}, proposalsOnVoting now = $proposalsOnVoting, daysForQuestToEnter = $daysForQuestToEnter") 
     Logger.info(
-      s"  votesToRemoveFromRotation = $votesToRemoveFromRotation")
+        s"  votesToRemoveFromRotation = $votesToRemoveFromRotation")
     Logger.info(
-      s"  ratioToRemoveFromRotation = $ratioToRemoveFromRotation")
-        
+        s"  ratioToRemoveFromRotation = $ratioToRemoveFromRotation")
+    
     updateConfig(ConfigParams.ProposalLikesToEnterRotation -> likesToAddToRotation.toString)
     updateConfig(ConfigParams.ProposalVotesToLeaveVoting -> votesToRemoveFromRotation.toString)
     updateConfig(ConfigParams.ProposalRatioToLeaveVoting -> ratioToRemoveFromRotation.toString)
 
-    OkApiResult(Some(CalculateProposalThresholdsResult()))
+    OkApiResult(CalculateProposalThresholdsResult())
   }
 }
 

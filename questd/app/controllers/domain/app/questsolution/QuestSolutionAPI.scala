@@ -45,7 +45,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         pornChange = checkInc(vote, IAPorn))
     } ifSome { o =>
       updateQuestSolutionState(UpdateQuestSolutionStateRequest(o)) ifOk
-        OkApiResult(Some(VoteQuestSolutionUpdateResult()))
+        OkApiResult(VoteQuestSolutionUpdateResult())
     }
 
   }
@@ -61,59 +61,49 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
     def checkWaitCompetitor(qs: QuestSolution) = {
       if (qs.shouldStopVoting)
         db.solution.updateStatus(solution.id, QuestSolutionStatus.WaitingForCompetitor.toString)
-      else
-        Some(qs)
+
+      qs
     }
 
     def checkCheatingSolution(qs: QuestSolution) = {
       if (qs.shouldBanCheating)
         db.solution.updateStatus(solution.id, QuestSolutionStatus.CheatingBanned.toString)
-      else
-        Some(qs)
+
+      qs
     }
 
     def checkAICSolution(qs: QuestSolution) = {
       if (qs.shouldBanIAC)
         db.solution.updateStatus(solution.id, QuestSolutionStatus.IACBanned.toString)
-      else
-        Some(qs)
+
+      qs
     }
 
-    val funcs = List(
-      checkWaitCompetitor _,
-      checkCheatingSolution _,
-      checkAICSolution _)
-    // TODO: check similar bug in quests.
-    val updatedSolution = funcs.foldLeft[Option[QuestSolution]](Some(solution))((r, f) => {
-      r.flatMap(f(_))
-    })
+    val updatedSolution =
+      checkCheatingSolution(
+        checkAICSolution(
+          checkWaitCompetitor(
+            solution)))
 
-    // TODO: chanke here with ifOk
-    updatedSolution match {
-      case None => InternalErrorApiResult()
-      case Some(s) => {
-
-        val authorUpdateResult =
-          if (s.status != solution.status) {
-            val authorId = solution.userId
-
-            db.user.readById(authorId) match {
-              case None => {
-                Logger.error("Unable to find author of quest solution user " + authorId)
-                InternalErrorApiResult()
-              }
-              case Some(author) => {
-                rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(s, author))
-              }
-            }
-          } else {
-            OkApiResult(None)
+    val authorUpdateResult =
+      if (updatedSolution.status != solution.status) {
+        val authorId = solution.userId
+        db.user.readById(authorId) match {
+          case None => {
+            Logger.error("Unable to find author of quest solution user " + authorId)
+            InternalErrorApiResult()
           }
-
-    authorUpdateResult ifOk OkApiResult(Some(UpdateQuestSolutionStateResult()))
+          case Some(author) => {
+            rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(updatedSolution, author))
+          }
+        }
+      } else {
+        OkApiResult(None)
       }
-    }
+
+    authorUpdateResult ifOk OkApiResult(UpdateQuestSolutionStateResult())
   }
+
 }
 
 
