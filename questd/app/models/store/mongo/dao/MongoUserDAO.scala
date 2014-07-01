@@ -630,17 +630,6 @@ private[mongo] class MongoUserDAO
           "profile.debug" -> debug))))
   }
 
-  /**
-   *
-   */
-  def setTutorialState(id: String, platform: String, state: String): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        ("$set" -> MongoDBObject(
-          s"tutorial.clientTutorialState.$platform" -> state))))
-  }
-
 }
 
 /**

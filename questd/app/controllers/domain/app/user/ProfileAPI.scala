@@ -41,7 +41,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def getAllUsers(request: GetAllUsersRequest): ApiResult[GetAllUsersResult] = handleDbException {
     import request._
 
-    OkApiResult(GetAllUsersResult(db.user.all))
+    OkApiResult(Some(GetAllUsersResult(db.user.all)))
   }
 
   /**
@@ -52,7 +52,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     db.user.resetPurchases(user.id, user.getResetPurchasesTimeout)
 
-    OkApiResult(ResetPurchasesResult())
+    OkApiResult(Some(ResetPurchasesResult()))
   })
 
   /**
@@ -75,7 +75,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       user
     }
 
-    checkIncreaseLevel(CheckIncreaseLevelRequest(u)) ifOk { r => OkApiResult(AdjustAssetsResult(r.user)) }
+    checkIncreaseLevel(CheckIncreaseLevelRequest(u)) ifOk { r => OkApiResult(Some(AdjustAssetsResult(r.user))) }
   }
 
   /**
@@ -97,7 +97,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         }
     } else request.user
 
-    OkApiResult(CheckIncreaseLevelResult(u))
+    OkApiResult(Some(CheckIncreaseLevelResult(u)))
   }
 
   /**
@@ -111,7 +111,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       u.calculateRights
     }
 
-    OkApiResult(GetRightsAtLevelsResult(rights.toList))
+    OkApiResult(Some(GetRightsAtLevelsResult(rights.toList)))
   }
 
   /**
@@ -122,7 +122,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     val rv = constants.restrictions.filterKeys(request.functionality.contains(_))
 
-    OkApiResult(GetLevelsForRightsResult(rv))
+    OkApiResult(Some(GetLevelsForRightsResult(rv)))
   }
 
   /**
@@ -132,7 +132,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     import request._
 
     db.user.setDebug(user.id, debug) ifSome { v =>
-      OkApiResult(SetDebugResult(v))
+      OkApiResult(Some(SetDebugResult(v)))
     }
 
   }
@@ -144,7 +144,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     import request._
 
     db.user.setGender(user.id, gender.toString) ifSome { v =>
-      OkApiResult(SetGenderResult(v))
+      OkApiResult(Some(SetGenderResult(v)))
     }
 
   }

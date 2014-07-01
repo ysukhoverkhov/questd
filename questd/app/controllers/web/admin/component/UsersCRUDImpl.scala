@@ -22,7 +22,7 @@ trait UsersCRUDImpl extends Controller { this: APIAccessor =>
     // Filling table.
     api.allUsers(AllUsersRequest()) match {
 
-      case OkApiResult(a: AllUsersResult) => Ok(
+      case OkApiResult(Some(a: AllUsersResult)) => Ok(
         views.html.admin.users(
           Menu(request),
           a.users.toList))

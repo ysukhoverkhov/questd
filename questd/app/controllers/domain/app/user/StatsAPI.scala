@@ -51,7 +51,7 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
           proposalsLikedPerDay = if (deltaDays == Double.NaN) 0 else user.stats.proposalsLiked / deltaDays
         ))
 
-    OkApiResult(ShiftStatsResult())
+    OkApiResult(Some(ShiftStatsResult()))
   }
 
   /**
@@ -90,7 +90,7 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         u
     }
     
-    OkApiResult(ShiftHistoryResult())
+    OkApiResult(Some(ShiftHistoryResult()))
   }
   
 }

@@ -14,32 +14,22 @@ import components._
 
 case class ThemeForm(
   id: String,
-  name: String,
-  description: String,
-
+  text: String,
+  comment: String,
   iconType: String,
   iconStorage: String,
-  iconReference: String,
-
-  mediaType: String,
-  mediaStorage: String,
-  mediaReference: String)
+  iconReference: String)
 
 trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
 
   val newThemeForm = Form(
     mapping(
       "id" -> text,
-      "name" -> nonEmptyText,
-      "description" -> nonEmptyText,
-
+      "text" -> nonEmptyText,
+      "comment" -> nonEmptyText,
       "iconType" -> nonEmptyText,
       "iconStorage" -> nonEmptyText,
-      "iconReference" -> nonEmptyText,
-
-      "mediaType" -> nonEmptyText,
-      "mediaStorage" -> nonEmptyText,
-      "mediaReference" -> nonEmptyText)(ThemeForm.apply)(ThemeForm.unapply))
+      "iconReference" -> nonEmptyText)(ThemeForm.apply)(ThemeForm.unapply))
 
   /**
    * Get all themes action
@@ -51,18 +41,15 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
       newThemeForm
     } else {
       api.getTheme(GetThemeRequest(id)) match {
-        case OkApiResult(GetThemeResult(theme)) => {
+        case OkApiResult(Some(GetThemeResult(theme))) => {
 
           newThemeForm.fill(ThemeForm(
             id = theme.id.toString,
-            name = theme.info.name,
-            description = theme.info.description,
-            iconType = theme.info.icon.get.contentType.toString,
-            iconStorage = theme.info.icon.get.storage,
-            iconReference = theme.info.icon.get.reference,
-            mediaType = theme.info.media.contentType.toString,
-            mediaStorage = theme.info.media.storage,
-            mediaReference = theme.info.media.reference))
+            text = theme.text,
+            comment = theme.comment,
+            iconType = theme.icon.contentType.toString,
+            iconStorage = theme.icon.storage,
+            iconReference = theme.icon.reference))
         }
         case _ => newThemeForm
       }
@@ -71,7 +58,7 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
     // Filling table.
     api.allThemes(AllThemesRequest(sorted = false)) match {
 
-      case OkApiResult(a: AllThemesResult) => Ok(
+      case OkApiResult(Some(a: AllThemesResult)) => Ok(
         views.html.admin.themes(
           Menu(request),
           a.themes.toList,
@@ -106,23 +93,26 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
 
       themeForm => {
 
-        val theme = Theme(
-          id = themeForm.id,
-          info = ThemeInfo(
-            name = themeForm.name,
-            description = themeForm.description,
-            icon = Some(ContentReference(
+        if (themeForm.id == "") {
+          val theme = Theme(
+            id = "",
+            text = themeForm.text,
+            comment = themeForm.comment,
+            icon = ContentReference(
               contentType = ContentType.withName(themeForm.iconType),
               storage = themeForm.iconStorage,
-              reference = themeForm.iconReference)),
-            media = ContentReference(
-              contentType = ContentType.withName(themeForm.mediaType),
-              storage = themeForm.mediaStorage,
-              reference = themeForm.mediaReference)))
-
-        if (theme.id == "") {
+              reference = themeForm.iconReference))
           api.createTheme(CreateThemeRequest(theme))
         } else {
+
+          val theme = Theme(
+            id = themeForm.id,
+            text = themeForm.text,
+            comment = themeForm.comment,
+            icon = ContentReference(
+              contentType = ContentType.withName(themeForm.iconType),
+              storage = themeForm.iconStorage,
+              reference = themeForm.iconReference))
           api.updateTheme(UpdateThemeRequest(theme))
         }
 

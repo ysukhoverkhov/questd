@@ -45,7 +45,7 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
 
     db.user.addMessage(u.id, message)
 
-    OkApiResult(SendMessageResult())
+    OkApiResult(Some(SendMessageResult()))
   }
 
   /**
@@ -56,7 +56,7 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
 
     db.user.removeMessage(user.id, messageId)
 
-    OkApiResult(RemoveMessageResult(OK))
+    OkApiResult(Some(RemoveMessageResult(OK)))
   }
   
   /**
@@ -65,7 +65,7 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
   def getMessages(request: GetMessagesRequest): ApiResult[GetMessagesResult] = handleDbException {
     import request._
 
-    OkApiResult(GetMessagesResult(OK, user.messages))
+    OkApiResult(Some(GetMessagesResult(OK, user.messages)))
   }
 
 }

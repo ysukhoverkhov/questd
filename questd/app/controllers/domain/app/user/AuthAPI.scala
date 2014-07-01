@@ -32,7 +32,7 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
 //	  calculateProposalThresholds(CalculateProposalThresholdsRequest(10, 3))
 //      shiftHistory(ShiftHistoryRequest(user))
 
-      OkApiResult(LoginFBResult(uuid))
+      OkApiResult(Some(LoginFBResult(uuid)))
     }
 
     def genderFromFBUser(u: UserFB) = {
@@ -96,13 +96,15 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
       db.user.readBySessionId(params.sessionId.get) match {
         case None => NotAuthorisedApiResult()
 
-        case Some(user: User) => OkApiResult(UserResult(user))
+        case Some(user: User) => OkApiResult(
+          Some(UserResult(user)))
       }
     } else if (params.userId != null) {
       db.user.readById(params.userId.get) match {
         case None => NotFoundApiResult()
 
-        case Some(user: User) => OkApiResult(UserResult(user))
+        case Some(user: User) => OkApiResult(
+          Some(UserResult(user)))
       }
 
     } else {

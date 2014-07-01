@@ -20,7 +20,7 @@ private[domain] trait MiscAPI { this: DBAccessor =>
   def getTime(request: GetTimeRequest): ApiResult[GetTimeResult] = handleDbException {
     import request._
 
-    OkApiResult(GetTimeResult(new Date()))
+    OkApiResult(Some(GetTimeResult(new Date())))
   }
 
 }

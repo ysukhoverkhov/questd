@@ -41,18 +41,18 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
    * Get ids of users from our shortlist.
    */
   def getShortlist(request: GetShortlistRequest): ApiResult[GetShortlistResult] = handleDbException {
-    OkApiResult(GetShortlistResult(
+    OkApiResult(Some(GetShortlistResult(
       allowed = OK,
-      userIds = request.user.shortlist))
+      userIds = request.user.shortlist)))
   }
 
   /**
    * How much it'll take to shortlist person.
    */
   def costToShortlist(request: CostToShortlistRequest): ApiResult[CostToShortlistResult] = handleDbException {
-    OkApiResult(CostToShortlistResult(
+    OkApiResult(Some(CostToShortlistResult(
       allowed = OK,
-      cost = Some(request.user.costToShortlist)))
+      cost = Some(request.user.costToShortlist))))
   }
 
   /**
@@ -63,7 +63,7 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
     val maxShortlistSize = 1000
 
     if (request.user.shortlist.length >= maxShortlistSize) {
-      OkApiResult(AddToShortlistResult(LimitExceeded))
+      OkApiResult(Some(AddToShortlistResult(LimitExceeded)))
     } else {
       request.user.canShortlist match {
         case OK => {
@@ -79,11 +79,11 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
           } ifOk { r =>
 
             db.user.addToShortlist(r.user.id, request.userIdToAdd)
-            OkApiResult(AddToShortlistResult(OK, Some(r.user.profile.assets)))
+            OkApiResult(Some(AddToShortlistResult(OK, Some(r.user.profile.assets))))
             
           }
         }
-        case a => OkApiResult(AddToShortlistResult(a))
+        case a => OkApiResult(Some(AddToShortlistResult(a)))
       }
     }
 
@@ -97,9 +97,9 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
     request.user.canShortlist match {
       case OK => {
         db.user.removeFromShortlist(request.user.id, request.userIdToAdd)
-        OkApiResult(RemoveFromShortlistResult(OK))
+        OkApiResult(Some(RemoveFromShortlistResult(OK)))
       }
-      case a => OkApiResult(RemoveFromShortlistResult(a))
+      case a => OkApiResult(Some(RemoveFromShortlistResult(a)))
     }
 
   }

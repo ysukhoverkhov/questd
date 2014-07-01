@@ -15,7 +15,7 @@ trait ConfigImpl extends Controller { this: APIAccessor =>
 
   def leftMenu(implicit request: RequestHeader): Map[String, String] = {
     api.getConfiguration(GetConfigurationRequest()) match {
-      case OkApiResult(GetConfigurationResult(r)) => r.sections.foldLeft[Map[String, String]](Map()) {
+      case OkApiResult(Some(GetConfigurationResult(r))) => r.sections.foldLeft[Map[String, String]](Map()) {
         (c, v) => c + (v.id -> controllers.web.admin.routes.Config.config(v.id).absoluteURL(false))
       }
       case _ => Map()
@@ -24,7 +24,7 @@ trait ConfigImpl extends Controller { this: APIAccessor =>
 
   def config(sectionName: String) = Action { implicit request =>
     api.getConfigSection(GetConfigSectionRequest(sectionName)) match {
-      case OkApiResult(GetConfigSectionResult(Some(r))) => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, r.values.toSeq.sortBy(_._1)))
+      case OkApiResult(Some(GetConfigSectionResult(Some(r)))) => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, r.values.toSeq.sortBy(_._1)))
       case _ => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, Map().toSeq))
     }
   }

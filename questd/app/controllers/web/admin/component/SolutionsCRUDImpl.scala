@@ -22,7 +22,7 @@ trait SolutionsCRUDImpl extends Controller { this: APIAccessor =>
     // Filling table.
     api.allSolutions(AllSolutionsRequest()) match {
 
-      case OkApiResult(a: AllSolutionsResult) => Ok(
+      case OkApiResult(Some(a: AllSolutionsResult)) => Ok(
         views.html.admin.solutions(
           Menu(request),
           a.solutions.toList.sortBy(_.info.questId)))

@@ -33,7 +33,7 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
   def allQuests(request: AllQuestsRequest): ApiResult[AllQuestsResult] = handleDbException {
     Logger.debug("Admin request for all Quests.")
 
-    OkApiResult(AllQuestsResult(db.quest.all))
+    OkApiResult(Some(AllQuestsResult(db.quest.all)))
   }
 
   /**
@@ -42,11 +42,24 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
   def getQuestAdmin(request: GetQuestAdminRequest): ApiResult[GetQuestAdminResult] = handleDbException {
     Logger.debug("Admin request for geting a quest.")
 
-    OkApiResult(GetQuestAdminResult(db.quest.readById(request.id)))
+    OkApiResult(Some(GetQuestAdminResult(db.quest.readById(request.id))))
   }
 
   /**
-   * Update a quest
+   * Create new quest
+   */
+  def createQuestAdmin(request: CreateThemeRequest): ApiResult[CreateThemeResult] = handleDbException {
+    import models.domain.base.ID
+
+    Logger.debug("Admin request for create new quest.")
+
+    db.theme.create(request.theme.copy(id = ID.generateUUID()))
+
+    OkApiResult(Some(CreateThemeResult()))
+  }
+
+  /**
+   * Update new theme
    */
   def updateQuestAdmin(request: UpdateQuestAdminRequest): ApiResult[UpdateQuestAdminResult] = handleDbException {
     Logger.debug("Admin request for update a quest " + request.id)
@@ -69,7 +82,7 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
       case _ =>
     }
 
-    OkApiResult(UpdateQuestAdminResult())
+    OkApiResult(Some(UpdateQuestAdminResult()))
   }
 
 }
