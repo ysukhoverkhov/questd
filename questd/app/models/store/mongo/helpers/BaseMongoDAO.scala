@@ -155,17 +155,6 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
   }
 
   /**
-   * Clear all objects
-   */
-  def clear: Unit = wrapMongoException {
-    val wr = remove(MongoDBObject())
-
-    if (!wr.getLastError().ok) {
-      throw new DatabaseException(wr.getLastError().getErrorMessage())
-    }
-  }
-  
-  /**
    * All objects
    */
   def all: Iterator[T] = wrapMongoException {

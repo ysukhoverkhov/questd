@@ -39,7 +39,10 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
           Future {
 
             api.getUser(UserRequest(sessionId = Some(sessionid))) match {
-              case OkApiResult(body) => body.user
+              case OkApiResult(body) => body match {
+                case Some(result: UserResult) => result.user
+                case None => ServerError
+              }
 
               case NotAuthorisedApiResult() => {
                 Unauthorized(

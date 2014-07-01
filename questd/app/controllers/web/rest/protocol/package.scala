@@ -306,28 +306,6 @@ package object protocol {
    */
   
   type WSGetTimeResult = GetTimeResult
-  
-  
-  /**
-   * Tutorial
-   */
-  
-  case class WSGetTutorialStateRequest(
-    /// Id of a platform to get state for.
-    platformId: String)
-    
-  /// if no state for platform present empty result will be returned.
-  type WSGetTutorialStateResult = GetTutorialStateResult
 
-  
-  case class WSSetTutorialStateRequest(
-    /// Id of a platform to get state for.
-    platformId: String,
-    state: String)
-    
-  /// may return LimitExceeded in "allowed" field if there are too many platforms (logic.constants.NumberOfStoredTutorialPlatforms) 
-  /// or state is too long (logic.constants.MaxLengthOfTutorlaPlatformState).
-  type WSSetTutorialStateResult = SetTutorialStateResult
-  
 }
 

@@ -26,43 +26,43 @@ case class GetAllSolutionsResult(quests: Iterator[QuestSolution])
 private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
 
   def getFriendsSolutions(request: GetFriendsSolutionsRequest): ApiResult[GetFriendsSolutionsResult] = handleDbException {
-    OkApiResult(GetFriendsSolutionsResult(db.solution.allWithParams(
+    OkApiResult(Some(GetFriendsSolutionsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
       userIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
-      levels = request.levels)))
+      levels = request.levels))))
   }
 
   def getShortlistSolutions(request: GetShortlistSolutionsRequest): ApiResult[GetShortlistSolutionsResult] = handleDbException {
-    OkApiResult(GetShortlistSolutionsResult(db.solution.allWithParams(
+    OkApiResult(Some(GetShortlistSolutionsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
       userIds = request.user.shortlist,
-      levels = request.levels)))
+      levels = request.levels))))
   }
 
   def getSolutionsForLikedQuests(request: GetSolutionsForLikedQuestsRequest): ApiResult[GetSolutionsForLikedQuestsResult] = handleDbException {
     import models.store.mongo.helpers._
     
-    OkApiResult(GetSolutionsForLikedQuestsResult(db.solution.allWithParams(
+    OkApiResult(Some(GetSolutionsForLikedQuestsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
       levels = request.levels,
-      questIds = request.user.history.likedQuestProposalIds.mongoFlatten)))
+      questIds = request.user.history.likedQuestProposalIds.mongoFlatten))))
   }
 
   def getVIPSolutions(request: GetVIPSolutionsRequest): ApiResult[GetVIPSolutionsResult] = handleDbException {
-    OkApiResult(GetVIPSolutionsResult(db.solution.allWithParams(
+    OkApiResult(Some(GetVIPSolutionsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
       levels = request.levels,
       vip = Some(true),
-      themeIds = request.themeIds)))
+      themeIds = request.themeIds))))
   }
   
   def getAllSolutions(request: GetAllSolutionsRequest): ApiResult[GetAllSolutionsResult] = handleDbException {
     Logger.trace("getAllSolutions - " + request.toString)
 
-    OkApiResult(GetAllSolutionsResult(db.solution.allWithParams(
+    OkApiResult(Some(GetAllSolutionsResult(db.solution.allWithParams(
       status = Some(request.status.toString),
       levels = request.levels,
-      themeIds = request.themeIds)))
+      themeIds = request.themeIds))))
   }
 }
 

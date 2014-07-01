@@ -51,7 +51,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getQuestCost(request: GetQuestCostRequest): ApiResult[GetQuestCostResult] = handleDbException {
     import request._
 
-    OkApiResult(GetQuestCostResult(OK, user.costOfPurchasingQuest))
+    OkApiResult(Some(GetQuestCostResult(OK, user.costOfPurchasingQuest)))
   }
 
   /**
@@ -77,14 +77,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             case Some(q) => skipQuest(SkipQuestRequest(q))
           }
         } else {
-          OkApiResult(SkipQuestResult())
+          OkApiResult(Some(SkipQuestResult()))
         }
 
         v ifOk {
 
           // Updating user profile.
           user.getRandomQuestForSolution match {
-            case None => OkApiResult(PurchaseQuestResult(OutOfContent))
+            case None => OkApiResult(Some(PurchaseQuestResult(OutOfContent)))
             case Some(q) => {
               {
                 val questCost = user.costOfPurchasingQuest
@@ -103,7 +103,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                       r.user.rewardForLosingQuest(q),
                       r.user.rewardForWinningQuest(q))
 
-                    OkApiResult(PurchaseQuestResult(OK, u.map(_.profile)))
+                    OkApiResult(Some(PurchaseQuestResult(OK, u.map(_.profile))))
                   }
                 }
               }
@@ -112,7 +112,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         }
       }
 
-      case a => OkApiResult(PurchaseQuestResult(a))
+      case a => OkApiResult(Some(PurchaseQuestResult(a)))
     }
   }
 
@@ -122,7 +122,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getTakeQuestCost(request: GetTakeQuestCostRequest): ApiResult[GetTakeQuestCostResult] = handleDbException {
     import request._
 
-    OkApiResult(GetTakeQuestCostResult(OK, user.costOfTakingQuest))
+    OkApiResult(Some(GetTakeQuestCostResult(OK, user.costOfTakingQuest)))
   }
 
   /**
@@ -150,7 +150,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             }
           }
         } else {
-          OkApiResult(TakeQuestUpdateResult)
+          OkApiResult(Some(TakeQuestUpdateResult))
         }
 
         v ifOk {
@@ -166,14 +166,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               r.user.getCooldownForTakeQuest(pq.obj),
               r.user.getDeadlineForTakeQuest(pq.obj)) ifSome { usr =>
 
-                OkApiResult(TakeQuestResult(OK, Some(usr.profile)))
+                OkApiResult(Some(TakeQuestResult(OK, Some(usr.profile))))
 
               }
           }
         }
       }
 
-      case (a: ProfileModificationResult) => OkApiResult(TakeQuestResult(a))
+      case (a: ProfileModificationResult) => OkApiResult(Some(TakeQuestResult(a)))
     }
   }
 
@@ -206,14 +206,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               user.id,
               config(api.ConfigParams.DebugDisableSolutionCooldown) == "1") ifSome { u =>
 
-                OkApiResult(ProposeSolutionResult(OK, Some(u.profile)))
+                OkApiResult(Some(ProposeSolutionResult(OK, Some(u.profile))))
 
               }
           }
         }
       }
 
-      case (a: ProfileModificationResult) => OkApiResult(ProposeSolutionResult(a))
+      case (a: ProfileModificationResult) => OkApiResult(Some(ProposeSolutionResult(a)))
     }
   }
 
@@ -223,7 +223,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getQuestGiveUpCost(request: GetQuestGiveUpCostRequest): ApiResult[GetQuestGiveUpCostResult] = handleDbException {
     import request._
 
-    OkApiResult(GetQuestGiveUpCostResult(OK, user.costOfGivingUpQuest))
+    OkApiResult(Some(GetQuestGiveUpCostResult(OK, user.costOfGivingUpQuest)))
   }
 
   /**
@@ -237,11 +237,11 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           val u = db.user.resetQuestSolution(
             r.user.id,
             config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
-          OkApiResult(GiveUpQuestResult(OK, u.map(_.profile)))
+          OkApiResult(Some(GiveUpQuestResult(OK, u.map(_.profile))))
         }
       }
 
-      case (a: ProfileModificationResult) => OkApiResult(GiveUpQuestResult(a))
+      case (a: ProfileModificationResult) => OkApiResult(Some(GiveUpQuestResult(a)))
     }
   }
 
@@ -253,7 +253,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       val u = db.user.resetQuestSolution(
         r.user.id,
         config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
-      OkApiResult(DeadlineQuestResult(u))
+      OkApiResult(Some(DeadlineQuestResult(u)))
     }
   }
 
@@ -277,7 +277,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           }
 
           case QuestSolutionStatus.WaitingForCompetitor =>
-            tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
+            tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(Some(StoreSolutionInDailyResultResult(author)))
 
           case QuestSolutionStatus.Won =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
@@ -293,7 +293,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         }
 
         r ifOk {
-          OkApiResult(RewardQuestSolutionAuthorResult())
+          OkApiResult(Some(RewardQuestSolutionAuthorResult()))
         }
       }
       case None => {
@@ -363,7 +363,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
           }
 
-          OkApiResult(TryFightQuestResult())
+          OkApiResult(Some(TryFightQuestResult()))
 
         } else {
 
@@ -373,7 +373,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       } else {
 
         // We didn;t find competitor but this is ok.
-        OkApiResult(TryFightQuestResult())
+        OkApiResult(Some(TryFightQuestResult()))
       }
     }
 

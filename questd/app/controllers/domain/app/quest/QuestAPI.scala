@@ -110,7 +110,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
           }
         }
 
-    OkApiResult(UpdateQuestStatusResult())
+        OkApiResult(Some(UpdateQuestStatusResult()))
       }
     }
   }
@@ -126,7 +126,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     } ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } ifOk {
-      OkApiResult(SkipQuestResult())
+      OkApiResult(Some(SkipQuestResult()))
     }
 
   }
@@ -142,7 +142,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     } ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } ifOk {
-      OkApiResult(TakeQuestUpdateResult())
+      OkApiResult(Some(TakeQuestUpdateResult()))
     }
 
   }
@@ -192,7 +192,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     q ifSome { v => 
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } ifOk {
-      OkApiResult(VoteQuestUpdateResult())
+      OkApiResult(Some(VoteQuestUpdateResult()))
     }
   }
   
@@ -218,7 +218,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     updateConfig(ConfigParams.ProposalVotesToLeaveVoting -> votesToRemoveFromRotation.toString)
     updateConfig(ConfigParams.ProposalRatioToLeaveVoting -> ratioToRemoveFromRotation.toString)
 
-    OkApiResult(CalculateProposalThresholdsResult())
+    OkApiResult(Some(CalculateProposalThresholdsResult()))
   }
 }
 

@@ -31,7 +31,7 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
         val q = user.getQuestSolutionToVote
 
         q match {
-          case None => OkApiResult(GetQuestSolutionToVoteResult(OutOfContent))
+          case None => OkApiResult(Some(GetQuestSolutionToVoteResult(OutOfContent)))
           case Some(a) => {
             val qsi = QuestSolutionInfoWithID(a.id, a.info)
             val questInfo = db.quest.readById(a.info.questId).map(_.info)
@@ -41,12 +41,12 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
               InternalErrorApiResult()
             } else {
               val u = db.user.selectQuestSolutionVote(user.id, qsi, questInfo.get)
-              OkApiResult(GetQuestSolutionToVoteResult(OK, u.map(_.profile)))
+              OkApiResult(Some(GetQuestSolutionToVoteResult(OK, u.map(_.profile))))
             }
           }
         }
       }
-      case a => OkApiResult(GetQuestSolutionToVoteResult(a))
+      case a => OkApiResult(Some(GetQuestSolutionToVoteResult(a)))
     }
   }
 
@@ -92,13 +92,13 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
                 None
               }
 
-              OkApiResult(VoteQuestSolutionResult(OK, u.map(_.profile), Some(reward), solver))
+              OkApiResult(Some(VoteQuestSolutionResult(OK, u.map(_.profile), Some(reward), solver)))
             }
           }
         }
       }
 
-      case a => OkApiResult(VoteQuestSolutionResult(a))
+      case a => OkApiResult(Some(VoteQuestSolutionResult(a)))
     }
   }
 

@@ -19,7 +19,7 @@ private[domain] trait UsersAdminAPI { this: DBAccessor =>
   def allUsers(request: AllUsersRequest): ApiResult[AllUsersResult] = handleDbException {
     Logger.debug("Admin request for all users.")
 
-    OkApiResult(AllUsersResult(db.user.all))
+    OkApiResult(Some(AllUsersResult(db.user.all)))
   }
 
 }

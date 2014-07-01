@@ -32,9 +32,9 @@ private[domain] trait ThemesAdminAPI { this: DBAccessor =>
     Logger.debug("Admin request for all themes.")
 
     if (request.sorted)
-      OkApiResult(AllThemesResult(db.theme.allSortedByUseDate))
+      OkApiResult(Some(AllThemesResult(db.theme.allSortedByUseDate)))
     else
-      OkApiResult(AllThemesResult(db.theme.all))
+      OkApiResult(Some(AllThemesResult(db.theme.all)))
   }
 
   /**
@@ -47,7 +47,7 @@ private[domain] trait ThemesAdminAPI { this: DBAccessor =>
 
     db.theme.create(request.theme.copy(id = ID.generateUUID()))
 
-    OkApiResult(CreateThemeResult())
+    OkApiResult(Some(CreateThemeResult()))
   }
 
   /**
@@ -59,7 +59,7 @@ private[domain] trait ThemesAdminAPI { this: DBAccessor =>
     // Update allowed here.
     db.theme.update(request.theme)
 
-    OkApiResult(UpdateThemeResult())
+    OkApiResult(Some(UpdateThemeResult()))
   }
 
   /**
@@ -69,7 +69,7 @@ private[domain] trait ThemesAdminAPI { this: DBAccessor =>
     Logger.debug("Admin request for getting theme by id.")
 
     db.theme.readById(request.id) match {
-      case Some(r) => OkApiResult(GetThemeResult(r))
+      case Some(r) => OkApiResult(Some(GetThemeResult(r)))
       case None => NotFoundApiResult()
     }
   }
@@ -81,7 +81,7 @@ private[domain] trait ThemesAdminAPI { this: DBAccessor =>
     Logger.debug("Admin request for delete theme " + request.id.toString)
     db.theme.delete(request.id)
 
-    OkApiResult(DeleteThemeResult())
+    OkApiResult(Some(DeleteThemeResult()))
   }
 
 }

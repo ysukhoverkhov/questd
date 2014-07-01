@@ -11,7 +11,7 @@ import org.json4s._
 
 private[component] trait CommonFunctions { this: QuestController with SecurityWSImpl =>
 
-  def wrapApiCall[T <: AnyRef](apiCall: AuthenticatedRequest[AnyContent] => ApiResult[T])(body: T => SimpleResult) = Authenticated.async { implicit request =>
+  def wrapApiCall[T <: AnyRef](apiCall: AuthenticatedRequest[AnyContent] => ApiResult[T])(body: Option[T] => SimpleResult) = Authenticated.async { implicit request =>
     Future {
 
       try {
@@ -37,8 +37,11 @@ private[component] trait CommonFunctions { this: QuestController with SecurityWS
     }
   }
 
-  def writeBodyInResponse[T <: AnyRef](body: T): SimpleResult = {
-    Ok(Json.write[T](body)).as(JSON)
+  def writeBodyInResponse[T <: AnyRef](body: Option[T]): SimpleResult = {
+    body match {
+      case Some(r) => Ok(Json.write[T](r)).as(JSON)
+      case _ => ServerError
+    }
   }
 
   def wrapApiCallReturnBody[T <: AnyRef](apiCall: AuthenticatedRequest[AnyContent] => ApiResult[T]) = wrapApiCall(apiCall)(writeBodyInResponse)

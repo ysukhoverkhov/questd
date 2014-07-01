@@ -57,9 +57,9 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
     } ifOk { r =>
 
-      OkApiResult(GetFriendsResult(
+      OkApiResult(Some(GetFriendsResult(
         allowed = OK,
-        userIds = r.user.friends))
+        userIds = r.user.friends)))
 
     }
 
@@ -72,14 +72,14 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
     db.user.readById(request.friendId) match {
       case Some(u) => {
-        OkApiResult(CostToRequestFriendshipResult(
+        OkApiResult(Some(CostToRequestFriendshipResult(
           allowed = OK,
-          cost = Some(request.user.costToAddFriend(u))))
+          cost = Some(request.user.costToAddFriend(u)))))
       }
 
       case None => {
-        OkApiResult(CostToRequestFriendshipResult(
-          allowed = OutOfContent))
+        OkApiResult(Some(CostToRequestFriendshipResult(
+          allowed = OutOfContent)))
       }
     }
   }
@@ -91,8 +91,8 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
     if (request.friendId == request.user.id ||
       request.user.friends.map(_.friendId).contains(request.friendId)) {
-      OkApiResult(AskFriendshipResult(
-        allowed = OutOfContent))
+      OkApiResult(Some(AskFriendshipResult(
+        allowed = OutOfContent)))
     } else {
       db.user.readById(request.friendId) match {
         case Some(u) => {
@@ -108,16 +108,16 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
                   Friendship(request.friendId, FriendshipStatus.Invited),
                   Friendship(r.user.id, FriendshipStatus.Invites))
 
-                OkApiResult(AskFriendshipResult(OK, Some(r.user.profile.assets)))
+                OkApiResult(Some(AskFriendshipResult(OK, Some(r.user.profile.assets))))
               }
             }
-            case a => OkApiResult(AskFriendshipResult(a))
+            case a => OkApiResult(Some(AskFriendshipResult(a)))
           }
         }
 
         case None => {
-          OkApiResult(AskFriendshipResult(
-            allowed = OutOfContent))
+          OkApiResult(Some(AskFriendshipResult(
+            allowed = OutOfContent)))
         }
       }
     }
@@ -133,7 +133,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
       request.user.friends.find {
         x => (x.friendId == request.friendId) && (x.status == FriendshipStatus.Invites.toString())
       } == None) {
-      OkApiResult(RespondFriendshipResult(allowed = OutOfContent))
+      OkApiResult(Some(RespondFriendshipResult(allowed = OutOfContent)))
     } else {
       if (request.accept == true) {
         db.user.updateFriendship(
@@ -159,7 +159,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
         }
       }
 
-      OkApiResult(RespondFriendshipResult(OK))
+      OkApiResult(Some(RespondFriendshipResult(OK)))
     }
   }
 
@@ -171,8 +171,8 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
       || request.user.friends.find {
         x => (x.friendId == request.friendId) && (x.status == FriendshipStatus.Accepted.toString() || x.status == FriendshipStatus.Invited.toString())
       } == None) {
-      OkApiResult(RemoveFromFriendsResult(
-        allowed = OutOfContent))
+      OkApiResult(Some(RemoveFromFriendsResult(
+        allowed = OutOfContent)))
     } else {
 
       db.user.removeFriendship(request.user.id, request.friendId)
@@ -186,7 +186,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
           }
         }
 
-        OkApiResult(RemoveFromFriendsResult(OK))
+        OkApiResult(Some(RemoveFromFriendsResult(OK)))
       }
     }
   }

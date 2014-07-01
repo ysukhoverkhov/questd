@@ -24,7 +24,6 @@ import com.github.nscala_time.time.Imports.DateTime
 import com.github.nscala_time.time.Imports.richDateTime
 import logic.LogicBootstrapper
 import java.util.Date
-import models.domain.stubCreators._
 
 class UserLogicSpecs extends BaseUserLogicSpecs {
 
@@ -33,7 +32,7 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
    */
   private def createStubThemes: List[Theme] = {
     (for (i <- List.range(1, 11)) yield {
-      createThemeStub(name = i.toString, desc = i.toString)
+      Theme(text = i.toString, comment = i.toString)
     })
   }
 
@@ -64,8 +63,8 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
       val favTheme = 4
 
       def fillMocks = {
-        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(AllThemesResult(themes.iterator))
-        api.getTheme(GetThemeRequest(themes(favTheme).id)) returns OkApiResult(GetThemeResult(themes(favTheme)))
+        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(Some(AllThemesResult(themes.iterator)))
+        api.getTheme(GetThemeRequest(themes(favTheme).id)) returns OkApiResult(Some(GetThemeResult(themes(favTheme))))
 
         api.config returns createStubConfig
 
@@ -87,8 +86,8 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
       val themes = createStubThemes
 
       def fillMocks = {
-        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(AllThemesResult(themes.iterator))
-        api.getTheme(GetThemeRequest(themes(0).id)) returns OkApiResult(GetThemeResult(themes(0)))
+        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(Some(AllThemesResult(themes.iterator)))
+        api.getTheme(GetThemeRequest(themes(0).id)) returns OkApiResult(Some(GetThemeResult(themes(0))))
 
         api.config returns createStubConfig
 
@@ -107,7 +106,7 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
     "Return None if no themes in db" in {
 
       def fillMocks = {
-        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(AllThemesResult(List[Theme]().iterator))
+        api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(Some(AllThemesResult(List[Theme]().iterator)))
         api.config returns createStubConfig
         rand.nextDouble returns 0.2
       }

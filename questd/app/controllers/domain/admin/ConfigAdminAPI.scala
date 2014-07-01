@@ -40,7 +40,7 @@ private[domain] trait ConfigAdminAPI { this: DBAccessor =>
   def getConfigSection(request: GetConfigSectionRequest): ApiResult[GetConfigSectionResult] = handleDbException {
     checkInit()
 
-    OkApiResult(GetConfigSectionResult(adminConfig(request.name)))
+    OkApiResult(Some(GetConfigSectionResult(adminConfig(request.name))))
   }
 
   /**
@@ -48,7 +48,7 @@ private[domain] trait ConfigAdminAPI { this: DBAccessor =>
    */
   def getConfiguration(request: GetConfigurationRequest): ApiResult[GetConfigurationResult] = handleDbException {
     checkInit()
-    OkApiResult(GetConfigurationResult(adminConfig))
+    OkApiResult(Some(GetConfigurationResult(adminConfig)))
   }
 
   /**
@@ -57,7 +57,7 @@ private[domain] trait ConfigAdminAPI { this: DBAccessor =>
   def setConfigSection(request: SetConfigSectionRequest) = handleDbException {
     storeConfigInDB(request.section)
 
-    OkApiResult(SetConfigSectionResult)
+    OkApiResult(Some(SetConfigSectionResult))
   }
 
 }

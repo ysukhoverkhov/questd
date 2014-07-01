@@ -7,17 +7,21 @@ sealed abstract class ApiResult[+T] {
 
   def ifOk[T2](f: T => ApiResult[T2]): ApiResult[T2] = {
     this match {
-      case OkApiResult(r) => {
+      case OkApiResult(Some(r)) => {
         f(r)
       }
 
+      case OkApiResult(None) => {
+        Logger.error("OkApiResult should contain result, but it doesn't")
+        InternalErrorApiResult()
+      }
       case NotFoundApiResult() => NotFoundApiResult()
       case NotAuthorisedApiResult() => NotAuthorisedApiResult()
       case InternalErrorApiResult() => InternalErrorApiResult()
 
     }
   }
-
+  
   def ifOk[T2](f: => ApiResult[T2]): ApiResult[T2] = {
     this match {
       case OkApiResult(_) => f
@@ -28,9 +32,7 @@ sealed abstract class ApiResult[+T] {
   }
 }
 
-final case class OkApiResult[T](value: T) extends ApiResult[T] {
-  val body = Some(value)
-}
+final case class OkApiResult[T](body: Option[T]) extends ApiResult[T]
 final case class NotFoundApiResult() extends ApiResult[Nothing] { val body = None }
 final case class NotAuthorisedApiResult() extends ApiResult[Nothing] { val body = None }
 final case class InternalErrorApiResult() extends ApiResult[Nothing] { val body = None }

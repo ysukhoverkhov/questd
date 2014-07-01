@@ -19,7 +19,7 @@ private[domain] trait SolutionsAdminAPI { this: DBAccessor =>
   def allSolutions(request: AllSolutionsRequest): ApiResult[AllSolutionsResult] = handleDbException {
     Logger.debug("Admin request for all Solutions.")
 
-    OkApiResult(AllSolutionsResult(db.solution.all))
+    OkApiResult(Some(AllSolutionsResult(db.solution.all)))
   }
 
 }
