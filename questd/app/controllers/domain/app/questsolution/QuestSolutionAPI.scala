@@ -58,47 +58,58 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
     def checkWaitCompetitor(qs: QuestSolution) = {
       if (qs.shouldStopVoting)
         db.solution.updateStatus(solution.id, QuestSolutionStatus.WaitingForCompetitor.toString)
-
-      qs
+      else
+        Some(qs)
     }
 
     def checkCheatingSolution(qs: QuestSolution) = {
       if (qs.shouldBanCheating)
         db.solution.updateStatus(solution.id, QuestSolutionStatus.CheatingBanned.toString)
-
-      qs
+      else
+        Some(qs)
     }
 
     def checkAICSolution(qs: QuestSolution) = {
       if (qs.shouldBanIAC)
         db.solution.updateStatus(solution.id, QuestSolutionStatus.IACBanned.toString)
-
-      qs
+      else
+        Some(qs)
     }
 
-    val updatedSolution =
-      checkCheatingSolution(
-        checkAICSolution(
-          checkWaitCompetitor(
-            solution)))
+    val funcs = List(
+      checkWaitCompetitor _,
+      checkCheatingSolution _,
+      checkAICSolution _)
+    // TODO: check similar bug in quests.
+    val updatedSolution = funcs.foldLeft[Option[QuestSolution]](Some(solution))((r, f) => {
+      r.flatMap(f(_))
+    })
 
-    val authorUpdateResult =
-      if (updatedSolution.status != solution.status) {
-        val authorId = solution.userId
-        db.user.readById(authorId) match {
-          case None => {
-            Logger.error("Unable to find author of quest solution user " + authorId)
-            InternalErrorApiResult()
+    // TODO: chanke here with ifOk
+    updatedSolution match {
+      case None => InternalErrorApiResult()
+      case Some(s) => {
+
+        val authorUpdateResult =
+          if (s.status != solution.status) {
+            val authorId = solution.userId
+
+            db.user.readById(authorId) match {
+              case None => {
+                Logger.error("Unable to find author of quest solution user " + authorId)
+                InternalErrorApiResult()
+              }
+              case Some(author) => {
+                rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(s, author))
+              }
+            }
+          } else {
+            OkApiResult(None)
           }
-          case Some(author) => {
-            rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(updatedSolution, author))
-          }
-        }
-      } else {
-        OkApiResult(None)
+
+        authorUpdateResult map OkApiResult(Some(UpdateQuestSolutionStateResult()))
       }
-
-    authorUpdateResult map OkApiResult(Some(UpdateQuestSolutionStateResult()))
+    }
   }
 
 }
