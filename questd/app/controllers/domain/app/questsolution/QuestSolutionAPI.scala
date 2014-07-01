@@ -111,7 +111,6 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
       }
     }
   }
-
 }
 
 
