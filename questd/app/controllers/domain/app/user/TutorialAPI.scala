@@ -16,7 +16,10 @@ case class GetTutorialStateResult(state: Option[String])
 case class SetTutorialStateRequest(user: User, platformId: String, state: String)
 case class SetTutorialStateResult(allowed: ProfileModificationResult)
 
-private[domain] trait TutorialAPI { this: DBAccessor =>
+case class AssignTutorialTaskRequest(user: User, taskId: String)
+case class AssignTutorialTaskResult(allowed: ProfileModificationResult)
+
+private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Get state of tutorial for a specified platform.
@@ -37,12 +40,48 @@ private[domain] trait TutorialAPI { this: DBAccessor =>
       state.length > logic.constants.MaxLengthOfTutorialPlatformState) {
       OkApiResult(SetTutorialStateResult(LimitExceeded))
     } else {
-
       db.user.setTutorialState(user.id, platformId, state)
       OkApiResult(SetTutorialStateResult(OK))
     }
 
   }
 
+  /**
+   * Assign client task to user.
+   */
+  def assignTutorialTask(request: AssignTutorialTaskRequest): ApiResult[AssignTutorialTaskResult] = handleDbException {
+    import request._
+// TODO test me.
+    // 1. check is the task was already given.
+    if (user.tutorial.assignedTutorialTaskIds.contains(taskId)) {
+      OkApiResult(AssignTutorialTaskResult(LimitExceeded))
+    } else {
+      db.tutorialTask.readById(taskId) match {
+        case Some(t) => {
+          // 2. If rewardReceived is true remove all tasks and give current one as a solely task.
+          if (user.profile.dailyTasks.rewardReceived == true) {
+            db.user.resetTasks(
+              user.id,
+              DailyTasks(tasks = List(), reward = Assets()),
+              user.getResetTasksTimeout)
+          }
+          
+          // 3. Add reward of current task to reward for current daily tasks and increase timeout to infinity.
+          val taskToAdd = t.task
+          val reward = t.reward 
+
+          db.user.addTasks(
+              user.id,
+              List(taskToAdd),
+              reward)
+
+          OkApiResult(AssignTutorialTaskResult(OK))
+        }
+        case None => {
+          OkApiResult(AssignTutorialTaskResult(OutOfContent))
+        }
+      }
+    }
+  }
 }
 

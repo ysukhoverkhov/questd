@@ -328,6 +328,13 @@ package object protocol {
   /// may return LimitExceeded in "allowed" field if there are too many platforms (logic.constants.NumberOfStoredTutorialPlatforms) 
   /// or state is too long (logic.constants.MaxLengthOfTutorlaPlatformState).
   type WSSetTutorialStateResult = SetTutorialStateResult
+ 
   
+  case class WSAssignTutorialTaskRequest(
+      taskId: String)
+  
+  /// LimitExceeded if task was already requested.
+  /// OutOfContent if task with this id is not exists.
+  type WSAssignTutorialTaskResult = AssignTutorialTaskResult
 }
 

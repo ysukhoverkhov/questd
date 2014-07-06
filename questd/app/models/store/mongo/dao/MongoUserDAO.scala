@@ -592,6 +592,22 @@ private[mongo] class MongoUserDAO
   }
 
   /**
+   * TODO: test me.
+   */
+  def addTasks(id: String, newTasks: List[Task], additionalReward: Assets): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.reward.coins" -> additionalReward.coins,
+          "profile.dailyTasks.reward.money" -> additionalReward.money,
+          "profile.dailyTasks.reward.rating" -> additionalReward.rating)),
+        ("$push" -> MongoDBObject(
+          "profile.dailyTasks.tasks" -> MongoDBObject(
+            "$each" -> newTasks.map(grater[Task].asDBObject(_)))))))
+  }
+
+  /**
    *
    */
   def incTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
@@ -604,8 +620,7 @@ private[mongo] class MongoUserDAO
           "profile.dailyTasks.tasks.$.currentCount" -> 1)),
         ("$set" -> MongoDBObject(
           "profile.dailyTasks.completed" -> completed,
-          "profile.dailyTasks.rewardReceived" -> rewardReceived))
-          ))
+          "profile.dailyTasks.rewardReceived" -> rewardReceived))))
   }
 
   /**
