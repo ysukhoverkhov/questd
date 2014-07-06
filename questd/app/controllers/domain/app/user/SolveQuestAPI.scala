@@ -265,38 +265,44 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     Logger.debug("API - rewardQuestSolutionAuthor")
 
-    // TODO: read quest here only if this is required.
-    // TODO: test banned users are penalized correctly.
-    db.quest.readById(solution.info.questId) match {
-      case Some(q) => {
+    case class QuestNotFoundException() extends Throwable
 
-        val r = solution.status match {
-          case QuestSolutionStatus.OnVoting => {
-            Logger.error("We are rewarding player for solution what is on voting.")
-            InternalErrorApiResult()
-          }
-
-          case QuestSolutionStatus.WaitingForCompetitor =>
-            tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
-
-          case QuestSolutionStatus.Won =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
-
-          case QuestSolutionStatus.Lost =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.defeatReward)))
-
-          case QuestSolutionStatus.CheatingBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForCheatingSolution(q))))
-
-          case QuestSolutionStatus.IACBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForIACSolution(q))))
-        }
-
-        r ifOk {
-          OkApiResult(RewardQuestSolutionAuthorResult())
-        }
+    def q = {
+      db.quest.readById(solution.info.questId) match {
+        case Some(qu) => qu
+        case None => throw QuestNotFoundException()
       }
-      case None => {
+    }
+
+    // TODO: test banned users are penalized correctly.
+    try {
+      val r = solution.status match {
+        case QuestSolutionStatus.OnVoting => {
+          Logger.error("We are rewarding player for solution what is on voting.")
+          InternalErrorApiResult()
+        }
+
+        case QuestSolutionStatus.WaitingForCompetitor =>
+          tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
+
+        case QuestSolutionStatus.Won =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
+
+        case QuestSolutionStatus.Lost =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.defeatReward)))
+
+        case QuestSolutionStatus.CheatingBanned =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForCheatingSolution(q))))
+
+        case QuestSolutionStatus.IACBanned =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForIACSolution(q))))
+      }
+
+      r ifOk {
+        OkApiResult(RewardQuestSolutionAuthorResult())
+      }
+    } catch {
+      case ex: QuestNotFoundException => {
         Logger.error("No quest found for updating player assets for changing solution state.")
         InternalErrorApiResult()
       }
