@@ -22,10 +22,21 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
    */
   def resetDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
     import request._
+    // TODO: test me to carry tutorial tasks if reward was not received.
+    val (tutorialTasksToCarry, tutorialReward) = if (!user.profile.dailyTasks.rewardReceived) {
+      val t = user.profile.dailyTasks.tasks.filter(_.tutorialTask != None)
+      (
+        t,
+        (Assets() /: t)((r, c) => r + c.tutorialTask.get.reward))
+    } else {
+      (List(), Assets())
+    }
 
-    db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout)
-
-    OkApiResult(ResetDailyTasksResult())
+    db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout) ifSome { v =>
+      db.user.addTasks(user.id, tutorialTasksToCarry, tutorialReward) ifSome { v =>
+        OkApiResult(ResetDailyTasksResult())
+      }
+    }
   }
 
   /**
@@ -36,10 +47,10 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     import request._
 
     if (user.profile.dailyTasks.tasks.count(t => t.taskType == request.taskType && t.currentCount < t.requiredCount) <= 0) {
-    
+
       // Nothing to do.
       OkApiResult(MakeTaskResult(user))
-    
+
     } else {
 
       // Creating copy of our results for future calculations.
