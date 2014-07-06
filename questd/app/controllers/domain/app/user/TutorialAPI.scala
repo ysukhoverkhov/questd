@@ -51,7 +51,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
    */
   def assignTutorialTask(request: AssignTutorialTaskRequest): ApiResult[AssignTutorialTaskResult] = handleDbException {
     import request._
-// TODO test me.
+    // TODO test me.
     // 1. check is the task was already given.
     if (user.tutorial.assignedTutorialTaskIds.contains(taskId)) {
       OkApiResult(AssignTutorialTaskResult(LimitExceeded))
@@ -65,17 +65,22 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
               DailyTasks(tasks = List(), reward = Assets()),
               user.getResetTasksTimeout)
           }
-          
-          // 3. Add reward of current task to reward for current daily tasks and increase timeout to infinity.
-          val taskToAdd = t.task
-          val reward = t.reward 
 
-          db.user.addTasks(
+          {
+            // 3. Add task to list of assigned tutorial tasks.
+            db.user.addTutorialTaskAssigned(user.id, taskId)
+          } ifSome { v =>
+            // 4. Add reward of current task to reward for current daily tasks and increase timeout to infinity.
+            val reward = t.reward
+            val taskToAdd = t.task
+
+            db.user.addTasks(
               user.id,
               List(taskToAdd),
               reward)
 
-          OkApiResult(AssignTutorialTaskResult(OK))
+            OkApiResult(AssignTutorialTaskResult(OK))
+          }
         }
         case None => {
           OkApiResult(AssignTutorialTaskResult(OutOfContent))

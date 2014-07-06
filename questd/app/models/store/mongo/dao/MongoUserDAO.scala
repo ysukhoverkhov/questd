@@ -655,6 +655,17 @@ private[mongo] class MongoUserDAO
         ("$set" -> MongoDBObject(
           s"tutorial.clientTutorialState.$platform" -> state))))
   }
+  
+  /**
+   * 
+   */
+  def addTutorialTaskAssigned(id: String, taskId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$addToSet" -> MongoDBObject(
+          "tutorial.assignedTutorialTaskIds" -> taskId))))
+  }
 
 }
 

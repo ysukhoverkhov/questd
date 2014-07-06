@@ -333,6 +333,30 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.length == 5)
       ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(101, 202, 303))
     }
+    
+    "addTutorialTaskAssigned works" in new WithApplication(appWithTestDatabase) {
+
+      def t = {
+        Task(TaskType.GiveRewards, "d", 1)
+      }
+
+      val userid = "addTasksTest"
+
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid,
+        tutorial = TutorialState(
+            assignedTutorialTaskIds = List())))
+
+      db.user.addTutorialTaskAssigned(userid, "t1")
+      db.user.addTutorialTaskAssigned(userid, "t2")
+      db.user.addTutorialTaskAssigned(userid, "t3")
+      val ou = db.user.addTutorialTaskAssigned(userid, "t2")
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.tutorial.assignedTutorialTaskIds.length == 3)
+    }
+
 
   }
 }

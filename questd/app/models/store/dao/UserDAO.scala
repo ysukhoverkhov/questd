@@ -65,5 +65,6 @@ trait UserDAO extends BaseDAO[User] {
   def setDebug(id: String, debug: String): Option[User]
 
   def setTutorialState(id: String, platform: String, state: String): Option[User]
+  def addTutorialTaskAssigned(id: String, taskId: String): Option[User]
 }
 
