@@ -592,7 +592,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * TODO: test me.
+   * 
    */
   def addTasks(id: String, newTasks: List[Task], additionalReward: Assets): Option[User] = {
     findAndModify(

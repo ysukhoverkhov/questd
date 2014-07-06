@@ -275,11 +275,11 @@ class UserDAOSpecs
       ou.get.profile.dailyTasks.completed must beEqualTo(0.4f)
       ou.get.profile.dailyTasks.rewardReceived must beEqualTo(true)
     }
-    
+
     "resetQuestProposal should reset cooldown if required" in new WithApplication(appWithTestDatabase) {
       val userid = "resetQuestProposal"
       val date = new Date(1000)
-    
+
       db.user.delete(userid)
       db.user.create(User(
         id = userid,
@@ -288,8 +288,8 @@ class UserDAOSpecs
             questProposalCooldown = date))))
 
       val ou = db.user.resetQuestProposal(userid, true)
-    
-          ou must beSome.which((u: User) => u.id.toString == userid)
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown != date)
     }
 
@@ -309,7 +309,31 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown == date)
     }
+
     
+    "addTasks works" in new WithApplication(appWithTestDatabase) {
+
+      def t = {
+        Task(TaskType.GiveRewards, "d", 1)
+      }
+
+      val userid = "addTasksTest"
+
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid,
+        profile = Profile(
+          dailyTasks = DailyTasks(
+            tasks = List(t, t, t),
+            reward = Assets(1, 2, 3)))))
+
+      val ou = db.user.addTasks(userid, List(t, t), Assets(100, 200, 300))
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.length == 5)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(101, 202, 303))
+    }
+
   }
 }
 
