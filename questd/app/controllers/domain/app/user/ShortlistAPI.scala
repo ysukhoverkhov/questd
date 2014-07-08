@@ -69,7 +69,7 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
         case OK => {
           {
 
-            makeTask(MakeTaskRequest(request.user, TaskType.AddToShortList))
+            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.AddToShortList)))
 
           } ifOk { r =>
 

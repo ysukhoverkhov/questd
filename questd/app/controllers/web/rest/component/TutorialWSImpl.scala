@@ -29,5 +29,11 @@ trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSCompo
     api.assignTutorialTask(AssignTutorialTaskRequest(r.user, v.taskId))
   }
   
+  def incTutorialTask = wrapJsonApiCallReturnBody[WSIncTutorialTaskResult] { (js, r) =>
+    val v = Json.read[WSIncTutorialTaskRequest](js)
+
+    api.incTutorialTask(IncTutorialTaskRequest(r.user, v.taskId))
+  }
+  
 }
 

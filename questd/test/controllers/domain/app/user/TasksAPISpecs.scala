@@ -28,7 +28,7 @@ class TasksAPISpecs extends BaseAPISpecs {
             requiredCount = 10,
             currentCount = 10))))
 
-      val result = api.makeTask(MakeTaskRequest(u, TaskType.Client))
+      val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.Client)))
 
       result.body.get.user must beEqualTo(u)
     }
@@ -42,7 +42,7 @@ class TasksAPISpecs extends BaseAPISpecs {
             requiredCount = 10,
             currentCount = 0))))
 
-      val result = api.makeTask(MakeTaskRequest(u, TaskType.Client))
+      val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.Client)))
 
       result.body.get.user must beEqualTo(u)
     }
@@ -68,7 +68,7 @@ class TasksAPISpecs extends BaseAPISpecs {
 
       db.user.incTask(u.id, TaskType.Client.toString, 0.5f, false) returns Some(u)
 
-      val result = api.makeTask(MakeTaskRequest(u, TaskType.Client))
+      val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.Client)))
 
       there was one(db.user).incTask(u.id, TaskType.Client.toString, 0.5f, false)
     }
@@ -97,7 +97,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       db.user.incTask(u.id, TaskType.Client.toString, 1f, true) returns Some(u)
       db.user.addToAssets(u.id, r) returns Some(u)
 
-      val result = api.makeTask(MakeTaskRequest(u, TaskType.Client))
+      val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.Client)))
 
       there was one(db.user).addToAssets(u.id, r)
       there was one(db.user).incTask(u.id, TaskType.Client.toString, 1f, true)

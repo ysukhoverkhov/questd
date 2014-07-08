@@ -135,7 +135,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
         {
 
-          makeTask(MakeTaskRequest(user, TaskType.SubmitQuestProposal))
+          makeTask(MakeTaskRequest(user, taskType = Some(TaskType.SubmitQuestProposal)))
 
         } ifOk { r =>
 

@@ -188,7 +188,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       case OK => {
 
         {
-          makeTask(MakeTaskRequest(user, TaskType.SubmitQuestResult))
+          makeTask(MakeTaskRequest(user, taskType = Some(TaskType.SubmitQuestResult)))
         } ifOk { r =>
 
           r.user.profile.questSolutionContext.takenQuest ifSome { takenQuest =>

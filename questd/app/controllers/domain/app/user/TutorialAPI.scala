@@ -14,10 +14,13 @@ case class GetTutorialStateRequest(user: User, platformId: String)
 case class GetTutorialStateResult(state: Option[String])
 
 case class SetTutorialStateRequest(user: User, platformId: String, state: String)
-case class SetTutorialStateResult(allowed: ProfileModificationResult)
+case class SetTutorialStateResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class AssignTutorialTaskRequest(user: User, taskId: String)
-case class AssignTutorialTaskResult(allowed: ProfileModificationResult)
+case class AssignTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+
+case class IncTutorialTaskRequest(user: User, taskId: String)
+case class IncTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -40,8 +43,9 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
       state.length > logic.constants.MaxLengthOfTutorialPlatformState) {
       OkApiResult(SetTutorialStateResult(LimitExceeded))
     } else {
-      db.user.setTutorialState(user.id, platformId, state)
-      OkApiResult(SetTutorialStateResult(OK))
+      db.user.setTutorialState(user.id, platformId, state) ifSome { v =>
+        OkApiResult(SetTutorialStateResult(OK, Some(v.profile)))
+      }
     }
 
   }
@@ -77,15 +81,32 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
             db.user.addTasks(
               user.id,
               List(taskToAdd),
-              reward)
-
-            OkApiResult(AssignTutorialTaskResult(OK))
+              reward) ifSome { v =>
+                OkApiResult(AssignTutorialTaskResult(OK, Some(v.profile)))
+              }
           }
         }
         case None => {
           OkApiResult(AssignTutorialTaskResult(OutOfContent))
         }
       }
+    }
+  }
+
+  /**
+   * Inc by one progress of tutorial task.
+   */
+  def incTutorialTask(request: IncTutorialTaskRequest): ApiResult[IncTutorialTaskResult] = handleDbException {
+    import request._
+
+    // TODO: test it works correctly.
+    
+    if (user.profile.dailyTasks.tasks.count(t => t.tutorialTask != None && t.tutorialTask.get.id == taskId) > 0) {
+      makeTask(MakeTaskRequest(user = user, tutorialTaskId = Some(taskId))) ifOk { r =>
+        OkApiResult(IncTutorialTaskResult(OK, Some(r.user.profile)))
+      }
+    } else {
+      OkApiResult(IncTutorialTaskResult(OutOfContent))
     }
   }
 }

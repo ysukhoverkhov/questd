@@ -9,6 +9,6 @@ object TutorialWS extends Controller with AccessToWSInstance {
   def getTutorialState = ws.getTutorialState
   def setTutorialState = ws.setTutorialState
   def assignTutorialTask = ws.assignTutorialTask
-  def setTutorialTaskProgress = TODO
+  def incTutorialTask = ws.incTutorialTask
 }
 

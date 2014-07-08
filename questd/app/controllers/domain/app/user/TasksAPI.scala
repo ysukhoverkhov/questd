@@ -12,7 +12,7 @@ import play.Logger
 case class ResetDailyTasksRequest(user: User)
 case class ResetDailyTasksResult()
 
-case class MakeTaskRequest(user: User, taskType: TaskType.Value)
+case class MakeTaskRequest(user: User, taskType: Option[TaskType.Value] = None, tutorialTaskId: Option[String] = None)
 case class MakeTaskResult(user: User)
 
 private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -39,23 +39,51 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     }
   }
 
+  
   /**
    * Increase by one number of completed tasks for given task. Recalculate percentage and schedule reward if all tasks are completed.
    * Do everything in other words.
    */
   def makeTask(request: MakeTaskRequest): ApiResult[MakeTaskResult] = handleDbException {
     import request._
+// TODO: test BooleanRich
+// TODO: test me with tutorial tasks.
 
-    if (user.profile.dailyTasks.tasks.count(t => t.taskType == request.taskType && t.currentCount < t.requiredCount) <= 0) {
+    assert(taskType == None ^^ tutorialTaskId == None, "Both taskType and tutorial task id are None or Some which is wrong.")
+    
+    // TODO: test this subfunction for both tutorial and regular tasks in mixed daily tasks.
+    def taskIsAlreadyCompleted = {
+      (taskType, tutorialTaskId) match {
+        case (Some(tt), None) => {
+          user.profile.dailyTasks.tasks.count(t => t.taskType == tt && t.currentCount < t.requiredCount) <= 0          
+        }
+        
+        case (None, Some(ti)) => {
+          user.profile.dailyTasks.tasks.count(t => t.tutorialTask != None && t.tutorialTask.get.id == ti && t.currentCount < t.requiredCount) <= 0          
+        }
+        
+        case _ => {
+          Logger.error("Incorrect request to makeTest")
+          true
+        }
+      }
+    }
+    
+    if (taskIsAlreadyCompleted) {
 
       // Nothing to do.
       OkApiResult(MakeTaskResult(user))
 
     } else {
 
+      // TODO: implement starting from here.
+      def createUpdatedTasks = {
+        user.profile.dailyTasks.copy(
+        tasks = user.profile.dailyTasks.tasks.map(t => if (t.taskType == request.taskType) t.copy(currentCount = t.currentCount + 1) else t))
+      }
+      
       // Creating copy of our results for future calculations.
-      val nt: DailyTasks = user.profile.dailyTasks.copy(
-        tasks = user.profile.dailyTasks.tasks.map(t => if (t.taskType == request.taskType) t.copy(currentCount = t.currentCount + 1) else t));
+      val nt: DailyTasks = createUpdatedTasks
 
       def calculatePercent(dt: DailyTasks): Float = {
         dt.tasks.map(t => t.currentCount.toFloat / t.requiredCount).sum / dt.tasks.size
@@ -75,8 +103,9 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       }
 
       r1 ifOk { r =>
+// TODO: think about tutorialIncTask
+        // TODO insert get here.
         val u = db.user.incTask(user.id, taskType.toString, newPercent, completed)
-
         OkApiResult(MakeTaskResult(u.get))
       }
     }

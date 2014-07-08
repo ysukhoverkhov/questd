@@ -336,5 +336,12 @@ package object protocol {
   /// LimitExceeded if task was already requested.
   /// OutOfContent if task with this id is not exists.
   type WSAssignTutorialTaskResult = AssignTutorialTaskResult
+  
+  
+  case class WSIncTutorialTaskRequest(
+      taskId: String)
+
+  /// OutOfContent if the task is not in active tasks.
+  type WSIncTutorialTaskResult = IncTutorialTaskResult
 }
 

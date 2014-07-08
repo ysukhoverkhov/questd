@@ -77,7 +77,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
               
             } ifOk { r =>
               
-              makeTask(MakeTaskRequest(request.user, TaskType.VoteQuestProposals))
+              makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuestProposals)))
               
             } ifOk {
 

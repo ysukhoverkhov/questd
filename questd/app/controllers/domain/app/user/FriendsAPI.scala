@@ -53,7 +53,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
     {
 
-      makeTask(MakeTaskRequest(request.user, TaskType.LookThroughFriendshipProposals))
+      makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LookThroughFriendshipProposals)))
 
     } ifOk { r =>
 
