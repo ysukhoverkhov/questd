@@ -272,8 +272,46 @@ class UserDAOSpecs
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
+      ou.get.profile.dailyTasks.tasks(0).currentCount must beEqualTo(1)
       ou.get.profile.dailyTasks.completed must beEqualTo(0.4f)
       ou.get.profile.dailyTasks.rewardReceived must beEqualTo(true)
+    }
+
+    "incTutorialTask should increase number of times task was completed by one" in new WithApplication(appWithTestDatabase) {
+      val userid = "incTutorialTasks"
+      val taskId = "tid"
+      db.user.create(User(userid))
+
+      val tasks = DailyTasks(
+        tasks = List(
+          Task(
+            taskType = TaskType.AddToShortList,
+            description = "",
+            requiredCount = 10),
+          Task(
+            taskType = TaskType.GiveRewards,
+            description = "",
+            requiredCount = 10),
+          Task(
+            taskType = TaskType.Client,
+            description = "",
+            requiredCount = 10,
+            tutorialTask = Some(TutorialTask(
+              id = taskId,
+              taskType = TaskType.Client,
+              description = "",
+              requiredCount = 10,
+              reward = Assets())))))
+
+      db.user.resetTasks(userid, tasks, new Date())
+
+      db.user.incTutorialTask(userid, taskId, 0.4f, true);
+
+      val ou = db.user.readById(userid)
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client)(0).currentCount == 1)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards)(0).currentCount == 0)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToShortList)(0).currentCount == 0)
     }
 
     "resetQuestProposal should reset cooldown if required" in new WithApplication(appWithTestDatabase) {
@@ -310,7 +348,6 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown == date)
     }
 
-    
     "addTasks works" in new WithApplication(appWithTestDatabase) {
 
       def t = {
@@ -333,7 +370,7 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.length == 5)
       ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(101, 202, 303))
     }
-    
+
     "addTutorialTaskAssigned works" in new WithApplication(appWithTestDatabase) {
 
       def t = {
@@ -346,7 +383,7 @@ class UserDAOSpecs
       db.user.create(User(
         id = userid,
         tutorial = TutorialState(
-            assignedTutorialTaskIds = List())))
+          assignedTutorialTaskIds = List())))
 
       db.user.addTutorialTaskAssigned(userid, "t1")
       db.user.addTutorialTaskAssigned(userid, "t2")
@@ -356,7 +393,6 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.tutorial.assignedTutorialTaskIds.length == 3)
     }
-
 
   }
 }

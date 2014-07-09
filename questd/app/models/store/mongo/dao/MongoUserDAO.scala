@@ -624,7 +624,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *TODO: test me.
+   *
    */
   def incTutorialTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
     findAndModify(
