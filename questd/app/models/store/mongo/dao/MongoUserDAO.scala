@@ -610,11 +610,11 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def incTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
+  def incTask(id: String, taskType: String, completed: Float, rewardReceived: Boolean): Option[User] = {
     findAndModify(
       MongoDBObject(
         "id" -> id,
-        "profile.dailyTasks.tasks.taskType" -> taskId),
+        "profile.dailyTasks.tasks.taskType" -> taskType),
       MongoDBObject(
         ("$inc" -> MongoDBObject(
           "profile.dailyTasks.tasks.$.currentCount" -> 1)),
@@ -623,6 +623,22 @@ private[mongo] class MongoUserDAO
           "profile.dailyTasks.rewardReceived" -> rewardReceived))))
   }
 
+  /**
+   *TODO: test me.
+   */
+  def incTutorialTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "profile.dailyTasks.tasks.tutorialTask.id" -> taskId),
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.tasks.$.currentCount" -> 1)),
+        ("$set" -> MongoDBObject(
+          "profile.dailyTasks.completed" -> completed,
+          "profile.dailyTasks.rewardReceived" -> rewardReceived))))
+  }
+  
   /**
    *
    */
