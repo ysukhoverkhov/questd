@@ -9,13 +9,15 @@ import controllers.domain.OkApiResult
 
 class TasksAPISpecs extends BaseAPISpecs {
 
-  def createUser(dt: DailyTasks) = {
+  def createUser(dt: DailyTasks, assignedTutorialTaskIds: List[String] = List()) = {
     User(
       id = "user_id",
       profile = Profile(
         dailyTasks = dt,
         ratingToNextLevel = 10000000,
-        rights = Rights.full))
+        rights = Rights.full),
+      tutorial = TutorialState(
+        assignedTutorialTaskIds = assignedTutorialTaskIds))
   }
 
   "Tasks API" should {
@@ -84,7 +86,7 @@ class TasksAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(IncTutorialTaskResult(ProfileModificationResult.OK, Some(u.profile))))
     }
-    
+
     "Calculate completed percent correctly" in context {
       val u = createUser(DailyTasks(
         tasks = List(
@@ -323,6 +325,60 @@ class TasksAPISpecs extends BaseAPISpecs {
       there was one(db.user).resetTasks(any, any, any)
       there was no(db.user).addTasks(any, any, any)
     }
+
+    "Do not assign already assigned tutorial ask" in context {
+      val tutorialTaskId = "ttid"
+      val u = createUser(DailyTasks(
+        reward = Assets(1, 2, 3),
+        rewardReceived = true,
+        tasks = List()), List(tutorialTaskId))
+
+      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, tutorialTaskId))
+
+      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.LimitExceeded)))
+    }
+
+    "Do not assign tutorial ask what is not exists" in context {
+      val tutorialTaskId = "ttid"
+      val u = createUser(DailyTasks(
+        reward = Assets(1, 2, 3),
+        tasks = List()), List())
+
+      db.tutorialTask.readById(s"a$tutorialTaskId") returns None
+
+      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, s"a$tutorialTaskId"))
+
+      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.OutOfContent)))
+      there was one(db.tutorialTask).readById(any)
+    }
+
+    "Assign tutorial ask" in context {
+      val tutorialTaskId = "ttid"
+      val u = createUser(DailyTasks(
+        reward = Assets(1, 2, 3),
+        rewardReceived = true,
+        tasks = List()), List())
+
+      db.tutorialTask.readById(tutorialTaskId) returns Some(
+        TutorialTask(
+          id = "taskId",
+          taskType = TaskType.Client,
+          description = "",
+          requiredCount = 10,
+          reward = Assets()))
+      db.user.resetTasks(any, any, any) returns Some(u)
+      db.user.addTutorialTaskAssigned(any, any) returns Some(u)
+      db.user.addTasks(any, any, any) returns Some(u)
+
+      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, tutorialTaskId))
+
+      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.OK, Some(u.profile))))
+      there was one(db.tutorialTask).readById(tutorialTaskId)
+      there was one(db.user).resetTasks(any, any, any)
+      there was one(db.user).addTutorialTaskAssigned(any, any)
+      there was one(db.user).addTasks(any, any, any)
+    }
+
   }
 }
 
