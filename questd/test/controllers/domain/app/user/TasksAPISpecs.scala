@@ -5,6 +5,7 @@ import models.domain._
 import models.domain.base._
 import java.util.Date
 import controllers.domain.app.protocol.ProfileModificationResult
+import controllers.domain.OkApiResult
 
 class TasksAPISpecs extends BaseAPISpecs {
 
@@ -99,9 +100,99 @@ class TasksAPISpecs extends BaseAPISpecs {
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.Client)))
 
+      result must beEqualTo(OkApiResult(MakeTaskResult(u)))
       there was one(db.user).addToAssets(u.id, r)
       there was one(db.user).incTask(u.id, TaskType.Client.toString, 1f, true)
     }
+
+    "Carry tutorial tasks to next day if all tasks are not completed" in context {
+      val r = Assets(10, 20, 30)
+      val tr = Assets(1, 2, 3)
+      val tutoralTask = Task(
+        taskType = TaskType.Client,
+        description = "",
+        requiredCount = 10,
+        tutorialTask = Some(TutorialTask(
+          id = "taskId",
+          taskType = TaskType.Client,
+          description = "",
+          requiredCount = 10,
+          reward = tr)))
+          
+      val u = createUser(DailyTasks(
+        reward = r,
+        tasks = List(
+          Task(
+            taskType = TaskType.AddToShortList,
+            description = "",
+            requiredCount = 10,
+            currentCount = 10),
+          Task(
+            taskType = TaskType.LookThroughFriendshipProposals,
+            description = "",
+            requiredCount = 10,
+            currentCount = 9),
+          Task(
+            taskType = TaskType.GiveRewards,
+            description = "",
+            requiredCount = 5,
+            currentCount = 5),
+          tutoralTask)))
+
+      user.resetTasks(any, any, any) returns Some(u)
+      user.addTasks(any, any, any) returns Some(u)
+
+      val result = api.resetDailyTasks(ResetDailyTasksRequest(u))
+
+      result must beEqualTo(OkApiResult(ResetDailyTasksResult()))
+      there was one(db.user).resetTasks(any, any, any)
+      there was one(db.user).addTasks(u.id, List(tutoralTask), tr)
+    }
+
+    "Do not carry tutorial tasks to next day if all tasks are completed" in context {
+      val r = Assets(10, 20, 30)
+      val tr = Assets(1, 2, 3)
+      val tutoralTask = Task(
+        taskType = TaskType.Client,
+        description = "",
+        requiredCount = 10,
+        tutorialTask = Some(TutorialTask(
+          id = "taskId",
+          taskType = TaskType.Client,
+          description = "",
+          requiredCount = 10,
+          reward = tr)))
+          
+      val u = createUser(DailyTasks(
+        reward = r,
+        rewardReceived = true,
+        tasks = List(
+          Task(
+            taskType = TaskType.AddToShortList,
+            description = "",
+            requiredCount = 10,
+            currentCount = 10),
+          Task(
+            taskType = TaskType.LookThroughFriendshipProposals,
+            description = "",
+            requiredCount = 10,
+            currentCount = 9),
+          Task(
+            taskType = TaskType.GiveRewards,
+            description = "",
+            requiredCount = 5,
+            currentCount = 5),
+          tutoralTask)))
+
+      user.resetTasks(any, any, any) returns Some(u)
+
+      val result = api.resetDailyTasks(ResetDailyTasksRequest(u))
+
+      result must beEqualTo(OkApiResult(ResetDailyTasksResult()))
+      there was one(db.user).resetTasks(any, any, any)
+      there was no(db.user).addTasks(any, any, any)
+    }
+    
   }
 
 }

@@ -22,7 +22,6 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
    */
   def resetDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
     import request._
-    // TODO: test me to carry tutorial tasks if reward was not received.
     val (tutorialTasksToCarry, tutorialReward) = if (!user.profile.dailyTasks.rewardReceived) {
       val t = user.profile.dailyTasks.tasks.filter(_.tutorialTask != None)
       (
@@ -33,7 +32,12 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     }
 
     db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout) ifSome { v =>
-      db.user.addTasks(user.id, tutorialTasksToCarry, tutorialReward) ifSome { v =>
+
+      (if (tutorialTasksToCarry != List()) {
+        db.user.addTasks(user.id, tutorialTasksToCarry, tutorialReward)
+      } else {
+        Some(user)
+      }) ifSome { v =>
         OkApiResult(ResetDailyTasksResult())
       }
     }
