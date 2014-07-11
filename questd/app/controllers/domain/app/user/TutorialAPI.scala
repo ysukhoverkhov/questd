@@ -98,9 +98,6 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
    */
   def incTutorialTask(request: IncTutorialTaskRequest): ApiResult[IncTutorialTaskResult] = handleDbException {
     import request._
-
-    // TODO: test it works correctly.
-    
     if (user.profile.dailyTasks.tasks.count(t => t.tutorialTask != None && t.tutorialTask.get.id == taskId) > 0) {
       makeTask(MakeTaskRequest(user = user, tutorialTaskId = Some(taskId))) ifOk { r =>
         OkApiResult(IncTutorialTaskResult(OK, Some(r.user.profile)))

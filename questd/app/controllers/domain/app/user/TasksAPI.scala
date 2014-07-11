@@ -49,7 +49,6 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
    */
   def makeTask(request: MakeTaskRequest): ApiResult[MakeTaskResult] = handleDbException {
     import request._
-    // TODO: test me with tutorial tasks.
 
     assert(taskType == None ^^ tutorialTaskId == None, "Both taskType and tutorial task id are None or Some which is wrong.")
 
