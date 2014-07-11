@@ -52,7 +52,6 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     assert(taskType == None ^^ tutorialTaskId == None, "Both taskType and tutorial task id are None or Some which is wrong.")
 
-    // TODO: test this subfunction for both tutorial and regular tasks in mixed daily tasks.
     def taskIsAlreadyCompleted = {
       (taskType, tutorialTaskId) match {
         case (Some(tt), None) => {
