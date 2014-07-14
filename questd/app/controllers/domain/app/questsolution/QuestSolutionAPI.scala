@@ -31,23 +31,20 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
-    {
-      db.solution.updatePoints(
-        solution.id,
+    val q = db.solution.updatePoints(
+      solution.id,
 
-        reviewsCountChange = 1,
-        pointsRandomChange = checkInc(vote, Cool),
-        pointsFriendsChange = 0,
-        pointsInvitedChange = 0,
-        cheatingChange = checkInc(vote, Cheating),
+      reviewsCountChange = 1,
+      pointsRandomChange = checkInc(vote, Cool),
+      pointsFriendsChange = 0,
+      pointsInvitedChange = 0,
+      cheatingChange = checkInc(vote, Cheating),
 
-        spamChange = checkInc(vote, IASpam),
-        pornChange = checkInc(vote, IAPorn))
-    } ifSome { o =>
-      updateQuestSolutionState(UpdateQuestSolutionStateRequest(o)) ifOk
-        OkApiResult(VoteQuestSolutionUpdateResult())
-    }
+      spamChange = checkInc(vote, IASpam),
+      pornChange = checkInc(vote, IAPorn))
 
+    updateQuestSolutionState(UpdateQuestSolutionStateRequest(q.get)) ifOk
+      OkApiResult(VoteQuestSolutionUpdateResult())
   }
 
   /**
@@ -61,49 +58,54 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
     def checkWaitCompetitor(qs: QuestSolution) = {
       if (qs.shouldStopVoting)
         db.solution.updateStatus(solution.id, QuestSolutionStatus.WaitingForCompetitor.toString)
-
-      qs
+      else
+        Some(qs)
     }
 
     def checkCheatingSolution(qs: QuestSolution) = {
       if (qs.shouldBanCheating)
         db.solution.updateStatus(solution.id, QuestSolutionStatus.CheatingBanned.toString)
-
-      qs
+      else
+        Some(qs)
     }
 
     def checkAICSolution(qs: QuestSolution) = {
       if (qs.shouldBanIAC)
         db.solution.updateStatus(solution.id, QuestSolutionStatus.IACBanned.toString)
-
-      qs
+      else
+        Some(qs)
     }
 
-    val updatedSolution =
-      checkCheatingSolution(
-        checkAICSolution(
-          checkWaitCompetitor(
-            solution)))
+    val funcs = List(
+      checkWaitCompetitor _,
+      checkCheatingSolution _,
+      checkAICSolution _)
 
-    val authorUpdateResult =
-      if (updatedSolution.status != solution.status) {
-        val authorId = solution.userId
-        db.user.readById(authorId) match {
-          case None => {
-            Logger.error("Unable to find author of quest solution user " + authorId)
-            InternalErrorApiResult()
+    val updatedSolution = funcs.foldLeft[Option[QuestSolution]](Some(solution))((r, f) => {
+      r.flatMap(f(_))
+    })
+
+    updatedSolution ifSome { s =>
+      val authorUpdateResult =
+        if (s.status != solution.status) {
+          val authorId = solution.userId
+
+          db.user.readById(authorId) match {
+            case None => {
+              Logger.error("Unable to find author of quest solution user " + authorId)
+              InternalErrorApiResult()
+            }
+            case Some(author) => {
+              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(s, author))
+            }
           }
-          case Some(author) => {
-            rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(updatedSolution, author))
-          }
+        } else {
+          OkApiResult(None)
         }
-      } else {
-        OkApiResult(None)
-      }
 
-    authorUpdateResult ifOk OkApiResult(UpdateQuestSolutionStateResult())
+      authorUpdateResult ifOk OkApiResult(UpdateQuestSolutionStateResult())
+    }
   }
-
 }
 
 
