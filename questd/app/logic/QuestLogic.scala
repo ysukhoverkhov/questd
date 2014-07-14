@@ -71,24 +71,20 @@ class QuestLogic(
   /**
    * Should we ban quest.
    */
-  def shouldBanQuest = {
-    val maxIACVotes = api.config(api.ConfigParams.ProposalIACRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
-    if ((quest.rating.iacpoints.porn > maxIACVotes)
-      || (quest.rating.iacpoints.spam > maxIACVotes))
-      true
-    else
-      false
+  def shouldBanIAC = {
+    val votesToBan = api.config(api.ConfigParams.ProposalIACRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
+    val maxVotes = List(
+        quest.rating.iacpoints.porn, 
+        quest.rating.iacpoints.spam).max 
+    maxVotes > votesToBan
   }
 
   /**
    * Should we decide user is a cheater.
    */
-  def shouldCheatingQuest = {
+  def shouldBanCheating = {
     val maxCheatingVotes = api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
-    if ((quest.rating.cheating > maxCheatingVotes) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
-      true
-    else
-      false
+    ((quest.rating.cheating > maxCheatingVotes) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
   }
 
   /**

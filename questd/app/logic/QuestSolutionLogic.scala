@@ -24,8 +24,11 @@ class QuestSolutionLogic(
    */
   def shouldBanCheating = {
     (qs.status == QuestSolutionStatus.OnVoting.toString) && {
-      val votesToThreatAsCheating = api.config(api.ConfigParams.SolutionCheatingRatio).toDouble * qs.rating.reviewsCount
-      qs.rating.cheating > Math.max(votesToThreatAsCheating, api.config(api.ConfigParams.SolutionMinCheatingVotes).toLong) 
+      val votesToThreatAsCheating = Math.max(
+        api.config(api.ConfigParams.SolutionCheatingRatio).toDouble * qs.rating.reviewsCount,
+        api.config(api.ConfigParams.SolutionMinCheatingVotes).toLong)
+
+      qs.rating.cheating > votesToThreatAsCheating
     }
   }
 
@@ -33,13 +36,15 @@ class QuestSolutionLogic(
    * Should we ban it for IAC
    */
   def shouldBanIAC = {
-    val pointsToBan = api.config(api.ConfigParams.SolutionIACRatio).toDouble * qs.rating.reviewsCount
+    val pointsToBan = Math.max(
+      api.config(api.ConfigParams.SolutionIACRatio).toDouble * qs.rating.reviewsCount,
+      api.config(api.ConfigParams.SolutionMinIACVotes).toLong)
 
     val maxPoints = List(
-        qs.rating.iacpoints.porn, 
-        qs.rating.iacpoints.spam).max 
-    
-    maxPoints > Math.max(pointsToBan, api.config(api.ConfigParams.SolutionMinIACVotes).toLong)
+      qs.rating.iacpoints.porn,
+      qs.rating.iacpoints.spam).max
+
+    maxPoints > pointsToBan
   }
 
   /**
@@ -47,9 +52,9 @@ class QuestSolutionLogic(
    */
   def calculatePoints = {
     List(
-        qs.rating.pointsRandom, 
-        qs.rating.pointsFriends * constants.friendsVoteMult,
-        qs.rating.pointsInvited * constants.invitedVoteMult).sum
+      qs.rating.pointsRandom,
+      qs.rating.pointsFriends * constants.friendsVoteMult,
+      qs.rating.pointsInvited * constants.invitedVoteMult).sum
   }
 }
 
