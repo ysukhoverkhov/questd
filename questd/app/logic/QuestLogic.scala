@@ -87,7 +87,7 @@ class QuestLogic(
    */
   def shouldBanCheating = {
     val maxCheatingVotes = api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
-    ((quest.rating.cheating > maxCheatingVotes) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
+    ((quest.rating.cheating > maxCheatingVotes) && (quest.status == QuestStatus.OnVoting))
   }
 
   /**
