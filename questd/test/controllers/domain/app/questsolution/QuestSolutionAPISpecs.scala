@@ -42,7 +42,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       status = status,
       rating = QuestSolutionRating(
         pointsRandom = points),
-      voteEndDate = new Date())
+      voteEndDate = new Date((new Date).getTime() + 100000))
   }
 
   def createQuest(id: String) = {

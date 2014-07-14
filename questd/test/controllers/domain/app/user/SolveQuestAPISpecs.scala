@@ -6,6 +6,7 @@ import models.domain.base._
 import java.util.Date
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.OkApiResult
+import org.mockito.Matchers
 
 class SolveQuestAPISpecs extends BaseAPISpecs {
 
@@ -48,7 +49,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       status = status,
       rating = QuestSolutionRating(
         pointsRandom = points),
-      voteEndDate = new Date())
+      voteEndDate = new Date((new Date).getTime() + 100000))
   }
 
   def createQuest(id: String) = {
@@ -91,7 +92,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
             themeId = u.profile.questSolutionContext.takenQuest.get.obj.themeId,
             questId = u.profile.questSolutionContext.takenQuest.get.id,
             vip = false),
-          voteEndDate = any))
+          voteEndDate = new Date()))
     }
 
     "Create VIP solution for VIP users" in context {
@@ -115,7 +116,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
             themeId = u.profile.questSolutionContext.takenQuest.get.obj.themeId,
             questId = u.profile.questSolutionContext.takenQuest.get.id,
             vip = true),
-          voteEndDate = any))
+          voteEndDate = new Date()))
     }
 
     "Do not fight with himself in quest" in context {
@@ -154,6 +155,9 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       user.readById(rivalSolution.userId) returns Some(user2)
 
       db.quest.readById(quest.id) returns Some(quest)
+      
+      db.user.storeSolutionInDailyResult(Matchers.eq(user1.id), any) returns Some(user1)
+      db.user.storeSolutionInDailyResult(Matchers.eq(user2.id), any) returns Some(user2)
 
       val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
 
