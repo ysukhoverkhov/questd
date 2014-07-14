@@ -51,7 +51,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getQuestCost(request: GetQuestCostRequest): ApiResult[GetQuestCostResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetQuestCostResult(OK, user.costOfPurchasingQuest)))
+    OkApiResult(GetQuestCostResult(OK, user.costOfPurchasingQuest))
   }
 
   /**
@@ -77,14 +77,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             case Some(q) => skipQuest(SkipQuestRequest(q))
           }
         } else {
-          OkApiResult(Some(SkipQuestResult()))
+          OkApiResult(SkipQuestResult())
         }
 
         v ifOk {
 
           // Updating user profile.
           user.getRandomQuestForSolution match {
-            case None => OkApiResult(Some(PurchaseQuestResult(OutOfContent)))
+            case None => OkApiResult(PurchaseQuestResult(OutOfContent))
             case Some(q) => {
               {
                 val questCost = user.costOfPurchasingQuest
@@ -103,7 +103,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                       r.user.rewardForLosingQuest(q),
                       r.user.rewardForWinningQuest(q))
 
-                    OkApiResult(Some(PurchaseQuestResult(OK, u.map(_.profile))))
+                    OkApiResult(PurchaseQuestResult(OK, u.map(_.profile)))
                   }
                 }
               }
@@ -112,7 +112,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         }
       }
 
-      case a => OkApiResult(Some(PurchaseQuestResult(a)))
+      case a => OkApiResult(PurchaseQuestResult(a))
     }
   }
 
@@ -122,7 +122,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getTakeQuestCost(request: GetTakeQuestCostRequest): ApiResult[GetTakeQuestCostResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetTakeQuestCostResult(OK, user.costOfTakingQuest)))
+    OkApiResult(GetTakeQuestCostResult(OK, user.costOfTakingQuest))
   }
 
   /**
@@ -150,7 +150,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             }
           }
         } else {
-          OkApiResult(Some(TakeQuestUpdateResult))
+          OkApiResult(TakeQuestUpdateResult)
         }
 
         v ifOk {
@@ -166,14 +166,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               r.user.getCooldownForTakeQuest(pq.obj),
               r.user.getDeadlineForTakeQuest(pq.obj)) ifSome { usr =>
 
-                OkApiResult(Some(TakeQuestResult(OK, Some(usr.profile))))
+                OkApiResult(TakeQuestResult(OK, Some(usr.profile)))
 
               }
           }
         }
       }
 
-      case (a: ProfileModificationResult) => OkApiResult(Some(TakeQuestResult(a)))
+      case (a: ProfileModificationResult) => OkApiResult(TakeQuestResult(a))
     }
   }
 
@@ -188,7 +188,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       case OK => {
 
         {
-          makeTask(MakeTaskRequest(user, TaskType.SubmitQuestResult))
+          makeTask(MakeTaskRequest(user, taskType = Some(TaskType.SubmitQuestResult)))
         } ifOk { r =>
 
           r.user.profile.questSolutionContext.takenQuest ifSome { takenQuest =>
@@ -207,14 +207,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               user.id,
               config(api.ConfigParams.DebugDisableSolutionCooldown) == "1") ifSome { u =>
 
-                OkApiResult(Some(ProposeSolutionResult(OK, Some(u.profile))))
+                OkApiResult(ProposeSolutionResult(OK, Some(u.profile)))
 
               }
           }
         }
       }
 
-      case (a: ProfileModificationResult) => OkApiResult(Some(ProposeSolutionResult(a)))
+      case (a: ProfileModificationResult) => OkApiResult(ProposeSolutionResult(a))
     }
   }
 
@@ -224,7 +224,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getQuestGiveUpCost(request: GetQuestGiveUpCostRequest): ApiResult[GetQuestGiveUpCostResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetQuestGiveUpCostResult(OK, user.costOfGivingUpQuest)))
+    OkApiResult(GetQuestGiveUpCostResult(OK, user.costOfGivingUpQuest))
   }
 
   /**
@@ -238,11 +238,11 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           val u = db.user.resetQuestSolution(
             r.user.id,
             config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
-          OkApiResult(Some(GiveUpQuestResult(OK, u.map(_.profile))))
+          OkApiResult(GiveUpQuestResult(OK, u.map(_.profile)))
         }
       }
 
-      case (a: ProfileModificationResult) => OkApiResult(Some(GiveUpQuestResult(a)))
+      case (a: ProfileModificationResult) => OkApiResult(GiveUpQuestResult(a))
     }
   }
 
@@ -254,7 +254,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       val u = db.user.resetQuestSolution(
         r.user.id,
         config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
-      OkApiResult(Some(DeadlineQuestResult(u)))
+      OkApiResult(DeadlineQuestResult(u))
     }
   }
 
@@ -266,38 +266,44 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     Logger.debug("API - rewardQuestSolutionAuthor")
 
-    // TODO: read quest here only if this is required.
-    // TODO: test banned users are penalized correctly.
-    db.quest.readById(solution.info.questId) match {
-      case Some(q) => {
+    case class QuestNotFoundException() extends Throwable
 
-        val r = solution.status match {
-          case QuestSolutionStatus.OnVoting => {
-            Logger.error("We are rewarding player for solution what is on voting.")
-            InternalErrorApiResult()
-          }
-
-          case QuestSolutionStatus.WaitingForCompetitor =>
-            tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(Some(StoreSolutionInDailyResultResult(author)))
-
-          case QuestSolutionStatus.Won =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
-
-          case QuestSolutionStatus.Lost =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.defeatReward)))
-
-          case QuestSolutionStatus.CheatingBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForCheatingSolution(q))))
-
-          case QuestSolutionStatus.IACBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForIACSolution(q))))
-        }
-
-        r ifOk {
-          OkApiResult(Some(RewardQuestSolutionAuthorResult()))
-        }
+    def q = {
+      db.quest.readById(solution.info.questId) match {
+        case Some(qu) => qu
+        case None => throw QuestNotFoundException()
       }
-      case None => {
+    }
+
+    // TODO: test banned users are penalized correctly.
+    try {
+      val r = solution.status match {
+        case QuestSolutionStatus.OnVoting => {
+          Logger.error("We are rewarding player for solution what is on voting.")
+          InternalErrorApiResult()
+        }
+
+        case QuestSolutionStatus.WaitingForCompetitor =>
+          tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
+
+        case QuestSolutionStatus.Won =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
+
+        case QuestSolutionStatus.Lost =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.defeatReward)))
+
+        case QuestSolutionStatus.CheatingBanned =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForCheatingSolution(q))))
+
+        case QuestSolutionStatus.IACBanned =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForIACSolution(q))))
+      }
+
+      r ifOk {
+        OkApiResult(RewardQuestSolutionAuthorResult())
+      }
+    } catch {
+      case ex: QuestNotFoundException => {
         Logger.error("No quest found for updating player assets for changing solution state.")
         InternalErrorApiResult()
       }
@@ -364,7 +370,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
           }
 
-          OkApiResult(Some(TryFightQuestResult()))
+          OkApiResult(TryFightQuestResult())
 
         } else {
 
@@ -374,7 +380,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       } else {
 
         // We didn;t find competitor but this is ok.
-        OkApiResult(Some(TryFightQuestResult()))
+        OkApiResult(TryFightQuestResult())
       }
     }
 

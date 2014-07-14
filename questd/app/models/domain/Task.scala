@@ -22,5 +22,6 @@ case class Task(
   taskType: TaskType.Value,
   description: String,
   requiredCount: Int,
-  currentCount: Int = 0)
+  currentCount: Int = 0,
+  tutorialTask: Option[TutorialTask] = None)
 

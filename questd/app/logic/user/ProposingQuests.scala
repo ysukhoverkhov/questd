@@ -126,7 +126,7 @@ trait ProposingQuests { this: UserLogic =>
         themeFromGlobal
       } else {
         api.getTheme(GetThemeRequest(id)) match {
-          case OkApiResult(Some(GetThemeResult(theme))) => Some(theme)
+          case OkApiResult(GetThemeResult(theme)) => Some(theme)
           case _ => None
         }
       }

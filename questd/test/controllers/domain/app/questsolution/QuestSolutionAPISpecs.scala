@@ -2,9 +2,8 @@ package controllers.domain.app.questsolution
 
 import org.specs2.mutable._
 import org.specs2.runner._
-import org.junit.runner._
-import play.api.test._
-import play.api.test.Helpers._
+import org.mockito.Mockito._
+
 import controllers.domain._
 import controllers.domain.app.user._
 import models.store._
@@ -64,16 +63,16 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
   "Quest solution API" should {
 
-    "updateQuestSolutionState calls rewardQuestSolutionAuthor is solution state is changed" in context {
+    "updateQuestSolutionState calls rewardQuestSolutionAuthor if solution state is changed" in context {
 
       val q = createQuest(id = "qid")
       val user1 = User(id = "uid")
       val sol = createSolution("sid", user1.id, q.id)
 
       val spiedQuestSolutionLogic = spy(new QuestSolutionLogic(sol, api.api))
-      api.questSolution2Logic(sol) returns spiedQuestSolutionLogic
+      when(api.questSolution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
 
-      spiedQuestSolutionLogic.shouldStopVoting returns true
+      when(spiedQuestSolutionLogic.shouldStopVoting).thenReturn(true)
       solution.updateStatus(sol.id, QuestSolutionStatus.WaitingForCompetitor.toString) returns Some(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor))      
       user.readById(user1.id) returns Some(user1)
       quest.readById(q.id) returns Some(q)
@@ -84,7 +83,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
       val result = api.updateQuestSolutionState(UpdateQuestSolutionStateRequest(sol))
 
-      result must beEqualTo(OkApiResult(Some(UpdateQuestSolutionStateResult())))
+      result must beEqualTo(OkApiResult(UpdateQuestSolutionStateResult()))
 
       there was one(solution).updateStatus(sol.id, QuestSolutionStatus.WaitingForCompetitor.toString)
       there was one(user).readById(user1.id)

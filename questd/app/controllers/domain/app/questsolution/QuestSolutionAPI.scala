@@ -44,10 +44,10 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         spamChange = checkInc(vote, IASpam),
         pornChange = checkInc(vote, IAPorn))
     } ifSome { o =>
-      updateQuestSolutionState(UpdateQuestSolutionStateRequest(o)) ifOk
-        OkApiResult(Some(VoteQuestSolutionUpdateResult()))
-    }
 
+      updateQuestSolutionState(UpdateQuestSolutionStateRequest(o)) ifOk
+        OkApiResult(VoteQuestSolutionUpdateResult())
+    }
   }
 
   /**
@@ -83,35 +83,30 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
       checkWaitCompetitor _,
       checkCheatingSolution _,
       checkAICSolution _)
-    // TODO: check similar bug in quests.
+
     val updatedSolution = funcs.foldLeft[Option[QuestSolution]](Some(solution))((r, f) => {
       r.flatMap(f(_))
     })
 
-    // TODO: chanke here with ifOk
-    updatedSolution match {
-      case None => InternalErrorApiResult()
-      case Some(s) => {
+    updatedSolution ifSome { s =>
+      val authorUpdateResult =
+        if (s.status != solution.status) {
+          val authorId = solution.userId
 
-        val authorUpdateResult =
-          if (s.status != solution.status) {
-            val authorId = solution.userId
-
-            db.user.readById(authorId) match {
-              case None => {
-                Logger.error("Unable to find author of quest solution user " + authorId)
-                InternalErrorApiResult()
-              }
-              case Some(author) => {
-                rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(s, author))
-              }
+          db.user.readById(authorId) match {
+            case None => {
+              Logger.error("Unable to find author of quest solution user " + authorId)
+              InternalErrorApiResult()
             }
-          } else {
-            OkApiResult(None)
+            case Some(author) => {
+              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(s, author))
+            }
           }
+        } else {
+          OkApiResult(None)
+        }
 
-    authorUpdateResult ifOk OkApiResult(Some(UpdateQuestSolutionStateResult()))
-      }
+      authorUpdateResult ifOk OkApiResult(UpdateQuestSolutionStateResult())
     }
   }
 }
