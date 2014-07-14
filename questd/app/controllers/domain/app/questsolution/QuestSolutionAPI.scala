@@ -31,20 +31,23 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
-    val q = db.solution.updatePoints(
-      solution.id,
+    {
+      db.solution.updatePoints(
+        solution.id,
 
-      reviewsCountChange = 1,
-      pointsRandomChange = checkInc(vote, Cool),
-      pointsFriendsChange = 0,
-      pointsInvitedChange = 0,
-      cheatingChange = checkInc(vote, Cheating),
+        reviewsCountChange = 1,
+        pointsRandomChange = checkInc(vote, Cool),
+        pointsFriendsChange = 0,
+        pointsInvitedChange = 0,
+        cheatingChange = checkInc(vote, Cheating),
 
-      spamChange = checkInc(vote, IASpam),
-      pornChange = checkInc(vote, IAPorn))
+        spamChange = checkInc(vote, IASpam),
+        pornChange = checkInc(vote, IAPorn))
+    } ifSome { o =>
 
-    updateQuestSolutionState(UpdateQuestSolutionStateRequest(q.get)) ifOk
-      OkApiResult(VoteQuestSolutionUpdateResult())
+      updateQuestSolutionState(UpdateQuestSolutionStateRequest(o)) ifOk
+        OkApiResult(VoteQuestSolutionUpdateResult())
+    }
   }
 
   /**
