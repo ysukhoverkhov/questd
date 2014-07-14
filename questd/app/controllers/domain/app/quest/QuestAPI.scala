@@ -61,14 +61,14 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     }
 
     def checkBanQuest(quest: Quest): Option[Quest] = {
-      if (quest.shouldBanQuest)
+      if (quest.shouldBanIAC)
         db.quest.updateStatus(quest.id, QuestStatus.IACBanned.toString)
       else
         Some(quest)
     }
 
     def checkCheatingQuest(quest: Quest): Option[Quest] = {
-      if (quest.shouldCheatingQuest)
+      if (quest.shouldBanCheating)
         db.quest.updateStatus(quest.id, QuestStatus.CheatingBanned.toString)
       else
         Some(quest)
@@ -204,7 +204,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     val votesToRemoveFromRotation: Long = Math.max(
       Math.round(request.proposalsVoted / proposalsOnVoting * daysForQuestToEnter),
       config(ConfigParams.ProposalMinVotesToTakeRemovalDecision).toInt)
-    val ratioToRemoveFromRotation: Double = request.proposalsLiked / request.proposalsVoted * config(ConfigParams.ProposalWorstLikesRatio).toDouble
+    val ratioToRemoveFromRotation: Double = (request.proposalsLiked / request.proposalsVoted) * config(ConfigParams.ProposalWorstLikesRatio).toDouble
 
     Logger.info("Calculating proposals threshold")
     Logger.info(

@@ -10,8 +10,8 @@ import controllers.domain.config.ApiConfigHolder
 import controllers.domain.DomainAPIComponent
 
 class QuestLogic(
-    val quest: Quest,
-    val api: DomainAPIComponent#DomainAPI) {
+  val quest: Quest,
+  val api: DomainAPIComponent#DomainAPI) {
 
   /**
    * Calculate level of a quest with current votes.
@@ -22,7 +22,7 @@ class QuestLogic(
         + quest.rating.difficultyRating.normal * constants.NormalWeight 
         + quest.rating.difficultyRating.hard * constants.HardWeight 
         + quest.rating.difficultyRating.extreme * constants.ExtremeWeight) / totalVotes
-    
+
     math.min(constants.MaxQuestLevel, math.max(constants.MinQuestLevel, l))
   }
 
@@ -31,25 +31,23 @@ class QuestLogic(
    */
   def calculateDifficulty = {
     List(
-        (QuestDifficulty.Easy,		quest.rating.difficultyRating.easy),
-        (QuestDifficulty.Normal,	quest.rating.difficultyRating.normal),
-        (QuestDifficulty.Hard,		quest.rating.difficultyRating.hard),
-        (QuestDifficulty.Extreme,	quest.rating.difficultyRating.extreme)
-        ).reduce((l, r) => if (l._2 > r._2) l else r)
+      (QuestDifficulty.Easy, quest.rating.difficultyRating.easy),
+      (QuestDifficulty.Normal, quest.rating.difficultyRating.normal),
+      (QuestDifficulty.Hard, quest.rating.difficultyRating.hard),
+      (QuestDifficulty.Extreme, quest.rating.difficultyRating.extreme)).reduce((l, r) => if (l._2 > r._2) l else r)
   }
-  
+
   /**
    * Calculate duration of a quest.
    */
   def calculateDuration = {
     List(
-        (QuestDuration.Minutes,		quest.rating.durationRating.mins),
-        (QuestDuration.Hour,		quest.rating.durationRating.hour),
-        (QuestDuration.Day,			quest.rating.durationRating.day),
-        (QuestDuration.Week,		quest.rating.durationRating.week)
-        ).reduce((l, r) => if (l._2 > r._2) l else r)
+      (QuestDuration.Minutes, quest.rating.durationRating.mins),
+      (QuestDuration.Hour, quest.rating.durationRating.hour),
+      (QuestDuration.Day, quest.rating.durationRating.day),
+      (QuestDuration.Week, quest.rating.durationRating.week)).reduce((l, r) => if (l._2 > r._2) l else r)
   }
-  
+
   /**
    * Are we able to add quest to rotation.
    */
@@ -73,28 +71,32 @@ class QuestLogic(
   /**
    * Should we ban quest.
    */
-  def shouldBanQuest = {
-    val maxIACVotes = api.config(api.ConfigParams.ProposalIACRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
-    if ((quest.rating.iacpoints.porn > maxIACVotes)
-      || (quest.rating.iacpoints.spam > maxIACVotes))
-      true
-    else
-      false
+  def shouldBanIAC = {
+    val votesToBan = Math.max(
+        api.config(api.ConfigParams.ProposalIACRatio).toDouble * quest.rating.votersCount,
+        api.config(api.ConfigParams.ProposalMinIACVotes).toLong)
+    
+    val maxVotes = List(
+        quest.rating.iacpoints.porn, 
+        quest.rating.iacpoints.spam).max 
+    maxVotes > votesToBan
   }
 
-  def shouldCheatingQuest = {
+  /**
+   * Should we decide user is a cheater.
+   */
+  def shouldBanCheating = {
     val maxCheatingVotes = api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
-    if ((quest.rating.cheating > maxCheatingVotes) && (quest.status == QuestStatus.OnVoting))
-      true else false
+    ((quest.rating.cheating > maxCheatingVotes) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
   }
 
+  /**
+   * Should we remove it because it's with us for too long without a reason.
+   */
   def shouldRemoveQuestFromVotingByTime = {
-    if ((quest.rating.votersCount > api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong) &&
-        ((quest.rating.points.toDouble / quest.rating.votersCount.toDouble) < api.config(api.ConfigParams.ProposalRatioToLeaveVoting).toDouble) &&
+    ((quest.rating.votersCount > api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong) &&
+      ((quest.rating.points.toDouble / quest.rating.votersCount.toDouble) < api.config(api.ConfigParams.ProposalRatioToLeaveVoting).toDouble) &&
         (quest.status == QuestStatus.OnVoting))
-      true
-    else
-      false
   }
 }
 

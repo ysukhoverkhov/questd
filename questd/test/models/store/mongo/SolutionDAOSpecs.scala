@@ -42,7 +42,8 @@ class SolutionDAOSpecs extends Specification
         questId = questId,
         themeId = themeId),
       status = status,
-      lastModDate = lastModDate)
+      lastModDate = lastModDate,
+      voteEndDate = new Date())
   }
 
   private def createSolutionInDB(
@@ -154,7 +155,7 @@ class SolutionDAOSpecs extends Specification
       val themeIds = db.solution.allWithParams(themeIds = List("q1_theme_id", "q2_theme_id")).toList
       themeIds.map(_.id).size must beEqualTo(2)
       themeIds.map(_.id) must contain(qs(0).id) and contain(qs(1).id)
-      
+
       val themeIdsAndIds = db.solution.allWithParams(ids = List("q1", "q2"), questIds = List("t1", "t3")).toList
       themeIdsAndIds.map(_.id).size must beEqualTo(1)
       themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))

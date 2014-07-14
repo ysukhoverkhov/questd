@@ -47,7 +47,8 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         questId = questId),
       status = status,
       rating = QuestSolutionRating(
-        pointsRandom = points))
+        pointsRandom = points),
+      voteEndDate = new Date())
   }
 
   def createQuest(id: String) = {
@@ -89,7 +90,8 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
             content = s,
             themeId = u.profile.questSolutionContext.takenQuest.get.obj.themeId,
             questId = u.profile.questSolutionContext.takenQuest.get.id,
-            vip = false)))
+            vip = false),
+          voteEndDate = any))
     }
 
     "Create VIP solution for VIP users" in context {
@@ -112,7 +114,8 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
             content = s,
             themeId = u.profile.questSolutionContext.takenQuest.get.obj.themeId,
             questId = u.profile.questSolutionContext.takenQuest.get.id,
-            vip = true)))
+            vip = true),
+          voteEndDate = any))
     }
 
     "Do not fight with himself in quest" in context {

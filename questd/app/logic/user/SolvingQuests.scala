@@ -148,7 +148,21 @@ trait SolvingQuests { this: UserLogic =>
    * Cooldown for reseting purchases. Purchases should be reset in nearest 5am at user's time.
    */
   def getResetPurchasesTimeout = getNextFlipHourDate
-
+  
+  /**
+   * Time when to stop voring for solution.
+   */
+  def solutionVoteEndDate(qi: QuestInfo) = {
+    val mult = qi.level match {
+      case x if (1 to 10 contains x) => 1
+      case x if (11 to 16 contains x) => 2
+      case _ => 3
+    }
+    
+    DateTime.now + mult.days toDate ()
+  }
+  
+// TODO: remove all gets here since functions and values are the same.
   /**
    * Reward for lost quest.
    */

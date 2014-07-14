@@ -188,6 +188,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       case OK => {
 
         {
+        // TODO: pull user.profile.questSolutionContext.takenQuest.get to a val here. in 0.20.02
           makeTask(MakeTaskRequest(user, TaskType.SubmitQuestResult))
         } ifOk { r =>
 
@@ -200,7 +201,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                   content = request.solution,
                   themeId = takenQuest.obj.themeId,
                   questId = takenQuest.id,
-                  vip = r.user.profile.publicProfile.vip)))
+              vip = user.profile.publicProfile.vip),
+            voteEndDate = user.solutionVoteEndDate(takenQuest.get.obj)))
 
             db.user.resetQuestSolution(
               user.id,
