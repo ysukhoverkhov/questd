@@ -83,7 +83,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
       val result = api.updateQuestSolutionState(UpdateQuestSolutionStateRequest(sol))
 
-      result must beEqualTo(OkApiResult(Some(UpdateQuestSolutionStateResult())))
+      result must beEqualTo(OkApiResult(UpdateQuestSolutionStateResult()))
 
       there was one(solution).updateStatus(sol.id, QuestSolutionStatus.WaitingForCompetitor.toString)
       there was one(user).readById(user1.id)
