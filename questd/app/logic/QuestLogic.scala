@@ -72,7 +72,10 @@ class QuestLogic(
    * Should we ban quest.
    */
   def shouldBanIAC = {
-    val votesToBan = api.config(api.ConfigParams.ProposalIACRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
+    val votesToBan = Math.max(
+        api.config(api.ConfigParams.ProposalIACRatio).toDouble * quest.rating.votersCount,
+        api.config(api.ConfigParams.ProposalMinIACVotes).toLong)
+    
     val maxVotes = List(
         quest.rating.iacpoints.porn, 
         quest.rating.iacpoints.spam).max 
