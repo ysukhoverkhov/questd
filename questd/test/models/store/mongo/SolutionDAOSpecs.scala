@@ -43,7 +43,7 @@ class SolutionDAOSpecs extends Specification
         themeId = themeId),
       status = status,
       lastModDate = lastModDate,
-      voteEndDate = new Date())
+      voteEndDate = new Date((new Date).getTime() + 100000))
   }
 
   private def createSolutionInDB(
