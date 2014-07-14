@@ -2,11 +2,11 @@ package logic
 
 import org.specs2.mutable._
 import org.specs2.runner._
+import org.specs2.matcher._
 import org.specs2.mock.Mockito
 import org.junit.runner._
 import play.Logger
 import functions._
-import org.specs2.matcher.BeEqualTo
 
 class FunctionsSpecs extends Specification {
 

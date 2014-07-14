@@ -40,7 +40,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val u = db.user.addPrivateDailyResult(user.id, DailyResult(user.getStartOfCurrentDailyResultPeriod, dailyAssetsDecrease))
 
     u match {
-      case Some(u: User) => OkApiResult(Some(ShiftDailyResultResult(u)))
+      case Some(u: User) => OkApiResult(ShiftDailyResultResult(u))
       case _ => {
         Logger.error("API - shiftDailyResult. user is not in db after update.")
         InternalErrorApiResult()
@@ -95,7 +95,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     if (internalError) {
       InternalErrorApiResult();
     } else {
-      OkApiResult(Some(GetDailyResultResult(u.profile, newOne)))
+      OkApiResult(GetDailyResultResult(u.profile, newOne))
     }
   }
 
@@ -109,7 +109,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val qpr = QuestProposalResult(questProposalId = request.questId, reward = request.reward, penalty = request.penalty)
     db.user.storeProposalInDailyResult(user.id, qpr) ifSome { v =>
-      OkApiResult(Some(StoreProposalInDailyResultResult(v)))
+      OkApiResult(StoreProposalInDailyResultResult(v))
     }
   })
 
@@ -123,7 +123,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val qpr = QuestSolutionResult(questSolutionId = request.solutionId, reward = request.reward, penalty = request.penalty)
     db.user.storeSolutionInDailyResult(user.id, qpr) ifSome { v =>
-      OkApiResult(Some(StoreSolutionInDailyResultResult(v)))
+      OkApiResult(StoreSolutionInDailyResultResult(v))
     }
 
   }
@@ -134,7 +134,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val u = ensurePrivateDailyResultExists(user)
 
     db.user.storeProposalOutOfTimePenalty(user.id, penalty) ifSome { v =>
-      OkApiResult(Some(StoreProposalOutOfTimePenaltyResult(v)))
+      OkApiResult(StoreProposalOutOfTimePenaltyResult(v))
     }
   }
 
@@ -144,7 +144,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val u = ensurePrivateDailyResultExists(user)
 
     db.user.storeSolutionOutOfTimePenalty(user.id, penalty) ifSome { v =>
-      OkApiResult(Some(StoreSolutionOutOfTimePenaltyResult(v)))
+      OkApiResult(StoreSolutionOutOfTimePenaltyResult(v))
     }
 
   }

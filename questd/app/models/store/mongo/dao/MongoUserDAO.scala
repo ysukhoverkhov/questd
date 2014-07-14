@@ -592,22 +592,53 @@ private[mongo] class MongoUserDAO
   }
 
   /**
+   * 
+   */
+  def addTasks(id: String, newTasks: List[Task], additionalReward: Assets): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.reward.coins" -> additionalReward.coins,
+          "profile.dailyTasks.reward.money" -> additionalReward.money,
+          "profile.dailyTasks.reward.rating" -> additionalReward.rating)),
+        ("$push" -> MongoDBObject(
+          "profile.dailyTasks.tasks" -> MongoDBObject(
+            "$each" -> newTasks.map(grater[Task].asDBObject(_)))))))
+  }
+
+  /**
    *
    */
-  def incTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
+  def incTask(id: String, taskType: String, completed: Float, rewardReceived: Boolean): Option[User] = {
     findAndModify(
       MongoDBObject(
         "id" -> id,
-        "profile.dailyTasks.tasks.taskType" -> taskId),
+        "profile.dailyTasks.tasks.taskType" -> taskType),
       MongoDBObject(
         ("$inc" -> MongoDBObject(
           "profile.dailyTasks.tasks.$.currentCount" -> 1)),
         ("$set" -> MongoDBObject(
           "profile.dailyTasks.completed" -> completed,
-          "profile.dailyTasks.rewardReceived" -> rewardReceived))
-          ))
+          "profile.dailyTasks.rewardReceived" -> rewardReceived))))
   }
 
+  /**
+   *
+   */
+  def incTutorialTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "profile.dailyTasks.tasks.tutorialTask.id" -> taskId),
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.tasks.$.currentCount" -> 1)),
+        ("$set" -> MongoDBObject(
+          "profile.dailyTasks.completed" -> completed,
+          "profile.dailyTasks.rewardReceived" -> rewardReceived))))
+  }
+  
   /**
    *
    */
@@ -628,6 +659,28 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         ("$set" -> MongoDBObject(
           "profile.debug" -> debug))))
+  }
+
+  /**
+   *
+   */
+  def setTutorialState(id: String, platform: String, state: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          s"tutorial.clientTutorialState.$platform" -> state))))
+  }
+  
+  /**
+   * 
+   */
+  def addTutorialTaskAssigned(id: String, taskId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$addToSet" -> MongoDBObject(
+          "tutorial.assignedTutorialTaskIds" -> taskId))))
   }
 
 }

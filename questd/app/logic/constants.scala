@@ -117,5 +117,10 @@ object constants {
    */
   val RatingForCompletingDailyTasks = 500
   
+  /**
+   * Tutorial
+   */
+  val NumberOfStoredTutorialPlatforms = 10
+  val MaxLengthOfTutorialPlatformState = 256
 }
 

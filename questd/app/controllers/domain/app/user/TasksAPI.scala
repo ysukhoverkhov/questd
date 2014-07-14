@@ -12,7 +12,7 @@ import play.Logger
 case class ResetDailyTasksRequest(user: User)
 case class ResetDailyTasksResult()
 
-case class MakeTaskRequest(user: User, taskType: TaskType.Value)
+case class MakeTaskRequest(user: User, taskType: Option[TaskType.Value] = None, tutorialTaskId: Option[String] = None)
 case class MakeTaskResult(user: User)
 
 private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -22,10 +22,25 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
    */
   def resetDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
     import request._
+    val (tutorialTasksToCarry, tutorialReward) = if (!user.profile.dailyTasks.rewardReceived) {
+      val t = user.profile.dailyTasks.tasks.filter(_.tutorialTask != None)
+      (
+        t,
+        (Assets() /: t)((r, c) => r + c.tutorialTask.get.reward))
+    } else {
+      (List(), Assets())
+    }
 
-    db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout)
+    db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout) ifSome { v =>
 
-    OkApiResult(Some(ResetDailyTasksResult()))
+      (if (tutorialTasksToCarry != List()) {
+        db.user.addTasks(user.id, tutorialTasksToCarry, tutorialReward)
+      } else {
+        Some(user)
+      }) ifSome { v =>
+        OkApiResult(ResetDailyTasksResult())
+      }
+    }
   }
 
   /**
@@ -35,16 +50,53 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def makeTask(request: MakeTaskRequest): ApiResult[MakeTaskResult] = handleDbException {
     import request._
 
-    if (user.profile.dailyTasks.tasks.count(t => t.taskType == request.taskType && t.currentCount < t.requiredCount) <= 0) {
-    
+    assert(taskType == None ^^ tutorialTaskId == None, "Both taskType and tutorial task id are None or Some which is wrong.")
+
+    def taskIsAlreadyCompleted = {
+      (taskType, tutorialTaskId) match {
+        case (Some(tt), None) => {
+          user.profile.dailyTasks.tasks.count(t => t.taskType == tt && t.currentCount < t.requiredCount) <= 0
+        }
+
+        case (None, Some(ti)) => {
+          user.profile.dailyTasks.tasks.count(t => t.tutorialTask != None && t.tutorialTask.get.id == ti && t.currentCount < t.requiredCount) <= 0
+        }
+
+        case _ => {
+          Logger.error("Incorrect request to makeTest")
+          true
+        }
+      }
+    }
+
+    if (taskIsAlreadyCompleted) {
+
       // Nothing to do.
-      OkApiResult(Some(MakeTaskResult(user)))
-    
+      OkApiResult(MakeTaskResult(user))
+
     } else {
 
+      def createUpdatedTasks = {
+        (taskType, tutorialTaskId) match {
+          case (Some(tt), None) => {
+            user.profile.dailyTasks.copy(
+              tasks = user.profile.dailyTasks.tasks.map(t => if (t.taskType == tt) t.copy(currentCount = t.currentCount + 1) else t))
+          }
+
+          case (None, Some(ti)) => {
+            user.profile.dailyTasks.copy(
+              tasks = user.profile.dailyTasks.tasks.map(t => if (t.tutorialTask != None && t.tutorialTask.get.id == ti) t.copy(currentCount = t.currentCount + 1) else t))
+          }
+
+          case _ => {
+            Logger.error("Incorrect request to makeTest")
+            user.profile.dailyTasks
+          }
+        }
+      }
+
       // Creating copy of our results for future calculations.
-      val nt: DailyTasks = user.profile.dailyTasks.copy(
-        tasks = user.profile.dailyTasks.tasks.map(t => if (t.taskType == request.taskType) t.copy(currentCount = t.currentCount + 1) else t));
+      val nt: DailyTasks = createUpdatedTasks
 
       def calculatePercent(dt: DailyTasks): Float = {
         dt.tasks.map(t => t.currentCount.toFloat / t.requiredCount).sum / dt.tasks.size
@@ -60,13 +112,28 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       val r1 = if (completed) {
         adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(nt.reward)))
       } else {
-        OkApiResult(Some(AdjustAssetsResult(user)))
+        OkApiResult(AdjustAssetsResult(user))
       }
 
       r1 ifOk { r =>
-        val u = db.user.incTask(user.id, taskType.toString, newPercent, completed)
+        val u = (taskType, tutorialTaskId) match {
+          case (Some(tt), None) => {
+            db.user.incTask(user.id, tt.toString, newPercent, completed)
+          }
 
-        OkApiResult(Some(MakeTaskResult(u.get)))
+          case (None, Some(ti)) => {
+            db.user.incTutorialTask(user.id, ti, newPercent, completed)
+          }
+
+          case _ => {
+            Logger.error("Incorrect request to makeTest")
+            Some(user)
+          }
+        }
+
+        u ifSome { v =>
+          OkApiResult(MakeTaskResult(v))
+        }
       }
     }
   }

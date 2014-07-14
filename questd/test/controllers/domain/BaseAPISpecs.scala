@@ -24,10 +24,11 @@ private[domain] abstract class BaseAPISpecs extends Specification
   val quest = mock[QuestDAO]
   val solution = mock[QuestSolutionDAO]
   val config = mock[ConfigDAO]
+  val tutorialTask = mock[TutorialTaskDAO]
   
   val rand = mock[Random]
   
-  val api = spy(new DomainAPI)
+  val api = new DomainAPI
   // End constructing
 
   def mockConfiguration: Configuration = {
@@ -40,6 +41,7 @@ private[domain] abstract class BaseAPISpecs extends Specification
       db.quest returns quest
       db.solution returns solution
       db.config returns config
+      db.tutorialTask returns tutorialTask
       
       config.readConfig returns mockConfiguration
     } 

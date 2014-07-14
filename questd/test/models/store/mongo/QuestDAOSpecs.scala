@@ -18,8 +18,7 @@ class QuestDAOSpecs extends Specification
   with BaseDAOSpecs {
 
   private[this] def clearDB() = {
-    for (i <- db.quest.all)
-      db.quest.delete(i.id)
+    db.quest.clear
   }
 
   "Mongo Quest DAO" should {
