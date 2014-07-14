@@ -73,7 +73,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
           media = ContentReference(ContentType.Video.toString, "", ""),
           icon = None),
         vip = false),
-      voteEndDate = new Date())
+      voteEndDate = new Date((new Date).getTime() + 100000))
   }
 
   "User Logic solution selector" should {
