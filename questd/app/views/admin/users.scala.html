@@ -1,0 +1,31 @@
+@(menuItems: Map[String, String], users: List[models.domain.User])
+
+@import helper._
+
+@main("Users")(menuItems, Map()) {
+
+	<p>
+	<table border="1">
+	    	<tr>
+	    		<td>id</td>
+	    		<td>FBID</td>
+	    		<td>lastLogin</td>
+	    		<td>name</td>
+	    		<td>level</td>
+	    		<td>assets</td>
+	    	</tr>
+		@for(u <- users) {
+	    	<tr>
+	    		<td>@u.id.toString</td>
+	    		<td>@u.auth.fbid.toString</td>
+	    		<td>@u.auth.lastLogin</td>
+	    		<td>@u.profile.publicProfile.bio.name</td>
+	    		<td>@u.profile.publicProfile.level.toString</td>
+	    		<td>@u.profile.assets.toString</td>
+	    	</tr>
+	    }
+	</table>
+	</p>
+	
+}
+
