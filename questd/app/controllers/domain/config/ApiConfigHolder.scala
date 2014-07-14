@@ -26,6 +26,11 @@ class _ConfigParams {
   val ProposalVotesToLeaveVoting = "50 22 Proposal Votes To Leave Voting (calculated)"
   val ProposalRatioToLeaveVoting = "50 23 Proposal Ratio To Leave Voting (calculated)"
 
+
+  val SolutionCheatingRatio = "60 12 Solution Cheating to Votes Ratio"
+  val SolutionIACRatio = "60 13 Solution IAC to Votes Ratio"
+    
+    
   val QuestProbabilityLevelsToGiveStartingQuests = "71 01 Level to give starting quests"
   val QuestProbabilityStartingVIPQuests = "71 02 Probability of selecting VIP quests in initial stage"
 
@@ -74,6 +79,9 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.ProposalVotesToLeaveVoting -> "100",
       ConfigParams.ProposalRatioToLeaveVoting -> "0.05",
 
+      ConfigParams.SolutionCheatingRatio -> "0.1",
+      ConfigParams.SolutionIACRatio -> "0.03",
+      
       ConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "5",
       ConfigParams.QuestProbabilityStartingVIPQuests -> "0.5",
 

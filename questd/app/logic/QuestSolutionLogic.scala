@@ -6,33 +6,43 @@ import models.domain._
 import controllers.domain.app.user._
 import controllers.domain.OkApiResult
 import controllers.domain.DomainAPIComponent
+import java.util.Date
 
 class QuestSolutionLogic(
-    val qs: QuestSolution, 
-    val api: DomainAPIComponent#DomainAPI) {
+  val qs: QuestSolution,
+  val api: DomainAPIComponent#DomainAPI) {
 
+  /**
+   * We check is time come to stop voting for the solution.
+   */
   def shouldStopVoting = {
-    (qs.status == QuestSolutionStatus.OnVoting.toString) && (qs.rating.reviewsCount >= reviewsToFinishVoting)
+    (qs.status == QuestSolutionStatus.OnVoting.toString) && ((new Date()).after(qs.voteEndDate))
   }
 
+  // TODO: apply min votes count restriction. perhaps something like 3 iacs.
   def shouldBanCheating = {
-    (qs.status == QuestSolutionStatus.OnVoting.toString) && (qs.rating.cheating >= cheatingToThreatAsCheating)
+    (qs.status == QuestSolutionStatus.OnVoting.toString) && {
+      val votesToThreatAsCheating = api.config(api.ConfigParams.SolutionCheatingRatio).toDouble * qs.rating.reviewsCount
+      qs.rating.cheating > votesToThreatAsCheating
+    }
   }
 
+  // TODO: apply min votes count restriction. perhaps something like 3 iacs.
   def shouldBanIAC = {
-    ((qs.rating.iacpoints.porn.toFloat / qs.rating.reviewsCount > iacBanRatio)
-      || (qs.rating.iacpoints.spam.toFloat / qs.rating.reviewsCount > iacBanRatio))
+    val pointsToBan = api.config(api.ConfigParams.SolutionIACRatio).toDouble * qs.rating.reviewsCount
+
+    ((qs.rating.iacpoints.porn > pointsToBan)
+      || (qs.rating.iacpoints.spam > pointsToBan))
   }
-  
+
   /**
    * Calculate points for quest solution voting.
    */
   def calculatePoints = {
-    qs.rating.pointsRandom + qs.rating.pointsFriends * constants.friendsVoteMult + qs.rating.pointsInvited * constants.invitedVoteMult
+    List(
+        qs.rating.pointsRandom, 
+        qs.rating.pointsFriends * constants.friendsVoteMult,
+        qs.rating.pointsInvited * constants.invitedVoteMult).sum
   }
-
-  private def reviewsToFinishVoting = 3
-  private def cheatingToThreatAsCheating = 3
-  private def iacBanRatio = 0.1
 }
 

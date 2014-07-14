@@ -187,6 +187,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     user.canResolveQuest(ContentType.withName(request.solution.media.contentType)) match {
       case OK => {
 
+        // TODO: pull user.profile.questSolutionContext.takenQuest.get to a val here. in 0.20.02
         db.solution.create(
           QuestSolution(
             userId = user.id,
@@ -195,11 +196,12 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               content = request.solution,
               themeId = user.profile.questSolutionContext.takenQuest.get.obj.themeId,
               questId = user.profile.questSolutionContext.takenQuest.get.id,
-              vip = user.profile.publicProfile.vip)))
+              vip = user.profile.publicProfile.vip),
+            voteEndDate = user.solutionVoteEndDate(user.profile.questSolutionContext.takenQuest.get.obj)))
 
         val u = db.user.resetQuestSolution(
-            user.id,
-            config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
+          user.id,
+          config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
 
         OkApiResult(Some(ProposeSolutionResult(OK, u.map(_.profile))))
       }
@@ -226,8 +228,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
         adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) map { r =>
           val u = db.user.resetQuestSolution(
-              r.user.id,
-              config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
+            r.user.id,
+            config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
           OkApiResult(Some(GiveUpQuestResult(OK, u.map(_.profile))))
         }
       }
@@ -242,8 +244,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def deadlineQuest(request: DeadlineQuestRequest): ApiResult[DeadlineQuestResult] = handleDbException {
     storeSolutionOutOfTimePenalty(StoreSolutionOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuest)) map { r =>
       val u = db.user.resetQuestSolution(
-          r.user.id,
-          config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
+        r.user.id,
+        config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
       OkApiResult(Some(DeadlineQuestResult(u)))
     }
   }

@@ -15,4 +15,5 @@ case class QuestSolution(
   questLevel: Int,
   info: QuestSolutionInfo,
   rating: QuestSolutionRating = QuestSolutionRating(),
+  voteEndDate: Date,
   status: String = QuestSolutionStatus.OnVoting.toString) extends ID

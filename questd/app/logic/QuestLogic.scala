@@ -10,19 +10,19 @@ import controllers.domain.config.ApiConfigHolder
 import controllers.domain.DomainAPIComponent
 
 class QuestLogic(
-    val quest: Quest,
-    val api: DomainAPIComponent#DomainAPI) {
+  val quest: Quest,
+  val api: DomainAPIComponent#DomainAPI) {
 
   /**
    * Calculate level of a quest with current votes.
    */
   def calculateQuestLevel = {
     val totalVotes = quest.rating.difficultyRating.easy + quest.rating.difficultyRating.normal + quest.rating.difficultyRating.hard + quest.rating.difficultyRating.extreme
-    val l: Int = (quest.rating.difficultyRating.easy * constants.easyWeight 
-        + quest.rating.difficultyRating.normal * constants.normalWeight 
-        + quest.rating.difficultyRating.hard * constants.hardWeight 
-        + quest.rating.difficultyRating.extreme * constants.extremeWeight) / totalVotes
-    
+    val l: Int = (quest.rating.difficultyRating.easy * constants.easyWeight
+      + quest.rating.difficultyRating.normal * constants.normalWeight
+      + quest.rating.difficultyRating.hard * constants.hardWeight
+      + quest.rating.difficultyRating.extreme * constants.extremeWeight) / totalVotes
+
     math.min(constants.maxQuestLevel, math.max(constants.minQuestLevel, l))
   }
 
@@ -31,25 +31,23 @@ class QuestLogic(
    */
   def calculateDifficulty = {
     List(
-        (QuestDifficulty.Easy,		quest.rating.difficultyRating.easy),
-        (QuestDifficulty.Normal,	quest.rating.difficultyRating.normal),
-        (QuestDifficulty.Hard,		quest.rating.difficultyRating.hard),
-        (QuestDifficulty.Extreme,	quest.rating.difficultyRating.extreme)
-        ).reduce((l, r) => if (l._2 > r._2) l else r)
+      (QuestDifficulty.Easy, quest.rating.difficultyRating.easy),
+      (QuestDifficulty.Normal, quest.rating.difficultyRating.normal),
+      (QuestDifficulty.Hard, quest.rating.difficultyRating.hard),
+      (QuestDifficulty.Extreme, quest.rating.difficultyRating.extreme)).reduce((l, r) => if (l._2 > r._2) l else r)
   }
-  
+
   /**
    * Calculate duration of a quest.
    */
   def calculateDuration = {
     List(
-        (QuestDuration.Minutes,		quest.rating.durationRating.mins),
-        (QuestDuration.Hour,		quest.rating.durationRating.hour),
-        (QuestDuration.Day,			quest.rating.durationRating.day),
-        (QuestDuration.Week,		quest.rating.durationRating.week)
-        ).reduce((l, r) => if (l._2 > r._2) l else r)
+      (QuestDuration.Minutes, quest.rating.durationRating.mins),
+      (QuestDuration.Hour, quest.rating.durationRating.hour),
+      (QuestDuration.Day, quest.rating.durationRating.day),
+      (QuestDuration.Week, quest.rating.durationRating.week)).reduce((l, r) => if (l._2 > r._2) l else r)
   }
-  
+
   /**
    * Are we able to add quest to rotation.
    */
@@ -82,16 +80,24 @@ class QuestLogic(
       false
   }
 
+  /**
+   * Should we decide user is a cheater.
+   */
   def shouldCheatingQuest = {
     val maxCheatingVotes = api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
     if ((quest.rating.cheating > maxCheatingVotes) && (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
-      true else false
+      true
+    else
+      false
   }
 
+  /**
+   * Should we remove it because it's with us for too long without a reason.
+   */
   def shouldRemoveQuestFromVotingByTime = {
     if ((quest.rating.votersCount > api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong) &&
-        ((quest.rating.points.toDouble / quest.rating.votersCount.toDouble) < api.config(api.ConfigParams.ProposalRatioToLeaveVoting).toDouble) &&
-        (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
+      ((quest.rating.points.toDouble / quest.rating.votersCount.toDouble) < api.config(api.ConfigParams.ProposalRatioToLeaveVoting).toDouble) &&
+      (QuestStatus.withName(quest.status) == QuestStatus.OnVoting))
       true
     else
       false
