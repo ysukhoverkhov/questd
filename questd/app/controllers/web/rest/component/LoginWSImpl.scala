@@ -45,7 +45,9 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
             
             // Login facebook.
             try {
-              (Option(fb.fetchObject(loginRequest.token, "me", classOf[UserFB])), None)
+              (
+                  Option(fb.fetchObject(loginRequest.token, "me", classOf[UserFB])),
+                  None)
             } catch {
               case ex: FacebookOAuthException => {
                 Logger.debug("Facebook auth failed")

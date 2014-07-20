@@ -9,16 +9,19 @@ import models.store.DatabaseComponent
 import controllers.domain.admin._
 import models.store.dao._
 import models.domain.admin.Configuration
+import controllers.domain.libs.facebook.FacebookComponent
 
 private[domain] abstract class BaseAPISpecs extends Specification 
   with RandomComponent
   with DatabaseComponent
   with DomainAPIComponent
+  with FacebookComponent
   with Mockito {
   
   isolated
 
   // Constructing our cake
+  val fb = mock[Facebook]
   val db = mock[Database]
   val user = mock[UserDAO]
   val quest = mock[QuestDAO]

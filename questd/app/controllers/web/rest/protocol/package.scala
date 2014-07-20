@@ -51,7 +51,6 @@ package object protocol {
    */
   type WSProfileResult = Profile
 
-
   /**
    * Set Gender protocol.
    */
@@ -174,10 +173,10 @@ package object protocol {
   type WSGetRightsAtLevelsResult = GetRightsAtLevelsResult
 
   type WSGetLevelsForRightsResult = GetLevelsForRightsResult
-  
+
   case class WSGetLevelsForRightsRequest(
-      functionality: List[String])
-  
+    functionality: List[String])
+
   /**
    * ********************
    * Content
@@ -260,7 +259,11 @@ package object protocol {
 
   type WSRemoveFromShortlistResult = RemoveFromShortlistResult
 
-  
+  case class WSGetSuggestsForShortlistRequest(
+    token: String)
+
+  type WSGetSuggestsForShortlistResult = GetSuggestsForShortlistResult
+
   /**
    * Friends
    */
@@ -288,11 +291,10 @@ package object protocol {
     id: String)
   type WSRemoveFromFriendsResult = RemoveFromFriendsResult
 
-  
   /**
    * Messages
    */
-  
+
   type WSGetMessagesResult = GetMessagesResult
 
   case class WSRemoveMessageRequest(
@@ -300,46 +302,41 @@ package object protocol {
     id: String)
   type WSRemoveMessageResult = RemoveMessageResult
 
-
   /**
    * Misc
    */
-  
+
   type WSGetTimeResult = GetTimeResult
-  
-  
+
   /**
    * Tutorial
    */
-  
+
   case class WSGetTutorialStateRequest(
     /// Id of a platform to get state for.
     platformId: String)
-    
+
   /// if no state for platform present empty result will be returned.
   type WSGetTutorialStateResult = GetTutorialStateResult
 
-  
   case class WSSetTutorialStateRequest(
     /// Id of a platform to get state for.
     platformId: String,
     state: String)
-    
+
   /// may return LimitExceeded in "allowed" field if there are too many platforms (logic.constants.NumberOfStoredTutorialPlatforms) 
   /// or state is too long (logic.constants.MaxLengthOfTutorlaPlatformState).
   type WSSetTutorialStateResult = SetTutorialStateResult
- 
-  
+
   case class WSAssignTutorialTaskRequest(
-      taskId: String)
-  
+    taskId: String)
+
   /// LimitExceeded if task was already requested.
   /// OutOfContent if task with this id is not exists.
   type WSAssignTutorialTaskResult = AssignTutorialTaskResult
-  
-  
+
   case class WSIncTutorialTaskRequest(
-      taskId: String)
+    taskId: String)
 
   /// OutOfContent if the task is not in active tasks.
   type WSIncTutorialTaskResult = IncTutorialTaskResult

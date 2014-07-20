@@ -14,7 +14,7 @@ case class GetShortlistRequest(
   user: User)
 case class GetShortlistResult(
   allowed: ProfileModificationResult,
-  userIds: List[String])
+  userIds: Option[List[String]])
 
 case class CostToShortlistRequest(
   user: User)
@@ -35,15 +35,29 @@ case class RemoveFromShortlistRequest(
 case class RemoveFromShortlistResult(
   allowed: ProfileModificationResult)
 
-private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#DomainAPI =>
+case class GetSuggestsForShortlistRequest(
+  user: User,
+  token: String)
+case class GetSuggestsForShortlistResult(
+  allowed: ProfileModificationResult,
+  userIds: Option[List[String]])
+
+private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#DomainAPI with FBAccessor =>
 
   /**
    * Get ids of users from our shortlist.
    */
   def getShortlist(request: GetShortlistRequest): ApiResult[GetShortlistResult] = handleDbException {
-    OkApiResult(GetShortlistResult(
-      allowed = OK,
-      userIds = request.user.shortlist))
+
+    request.user.canShortlist match {
+      case OK => {
+        OkApiResult(GetShortlistResult(
+          allowed = OK,
+          userIds = Some(request.user.shortlist)))
+      }
+      case a => OkApiResult(GetShortlistResult(a, None))
+    }
+
   }
 
   /**
@@ -80,7 +94,7 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
 
             db.user.addToShortlist(r.user.id, request.userIdToAdd)
             OkApiResult(AddToShortlistResult(OK, Some(r.user.profile.assets)))
-            
+
           }
         }
         case a => OkApiResult(AddToShortlistResult(a))
@@ -90,7 +104,7 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
   }
 
   /**
-   * Adds a user to shortlist
+   * Removes user from shortlist (following).
    */
   def removeFromShortlist(request: RemoveFromShortlistRequest): ApiResult[RemoveFromShortlistResult] = handleDbException {
 
@@ -102,6 +116,40 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
       case a => OkApiResult(RemoveFromShortlistResult(a))
     }
 
+  }
+
+  /**
+   * Returns list of users we would like to follow (theoretically).
+   */
+  def getSuggestsForShortlist(request: GetSuggestsForShortlistRequest): ApiResult[GetSuggestsForShortlistResult] = handleDbException {
+    request.user.canShortlist match {
+      case OK => {
+
+        // TODO: make abstract SNComponent.
+        
+        // TODO: catch all FB exceptions here (like in auth).
+        import collection.JavaConversions._
+        import controllers.domain.libs.facebook.FacebookComponent
+        import controllers.domain.libs.facebook.UserFB
+
+        val myFriends = fb.fetchConnection(request.token, "me/friends", classOf[UserFB])
+        val friends = (for (i <- myFriends.getData().toList) yield {
+          
+          // TODO: optimize it in batch call.
+          // TODO: test batch call
+          
+          Logger.error("TTTT " + i.getId() + " " + i.getName())
+          db.user.readByFBid(i.getId())
+        })
+        
+        val idsOfFriends = friends.filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
+
+        // TODO: test each filter here.
+
+        OkApiResult(GetSuggestsForShortlistResult(OK, Some(idsOfFriends)))
+      }
+      case a => OkApiResult(GetSuggestsForShortlistResult(a, None))
+    }
   }
 
 }
