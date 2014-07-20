@@ -68,6 +68,7 @@ POST	/rest/getShortlist								controllers.web.rest.ShortlistWS.getShortlist
 POST	/rest/costToShortlist							controllers.web.rest.ShortlistWS.costToShortlist
 POST	/rest/addToShortlist							controllers.web.rest.ShortlistWS.addToShortlist
 POST	/rest/removeFromShortlist						controllers.web.rest.ShortlistWS.removeFromShortlist
+POST	/rest/getSuggestsForShortlist					controllers.web.rest.ShortlistWS.getSuggestsForShortlist
 
 # Friends requests
 POST	/rest/getFriends								controllers.web.rest.FriendsWS.getFriends

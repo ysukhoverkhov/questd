@@ -32,5 +32,6 @@ trait ShortlistWSImpl extends QuestController with SecurityWSImpl { this: WSComp
     api.removeFromShortlist(RemoveFromShortlistRequest(r.user, v.id))
   }
 
+  def getSuggestsForShortlist = TODO
 }
 
