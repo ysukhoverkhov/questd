@@ -58,14 +58,12 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   def getQuestsWithSuperAlgorithm(reason: QuestGetReason) = {
-    List(
+    val algs = List(
       () => getTutorialQuests(reason),
       () => getStartingQuests(reason),
-      () => getDefaultQuests(reason)).
-      foldLeft[Option[Iterator[Quest]]](None)((run, fun) => {
-        if (run == None) fun() else run
-      }).
-      getOrElse(List().iterator)
+      () => getDefaultQuests(reason))
+
+    selectFromChain(algs, default = List().iterator)
   }
 
   private[user] def getTutorialQuests(reason: QuestGetReason): Option[Iterator[Quest]] = {
@@ -79,47 +77,29 @@ trait QuestSelectUserLogic { this: UserLogic =>
     if (user.profile.publicProfile.level > api.config(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
       None
     } else {
-      if (rand.nextDouble < api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble) {
-        getVIPQuests(reason)
-      } else {
-        getOtherQuests(reason)
-      }
+
+      val algs = List(
+        (api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests(reason)),
+        (1.00, () => getOtherQuests(reason)) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
+        )
+
+      selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
+
     }
   }
 
   private[user] def getDefaultQuests(reason: QuestGetReason): Option[Iterator[Quest]] = {
     Logger.trace("getDefaultQuests")
 
-    val dice = rand.nextDouble
-
-    List(
+    val algs = List(
       (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests(reason)),
       (api.config(api.ConfigParams.QuestProbabilityShortlist).toDouble, () => getShortlistQuests(reason)),
       (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests(reason)),
       (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPQuests(reason)),
       (1.00, () => getOtherQuests(reason)) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
-      ).foldLeft[Either[Double, Option[Iterator[Quest]]]](Left(0))((run, fun) => {
-        run match {
-          case Left(p) => {
-            val curProbabiliy = p + fun._1
-            if (curProbabiliy > dice) {
-              Right(fun._2())
-            } else {
-              Left(curProbabiliy)
-            }
-          }
-          case _ => run
-        }
-      }) match {
-        case Right(oi) => oi match {
-          case Some(i) => if (i.hasNext) Some(i) else None
-          case None => None
-        }
-        case Left(_) => {
-          Logger.error("getDefaultQuests - None of quest selector functions were called. Check probabilities.")
-          None
-        }
-      }
+      )
+
+    selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
   }
 
   private[user] def getFriendsQuests(reason: QuestGetReason) = {
