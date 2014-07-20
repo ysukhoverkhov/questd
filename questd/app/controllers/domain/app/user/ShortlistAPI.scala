@@ -132,21 +132,20 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
         import controllers.domain.libs.facebook.FacebookComponent
         import controllers.domain.libs.facebook.UserFB
 
-        val myFriends = fb.fetchConnection(request.token, "me/friends", classOf[UserFB])
-        val friends = (for (i <- myFriends.getData().toList) yield {
+        val fbFriends = fb.fetchConnection(request.token, "me/friends", classOf[UserFB])
+        val friends = (for (i <- fbFriends.getData().toList) yield {
           
           // TODO: optimize it in batch call.
           // TODO: test batch call
           
           Logger.error("TTTT " + i.getId() + " " + i.getName())
           db.user.readByFBid(i.getId())
-        })
+        }).filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
         
-        val idsOfFriends = friends.filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
 
         // TODO: test each filter here.
 
-        OkApiResult(GetSuggestsForShortlistResult(OK, Some(idsOfFriends)))
+        OkApiResult(GetSuggestsForShortlistResult(OK, Some(friends)))
       }
       case a => OkApiResult(GetSuggestsForShortlistResult(a, None))
     }
