@@ -165,6 +165,22 @@ class SolutionDAOSpecs extends Specification
       ids.map(_.id) must beEqualTo(List(qs(1).id))
     }
 
+    
+    "updateStatus for solution updates rival correctly" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+      
+      val id1 = "id1"
+      val id2 = "id2"
+      createSolutionInDB(id1)
+      createSolutionInDB(id2)
+      
+      val su1 = db.solution.updateStatus(id1, QuestSolutionStatus.Lost.toString)
+      val su2 = db.solution.updateStatus(id2, QuestSolutionStatus.Won.toString, Some(id1))
+      
+      su1 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Lost.toString && s.rivalSolutionId == None)
+      su2 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Won.toString && s.rivalSolutionId == Some(id1))
+    }
+    
   }
 
 }

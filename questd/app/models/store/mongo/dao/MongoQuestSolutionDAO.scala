@@ -64,19 +64,22 @@ private[mongo] class MongoQuestSolutionDAO
       MongoDBObject("lastModDate" -> 1),
       skip)
   }
-// TODO test me.
+  
   def updateStatus(id: String, newStatus: String, rivalId: Option[String] = None): Option[QuestSolution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
-    queryBuilder +=
-      ("$set" -> MongoDBObject(
-        "status" -> newStatus,
-        "lastModDate" -> new Date()))
 
     if (rivalId != None) {
       queryBuilder +=
         ("$set" -> MongoDBObject(
+          "status" -> newStatus,
+          "lastModDate" -> new Date(),
           "rivalSolutionId" -> rivalId.get))
+    } else {
+      queryBuilder +=
+        ("$set" -> MongoDBObject(
+          "status" -> newStatus,
+          "lastModDate" -> new Date()))
     }
 
     findAndModify(
