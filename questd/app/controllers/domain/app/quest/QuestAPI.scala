@@ -6,7 +6,7 @@ import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.app.user._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import logic._
 import play.Logger
 
@@ -22,8 +22,8 @@ case class TakeQuestUpdateResult()
 case class VoteQuestUpdateRequest(
   quest: Quest,
   vote: QuestProposalVote.Value,
-  duration: Option[QuestDuration.Value],
-  difficulty: Option[QuestDifficulty.Value])
+  duration: QuestDuration.Value,
+  difficulty: QuestDifficulty.Value)
 case class VoteQuestUpdateResult()
 
 case class CalculateProposalThresholdsRequest(proposalsVoted: Double, proposalsLiked: Double)
@@ -41,7 +41,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       if (quest.rating.votersCount > Int.MaxValue / 2) {
         Logger.error("quest.rating.votersCount > Int.MaxValue / 2. this is the time to invent what to do with this.")
       }
-      
+
       Some(quest)
     }
 
@@ -93,25 +93,21 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       r.flatMap(f(_))
     })
 
-    // TODO: change to ifSome
-    updatedQuest match {
-      case None => InternalErrorApiResult()
-      case Some(q) => {
-        if (q.status != quest.status) {
-          val authorId = quest.authorUserId
-          db.user.readById(authorId) match {
-            case None => {
-              Logger.error("Unable to find author of quest user " + authorId)
-              InternalErrorApiResult()
-            }
-            case Some(author) => {
-              rewardQuestProposalAuthor(RewardQuestProposalAuthorRequest(q, author))
-            }
+    updatedQuest ifSome { q =>
+      if (q.status != quest.status) {
+        val authorId = quest.authorUserId
+        db.user.readById(authorId) match {
+          case None => {
+            Logger.error("Unable to find author of quest user " + authorId)
+            InternalErrorApiResult()
+          }
+          case Some(author) => {
+            rewardQuestProposalAuthor(RewardQuestProposalAuthorRequest(q, author))
           }
         }
-
-        OkApiResult(Some(UpdateQuestStatusResult()))
       }
+
+      OkApiResult(UpdateQuestStatusResult())
     }
   }
 
@@ -121,10 +117,13 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def skipQuest(request: SkipQuestRequest): ApiResult[SkipQuestResult] = handleDbException {
     import request._
 
-    val nq = db.quest.updatePoints(quest.id, -1, 1)
-    updateQuestStatus(UpdateQuestStatusRequest(nq.get))
-
-    OkApiResult(Some(SkipQuestResult()))
+    {
+      db.quest.updatePoints(quest.id, -1, 1)
+    } ifSome { v =>
+      updateQuestStatus(UpdateQuestStatusRequest(v))
+    } ifOk {
+      OkApiResult(SkipQuestResult())
+    }
   }
 
   /**
@@ -133,10 +132,13 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def takeQuestUpdate(request: TakeQuestUpdateRequest): ApiResult[TakeQuestUpdateResult] = handleDbException {
     import request._
 
-    val nq = db.quest.updatePoints(quest.id, ratio, 1)
-    updateQuestStatus(UpdateQuestStatusRequest(nq.get))
-
-    OkApiResult(Some(TakeQuestUpdateResult()))
+    {
+      db.quest.updatePoints(quest.id, ratio, 1)
+    } ifSome { v =>
+      updateQuestStatus(UpdateQuestStatusRequest(v))
+    } ifOk {
+      OkApiResult(TakeQuestUpdateResult())
+    }
   }
 
   /**
@@ -168,23 +170,25 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         0,
         0,
 
-        checkInc(difficulty.get, QuestDifficulty.Easy),
-        checkInc(difficulty.get, QuestDifficulty.Normal),
-        checkInc(difficulty.get, QuestDifficulty.Hard),
-        checkInc(difficulty.get, QuestDifficulty.Extreme),
+        checkInc(difficulty, QuestDifficulty.Easy),
+        checkInc(difficulty, QuestDifficulty.Normal),
+        checkInc(difficulty, QuestDifficulty.Hard),
+        checkInc(difficulty, QuestDifficulty.Extreme),
 
-        checkInc(duration.get, QuestDuration.Minutes),
-        checkInc(duration.get, QuestDuration.Hour),
-        checkInc(duration.get, QuestDuration.Day),
-        checkInc(duration.get, QuestDuration.Week))
+        checkInc(duration, QuestDuration.Minutes),
+        checkInc(duration, QuestDuration.Hour),
+        checkInc(duration, QuestDuration.Day),
+        checkInc(duration, QuestDuration.Week))
     } else {
       q
     }
 
-    updateQuestStatus(UpdateQuestStatusRequest(q2.get))
-
-    OkApiResult(Some(VoteQuestUpdateResult()))
-  }
+    q ifSome { v => 
+      updateQuestStatus(UpdateQuestStatusRequest(v))
+    } ifOk {
+      OkApiResult(VoteQuestUpdateResult())
+     }
+}
 
   def calculateProposalThresholds(request: CalculateProposalThresholdsRequest): ApiResult[CalculateProposalThresholdsResult] = handleDbException {
 
@@ -208,7 +212,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     updateConfig(ConfigParams.ProposalVotesToLeaveVoting -> votesToRemoveFromRotation.toString)
     updateConfig(ConfigParams.ProposalRatioToLeaveVoting -> ratioToRemoveFromRotation.toString)
 
-    OkApiResult(Some(CalculateProposalThresholdsResult()))
+    OkApiResult(CalculateProposalThresholdsResult())
   }
 }
 

@@ -58,14 +58,12 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   def getQuestsWithSuperAlgorithm(reason: QuestGetReason) = {
-    List(
+    val algs = List(
       () => getTutorialQuests(reason),
       () => getStartingQuests(reason),
-      () => getDefaultQuests(reason)).
-      foldLeft[Option[Iterator[Quest]]](None)((run, fun) => {
-        if (run == None) fun() else run
-      }).
-      getOrElse(List().iterator)
+      () => getDefaultQuests(reason))
+
+    selectFromChain(algs, default = List().iterator)
   }
 
   private[user] def getTutorialQuests(reason: QuestGetReason): Option[Iterator[Quest]] = {
@@ -79,47 +77,29 @@ trait QuestSelectUserLogic { this: UserLogic =>
     if (user.profile.publicProfile.level > api.config(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
       None
     } else {
-      if (rand.nextDouble < api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble) {
-        getVIPQuests(reason)
-      } else {
-        getOtherQuests(reason)
-      }
+
+      val algs = List(
+        (api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests(reason)),
+        (1.00, () => getOtherQuests(reason)) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
+        )
+
+      selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
+
     }
   }
 
   private[user] def getDefaultQuests(reason: QuestGetReason): Option[Iterator[Quest]] = {
     Logger.trace("getDefaultQuests")
 
-    val dice = rand.nextDouble
-
-    List(
+    val algs = List(
       (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests(reason)),
       (api.config(api.ConfigParams.QuestProbabilityShortlist).toDouble, () => getShortlistQuests(reason)),
       (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests(reason)),
       (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPQuests(reason)),
       (1.00, () => getOtherQuests(reason)) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
-      ).foldLeft[Either[Double, Option[Iterator[Quest]]]](Left(0))((run, fun) => {
-        run match {
-          case Left(p) => {
-            val curProbabiliy = p + fun._1
-            if (curProbabiliy > dice) {
-              Right(fun._2())
-            } else {
-              Left(curProbabiliy)
-            }
-          }
-          case _ => run
-        }
-      }) match {
-        case Right(oi) => oi match {
-          case Some(i) => if (i.hasNext) Some(i) else None
-          case None => None
-        }
-        case Left(_) => {
-          Logger.error("getDefaultQuests - None of quest selector functions were called. Check probabilities.")
-          None
-        }
-      }
+      )
+
+    selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
   }
 
   private[user] def getFriendsQuests(reason: QuestGetReason) = {
@@ -154,7 +134,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   private[user] def getVIPQuests(reason: QuestGetReason) = {
     Logger.trace("  Returning VIP quests")
 
-    val themeIds = selectRandomThemes(numberOfFavoriteThemesForVIPQuests)
+    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPQuests)
     Logger.trace("    Selected themes of vip's quests: " + themeIds.mkString(", "))
 
     Some(api.getVIPQuests(GetVIPQuestsRequest(
@@ -167,7 +147,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   private[user] def getOtherQuests(reason: QuestGetReason) = {
     Logger.trace("  Returning from all quests with favorite themes")
 
-    val themeIds = selectRandomThemes(numberOfFavoriteThemesForOtherQuests)
+    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
     Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
 
     Some(api.getAllQuests(GetAllQuestsRequest(
@@ -187,9 +167,9 @@ trait QuestSelectUserLogic { this: UserLogic =>
   /**
    * Tells what level we should give quests based on reason of getting quest.
    */
-  private def levels(reason: QuestGetReason) = {
+  private def levels(reason: QuestGetReason): Option[(Int, Int)] = {
     reason match {
-      case ForSolving => Some(user.profile.publicProfile.level - questForSolveLevelToleranceDown, user.profile.publicProfile.level + questForSolveLevelToleranceUp)
+      case ForSolving => Some((user.profile.publicProfile.level - QuestForSolveLevelToleranceDown, user.profile.publicProfile.level + QuestForSolveLevelToleranceUp))
       case ForVoting => None
     }
   }
