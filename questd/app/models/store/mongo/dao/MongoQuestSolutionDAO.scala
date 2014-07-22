@@ -56,7 +56,7 @@ private[mongo] class MongoQuestSolutionDAO
     if (themeIds.length > 0) {
       queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
     }
-    
+
     Logger.trace("MongoQuestSolutionDAO - allWithParams - " + queryBuilder.result);
 
     findByExample(
@@ -64,14 +64,24 @@ private[mongo] class MongoQuestSolutionDAO
       MongoDBObject("lastModDate" -> 1),
       skip)
   }
+// TODO test me.
+  def updateStatus(id: String, newStatus: String, rivalId: Option[String] = None): Option[QuestSolution] = {
 
-  def updateStatus(id: String, newStatus: String): Option[QuestSolution] = {
+    val queryBuilder = MongoDBObject.newBuilder
+    queryBuilder +=
+      ("$set" -> MongoDBObject(
+        "status" -> newStatus,
+        "lastModDate" -> new Date()))
+
+    if (rivalId != None) {
+      queryBuilder +=
+        ("$set" -> MongoDBObject(
+          "rivalSolutionId" -> rivalId.get))
+    }
+
     findAndModify(
       id,
-      MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "status" -> newStatus,
-          "lastModDate" -> new Date()))))
+      queryBuilder.result)
   }
 
   def updatePoints(

@@ -336,7 +336,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- winners) {
             Logger.debug("  winner id=" + curSol.id)
 
-            val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString)
+            val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString, curSol.rivalSolutionId)
 
             val u = db.user.readById(curSol.userId)
             if (u != None) {
@@ -348,7 +348,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- losers) {
             Logger.debug("  loser id=" + curSol.id)
 
-            val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString)
+            val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString, curSol.rivalSolutionId)
 
             val u = db.user.readById(curSol.userId)
             if (u != None) {

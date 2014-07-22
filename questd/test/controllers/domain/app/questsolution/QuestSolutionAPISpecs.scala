@@ -14,6 +14,7 @@ import controllers.domain.app.quest._
 import logic.UserLogic
 import logic.QuestSolutionLogic
 import java.util.Date
+import org.mockito.Matchers
 
 class QuestSolutionAPISpecs extends BaseAPISpecs {
 
@@ -74,7 +75,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       api.questSolution2Logic(sol) returns spiedQuestSolutionLogic
 
       spiedQuestSolutionLogic.shouldStopVoting returns true
-      solution.updateStatus(sol.id, QuestSolutionStatus.WaitingForCompetitor.toString) returns Some(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor.toString))
+      solution.updateStatus(any, any, any) returns Some(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor.toString))
       user.readById(user1.id) returns Some(user1)
       quest.readById(q.id) returns Some(q)
 
@@ -86,7 +87,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(Some(UpdateQuestSolutionStateResult())))
 
-      there was one(solution).updateStatus(sol.id, QuestSolutionStatus.WaitingForCompetitor.toString)
+      there was one(solution).updateStatus(Matchers.eq(sol.id), Matchers.eq(QuestSolutionStatus.WaitingForCompetitor.toString), Matchers.eq(null))
       there was one(user).readById(user1.id)
       there was one(api).rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor.toString), user1))
     }

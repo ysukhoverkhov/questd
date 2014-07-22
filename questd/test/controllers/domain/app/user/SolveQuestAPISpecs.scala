@@ -132,7 +132,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(Some(TryFightQuestResult())))
 
-      there were no(solution).updateStatus(any, any)
+      there were no(solution).updateStatus(any, any, any)
       there were no(user).storeSolutionInDailyResult(any, any)
     }
 
@@ -148,14 +148,14 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         status = Some(QuestSolutionStatus.WaitingForCompetitor.toString),
         questIds = List(mySolution.info.questId)) returns List(mySolution, rivalSolution).iterator
 
-      solution.updateStatus(mySolution.id, QuestSolutionStatus.Won.toString) returns Some(mySolution.copy(status = QuestSolutionStatus.Won.toString))
-      solution.updateStatus(rivalSolution.id, QuestSolutionStatus.Lost.toString) returns Some(rivalSolution.copy(status = QuestSolutionStatus.Lost.toString))
+      solution.updateStatus(mySolution.id, QuestSolutionStatus.Won.toString, Some(rivalSolution.id)) returns Some(mySolution.copy(status = QuestSolutionStatus.Won.toString))
+      solution.updateStatus(rivalSolution.id, QuestSolutionStatus.Lost.toString, Some(mySolution.id)) returns Some(rivalSolution.copy(status = QuestSolutionStatus.Lost.toString))
 
       user.readById(mySolution.userId) returns Some(user1)
       user.readById(rivalSolution.userId) returns Some(user2)
 
       db.quest.readById(quest.id) returns Some(quest)
-      
+
       db.user.storeSolutionInDailyResult(Matchers.eq(user1.id), any) returns Some(user1)
       db.user.storeSolutionInDailyResult(Matchers.eq(user2.id), any) returns Some(user2)
 
@@ -163,7 +163,9 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(Some(TryFightQuestResult())))
 
-      there were two(solution).updateStatus(any, any)
+      there was
+        one(solution).updateStatus(mySolution.id, QuestSolutionStatus.Won.toString, Some(rivalSolution.id)) andThen
+        one(solution).updateStatus(rivalSolution.id, QuestSolutionStatus.Lost.toString, Some(mySolution.id))
       there were two(user).readById(any)
       there were two(user).storeSolutionInDailyResult(any, any)
     }
