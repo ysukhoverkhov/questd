@@ -350,8 +350,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- winners) {
             Logger.debug("  winner id=" + curSol.id)
 
-            val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString, curSol.rivalSolutionId)
-            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString) ifSome { s =>
+            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString, curSol.rivalSolutionId) ifSome { s =>
               db.user.readById(curSol.userId) ifSome { u =>
                 rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u))
               }
@@ -363,8 +362,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- losers) {
             Logger.debug("  loser id=" + curSol.id)
 
-            val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString, curSol.rivalSolutionId)
-            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString) ifSome { s =>
+            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString, curSol.rivalSolutionId) ifSome { s =>
               db.user.readById(curSol.userId) ifSome { u =>
                 rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u))
               }

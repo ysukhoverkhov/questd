@@ -177,8 +177,8 @@ class SolutionDAOSpecs extends Specification
       val su1 = db.solution.updateStatus(id1, QuestSolutionStatus.Lost.toString)
       val su2 = db.solution.updateStatus(id2, QuestSolutionStatus.Won.toString, Some(id1))
       
-      su1 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Lost.toString && s.rivalSolutionId == None)
-      su2 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Won.toString && s.rivalSolutionId == Some(id1))
+      su1 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Lost && s.rivalSolutionId == None)
+      su2 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Won && s.rivalSolutionId == Some(id1))
     }
     
   }

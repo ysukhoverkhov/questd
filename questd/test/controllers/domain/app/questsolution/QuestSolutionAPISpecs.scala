@@ -74,7 +74,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       when(api.questSolution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
 
       when(spiedQuestSolutionLogic.shouldStopVoting).thenReturn(true)
-      solution.updateStatus(any, any, any) returns Some(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor.toString))
+      solution.updateStatus(any, any, any) returns Some(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor))
       user.readById(user1.id) returns Some(user1)
       quest.readById(q.id) returns Some(q)
 
