@@ -23,7 +23,7 @@ trait DailyResults { this: UserLogic =>
    */
   def getStartOfCurrentDailyResultPeriod: Date = {
     val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    DateTime.now(tz).hour(constants.flipHour).minute(0).second(0) toDate ()
+    DateTime.now(tz).hour(constants.FlipHour).minute(0).second(0) toDate ()
   }
 
   /**

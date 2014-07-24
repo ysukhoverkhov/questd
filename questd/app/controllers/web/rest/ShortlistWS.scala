@@ -11,6 +11,6 @@ object ShortlistWS extends Controller with AccessToWSInstance {
   def costToShortlist = ws.costToShortlist
   def addToShortlist = ws.addToShortlist
   def removeFromShortlist = ws.removeFromShortlist
-
+  def getSuggestsForShortlist = ws.getSuggestsForShortlist
 }
 

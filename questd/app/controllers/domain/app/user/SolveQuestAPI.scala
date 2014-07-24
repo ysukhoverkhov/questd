@@ -5,7 +5,7 @@ import models.domain.base._
 import models.store._
 import play.Logger
 import helpers._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import controllers.domain._
 import components._
 import logic._
@@ -51,7 +51,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getQuestCost(request: GetQuestCostRequest): ApiResult[GetQuestCostResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetQuestCostResult(OK, user.costOfPurchasingQuest)))
+    OkApiResult(GetQuestCostResult(OK, user.costOfPurchasingQuest))
   }
 
   /**
@@ -77,14 +77,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             case Some(q) => skipQuest(SkipQuestRequest(q))
           }
         } else {
-          OkApiResult(Some(SkipQuestResult()))
+          OkApiResult(SkipQuestResult())
         }
 
-        v map {
+        v ifOk {
 
           // Updating user profile.
           user.getRandomQuestForSolution match {
-            case None => OkApiResult(Some(PurchaseQuestResult(OutOfContent)))
+            case None => OkApiResult(PurchaseQuestResult(OutOfContent))
             case Some(q) => {
               {
                 val questCost = user.costOfPurchasingQuest
@@ -94,7 +94,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                   Logger.error("API - purchaseQuest. Unable to find quest author")
                   InternalErrorApiResult()
                 } else {
-                  adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) map { r =>
+                  adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) ifOk { r =>
 
                     val u = db.user.purchaseQuest(
                       r.user.id,
@@ -103,7 +103,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                       r.user.rewardForLosingQuest(q),
                       r.user.rewardForWinningQuest(q))
 
-                    OkApiResult(Some(PurchaseQuestResult(OK, u.map(_.profile))))
+                    OkApiResult(PurchaseQuestResult(OK, u.map(_.profile)))
                   }
                 }
               }
@@ -112,7 +112,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         }
       }
 
-      case a => OkApiResult(Some(PurchaseQuestResult(a)))
+      case a => OkApiResult(PurchaseQuestResult(a))
     }
   }
 
@@ -122,7 +122,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getTakeQuestCost(request: GetTakeQuestCostRequest): ApiResult[GetTakeQuestCostResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetTakeQuestCostResult(OK, user.costOfTakingQuest)))
+    OkApiResult(GetTakeQuestCostResult(OK, user.costOfTakingQuest))
   }
 
   /**
@@ -150,30 +150,30 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             }
           }
         } else {
-          OkApiResult(Some(TakeQuestUpdateResult))
+          OkApiResult(TakeQuestUpdateResult)
         }
 
-        v map {
+        v ifOk {
           adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuest)))
-        } map { r =>
+        } ifOk { r =>
 
           // Updating user profile.
-          val pq = r.user.profile.questSolutionContext.purchasedQuest
-          if (pq == None) {
-            Logger.error("API - takeQuest. Purchased quest is None")
-            InternalErrorApiResult()
-          } else {
-            val u = db.user.takeQuest(
+          r.user.profile.questSolutionContext.purchasedQuest ifSome { pq =>
+
+            db.user.takeQuest(
               id = r.user.id,
-              takenQuest = pq.get,
-              cooldown = r.user.getCooldownForTakeQuest(pq.get.obj),
-              deadline = r.user.getDeadlineForTakeQuest(pq.get.obj))
-            OkApiResult(Some(TakeQuestResult(OK, u.map(_.profile))))
+              pq,
+              r.user.getCooldownForTakeQuest(pq.obj),
+              r.user.getDeadlineForTakeQuest(pq.obj)) ifSome { usr =>
+
+                OkApiResult(TakeQuestResult(OK, Some(usr.profile)))
+
+              }
           }
         }
       }
 
-      case (a: ProfileModificationResult) => OkApiResult(Some(TakeQuestResult(a)))
+      case (a: ProfileModificationResult) => OkApiResult(TakeQuestResult(a))
     }
   }
 
@@ -184,29 +184,37 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     val user = ensureNoDeadlineQuest(request.user)
 
-    user.canResolveQuest(ContentType.withName(request.solution.media.contentType)) match {
+    user.canResolveQuest(request.solution.media.contentType) match {
       case OK => {
 
-        // TODO: pull user.profile.questSolutionContext.takenQuest.get to a val here. in 0.20.02
-        db.solution.create(
-          QuestSolution(
-            userId = user.id,
-            questLevel = user.profile.questSolutionContext.takenQuest.get.obj.level,
-            info = QuestSolutionInfo(
-              content = request.solution,
-              themeId = user.profile.questSolutionContext.takenQuest.get.obj.themeId,
-              questId = user.profile.questSolutionContext.takenQuest.get.id,
+        {
+          makeTask(MakeTaskRequest(user, taskType = Some(TaskType.SubmitQuestResult)))
+        } ifOk { r =>
+
+          r.user.profile.questSolutionContext.takenQuest ifSome { takenQuest =>
+            db.solution.create(
+              QuestSolution(
+                userId = r.user.id,
+                questLevel = takenQuest.obj.level,
+                info = QuestSolutionInfo(
+                  content = request.solution,
+                  themeId = takenQuest.obj.themeId,
+                  questId = takenQuest.id,
               vip = user.profile.publicProfile.vip),
-            voteEndDate = user.solutionVoteEndDate(user.profile.questSolutionContext.takenQuest.get.obj)))
+            voteEndDate = user.solutionVoteEndDate(takenQuest.obj)))
 
-        val u = db.user.resetQuestSolution(
-          user.id,
-          config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
+            db.user.resetQuestSolution(
+              user.id,
+              config(api.ConfigParams.DebugDisableSolutionCooldown) == "1") ifSome { u =>
 
-        OkApiResult(Some(ProposeSolutionResult(OK, u.map(_.profile))))
+                OkApiResult(ProposeSolutionResult(OK, Some(u.profile)))
+
+              }
+          }
+        }
       }
 
-      case (a: ProfileModificationResult) => OkApiResult(Some(ProposeSolutionResult(a)))
+      case (a: ProfileModificationResult) => OkApiResult(ProposeSolutionResult(a))
     }
   }
 
@@ -216,7 +224,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getQuestGiveUpCost(request: GetQuestGiveUpCostRequest): ApiResult[GetQuestGiveUpCostResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetQuestGiveUpCostResult(OK, user.costOfGivingUpQuest)))
+    OkApiResult(GetQuestGiveUpCostResult(OK, user.costOfGivingUpQuest))
   }
 
   /**
@@ -226,15 +234,15 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     request.user.canGiveUpQuest match {
       case OK => {
 
-        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) map { r =>
+        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) ifOk { r =>
           val u = db.user.resetQuestSolution(
             r.user.id,
             config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
-          OkApiResult(Some(GiveUpQuestResult(OK, u.map(_.profile))))
+          OkApiResult(GiveUpQuestResult(OK, u.map(_.profile)))
         }
       }
 
-      case (a: ProfileModificationResult) => OkApiResult(Some(GiveUpQuestResult(a)))
+      case (a: ProfileModificationResult) => OkApiResult(GiveUpQuestResult(a))
     }
   }
 
@@ -242,11 +250,11 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    * Stop from solving quests because its deadline reached.
    */
   def deadlineQuest(request: DeadlineQuestRequest): ApiResult[DeadlineQuestResult] = handleDbException {
-    storeSolutionOutOfTimePenalty(StoreSolutionOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuest)) map { r =>
+    storeSolutionOutOfTimePenalty(StoreSolutionOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuest)) ifOk { r =>
       val u = db.user.resetQuestSolution(
         r.user.id,
         config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
-      OkApiResult(Some(DeadlineQuestResult(u)))
+      OkApiResult(DeadlineQuestResult(u))
     }
   }
 
@@ -258,38 +266,44 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     Logger.debug("API - rewardQuestSolutionAuthor")
 
-    // TODO: read quest here only if this is required.
-    // TODO: test banned users are penalized correctly.
-    db.quest.readById(solution.info.questId) match {
-      case Some(q) => {
+    case class QuestNotFoundException() extends Throwable
 
-        val r = QuestSolutionStatus.withName(solution.status) match {
-          case QuestSolutionStatus.OnVoting => {
-            Logger.error("We are rewarding player for solution what is on voting.")
-            InternalErrorApiResult()
-          }
-
-          case QuestSolutionStatus.WaitingForCompetitor =>
-            tryFightQuest(TryFightQuestRequest(solution)) map OkApiResult(Some(StoreSolutionInDailyResultResult(author)))
-
-          case QuestSolutionStatus.Won =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
-
-          case QuestSolutionStatus.Lost =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.defeatReward)))
-
-          case QuestSolutionStatus.CheatingBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForCheatingSolution(q))))
-
-          case QuestSolutionStatus.IACBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForIACSolution(q))))
-        }
-
-        r map {
-          OkApiResult(Some(RewardQuestSolutionAuthorResult()))
-        }
+    def q = {
+      db.quest.readById(solution.info.questId) match {
+        case Some(qu) => qu
+        case None => throw QuestNotFoundException()
       }
-      case None => {
+    }
+
+    // TODO: test banned users are penalized correctly.
+    try {
+      val r = solution.status match {
+        case QuestSolutionStatus.OnVoting => {
+          Logger.error("We are rewarding player for solution what is on voting.")
+          InternalErrorApiResult()
+        }
+
+        case QuestSolutionStatus.WaitingForCompetitor =>
+          tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
+
+        case QuestSolutionStatus.Won =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
+
+        case QuestSolutionStatus.Lost =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.defeatReward)))
+
+        case QuestSolutionStatus.CheatingBanned =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForCheatingSolution(q))))
+
+        case QuestSolutionStatus.IACBanned =>
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForIACSolution(q))))
+      }
+
+      r ifOk {
+        OkApiResult(RewardQuestSolutionAuthorResult())
+      }
+    } catch {
+      case ex: QuestNotFoundException => {
         Logger.error("No quest found for updating player assets for changing solution state.")
         InternalErrorApiResult()
       }
@@ -336,27 +350,27 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- winners) {
             Logger.debug("  winner id=" + curSol.id)
 
-            val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString, curSol.rivalSolutionId)
-
-            val u = db.user.readById(curSol.userId)
-            if (u != None) {
-              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s.get, author = u.get))
+            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString, curSol.rivalSolutionId) ifSome { s =>
+              db.user.readById(curSol.userId) ifSome { u =>
+                rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u))
+              }
             }
+
           }
 
           // and losers
           for (curSol <- losers) {
             Logger.debug("  loser id=" + curSol.id)
 
-            val s = db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString, curSol.rivalSolutionId)
-
-            val u = db.user.readById(curSol.userId)
-            if (u != None) {
-              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s.get, author = u.get))
+            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString, curSol.rivalSolutionId) ifSome { s =>
+              db.user.readById(curSol.userId) ifSome { u =>
+                rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u))
+              }
             }
+
           }
 
-          OkApiResult(Some(TryFightQuestResult()))
+          OkApiResult(TryFightQuestResult())
 
         } else {
 
@@ -366,13 +380,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       } else {
 
         // We didn;t find competitor but this is ok.
-        OkApiResult(Some(TryFightQuestResult()))
+        OkApiResult(TryFightQuestResult())
       }
     }
 
     compete(solutionsForQuest)
   }
 
+  // it should return not user but its option.
   private def ensureNoDeadlineQuest(user: User): User = {
     if (user.questDeadlineReached) {
       deadlineQuest(DeadlineQuestRequest(user)).body.get.user.get

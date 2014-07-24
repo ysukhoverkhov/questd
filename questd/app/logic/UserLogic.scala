@@ -34,10 +34,11 @@ class UserLogic(
     with VotingQuestSolutions
     with DailyResults
     with Friends
+    with Tasks
     with MiscUserLogic
     with QuestSelectUserLogic
     with SolutionSelectUserLogic
     
-    with CommonUtil {
+    with SelectionHelpers {
 }
 
