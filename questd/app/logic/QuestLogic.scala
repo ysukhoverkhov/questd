@@ -29,23 +29,23 @@ class QuestLogic(
   /**
    * Calculate difficulty of a quest.
    */
-  def calculateDifficulty = {
+  def calculateDifficulty: QuestDifficulty.Value = {
     List(
       (QuestDifficulty.Easy, quest.rating.difficultyRating.easy),
       (QuestDifficulty.Normal, quest.rating.difficultyRating.normal),
       (QuestDifficulty.Hard, quest.rating.difficultyRating.hard),
-      (QuestDifficulty.Extreme, quest.rating.difficultyRating.extreme)).reduce((l, r) => if (l._2 > r._2) l else r)
+      (QuestDifficulty.Extreme, quest.rating.difficultyRating.extreme)).reduce((l, r) => if (l._2 > r._2) l else r)._1
   }
 
   /**
    * Calculate duration of a quest.
    */
-  def calculateDuration = {
+  def calculateDuration: QuestDuration.Value = {
     List(
       (QuestDuration.Minutes, quest.rating.durationRating.mins),
       (QuestDuration.Hour, quest.rating.durationRating.hour),
       (QuestDuration.Day, quest.rating.durationRating.day),
-      (QuestDuration.Week, quest.rating.durationRating.week)).reduce((l, r) => if (l._2 > r._2) l else r)
+      (QuestDuration.Week, quest.rating.durationRating.week)).reduce((l, r) => if (l._2 > r._2) l else r)._1
   }
 
   /**
