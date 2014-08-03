@@ -3,7 +3,7 @@ package controllers.domain.app.user
 import components._
 import controllers.domain._
 import controllers.domain.app.quest._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import logic._
 import models.domain._
 import models.domain.base.QuestInfoWithID
@@ -16,7 +16,7 @@ import models.domain.base.PublicProfileWithID
 case class GetQuestProposalToVoteRequest(user: User)
 case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: Option[QuestDuration.Value] = None, difficulty: Option[QuestDifficulty.Value] = None)
+case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: QuestDuration.Value, difficulty: QuestDifficulty.Value)
 case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, author: Option[PublicProfileWithID] = None)
 
 private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -31,12 +31,12 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
       case OK => {
 
         Logger.trace("getQuestProposalToVote - we are eligable to vote quest.")
-        
+
         // Updating user profile.
         val q = user.getQuestProposalToVote
 
         q match {
-          case None => OkApiResult(Some(GetQuestProposalToVoteResult(OutOfContent)))
+          case None => OkApiResult(GetQuestProposalToVoteResult(OutOfContent))
           case Some(a) => {
             val qi = QuestInfoWithID(a.id, a.info)
             val theme = db.theme.readById(a.info.themeId)
@@ -46,12 +46,12 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
               InternalErrorApiResult()
             } else {
               val u = db.user.selectQuestProposalVote(user.id, qi, theme.get)
-              OkApiResult(Some(GetQuestProposalToVoteResult(OK, u.map(_.profile))))
+              OkApiResult(GetQuestProposalToVoteResult(OK, u.map(_.profile)))
             }
           }
         }
       }
-      case a => OkApiResult(Some(GetQuestProposalToVoteResult(a)))
+      case a => OkApiResult(GetQuestProposalToVoteResult(a))
     }
 
   }
@@ -74,13 +74,19 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
           }
           case Some(q) => {
             {
+              
               voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
-            } map {
+              
+            } ifOk { r =>
+              
+              makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuestProposals)))
+              
+            } ifOk {
 
               adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))
-            } map { r =>
-              // 3. update user profile.
-              // 4. save profile in db.
+
+            } ifOk { r =>
+
               val liked = (request.vote == QuestProposalVote.Cool)
               val u = db.user.recordQuestProposalVote(r.user.id, q.id, liked)
 
@@ -96,13 +102,13 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
                 None
               }
 
-              OkApiResult(Some(VoteQuestProposalResult(OK, u.map(_.profile), Some(reward), author)))
+              OkApiResult(VoteQuestProposalResult(OK, u.map(_.profile), Some(reward), author))
             }
           }
         }
 
       }
-      case a => OkApiResult(Some(VoteQuestProposalResult(a)))
+      case a => OkApiResult(VoteQuestProposalResult(a))
     }
   }
 

@@ -8,7 +8,7 @@ object ContentType extends Enumeration {
 }
 
 case class ContentReference(
-  contentType: String,
+  contentType: ContentType.Value,
   storage: String,
   reference: String)
 

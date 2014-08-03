@@ -5,7 +5,7 @@ import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import logic._
 import java.util.Date
 import org.joda.time.DateTime
@@ -51,7 +51,7 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
           proposalsLikedPerDay = if (deltaDays == Double.NaN) 0 else user.stats.proposalsLiked / deltaDays
         ))
 
-    OkApiResult(Some(ShiftStatsResult()))
+    OkApiResult(ShiftStatsResult())
   }
 
   /**
@@ -90,7 +90,7 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         u
     }
     
-    OkApiResult(Some(ShiftHistoryResult()))
+    OkApiResult(ShiftHistoryResult())
   }
   
 }

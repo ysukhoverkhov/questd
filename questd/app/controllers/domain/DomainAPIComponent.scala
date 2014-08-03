@@ -14,8 +14,10 @@ import logic.UserLogic
 import logic.LogicBootstrapper
 import components.random.RandomComponent
 import controllers.domain.app.quest.QuestsFetchAPI
+import controllers.domain.libs.facebook.FacebookComponent
+import controllers.domain.libs.facebook.FacebookComponent
 
-trait DomainAPIComponent { component: DatabaseComponent with RandomComponent =>
+trait DomainAPIComponent { component: DatabaseComponent with RandomComponent with FacebookComponent =>
 
   protected val api: DomainAPI
 
@@ -23,6 +25,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent =>
     extends DBAccessor
     with APIAccessor
     with RandomAccessor
+    with FBAccessor
 
     with AuthAPI
     with ProfileAPI
@@ -37,6 +40,8 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent =>
     with FriendsAPI
     with MessagesAPI 
     with MiscAPI
+    with TasksAPI
+    with TutorialAPI
     
     with QuestAPI
     with QuestsFetchAPI
@@ -46,6 +51,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent =>
     with ThemesAdminAPI
     with UsersAdminAPI
     with QuestsAdminAPI
+    with TutorialTasksAdminAPI
     with SolutionsAdminAPI
     with ConfigAdminAPI 
     
@@ -54,10 +60,10 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent =>
     
     with LogicBootstrapper { 
 
+    lazy val fb = component.fb
     lazy val db = component.db
     lazy val api = component.api // This is lazy since it references to his parent which creates us during initialization.
     lazy val rand = component.rand
-    
     
   }
 
