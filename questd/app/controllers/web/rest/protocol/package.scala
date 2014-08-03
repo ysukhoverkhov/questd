@@ -166,10 +166,10 @@ package object protocol {
   type WSGetRightsAtLevelsResult = GetRightsAtLevelsResult
 
   type WSGetLevelsForRightsResult = GetLevelsForRightsResult
-  
+
   case class WSGetLevelsForRightsRequest(
-      functionality: List[String])
-  
+    functionality: List[String])
+
   /**
    * ********************
    * Content
@@ -194,6 +194,28 @@ package object protocol {
     id: String,
 
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: Option[String],
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+
+  type WSGetOwnSolutionsResult = GetOwnSolutionsResult
+  case class WSGetOwnSolutionsRequest(
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: Option[String],
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+
+  type WSGetOwnQuestsResult = GetOwnQuestsResult
+  case class WSGetOwnQuestsRequest(
+    // see QuestStatus enum. if missing all solutions will be returned.
     status: Option[String],
 
     // Number of page in result, zero based.
@@ -252,7 +274,6 @@ package object protocol {
 
   type WSRemoveFromShortlistResult = RemoveFromShortlistResult
 
-  
   /**
    * Friends
    */
@@ -280,11 +301,10 @@ package object protocol {
     id: String)
   type WSRemoveFromFriendsResult = RemoveFromFriendsResult
 
-  
   /**
    * Messages
    */
-  
+
   type WSGetMessagesResult = GetMessagesResult
 
   case class WSRemoveMessageRequest(
@@ -292,11 +312,10 @@ package object protocol {
     id: String)
   type WSRemoveMessageResult = RemoveMessageResult
 
-
   /**
    * Misc
    */
-  
+
   type WSGetTimeResult = GetTimeResult
 
 }

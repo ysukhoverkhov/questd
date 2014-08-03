@@ -34,6 +34,28 @@ case class GetPublicProfileResult(
   allowed: ProfileModificationResult,
   publicProfile: Option[PublicProfile])
 
+case class GetOwnSolutionsRequest(
+  user: User,
+  status: Option[QuestSolutionStatus.Value],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetOwnSolutionsResult(
+  allowed: ProfileModificationResult,
+  solutions: List[QuestSolution],
+  pageSize: Int,
+  hasMore: Boolean)
+
+case class GetOwnQuestsRequest(
+  user: User,
+  status: Option[QuestStatus.Value],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetOwnQuestsResult(
+  allowed: ProfileModificationResult,
+  quests: List[Quest],
+  pageSize: Int,
+  hasMore: Boolean)
+  
   
 case class GetSolutionsForQuestRequest(
   user: User,
@@ -143,6 +165,42 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     }
   }
 
+  
+  /**
+   * Get own solutions.
+   */
+  def getOwnSolutions(request: GetOwnSolutionsRequest): ApiResult[GetOwnSolutionsResult] = handleDbException {
+    val pageSize = if (request.pageSize > 50) 50 else request.pageSize
+    val solutionsForUser = db.solution.allWithParams(
+        status = request.status.map(_.toString), 
+        userIds = List(request.user.id),
+        skip = request.pageNumber * pageSize)
+    
+    OkApiResult(Some(GetOwnSolutionsResult(
+      allowed = OK,
+      solutions = solutionsForUser.take(pageSize).toList,
+      pageSize,
+      solutionsForUser.hasNext)))
+  }
+
+  /**
+   * Get own quests.
+   */
+  def getOwnQuests(request: GetOwnQuestsRequest): ApiResult[GetOwnQuestsResult] = handleDbException {
+    val pageSize = if (request.pageSize > 50) 50 else request.pageSize
+    val questsForUser = db.quest.allWithParams(
+        status = request.status.map(_.toString), 
+        userIds = List(request.user.id),
+        skip = request.pageNumber * pageSize)
+    
+    OkApiResult(Some(GetOwnQuestsResult(
+      allowed = OK,
+      quests = questsForUser.take(pageSize).toList,
+      pageSize,
+      questsForUser.hasNext)))
+  }
+  
+  
   /**
    * Get solutions for a quest.
    */

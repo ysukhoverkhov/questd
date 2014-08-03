@@ -10,12 +10,14 @@ import models.domain.base.QuestInfoWithID
 import controllers.domain.app.protocol.ProfileModificationResult._
 import play.Logger
 import controllers.domain._
+import models.domain.base.PublicProfileWithID
+import models.domain.base.PublicProfileWithID
 
 case class GetQuestProposalToVoteRequest(user: User)
 case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: Option[QuestDuration.Value] = None, difficulty: Option[QuestDifficulty.Value] = None)
-case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, author: Option[PublicProfile] = None)
+case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, author: Option[PublicProfileWithID] = None)
 
 private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -83,7 +85,13 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
               val u = db.user.recordQuestProposalVote(r.user.id, q.id, liked)
 
               val author = if (liked) {
-                db.user.readById(q.authorUserId).map(_.profile.publicProfile)
+                // TODO: make here if Some
+                val a = db.user.readById(q.authorUserId)
+                if (a != None) {
+                  Some(PublicProfileWithID(a.get.id, a.get.profile.publicProfile))
+                } else {
+                  None
+                }
               } else {
                 None
               }

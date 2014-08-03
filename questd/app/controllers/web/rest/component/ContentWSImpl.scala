@@ -37,6 +37,32 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
   }
 
   /**
+   * Get own solutions.
+   */
+  def getOwnSolutions = wrapJsonApiCallReturnBody[WSGetOwnSolutionsResult] { (js, r) =>
+    val v = Json.read[WSGetOwnSolutionsRequest](js)
+
+    api.getOwnSolutions(GetOwnSolutionsRequest(
+      r.user,
+      v.status.map(QuestSolutionStatus.withName(_)),
+      v.pageNumber,
+      v.pageSize))
+  }
+
+  /**
+   * Get own quests.
+   */
+  def getOwnQuests = wrapJsonApiCallReturnBody[WSGetOwnQuestsResult] { (js, r) =>
+    val v = Json.read[WSGetOwnQuestsRequest](js)
+
+    api.getOwnQuests(GetOwnQuestsRequest(
+      r.user,
+      v.status.map(QuestStatus.withName(_)),
+      v.pageNumber,
+      v.pageSize))
+  }
+
+  /**
    * Get solutions for a given quest id.
    */
   def getSolutionsForQuest = wrapJsonApiCallReturnBody[WSGetSolutionsForQuestResult] { (js, r) =>
@@ -67,7 +93,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
   /**
    * Get quests for a given person.
    */
-  def getQuestsForUser  = wrapJsonApiCallReturnBody[WSGetQuestsForUserResult] { (js, r) =>
+  def getQuestsForUser = wrapJsonApiCallReturnBody[WSGetQuestsForUserResult] { (js, r) =>
     val v = Json.read[WSGetQuestsForUserRequest](js)
 
     api.getQuestsForUser(GetQuestsForUserRequest(
