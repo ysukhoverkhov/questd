@@ -24,7 +24,7 @@ trait SolvingQuests { this: UserLogic =>
    * Check can the user purchase quest.
    */
   def canPurchaseQuest = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costOfPurchasingQuest))
       NotEnoughAssets
@@ -35,19 +35,27 @@ trait SolvingQuests { this: UserLogic =>
     else
       OK
   }
+  
+  /**
+   * Checks is user potentially able to solve quests today (disregarding coins and other things).
+   */
+  def canSolveQuestToday = {
+    user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults) &&
+    user.profile.questSolutionContext.questCooldown.before(new Date())
+  }
 
   /**
-   * Tells cost of next theme purchase
+   * Tells cost of next quest purchase
    */
   def costOfPurchasingQuest = {
-    if (user.profile.questSolutionContext.numberOfPurchasedQuests < numberOfQuestsSkipsForCoins) {
+    if (user.profile.questSolutionContext.numberOfPurchasedQuests <= NumberOfQuestsSkipsForCoins) {
 
       val questDuration = user.profile.questSolutionContext.purchasedQuest match {
         case Some(QuestInfoWithID(_, q)) => q.daysDuration
         case _ => 1
       }
 
-      val c = costToSkipQuest(user.profile.publicProfile.level, user.profile.questSolutionContext.numberOfPurchasedQuests + 1, questDuration)
+      val c = costToSkipQuest(user.profile.publicProfile.level, user.profile.questSolutionContext.numberOfPurchasedQuests, questDuration)
       Assets(coins = c)
     } else {
       Assets(money = 1)
@@ -65,7 +73,7 @@ trait SolvingQuests { this: UserLogic =>
    * Check are we able to take quest.
    */
   def canTakeQuest = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults.toString()))
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults))
       NotEnoughRights
     else if (user.profile.questSolutionContext.purchasedQuest == None)
       InvalidState
@@ -87,8 +95,8 @@ trait SolvingQuests { this: UserLogic =>
    */
   def canResolveQuest(conentType: ContentType) = {
     val content = conentType match {
-      case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults.toString())
-      case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoResults.toString())
+      case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults)
+      case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoResults)
     }
 
     if (!content)
@@ -123,7 +131,7 @@ trait SolvingQuests { this: UserLogic =>
     val daysToSkipt = qi.daysDuration
 
     val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + daysToSkipt.days).hour(constants.flipHour).minute(0).second(0) toDate ()
+    (DateTime.now(tz) + daysToSkipt.days).hour(constants.FlipHour).minute(0).second(0) toDate ()
   }
 
   /**
@@ -139,10 +147,7 @@ trait SolvingQuests { this: UserLogic =>
   /**
    * Cooldown for reseting purchases. Purchases should be reset in nearest 5am at user's time.
    */
-  def getResetPurchasesTimeout = {
-    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + 1.day).hour(constants.flipHour).minute(0).second(0) toDate ()
-  }
+  def getResetPurchasesTimeout = getNextFlipHourDate
   
   /**
    * Time when to stop voring for solution.
@@ -176,14 +181,14 @@ trait SolvingQuests { this: UserLogic =>
    * Penalty for cheating solution
    */
   def penaltyForCheatingSolution(quest: Quest) = {
-    (rewardForLosingQuest(quest) * questSolutionCheatingPenalty) clampTop user.profile.assets
+    (rewardForLosingQuest(quest) * QuestSolutionCheatingPenalty) clampTop user.profile.assets
   }
 
   /**
    * Penalty for IAC solution
    */
   def penaltyForIACSolution(quest: Quest) = {
-    (rewardForLosingQuest(quest) * questSolutionIACPenalty) clampTop user.profile.assets
+    (rewardForLosingQuest(quest) * QuestSolutionIACPenalty) clampTop user.profile.assets
   }
 
   /**

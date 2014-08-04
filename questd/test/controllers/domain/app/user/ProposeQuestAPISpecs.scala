@@ -16,25 +16,28 @@ import components.componentregistry.ComponentRegistry
 import models.domain.base.ThemeWithID
 import java.util.Date
 import controllers.domain.app.protocol.ProfileModificationResult
+import models.domain.stubCreators._
+
 
 class ProposeQuestAPISpecs extends BaseAPISpecs {
 
   def createUser(vip: Boolean) = {
+
     User(
-        id = "user_id",
-        profile = Profile(
-          questProposalContext = QuestProposalConext(
-            approveReward = Assets(1, 2, 3),
-            takenTheme = Some(ThemeWithID("theme_id", Theme(id = "theme_id", text = "", comment = ""))),
-            questProposalCooldown = new Date(Long.MaxValue)),
-          publicProfile = PublicProfile(vip = vip),
-          rights = Rights.full))
+      id = "user_id",
+      profile = Profile(
+        questProposalContext = QuestProposalConext(
+          approveReward = Assets(1, 2, 3),
+          takenTheme = Some(ThemeWithID("theme_id", createThemeStub().info)),
+          questProposalCooldown = new Date(Long.MaxValue)),
+        publicProfile = PublicProfile(vip = vip),
+        rights = Rights.full))
   }
 
   def createQuest = {
-    QuestInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None, "")
+    QuestInfoContent(ContentReference(ContentType.Photo, "", ""), None, "")
   }
-  
+
   "Propose Quest API" should {
 
     "Create regular quests for regular users" in context {
@@ -43,11 +46,11 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
       val q = createQuest
 
       user.resetQuestProposal(any, any) returns Some(u)      
-      
+
       val result = api.proposeQuest(ProposeQuestRequest(u, q))
 
       result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
-      
+
       there was one(quest).create(
         Quest(
           id = anyString,
@@ -64,11 +67,11 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
       val q = createQuest
 
       user.resetQuestProposal(any, any) returns Some(u)      
-      
+
       val result = api.proposeQuest(ProposeQuestRequest(u, q))
 
       result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
-      
+
       there was one(quest).create(
         Quest(
           id = anyString,

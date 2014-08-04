@@ -18,8 +18,7 @@ class QuestDAOSpecs extends Specification
   with BaseDAOSpecs {
 
   private[this] def clearDB() = {
-    for (i <- db.quest.all)
-      db.quest.delete(i.id)
+    db.quest.clear
   }
 
   "Mongo Quest DAO" should {
@@ -36,10 +35,11 @@ class QuestDAOSpecs extends Specification
         info = QuestInfo(
           themeId = "theme_id",
           content = QuestInfoContent(
-            media = ContentReference(ContentType.Video.toString, "", ""),
+            media = ContentReference(ContentType.Video, "", ""),
             icon = None,
             description = "The description"),
-          vip = true)))
+          vip = true),
+        status = QuestStatus.OnVoting))
 
       val q = db.quest.readById(id)
 
@@ -58,7 +58,7 @@ class QuestDAOSpecs extends Specification
         info = QuestInfo(
           themeId = "theme_id",
           content = QuestInfoContent(
-            media = ContentReference(ContentType.Video.toString, "", ""),
+            media = ContentReference(ContentType.Video, "", ""),
             icon = None,
             description = "The description"),
           vip = true)))
@@ -68,7 +68,7 @@ class QuestDAOSpecs extends Specification
 
       db.quest.update(q.get.copy(info = q.get.info.copy(
         content = q.get.info.content.copy(
-          media = ContentReference(ContentType.Video.toString, "2", "3")))))
+          media = ContentReference(ContentType.Video, "2", "3")))))
 
       val q2 = db.quest.readById(id)
 
@@ -89,7 +89,7 @@ class QuestDAOSpecs extends Specification
         info = QuestInfo(
           themeId = "theme_id",
           content = QuestInfoContent(
-            media = ContentReference(ContentType.Video.toString, "", ""),
+            media = ContentReference(ContentType.Video, "", ""),
             icon = None,
             description = "The description"),
           vip = true)))
@@ -116,12 +116,12 @@ class QuestDAOSpecs extends Specification
           info = QuestInfo(
             themeId = "t1",
             content = QuestInfoContent(
-              media = ContentReference(ContentType.Video.toString, "", ""),
+              media = ContentReference(ContentType.Video, "", ""),
               icon = None,
               description = "The description"),
             level = 3,
             vip = false),
-          status = QuestStatus.OnVoting.toString),
+          status = QuestStatus.OnVoting),
 
         Quest(
           id = "q2",
@@ -130,12 +130,12 @@ class QuestDAOSpecs extends Specification
           info = QuestInfo(
             themeId = "t2",
             content = QuestInfoContent(
-              media = ContentReference(ContentType.Video.toString, "", ""),
+              media = ContentReference(ContentType.Video, "", ""),
               icon = None,
               description = "The description"),
             level = 13,
             vip = true),
-          status = QuestStatus.InRotation.toString),
+          status = QuestStatus.InRotation),
 
         Quest(
           id = "q3",
@@ -144,12 +144,12 @@ class QuestDAOSpecs extends Specification
           info = QuestInfo(
             themeId = "t3",
             content = QuestInfoContent(
-              media = ContentReference(ContentType.Video.toString, "", ""),
+              media = ContentReference(ContentType.Video, "", ""),
               icon = None,
               description = "The description"),
             level = 7,
             vip = true),
-          status = QuestStatus.OnVoting.toString))
+          status = QuestStatus.OnVoting))
 
       qs.foreach(db.quest.create)
 
