@@ -9,6 +9,8 @@ import controllers.domain.helpers.exceptionwrappers._
 import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
+import models.domain.base.PublicProfileWithID
+import models.domain.base.PublicProfileWithID
 
 
 case class GetQuestRequest(user: User, questId: String)
@@ -25,7 +27,7 @@ case class GetSolutionResult(
   myRating: Option[QuestSolutionRating] = None,
   rivalSolution: Option[QuestSolutionInfo] = None,
   rivalRating: Option[QuestSolutionRating] = None,
-  rivalProfile: Option[Profile] = None,
+  rivalProfile: Option[PublicProfileWithID] = None,
   quest: Option[QuestInfo] = None)
 
   
@@ -140,7 +142,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readById(id))
       val rivalSolutionInfo = rivalSolution.map(rs => rs.info)
       val rivalRating = rivalSolution.map(rs => rs.rating)
-      val rivalProfile = rivalSolution.flatMap(rs => db.user.readById(rs.userId)).map(ru => ru.profile)
+      val rivalProfile = rivalSolution.flatMap(rs => db.user.readById(rs.userId)).flatMap(ru => Some(PublicProfileWithID(ru.id, ru.profile.publicProfile)))
 
       OkApiResult(Some(GetSolutionResult(
         allowed = OK,
