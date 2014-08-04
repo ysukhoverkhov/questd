@@ -176,11 +176,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         userIds = List(request.user.id),
         skip = request.pageNumber * pageSize)
     
-    OkApiResult(Some(GetOwnSolutionsResult(
+    OkApiResult(GetOwnSolutionsResult(
       allowed = OK,
       solutions = solutionsForUser.take(pageSize).toList,
       pageSize,
-      solutionsForUser.hasNext)))
+      solutionsForUser.hasNext))
   }
 
   /**
@@ -193,11 +193,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         userIds = List(request.user.id),
         skip = request.pageNumber * pageSize)
     
-    OkApiResult(Some(GetOwnQuestsResult(
+    OkApiResult(GetOwnQuestsResult(
       allowed = OK,
       quests = questsForUser.take(pageSize).toList,
       pageSize,
-      questsForUser.hasNext)))
+      questsForUser.hasNext))
   }
   
   
