@@ -204,7 +204,6 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       questIds = List(request.questId),
       skip = request.pageNumber * pageSize)
 
-    OkApiResult(GetSolutionsForQuestResult(
     val solutions = solutionsForQuest.take(pageSize).toList.map(s => {
       QuestSolutionListInfo(
           solution = QuestSolutionInfoWithID(s.id, s.info),
@@ -213,6 +212,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     })
     
 
+    OkApiResult(GetSolutionsForQuestResult(
       allowed = OK,
       solutions = solutions,
       pageSize,
@@ -229,7 +229,6 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       userIds = List(request.userId),
       skip = request.pageNumber * pageSize)
 
-    OkApiResult(GetSolutionsForUserResult(
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
       QuestSolutionListInfo(
           solution = QuestSolutionInfoWithID(s.id, s.info),
@@ -237,6 +236,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
           author = None)
     })
 
+    OkApiResult(GetSolutionsForUserResult(
       allowed = OK,
       solutions = solutions,
       pageSize,
