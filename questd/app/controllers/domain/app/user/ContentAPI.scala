@@ -163,11 +163,13 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get own solutions.
    */
   def getOwnSolutions(request: GetOwnSolutionsRequest): ApiResult[GetOwnSolutionsResult] = handleDbException {
-    val pageSize = if (request.pageSize > 50) 50 else request.pageSize
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
     val solutionsForUser = db.solution.allWithParams(
       status = request.status.map(_.toString),
       userIds = List(request.user.id),
-      skip = request.pageNumber * pageSize)
+      skip = pageNumber * pageSize)
 
     OkApiResult(Some(GetOwnSolutionsResult(
       allowed = OK,
@@ -180,11 +182,13 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get own quests.
    */
   def getOwnQuests(request: GetOwnQuestsRequest): ApiResult[GetOwnQuestsResult] = handleDbException {
-    val pageSize = if (request.pageSize > 50) 50 else request.pageSize
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
     val questsForUser = db.quest.allWithParams(
       status = request.status.map(_.toString),
       userIds = List(request.user.id),
-      skip = request.pageNumber * pageSize)
+      skip = pageNumber * pageSize)
 
     OkApiResult(Some(GetOwnQuestsResult(
       allowed = OK,
@@ -197,20 +201,20 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get solutions for a quest.
    */
   def getSolutionsForQuest(request: GetSolutionsForQuestRequest): ApiResult[GetSolutionsForQuestResult] = handleDbException {
-    val pageSize = if (request.pageSize > 50) 50 else request.pageSize
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForQuest = db.solution.allWithParams(
       status = request.status.map(_.toString),
       questIds = List(request.questId),
-      skip = request.pageNumber * pageSize)
+      skip = pageNumber * pageSize)
 
     val solutions = solutionsForQuest.take(pageSize).toList.map(s => {
       QuestSolutionListInfo(
-          solution = QuestSolutionInfoWithID(s.id, s.info),
-          quest = None,
-          author = db.user.readById(s.userId).map(us => PublicProfileWithID(us.id, us.profile.publicProfile)))
+        solution = QuestSolutionInfoWithID(s.id, s.info),
+        quest = None,
+        author = db.user.readById(s.userId).map(us => PublicProfileWithID(us.id, us.profile.publicProfile)))
     })
-    
 
     OkApiResult(Some(GetSolutionsForQuestResult(
       allowed = OK,
@@ -223,17 +227,19 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get all solutions for a user.
    */
   def getSolutionsForUser(request: GetSolutionsForUserRequest): ApiResult[GetSolutionsForUserResult] = handleDbException {
-    val pageSize = if (request.pageSize > 50) 50 else request.pageSize
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
     val solutionsForUser = db.solution.allWithParams(
       status = request.status.map(_.toString),
       userIds = List(request.userId),
-      skip = request.pageNumber * pageSize)
+      skip = pageNumber * pageSize)
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
       QuestSolutionListInfo(
-          solution = QuestSolutionInfoWithID(s.id, s.info),
-          quest = db.quest.readById(s.info.questId).map(qu => QuestInfoWithID(qu.id, qu.info)),
-          author = None)
+        solution = QuestSolutionInfoWithID(s.id, s.info),
+        quest = db.quest.readById(s.info.questId).map(qu => QuestInfoWithID(qu.id, qu.info)),
+        author = None)
     })
 
     OkApiResult(Some(GetSolutionsForUserResult(
@@ -247,12 +253,13 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get all quests for a user.
    */
   def getQuestsForUser(request: GetQuestsForUserRequest): ApiResult[GetQuestsForUserResult] = handleDbException {
-    val pageSize = if (request.pageSize > 50) 50 else request.pageSize
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val questsForUser = db.quest.allWithParams(
       request.status.map(_.toString),
       List(request.userId),
-      skip = request.pageNumber * pageSize)
+      skip = pageNumber * pageSize)
 
     OkApiResult(Some(GetQuestsForUserResult(
       allowed = OK,
@@ -260,5 +267,31 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       pageSize,
       questsForUser.hasNext)))
   }
+
+  /**
+   * Make page of correct size correcting client's request.
+   */
+  private def adjustedPageSize(pageSize: Int): Int = {
+    val maxPageSize = 50
+    val defaultPageSize = 10
+
+    if (pageSize <= 0)
+      defaultPageSize
+    else if (pageSize > maxPageSize)
+      maxPageSize
+    else
+      pageSize
+  }
+
+  /**
+   * Make page number of correct number correcting client's request.
+   */
+  private def adjustedPageNumber(pageNumber: Int): Int = {
+    if (pageNumber < 0)
+      0
+    else
+      pageNumber
+  }
+
 }
 
