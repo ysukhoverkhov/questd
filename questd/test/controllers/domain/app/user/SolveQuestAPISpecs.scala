@@ -2,7 +2,7 @@ package controllers.domain.app.user
 
 import controllers.domain.BaseAPISpecs
 import models.domain._
-import models.domain.base._
+import models.domain.view._
 import java.util.Date
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.OkApiResult

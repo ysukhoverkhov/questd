@@ -10,10 +10,10 @@ import controllers.domain._
 import controllers.domain.app.user._
 import models.store._
 import models.domain._
+import models.domain.view._
 import models.store.mongo._
 import models.store.dao.UserDAO
 import components.componentregistry.ComponentRegistry
-import models.domain.base.ThemeWithID
 import java.util.Date
 import controllers.domain.app.protocol.ProfileModificationResult
 

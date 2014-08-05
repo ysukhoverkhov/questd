@@ -9,8 +9,7 @@ import controllers.domain.helpers.exceptionwrappers._
 import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
-import models.domain.base.PublicProfileWithID
-import models.domain.base.PublicProfileWithID
+import models.domain.view.PublicProfileWithID
 
 
 case class GetQuestRequest(user: User, questId: String)

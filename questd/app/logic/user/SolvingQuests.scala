@@ -9,7 +9,7 @@ import logic.constants._
 import logic.functions._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
-import models.domain.base._
+import models.domain.view._
 import models.domain.ContentType._
 import controllers.domain.admin._
 import controllers.domain._
