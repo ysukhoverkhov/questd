@@ -1,13 +1,15 @@
 package controllers.domain.app.user
 
+import play.Logger
 import components._
 import controllers.domain.helpers._
+import controllers.domain._
 import logic._
 import models.domain._
-import controllers.domain.app.protocol.ProfileModificationResult._
-import play.Logger
+import models.domain.view._
 import models.domain.base._
 import controllers.domain._
+import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.questsolution.VoteQuestSolutionUpdateRequest
 
 case class GetQuestSolutionToVoteRequest(user: User)

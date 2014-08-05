@@ -1,4 +1,4 @@
-package models.domain.base
+package models.domain.view
 
 import models.domain._
 

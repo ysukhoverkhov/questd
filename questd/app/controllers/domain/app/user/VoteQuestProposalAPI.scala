@@ -6,12 +6,10 @@ import controllers.domain.app.quest._
 import controllers.domain.helpers._
 import logic._
 import models.domain._
-import models.domain.base.QuestInfoWithID
+import models.domain.view._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import play.Logger
 import controllers.domain._
-import models.domain.base.PublicProfileWithID
-import models.domain.base.PublicProfileWithID
 
 case class GetQuestProposalToVoteRequest(user: User)
 case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)

@@ -1,6 +1,6 @@
 package models.domain
 
-import models.domain.base._
+import models.domain.view._
 
 case class QuestSolutionVoteContext(
   reviewingQuestSolution: Option[QuestSolutionInfoWithID] = None,

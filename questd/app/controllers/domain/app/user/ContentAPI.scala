@@ -6,12 +6,10 @@ import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
+import models.domain.view._
 import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
-import models.domain.base.PublicProfileWithID
-import models.domain.base.PublicProfileWithID
-
 
 case class GetQuestRequest(user: User, questId: String)
 case class GetQuestResult(
@@ -19,7 +17,6 @@ case class GetQuestResult(
   quest: Option[QuestInfo] = None,
   theme: Option[Theme] = None)
 
-  
 case class GetSolutionRequest(user: User, solutionId: String)
 case class GetSolutionResult(
   allowed: ProfileModificationResult,
@@ -30,7 +27,6 @@ case class GetSolutionResult(
   rivalProfile: Option[PublicProfileWithID] = None,
   quest: Option[QuestInfo] = None)
 
-  
 case class GetPublicProfileRequest(user: User, userId: String)
 case class GetPublicProfileResult(
   allowed: ProfileModificationResult,
@@ -57,8 +53,7 @@ case class GetOwnQuestsResult(
   quests: List[Quest],
   pageSize: Int,
   hasMore: Boolean)
-  
-  
+
 case class GetSolutionsForQuestRequest(
   user: User,
   questId: String,
@@ -67,11 +62,10 @@ case class GetSolutionsForQuestRequest(
   pageSize: Int)
 case class GetSolutionsForQuestResult(
   allowed: ProfileModificationResult,
-  solutions: List[QuestSolution],
+  solutions: List[QuestSolutionListInfo],
   pageSize: Int,
   hasMore: Boolean)
 
-  
 case class GetSolutionsForUserRequest(
   user: User,
   userId: String,
@@ -80,11 +74,10 @@ case class GetSolutionsForUserRequest(
   pageSize: Int)
 case class GetSolutionsForUserResult(
   allowed: ProfileModificationResult,
-  solutions: List[QuestSolution],
+  solutions: List[QuestSolutionListInfo],
   pageSize: Int,
   hasMore: Boolean)
 
-  
 case class GetQuestsForUserRequest(
   user: User,
   userId: String,
@@ -96,8 +89,7 @@ case class GetQuestsForUserResult(
   quests: List[Quest],
   pageSize: Int,
   hasMore: Boolean)
-  
-  
+
 private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -167,17 +159,16 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     }
   }
 
-  
   /**
    * Get own solutions.
    */
   def getOwnSolutions(request: GetOwnSolutionsRequest): ApiResult[GetOwnSolutionsResult] = handleDbException {
     val pageSize = if (request.pageSize > 50) 50 else request.pageSize
     val solutionsForUser = db.solution.allWithParams(
-        status = request.status.map(_.toString), 
-        userIds = List(request.user.id),
-        skip = request.pageNumber * pageSize)
-    
+      status = request.status.map(_.toString),
+      userIds = List(request.user.id),
+      skip = request.pageNumber * pageSize)
+
     OkApiResult(GetOwnSolutionsResult(
       allowed = OK,
       solutions = solutionsForUser.take(pageSize).toList,
@@ -191,32 +182,39 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def getOwnQuests(request: GetOwnQuestsRequest): ApiResult[GetOwnQuestsResult] = handleDbException {
     val pageSize = if (request.pageSize > 50) 50 else request.pageSize
     val questsForUser = db.quest.allWithParams(
-        status = request.status.map(_.toString), 
-        userIds = List(request.user.id),
-        skip = request.pageNumber * pageSize)
-    
+      status = request.status.map(_.toString),
+      userIds = List(request.user.id),
+      skip = request.pageNumber * pageSize)
+
     OkApiResult(GetOwnQuestsResult(
       allowed = OK,
       quests = questsForUser.take(pageSize).toList,
       pageSize,
       questsForUser.hasNext))
   }
-  
-  
+
   /**
    * Get solutions for a quest.
    */
   def getSolutionsForQuest(request: GetSolutionsForQuestRequest): ApiResult[GetSolutionsForQuestResult] = handleDbException {
     val pageSize = if (request.pageSize > 50) 50 else request.pageSize
-    
+
     val solutionsForQuest = db.solution.allWithParams(
-        status = request.status.map(_.toString), 
-        questIds = List(request.questId),
-        skip = request.pageNumber * pageSize)
-        
+      status = request.status.map(_.toString),
+      questIds = List(request.questId),
+      skip = request.pageNumber * pageSize)
+
     OkApiResult(GetSolutionsForQuestResult(
+    val solutions = solutionsForQuest.take(pageSize).toList.map(s => {
+      QuestSolutionListInfo(
+          solution = QuestSolutionInfoWithID(s.id, s.info),
+          quest = None,
+          author = db.user.readById(s.userId).map(us => PublicProfileWithID(us.id, us.profile.publicProfile)))
+    })
+    
+
       allowed = OK,
-      solutions = solutionsForQuest.take(pageSize).toList,
+      solutions = solutions,
       pageSize,
       solutionsForQuest.hasNext))
   }
@@ -227,13 +225,20 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def getSolutionsForUser(request: GetSolutionsForUserRequest): ApiResult[GetSolutionsForUserResult] = handleDbException {
     val pageSize = if (request.pageSize > 50) 50 else request.pageSize
     val solutionsForUser = db.solution.allWithParams(
-        status = request.status.map(_.toString), 
-        userIds = List(request.userId),
-        skip = request.pageNumber * pageSize)
-    
+      status = request.status.map(_.toString),
+      userIds = List(request.userId),
+      skip = request.pageNumber * pageSize)
+
     OkApiResult(GetSolutionsForUserResult(
+    val solutions = solutionsForUser.take(pageSize).toList.map(s => {
+      QuestSolutionListInfo(
+          solution = QuestSolutionInfoWithID(s.id, s.info),
+          quest = db.quest.readById(s.info.questId).map(qu => QuestInfoWithID(qu.id, qu.info)),
+          author = None)
+    })
+
       allowed = OK,
-      solutions = solutionsForUser.take(pageSize).toList,
+      solutions = solutions,
       pageSize,
       solutionsForUser.hasNext))
   }
@@ -243,11 +248,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    */
   def getQuestsForUser(request: GetQuestsForUserRequest): ApiResult[GetQuestsForUserResult] = handleDbException {
     val pageSize = if (request.pageSize > 50) 50 else request.pageSize
-    
+
     val questsForUser = db.quest.allWithParams(
-        request.status.map(_.toString), 
-        List(request.userId),
-        skip = request.pageNumber * pageSize)
+      request.status.map(_.toString),
+      List(request.userId),
+      skip = request.pageNumber * pageSize)
 
     OkApiResult(GetQuestsForUserResult(
       allowed = OK,

@@ -10,12 +10,9 @@ import play.api.test.Helpers._
 import models.store._
 import models.domain._
 import play.Logger
-import models.domain.base.ThemeWithID
-import models.domain.base.ThemeWithID
-import models.domain.base.ThemeWithID
+import models.domain.view._
 import org.specs2.matcher.BeEqualTo
 import com.mongodb.BasicDBList
-import models.domain.base.QuestInfoWithID
 import java.util.Date
 import models.domain.stubCreators._
 

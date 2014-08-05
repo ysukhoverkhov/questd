@@ -1,7 +1,7 @@
 package models.store.dao
 
 import models.domain._
-import models.domain.base._
+import models.domain.view._
 import java.util.Date
 
 trait UserDAO extends BaseDAO[User] {
