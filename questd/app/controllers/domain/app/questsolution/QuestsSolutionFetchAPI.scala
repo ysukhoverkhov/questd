@@ -27,14 +27,14 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
 
   def getFriendsSolutions(request: GetFriendsSolutionsRequest): ApiResult[GetFriendsSolutionsResult] = handleDbException {
     OkApiResult(Some(GetFriendsSolutionsResult(db.solution.allWithParams(
-      status = Some(request.status.toString),
+      status = List(request.status.toString),
       userIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted.toString).map(_.friendId),
       levels = request.levels))))
   }
 
   def getShortlistSolutions(request: GetShortlistSolutionsRequest): ApiResult[GetShortlistSolutionsResult] = handleDbException {
     OkApiResult(Some(GetShortlistSolutionsResult(db.solution.allWithParams(
-      status = Some(request.status.toString),
+      status = List(request.status.toString),
       userIds = request.user.shortlist,
       levels = request.levels))))
   }
@@ -43,14 +43,14 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
     import models.store.mongo.helpers._
     
     OkApiResult(Some(GetSolutionsForLikedQuestsResult(db.solution.allWithParams(
-      status = Some(request.status.toString),
+      status = List(request.status.toString),
       levels = request.levels,
       questIds = request.user.history.likedQuestProposalIds.mongoFlatten))))
   }
 
   def getVIPSolutions(request: GetVIPSolutionsRequest): ApiResult[GetVIPSolutionsResult] = handleDbException {
     OkApiResult(Some(GetVIPSolutionsResult(db.solution.allWithParams(
-      status = Some(request.status.toString),
+      status = List(request.status.toString),
       levels = request.levels,
       vip = Some(true),
       themeIds = request.themeIds))))
@@ -60,7 +60,7 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
     Logger.trace("getAllSolutions - " + request.toString)
 
     OkApiResult(Some(GetAllSolutionsResult(db.solution.allWithParams(
-      status = Some(request.status.toString),
+      status = List(request.status.toString),
       levels = request.levels,
       themeIds = request.themeIds))))
   }

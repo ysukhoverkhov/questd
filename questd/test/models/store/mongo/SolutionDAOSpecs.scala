@@ -121,7 +121,7 @@ class SolutionDAOSpecs extends Specification
       // Checking order with lastModDate
       all must beEqualTo(List(qs(1), qs(2), qs(0)))
 
-      val status = db.solution.allWithParams(status = Some(QuestStatus.OnVoting.toString)).toList
+      val status = db.solution.allWithParams(status = List(QuestStatus.OnVoting.toString)).toList
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
 
@@ -140,7 +140,7 @@ class SolutionDAOSpecs extends Specification
       vip.map(_.id).size must beEqualTo(2)
       vip.map(_.id) must contain(qs(1).id) and contain(qs(2).id)
 
-      val statusVip = db.solution.allWithParams(status = Some(QuestStatus.OnVoting.toString), vip = Some(false)).toList
+      val statusVip = db.solution.allWithParams(status = List(QuestStatus.OnVoting.toString), vip = Some(false)).toList
       statusVip.map(_.id).size must beEqualTo(1)
       statusVip.map(_.id) must beEqualTo(List(qs(0).id))
 
@@ -160,7 +160,7 @@ class SolutionDAOSpecs extends Specification
       themeIdsAndIds.map(_.id).size must beEqualTo(1)
       themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))
 
-      val statusWithQuestIds = db.solution.allWithParams(ids = List("q1", "q2"), status = Some(QuestStatus.OnVoting.toString)).toList
+      val statusWithQuestIds = db.solution.allWithParams(ids = List("q1", "q2"), status = List(QuestStatus.OnVoting.toString)).toList
       ids.map(_.id).size must beEqualTo(1)
       ids.map(_.id) must beEqualTo(List(qs(1).id))
     }

@@ -34,7 +34,7 @@ case class GetPublicProfileResult(
 
 case class GetOwnSolutionsRequest(
   user: User,
-  status: Option[QuestSolutionStatus.Value],
+  status: List[QuestSolutionStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetOwnSolutionsResult(
@@ -45,7 +45,7 @@ case class GetOwnSolutionsResult(
 
 case class GetOwnQuestsRequest(
   user: User,
-  status: Option[QuestStatus.Value],
+  status: List[QuestStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetOwnQuestsResult(
@@ -57,7 +57,7 @@ case class GetOwnQuestsResult(
 case class GetSolutionsForQuestRequest(
   user: User,
   questId: String,
-  status: Option[QuestSolutionStatus.Value],
+  status: List[QuestSolutionStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetSolutionsForQuestResult(
@@ -69,7 +69,7 @@ case class GetSolutionsForQuestResult(
 case class GetSolutionsForUserRequest(
   user: User,
   userId: String,
-  status: Option[QuestSolutionStatus.Value],
+  status: List[QuestSolutionStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetSolutionsForUserResult(
@@ -81,12 +81,12 @@ case class GetSolutionsForUserResult(
 case class GetQuestsForUserRequest(
   user: User,
   userId: String,
-  status: Option[QuestStatus.Value],
+  status: List[QuestStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetQuestsForUserResult(
   allowed: ProfileModificationResult,
-  quests: List[Quest],
+  quests: List[Quest], // TODO: replace here with QuestInfoWithID
   pageSize: Int,
   hasMore: Boolean)
 

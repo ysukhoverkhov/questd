@@ -125,7 +125,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val mySolution = createSolution("solId1", user1.id, "qid")
 
       solution.allWithParams(
-        status = Some(QuestSolutionStatus.WaitingForCompetitor.toString),
+        status = List(QuestSolutionStatus.WaitingForCompetitor.toString),
         questIds = List(mySolution.info.questId)) returns List(mySolution).iterator
 
       val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
@@ -145,7 +145,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val rivalSolution = createSolution("solId2", user2.id, quest.id, points = 0)
 
       solution.allWithParams(
-        status = Some(QuestSolutionStatus.WaitingForCompetitor.toString),
+        status = List(QuestSolutionStatus.WaitingForCompetitor.toString),
         questIds = List(mySolution.info.questId)) returns List(mySolution, rivalSolution).iterator
 
       solution.updateStatus(mySolution.id, QuestSolutionStatus.Won.toString, Some(rivalSolution.id)) returns Some(mySolution.copy(status = QuestSolutionStatus.Won.toString))

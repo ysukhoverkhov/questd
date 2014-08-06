@@ -80,7 +80,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       quest.readById(q.id) returns Some(q)
 
       solution.allWithParams(
-        status = Some(QuestSolutionStatus.WaitingForCompetitor.toString),
+        status = List(QuestSolutionStatus.WaitingForCompetitor.toString),
         questIds = List(sol.info.questId)) returns List(sol).iterator
 
       val result = api.updateQuestSolutionState(UpdateQuestSolutionStateRequest(sol))

@@ -194,7 +194,7 @@ package object protocol {
     id: String,
 
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: Option[String],
+    status: List[String] = List(),
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -205,7 +205,7 @@ package object protocol {
   type WSGetOwnSolutionsResult = GetOwnSolutionsResult
   case class WSGetOwnSolutionsRequest(
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: Option[String],
+    status: List[String] = List(),
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -216,7 +216,7 @@ package object protocol {
   type WSGetOwnQuestsResult = GetOwnQuestsResult
   case class WSGetOwnQuestsRequest(
     // see QuestStatus enum. if missing all solutions will be returned.
-    status: Option[String],
+    status: List[String] = List(),
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -230,7 +230,7 @@ package object protocol {
     id: String,
 
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: Option[String],
+    status: List[String] = List(),
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -244,7 +244,7 @@ package object protocol {
     id: String,
 
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: Option[String],
+    status: List[String] = List(),
 
     // Number of page in result, zero based.
     pageNumber: Int,

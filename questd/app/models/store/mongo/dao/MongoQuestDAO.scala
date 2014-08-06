@@ -29,7 +29,7 @@ private[mongo] class MongoQuestDAO
   }
 
   def allWithParams(
-      status: Option[String] = None, 
+      status: List[String] = List(), 
       userIds: List[String] = List(), 
       levels: Option[(Int, Int)] = None, 
       skip: Int = 0,
@@ -39,8 +39,8 @@ private[mongo] class MongoQuestDAO
     
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (status != None) {
-      queryBuilder += ("status" -> status.get)
+    if (status.length > 0) {
+      queryBuilder += ("status" -> MongoDBObject("$in" -> status))
     }
 
     if (userIds.length > 0) {

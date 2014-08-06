@@ -303,7 +303,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     // 1. find all solutions with the same quest id with status waiting for competitor.
 
     val solutionsForQuest = db.solution.allWithParams(
-      status = Some(QuestSolutionStatus.WaitingForCompetitor.toString),
+      status = List(QuestSolutionStatus.WaitingForCompetitor.toString),
       questIds = List(request.solution.info.questId))
 
     def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {

@@ -8,7 +8,7 @@ trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
    * Get solutions what meets following optional parameters.
    */
   def allWithParams(
-    status: Option[String] = None,
+    status: List[String] = List(),
     userIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,

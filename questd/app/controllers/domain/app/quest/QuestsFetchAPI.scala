@@ -26,14 +26,14 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
 
   def getFriendsQuests(request: GetFriendsQuestsRequest): ApiResult[GetFriendsQuestsResult] = handleDbException {
     OkApiResult(Some(GetFriendsQuestsResult(db.quest.allWithParams(
-      Some(request.status.toString),
+      List(request.status.toString),
       request.user.friends.filter(_.status == FriendshipStatus.Accepted.toString).map(_.friendId),
       request.levels))))
   }
 
   def getShortlistQuests(request: GetShortlistQuestsRequest): ApiResult[GetShortlistQuestsResult] = handleDbException {
     OkApiResult(Some(GetShortlistQuestsResult(db.quest.allWithParams(
-      Some(request.status.toString),
+      List(request.status.toString),
       request.user.shortlist,
       request.levels))))
   }
@@ -44,14 +44,14 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
     val ids = request.user.history.likedQuestProposalIds.mongoFlatten
 
     OkApiResult(Some(GetLikedQuestsResult(db.quest.allWithParams(
-      status = Some(request.status.toString),
+      status = List(request.status.toString),
       levels = request.levels,
       ids = ids))))
   }
 
   def getVIPQuests(request: GetVIPQuestsRequest): ApiResult[GetVIPQuestsResult] = handleDbException {
     OkApiResult(Some(GetVIPQuestsResult(db.quest.allWithParams(
-      status = Some(request.status.toString),
+      status = List(request.status.toString),
       levels = request.levels,
       vip = Some(true),
       themeIds = request.themeIds))))
@@ -61,7 +61,7 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
     Logger.trace("getAllQuests - " + request.toString)
 
     OkApiResult(Some(GetAllQuestsResult(db.quest.allWithParams(
-      status = Some(request.status.toString),
+      status = List(request.status.toString),
       levels = request.levels,
       themeIds = request.themeIds))))
   }

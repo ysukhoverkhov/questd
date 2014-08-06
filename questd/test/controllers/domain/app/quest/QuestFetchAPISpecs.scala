@@ -31,13 +31,13 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
 
       val u = createUser(List(Friendship(f1.id, FriendshipStatus.Accepted.toString), Friendship(f2.id, FriendshipStatus.Invited.toString)))
 
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
+      db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
+      db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
 
       val result = api.getFriendsQuests(GetFriendsQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
 
       there was one(quest).allWithParams(
-        Some(QuestStatus.InRotation.toString),
+        List(QuestStatus.InRotation.toString),
         List(f1.id),
         Some(1, 2),
         0,
@@ -46,7 +46,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         null)
 
       there was no(quest).allWithParams(
-        Some(QuestStatus.InRotation.toString),
+        List(QuestStatus.InRotation.toString),
         List(),
         Some(1, 2),
         0,
@@ -55,7 +55,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         null)
         
       there was no(quest).allWithParams(
-        Some(QuestStatus.InRotation.toString),
+        List(QuestStatus.InRotation.toString),
         List(f1.id, f2.id),
         Some(1, 2),
         0,
@@ -66,7 +66,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
 
     "getLikedQuests calls db correctly" in context {
 
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator
+      db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator
 
       
       val liked = List(
@@ -76,7 +76,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       val result = api.getLikedQuests(GetLikedQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
 
       there was one(quest).allWithParams(
-        Some(QuestStatus.InRotation.toString),
+        List(QuestStatus.InRotation.toString),
         null,
         Some(1, 2),
         0,
@@ -87,12 +87,12 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
     
     "getVIPQuests calls db correctly" in context {
 
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List(), List("a")) returns List().iterator
+      db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List(), List("a")) returns List().iterator
 
       val result = api.getVIPQuests(GetVIPQuestsRequest(User(), QuestStatus.InRotation, Some(1, 2), List("a")))
 
       there was one(quest).allWithParams(
-        Some(QuestStatus.InRotation.toString),
+        List(QuestStatus.InRotation.toString),
         null,
         Some(1, 2),
         0,
@@ -103,12 +103,12 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
 
     "getAllQuests calls db correctly" in context {
 
-      db.quest.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, None, List(), List("a")) returns List().iterator
+      db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, None, List(), List("a")) returns List().iterator
 
       val result = api.getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, Some(1, 2), List("a")))
 
       there was one(quest).allWithParams(
-        Some(QuestStatus.InRotation.toString),
+        List(QuestStatus.InRotation.toString),
         null,
         Some(1, 2),
         0,

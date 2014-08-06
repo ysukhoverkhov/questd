@@ -31,13 +31,13 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
 
       val u = createUser(List(Friendship(f1.id, FriendshipStatus.Accepted.toString), Friendship(f2.id, FriendshipStatus.Invited.toString)))
 
-      db.solution.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
-      db.solution.allWithParams(Some(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
+      db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
+      db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0, None, List(), List()) returns List().iterator
 
       val result = api.getFriendsSolutions(GetFriendsSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some(1, 2)))
 
       there was one(solution).allWithParams(
-        Some(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting.toString),
         List(f1.id),
         Some(1, 2),
         0,
@@ -47,7 +47,7 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
         null)
 
       there was no(solution).allWithParams(
-        Some(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting.toString),
         List(),
         Some(1, 2),
         0,
@@ -57,7 +57,7 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
         null)
         
       there was no(solution).allWithParams(
-        Some(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting.toString),
         List(f1.id, f2.id),
         Some(1, 2),
         0,
@@ -69,7 +69,7 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
 
     "getSolutionsForLikedQuests calls db correctly" in context {
 
-      db.solution.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator
+      db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator
 
       
       val liked = List(
@@ -79,7 +79,7 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
       val result = api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(u, QuestSolutionStatus.OnVoting, Some(1, 2)))
 
       there was one(solution).allWithParams(
-        Some(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting.toString),
         null,
         Some(1, 2),
         0,
@@ -91,12 +91,12 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
     
     "getVIPSolutions calls db correctly" in context {
 
-      db.solution.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List(), List("a")) returns List().iterator
+      db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List(), List("a")) returns List().iterator
 
       val result = api.getVIPSolutions(GetVIPSolutionsRequest(User(), QuestSolutionStatus.OnVoting, Some(1, 2), List("a")))
 
       there was one(solution).allWithParams(
-        Some(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting.toString),
         null,
         Some(1, 2),
         0,
@@ -108,12 +108,12 @@ class QuestsSolutionFetchAPISpecs extends BaseAPISpecs {
 
     "getAllSolutions calls db correctly" in context {
 
-      db.solution.allWithParams(Some(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, None, List(), List("a")) returns List().iterator
+      db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, None, List(), List("a")) returns List().iterator
 
       val result = api.getAllSolutions(GetAllSolutionsRequest(QuestSolutionStatus.OnVoting, Some(1, 2), List("a")))
 
       there was one(solution).allWithParams(
-        Some(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting.toString),
         null,
         Some(1, 2),
         0,
