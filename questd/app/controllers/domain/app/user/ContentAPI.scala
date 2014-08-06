@@ -39,7 +39,7 @@ case class GetOwnSolutionsRequest(
   pageSize: Int)
 case class GetOwnSolutionsResult(
   allowed: ProfileModificationResult,
-  solutions: List[QuestSolution],
+  solutions: List[QuestSolutionInfoWithID],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -50,7 +50,7 @@ case class GetOwnQuestsRequest(
   pageSize: Int)
 case class GetOwnQuestsResult(
   allowed: ProfileModificationResult,
-  quests: List[Quest],
+  quests: List[QuestInfoWithID],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -173,7 +173,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(Some(GetOwnSolutionsResult(
       allowed = OK,
-      solutions = solutionsForUser.take(pageSize).toList,
+      solutions = solutionsForUser.take(pageSize).toList.map(s => QuestSolutionInfoWithID(s.id, s.info)),
       pageSize,
       solutionsForUser.hasNext)))
   }
@@ -192,7 +192,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(Some(GetOwnQuestsResult(
       allowed = OK,
-      quests = questsForUser.take(pageSize).toList,
+      quests = questsForUser.take(pageSize).toList.map(q => QuestInfoWithID(q.id, q.info)),
       pageSize,
       questsForUser.hasNext)))
   }
