@@ -89,13 +89,7 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
               val u = db.user.recordQuestSolutionVote(r.user.id, s.id)
 
               val solver = if (request.vote == QuestSolutionVote.Cool) {
-                  // TODO: make here ifSome
-                  val a = db.user.readById(s.userId)
-                  if (a != None) {
-                    Some(PublicProfileWithID(a.get.id, a.get.profile.publicProfile))
-                  } else {
-                    None
-                  }
+                  db.user.readById(s.userId).map(a => PublicProfileWithID(a.id, a.profile.publicProfile))
               } else {
                 None
               }
