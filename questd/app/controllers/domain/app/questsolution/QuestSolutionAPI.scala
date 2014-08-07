@@ -4,7 +4,7 @@ import models.domain._
 import models.store._
 import components._
 import controllers.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import controllers.domain.app.user._
 import logic._
 import play.Logger
@@ -31,20 +31,23 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
-    val q = db.solution.updatePoints(
-      solution.id,
+    {
+      db.solution.updatePoints(
+        solution.id,
 
-      reviewsCountChange = 1,
-      pointsRandomChange = checkInc(vote, Cool),
-      pointsFriendsChange = 0,
-      pointsInvitedChange = 0,
-      cheatingChange = checkInc(vote, Cheating),
+        reviewsCountChange = 1,
+        pointsRandomChange = checkInc(vote, Cool),
+        pointsFriendsChange = 0,
+        pointsInvitedChange = 0,
+        cheatingChange = checkInc(vote, Cheating),
 
-      spamChange = checkInc(vote, IASpam),
-      pornChange = checkInc(vote, IAPorn))
+        spamChange = checkInc(vote, IASpam),
+        pornChange = checkInc(vote, IAPorn))
+    } ifSome { o =>
 
-    updateQuestSolutionState(UpdateQuestSolutionStateRequest(q.get)) map
-      OkApiResult(Some(VoteQuestSolutionUpdateResult()))
+      updateQuestSolutionState(UpdateQuestSolutionStateRequest(o)) ifOk
+        OkApiResult(VoteQuestSolutionUpdateResult())
+    }
   }
 
   /**
@@ -80,35 +83,30 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
       checkWaitCompetitor _,
       checkCheatingSolution _,
       checkAICSolution _)
-    // TODO: check similar bug in quests.
+
     val updatedSolution = funcs.foldLeft[Option[QuestSolution]](Some(solution))((r, f) => {
       r.flatMap(f(_))
     })
 
-    // TODO: chanke here with ifOk
-    updatedSolution match {
-      case None => InternalErrorApiResult()
-      case Some(s) => {
+    updatedSolution ifSome { s =>
+      val authorUpdateResult =
+        if (s.status != solution.status) {
+          val authorId = solution.userId
 
-        val authorUpdateResult =
-          if (s.status != solution.status) {
-            val authorId = solution.userId
-
-            db.user.readById(authorId) match {
-              case None => {
-                Logger.error("Unable to find author of quest solution user " + authorId)
-                InternalErrorApiResult()
-              }
-              case Some(author) => {
-                rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(s, author))
-              }
+          db.user.readById(authorId) match {
+            case None => {
+              Logger.error("Unable to find author of quest solution user " + authorId)
+              InternalErrorApiResult()
             }
-          } else {
-            OkApiResult(None)
+            case Some(author) => {
+              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(s, author))
+            }
           }
+        } else {
+          OkApiResult(None)
+        }
 
-        authorUpdateResult map OkApiResult(Some(UpdateQuestSolutionStateResult()))
-      }
+      authorUpdateResult ifOk OkApiResult(UpdateQuestSolutionStateResult())
     }
   }
 }

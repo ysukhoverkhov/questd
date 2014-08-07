@@ -6,7 +6,7 @@ import models.store._
 import models.domain.admin._
 
 import controllers.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 
 import components._
 
@@ -40,7 +40,7 @@ private[domain] trait ConfigAdminAPI { this: DBAccessor =>
   def getConfigSection(request: GetConfigSectionRequest): ApiResult[GetConfigSectionResult] = handleDbException {
     checkInit()
 
-    OkApiResult(Some(GetConfigSectionResult(adminConfig(request.name))))
+    OkApiResult(GetConfigSectionResult(adminConfig(request.name)))
   }
 
   /**
@@ -48,7 +48,7 @@ private[domain] trait ConfigAdminAPI { this: DBAccessor =>
    */
   def getConfiguration(request: GetConfigurationRequest): ApiResult[GetConfigurationResult] = handleDbException {
     checkInit()
-    OkApiResult(Some(GetConfigurationResult(adminConfig)))
+    OkApiResult(GetConfigurationResult(adminConfig))
   }
 
   /**
@@ -57,7 +57,7 @@ private[domain] trait ConfigAdminAPI { this: DBAccessor =>
   def setConfigSection(request: SetConfigSectionRequest) = handleDbException {
     storeConfigInDB(request.section)
 
-    OkApiResult(Some(SetConfigSectionResult))
+    OkApiResult(SetConfigSectionResult)
   }
 
 }

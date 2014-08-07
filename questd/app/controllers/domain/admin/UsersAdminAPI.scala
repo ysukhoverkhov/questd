@@ -5,7 +5,7 @@ import play.Logger
 import components.DBAccessor
 import models.store._
 import models.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import controllers.domain._
 
 case class AllUsersRequest()
@@ -19,7 +19,7 @@ private[domain] trait UsersAdminAPI { this: DBAccessor =>
   def allUsers(request: AllUsersRequest): ApiResult[AllUsersResult] = handleDbException {
     Logger.debug("Admin request for all users.")
 
-    OkApiResult(Some(AllUsersResult(db.user.all)))
+    OkApiResult(AllUsersResult(db.user.all))
   }
 
 }

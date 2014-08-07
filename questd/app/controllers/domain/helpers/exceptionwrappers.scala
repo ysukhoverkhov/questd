@@ -9,7 +9,7 @@ object exceptionwrappers {
   /**
    * Wrapper for handling unknown exceptions.
    */
-  private [domain] def handleUnknownEx[P, T >: ApiResult[P]](f: => T): T = try {
+  private [helpers] def handleUnknownEx[P, T >: ApiResult[P]](f: => T): T = try {
     f
   } catch {
     case ex: Throwable => {
@@ -21,7 +21,7 @@ object exceptionwrappers {
   /**
    * Wrapper for handling db exceptions.
    */
-  private [domain] def handleDbException[P, T >: ApiResult[P]](f: => T): T = handleUnknownEx {
+  private [helpers] def handleDbException[P, T >: ApiResult[P]](f: => T): T = handleUnknownEx {
     try {
       f
     } catch {
@@ -32,5 +32,4 @@ object exceptionwrappers {
     }
   }
   
-
 }

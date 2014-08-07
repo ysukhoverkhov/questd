@@ -24,13 +24,15 @@ body {
   height:auto;
   position: relative; 
   width: 960px;
+#  width: auto;
 }
 
 
 #header
 {
 height:85px;
-width:960px;	
+#width:960px;	
+width:auto;	
 }
 
 #header h1
@@ -167,7 +169,8 @@ color:#EED7D7;
 {
 display:block;
 float:left;
-width:689px;
+#width:689px;
+width:auto;
 height:auto;
 padding-left:10px;
 padding-top:15px;
@@ -180,7 +183,9 @@ padding-bottom:5px;
 {
 	background-image:url(../images/slickred/main_top.png);
 	background-repeat:no-repeat;
-	width:689px;
+	background-size:100%;
+	width:auto;
+#	width:689px;
 	height:23px;
 }
 
@@ -188,7 +193,11 @@ padding-bottom:5px;
 {
 background-image:url(../images/slickred/main_back.png);
 background-repeat:repeat-y;
-width:659px;
+background-size:100%;
+width:auto;
+min-width:659px;
+#width:659px;
+#width:1365px;
 padding-left:15px;
 padding-right:15px;
 }
@@ -197,7 +206,9 @@ padding-right:15px;
 {
 background-image:url(../images/slickred/main_bottom.png);
 background-repeat:no-repeat;
-width:689px;
+background-size:100%;
+#width:1689px;
+width:auto;
 height:23px;
 }
 
