@@ -86,7 +86,7 @@ case class GetQuestsForUserRequest(
   pageSize: Int)
 case class GetQuestsForUserResult(
   allowed: ProfileModificationResult,
-  quests: List[Quest], // TODO: replace here with QuestInfoWithID
+  quests: List[QuestInfoWithID],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -263,7 +263,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(Some(GetQuestsForUserResult(
       allowed = OK,
-      quests = questsForUser.take(pageSize).toList,
+      quests = questsForUser.take(pageSize).toList.map(q => QuestInfoWithID(q.id, q.info)),
       pageSize,
       questsForUser.hasNext)))
   }
