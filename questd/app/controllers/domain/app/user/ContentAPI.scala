@@ -5,8 +5,8 @@ import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
+import controllers.domain.helpers._
 import models.domain.view._
-import controllers.domain.helpers.exceptionwrappers._
 import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
@@ -102,7 +102,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       case Some(q) => {
         db.theme.readById(q.info.themeId) match {
           case Some(t) => {
-            OkApiResult(Some(GetQuestResult(OK, Some(q.info), Some(t))))
+            OkApiResult(GetQuestResult(OK, Some(q.info), Some(t)))
           }
 
           case None => {
@@ -136,14 +136,14 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       val rivalRating = rivalSolution.map(rs => rs.rating)
       val rivalProfile = rivalSolution.flatMap(rs => db.user.readById(rs.userId)).flatMap(ru => Some(PublicProfileWithID(ru.id, ru.profile.publicProfile)))
 
-      OkApiResult(Some(GetSolutionResult(
+      OkApiResult(GetSolutionResult(
         allowed = OK,
         mySolution = Some(s.info),
         myRating = Some(s.rating),
         rivalSolution = rivalSolutionInfo,
         rivalRating = rivalRating,
         rivalProfile = rivalProfile,
-        quest = quest)))
+        quest = quest))
     }
   }
 
@@ -152,10 +152,10 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    */
   def getPublicProfile(request: GetPublicProfileRequest): ApiResult[GetPublicProfileResult] = handleDbException {
 
-    getUser(UserRequest(userId = Some(request.userId))) map { r =>
-      OkApiResult(Some(GetPublicProfileResult(
+    getUser(UserRequest(userId = Some(request.userId))) ifOk { r =>
+      OkApiResult(GetPublicProfileResult(
         allowed = OK,
-        publicProfile = Some(r.user.profile.publicProfile))))
+        publicProfile = Some(r.user.profile.publicProfile)))
     }
   }
 
@@ -171,11 +171,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       userIds = List(request.user.id),
       skip = pageNumber * pageSize)
 
-    OkApiResult(Some(GetOwnSolutionsResult(
+    OkApiResult(GetOwnSolutionsResult(
       allowed = OK,
       solutions = solutionsForUser.take(pageSize).toList.map(s => QuestSolutionInfoWithID(s.id, s.info)),
       pageSize,
-      solutionsForUser.hasNext)))
+      solutionsForUser.hasNext))
   }
 
   /**
@@ -190,11 +190,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       userIds = List(request.user.id),
       skip = pageNumber * pageSize)
 
-    OkApiResult(Some(GetOwnQuestsResult(
+    OkApiResult(GetOwnQuestsResult(
       allowed = OK,
       quests = questsForUser.take(pageSize).toList.map(q => QuestInfoWithID(q.id, q.info)),
       pageSize,
-      questsForUser.hasNext)))
+      questsForUser.hasNext))
   }
 
   /**
@@ -216,11 +216,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         author = db.user.readById(s.userId).map(us => PublicProfileWithID(us.id, us.profile.publicProfile)))
     })
 
-    OkApiResult(Some(GetSolutionsForQuestResult(
+    OkApiResult(GetSolutionsForQuestResult(
       allowed = OK,
       solutions = solutions,
       pageSize,
-      solutionsForQuest.hasNext)))
+      solutionsForQuest.hasNext))
   }
 
   /**
@@ -242,11 +242,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         author = None)
     })
 
-    OkApiResult(Some(GetSolutionsForUserResult(
+    OkApiResult(GetSolutionsForUserResult(
       allowed = OK,
       solutions = solutions,
       pageSize,
-      solutionsForUser.hasNext)))
+      solutionsForUser.hasNext))
   }
 
   /**
@@ -261,11 +261,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       List(request.userId),
       skip = pageNumber * pageSize)
 
-    OkApiResult(Some(GetQuestsForUserResult(
+    OkApiResult(GetQuestsForUserResult(
       allowed = OK,
       quests = questsForUser.take(pageSize).toList.map(q => QuestInfoWithID(q.id, q.info)),
       pageSize,
-      questsForUser.hasNext)))
+      questsForUser.hasNext))
   }
 
   /**

@@ -27,11 +27,14 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
 
   "User Logic" should {
 
-    "Do not allow user without coins purchase themes" in {
+    "Allow user without coins purchase themes" in {
       val u = User(id = "",
-        profile = Profile(publicProfile = PublicProfile(level = 20), assets = Assets(0, 0, 0), rights = Rights.full))
+        profile = Profile(
+            publicProfile = PublicProfile(level = 20), 
+            assets = Assets(0, 0, 0), 
+            rights = Rights.full))
 
-      u.canPurchaseQuestProposals must beEqualTo(NotEnoughAssets)
+      u.canPurchaseQuestProposals must beEqualTo(OK)
     }
 
     "Do not allow user with low level purchase themes" in {
