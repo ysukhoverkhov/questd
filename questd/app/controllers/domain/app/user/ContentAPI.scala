@@ -39,7 +39,7 @@ case class GetOwnSolutionsRequest(
   pageSize: Int)
 case class GetOwnSolutionsResult(
   allowed: ProfileModificationResult,
-  solutions: List[QuestSolutionInfoWithID],
+  solutions: List[QuestSolutionListInfo],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -171,9 +171,16 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       userIds = List(request.user.id),
       skip = pageNumber * pageSize)
 
+    val solutions = solutionsForUser.take(pageSize).toList.map(s => {
+      QuestSolutionListInfo(
+        solution = QuestSolutionInfoWithID(s.id, s.info),
+        quest = db.quest.readById(s.info.questId).map(qu => QuestInfoWithID(qu.id, qu.info)),
+        author = None)
+    })
+      
     OkApiResult(Some(GetOwnSolutionsResult(
       allowed = OK,
-      solutions = solutionsForUser.take(pageSize).toList.map(s => QuestSolutionInfoWithID(s.id, s.info)),
+      solutions = solutions,
       pageSize,
       solutionsForUser.hasNext)))
   }
