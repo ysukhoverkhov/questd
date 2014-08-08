@@ -20,12 +20,13 @@ case class GetQuestResult(
 case class GetSolutionRequest(user: User, solutionId: String)
 case class GetSolutionResult(
   allowed: ProfileModificationResult,
-  mySolution: Option[QuestSolutionInfo] = None,
+  mySolution: Option[QuestSolutionInfoWithID] = None,
   myRating: Option[QuestSolutionRating] = None,
-  rivalSolution: Option[QuestSolutionInfo] = None,
+  rivalSolution: Option[QuestSolutionInfoWithID] = None,
   rivalRating: Option[QuestSolutionRating] = None,
   rivalProfile: Option[PublicProfileWithID] = None,
-  quest: Option[QuestInfo] = None)
+  quest: Option[QuestInfoWithID] = None,
+  questAuthor: Option[PublicProfileWithID] = None)
 
 case class GetPublicProfileRequest(user: User, userId: String)
 case class GetPublicProfileResult(
@@ -130,20 +131,23 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       InternalErrorApiResult()
     } { s =>
 
-      val quest = db.quest.readById(s.info.questId).map(q => q.info)
+      val quest = db.quest.readById(s.info.questId)
+      val questInfo = quest.map(q => QuestInfoWithID(q.id, q.info))
+      val questAuthor = quest.flatMap(q => db.user.readById(q.authorUserId).map (u => PublicProfileWithID(u.id, u.profile.publicProfile))) 
       val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readById(id))
-      val rivalSolutionInfo = rivalSolution.map(rs => rs.info)
+      val rivalSolutionInfo = rivalSolution.map(rs => QuestSolutionInfoWithID(rs.id, rs.info))
       val rivalRating = rivalSolution.map(rs => rs.rating)
       val rivalProfile = rivalSolution.flatMap(rs => db.user.readById(rs.userId)).flatMap(ru => Some(PublicProfileWithID(ru.id, ru.profile.publicProfile)))
 
       OkApiResult(Some(GetSolutionResult(
         allowed = OK,
-        mySolution = Some(s.info),
+        mySolution = Some(QuestSolutionInfoWithID(s.id, s.info)),
         myRating = Some(s.rating),
         rivalSolution = rivalSolutionInfo,
         rivalRating = rivalRating,
         rivalProfile = rivalProfile,
-        quest = quest)))
+        quest = questInfo,
+        questAuthor = questAuthor)))
     }
   }
 
