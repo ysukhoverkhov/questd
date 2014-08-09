@@ -38,9 +38,9 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
           case None => OkApiResult(Some(GetQuestSolutionToVoteResult(OutOfContent)))
           case Some(a) => {
             val qsi = QuestSolutionInfoWithID(a.id, a.info)
-            val questInfo = db.quest.readById(a.info.questId).map(_.info)
+            val questInfo = db.quest.readById(a.info.questId).map(qi => QuestInfoWithID(qi.id, qi.info))
 
-            if (questInfo == None) {
+            if (questInfo == None) {// TODO: make here ifSome
               Logger.error("API - getQuestSolutionToVote. Unable to find quest for solution.")
               InternalErrorApiResult()
             } else {

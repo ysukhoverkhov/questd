@@ -61,13 +61,13 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def selectQuestSolutionVote(id: String, qsi: QuestSolutionInfoWithID, qi: QuestInfo): Option[User] = {
+  def selectQuestSolutionVote(id: String, qsi: QuestSolutionInfoWithID, qi: QuestInfoWithID): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
           "profile.questSolutionVoteContext.reviewingQuestSolution" -> grater[QuestSolutionInfoWithID].asDBObject(qsi),
-          "profile.questSolutionVoteContext.questOfSolution" -> grater[QuestInfo].asDBObject(qi)))))
+          "profile.questSolutionVoteContext.questOfSolution" -> grater[QuestInfoWithID].asDBObject(qi)))))
   }
 
   /**
