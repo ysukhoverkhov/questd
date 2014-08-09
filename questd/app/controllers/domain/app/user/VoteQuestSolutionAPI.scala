@@ -38,11 +38,8 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
             val qsi = QuestSolutionInfoWithID(a.id, a.info)
             val questInfo = db.quest.readById(a.info.questId).map(qi => QuestInfoWithID(qi.id, qi.info))
 
-            if (questInfo == None) {// TODO: make here ifSome
-              Logger.error("API - getQuestSolutionToVote. Unable to find quest for solution.")
-              InternalErrorApiResult()
-            } else {
-              val u = db.user.selectQuestSolutionVote(user.id, qsi, questInfo.get)
+            questInfo ifSome { f =>
+              val u = db.user.selectQuestSolutionVote(user.id, qsi, f)
               OkApiResult(GetQuestSolutionToVoteResult(OK, u.map(_.profile)))
             }
           }
@@ -75,21 +72,21 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
           case Some(s) => {
             {
               voteQuestSolutionUpdate(VoteQuestSolutionUpdateRequest(s, request.vote))
-              
+
             } ifOk { r =>
-              
+
               makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuestSolutions)))
-              
+
             } ifOk { r =>
-              
+
               adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(reward)))
-              
+
             } ifOk { r =>
 
               val u = db.user.recordQuestSolutionVote(r.user.id, s.id)
 
               val solver = if (request.vote == QuestSolutionVote.Cool) {
-                  db.user.readById(s.userId).map(a => PublicProfileWithID(a.id, a.profile.publicProfile))
+                db.user.readById(s.userId).map(a => PublicProfileWithID(a.id, a.profile.publicProfile))
               } else {
                 None
               }
