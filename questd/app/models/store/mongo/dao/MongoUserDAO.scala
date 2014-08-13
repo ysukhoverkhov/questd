@@ -61,12 +61,17 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def selectQuestSolutionVote(id: String, qsi: QuestSolutionInfoWithID, qi: QuestInfoWithID): Option[User] = {
+  def selectQuestSolutionVote(
+      id: String,
+      qsi: QuestSolutionInfoWithID, 
+      qsa: PublicProfileWithID,
+      qi: QuestInfoWithID): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
           "profile.questSolutionVoteContext.reviewingQuestSolution" -> grater[QuestSolutionInfoWithID].asDBObject(qsi),
+          "profile.questSolutionVoteContext.authorOfQuestSolution" -> grater[PublicProfileWithID].asDBObject(qsa),
           "profile.questSolutionVoteContext.questOfSolution" -> grater[QuestInfoWithID].asDBObject(qi)))))
   }
 
@@ -81,6 +86,7 @@ private[mongo] class MongoUserDAO
           "profile.questSolutionVoteContext.numberOfReviewedSolutions" -> 1)),
         ("$unset" -> MongoDBObject(
           "profile.questSolutionVoteContext.reviewingQuestSolution" -> "",
+          "profile.questSolutionVoteContext.authorOfQuestSolution" -> "",
           "profile.questSolutionVoteContext.questOfSolution" -> "")),
         ("$push" -> MongoDBObject(
           "history.votedQuestSolutionIds.0" -> solutionId))))

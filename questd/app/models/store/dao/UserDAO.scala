@@ -13,7 +13,7 @@ trait UserDAO extends BaseDAO[User] {
 
   def addToAssets(id: String, assets: Assets): Option[User]
 
-  def selectQuestSolutionVote(id: String, qsi: QuestSolutionInfoWithID, qi: QuestInfoWithID): Option[User]
+  def selectQuestSolutionVote(id: String, qsi: QuestSolutionInfoWithID, qsa: PublicProfileWithID, qi: QuestInfoWithID): Option[User]
   def recordQuestSolutionVote(id: String, solutionId: String): Option[User]
 
   def selectQuestProposalVote(id: String, qi: QuestInfoWithID, theme: Theme): Option[User]
