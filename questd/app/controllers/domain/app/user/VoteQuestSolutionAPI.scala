@@ -36,14 +36,14 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
           case None => OkApiResult(GetQuestSolutionToVoteResult(OutOfContent))
           case Some(a) => {
             val qsi = QuestSolutionInfoWithID(a.id, a.info)
-            val qsa = db.user.readById(a.userId).map(author => PublicProfileWithID(author.id, author.profile.publicProfile))  
+            val qsa = db.user.readById(a.userId).map(author => PublicProfileWithID(author.id, author.profile.publicProfile))
             val questInfo = db.quest.readById(a.info.questId).map(qi => QuestInfoWithID(qi.id, qi.info))
 
-            questInfo ifSome { f =>
-              val u = db.user.selectQuestSolutionVote(user.id, qsi, f)
-              OkApiResult(GetQuestSolutionToVoteResult(OK, u.map(_.profile)))
-              // TODO: remove get here.
-              val u = db.user.selectQuestSolutionVote(user.id, qsi, qsa.get, questInfo.get)
+            questInfo ifSome { questInfoValue =>
+              qsa ifSome { qsaValue =>
+                val u = db.user.selectQuestSolutionVote(user.id, qsi, qsaValue, questInfoValue)
+                OkApiResult(GetQuestSolutionToVoteResult(OK, u.map(_.profile)))
+              }
             }
           }
         }
