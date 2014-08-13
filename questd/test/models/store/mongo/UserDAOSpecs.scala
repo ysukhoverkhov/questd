@@ -14,6 +14,7 @@ import models.domain.view._
 import org.specs2.matcher.BeEqualTo
 import com.mongodb.BasicDBList
 import java.util.Date
+import models.domain.stubCreators._
 
 //@RunWith(classOf[JUnitRunner])
 class UserDAOSpecs
@@ -23,6 +24,7 @@ class UserDAOSpecs
 
   "Mongo User DAO" should {
     "Create new User in DB and find it by userid" in new WithApplication(appWithTestDatabase) {
+      db.user.clear
       val userid = "lalala"
       db.user.create(User(userid))
       val u = db.user.readById(userid)
@@ -118,15 +120,15 @@ class UserDAOSpecs
       db.user.create(User(userid))
       db.user.purchaseQuestTheme(
         userid,
-        ThemeWithID(themeid, Theme(text = "text", comment = "comment")),
-        Some(QuestInfo("themeId", QuestInfoContent(ContentReference("type", "storage", "reference"), None, questdescr), vip = false)),
+        ThemeWithID(themeid, createThemeStub().info),
+        Some(QuestInfo("themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
         rew)
 
       val ou = db.user.readById(userid)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
 
-      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.obj.id == themeid) and
+      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.id == themeid) and
         beSome.which((t: ThemeWithID) => t.id == themeid)
 
       ou.get.profile.questProposalContext.sampleQuest must beSome.which((q: QuestInfo) => q.content.description == questdescr)
@@ -147,12 +149,12 @@ class UserDAOSpecs
       db.user.create(User(userid))
       db.user.purchaseQuestTheme(
         userid,
-        ThemeWithID(themeid, Theme(text = "text", comment = "comment")),
-        Some(QuestInfo("themeId", QuestInfoContent(ContentReference("type", "storage", "reference"), None, questdescr), vip = false)),
+        ThemeWithID(themeid, createThemeStub().info),
+        Some(QuestInfo("themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
         rew)
       db.user.purchaseQuestTheme(
         userid,
-        ThemeWithID(themeid, Theme(text = "text", comment = "comment")),
+        ThemeWithID(themeid, createThemeStub().info),
         None,
         rew)
 
@@ -160,7 +162,7 @@ class UserDAOSpecs
 
       ou must beSome.which((u: User) => u.id.toString == userid)
 
-      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.obj.id == themeid) and
+      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.id == themeid) and
         beSome.which((t: ThemeWithID) => t.id == themeid)
 
       ou.get.profile.questProposalContext.sampleQuest must beNone
@@ -209,7 +211,7 @@ class UserDAOSpecs
             themeId = themeId,
             content = QuestInfoContent(
               media = ContentReference(
-                contentType = "",
+                contentType = ContentType.Photo,
                 storage = "",
                 reference = ""),
               icon = None,
@@ -223,10 +225,97 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.history.themesOfSelectedQuests.contains(themeId))
     }
 
+    "incTask should increase number of times task was completed by one" in new WithApplication(appWithTestDatabase) {
+      val userid = "incTasks"
+      db.user.create(User(userid))
+
+      val tasks = DailyTasks(
+        tasks = List(
+          Task(
+            taskType = TaskType.Client,
+            description = "",
+            requiredCount = 10),
+          Task(
+            taskType = TaskType.GiveRewards,
+            description = "",
+            requiredCount = 10)))
+
+      db.user.resetTasks(userid, tasks, new Date())
+
+      db.user.incTask(userid, TaskType.Client.toString(), 0.4f, true);
+      db.user.incTask(userid, TaskType.GiveRewards.toString(), 0.4f, true);
+      db.user.incTask(userid, TaskType.GiveRewards.toString(), 0.4f, true);
+
+      val ou = db.user.readById(userid)
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client)(0).currentCount == 1)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards)(0).currentCount == 2)
+    }
+
+    "incTask should change percentage completed" in new WithApplication(appWithTestDatabase) {
+      val userid = "incTasks2"
+      db.user.create(User(userid))
+
+      val tasks = DailyTasks(
+        tasks = List(
+          Task(
+            taskType = TaskType.Client,
+            description = "",
+            requiredCount = 10)))
+
+      db.user.resetTasks(userid, tasks, new Date())
+
+      db.user.incTask(userid, TaskType.Client.toString(), 0.4f, true);
+
+      val ou = db.user.readById(userid)
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou.get.profile.dailyTasks.tasks(0).currentCount must beEqualTo(1)
+      ou.get.profile.dailyTasks.completed must beEqualTo(0.4f)
+      ou.get.profile.dailyTasks.rewardReceived must beEqualTo(true)
+    }
+
+    "incTutorialTask should increase number of times task was completed by one" in new WithApplication(appWithTestDatabase) {
+      val userid = "incTutorialTasks"
+      val taskId = "tid"
+      db.user.create(User(userid))
+
+      val tasks = DailyTasks(
+        tasks = List(
+          Task(
+            taskType = TaskType.AddToShortList,
+            description = "",
+            requiredCount = 10),
+          Task(
+            taskType = TaskType.GiveRewards,
+            description = "",
+            requiredCount = 10),
+          Task(
+            taskType = TaskType.Client,
+            description = "",
+            requiredCount = 10,
+            tutorialTask = Some(TutorialTask(
+              id = taskId,
+              taskType = TaskType.Client,
+              description = "",
+              requiredCount = 10,
+              reward = Assets())))))
+
+      db.user.resetTasks(userid, tasks, new Date())
+
+      db.user.incTutorialTask(userid, taskId, 0.4f, true);
+
+      val ou = db.user.readById(userid)
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client)(0).currentCount == 1)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards)(0).currentCount == 0)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToShortList)(0).currentCount == 0)
+    }
+
     "resetQuestProposal should reset cooldown if required" in new WithApplication(appWithTestDatabase) {
       val userid = "resetQuestProposal"
-      val date = new Date(3)
+      val date = new Date(1000)
 
+      db.user.delete(userid)
       db.user.create(User(
         id = userid,
         profile = Profile(
@@ -255,8 +344,54 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown == date)
     }
-  }
 
+    "addTasks works" in new WithApplication(appWithTestDatabase) {
+
+      def t = {
+        Task(TaskType.GiveRewards, "d", 1)
+      }
+
+      val userid = "addTasksTest"
+
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid,
+        profile = Profile(
+          dailyTasks = DailyTasks(
+            tasks = List(t, t, t),
+            reward = Assets(1, 2, 3)))))
+
+      val ou = db.user.addTasks(userid, List(t, t), Assets(100, 200, 300))
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.length == 5)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(101, 202, 303))
+    }
+
+    "addTutorialTaskAssigned works" in new WithApplication(appWithTestDatabase) {
+
+      def t = {
+        Task(TaskType.GiveRewards, "d", 1)
+      }
+
+      val userid = "addTasksTest"
+
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid,
+        tutorial = TutorialState(
+          assignedTutorialTaskIds = List())))
+
+      db.user.addTutorialTaskAssigned(userid, "t1")
+      db.user.addTutorialTaskAssigned(userid, "t2")
+      db.user.addTutorialTaskAssigned(userid, "t3")
+      val ou = db.user.addTutorialTaskAssigned(userid, "t2")
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.tutorial.assignedTutorialTaskIds.length == 3)
+    }
+
+  }
 }
 
 /**

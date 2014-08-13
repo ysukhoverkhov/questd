@@ -3,128 +3,140 @@
 # ~~~~
 
 # Home page
-GET     /                           		controllers.web.rest.Application.index
+GET     /                           					controllers.web.rest.Application.index
 
 #######################
 # WS
 #######################
 
 # Auth
-POST	/rest/loginfb						controllers.web.rest.LoginWS.loginfb
+POST	/rest/loginfb									controllers.web.rest.LoginWS.loginfb
 
 # Requesting profile
-POST	/rest/getProfile					controllers.web.rest.ProfileWS.getProfile
+POST	/rest/getProfile								controllers.web.rest.ProfileWS.getProfile
+POST	/rest/setGender									controllers.web.rest.ProfileWS.setGender
+POST	/rest/setDebug									controllers.web.rest.ProfileWS.setDebug
 
 # Generating quests 
-POST	/rest/getQuestThemeCost				controllers.web.rest.ProposeQuestWS.getQuestThemeCost
-POST	/rest/purchaseQuestTheme			controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
+POST	/rest/getQuestThemeCost							controllers.web.rest.ProposeQuestWS.getQuestThemeCost
+POST	/rest/purchaseQuestTheme						controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
 
-POST	/rest/getQuestThemeTakeCost			controllers.web.rest.ProposeQuestWS.getQuestThemeTakeCost
-POST	/rest/takeQuestTheme				controllers.web.rest.ProposeQuestWS.takeQuestTheme
+POST	/rest/getQuestThemeTakeCost						controllers.web.rest.ProposeQuestWS.getQuestThemeTakeCost
+POST	/rest/takeQuestTheme							controllers.web.rest.ProposeQuestWS.takeQuestTheme
 
-POST	/rest/proposeQuest					controllers.web.rest.ProposeQuestWS.proposeQuest
+POST	/rest/proposeQuest								controllers.web.rest.ProposeQuestWS.proposeQuest
 
-POST	/rest/giveUpQuestProposal			controllers.web.rest.ProposeQuestWS.giveUpQuestProposal
-POST	/rest/getQuestProposalGiveUpCost	controllers.web.rest.ProposeQuestWS.getQuestProposalGiveUpCost
+POST	/rest/giveUpQuestProposal						controllers.web.rest.ProposeQuestWS.giveUpQuestProposal
+POST	/rest/getQuestProposalGiveUpCost				controllers.web.rest.ProposeQuestWS.getQuestProposalGiveUpCost
 
 # Solve quest
-POST	/rest/getQuestCost					controllers.web.rest.SolveQuestWS.getQuestCost
-POST	/rest/purchaseQuest					controllers.web.rest.SolveQuestWS.purchaseQuest
+POST	/rest/getQuestCost								controllers.web.rest.SolveQuestWS.getQuestCost
+POST	/rest/purchaseQuest								controllers.web.rest.SolveQuestWS.purchaseQuest
 
-POST	/rest/getTakeQuestCost				controllers.web.rest.SolveQuestWS.getTakeQuestCost
-POST	/rest/takeQuest						controllers.web.rest.SolveQuestWS.takeQuest
+POST	/rest/getTakeQuestCost							controllers.web.rest.SolveQuestWS.getTakeQuestCost
+POST	/rest/takeQuest									controllers.web.rest.SolveQuestWS.takeQuest
 
-POST	/rest/proposeSolution				controllers.web.rest.SolveQuestWS.proposeSolution
+POST	/rest/proposeSolution							controllers.web.rest.SolveQuestWS.proposeSolution
 
-POST	/rest/getQuestGiveUpCost			controllers.web.rest.SolveQuestWS.getQuestGiveUpCost
-POST	/rest/giveUpQuest					controllers.web.rest.SolveQuestWS.giveUpQuest
+POST	/rest/getQuestGiveUpCost						controllers.web.rest.SolveQuestWS.getQuestGiveUpCost
+POST	/rest/giveUpQuest								controllers.web.rest.SolveQuestWS.giveUpQuest
 
 # Vote quest proposal
-POST	/rest/getQuestProposalToVote		controllers.web.rest.VoteQuestProposalWS.getQuestProposalToVote
-POST	/rest/voteQuestProposal				controllers.web.rest.VoteQuestProposalWS.voteQuestProposal
+POST	/rest/getQuestProposalToVote					controllers.web.rest.VoteQuestProposalWS.getQuestProposalToVote
+POST	/rest/voteQuestProposal							controllers.web.rest.VoteQuestProposalWS.voteQuestProposal
 
 # Vote quest solution
-POST	/rest/getQuestSolutionToVote		controllers.web.rest.VoteQuestSolutionWS.getQuestSolutionToVote
-POST	/rest/voteQuestSolution				controllers.web.rest.VoteQuestSolutionWS.voteQuestSolution
+POST	/rest/getQuestSolutionToVote					controllers.web.rest.VoteQuestSolutionWS.getQuestSolutionToVote
+POST	/rest/voteQuestSolution							controllers.web.rest.VoteQuestSolutionWS.voteQuestSolution
 
 # Daily result
-POST	/rest/getDailyResult				controllers.web.rest.DailyResultWS.getDailyResult
-POST	/rest/getRightsAtLevel				controllers.web.rest.DailyResultWS.getRightsAtLevel
-POST	/rest/getLevelsForRights			controllers.web.rest.DailyResultWS.getLevelsForRights
+POST	/rest/getDailyResult							controllers.web.rest.DailyResultWS.getDailyResult
+POST	/rest/getRightsAtLevel							controllers.web.rest.DailyResultWS.getRightsAtLevel
+POST	/rest/getLevelsForRights						controllers.web.rest.DailyResultWS.getLevelsForRights
 
 # Content requests
-POST	/rest/getQuest						controllers.web.rest.ContentWS.getQuest
-POST	/rest/getSolution					controllers.web.rest.ContentWS.getSolution
-POST	/rest/getPublicProfile				controllers.web.rest.ContentWS.getPublicProfile
+POST	/rest/getQuest									controllers.web.rest.ContentWS.getQuest
+POST	/rest/getSolution								controllers.web.rest.ContentWS.getSolution
+POST	/rest/getPublicProfile							controllers.web.rest.ContentWS.getPublicProfile
 
 POST	/rest/getOwnSolutions				controllers.web.rest.ContentWS.getOwnSolutions
 POST	/rest/getOwnQuests					controllers.web.rest.ContentWS.getOwnQuests
 
-POST	/rest/getSolutionsForQuest			controllers.web.rest.ContentWS.getSolutionsForQuest
-POST	/rest/getSolutionsForUser			controllers.web.rest.ContentWS.getSolutionsForUser
-POST	/rest/getQuestsForUser				controllers.web.rest.ContentWS.getQuestsForUser
+POST	/rest/getSolutionsForQuest						controllers.web.rest.ContentWS.getSolutionsForQuest
+POST	/rest/getSolutionsForUser						controllers.web.rest.ContentWS.getSolutionsForUser
+POST	/rest/getQuestsForUser							controllers.web.rest.ContentWS.getQuestsForUser
 
 # Shortlist requests
-POST	/rest/getShortlist					controllers.web.rest.ShortlistWS.getShortlist
-POST	/rest/costToShortlist				controllers.web.rest.ShortlistWS.costToShortlist
-POST	/rest/addToShortlist				controllers.web.rest.ShortlistWS.addToShortlist
-POST	/rest/removeFromShortlist			controllers.web.rest.ShortlistWS.removeFromShortlist
+POST	/rest/getShortlist								controllers.web.rest.ShortlistWS.getShortlist
+POST	/rest/costToShortlist							controllers.web.rest.ShortlistWS.costToShortlist
+POST	/rest/addToShortlist							controllers.web.rest.ShortlistWS.addToShortlist
+POST	/rest/removeFromShortlist						controllers.web.rest.ShortlistWS.removeFromShortlist
+POST	/rest/getSuggestsForShortlist					controllers.web.rest.ShortlistWS.getSuggestsForShortlist
 
 # Friends requests
-POST	/rest/getFriends					controllers.web.rest.FriendsWS.getFriends
-POST	/rest/costToRequestFriendship		controllers.web.rest.FriendsWS.costToRequestFriendship
-POST	/rest/askFriendship					controllers.web.rest.FriendsWS.askFriendship
-POST	/rest/respondFriendship				controllers.web.rest.FriendsWS.respondFriendship
-POST	/rest/removeFromFriends				controllers.web.rest.FriendsWS.removeFromFriends
+POST	/rest/getFriends								controllers.web.rest.FriendsWS.getFriends
+POST	/rest/costToRequestFriendship					controllers.web.rest.FriendsWS.costToRequestFriendship
+POST	/rest/askFriendship								controllers.web.rest.FriendsWS.askFriendship
+POST	/rest/respondFriendship							controllers.web.rest.FriendsWS.respondFriendship
+POST	/rest/removeFromFriends							controllers.web.rest.FriendsWS.removeFromFriends
 
 # Messages
-POST	/rest/getMessages					controllers.web.rest.MessagesWS.getMessages
-POST	/rest/removeMessage					controllers.web.rest.MessagesWS.removeMessage
+POST	/rest/getMessages								controllers.web.rest.MessagesWS.getMessages
+POST	/rest/removeMessage								controllers.web.rest.MessagesWS.removeMessage
 
 # Misc
-POST	/rest/getTime						controllers.web.rest.MiscWS.getTime
+POST	/rest/getTime									controllers.web.rest.MiscWS.getTime
 
+# Tutorial
+POST	/rest/getTutorialState							controllers.web.rest.TutorialWS.getTutorialState
+POST	/rest/setTutorialState							controllers.web.rest.TutorialWS.setTutorialState
+POST	/rest/assignTutorialTask						controllers.web.rest.TutorialWS.assignTutorialTask
+POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
 
 
 #######################
 # Debug (Should be removed in production)
 #######################
-POST	/rest/debug/shiftDailyResult		controllers.web.rest.DailyResultWS.shiftDailyResult
+POST	/rest/debug/shiftDailyResult					controllers.web.rest.DailyResultWS.shiftDailyResult
 
 
 #######################
 # Admin
 #######################
-GET		/admin								controllers.web.admin.AdminApp.index
+GET		/admin											controllers.web.admin.AdminApp.index
 
-GET		/admin/themes						controllers.web.admin.ThemesCRUD.themes(id = "")
-GET		/admin/themes/byid/:id				controllers.web.admin.ThemesCRUD.themes(id)
-POST	/admin/themes/createTheme			controllers.web.admin.ThemesCRUD.createThemeCB
-GET		/admin/themes/deleteTheme/:id		controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
+GET		/admin/themes									controllers.web.admin.ThemesCRUD.themes(id = "")
+GET		/admin/themes/byid/:id							controllers.web.admin.ThemesCRUD.themes(id)
+POST	/admin/themes/createTheme						controllers.web.admin.ThemesCRUD.createThemeCB
+GET		/admin/themes/deleteTheme/:id					controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
 
-GET		/admin/quests						controllers.web.admin.QuestsCRUD.quests(id = "")
-GET		/admin/quests/byid/:id				controllers.web.admin.QuestsCRUD.quests(id)
-POST	/admin/updateQuest					controllers.web.admin.QuestsCRUD.updateQuest
+GET		/admin/quests									controllers.web.admin.QuestsCRUD.quests(id = "")
+GET		/admin/quests/byid/:id							controllers.web.admin.QuestsCRUD.quests(id)
+POST	/admin/quests/update							controllers.web.admin.QuestsCRUD.updateQuest
 
-GET		/admin/users						controllers.web.admin.UsersCRUD.users(id = "")
-GET		/admin/solutions					controllers.web.admin.SolutionsCRUD.solutions(id = "")
+GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")
+GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)
+POST	/admin/tutorialTasks/update						controllers.web.admin.TutorialTasksCRUD.updateTutorialTask
 
-GET		/admin/config						controllers.web.admin.Config.config(name = "")
-GET		/admin/config/byname/:name			controllers.web.admin.Config.config(name)
-POST	/admin/config/configUpdate/:name	controllers.web.admin.Config.configUpdate(name)
+GET		/admin/users									controllers.web.admin.UsersCRUD.users(id = "")
+GET		/admin/solutions								controllers.web.admin.SolutionsCRUD.solutions(id = "")
+
+GET		/admin/config									controllers.web.admin.Config.config(name = "")
+GET		/admin/config/byname/:name						controllers.web.admin.Config.config(name)
+POST	/admin/config/configUpdate/:name				controllers.web.admin.Config.configUpdate(name)
 
 
 #######################
 # Test client
 #######################
-GET     /testclient                 		controllers.web.testclient.Client.index
-GET     /testclient/loginfb           		controllers.web.testclient.Client.loginfb
+GET     /testclient                 					controllers.web.testclient.Client.index
+GET     /testclient/loginfb           					controllers.web.testclient.Client.loginfb
 
-POST	/testclient/loginfbTarget			controllers.web.testclient.Client.loginfbTarget
+POST	/testclient/loginfbTarget						controllers.web.testclient.Client.loginfbTarget
 
-GET     /testclient/main            		controllers.web.testclient.App.main
+GET     /testclient/main            					controllers.web.testclient.App.main
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               		controllers.Assets.at(path="/public", file)
+GET     /assets/*file               					controllers.Assets.at(path="/public", file)
 
