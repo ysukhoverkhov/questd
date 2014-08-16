@@ -8,11 +8,12 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
-import com.restfb.exception._
 import components._
 import controllers.web.rest.protocol._
 import org.json4s.MappingException
 import controllers.web.rest.config.WSConfigHolder
+import controllers.sn.client.SNUser
+import controllers.sn.exception._
 
 trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor with APIAccessor with WSConfigHolder =>
 
@@ -26,7 +27,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
    * 503 - Unable to connect to facebook to check status.
    */
   def loginfb = Action.async { implicit request =>
-// TODO uncomment me.
+
     request.body.asJson.fold {
       Future.successful { BadRequest("Detected error: Empty request") }
     } { js =>
@@ -44,18 +45,16 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
             
             // Login facebook.
             try {
-//              (
-//                  Option(fb.fetchObject(loginRequest.token, "me", classOf[UserFB])),
-//                  None)
-              // TODO remove me.
-              (None, None)
+              (
+                  Option( sn.clientForName("FB").get.fetchUserByToken(loginRequest.token) ),
+                  None)
             } catch {
-              case ex: FacebookOAuthException => {
+              case ex: AuthException => {
                 Logger.debug("Facebook auth failed")
                 (None, Some(Unauthorized(
                   Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)))
               }
-              case ex: FacebookNetworkException => {
+              case ex: NetworkException => {
                 Logger.debug("Unable to connect to facebook")
                 (None, Some(ServiceUnavailable("Unable to connect to Facebook")))
               }
@@ -72,23 +71,21 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
         }
       } map { rv =>
         rv match {
-          // TODO uncomment me.
-//          case (Some(user: UserFB), _) => {
-//            val params = LoginFBRequest(user)
-//
-//            api.loginfb(params) match {
-//              case OkApiResult(loginResult: LoginFBResult) =>
-//                storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session.toString))).as(JSON), loginResult)
-//
-//              case _ => ServerError
-//            }
-//
-//          }
+          case (Some(user: SNUser), _) => {
+            val params = LoginFBRequest(user)
+
+            api.loginfb(params) match {
+              case OkApiResult(loginResult: LoginFBResult) =>
+                storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session.toString))).as(JSON), loginResult)
+
+              case _ => ServerError
+            }
+
+          }
           case (None, Some(r: SimpleResult)) => r
           case (None, None) => ServerError
         }
       }
     }
   }
-
 }

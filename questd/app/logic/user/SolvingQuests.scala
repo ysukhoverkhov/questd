@@ -162,7 +162,6 @@ trait SolvingQuests { this: UserLogic =>
     DateTime.now + mult.days toDate ()
   }
   
-// TODO: remove all gets here since functions and values are the same.
   /**
    * Reward for lost quest.
    */

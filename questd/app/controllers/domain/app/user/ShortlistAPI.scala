@@ -9,6 +9,7 @@ import controllers.domain.helpers._
 import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.sn.exception._
 
 case class GetShortlistRequest(
   user: User)
@@ -38,6 +39,7 @@ case class RemoveFromShortlistResult(
 case class GetSuggestsForShortlistRequest(
   user: User,
   token: String)
+// userIds may be null if request to social network is failed. 
 case class GetSuggestsForShortlistResult(
   allowed: ProfileModificationResult,
   userIds: Option[List[String]])
@@ -125,27 +127,35 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
     request.user.canShortlist match {
       case OK => {
 
-        // TODO: catch all FB exceptions here (like in auth).
-//        import collection.JavaConversions._
-//        import controllers.domain.libs.facebook.FacebookComponent
-//        import controllers.domain.libs.facebook.UserFB
+        // Login facebook.
+        try {
 
-//        val fbFriends = fb.fetchConnection(request.token, "me/friends", classOf[UserFB])
-//        val friends = (for (i <- fbFriends.getData().toList) yield {
+          // TODO: change "FB" here.
           
-          // TODO: optimize it in batch call.
-          // TODO: test batch call
-          
-//          Logger.error("TTTT " + i.getId() + " " + i.getName())
-//          db.user.readByFBid(i.getId())
-//        }).filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
-        
+          val fbFriends = sn.clientForName("FB").get.fetchFriendsByToken(request.token)
+          val friends = (for (i <- fbFriends) yield {
 
-        // TODO: test each filter here.
+            // TODO: optimize it in batch call.
+            // TODO: test batch call
 
-//        OkApiResult(GetSuggestsForShortlistResult(OK, Some(friends)))
-        // TODO: remove me.
-        OkApiResult(GetSuggestsForShortlistResult(OK, None))
+            Logger.error("TTTT " + i.snId + " " + i.firstName)
+            db.user.readByFBid(i.snId)
+          }).filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
+
+          // TODO: test each filter here.
+
+          OkApiResult(GetSuggestsForShortlistResult(OK, Some(friends)))
+
+        } catch {
+          case ex: AuthException => {
+            Logger.debug("Facebook auth failed")
+            OkApiResult(GetSuggestsForShortlistResult(OK, None))
+          }
+          case ex: NetworkException => {
+            Logger.debug("Unable to connect to facebook")
+            OkApiResult(GetSuggestsForShortlistResult(OK, None))
+          }
+        }
       }
       case a => OkApiResult(GetSuggestsForShortlistResult(a, None))
     }
