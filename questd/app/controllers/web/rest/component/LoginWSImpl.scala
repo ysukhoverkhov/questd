@@ -8,14 +8,13 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
-import controllers.domain.libs.facebook.UserFB
 import com.restfb.exception._
 import components._
 import controllers.web.rest.protocol._
 import org.json4s.MappingException
 import controllers.web.rest.config.WSConfigHolder
 
-trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor with APIAccessor with WSConfigHolder =>
+trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor with APIAccessor with WSConfigHolder =>
 
   /**
    * Logins with Facebook or create new user if it not exists
@@ -27,7 +26,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
    * 503 - Unable to connect to facebook to check status.
    */
   def loginfb = Action.async { implicit request =>
-
+// TODO uncomment me.
     request.body.asJson.fold {
       Future.successful { BadRequest("Detected error: Empty request") }
     } { js =>
@@ -45,9 +44,11 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
             
             // Login facebook.
             try {
-              (
-                  Option(fb.fetchObject(loginRequest.token, "me", classOf[UserFB])),
-                  None)
+//              (
+//                  Option(fb.fetchObject(loginRequest.token, "me", classOf[UserFB])),
+//                  None)
+              // TODO remove me.
+              (None, None)
             } catch {
               case ex: FacebookOAuthException => {
                 Logger.debug("Facebook auth failed")
@@ -71,17 +72,18 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
         }
       } map { rv =>
         rv match {
-          case (Some(user: UserFB), _) => {
-            val params = LoginFBRequest(user)
-
-            api.loginfb(params) match {
-              case OkApiResult(loginResult: LoginFBResult) =>
-                storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session.toString))).as(JSON), loginResult)
-
-              case _ => ServerError
-            }
-
-          }
+          // TODO uncomment me.
+//          case (Some(user: UserFB), _) => {
+//            val params = LoginFBRequest(user)
+//
+//            api.loginfb(params) match {
+//              case OkApiResult(loginResult: LoginFBResult) =>
+//                storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session.toString))).as(JSON), loginResult)
+//
+//              case _ => ServerError
+//            }
+//
+//          }
           case (None, Some(r: SimpleResult)) => r
           case (None, None) => ServerError
         }

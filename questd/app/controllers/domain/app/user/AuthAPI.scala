@@ -7,9 +7,9 @@ import helpers._
 import controllers.domain.helpers._
 import controllers.domain._
 import components._
-import controllers.domain.libs.facebook.UserFB
+import controllers.sn.client.SNUser
 
-case class LoginFBRequest(userfb: UserFB)
+case class LoginFBRequest(userfb: SNUser)
 case class LoginFBResult(session: String)
 
 case class UserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
@@ -35,39 +35,32 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
       OkApiResult(LoginFBResult(uuid))
     }
 
-    def genderFromFBUser(u: UserFB) = {
-      (u.getGender()) match {
-        case "male" => Gender.Male
-        case "female" => Gender.Female
-        case _ => Gender.Unknown
-      }
-    }
 
-    Logger.debug("Searching for user in database for login with fbid " + params.userfb.getId())
+    Logger.debug("Searching for user in database for login with fbid " + params.userfb.snId)
 
-    db.user.readByFBid(params.userfb.getId()) match {
+    db.user.readByFBid(params.userfb.snId) match {
       case None => {
 
-        Logger.debug("No user with FB id found, creating new one " + params.userfb.getId())
+        Logger.debug("No user with FB id found, creating new one " + params.userfb.snId)
 
         val newUser = User(
           auth = AuthInfo(
-            fbid = Some(params.userfb.getId())),
+            fbid = Some(params.userfb.snId)),
           profile = Profile(
             publicProfile = PublicProfile(
               bio = Bio(
-                name = params.userfb.getFirstName(),
-                gender = genderFromFBUser(params.userfb),
-                timezone = params.userfb.getTimezone().toInt,
+                name = params.userfb.firstName,
+                gender = params.userfb.gender,
+                timezone = params.userfb.timezone,
                 avatar = Some(
-                  ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = params.userfb.getId()))))))
+                  ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = params.userfb.snId))))))
 
         db.user.create(newUser)
         checkIncreaseLevel(CheckIncreaseLevelRequest(newUser))
 
-        db.user.readByFBid(params.userfb.getId()) match {
+        db.user.readByFBid(params.userfb.snId) match {
           case None => {
-            Logger.error("Unable to find user just created in DB with fbid " + params.userfb.getId())
+            Logger.error("Unable to find user just created in DB with fbid " + params.userfb.snId)
             InternalErrorApiResult()
           }
 

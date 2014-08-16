@@ -1,11 +1,11 @@
 package controllers.web.rest.component
 
-import controllers.domain.libs.facebook.FacebookComponent
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.web.rest.config.WSConfigHolder
+import controllers.sn.component.SocialNetworkComponent
 
-trait WSComponent { component: DomainAPIComponent with FacebookComponent =>
+trait WSComponent { component: DomainAPIComponent with SocialNetworkComponent =>
 
   val ws: WS
 
@@ -24,12 +24,12 @@ trait WSComponent { component: DomainAPIComponent with FacebookComponent =>
     with MiscWSImpl
     with TutorialWSImpl
 
-    with FBAccessor
+    with SNAccessor
     with APIAccessor
 
     with WSConfigHolder {
 
-    val fb = component.fb
+    val sn = component.sn
     val api = component.api
   }
 

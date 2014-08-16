@@ -42,7 +42,7 @@ case class GetSuggestsForShortlistResult(
   allowed: ProfileModificationResult,
   userIds: Option[List[String]])
 
-private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#DomainAPI with FBAccessor =>
+private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#DomainAPI with SNAccessor =>
 
   /**
    * Get ids of users from our shortlist.
@@ -128,24 +128,26 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
         // TODO: make abstract SNComponent.
         
         // TODO: catch all FB exceptions here (like in auth).
-        import collection.JavaConversions._
-        import controllers.domain.libs.facebook.FacebookComponent
-        import controllers.domain.libs.facebook.UserFB
+//        import collection.JavaConversions._
+//        import controllers.domain.libs.facebook.FacebookComponent
+//        import controllers.domain.libs.facebook.UserFB
 
-        val fbFriends = fb.fetchConnection(request.token, "me/friends", classOf[UserFB])
-        val friends = (for (i <- fbFriends.getData().toList) yield {
+//        val fbFriends = fb.fetchConnection(request.token, "me/friends", classOf[UserFB])
+//        val friends = (for (i <- fbFriends.getData().toList) yield {
           
           // TODO: optimize it in batch call.
           // TODO: test batch call
           
-          Logger.error("TTTT " + i.getId() + " " + i.getName())
-          db.user.readByFBid(i.getId())
-        }).filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
+//          Logger.error("TTTT " + i.getId() + " " + i.getName())
+//          db.user.readByFBid(i.getId())
+//        }).filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
         
 
         // TODO: test each filter here.
 
-        OkApiResult(GetSuggestsForShortlistResult(OK, Some(friends)))
+//        OkApiResult(GetSuggestsForShortlistResult(OK, Some(friends)))
+        // TODO: remove me.
+        OkApiResult(GetSuggestsForShortlistResult(OK, None))
       }
       case a => OkApiResult(GetSuggestsForShortlistResult(a, None))
     }
