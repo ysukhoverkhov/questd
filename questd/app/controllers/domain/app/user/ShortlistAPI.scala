@@ -125,8 +125,6 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
     request.user.canShortlist match {
       case OK => {
 
-        // TODO: make abstract SNComponent.
-        
         // TODO: catch all FB exceptions here (like in auth).
 //        import collection.JavaConversions._
 //        import controllers.domain.libs.facebook.FacebookComponent

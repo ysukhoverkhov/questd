@@ -30,6 +30,7 @@ private[sn] class SNUserFacebook(u: com.restfb.types.User) extends SNUser {
   def timezone: Int = {
     user.getTimezone().toInt
   }
+
 }
 
 private[sn] object SNUserFacebook {

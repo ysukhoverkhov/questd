@@ -13,6 +13,6 @@ trait SNUser {
   /// Gender of a user.
   def gender: Gender.Value
 
-  /// Time zone ofset of a user.
+  /// Time zone offset of a user.
   def timezone: Int
 }
