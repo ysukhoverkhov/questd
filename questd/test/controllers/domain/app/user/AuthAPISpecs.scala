@@ -19,76 +19,75 @@ class AuthAPISpecs extends BaseAPISpecs {
 
   "Auth API" should {
 
-    // TODO: implement me.
-//    "Register user with new FB id" in context {
-//
-//      val fbid = "fbid"
-//      val userfb = mock[SNUser]
-//      userfb.getId returns fbid
-//        
-//      db.user.readByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(fbid = Some(fbid))))
-//      db.user.levelup(anyString, anyInt) returns Some(User("", AuthInfo(fbid = Some(fbid))))
-//      db.user.setNextLevelRatingAndRights(
-//        anyString,
-//        anyInt,
-//        any) returns Some(User("", AuthInfo(fbid = Some(fbid))))
-//      
-//      val rv = api.loginfb(LoginFBRequest(userfb))
-//
-//      // Update allowed.
-//      there was one(user).readByFBid(fbid) andThen 
-//        one(user).create(any[User]) andThen
-//        one(user).readByFBid(fbid) andThen
-//        one(user).update(any[User])
-//
-//      rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
-//      rv.body must beSome[LoginFBResult]
-//    }
-//
-//    "Login existing user with new FB id" in context {
-//
-//      val fbid = "fbid"
-//      val userfb = mock[UserFB]
-//      userfb.getId returns fbid
-//
-//      db.user.readByFBid(anyString) returns Some(User("", AuthInfo(fbid = Some(fbid))))
-//
-//      val rv = api.loginfb(LoginFBRequest(userfb))
-//
-//      there was one(user).readByFBid(fbid) andThen one(user).create(any[User])
-//
-//      rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
-//      rv.body must beSome[LoginFBResult]
-//    }
-//
-//    "Behaves well with DB exception" in context {
-//
-//      db.user.readByFBid(anyString) throws new DatabaseException("Test exception")
-//
-//      val userfb = mock[UserFB]
-//      userfb.getId returns "1"
-//
-//      val rv = api.loginfb(LoginFBRequest(userfb))
-//
-//      there was one(user).readByFBid(anyString)
-//
-//      rv must beAnInstanceOf[InternalErrorApiResult]
-//      rv.body must beNone
-//    }
-//
-//    "Return logged in user" in context {
-//
-//      val sesid = "session id"
-//
-//      db.user.readBySessionId(sesid) returns Some(User("", AuthInfo(session = Some(sesid))))
-//
-//      val rv = api.getUser(UserRequest(sessionId = Some(sesid)))
-//
-//      rv must beAnInstanceOf[OkApiResult[UserResult]]
-//      rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
-//        u.user.auth.session == Some(sesid))
-//
-//    }
+    "Register user with new FB id" in context {
+
+      val fbid = "fbid"
+      val userfb = mock[SNUser]
+      userfb.snId returns fbid
+        
+      db.user.readByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(fbid = Some(fbid))))
+      db.user.levelup(anyString, anyInt) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+      db.user.setNextLevelRatingAndRights(
+        anyString,
+        anyInt,
+        any) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+      
+      val rv = api.loginfb(LoginFBRequest(userfb))
+
+      // Update allowed.
+      there was one(user).readByFBid(fbid) andThen 
+        one(user).create(any[User]) andThen
+        one(user).readByFBid(fbid) andThen
+        one(user).update(any[User])
+
+      rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
+      rv.body must beSome[LoginFBResult]
+    }
+
+    "Login existing user with new FB id" in context {
+
+      val fbid = "fbid"
+      val userfb = mock[SNUser]
+      userfb.snId returns fbid
+
+      db.user.readByFBid(anyString) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+
+      val rv = api.loginfb(LoginFBRequest(userfb))
+
+      there was one(user).readByFBid(fbid) andThen one(user).create(any[User])
+
+      rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
+      rv.body must beSome[LoginFBResult]
+    }
+
+    "Behaves well with DB exception" in context {
+
+      db.user.readByFBid(anyString) throws new DatabaseException("Test exception")
+
+      val userfb = mock[SNUser]
+      userfb.snId returns "1"
+
+      val rv = api.loginfb(LoginFBRequest(userfb))
+
+      there was one(user).readByFBid(anyString)
+
+      rv must beAnInstanceOf[InternalErrorApiResult]
+      rv.body must beNone
+    }
+
+    "Return logged in user" in context {
+
+      val sesid = "session id"
+
+      db.user.readBySessionId(sesid) returns Some(User("", AuthInfo(session = Some(sesid))))
+
+      val rv = api.getUser(UserRequest(sessionId = Some(sesid)))
+
+      rv must beAnInstanceOf[OkApiResult[UserResult]]
+      rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
+        u.user.auth.session == Some(sesid))
+
+    }
 
     "Do not return none existing user" in context {
       val sesid = "session id"
