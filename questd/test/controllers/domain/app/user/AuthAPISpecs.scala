@@ -25,14 +25,14 @@ class AuthAPISpecs extends BaseAPISpecs {
       val userfb = mock[SNUser]
       userfb.snId returns fbid
         
-      db.user.readByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(fbid = Some(fbid))))
-      db.user.levelup(anyString, anyInt) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+      db.user.readByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
+      db.user.levelup(anyString, anyInt) returns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
       db.user.setNextLevelRatingAndRights(
         anyString,
         anyInt,
-        any) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+        any) returns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
       
-      val rv = api.loginfb(LoginFBRequest(userfb))
+      val rv = api.login(LoginRequest("FB", userfb))
 
       // Update allowed.
       there was one(user).readByFBid(fbid) andThen 
@@ -40,8 +40,8 @@ class AuthAPISpecs extends BaseAPISpecs {
         one(user).readByFBid(fbid) andThen
         one(user).update(any[User])
 
-      rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
-      rv.body must beSome[LoginFBResult]
+      rv must beAnInstanceOf[OkApiResult[LoginResult]]
+      rv.body must beSome[LoginResult]
     }
 
     "Login existing user with new FB id" in context {
@@ -50,14 +50,14 @@ class AuthAPISpecs extends BaseAPISpecs {
       val userfb = mock[SNUser]
       userfb.snId returns fbid
 
-      db.user.readByFBid(anyString) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+      db.user.readByFBid(anyString) returns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
 
-      val rv = api.loginfb(LoginFBRequest(userfb))
+      val rv = api.login(LoginRequest("FB", userfb))
 
       there was one(user).readByFBid(fbid) andThen one(user).create(any[User])
 
-      rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
-      rv.body must beSome[LoginFBResult]
+      rv must beAnInstanceOf[OkApiResult[LoginResult]]
+      rv.body must beSome[LoginResult]
     }
 
     "Behaves well with DB exception" in context {
@@ -67,7 +67,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       val userfb = mock[SNUser]
       userfb.snId returns "1"
 
-      val rv = api.loginfb(LoginFBRequest(userfb))
+      val rv = api.login(LoginRequest("FB", userfb))
 
       there was one(user).readByFBid(anyString)
 

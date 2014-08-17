@@ -11,7 +11,7 @@ import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.Future
-
+// TODO: remove client login completelly.
 object Client extends Controller {
 
   def index = Action {
@@ -54,7 +54,7 @@ object Client extends Controller {
         val data = Json.obj(
           "token" -> loginCreds.token)
 
-        WS.url(controllers.web.rest.routes.LoginWS.loginfb.absoluteURL(false))
+        WS.url(controllers.web.rest.routes.LoginWS.login.absoluteURL(false))
           .post(data)
           .map(result => {
             result.header(SET_COOKIE) match {

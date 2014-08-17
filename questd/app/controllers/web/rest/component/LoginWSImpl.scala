@@ -26,7 +26,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
    * 500 - Internal error.
    * 503 - Unable to connect to facebook to check status.
    */
-  def loginfb = Action.async { implicit request =>
+  def login = Action.async { implicit request =>
 
     request.body.asJson.fold {
       Future.successful { BadRequest("Detected error: Empty request") }
@@ -35,19 +35,22 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
       Future {
 
         try {
-          val loginRequest = Json.read[WSLoginFBRequest](js.toString)
+          val loginRequest = Json.read[WSLoginRequest](js.toString)
 
           // Check app version.
           if (config.values(ConfigParams.MinAppVersion).toInt > loginRequest.appVersion) {
             (None, Some(Unauthorized(
               Json.write(WSUnauthorisedResult(UnauthorisedReason.UnsupportedAppVersion))).as(JSON)))
           } else {
-            
-            // Login facebook.
+
+            // Login with SN.
+            // TODO: refactor here with either.
             try {
               (
-                  Option( sn.clientForName("FB").get.fetchUserByToken(loginRequest.token) ),
-                  None)
+                Option(LoginRequest(
+                  loginRequest.snName,
+                  sn.clientForName(loginRequest.snName).fetchUserByToken(loginRequest.token))),
+                None)
             } catch {
               case ex: AuthException => {
                 Logger.debug("Facebook auth failed")
@@ -57,6 +60,11 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
               case ex: NetworkException => {
                 Logger.debug("Unable to connect to facebook")
                 (None, Some(ServiceUnavailable("Unable to connect to Facebook")))
+              }
+              case ex: SocialNetworkClientNotFound => {
+                // TODO: test me.
+                Logger.debug("Request to unexisting social network.")
+                (None, Some(BadRequest("Social network with provided name not found")))
               }
             }
           }
@@ -71,12 +79,10 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
         }
       } map { rv =>
         rv match {
-          case (Some(user: SNUser), _) => {
-            val params = LoginFBRequest(user)
-
-            api.loginfb(params) match {
-              case OkApiResult(loginResult: LoginFBResult) =>
-                storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session.toString))).as(JSON), loginResult)
+          case (Some(params), _) => {
+            api.login(params) match {
+              case OkApiResult(loginResult: LoginResult) =>
+                storeAuthInfoInResult(Ok(Json.write(WSLoginResult(loginResult.session.toString))).as(JSON), loginResult)
 
               case _ => ServerError
             }

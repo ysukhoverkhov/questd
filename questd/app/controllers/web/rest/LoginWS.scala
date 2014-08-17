@@ -8,7 +8,7 @@ import controllers.web.rest.component.helpers.AccessToWSInstance
 
 object LoginWS extends Controller with AccessToWSInstance {
 
-  def loginfb = ws.loginfb
+  def login = ws.login
 
 }
 

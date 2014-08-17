@@ -9,8 +9,8 @@ import controllers.domain._
 import components._
 import controllers.sn.client.SNUser
 
-case class LoginFBRequest(userfb: SNUser)
-case class LoginFBResult(session: String)
+case class LoginRequest(snName:String, userfb: SNUser)
+case class LoginResult(session: String)
 
 case class UserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
 case class UserResult(user: User)
@@ -20,19 +20,20 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
   /**
    * Login with FB. Or create new one if it doesn't exists.
    */
-  def loginfb(params: LoginFBRequest): ApiResult[LoginFBResult] = handleDbException {
+  def login(params: LoginRequest): ApiResult[LoginResult] = handleDbException {
 
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString()
       db.user.updateSessionId(user.id, uuid)
 
+      // TODO: make call for api tests.
       // API Test place
 //      shiftStats(ShiftStatsRequest(user))
 //import controllers.domain.app.quest._
 //	  calculateProposalThresholds(CalculateProposalThresholdsRequest(10, 3))
 //      shiftHistory(ShiftHistoryRequest(user))
 
-      OkApiResult(LoginFBResult(uuid))
+      OkApiResult(LoginResult(uuid))
     }
 
 
@@ -45,7 +46,7 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
 
         val newUser = User(
           auth = AuthInfo(
-            fbid = Some(params.userfb.snId)),
+            snids = Map(params.snName -> params.userfb.snId)),
           profile = Profile(
             publicProfile = PublicProfile(
               bio = Bio(
@@ -57,7 +58,7 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
 
         db.user.create(newUser)
         checkIncreaseLevel(CheckIncreaseLevelRequest(newUser))
-
+// TODO: replace "readByFBId" with readBySNId 
         db.user.readByFBid(params.userfb.snId) match {
           case None => {
             Logger.error("Unable to find user just created in DB with fbid " + params.userfb.snId)

@@ -127,12 +127,10 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
     request.user.canShortlist match {
       case OK => {
 
-        // Login facebook.
+        // TODO: check all social networks here.
         try {
 
-          // TODO: change "FB" here.
-          
-          val fbFriends = sn.clientForName("FB").get.fetchFriendsByToken(request.token)
+          val fbFriends = sn.clientForName("FB").fetchFriendsByToken(request.token)
           val friends = (for (i <- fbFriends) yield {
 
             // TODO: optimize it in batch call.

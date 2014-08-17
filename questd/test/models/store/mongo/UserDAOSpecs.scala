@@ -34,10 +34,10 @@ class UserDAOSpecs
     "Find user by FB id" in new WithApplication(appWithTestDatabase) {
       val fbid = "idid"
       val testsess = "session name"
-      db.user.create(User(testsess, AuthInfo(fbid = Some(fbid))))
+      db.user.create(User(testsess, AuthInfo(snids = Map("FB" -> fbid))))
       val u = db.user.readByFBid(fbid)
       u must beSome.which((u: User) => u.id.toString == testsess) and
-        beSome.which((u: User) => u.auth.fbid == fbid)
+        beSome.which((u: User) => u.auth.snids("FB") == fbid)
     }
 
     "Find user by session id" in new WithApplication(appWithTestDatabase) {
@@ -46,7 +46,7 @@ class UserDAOSpecs
       db.user.create(User(testsess, AuthInfo(session = Some(sessid))))
       val u = db.user.readBySessionId(sessid)
       u must beSome.which((u: User) => u.id.toString == testsess) and
-        beSome.which((u: User) => u.auth.fbid == None) and
+        beSome.which((u: User) => u.auth.snids == Map()) and
         beSome.which((u: User) => u.auth.session == Some(sessid))
     }
 
@@ -66,10 +66,10 @@ class UserDAOSpecs
       val u2 = db.user.readById(u1unlifted.id)
 
       u1 must beSome.which((u: User) => u.id.toString == id) and
-        beSome.which((u: User) => u.auth.fbid == None) and
+        beSome.which((u: User) => u.auth.snids == Map()) and
         beSome.which((u: User) => u.auth.session == Some(sessid))
       u2 must beSome.which((u: User) => u.id.toString == id) and
-        beSome.which((u: User) => u.auth.fbid == None) and
+        beSome.which((u: User) => u.auth.snids == Map()) and
         beSome.which((u: User) => u.auth.session == Some(newsessid))
     }
 

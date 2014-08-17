@@ -10,7 +10,7 @@ GET     /                           					controllers.web.rest.Application.index
 #######################
 
 # Auth
-POST	/rest/loginfb									controllers.web.rest.LoginWS.loginfb
+POST	/rest/login										controllers.web.rest.LoginWS.login
 
 # Requesting profile
 POST	/rest/getProfile								controllers.web.rest.ProfileWS.getProfile

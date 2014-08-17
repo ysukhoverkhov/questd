@@ -36,15 +36,13 @@ package object protocol {
 
   /**
    * Login Request
-   * Single entry. Key - "token", value - value.
    */
-  case class WSLoginFBRequest(token: String, appVersion: Int)
+  case class WSLoginRequest(snName:String, token: String, appVersion: Int)
 
   /**
    * Login Result
-   * Single entry. Key - "token", value - value.
    */
-  case class WSLoginFBResult(sessionid: String)
+  case class WSLoginResult(sessionid: String)
 
   /**
    * Get profile response
