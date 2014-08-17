@@ -40,46 +40,43 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
 
           // Check app version.
           if (config.values(ConfigParams.MinAppVersion).toInt > loginRequest.appVersion) {
-            (None, Some(Unauthorized(
-              Json.write(WSUnauthorisedResult(UnauthorisedReason.UnsupportedAppVersion))).as(JSON)))
+            Right(Unauthorized(
+              Json.write(WSUnauthorisedResult(UnauthorisedReason.UnsupportedAppVersion))).as(JSON))
           } else {
 
             // Login with SN.
-            // TODO: refactor here with either.
             try {
-              (
-                Option(LoginRequest(
-                  loginRequest.snName,
-                  sn.clientForName(loginRequest.snName).fetchUserByToken(loginRequest.token))),
-                None)
+              Left(LoginRequest(
+                loginRequest.snName,
+                sn.clientForName(loginRequest.snName).fetchUserByToken(loginRequest.token)))
             } catch {
               case ex: AuthException => {
                 Logger.debug("Facebook auth failed")
-                (None, Some(Unauthorized(
-                  Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON)))
+                Right(Unauthorized(
+                  Json.write(WSUnauthorisedResult(UnauthorisedReason.InvalidFBToken))).as(JSON))
               }
               case ex: NetworkException => {
                 Logger.debug("Unable to connect to facebook")
-                (None, Some(ServiceUnavailable("Unable to connect to Facebook")))
+                Right(ServiceUnavailable("Unable to connect to Facebook"))
               }
               case ex: SocialNetworkClientNotFound => {
                 Logger.debug("Request to unexisting social network.")
-                (None, Some(BadRequest("Social network with provided name not found")))
+                Right(BadRequest("Social network with provided name not found"))
               }
             }
-          }
+          } : Either[LoginRequest, SimpleResult] 
         } catch {
           case ex @ (_: MappingException | _: org.json4s.ParserUtil$ParseException) => {
-            (None, Some(BadRequest(ex.getMessage())))
+            Right(BadRequest(ex.getMessage()))
           }
           case ex: Throwable => {
             Logger.error("Api calling exception", ex)
-            (None, Some(ServerError))
+            Right(ServerError)
           }
         }
       } map { rv =>
         rv match {
-          case (Some(params), _) => {
+          case Left(params) => {
             api.login(params) match {
               case OkApiResult(loginResult: LoginResult) =>
                 storeAuthInfoInResult(Ok(Json.write(WSLoginResult(loginResult.session.toString))).as(JSON), loginResult)
@@ -88,8 +85,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
             }
 
           }
-          case (None, Some(r: SimpleResult)) => r
-          case (None, None) => ServerError
+          case Right(r: SimpleResult) => r
         }
       }
     }
