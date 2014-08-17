@@ -22,6 +22,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
    *
    * HTTP statuses:
    * 200 - Logged in
+   * 400 - Incorrect sovial network name used.
    * 401 - Session expired or other problems with facebook login.
    * 500 - Internal error.
    * 503 - Unable to connect to facebook to check status.
@@ -62,7 +63,6 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
                 (None, Some(ServiceUnavailable("Unable to connect to Facebook")))
               }
               case ex: SocialNetworkClientNotFound => {
-                // TODO: test me.
                 Logger.debug("Request to unexisting social network.")
                 (None, Some(BadRequest("Social network with provided name not found")))
               }

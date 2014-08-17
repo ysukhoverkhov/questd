@@ -112,6 +112,29 @@ class LoginWSSpecs extends Specification
 
       status(r) must equalTo(SERVICE_UNAVAILABLE)
     }
+
+    "Workout incorect SN name" in new WithApplication {
+
+      val facebookToken = "Facebook token"
+
+      val user = mock[SNUser]
+      val fbsn = mock[SocialNetworkClient]
+      sn.clientForName("FB") returns fbsn 
+      fbsn.fetchUserByToken(facebookToken) throws new SocialNetworkClientNotFound()
+
+      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
+
+      val fakeRequest = FakeRequest(
+        Helpers.POST,
+        "",
+        FakeHeaders(),
+        data)
+
+      val r = ws.login()(fakeRequest)
+
+      status(r) must equalTo(BAD_REQUEST)
+    }
+    
   }
 }
 
