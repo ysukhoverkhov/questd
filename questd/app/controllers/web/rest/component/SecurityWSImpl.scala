@@ -70,7 +70,5 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
         }
       }
     }
-
   }
-
 }

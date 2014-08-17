@@ -26,13 +26,6 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
       val uuid = java.util.UUID.randomUUID().toString()
       db.user.updateSessionId(user.id, uuid)
 
-      // TODO: make call for api tests.
-      // API Test place
-//      shiftStats(ShiftStatsRequest(user))
-//import controllers.domain.app.quest._
-//	  calculateProposalThresholds(CalculateProposalThresholdsRequest(10, 3))
-//      shiftHistory(ShiftHistoryRequest(user))
-
       OkApiResult(LoginResult(uuid))
     }
 

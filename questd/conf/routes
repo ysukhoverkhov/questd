@@ -98,6 +98,7 @@ POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
 # Debug (Should be removed in production)
 #######################
 POST	/rest/debug/shiftDailyResult					controllers.web.rest.DailyResultWS.shiftDailyResult
+POST	/rest/debug/test								controllers.web.rest.DebugWS.test
 
 
 #######################
