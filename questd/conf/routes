@@ -126,16 +126,6 @@ GET		/admin/config/byname/:name						controllers.web.admin.Config.config(name)
 POST	/admin/config/configUpdate/:name				controllers.web.admin.Config.configUpdate(name)
 
 
-#######################
-# Test client
-#######################
-GET     /testclient                 					controllers.web.testclient.Client.index
-GET     /testclient/loginfb           					controllers.web.testclient.Client.loginfb
-
-POST	/testclient/loginfbTarget						controllers.web.testclient.Client.loginfbTarget
-
-GET     /testclient/main            					controllers.web.testclient.App.main
-
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               					controllers.Assets.at(path="/public", file)
