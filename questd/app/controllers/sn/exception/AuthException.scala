@@ -1,6 +1,6 @@
 package controllers.sn.exception
 
-class AuthException extends Exception {
+class AuthException extends RuntimeException {
 
 }
 

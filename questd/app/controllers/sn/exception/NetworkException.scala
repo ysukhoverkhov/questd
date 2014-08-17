@@ -1,6 +1,6 @@
 package controllers.sn.exception
 
-class NetworkException extends Exception {
+class NetworkException extends RuntimeException {
 
 }
 
