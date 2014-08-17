@@ -32,12 +32,15 @@ class UserDAOSpecs
     }
 
     "Find user by FB id" in new WithApplication(appWithTestDatabase) {
-      val fbid = "idid"
-      val testsess = "session name"
-      db.user.create(User(testsess, AuthInfo(snids = Map("FB" -> fbid))))
-      val u = db.user.readBySNid("SN", fbid)
-      u must beSome.which((u: User) => u.id.toString == testsess) and
-        beSome.which((u: User) => u.auth.snids("FB") == fbid)
+      val fbid = "idid_fbid"
+      val user_id = "session name"
+      db.user.create(User(user_id, AuthInfo(snids = Map("FB" -> fbid))))
+      val u = db.user.readBySNid("FB", fbid)
+      
+      Logger.error(u.toString())
+      
+      u must beSome
+      u must beSome.which((u: User) => u.id == user_id)
     }
 
     "Find user by session id" in new WithApplication(appWithTestDatabase) {

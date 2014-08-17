@@ -29,7 +29,6 @@ private[mongo] class MongoUserDAO
   /**
    * Read by fb id
    */
-  // TODO: test me.
   def readBySNid(snName:String, snid: String): Option[User] = {
     readByExample(s"auth.snids.$snName", snid)
   }
