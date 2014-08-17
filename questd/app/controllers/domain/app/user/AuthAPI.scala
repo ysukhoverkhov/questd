@@ -39,7 +39,7 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
 
     Logger.debug("Searching for user in database for login with fbid " + params.userfb.snId)
 
-    db.user.readByFBid(params.userfb.snId) match {
+    db.user.readBySNid(params.snName, params.userfb.snId) match {
       case None => {
 
         Logger.debug("No user with FB id found, creating new one " + params.userfb.snId)
@@ -58,8 +58,8 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
 
         db.user.create(newUser)
         checkIncreaseLevel(CheckIncreaseLevelRequest(newUser))
-// TODO: replace "readByFBId" with readBySNId 
-        db.user.readByFBid(params.userfb.snId) match {
+ 
+        db.user.readBySNid(params.snName, params.userfb.snId) match {
           case None => {
             Logger.error("Unable to find user just created in DB with fbid " + params.userfb.snId)
             InternalErrorApiResult()

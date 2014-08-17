@@ -9,7 +9,7 @@ trait UserDAO extends BaseDAO[User] {
   def updateSessionId(id: String, sessionid: String): Option[User]
   
   def readBySessionId(sessionid: String): Option[User]
-  def readByFBid(fbid: String): Option[User]
+  def readBySNid(snName:String, snid: String): Option[User]
 
   def addToAssets(id: String, assets: Assets): Option[User]
 

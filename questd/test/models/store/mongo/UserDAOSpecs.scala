@@ -35,7 +35,7 @@ class UserDAOSpecs
       val fbid = "idid"
       val testsess = "session name"
       db.user.create(User(testsess, AuthInfo(snids = Map("FB" -> fbid))))
-      val u = db.user.readByFBid(fbid)
+      val u = db.user.readBySNid("SN", fbid)
       u must beSome.which((u: User) => u.id.toString == testsess) and
         beSome.which((u: User) => u.auth.snids("FB") == fbid)
     }

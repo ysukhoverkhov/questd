@@ -25,7 +25,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       val userfb = mock[SNUser]
       userfb.snId returns fbid
         
-      db.user.readByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
+      db.user.readBySNid(anyString, anyString) returns None thenReturns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
       db.user.levelup(anyString, anyInt) returns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
       db.user.setNextLevelRatingAndRights(
         anyString,
@@ -35,9 +35,9 @@ class AuthAPISpecs extends BaseAPISpecs {
       val rv = api.login(LoginRequest("FB", userfb))
 
       // Update allowed.
-      there was one(user).readByFBid(fbid) andThen 
+      there was one(user).readBySNid("FB", fbid) andThen 
         one(user).create(any[User]) andThen
-        one(user).readByFBid(fbid) andThen
+        one(user).readBySNid("FB", fbid) andThen
         one(user).update(any[User])
 
       rv must beAnInstanceOf[OkApiResult[LoginResult]]
@@ -50,11 +50,11 @@ class AuthAPISpecs extends BaseAPISpecs {
       val userfb = mock[SNUser]
       userfb.snId returns fbid
 
-      db.user.readByFBid(anyString) returns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
+      db.user.readBySNid(anyString, anyString) returns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
 
       val rv = api.login(LoginRequest("FB", userfb))
 
-      there was one(user).readByFBid(fbid) andThen one(user).create(any[User])
+      there was one(user).readBySNid("FB", fbid) andThen one(user).create(any[User])
 
       rv must beAnInstanceOf[OkApiResult[LoginResult]]
       rv.body must beSome[LoginResult]
@@ -62,14 +62,14 @@ class AuthAPISpecs extends BaseAPISpecs {
 
     "Behaves well with DB exception" in context {
 
-      db.user.readByFBid(anyString) throws new DatabaseException("Test exception")
+      db.user.readBySNid(anyString, anyString) throws new DatabaseException("Test exception")
 
       val userfb = mock[SNUser]
       userfb.snId returns "1"
 
       val rv = api.login(LoginRequest("FB", userfb))
 
-      there was one(user).readByFBid(anyString)
+      there was one(user).readBySNid(anyString, anyString)
 
       rv must beAnInstanceOf[InternalErrorApiResult]
       rv.body must beNone

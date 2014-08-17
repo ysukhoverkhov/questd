@@ -137,7 +137,7 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
             // TODO: test batch call
 
             Logger.error("TTTT " + i.snId + " " + i.firstName)
-            db.user.readByFBid(i.snId)
+            db.user.readBySNid("FB", i.snId)
           }).filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
 
           // TODO: test each filter here.
