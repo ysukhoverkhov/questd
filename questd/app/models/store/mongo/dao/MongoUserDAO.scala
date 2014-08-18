@@ -8,9 +8,18 @@ import models.domain._
 import models.domain.view._
 import play.Logger
 import com.mongodb.casbah.commons._
-
 import com.novus.salat._
 import models.store.mongo.SalatContext._
+
+/**
+ * Test version of dao what fails all the time
+ */
+
+import com.novus.salat.dao.SalatDAO
+import org.bson.types.ObjectId
+import models.store.mongo.SalatContext._
+import com.mongodb.casbah.MongoConnection
+import com.mongodb.casbah.MongoClient
 
 /**
  * DOA for User objects
@@ -691,17 +700,8 @@ private[mongo] class MongoUserDAO
 
 }
 
-/**
- * Test version of dao what fails all the time
- */
-
-import com.novus.salat.dao.SalatDAO
-import org.bson.types.ObjectId
-import models.store.mongo.SalatContext._
-import com.mongodb.casbah.MongoConnection
-
 class MongoUserDAOForTest extends MongoUserDAO {
-  override val dao = new QSalatDAO[User, ObjectId](collection = MongoConnection("localhost", 55555)("test_db")("test_coll")) {}
+  override val dao = new QSalatDAO[User, ObjectId](collection = MongoClient("localhost", 55555)("test_db")("test_coll")) {}
 
 }
 

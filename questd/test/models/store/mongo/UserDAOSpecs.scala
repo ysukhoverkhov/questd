@@ -58,11 +58,11 @@ class UserDAOSpecs
       val id = "id for test of update"
 
       db.user.create(User(id, AuthInfo(session = Some(sessid))))
-      val u1 = db.user.readBySessionId(sessid)
-      val u1unlifted = u1 match {
-        case Some(z) => z
-        case _ => failure("User not found in database")
-      }
+      val u1: Option[User] = db.user.readBySessionId(sessid)
+
+      u1 must beSome
+      
+      val u1unlifted: User = u1.get
 
       val newsessid = "very new session id"
       db.user.update(u1unlifted.copy(auth = u1unlifted.auth.copy(session = Some(newsessid))))

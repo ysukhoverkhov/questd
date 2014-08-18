@@ -4,7 +4,6 @@ import scala.concurrent.Future
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.specs2.mock.Mockito
-import org.junit.runner._
 import play.Logger
 import play.api.test._
 import play.api.test.Helpers._
@@ -60,7 +59,7 @@ class LoginWSSpecs extends Specification
         FakeHeaders(),
         data)
 
-      val r: Future[SimpleResult] = ws.login()(fakeRequest)
+      val r: Future[Result] = ws.login()(fakeRequest)
 
       status(r) must equalTo(OK)
       contentType(r) must beSome("application/json")
