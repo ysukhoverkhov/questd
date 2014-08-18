@@ -280,7 +280,7 @@ package object protocol {
   type WSRemoveFromShortlistResult = RemoveFromShortlistResult
 
   case class WSGetSuggestsForShortlistRequest(
-    token: String)
+    tokens: Map[String, String])
 
   type WSGetSuggestsForShortlistResult = GetSuggestsForShortlistResult
 

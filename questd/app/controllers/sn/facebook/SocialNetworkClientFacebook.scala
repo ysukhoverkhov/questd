@@ -43,6 +43,8 @@ private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
 }
 
 private[sn] object SocialNetworkClientFacebook {
+  val Name = "FB"
+  
   def apply(): SocialNetworkClientFacebook = new SocialNetworkClientFacebook()
 }
 

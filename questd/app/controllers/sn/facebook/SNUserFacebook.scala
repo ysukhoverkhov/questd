@@ -7,6 +7,11 @@ private[sn] class SNUserFacebook(u: com.restfb.types.User) extends SNUser {
 
   private val user = u
 
+  /// Name of social network.
+  def snName: String = {
+    SocialNetworkClientFacebook.Name
+  }
+  
   /// Id of user in terms of social network.
   def snId: String = {
     u.getId()

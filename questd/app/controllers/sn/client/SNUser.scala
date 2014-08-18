@@ -3,6 +3,9 @@ package controllers.sn.client
 import models.domain.Gender
 
 trait SNUser {
+  
+  /// Name of social network.
+  def snName: String
 
   /// Id of user in terms of social network.
   def snId: String

@@ -10,6 +10,7 @@ import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.sn.exception._
+import controllers.sn.client.SNUser
 
 case class GetShortlistRequest(
   user: User)
@@ -38,11 +39,12 @@ case class RemoveFromShortlistResult(
 
 case class GetSuggestsForShortlistRequest(
   user: User,
-  token: String)
-// userIds may be null if request to social network is failed. 
+  // keys - SN names, values - tokens for them.
+  tokens: Map[String, String])
+
 case class GetSuggestsForShortlistResult(
   allowed: ProfileModificationResult,
-  userIds: Option[List[String]])
+  userIds: List[String] = List())
 
 private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#DomainAPI with SNAccessor =>
 
@@ -127,37 +129,31 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
     request.user.canShortlist match {
       case OK => {
 
-        // TODO: check all social networks here.
-        try {
-
-          val fbFriends = sn.clientForName("FB").fetchFriendsByToken(request.token)
-          val friends = (for (i <- fbFriends) yield {
-
-            // TODO: optimize it in batch call.
-            // TODO: test batch call
-
-            Logger.error("TTTT " + i.snId + " " + i.firstName)
-            db.user.readBySNid("FB", i.snId)
-          }).filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
-
-          // TODO: test each filter here.
-
-          OkApiResult(GetSuggestsForShortlistResult(OK, Some(friends)))
-
-        } catch {
-          case ex: AuthException => {
-            Logger.debug("Facebook auth failed")
-            OkApiResult(GetSuggestsForShortlistResult(OK, None))
-          }
-          case ex: NetworkException => {
-            Logger.debug("Unable to connect to facebook")
-            OkApiResult(GetSuggestsForShortlistResult(OK, None))
+        val snFriends = request.tokens.foldLeft(List[SNUser]()) { (r, v) =>
+          try {
+            r ::: sn.clientForName(v._1).fetchFriendsByToken(v._2)
+          } catch {
+            case _ : Throwable => {
+              r
+            }
           }
         }
+
+        val friends = (for (i <- snFriends) yield {
+
+          // optimize it in batch call.
+          // test batch call
+
+          db.user.readBySNid(i.snName, i.snId)
+        }).filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
+
+        // TODO: test each filter here.
+
+        OkApiResult(GetSuggestsForShortlistResult(OK, friends))
+
       }
-      case a => OkApiResult(GetSuggestsForShortlistResult(a, None))
+      case a => OkApiResult(GetSuggestsForShortlistResult(a))
     }
   }
-
 }
 

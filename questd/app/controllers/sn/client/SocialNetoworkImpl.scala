@@ -7,7 +7,7 @@ import play.Logger
 abstract class SocialNetoworkImpl {
 
   val clients = Map(
-    "FB" -> SocialNetworkClientFacebook())
+    SocialNetworkClientFacebook.Name -> SocialNetworkClientFacebook())
 
   def clientForName(name: String): SocialNetworkClient = {
     try {
