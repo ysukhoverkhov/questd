@@ -36,7 +36,7 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
           case None => OkApiResult(GetQuestSolutionToVoteResult(OutOfContent))
           case Some(a) => {
             val qsi = QuestSolutionInfoWithID(a.id, a.info)
-            val qsa = db.user.readById(a.userId).map(author => PublicProfileWithID(author.id, author.profile.publicProfile))
+            val qsa = db.user.readById(a.info.authorId).map(author => PublicProfileWithID(author.id, author.profile.publicProfile))
             val questInfo = db.quest.readById(a.info.questId).map(qi => QuestInfoWithID(qi.id, qi.info))
 
             questInfo ifSome { questInfoValue =>
@@ -89,7 +89,7 @@ private[domain] trait VoteQuestSolutionAPI { this: DomainAPIComponent#DomainAPI 
               val u = db.user.recordQuestSolutionVote(r.user.id, s.id)
 
               val solver = if (request.vote == QuestSolutionVote.Cool) {
-                db.user.readById(s.userId).map(a => PublicProfileWithID(a.id, a.profile.publicProfile))
+                db.user.readById(s.info.authorId).map(a => PublicProfileWithID(a.id, a.profile.publicProfile))
               } else {
                 None
               }

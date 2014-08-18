@@ -18,7 +18,6 @@ import java.util.Date
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.stubCreators._
 
-
 class ProposeQuestAPISpecs extends BaseAPISpecs {
 
   def createUser(vip: Boolean) = {
@@ -45,7 +44,7 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
       val u = createUser(false)
       val q = createQuest
 
-      user.resetQuestProposal(any, any) returns Some(u)      
+      user.resetQuestProposal(any, any) returns Some(u)
 
       val result = api.proposeQuest(ProposeQuestRequest(u, q))
 
@@ -54,9 +53,9 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
       there was one(quest).create(
         Quest(
           id = anyString,
-          authorUserId = u.id,
           approveReward = u.profile.questProposalContext.approveReward,
           info = QuestInfo(
+            authorId = u.id,
             themeId = u.profile.questProposalContext.takenTheme.get.id,
             content = q,
             vip = false)))
@@ -66,7 +65,7 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
       val u = createUser(true)
       val q = createQuest
 
-      user.resetQuestProposal(any, any) returns Some(u)      
+      user.resetQuestProposal(any, any) returns Some(u)
 
       val result = api.proposeQuest(ProposeQuestRequest(u, q))
 
@@ -75,9 +74,9 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
       there was one(quest).create(
         Quest(
           id = anyString,
-          authorUserId = u.id,
           approveReward = u.profile.questProposalContext.approveReward,
           info = QuestInfo(
+            authorId = u.id,
             themeId = u.profile.questProposalContext.takenTheme.get.id,
             content = q,
             vip = true)))

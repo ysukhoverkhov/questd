@@ -133,11 +133,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
       val quest = db.quest.readById(s.info.questId)
       val questInfo = quest.map(q => QuestInfoWithID(q.id, q.info))
-      val questAuthor = quest.flatMap(q => db.user.readById(q.authorUserId).map (u => PublicProfileWithID(u.id, u.profile.publicProfile))) 
+      val questAuthor = quest.flatMap(q => db.user.readById(q.info.authorId).map (u => PublicProfileWithID(u.id, u.profile.publicProfile))) 
       val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readById(id))
       val rivalSolutionInfo = rivalSolution.map(rs => QuestSolutionInfoWithID(rs.id, rs.info))
       val rivalRating = rivalSolution.map(rs => rs.rating)
-      val rivalProfile = rivalSolution.flatMap(rs => db.user.readById(rs.userId)).flatMap(ru => Some(PublicProfileWithID(ru.id, ru.profile.publicProfile)))
+      val rivalProfile = rivalSolution.flatMap(rs => db.user.readById(rs.info.authorId)).flatMap(ru => Some(PublicProfileWithID(ru.id, ru.profile.publicProfile)))
 
       OkApiResult(GetSolutionResult(
         allowed = OK,
@@ -172,7 +172,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     val solutionsForUser = db.solution.allWithParams(
       status = request.status.map(_.toString),
-      userIds = List(request.user.id),
+      authorIds = List(request.user.id),
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
@@ -198,7 +198,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     val questsForUser = db.quest.allWithParams(
       status = request.status.map(_.toString),
-      userIds = List(request.user.id),
+      authorIds = List(request.user.id),
       skip = pageNumber * pageSize)
 
     OkApiResult(GetOwnQuestsResult(
@@ -224,7 +224,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       QuestSolutionListInfo(
         solution = QuestSolutionInfoWithID(s.id, s.info),
         quest = None,
-        author = db.user.readById(s.userId).map(us => PublicProfileWithID(us.id, us.profile.publicProfile)))
+        author = db.user.readById(s.info.authorId).map(us => PublicProfileWithID(us.id, us.profile.publicProfile)))
     })
 
     OkApiResult(GetSolutionsForQuestResult(
@@ -243,7 +243,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     val solutionsForUser = db.solution.allWithParams(
       status = request.status.map(_.toString),
-      userIds = List(request.userId),
+      authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {

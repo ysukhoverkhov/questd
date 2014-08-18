@@ -21,7 +21,7 @@ trait QuestDAO extends BaseDAO[Quest] {
    */
   def allWithParams(
       status: List[String] = List(), 
-      userIds: List[String] = List(), 
+      authorIds: List[String] = List(), 
       levels: Option[(Int, Int)] = None, 
       skip: Int = 0,
       vip: Option[Boolean] = None,

@@ -124,7 +124,7 @@ class UserDAOSpecs
       db.user.purchaseQuestTheme(
         userid,
         ThemeWithID(themeid, createThemeStub().info),
-        Some(QuestInfo("themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
+        Some(QuestInfo("authorId", "themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
         rew)
 
       val ou = db.user.readById(userid)
@@ -153,7 +153,7 @@ class UserDAOSpecs
       db.user.purchaseQuestTheme(
         userid,
         ThemeWithID(themeid, createThemeStub().info),
-        Some(QuestInfo("themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
+        Some(QuestInfo("authorId", "themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
         rew)
       db.user.purchaseQuestTheme(
         userid,
@@ -211,6 +211,7 @@ class UserDAOSpecs
         QuestInfoWithID(
           "q",
           QuestInfo(
+            authorId = "authorId",
             themeId = themeId,
             content = QuestInfoContent(
               media = ContentReference(

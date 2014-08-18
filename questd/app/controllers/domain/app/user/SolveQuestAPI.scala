@@ -1,5 +1,6 @@
 package controllers.domain.app.user
 
+import scala.language.postfixOps
 import models.domain._
 import models.domain.view._
 import models.store._
@@ -88,7 +89,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             case Some(q) => {
               {
                 val questCost = user.costOfPurchasingQuest
-                val author = db.user.readById(q.authorUserId).map(x => PublicProfileWithID(q.authorUserId, x.profile.publicProfile))
+                val author = db.user.readById(q.info.authorId).map(x => PublicProfileWithID(q.info.authorId, x.profile.publicProfile))
 
                 if (author == None) {
                   Logger.error("API - purchaseQuest. Unable to find quest author")
@@ -194,14 +195,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           r.user.profile.questSolutionContext.takenQuest ifSome { takenQuest =>
             db.solution.create(
               QuestSolution(
-                userId = r.user.id,
                 questLevel = takenQuest.obj.level,
                 info = QuestSolutionInfo(
                   content = request.solution,
+                  authorId = r.user.id,
                   themeId = takenQuest.obj.themeId,
                   questId = takenQuest.id,
-              vip = user.profile.publicProfile.vip),
-            voteEndDate = user.solutionVoteEndDate(takenQuest.obj)))
+                  vip = user.profile.publicProfile.vip),
+                voteEndDate = user.solutionVoteEndDate(takenQuest.obj)))
 
             db.user.resetQuestSolution(
               user.id,
@@ -333,7 +334,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       if (solutions.hasNext) {
         val other = solutions.next
 
-        if (other.userId != request.solution.userId) {
+        if (other.info.authorId != request.solution.info.authorId) {
 
           Logger.debug("Found fight pair for quest " + request.solution + ":")
           Logger.debug("  s1.id=" + request.solution.id)
@@ -351,7 +352,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             Logger.debug("  winner id=" + curSol.id)
 
             db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString, curSol.rivalSolutionId) ifSome { s =>
-              db.user.readById(curSol.userId) ifSome { u =>
+              db.user.readById(curSol.info.authorId) ifSome { u =>
                 rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u))
               }
             }
@@ -363,7 +364,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             Logger.debug("  loser id=" + curSol.id)
 
             db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString, curSol.rivalSolutionId) ifSome { s =>
-              db.user.readById(curSol.userId) ifSome { u =>
+              db.user.readById(curSol.info authorId) ifSome { u =>
                 rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u))
               }
             }

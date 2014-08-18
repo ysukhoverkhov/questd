@@ -29,10 +29,9 @@ class QuestDAOSpecs extends Specification
 
       db.quest.create(Quest(
         id = id,
-
-        authorUserId = "user id",
         approveReward = Assets(),
         info = QuestInfo(
+          authorId = "user id",
           themeId = "theme_id",
           content = QuestInfoContent(
             media = ContentReference(ContentType.Video, "", ""),
@@ -53,9 +52,9 @@ class QuestDAOSpecs extends Specification
 
       db.quest.create(Quest(
         id = id,
-        authorUserId = "user id",
         approveReward = Assets(),
         info = QuestInfo(
+          authorId = "user id",
           themeId = "theme_id",
           content = QuestInfoContent(
             media = ContentReference(ContentType.Video, "", ""),
@@ -84,9 +83,9 @@ class QuestDAOSpecs extends Specification
 
       db.quest.create(Quest(
         id = id,
-        authorUserId = "user id",
         approveReward = Assets(),
         info = QuestInfo(
+          authorId = "user id",
           themeId = "theme_id",
           content = QuestInfoContent(
             media = ContentReference(ContentType.Video, "", ""),
@@ -104,16 +103,17 @@ class QuestDAOSpecs extends Specification
     }
 
     "Get all quests" in new WithApplication(appWithTestDatabase) {
+
       clearDB()
-      
+
       // Preparing quests to store in db.
 
       val qs = List(
         Quest(
           id = "q1",
-          authorUserId = "q1_author id",
           approveReward = Assets(),
           info = QuestInfo(
+            authorId = "q1_author id",
             themeId = "t1",
             content = QuestInfoContent(
               media = ContentReference(ContentType.Video, "", ""),
@@ -122,12 +122,12 @@ class QuestDAOSpecs extends Specification
             level = 3,
             vip = false),
           status = QuestStatus.OnVoting),
-          
+
         Quest(
           id = "q2",
-          authorUserId = "q2_author id",
           approveReward = Assets(),
           info = QuestInfo(
+            authorId = "q2_author id",
             themeId = "t2",
             content = QuestInfoContent(
               media = ContentReference(ContentType.Video, "", ""),
@@ -139,9 +139,9 @@ class QuestDAOSpecs extends Specification
 
         Quest(
           id = "q3",
-          authorUserId = "q3_author id",
           approveReward = Assets(),
           info = QuestInfo(
+            authorId = "q3_author id",
             themeId = "t3",
             content = QuestInfoContent(
               media = ContentReference(ContentType.Video, "", ""),
@@ -160,7 +160,7 @@ class QuestDAOSpecs extends Specification
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
 
-      val userids = db.quest.allWithParams(userIds = List("q2_author id")).toList
+      val userids = db.quest.allWithParams(authorIds = List("q2_author id")).toList
       userids.map(_.id) must beEqualTo(List(qs(1).id))
 
       val levels = db.quest.allWithParams(levels = Some((1, 10))).toList
@@ -191,8 +191,6 @@ class QuestDAOSpecs extends Specification
       themeIdsAndIds.map(_.id).size must beEqualTo(1)
       themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))
     }
-
-
 
   }
 

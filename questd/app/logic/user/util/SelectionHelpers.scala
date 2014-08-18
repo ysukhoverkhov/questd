@@ -15,7 +15,7 @@ trait SelectionHelpers { this: UserLogic =>
     selectObject[Quest, String](
       i,
       (_.id),
-      (_.authorUserId),
+      (_.info.authorId),
       usedQuests,
       ((x: String) => x))
   }
@@ -27,7 +27,7 @@ trait SelectionHelpers { this: UserLogic =>
     selectObject[QuestSolution, String](
       i,
       (_.id),
-      (_.userId),
+      (_.info.authorId),
       usedQuests,
       ((x: String) => x))
   }

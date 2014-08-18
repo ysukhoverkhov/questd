@@ -14,6 +14,7 @@ case class QuestInfoContent(
   description: String)
 
 case class QuestInfo(
+  authorId: String,
   themeId: String,
   content: QuestInfoContent,
   level: Int = 0,

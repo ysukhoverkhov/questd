@@ -62,9 +62,9 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
   private def createQuestSolution(newid: String, authorid: String) = {
     QuestSolution(
       id = newid,
-      userId = authorid,
       questLevel = 10,
       info = QuestSolutionInfo(
+        authorId = authorid,
         themeId = "theme_id",
         questId = "quest_id",
         content = QuestSolutionInfoContent(

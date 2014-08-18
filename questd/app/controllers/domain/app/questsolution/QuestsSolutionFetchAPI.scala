@@ -28,14 +28,14 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
   def getFriendsSolutions(request: GetFriendsSolutionsRequest): ApiResult[GetFriendsSolutionsResult] = handleDbException {
     OkApiResult(GetFriendsSolutionsResult(db.solution.allWithParams(
       status = List(request.status.toString),
-      userIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
+      authorIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
       levels = request.levels)))
   }
 
   def getShortlistSolutions(request: GetShortlistSolutionsRequest): ApiResult[GetShortlistSolutionsResult] = handleDbException {
     OkApiResult(GetShortlistSolutionsResult(db.solution.allWithParams(
       status = List(request.status.toString),
-      userIds = request.user.shortlist,
+      authorIds = request.user.shortlist,
       levels = request.levels)))
   }
 

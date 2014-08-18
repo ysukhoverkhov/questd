@@ -99,7 +99,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     updatedQuest ifSome { q =>
       if (q.status != quest.status) {
-        val authorId = quest.authorUserId
+        val authorId = quest.info.authorId
         db.user.readById(authorId) match {
           case None => {
             Logger.error("Unable to find author of quest user " + authorId)

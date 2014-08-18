@@ -143,9 +143,9 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
             db.quest.create(
               Quest(
-                authorUserId = r.user.id,
                 approveReward = r.user.profile.questProposalContext.approveReward,
                 info = QuestInfo(
+                  authorId = r.user.id,
                   themeId = v.id,
                   content = request.quest,
                   vip = r.user.profile.publicProfile.vip)))

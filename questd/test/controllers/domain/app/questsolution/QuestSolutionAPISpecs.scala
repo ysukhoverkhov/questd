@@ -32,11 +32,11 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
     QuestSolution(
       id = solutionId,
-      userId = userId,
       questLevel = questLevel,
       info = QuestSolutionInfo(
         content = createSolutionInfoContent,
         vip = true,
+        authorId = userId,
         themeId = themeId,
         questId = questId),
       status = status,
@@ -48,9 +48,9 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
   def createQuest(id: String) = {
     Quest(
       id = id,
-      authorUserId = "aid",
       approveReward = Assets(1, 2, 3),
       info = QuestInfo(
+        authorId = "aid",
         themeId = "tid",
         vip = false,
         content = QuestInfoContent(

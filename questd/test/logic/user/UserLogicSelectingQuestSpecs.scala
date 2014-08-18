@@ -60,9 +60,9 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
   private def createQuest(newid: String, authorid: String) = {
     Quest(
       id = newid,
-      authorUserId = authorid,
       approveReward = Assets(1, 2, 3),
       info = QuestInfo(
+        authorId = authorid,
         themeId = "theme_id",
         content = QuestInfoContent(
           media = ContentReference(ContentType.Video, "", ""),
