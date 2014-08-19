@@ -28,6 +28,7 @@ trait UserDAO extends BaseDAO[User] {
   def resetQuestProposal(id: String, shouldResetCooldown: Boolean): Option[User]
   
   def resetCounters(id: String, resetPurchasesTimeout: Date): Option[User]
+  def resetTodayReviewedThemes(id: String): Option[User]
   
   def addPrivateDailyResult(id: String, dailyResult: DailyResult): Option[User]
   def movePrivateDailyResultsToPublic(id: String, dailyResults: List[DailyResult]): Option[User]

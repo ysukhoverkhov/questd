@@ -54,7 +54,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    * Returns purchased quest theme.
    */
   def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
-
+// TODO: reset themes here.
     val user = ensureNoDeadlineProposal(request.user)
 
     user.canPurchaseQuestProposals match {
@@ -65,6 +65,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) map { r =>
           val user = r.user
           val reward = r.user.rewardForMakingApprovedQuest
+          
           r.user.getRandomThemeForQuestProposal(db.theme.count) match {
             case Some(t) => {
               val sampleQuest = {

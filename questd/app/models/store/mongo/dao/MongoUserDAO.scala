@@ -62,10 +62,10 @@ private[mongo] class MongoUserDAO
    *
    */
   def selectQuestSolutionVote(
-      id: String,
-      qsi: QuestSolutionInfoWithID, 
-      qsa: PublicProfileWithID,
-      qi: QuestInfoWithID): Option[User] = {
+    id: String,
+    qsi: QuestSolutionInfoWithID,
+    qsa: PublicProfileWithID,
+    qi: QuestInfoWithID): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
@@ -295,6 +295,17 @@ private[mongo] class MongoUserDAO
           "profile.questProposalContext.todayReviewedThemeIds" -> "",
           "profile.questProposalVoteContext.reviewingQuest" -> "",
           "profile.questSolutionVoteContext.reviewingQuestSolution" -> ""))))
+  }
+
+  /**
+   * // TODO test me.
+   */
+  def resetTodayReviewedThemes(id: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$unset" -> MongoDBObject(
+          "profile.questProposalContext.todayReviewedThemeIds" -> ""))))
   }
 
   /**
