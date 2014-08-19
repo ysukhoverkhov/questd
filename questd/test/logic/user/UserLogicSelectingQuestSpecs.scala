@@ -249,7 +249,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       there was one(api).getAllQuests(any[GetAllQuestsRequest])
     }
 
-    "Starting quests return other quests ignoring recent quests list if no quests available otherwise" in {
+    "Starting quests does not return other quests ignoring recent quests list if no quests available otherwise" in {
       val qid = "qid"
       val u = User(
         profile = Profile(
@@ -268,9 +268,9 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
 
       val q = u.getRandomQuestForSolution
 
-      there were two(rand).nextDouble
-      there were atLeast(4)(api).getAllQuests(any[GetAllQuestsRequest])
-      q must beSome
+      there were one(rand).nextDouble
+      there were atLeast(3)(api).getAllQuests(any[GetAllQuestsRequest])
+      q must beNone
     }
 
     "Other quests are used if vip quests are unavailable" in {
