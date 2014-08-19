@@ -1,4 +1,4 @@
-package controllers.domain.libs.facebook
+package controllers.sn.facebook
 
 import com.restfb._
 import com.restfb.exception._

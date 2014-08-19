@@ -5,15 +5,15 @@ import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import logic._
 import play.Logger
 
 case class GetAllUsersRequest()
 case class GetAllUsersResult(users: Iterator[User])
 
-case class ResetCountersRequest(user: User)
-case class ResetCountersResult()
+case class ResetPurchasesRequest(user: User)
+case class ResetPurchasesResult()
 
 case class AdjustAssetsRequest(user: User, reward: Option[Assets] = None, cost: Option[Assets] = None)
 case class AdjustAssetsResult(user: User)
@@ -25,7 +25,13 @@ case class GetRightsAtLevelsRequest(user: User, levelFrom: Int, levelTo: Int)
 case class GetRightsAtLevelsResult(rights: List[Rights])
 
 case class GetLevelsForRightsRequest(user: User, functionality: List[String])
-case class GetLevelsForRightsResult(levels: Map[String, Int])
+case class GetLevelsForRightsResult(levels: Map[Functionality.Value, Int])
+
+case class SetDebugRequest(user: User, debug: String)
+case class SetDebugResult(user: User)
+
+case class SetGenderRequest(user: User, gender: Gender.Value)
+case class SetGenderResult(user: User)
 
 private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -35,19 +41,19 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def getAllUsers(request: GetAllUsersRequest): ApiResult[GetAllUsersResult] = handleDbException {
     import request._
 
-    OkApiResult(Some(GetAllUsersResult(db.user.all)))
+    OkApiResult(GetAllUsersResult(db.user.all))
   }
 
   /**
    * Reset all purchases (quests and themes) overnight.
    */
-  def resetCounters(request: ResetCountersRequest): ApiResult[ResetCountersResult] = handleDbException {
+  def resetPurchases(request: ResetPurchasesRequest): ApiResult[ResetPurchasesResult] = handleDbException({
     import request._
 
-    db.user.resetCounters(user.id, user.getResetPurchasesTimeout)
+    db.user.resetPurchases(user.id, user.getResetPurchasesTimeout)
 
-    OkApiResult(Some(ResetCountersResult()))
-  }
+    OkApiResult(ResetPurchasesResult())
+  })
 
   /**
    * Adjust assets value and performs other modifications on profile because of this.
@@ -69,7 +75,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       user
     }
 
-    checkIncreaseLevel(CheckIncreaseLevelRequest(u)) map { r => OkApiResult(Some(AdjustAssetsResult(r.user))) }
+    checkIncreaseLevel(CheckIncreaseLevelRequest(u)) ifOk { r => OkApiResult(AdjustAssetsResult(r.user)) }
   }
 
   /**
@@ -91,7 +97,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         }
     } else request.user
 
-    OkApiResult(Some(CheckIncreaseLevelResult(u)))
+    OkApiResult(CheckIncreaseLevelResult(u))
   }
 
   /**
@@ -105,7 +111,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       u.calculateRights
     }
 
-    OkApiResult(Some(GetRightsAtLevelsResult(rights.toList)))
+    OkApiResult(GetRightsAtLevelsResult(rights.toList))
   }
 
   /**
@@ -113,10 +119,34 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    */
   def getLevelsForRights(request: GetLevelsForRightsRequest): ApiResult[GetLevelsForRightsResult] = handleDbException {
     import request._
-    
+
     val rv = constants.restrictions.filterKeys(request.functionality.contains(_))
 
-    OkApiResult(Some(GetLevelsForRightsResult(rv)))
+    OkApiResult(GetLevelsForRightsResult(rv))
+  }
+
+  /**
+   * Updates debug string in user profile.
+   */
+  def setDebug(request: SetDebugRequest): ApiResult[SetDebugResult] = handleDbException {
+    import request._
+
+    db.user.setDebug(user.id, debug) ifSome { v =>
+      OkApiResult(SetDebugResult(v))
+    }
+
+  }
+
+  /**
+   * Updates user gender.
+   */
+  def setGender(request: SetGenderRequest): ApiResult[SetGenderResult] = handleDbException {
+    import request._
+
+    db.user.setGender(user.id, gender.toString) ifSome { v =>
+      OkApiResult(SetGenderResult(v))
+    }
+
   }
 
 }

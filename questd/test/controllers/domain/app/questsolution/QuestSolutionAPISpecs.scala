@@ -2,9 +2,8 @@ package controllers.domain.app.questsolution
 
 import org.specs2.mutable._
 import org.specs2.runner._
-import org.junit.runner._
-import play.api.test._
-import play.api.test.Helpers._
+import org.mockito.Mockito._
+
 import controllers.domain._
 import controllers.domain.app.user._
 import models.store._
@@ -19,25 +18,25 @@ import org.mockito.Matchers
 class QuestSolutionAPISpecs extends BaseAPISpecs {
 
   def createSolutionInfoContent = {
-    QuestSolutionInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None)
+    QuestSolutionInfoContent(ContentReference(ContentType.Photo, "", ""), None)
   }
 
   def createSolution(
     solutionId: String,
     userId: String,
     questId: String,
-    status: String = QuestSolutionStatus.OnVoting.toString,
+    status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting,
     questLevel: Int = 1,
     themeId: String = "tid",
     points: Int = 0) = {
 
     QuestSolution(
       id = solutionId,
-      userId = userId,
       questLevel = questLevel,
       info = QuestSolutionInfo(
         content = createSolutionInfoContent,
         vip = true,
+        authorId = userId,
         themeId = themeId,
         questId = questId),
       status = status,
@@ -49,14 +48,14 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
   def createQuest(id: String) = {
     Quest(
       id = id,
-      authorUserId = "aid",
       approveReward = Assets(1, 2, 3),
       info = QuestInfo(
+        authorId = "aid",
         themeId = "tid",
         vip = false,
         content = QuestInfoContent(
           media = ContentReference(
-            contentType = "type",
+            contentType = ContentType.Photo,
             storage = "la",
             reference = "tu"),
           icon = None,
@@ -65,17 +64,17 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
   "Quest solution API" should {
 
-    "updateQuestSolutionState calls rewardQuestSolutionAuthor is solution state is changed" in context {
+    "updateQuestSolutionState calls rewardQuestSolutionAuthor if solution state is changed" in context {
 
       val q = createQuest(id = "qid")
       val user1 = User(id = "uid")
       val sol = createSolution("sid", user1.id, q.id)
 
       val spiedQuestSolutionLogic = spy(new QuestSolutionLogic(sol, api.api))
-      api.questSolution2Logic(sol) returns spiedQuestSolutionLogic
+      when(api.questSolution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
 
-      spiedQuestSolutionLogic.shouldStopVoting returns true
-      solution.updateStatus(any, any, any) returns Some(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor.toString))
+      when(spiedQuestSolutionLogic.shouldStopVoting).thenReturn(true)
+      solution.updateStatus(any, any, any) returns Some(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor))
       user.readById(user1.id) returns Some(user1)
       quest.readById(q.id) returns Some(q)
 
@@ -85,11 +84,11 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
       val result = api.updateQuestSolutionState(UpdateQuestSolutionStateRequest(sol))
 
-      result must beEqualTo(OkApiResult(Some(UpdateQuestSolutionStateResult())))
+      result must beEqualTo(OkApiResult(UpdateQuestSolutionStateResult()))
 
       there was one(solution).updateStatus(Matchers.eq(sol.id), Matchers.eq(QuestSolutionStatus.WaitingForCompetitor.toString), Matchers.eq(null))
       there was one(user).readById(user1.id)
-      there was one(api).rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor.toString), user1))
+      there was one(api).rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor), user1))
     }
   }
 }
