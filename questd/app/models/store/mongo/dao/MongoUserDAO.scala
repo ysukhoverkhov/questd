@@ -298,7 +298,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * // TODO test me.
+   * 
    */
   def resetTodayReviewedThemes(id: String): Option[User] = {
     findAndModify(

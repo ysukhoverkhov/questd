@@ -54,7 +54,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    * Returns purchased quest theme.
    */
   def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
-// TODO: reset themes here.
+    
     val user = ensureNoDeadlineProposal(request.user)
 
     user.canPurchaseQuestProposals match {
@@ -65,24 +65,40 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) map { r =>
           val user = r.user
           val reward = r.user.rewardForMakingApprovedQuest
-          
-          r.user.getRandomThemeForQuestProposal(db.theme.count) match {
-            case Some(t) => {
-              val sampleQuest = {
-                val all = db.quest.allWithStatusAndThemeByPoints(QuestStatus.InRotation.toString, t.id)
-                if (all.hasNext) {
-                  Some(all.next.info)
+          val themesCount = db.theme.count
+
+          // Recursion for reseting today selected themes.
+          def selectRandomThemeToPresentUser(user: User): ApiResult[PurchaseQuestThemeResult] = {
+            user.getRandomThemeForQuestProposal(themesCount) match {
+              case Some(t) => {
+                val sampleQuest = {
+                  val all = db.quest.allWithStatusAndThemeByPoints(QuestStatus.InRotation.toString, t.id)
+                  if (all.hasNext) {
+                    Some(all.next.info)
+                  } else {
+                    None
+                  }
+                }
+
+                val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t), sampleQuest, reward) // TODO: make here isSome
+                OkApiResult(Some(PurchaseQuestThemeResult(OK, u.map(_.profile))))
+              }
+
+              case None => {
+                if (user.profile.questProposalContext.todayReviewedThemeIds.size == 0) {
+                  OkApiResult(Some(PurchaseQuestThemeResult(OutOfContent)))
                 } else {
-                  None
+                  
+                  val userWithoutReviewdThemes = db.user.resetTodayReviewedThemes(user.id)
+                  // TODO: ifSome
+                  selectRandomThemeToPresentUser(userWithoutReviewdThemes.get)
                 }
               }
 
-              val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t), sampleQuest, reward)
-              OkApiResult(Some(PurchaseQuestThemeResult(OK, u.map(_.profile))))
             }
-
-            case None => OkApiResult(Some(PurchaseQuestThemeResult(OutOfContent)))
           }
+
+          selectRandomThemeToPresentUser(r.user)
         }
 
       }
