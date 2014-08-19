@@ -39,14 +39,6 @@ trait QuestSelectUserLogic { this: UserLogic =>
           run
         }
       })
-    } orElse {
-      algorithms.foldLeft[Option[Quest]](None)((run, fun) => {
-        if (run == None) {
-          selectQuest(fun(), List())
-        } else {
-          run
-        }
-      })
     }
   }
 
