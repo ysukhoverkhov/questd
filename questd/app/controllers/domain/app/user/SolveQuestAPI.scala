@@ -187,13 +187,20 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     user.canResolveQuest(ContentType.withName(request.solution.media.contentType)) match {
       case OK => {
 
+        def content = if (request.user.payedAuthor) {
+          // TODO: insert here downlading of content.
+          request.solution
+        } else {
+          request.solution
+        }
+        
         // TODO: pull user.profile.questSolutionContext.takenQuest.get to a val here. in 0.20.02
         db.solution.create(
           QuestSolution(
             userId = user.id,
             questLevel = user.profile.questSolutionContext.takenQuest.get.obj.level,
             info = QuestSolutionInfo(
-              content = request.solution,
+              content = content,
               themeId = user.profile.questSolutionContext.takenQuest.get.obj.themeId,
               questId = user.profile.questSolutionContext.takenQuest.get.id,
               vip = user.profile.publicProfile.vip),

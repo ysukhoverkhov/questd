@@ -15,5 +15,6 @@ case class User(
   history: UserHistory = UserHistory(),
   shortlist: List[String] = List(),
   friends: List[Friendship] = List(),
-  messages: List[Message] = List()) extends ID
+  messages: List[Message] = List(),
+  payedAuthor: Boolean = false) extends ID
 

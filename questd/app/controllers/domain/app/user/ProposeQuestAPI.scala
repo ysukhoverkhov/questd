@@ -150,6 +150,13 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
     user.canProposeQuest(ContentType.withName(request.quest.media.contentType)) match {
       case OK => {
+        
+        def content = if (request.user.payedAuthor) {
+          // TODO: insert here downlading of content.
+          request.quest
+        } else {
+          request.quest
+        }
 
         db.quest.create(
           Quest(
@@ -157,7 +164,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
             approveReward = user.profile.questProposalContext.approveReward,
             info = QuestInfo(
               themeId = user.profile.questProposalContext.takenTheme.get.id,
-              content = request.quest,
+              content = content,
               vip = request.user.profile.publicProfile.vip)))
 
         val u = db.user.resetQuestProposal(

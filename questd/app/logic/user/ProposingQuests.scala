@@ -201,5 +201,4 @@ trait ProposingQuests { this: UserLogic =>
       None
     }
   }
-
 }
