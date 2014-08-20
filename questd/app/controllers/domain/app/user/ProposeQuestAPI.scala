@@ -54,7 +54,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    * Returns purchased quest theme.
    */
   def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
-
+    
     val user = ensureNoDeadlineProposal(request.user)
 
     user.canPurchaseQuestProposals match {
@@ -65,23 +65,41 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) ifOk { r =>
           val user = r.user
           val reward = r.user.rewardForMakingApprovedQuest
-          r.user.getRandomThemeForQuestProposal(db.theme.count) match {
-            case Some(t) => {
-              val sampleQuest = {
-                val all = db.quest.allWithStatusAndThemeByPoints(QuestStatus.InRotation.toString, t.id)
-                if (all.hasNext) {
-                  Some(all.next.info)
+          val themesCount = db.theme.count
+
+          // Recursion for reseting today selected themes.
+          def selectRandomThemeToPresentUser(user: User): ApiResult[PurchaseQuestThemeResult] = {
+            user.getRandomThemeForQuestProposal(themesCount) match {
+              case Some(t) => {
+                val sampleQuest = {
+                  val all = db.quest.allWithStatusAndThemeByPoints(QuestStatus.InRotation.toString, t.id)
+                  if (all.hasNext) {
+                    Some(all.next.info)
+                  } else {
+                    None
+                  }
+                }
+
+              val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t.info), sampleQuest, reward)
+                val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t), sampleQuest, reward) // TODO: make here isSome
+              OkApiResult(PurchaseQuestThemeResult(OK, u.map(_.profile)))
+              }
+
+              case None => {
+                if (user.profile.questProposalContext.todayReviewedThemeIds.size == 0) {
+                  OkApiResult(Some(PurchaseQuestThemeResult(OutOfContent)))
                 } else {
-                  None
+                  
+                  val userWithoutReviewdThemes = db.user.resetTodayReviewedThemes(user.id)
+                  // TODO: ifSome
+                  selectRandomThemeToPresentUser(userWithoutReviewdThemes.get)
                 }
               }
 
-              val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t.info), sampleQuest, reward)
-              OkApiResult(PurchaseQuestThemeResult(OK, u.map(_.profile)))
             }
-
-            case None => OkApiResult(PurchaseQuestThemeResult(OutOfContent))
           }
+
+          selectRandomThemeToPresentUser(r.user)
         }
 
       }
@@ -132,6 +150,13 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
     user.canProposeQuest(request.quest.media.contentType) match {
       case OK => {
+        
+        def content = if (request.user.payedAuthor) {
+          // TODO: insert here downlading of content.
+          request.quest
+        } else {
+          request.quest
+        }
 
         {
 
@@ -147,7 +172,8 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                 info = QuestInfo(
                   authorId = r.user.id,
                   themeId = v.id,
-                  content = request.quest,
+              content = content,
+
                   vip = r.user.profile.publicProfile.vip)))
 
             val u = db.user.resetQuestProposal(

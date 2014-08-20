@@ -349,6 +349,23 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown == date)
     }
 
+    "resetTodayReviewedThemes do its work" in new WithApplication(appWithTestDatabase) {
+      val userid = "resetTodayReviewedThemes"
+      val date = new Date(1000)
+
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid,
+        profile = Profile(
+          questProposalContext = QuestProposalConext(
+            todayReviewedThemeIds = List("lala")))))
+
+      val ou = db.user.resetTodayReviewedThemes(userid)
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.questProposalContext.todayReviewedThemeIds == List())
+    }
+
     "addTasks works" in new WithApplication(appWithTestDatabase) {
 
       def t = {

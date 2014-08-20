@@ -119,7 +119,7 @@ trait ProposingQuests { this: UserLogic =>
       Logger.debug("Using recent list")
       val id = user.history.selectedThemeIds(rand.nextInt(user.history.selectedThemeIds.length))
 
-      Logger.trace("  Selected id from themes in history: " + id)
+      Logger.debug("  Selected id from themes in history: " + id)
 
       if (user.profile.questProposalContext.todayReviewedThemeIds.contains(id)) {
         Logger.debug("Recent list returned theme we've used today, requesting from global one.")
@@ -127,7 +127,7 @@ trait ProposingQuests { this: UserLogic =>
       } else {
         api.getTheme(GetThemeRequest(id)) match {
           case OkApiResult(GetThemeResult(theme)) => Some(theme)
-          case _ => None
+          case _ => themeFromGlobal // If theme in history is removed from our themes - get from global list.
         }
       }
     } else {
@@ -209,5 +209,4 @@ trait ProposingQuests { this: UserLogic =>
       None
     }
   }
-
 }

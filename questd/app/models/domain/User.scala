@@ -16,5 +16,6 @@ case class User(
   shortlist: List[String] = List(),
   friends: List[Friendship] = List(),
   messages: List[Message] = List(),
-  tutorial: TutorialState = TutorialState()) extends ID
+  tutorial: TutorialState = TutorialState(),
+  payedAuthor: Boolean = false) extends ID
 
