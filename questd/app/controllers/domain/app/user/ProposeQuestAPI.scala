@@ -54,7 +54,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    * Returns purchased quest theme.
    */
   def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
-    
+
     val user = ensureNoDeadlineProposal(request.user)
 
     user.canPurchaseQuestProposals match {
@@ -80,19 +80,20 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                   }
                 }
 
-              val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t.info), sampleQuest, reward)
-                val u = db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t), sampleQuest, reward) // TODO: make here isSome
-              OkApiResult(PurchaseQuestThemeResult(OK, u.map(_.profile)))
+                db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t.info), sampleQuest, reward) ifSome { v =>
+                  OkApiResult(PurchaseQuestThemeResult(OK, Some(v.profile)))
+                }
+
               }
 
               case None => {
                 if (user.profile.questProposalContext.todayReviewedThemeIds.size == 0) {
-                  OkApiResult(Some(PurchaseQuestThemeResult(OutOfContent)))
+                  OkApiResult(PurchaseQuestThemeResult(OutOfContent))
                 } else {
-                  
-                  val userWithoutReviewdThemes = db.user.resetTodayReviewedThemes(user.id)
-                  // TODO: ifSome
-                  selectRandomThemeToPresentUser(userWithoutReviewdThemes.get)
+
+                  db.user.resetTodayReviewedThemes(user.id) ifSome { v =>
+                    selectRandomThemeToPresentUser(v)
+                  }
                 }
               }
 
@@ -150,7 +151,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
     user.canProposeQuest(request.quest.media.contentType) match {
       case OK => {
-        
+
         def content = if (request.user.payedAuthor) {
           // TODO: insert here downlading of content.
           request.quest
@@ -172,7 +173,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                 info = QuestInfo(
                   authorId = r.user.id,
                   themeId = v.id,
-              content = content,
+                  content = content,
 
                   vip = r.user.profile.publicProfile.vip)))
 
