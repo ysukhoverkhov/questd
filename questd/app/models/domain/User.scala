@@ -16,5 +16,5 @@ case class User(
   shortlist: List[String] = List(),
   friends: List[Friendship] = List(),
   messages: List[Message] = List(),
-  payedAuthor: Boolean = false) extends ID
+  payedAuthor: Boolean = true) extends ID // TODO: change me to false.
 

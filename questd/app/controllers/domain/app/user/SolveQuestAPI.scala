@@ -188,8 +188,69 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       case OK => {
 
         def content = if (request.user.payedAuthor) {
-          // TODO: insert here downlading of content.
-          request.solution
+
+          // TODO: the same is in proposing quests. perhaps it should be moved in one place.
+          try {
+            import com.restfb.types.Photo
+            import play.api.Play.current
+            import play.api.libs.ws._
+            import scala.concurrent._
+            import scala.concurrent.duration._
+            import scala.concurrent.ExecutionContext.Implicits.global
+            import play.api.libs.iteratee._
+            import scalax.io._
+            import java.io._
+            import java.util.UUID
+            import scala.language.postfixOps
+
+            val rv = fb.fetchObject(
+              request.user.auth.fbtoken.getOrElse(""),
+              request.solution.media.reference,
+              classOf[Photo])
+
+            Logger.error(rv.getImages().get(0).getSource())
+
+            def fromStream(stream: OutputStream): Iteratee[Array[Byte], Unit] = Cont {
+              case e @ Input.EOF =>
+                stream.close()
+                Logger.error("Done")
+                Done((), e)
+              case Input.El(data) =>
+                stream.write(data)
+                fromStream(stream)
+              case Input.Empty =>
+                fromStream(stream)
+            }
+
+            val fileName = s"${UUID.randomUUID().toString()}.jpg"
+            val path = s"/var/www/vhosts/questmeapp.com/static-1.questmeapp.com/files/$fileName"
+            val url = s"http://static-1.questmeapp.com/files/$fileName"
+
+            Logger.error(s"Saving to file $path and url $url")
+
+            val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(path))
+
+            Logger.error("Starting")
+
+            val futureResponse = WS.url(rv.getImages().get(0).getSource()).get {
+              headers =>
+                fromStream(outputStream)
+            }.map(_.run)
+
+            Await.ready(futureResponse, 20 seconds)
+
+            Logger.error("Exited")
+
+            request.solution.copy(
+              media = request.solution.media.copy(
+                storage = "url",
+                reference = url))
+          } catch {
+            case ex: Throwable => {
+              Logger.error("unable to get content for store for payed user.")
+              request.solution
+            }
+          }
         } else {
           request.solution
         }
