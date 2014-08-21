@@ -153,60 +153,67 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
         def content = if (request.user.payedAuthor) {
 
-          import com.restfb.types.Photo
-          import play.api.Play.current
-          import play.api.libs.ws._
-          import scala.concurrent._
-          import scala.concurrent.duration._
-          import scala.concurrent.ExecutionContext.Implicits.global
-          import play.api.libs.iteratee._
-          import scalax.io._
-          import java.io._
-          import java.util.UUID
-          import scala.language.postfixOps
+          try {
+            import com.restfb.types.Photo
+            import play.api.Play.current
+            import play.api.libs.ws._
+            import scala.concurrent._
+            import scala.concurrent.duration._
+            import scala.concurrent.ExecutionContext.Implicits.global
+            import play.api.libs.iteratee._
+            import scalax.io._
+            import java.io._
+            import java.util.UUID
+            import scala.language.postfixOps
 
-          val rv = fb.fetchObject(
-            request.user.auth.fbtoken.getOrElse(""),
-            request.quest.media.reference,
-            classOf[Photo])
+            val rv = fb.fetchObject(
+              request.user.auth.fbtoken.getOrElse(""),
+              request.quest.media.reference,
+              classOf[Photo])
 
-          Logger.error(rv.getImages().get(0).getSource())
+            Logger.error(rv.getImages().get(0).getSource())
 
-          def fromStream(stream: OutputStream): Iteratee[Array[Byte], Unit] = Cont {
-            case e @ Input.EOF =>
-              stream.close()
-              Logger.error("Done")
-              Done((), e)
-            case Input.El(data) =>
-              stream.write(data)
-              fromStream(stream)
-            case Input.Empty =>
-              fromStream(stream)
+            def fromStream(stream: OutputStream): Iteratee[Array[Byte], Unit] = Cont {
+              case e @ Input.EOF =>
+                stream.close()
+                Logger.error("Done")
+                Done((), e)
+              case Input.El(data) =>
+                stream.write(data)
+                fromStream(stream)
+              case Input.Empty =>
+                fromStream(stream)
+            }
+
+            val fileName = s"${UUID.randomUUID().toString()}.jpg"
+            val path = s"/var/www/vhosts/questmeapp.com/static-1.questmeapp.com/files/$fileName"
+            val url = s"http://static-1.questmeapp.com/files/$fileName"
+
+            Logger.error(s"Saving to file $path and url $url")
+
+            val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(path))
+
+            Logger.error("Starting")
+
+            val futureResponse = WS.url(rv.getImages().get(0).getSource()).get {
+              headers =>
+                fromStream(outputStream)
+            }.map(_.run)
+
+            Await.ready(futureResponse, 20 seconds)
+
+            Logger.error("Exited")
+
+            request.quest.copy(
+              media = request.quest.media.copy(
+                storage = "url",
+                reference = url))
+          } catch {
+            case ex: Throwable => {
+              Logger.error("unable to get content for store for payed user.")
+              request.quest
+            }
           }
-
-          val fileName = s"${UUID.randomUUID().toString()}.jpg"
-          val path = s"/var/www/vhosts/questmeapp.com/static-1.questmeapp.com/files/$fileName"
-          val url = s"http://static-1.questmeapp.com/files/$fileName"
-          
-          Logger.error(s"Saving to file $path and url $url")
-
-          val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(path))
-
-          Logger.error("Starting")
-
-          val futureResponse = WS.url(rv.getImages().get(0).getSource()).get {
-            headers =>
-              fromStream(outputStream)
-          }.map(_.run)
-
-          Await.ready(futureResponse, 20 seconds)
-
-          Logger.error("Exited")
-
-          request.quest.copy(
-            media = request.quest.media.copy(
-              storage = "url",
-              reference = url))
         } else {
           request.quest
         }
