@@ -38,7 +38,7 @@ case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, 
 case class RewardQuestProposalAuthorRequest(quest: Quest, author: User)
 case class RewardQuestProposalAuthorResult()
 
-private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
+private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor with FBAccessor =>
 
   /**
    * Get cost of next quest purchase.
@@ -54,7 +54,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    * Returns purchased quest theme.
    */
   def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
-    
+
     val user = ensureNoDeadlineProposal(request.user)
 
     user.canPurchaseQuestProposals match {
@@ -88,7 +88,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                 if (user.profile.questProposalContext.todayReviewedThemeIds.size == 0) {
                   OkApiResult(Some(PurchaseQuestThemeResult(OutOfContent)))
                 } else {
-                  
+
                   val userWithoutReviewdThemes = db.user.resetTodayReviewedThemes(user.id)
                   // TODO: ifSome
                   selectRandomThemeToPresentUser(userWithoutReviewdThemes.get)
@@ -150,10 +150,60 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
     user.canProposeQuest(ContentType.withName(request.quest.media.contentType)) match {
       case OK => {
-        
+
         def content = if (request.user.payedAuthor) {
-          // TODO: insert here downlading of content.
-          request.quest
+
+          import com.restfb.types.Photo
+          import play.api.Play.current
+          import play.api.libs.ws._
+          import scala.concurrent._
+          import scala.concurrent.duration._
+          import scala.concurrent.ExecutionContext.Implicits.global
+          import play.api.libs.iteratee._
+          import scalax.io._
+          import java.io._
+          import java.util.UUID
+
+          val rv = fb.fetchObject(
+            "CAACEdEose0cBAOPL16uHXtiZATOGyGi3He37R4lp6SNFZBatxNk9Po8nVZAH6pmwJ2eUWq6DYjvg3M7KZCBhpAbBHwsiCr2ZB5YDSjZAZCpD93kRr67dFyg5LBbpWyrIF2pZB97ZCehZBdcEGf7mZBSIdCURmUCuOop0hVRZAywmdL137KKE7rBqJCgJmCUk8uZCvdd0mq9ifs6RyDfIM6dZBQZAl8u",
+            request.quest.media.reference,
+            classOf[Photo])
+
+          Logger.error(rv.getImages().get(0).getSource())
+
+          def fromStream(stream: OutputStream): Iteratee[Array[Byte], Unit] = Cont {
+            case e @ Input.EOF =>
+              stream.close()
+              Logger.error("Done")
+              Done((), e)
+            case Input.El(data) =>
+              stream.write(data)
+              fromStream(stream)
+            case Input.Empty =>
+              fromStream(stream)
+          }
+
+          val fileName = s"${UUID.randomUUID().toString()}.jpg"
+          val path = s"d:/$fileName"
+          val url = s"http://qwe/$fileName"
+
+          val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream("d:/no.jpg"))
+
+          Logger.error("Starting")
+
+          val futureResponse = WS.url(rv.getImages().get(0).getSource()).get {
+            headers =>
+              fromStream(outputStream)
+          }.map(_.run)
+
+          Await.ready(futureResponse, 20 seconds)
+
+          Logger.error("Exited")
+
+          request.quest.copy(
+            media = request.quest.media.copy(
+              storage = "url",
+              reference = url))
         } else {
           request.quest
         }

@@ -15,7 +15,7 @@ case class LoginFBResult(session: String)
 case class UserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
 case class UserResult(user: User)
 
-private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
+private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccessor with FBAccessor =>
 
   /**
    * Login with FB. Or create new one if it doesn't exists.
@@ -27,10 +27,10 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
       db.user.updateSessionId(user.id, uuid)
 
       // API Test place
-//      shiftStats(ShiftStatsRequest(user))
-//import controllers.domain.app.quest._
-//	  calculateProposalThresholds(CalculateProposalThresholdsRequest(10, 3))
-//      shiftHistory(ShiftHistoryRequest(user))
+      //      shiftStats(ShiftStatsRequest(user))
+      //import controllers.domain.app.quest._
+      //	  calculateProposalThresholds(CalculateProposalThresholdsRequest(10, 3))
+      //      shiftHistory(ShiftHistoryRequest(user))
 
       OkApiResult(Some(LoginFBResult(uuid)))
     }
