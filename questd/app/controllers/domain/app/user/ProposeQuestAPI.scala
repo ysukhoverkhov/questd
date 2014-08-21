@@ -163,9 +163,10 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
           import scalax.io._
           import java.io._
           import java.util.UUID
+          import scala.language.postfixOps
 
           val rv = fb.fetchObject(
-            "CAACEdEose0cBAOPL16uHXtiZATOGyGi3He37R4lp6SNFZBatxNk9Po8nVZAH6pmwJ2eUWq6DYjvg3M7KZCBhpAbBHwsiCr2ZB5YDSjZAZCpD93kRr67dFyg5LBbpWyrIF2pZB97ZCehZBdcEGf7mZBSIdCURmUCuOop0hVRZAywmdL137KKE7rBqJCgJmCUk8uZCvdd0mq9ifs6RyDfIM6dZBQZAl8u",
+            request.user.auth.fbtoken.getOrElse(""),
             request.quest.media.reference,
             classOf[Photo])
 
@@ -184,10 +185,12 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
           }
 
           val fileName = s"${UUID.randomUUID().toString()}.jpg"
-          val path = s"d:/$fileName"
-          val url = s"http://qwe/$fileName"
+          val path = s"/var/www/vhosts/questmeapp.com/static-1.questmeapp.com/files/$fileName"
+          val url = s"http://static-1.questmeapp.com/files/$fileName"
+          
+          Logger.error(s"Saving to file $path and url $url")
 
-          val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream("d:/no.jpg"))
+          val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(path))
 
           Logger.error("Starting")
 

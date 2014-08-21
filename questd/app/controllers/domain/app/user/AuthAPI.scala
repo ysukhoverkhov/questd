@@ -9,7 +9,7 @@ import controllers.domain._
 import components._
 import controllers.domain.libs.facebook.UserFB
 
-case class LoginFBRequest(userfb: UserFB)
+case class LoginFBRequest(userfb: UserFB, token: String)
 case class LoginFBResult(session: String)
 
 case class UserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
@@ -24,7 +24,7 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
 
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString()
-      db.user.updateSessionId(user.id, uuid)
+      db.user.updateSessionId(user.id, uuid, params.token)
 
       // API Test place
       //      shiftStats(ShiftStatsRequest(user))
@@ -52,7 +52,8 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
 
         val newUser = User(
           auth = AuthInfo(
-            fbid = Some(params.userfb.getId())),
+            fbid = Some(params.userfb.getId()),
+            fbtoken = Some(params.token)),
           profile = Profile(
             publicProfile = PublicProfile(
               bio = Bio(
