@@ -189,7 +189,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       case OK => {
 
         def content = if (request.user.payedAuthor) {
-          // TODO: insert here downlading of content.
           request.solution
         } else {
           request.solution
