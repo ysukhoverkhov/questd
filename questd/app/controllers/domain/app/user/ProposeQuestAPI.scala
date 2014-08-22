@@ -153,7 +153,6 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
       case OK => {
 
         def content = if (request.user.payedAuthor) {
-          // TODO: insert here downlading of content.
           request.quest
         } else {
           request.quest
