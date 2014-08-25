@@ -1,7 +1,5 @@
 package models.domain
 
-import com.novus.salat.annotations.raw.Salat
-
 object Gender extends Enumeration {
   val Male, Female, Unknown = Value
 }
