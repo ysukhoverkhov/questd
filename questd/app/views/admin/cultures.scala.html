@@ -1,0 +1,60 @@
+@(menuItems: Map[String, String], cultures: List[models.domain.Culture], newForm: Form[controllers.web.admin.component.CultureForm])
+
+@import helper._
+
+@main("Cultures")(menuItems, Map()) {
+
+	<!--p>
+		@form(action = controllers.web.admin.routes.ThemesCRUD.createThemeCB()) {
+			@inputText(newForm("id"), 'size -> 50, 'readonly -> "readonly")
+			@inputText(newForm("name"), 'size -> 20, 'placeholder -> "Name")
+			@inputText(newForm("description"), 'size -> 100, 'placeholder -> "Description")
+			
+			@select(newForm("iconType"), options(List("Photo", "Video")))
+			@inputText(newForm("iconStorage"), 'size -> 20, 'placeholder -> "Storage")
+			@inputText(newForm("iconReference"), 'size -> 100, 'placeholder -> "Reference")
+			
+			@select(newForm("mediaType"), options(List("Photo", "Video")))
+			@inputText(newForm("mediaStorage"), 'size -> 20, 'placeholder -> "Storage")
+			@inputText(newForm("mediaReference"), 'size -> 100, 'placeholder -> "Reference")
+
+			@if(newForm("id").value == None) {
+				<input type="submit" value="Create">
+			} else {
+				<input type="submit" value="Update">
+			}
+   		}
+	</p-->
+	
+	<p>
+	<table border="1">
+    	<tr>
+    		<td>id</td>
+    		<td>name</td>
+    		<td>countries</td>
+    	</tr>
+
+		@for(t <- cultures) {
+	    	<tr>
+	    		<td>@t.id</td>
+	    		<td>@t.name</td>
+	    		<td>@t.countries.size</td>
+	    		
+				<td><a href="@controllers.web.admin.routes.CulturesCRUD.cultures(t.id)">edit</a></td>
+				<!--td><a onClick='deleteFun("@controllers.web.admin.routes.ThemesCRUD.deleteThemeCB(t.id)")' >delete</a></td-->
+	    	</tr>
+	    }
+
+	</table>
+	</p>
+	
+	<!-- TODO: move it to common functions in JS (search for it in other htmls. -->
+	<script>
+		function deleteFun(url) {
+			if (confirm("Are you sure want to delete it?")) {
+				window.open(url, "_self");
+			}
+		}
+	</script>
+}
+

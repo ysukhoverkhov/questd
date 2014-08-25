@@ -15,6 +15,7 @@ trait AdminComponent { component: DomainAPIComponent =>
     with QuestsCRUDImpl
     with TutorialTasksCRUDImpl
     with SolutionsCRUDImpl
+    with CulturesCRUDImpl
     with ConfigImpl
     with APIAccessor {
 

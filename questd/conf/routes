@@ -111,6 +111,9 @@ GET		/admin/themes/byid/:id							controllers.web.admin.ThemesCRUD.themes(id)
 POST	/admin/themes/createTheme						controllers.web.admin.ThemesCRUD.createThemeCB
 GET		/admin/themes/deleteTheme/:id					controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
 
+GET		/admin/cultures									controllers.web.admin.CulturesCRUD.cultures(id = "")
+GET		/admin/cultures/byid/:id						controllers.web.admin.CulturesCRUD.cultures(id)
+
 GET		/admin/quests									controllers.web.admin.QuestsCRUD.quests(id = "")
 GET		/admin/quests/byid/:id							controllers.web.admin.QuestsCRUD.quests(id)
 POST	/admin/quests/update							controllers.web.admin.QuestsCRUD.updateQuest
