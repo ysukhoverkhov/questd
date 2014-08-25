@@ -82,36 +82,24 @@ trait CulturesCRUDImpl extends Controller with BaseCRUDImpl[Culture, CultureForm
       _ : Form[CultureForm])
   }
 
-  /**
-   * Get all cultures
-   */
-  def cultures = objects _
-
-//  /**
-//   * Delete theme action
-//   */
-//  def deleteThemeCB(id: String) = Action { implicit request =>
-//
+  // TODO: implement me.
+  protected def deleteObjectWithId(id: String): Unit = {
 //    api.deleteTheme(DeleteThemeRequest(id))
-//
-//    Redirect(controllers.web.admin.routes.ThemesCRUD.themes(""))
-//  }
-//
-//  /**
-//   * Create theme action
-//   */
-//  def createThemeCB = Action { implicit request =>
-//    newThemeForm.bindFromRequest.fold(
-//
-//      formWithErrors => {
-//        BadRequest(views.html.admin.themes(
-//          Menu(request),
-//          List(),
-//          formWithErrors))
-//      },
-//
-//      themeForm => {
-//
+    Logger.error("Deleting Object!")
+  }
+  
+  /**
+   * Home page of our CRUD
+   */
+  protected val callToHomePage = controllers.web.admin.routes.CulturesCRUD.cultures("")
+  
+  /**
+   * Create culture from its form.
+   */
+  protected def updateObjectFromForm(form: CultureForm): Unit = {
+    Logger.error("Logging in Object!")
+    // TODO: implement me.
+    
 //        val theme = Theme(
 //          id = themeForm.id,
 //          info = ThemeInfo(
@@ -131,10 +119,22 @@ trait CulturesCRUDImpl extends Controller with BaseCRUDImpl[Culture, CultureForm
 //        } else {
 //          api.updateTheme(UpdateThemeRequest(theme))
 //        }
-//
-//        Redirect(controllers.web.admin.routes.ThemesCRUD.themes(""))
-//      })
-//  }
+  }
 
+  
+  /**
+   * Get all cultures
+   */
+  def cultures = objects _
+
+  /**
+   * Delete a culture
+   */
+  def deleteCultureCB = deleteObjectCB _
+
+  /**
+   * Updating a culture
+   */
+  def createCultureCB = createObjectCB
 }
 

@@ -13,14 +13,16 @@ import controllers.domain.admin._
 import components._
 import play.twirl.api.HtmlFormat.Appendable
 
-trait BaseCRUDImpl[DT, FT] { 
+trait BaseCRUDImpl[DT, FT] {
 
   protected def emptyForm: Form[FT]
-  protected def formFilledWithObject(id: String): Form[FT] 
+  protected def formFilledWithObject(id: String): Form[FT]
   protected def allObjects: Option[List[DT]]
-  protected def renderFunction(request: Request[AnyContent]): (List[DT], Form[FT]) => Appendable 
-  
-  
+  protected def renderFunction(request: Request[AnyContent]): (List[DT], Form[FT]) => Appendable
+  protected def deleteObjectWithId(id: String): Unit
+  protected def updateObjectFromForm(form: FT): Unit
+  protected def callToHomePage: Call
+
   /**
    * Get all objects action
    */
@@ -42,54 +44,30 @@ trait BaseCRUDImpl[DT, FT] {
     }
   }
 
-//  /**
-//   * Delete theme action
-//   */
-//  def deleteThemeCB(id: String) = Action { implicit request =>
-//
-//    api.deleteTheme(DeleteThemeRequest(id))
-//
-//    Redirect(controllers.web.admin.routes.ThemesCRUD.themes(""))
-//  }
-//
-//  /**
-//   * Create theme action
-//   */
-//  def createThemeCB = Action { implicit request =>
-//    newThemeForm.bindFromRequest.fold(
-//
-//      formWithErrors => {
-//        BadRequest(views.html.admin.themes(
-//          Menu(request),
-//          List(),
-//          formWithErrors))
-//      },
-//
-//      themeForm => {
-//
-//        val theme = Theme(
-//          id = themeForm.id,
-//          info = ThemeInfo(
-//            name = themeForm.name,
-//            description = themeForm.description,
-//            icon = Some(ContentReference(
-//              contentType = ContentType.withName(themeForm.iconType),
-//              storage = themeForm.iconStorage,
-//              reference = themeForm.iconReference)),
-//            media = ContentReference(
-//              contentType = ContentType.withName(themeForm.mediaType),
-//              storage = themeForm.mediaStorage,
-//              reference = themeForm.mediaReference)))
-//
-//        if (theme.id == "") {
-//          api.createTheme(CreateThemeRequest(theme))
-//        } else {
-//          api.updateTheme(UpdateThemeRequest(theme))
-//        }
-//
-//        Redirect(controllers.web.admin.routes.ThemesCRUD.themes(""))
-//      })
-//  }
+  /**
+   * Delete object action
+   */
+  def deleteObjectCB(id: String) = Action { implicit request =>
+    deleteObjectWithId(id)
+    Redirect(callToHomePage)
+  }
+
+  /**
+   * Create theme action
+   */
+  def createObjectCB = Action { implicit request =>
+    emptyForm.bindFromRequest.fold(
+
+      formWithErrors => {
+        BadRequest(renderFunction(request)(List(), formWithErrors))
+      },
+
+      themeForm => {
+        updateObjectFromForm(themeForm)
+
+        Redirect(callToHomePage)
+      })
+  }
 
 }
 

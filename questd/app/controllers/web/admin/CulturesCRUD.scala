@@ -12,9 +12,9 @@ object CulturesCRUD extends Controller {
 
   def cultures(id: String) = admin.cultures(id)
   
-  // TODO: uncomment me.
-//  def deleteThemeCB(id: String) = admin.deleteThemeCB(id)
-//  def createThemeCB = admin.createThemeCB
+  def deleteCultureCB(id: String) = admin.deleteCultureCB(id)
+
+  def createCultureCB = admin.createCultureCB
 
 }
 
