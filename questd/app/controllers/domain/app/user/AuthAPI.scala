@@ -9,7 +9,7 @@ import controllers.domain._
 import components._
 import controllers.sn.client.SNUser
 
-case class LoginRequest(snName:String, userfb: SNUser)
+case class LoginRequest(snName:String, snuser: SNUser)
 case class LoginResult(session: String)
 
 case class UserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
@@ -30,31 +30,33 @@ private[domain] trait AuthAPI { this: DomainAPIComponent#DomainAPI with DBAccess
     }
 
 
-    Logger.debug("Searching for user in database for login with fbid " + params.userfb.snId)
+    Logger.debug("Searching for user in database for login with fbid " + params.snuser.snId)
 
-    db.user.readBySNid(params.snName, params.userfb.snId) match {
+    db.user.readBySNid(params.snName, params.snuser.snId) match {
       case None => {
 
-        Logger.debug("No user with FB id found, creating new one " + params.userfb.snId)
+        Logger.debug("No user with FB id found, creating new one " + params.snuser.snId)
 
         val newUser = User(
           auth = AuthInfo(
-            snids = Map(params.snName -> params.userfb.snId)),
+            snids = Map(params.snName -> params.snuser.snId)),
           profile = Profile(
             publicProfile = PublicProfile(
               bio = Bio(
-                name = params.userfb.firstName,
-                gender = params.userfb.gender,
-                timezone = params.userfb.timezone,
+                name = params.snuser.firstName,
+                gender = params.snuser.gender,
+                timezone = params.snuser.timezone,
+                country = params.snuser.country,
+                city = params.snuser.city,
                 avatar = Some(
-                  ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = params.userfb.snId))))))
+                  ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = params.snuser.snId))))))
 
         db.user.create(newUser)
         checkIncreaseLevel(CheckIncreaseLevelRequest(newUser))
  
-        db.user.readBySNid(params.snName, params.userfb.snId) match {
+        db.user.readBySNid(params.snName, params.snuser.snId) match {
           case None => {
-            Logger.error("Unable to find user just created in DB with fbid " + params.userfb.snId)
+            Logger.error("Unable to find user just created in DB with fbid " + params.snuser.snId)
             InternalErrorApiResult()
           }
 

@@ -18,4 +18,10 @@ trait SNUser {
 
   /// Time zone offset of a user.
   def timezone: Int
+  
+  /// Country of a user.
+  def country: String
+
+  /// City of a user.
+  def city: String
 }
