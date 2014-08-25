@@ -12,11 +12,8 @@ import com.restfb.types.Location
 import controllers.sn.exception.LogicException
 
 private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
-  private val facebookClient = (x: String) => new FacebookClientRepeater(new DefaultFacebookClient(x))
 
-  // TODO: remove this implicit since all requests should be repeated 3 times.
-  // TODO: make client private.
-  implicit def repeaterToClient(r: FacebookClientRepeater): FacebookClient = r.client
+  private val facebookClient = (x: String) => new FacebookClientRepeater(new DefaultFacebookClient(x))
 
   /// Facebook exception handler.
   private def handleExceptions[T](f: => T): T = try {
