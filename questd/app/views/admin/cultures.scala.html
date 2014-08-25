@@ -4,19 +4,10 @@
 
 @main("Cultures")(menuItems, Map()) {
 
-	<!--p>
-		@form(action = controllers.web.admin.routes.ThemesCRUD.createThemeCB()) {
+	<p>
+		@form(action = controllers.web.admin.routes.CulturesCRUD.createCultureCB()) {
 			@inputText(newForm("id"), 'size -> 50, 'readonly -> "readonly")
 			@inputText(newForm("name"), 'size -> 20, 'placeholder -> "Name")
-			@inputText(newForm("description"), 'size -> 100, 'placeholder -> "Description")
-			
-			@select(newForm("iconType"), options(List("Photo", "Video")))
-			@inputText(newForm("iconStorage"), 'size -> 20, 'placeholder -> "Storage")
-			@inputText(newForm("iconReference"), 'size -> 100, 'placeholder -> "Reference")
-			
-			@select(newForm("mediaType"), options(List("Photo", "Video")))
-			@inputText(newForm("mediaStorage"), 'size -> 20, 'placeholder -> "Storage")
-			@inputText(newForm("mediaReference"), 'size -> 100, 'placeholder -> "Reference")
 
 			@if(newForm("id").value == None) {
 				<input type="submit" value="Create">
@@ -24,7 +15,7 @@
 				<input type="submit" value="Update">
 			}
    		}
-	</p-->
+	</p>
 	
 	<p>
 	<table border="1">

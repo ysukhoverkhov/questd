@@ -12,36 +12,16 @@ import controllers.domain._
 import controllers.domain.admin._
 import components._
 
-// TODO: change me.
 case class CultureForm(
   id: String,
-  name: String,
-  description: String,
-
-  iconType: String,
-  iconStorage: String,
-  iconReference: String,
-
-  mediaType: String,
-  mediaStorage: String,
-  mediaReference: String)
+  name: String)
 
 trait CulturesCRUDImpl extends Controller with BaseCRUDImpl[Culture, CultureForm] { this: APIAccessor =>
 
-  // TODO: change me.
   protected final val emptyForm: Form[CultureForm] = Form(
     mapping(
       "id" -> text,
-      "name" -> nonEmptyText,
-      "description" -> nonEmptyText,
-
-      "iconType" -> nonEmptyText,
-      "iconStorage" -> nonEmptyText,
-      "iconReference" -> nonEmptyText,
-
-      "mediaType" -> nonEmptyText,
-      "mediaStorage" -> nonEmptyText,
-      "mediaReference" -> nonEmptyText)(CultureForm.apply)(CultureForm.unapply))
+      "name" -> nonEmptyText)(CultureForm.apply)(CultureForm.unapply))
 
   // TODO: change me.
   protected final def formFilledWithObject(id: String) = {
@@ -50,14 +30,7 @@ trait CulturesCRUDImpl extends Controller with BaseCRUDImpl[Culture, CultureForm
 
         emptyForm.fill(CultureForm(
           id = theme.id.toString,
-          name = theme.info.name,
-          description = theme.info.description,
-          iconType = theme.info.icon.get.contentType.toString,
-          iconStorage = theme.info.icon.get.storage,
-          iconReference = theme.info.icon.get.reference,
-          mediaType = theme.info.media.contentType.toString,
-          mediaStorage = theme.info.media.storage,
-          mediaReference = theme.info.media.reference))
+          name = theme.info.name))
       }
       case _ => emptyForm
     }
@@ -75,6 +48,9 @@ trait CulturesCRUDImpl extends Controller with BaseCRUDImpl[Culture, CultureForm
 //    }
   }
 
+  /**
+   * Functions what renders HTML
+   */
   protected final def renderFunction(request: Request[AnyContent]) = {
     views.html.admin.cultures(
       Menu(request),

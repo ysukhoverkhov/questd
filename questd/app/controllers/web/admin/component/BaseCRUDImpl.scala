@@ -35,10 +35,8 @@ trait BaseCRUDImpl[DT, FT] {
       formFilledWithObject(id)
     }
 
-    val objects = allObjects
-
     // Filling table.
-    objects match {
+    allObjects match {
       case Some(o) => Ok(renderFunction(request)(o, form))
       case _ => Ok("Internal server error - themes not received.")
     }
@@ -59,7 +57,11 @@ trait BaseCRUDImpl[DT, FT] {
     emptyForm.bindFromRequest.fold(
 
       formWithErrors => {
-        BadRequest(renderFunction(request)(List(), formWithErrors))
+
+        allObjects match {
+          case Some(o) => BadRequest(renderFunction(request)(o, formWithErrors))
+          case _ => Ok("Internal server error - themes not received.")
+        }
       },
 
       themeForm => {
