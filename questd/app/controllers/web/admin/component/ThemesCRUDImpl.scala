@@ -15,6 +15,7 @@ case class ThemeForm(
   id: String,
   name: String,
   description: String,
+  cultureId: String,
 
   iconType: String,
   iconStorage: String,
@@ -34,6 +35,7 @@ class ThemesCRUDImpl(
       "id" -> text,
       "name" -> nonEmptyText,
       "description" -> nonEmptyText,
+      "cultureId" -> nonEmptyText,
 
       "iconType" -> nonEmptyText,
       "iconStorage" -> nonEmptyText,
@@ -54,6 +56,7 @@ class ThemesCRUDImpl(
           id = theme.id.toString,
           name = theme.info.name,
           description = theme.info.description,
+          cultureId = theme.cultureId,
           iconType = theme.info.icon.get.contentType.toString,
           iconStorage = theme.info.icon.get.storage,
           iconReference = theme.info.icon.get.reference,
@@ -92,7 +95,7 @@ class ThemesCRUDImpl(
     views.html.admin.themes(
       Menu(request),
       _: List[Theme],
-      cultures,
+      cultures, // TODO: pass here map id -> name
       _: Form[ThemeForm])
   }
 
@@ -114,7 +117,7 @@ class ThemesCRUDImpl(
   protected def updateObjectFromForm(form: ThemeForm): Unit = {
     val theme = Theme(
       id = form.id,
-      cultureId = "", // TODO: get culture from the form.
+      cultureId = form.cultureId,
       info = ThemeInfo(
         name = form.name,
         description = form.description,

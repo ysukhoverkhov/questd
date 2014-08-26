@@ -9,6 +9,7 @@
 			@inputText(newThemeForm("id"), 'size -> 50, 'readonly -> "readonly") <br />
 			@inputText(newThemeForm("name"), 'size -> 20, 'placeholder -> "Name") <br />
 			@inputText(newThemeForm("description"), 'size -> 100, 'placeholder -> "Description") <br />
+			@select(newThemeForm("cultureId"), options(cultures.map(_.name))) <br />
 			
 			@select(newThemeForm("iconType"), options(List("Photo", "Video"))) <br />
 			@inputText(newThemeForm("iconStorage"), 'size -> 20, 'placeholder -> "Storage") <br />
@@ -32,6 +33,7 @@
     		<td>id</td>
     		<td>text</td>
     		<td>comment</td>
+    		<td>culture</td>
 
     		<td>icon.contentType</td>
     		<td>icon.storage</td>
@@ -44,11 +46,21 @@
     		<td>media</td>
     	</tr>
 
+					@for(c <- cultures) {
+				    	<tr>
+				    	
+				    		<td>@c.id</td>
+				    		<td>@c.name</td>
+							
+	    				</tr>
+	   				}
+
 		@for(t <- themes) {
 	    	<tr>
 	    		<td>@t.id</td>
 	    		<td>@t.info.name</td>
 	    		<td>@t.info.description</td>
+	    		<td>@t.cultureId</td>
 	    		
 				@if(t.info.icon != None) {
 		    		<td>@t.info.icon.get.contentType.toString</td>
