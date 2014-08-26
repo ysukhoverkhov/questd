@@ -24,8 +24,6 @@ trait AdminComponent { component: DomainAPIComponent =>
     val api = component.api
 
     val themes = new ThemesCRUDImpl(component.api)
-    
-    
   }
 
 }
