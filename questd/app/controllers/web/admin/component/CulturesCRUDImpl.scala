@@ -23,29 +23,32 @@ trait CulturesCRUDImpl extends Controller with BaseCRUDImpl[Culture, CultureForm
       "id" -> text,
       "name" -> nonEmptyText)(CultureForm.apply)(CultureForm.unapply))
 
-  // TODO: change me.
+  /**
+   * Form willed with obect.
+   */
   protected final def formFilledWithObject(id: String) = {
-    api.getTheme(GetThemeRequest(id)) match {
-      case OkApiResult(GetThemeResult(theme)) => {
+    api.getCulture(GetCultureRequest(id)) match {
+      case OkApiResult(GetCultureResult(c)) => {
 
         emptyForm.fill(CultureForm(
-          id = theme.id.toString,
-          name = theme.info.name))
+          id = c.id.toString,
+          name = c.name))
       }
       case _ => emptyForm
     }
   }
 
-  // TODO: implement me.
+  /**
+   * All objects crud is for.
+   */
   protected final def allObjects = {
-    Some(List(Culture(name = "name")))
-//    api.allThemes(AllThemesRequest(sorted = false)) match {
-//
-//      case OkApiResult(a: AllThemesResult) =>
-//        Some(a.themes.toList)
-//
-//      case _ => None
-//    }
+    api.allCultures(AllCulturesRequest()) match {
+
+      case OkApiResult(a: AllCulturesResult) =>
+        Some(a.cultures.toList)
+
+      case _ => None
+    }
   }
 
   /**
@@ -54,50 +57,38 @@ trait CulturesCRUDImpl extends Controller with BaseCRUDImpl[Culture, CultureForm
   protected final def renderFunction(request: Request[AnyContent]) = {
     views.html.admin.cultures(
       Menu(request),
-      _ : List[Culture], 
-      _ : Form[CultureForm])
+      _: List[Culture],
+      _: Form[CultureForm])
   }
 
-  // TODO: implement me.
+  /**
+   * Delete object.
+   */
   protected def deleteObjectWithId(id: String): Unit = {
-//    api.deleteTheme(DeleteThemeRequest(id))
-    Logger.error("Deleting Object!")
+        api.deleteCulture(DeleteCultureRequest(id))
   }
-  
+
   /**
    * Home page of our CRUD
    */
   protected val callToHomePage = controllers.web.admin.routes.CulturesCRUD.cultures("")
-  
+
   /**
    * Create culture from its form.
    */
   protected def updateObjectFromForm(form: CultureForm): Unit = {
-    Logger.error("Logging in Object!")
-    // TODO: implement me.
-    
-//        val theme = Theme(
-//          id = themeForm.id,
-//          info = ThemeInfo(
-//            name = themeForm.name,
-//            description = themeForm.description,
-//            icon = Some(ContentReference(
-//              contentType = ContentType.withName(themeForm.iconType),
-//              storage = themeForm.iconStorage,
-//              reference = themeForm.iconReference)),
-//            media = ContentReference(
-//              contentType = ContentType.withName(themeForm.mediaType),
-//              storage = themeForm.mediaStorage,
-//              reference = themeForm.mediaReference)))
-//
-//        if (theme.id == "") {
-//          api.createTheme(CreateThemeRequest(theme))
-//        } else {
-//          api.updateTheme(UpdateThemeRequest(theme))
-//        }
+
+    val culture = Culture(
+      id = form.id,
+      name = form.name)
+
+    if (culture.id == "") {
+      api.createCulture(CreateCultureRequest(culture))
+    } else {
+      api.updateCulture(UpdateCultureRequest(culture))
+    }
   }
 
-  
   /**
    * Get all cultures
    */
