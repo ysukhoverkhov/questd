@@ -8,6 +8,7 @@ package object stubCreators {
   def createThemeStub(id: String = ID.generateUUID, name: String = "name", desc: String = "desc") = {
     Theme(
       id = id,
+      cultureId = "",
       info = ThemeInfo(
         media = ContentReference(
           contentType = ContentType.Photo,

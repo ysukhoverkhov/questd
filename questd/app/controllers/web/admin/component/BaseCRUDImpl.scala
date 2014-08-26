@@ -26,7 +26,7 @@ trait BaseCRUDImpl[DT, FT] {
   /**
    * Get all objects action
    */
-  protected def objects(id: String) = Action { implicit request =>
+  def objects(id: String) = Action { implicit request =>
 
     // Filling form.
     val form = if (id == "") {

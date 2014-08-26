@@ -8,9 +8,10 @@ trait AdminComponent { component: DomainAPIComponent =>
 
   val admin: Admin 
 
+  // TODO: move everything to vals.
   class Admin
     extends AdminAppImpl
-    with ThemesCRUDImpl 
+//    with ThemesCRUDImpl 
     with UsersCRUDImpl
     with QuestsCRUDImpl
     with TutorialTasksCRUDImpl
@@ -19,8 +20,12 @@ trait AdminComponent { component: DomainAPIComponent =>
     with ConfigImpl
     with APIAccessor {
 
+    // TODO: remove me.
     val api = component.api
 
+    val themes = new ThemesCRUDImpl(component.api)
+    
+    
   }
 
 }
