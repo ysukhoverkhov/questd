@@ -1,15 +1,12 @@
 package controllers.web.admin.component
 
+import controllers.domain._
+import controllers.domain.admin._
 import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
-import play.api.libs.ws._
-import play.api.libs.json._
 import models.domain._
-import controllers.domain._
-import controllers.domain.admin._
-import components._
 
 case class ThemeForm(
   id: String,
@@ -50,8 +47,7 @@ class ThemesCRUDImpl(
    */
   protected final def formFilledWithObject(id: String) = {
     api.getTheme(GetThemeRequest(id)) match {
-      case OkApiResult(GetThemeResult(theme)) => {
-
+      case OkApiResult(GetThemeResult(theme)) =>
         emptyForm.fill(ThemeForm(
           id = theme.id.toString,
           name = theme.info.name,
@@ -63,7 +59,7 @@ class ThemesCRUDImpl(
           mediaType = theme.info.media.contentType.toString,
           mediaStorage = theme.info.media.storage,
           mediaReference = theme.info.media.reference))
-      }
+
       case _ => emptyForm
     }
   }
