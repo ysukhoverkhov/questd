@@ -6,17 +6,17 @@
 
 	<p>
 		@form(action = controllers.web.admin.routes.ThemesCRUD.createThemeCB()) {
-			@inputText(newThemeForm("id"), 'size -> 50, 'readonly -> "readonly")
-			@inputText(newThemeForm("name"), 'size -> 20, 'placeholder -> "Name")
-			@inputText(newThemeForm("description"), 'size -> 100, 'placeholder -> "Description")
+			@inputText(newThemeForm("id"), 'size -> 50, 'readonly -> "readonly") <br />
+			@inputText(newThemeForm("name"), 'size -> 20, 'placeholder -> "Name") <br />
+			@inputText(newThemeForm("description"), 'size -> 100, 'placeholder -> "Description") <br />
 			
-			@select(newThemeForm("iconType"), options(List("Photo", "Video")))
-			@inputText(newThemeForm("iconStorage"), 'size -> 20, 'placeholder -> "Storage")
-			@inputText(newThemeForm("iconReference"), 'size -> 100, 'placeholder -> "Reference")
+			@select(newThemeForm("iconType"), options(List("Photo", "Video"))) <br />
+			@inputText(newThemeForm("iconStorage"), 'size -> 20, 'placeholder -> "Storage") <br />
+			@inputText(newThemeForm("iconReference"), 'size -> 100, 'placeholder -> "Reference") <br />
 			
-			@select(newThemeForm("mediaType"), options(List("Photo", "Video")))
-			@inputText(newThemeForm("mediaStorage"), 'size -> 20, 'placeholder -> "Storage")
-			@inputText(newThemeForm("mediaReference"), 'size -> 100, 'placeholder -> "Reference")
+			@select(newThemeForm("mediaType"), options(List("Photo", "Video"))) <br />
+			@inputText(newThemeForm("mediaStorage"), 'size -> 20, 'placeholder -> "Storage") <br />
+			@inputText(newThemeForm("mediaReference"), 'size -> 100, 'placeholder -> "Reference") <br />
 
 			@if(newThemeForm("id").value == None) {
 				<input type="submit" value="Create">
