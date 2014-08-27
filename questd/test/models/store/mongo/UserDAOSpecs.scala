@@ -2,19 +2,16 @@
 
 package models.store.mongo
 
-import org.specs2.mutable._
-import org.specs2.runner._
-import org.junit.runner._
-import play.api.test._
-import play.api.test.Helpers._
-import models.store._
-import models.domain._
-import play.Logger
-import models.domain.view._
-import org.specs2.matcher.BeEqualTo
-import com.mongodb.BasicDBList
 import java.util.Date
+
+import com.mongodb.BasicDBList
+import models.domain._
 import models.domain.stubCreators._
+import models.domain.view._
+import models.store._
+import org.specs2.mutable._
+import play.Logger
+import play.api.test._
 
 //@RunWith(classOf[JUnitRunner])
 class UserDAOSpecs
@@ -24,7 +21,7 @@ class UserDAOSpecs
 
   "Mongo User DAO" should {
     "Create new User in DB and find it by userid" in new WithApplication(appWithTestDatabase) {
-      db.user.clear
+      db.user.clear()
       val userid = "lalala"
       db.user.create(User(userid))
       val u = db.user.readById(userid)
@@ -36,9 +33,9 @@ class UserDAOSpecs
       val user_id = "session name"
       db.user.create(User(user_id, AuthInfo(snids = Map("FB" -> fbid))))
       val u = db.user.readBySNid("FB", fbid)
-      
-      Logger.error(u.toString())
-      
+
+      Logger.error(u.toString)
+
       u must beSome
       u must beSome.which((u: User) => u.id == user_id)
     }
@@ -61,7 +58,7 @@ class UserDAOSpecs
       val u1: Option[User] = db.user.readBySessionId(sessid)
 
       u1 must beSome
-      
+
       val u1unlifted: User = u1.get
 
       val newsessid = "very new session id"
@@ -184,20 +181,20 @@ class UserDAOSpecs
 
       db.user.create(User(userid))
 
-      db.user.recordQuestProposalVote(userid, q1id, true)
-      db.user.recordQuestProposalVote(userid, q2id, false)
+      db.user.recordQuestProposalVote(userid, q1id, liked = true)
+      db.user.recordQuestProposalVote(userid, q2id, liked = false)
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid && u.profile.questProposalVoteContext.numberOfReviewedQuests == 2)
 
-      val arr1 = ou.get.history.likedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray().collect { case s: String => s }
+      val arr1 = ou.get.history.likedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray.collect { case s: String => s}
       arr1.size must beEqualTo(3) // 2 is "", "" stub in list of lists.
       arr1(2) must beEqualTo(q1id)
 
-      val arr2 = ou.get.history.votedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray().collect { case s: String => s }
+      val arr2 = ou.get.history.votedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray.collect { case s: String => s}
       arr2.size must beEqualTo(4) // 2 is "", "" stub in list of lists.
-      arr2(2).asInstanceOf[String] must beEqualTo(q1id)
-      arr2(3).asInstanceOf[String] must beEqualTo(q2id)
+      arr2(2) must beEqualTo(q1id)
+      arr2(3) must beEqualTo(q2id)
     }
 
     "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {
@@ -246,9 +243,9 @@ class UserDAOSpecs
 
       db.user.resetTasks(userid, tasks, new Date())
 
-      db.user.incTask(userid, TaskType.Client.toString(), 0.4f, true);
-      db.user.incTask(userid, TaskType.GiveRewards.toString(), 0.4f, true);
-      db.user.incTask(userid, TaskType.GiveRewards.toString(), 0.4f, true);
+      db.user.incTask(userid, TaskType.Client.toString, 0.4f, rewardReceived = true)
+      db.user.incTask(userid, TaskType.GiveRewards.toString, 0.4f, rewardReceived = true)
+      db.user.incTask(userid, TaskType.GiveRewards.toString, 0.4f, rewardReceived = true)
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
@@ -269,7 +266,7 @@ class UserDAOSpecs
 
       db.user.resetTasks(userid, tasks, new Date())
 
-      db.user.incTask(userid, TaskType.Client.toString(), 0.4f, true);
+      db.user.incTask(userid, TaskType.Client.toString, 0.4f, rewardReceived = true)
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
@@ -306,7 +303,7 @@ class UserDAOSpecs
 
       db.user.resetTasks(userid, tasks, new Date())
 
-      db.user.incTutorialTask(userid, taskId, 0.4f, true);
+      db.user.incTutorialTask(userid, taskId, 0.4f, rewardReceived = true)
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
@@ -326,7 +323,7 @@ class UserDAOSpecs
           questProposalContext = QuestProposalConext(
             questProposalCooldown = date))))
 
-      val ou = db.user.resetQuestProposal(userid, true)
+      val ou = db.user.resetQuestProposal(userid, shouldResetCooldown = true)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown != date)
@@ -343,7 +340,7 @@ class UserDAOSpecs
           questProposalContext = QuestProposalConext(
             questProposalCooldown = date))))
 
-      val ou = db.user.resetQuestProposal(userid, false)
+      val ou = db.user.resetQuestProposal(userid, shouldResetCooldown = false)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown == date)
@@ -412,6 +409,20 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.tutorial.assignedTutorialTaskIds.length == 3)
     }
 
+    "updateCultureId works" in new WithApplication(appWithTestDatabase) {
+
+      val userid = "updateCultureId"
+
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid))
+
+      private val cultureId: String = "cult"
+      val ou = db.user.updateCultureId(userid, cultureId)
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.demo.cultureId == cultureId)
+    }
   }
 }
 
@@ -419,19 +430,19 @@ class UserDAOSpecs
  * Spec with another component setup for testing
  */
 class UserDAOFailSpecs extends Specification
-  with MongoDatabaseForTestComponent {
-
-  def testMongoDatabase(name: String = "default"): Map[String, String] = {
-    val dbname: String = "questdb-test"
-    Map(
-      ("mongodb." + name + ".db" -> dbname))
-  }
-  val appWithTestDatabase = FakeApplication(additionalConfiguration = testMongoDatabase())
+with MongoDatabaseForTestComponent {
 
   /*
    * Initializing components. It's lazy to let app start first and bring up db driver.
    */
   lazy val db = new MongoDatabaseForTest
+  val appWithTestDatabase = FakeApplication(additionalConfiguration = testMongoDatabase())
+
+  def testMongoDatabase(name: String = "default"): Map[String, String] = {
+    val dbname: String = "questdb-test"
+    Map(
+      "mongodb." + name + ".db" -> dbname)
+  }
 
   "Mongo User DAO" should {
     "Throw StoreException in case of underlaying error" in new WithApplication(appWithTestDatabase) {

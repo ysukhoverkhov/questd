@@ -5,9 +5,10 @@ import models.domain.base.ID
 /**
  * Structure representing beloved user.
  */
-case class User (
+case class User(
   id: String = ID.generateUUID(),
   auth: AuthInfo = AuthInfo(),
+  demo: UserDemographics = UserDemographics(),
   profile: Profile = Profile(),
   schedules: UserSchedules = UserSchedules(),
   stats: UserStats = UserStats(),

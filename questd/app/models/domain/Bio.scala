@@ -12,6 +12,6 @@ case class Bio(
   name: String = "",
   gender: Gender.Value = Gender.Unknown,
   timezone: Int = 0,
-  country: String = "Unknown",
-  city: String = "Unknown")
+  country: String = "",
+  city: String = "")
     
