@@ -1,20 +1,19 @@
 package controllers.web.admin
 
-import play.api._
-import play.api.mvc._
-
 import controllers.web.admin.component.AdminComponent
 import components.componentregistry.ComponentRegistrySingleton
+import play.api.mvc._
+
 
 object CulturesCRUD extends Controller {
 
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
-  def cultures(id: String) = admin.cultures(id)
+  def cultures(id: String) = admin.cultures.objects(id)
   
-  def deleteCultureCB(id: String) = admin.deleteCultureCB(id)
+  def deleteCultureCB(id: String) = admin.cultures.deleteObjectCB(id)
 
-  def createCultureCB = admin.createCultureCB
+  def createCultureCB = admin.cultures.createObjectCB
 
 }
 

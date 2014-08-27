@@ -1,30 +1,19 @@
 package controllers.web.admin.component
 
 import controllers.domain.DomainAPIComponent
-import components._
 
 
 trait AdminComponent { component: DomainAPIComponent =>
 
-  val admin: Admin 
+  class Admin {
 
-  // TODO: move everything to vals.
-  class Admin
-    extends AdminAppImpl
-//    with ThemesCRUDImpl 
-    with UsersCRUDImpl
-    with QuestsCRUDImpl
-    with TutorialTasksCRUDImpl
-    with SolutionsCRUDImpl
-    with CulturesCRUDImpl
-    with ConfigImpl
-    with APIAccessor {
-
-    // TODO: remove me.
-    val api = component.api
-
+    val app = new AdminAppImpl(component.api)
+    val users = new UsersCRUDImpl(component.api)
+    val quests = new QuestsCRUDImpl(component.api)
+    val solutions = new SolutionsCRUDImpl(component.api)
     val themes = new ThemesCRUDImpl(component.api)
+    val cultures = new CulturesCRUDImpl(component.api)
+    val tutorial = new TutorialTasksCRUDImpl(component.api)
+    val config = new ConfigImpl(component.api)
   }
-
 }
-

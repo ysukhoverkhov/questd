@@ -91,7 +91,7 @@ class ThemesCRUDImpl(
     views.html.admin.themes(
       Menu(request),
       _: List[Theme],
-      cultures, // TODO: pass here map id -> name
+      cultures,
       _: Form[ThemeForm])
   }
 

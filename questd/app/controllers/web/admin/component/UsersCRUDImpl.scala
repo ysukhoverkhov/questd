@@ -1,18 +1,10 @@
 package controllers.web.admin.component
 
-import play.api._
+import controllers.domain.admin.{AllUsersRequest, AllUsersResult}
+import controllers.domain.{DomainAPIComponent, OkApiResult}
 import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.ws._
-import play.api.libs.json._
 
-import models.domain._
-import controllers.domain._
-import controllers.domain.admin._
-import components._
-
-trait UsersCRUDImpl extends Controller { this: APIAccessor =>
+class UsersCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller {
 
   /**
    * Get all users action

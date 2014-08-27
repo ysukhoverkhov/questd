@@ -1,22 +1,18 @@
 package controllers.web.admin.component
 
-import play.api._
-import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.ws._
-import play.api.libs.json._
-
-import models.domain._
-import controllers.domain._
 import controllers.domain.admin._
-import components._
+import controllers.domain.{DomainAPIComponent, OkApiResult}
+import models.domain._
+import play.api._
+import play.api.data.Forms._
+import play.api.data._
+import play.api.mvc._
 
 case class CultureForm(
   id: String,
   name: String)
 
-trait CulturesCRUDImpl extends Controller with BaseCRUDImpl[Culture, CultureForm] { this: APIAccessor =>
+class CulturesCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with BaseCRUDImpl[Culture, CultureForm] {
 
   protected final val emptyForm: Form[CultureForm] = Form(
     mapping(
@@ -24,16 +20,15 @@ trait CulturesCRUDImpl extends Controller with BaseCRUDImpl[Culture, CultureForm
       "name" -> nonEmptyText)(CultureForm.apply)(CultureForm.unapply))
 
   /**
-   * Form willed with obect.
+   * Form willed with object.
    */
   protected final def formFilledWithObject(id: String) = {
     api.getCulture(GetCultureRequest(id)) match {
-      case OkApiResult(GetCultureResult(c)) => {
-
+      case OkApiResult(GetCultureResult(c)) =>
         emptyForm.fill(CultureForm(
           id = c.id.toString,
           name = c.name))
-      }
+
       case _ => emptyForm
     }
   }
@@ -88,20 +83,5 @@ trait CulturesCRUDImpl extends Controller with BaseCRUDImpl[Culture, CultureForm
       api.updateCulture(UpdateCultureRequest(culture))
     }
   }
-
-  /**
-   * Get all cultures
-   */
-  def cultures = objects _
-
-  /**
-   * Delete a culture
-   */
-  def deleteCultureCB = deleteObjectCB _
-
-  /**
-   * Updating a culture
-   */
-  def createCultureCB = createObjectCB
 }
 

@@ -1,16 +1,12 @@
 package controllers.web.admin.component
 
-import play.api._
-import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.ws._
-import play.api.libs.json._
-
-import models.domain._
-import controllers.domain._
 import controllers.domain.admin._
-import components._
+import controllers.domain.{DomainAPIComponent, OkApiResult}
+import models.domain._
+import play.api._
+import play.api.data.Forms._
+import play.api.data._
+import play.api.mvc._
 
 case class TutorialTaskForm(
   id: String,
@@ -21,7 +17,7 @@ case class TutorialTaskForm(
   rewardMoney: Int,
   rewardRating: Int)
 
-trait TutorialTasksCRUDImpl extends Controller { this: APIAccessor =>
+class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller {
 
   private val form = Form(
     mapping(
@@ -43,7 +39,7 @@ trait TutorialTasksCRUDImpl extends Controller { this: APIAccessor =>
       form
     } else {
       api.getTutorialTaskAdmin(GetTutorialTaskAdminRequest(id)) match {
-        case OkApiResult(GetTutorialTaskAdminResult(Some(task))) => {
+        case OkApiResult(GetTutorialTaskAdminResult(Some(task))) =>
           form.fill(TutorialTaskForm(
             id = task.id,
             description = task.description,
@@ -52,7 +48,6 @@ trait TutorialTasksCRUDImpl extends Controller { this: APIAccessor =>
             rewardCoins = task.reward.coins.toInt,
             rewardMoney = task.reward.money.toInt,
             rewardRating = task.reward.rating.toInt))
-        }
         case _ => form
       }
     }
@@ -73,12 +68,12 @@ trait TutorialTasksCRUDImpl extends Controller { this: APIAccessor =>
   /**
    * Updates task from CRUD
    */
-  def updateTutorialTask = Action { implicit request =>
+  def updateTutorialTask() = Action { implicit request =>
     form.bindFromRequest.fold(
 
       formWithErrors => {
 
-        Logger.error(formWithErrors.errors.toString)
+        Logger.error(s"$formWithErrors.errors")
 
         BadRequest(views.html.admin.tutorialTasks(
           Menu(request),
