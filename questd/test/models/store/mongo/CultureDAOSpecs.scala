@@ -15,7 +15,7 @@ with BaseDAOSpecs {
     db.culture.clear()
   }
 
-  "Mongo Quest DAO" should {
+  "Mongo Culture DAO" should {
     "Search culture by country" in new WithApplication(appWithTestDatabase) {
       clearDB()
 

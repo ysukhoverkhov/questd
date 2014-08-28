@@ -3,20 +3,24 @@ package models.domain
 package object stubCreators {
 
   import models.domain.base.ID
-  import models.domain._
 
-  def createThemeStub(id: String = ID.generateUUID, name: String = "name", desc: String = "desc") = {
+  def createThemeStub(
+    id: String = ID.generateUUID(),
+    cultureId: String = "cultureId",
+    name: String = "name",
+    desc: String = "desc") =
+
     Theme(
       id = id,
-      cultureId = "",
+      cultureId = cultureId,
       info = ThemeInfo(
-        media = ContentReference(
-          contentType = ContentType.Photo,
-          storage = "",
-          reference = ""),
+        media = createContentReferenceStub,
         name = name,
         description = desc))
-  }
 
+  def createContentReferenceStub = ContentReference(
+    contentType = ContentType.Photo,
+    storage = "",
+    reference = "")
 }
 
