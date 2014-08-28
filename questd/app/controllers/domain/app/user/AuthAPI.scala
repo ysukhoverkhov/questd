@@ -30,7 +30,7 @@ private[domain] trait AuthAPI {
             db.user.updateCultureId(user.id, c.id)
 
         case None =>
-          Logger.debug(s"Creating new culture $user.profile.publicProfile.bio.country")
+          Logger.debug(s"Creating new culture ${user.profile.publicProfile.bio.country}")
 
           val newCulture = Culture(
             name = user.profile.publicProfile.bio.country,
