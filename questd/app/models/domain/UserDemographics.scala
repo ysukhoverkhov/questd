@@ -4,5 +4,6 @@ package models.domain
  * Structure representing demographics of a user.
  */
 case class UserDemographics(
+// TODO: this should be None by default
   cultureId: String = "")
 

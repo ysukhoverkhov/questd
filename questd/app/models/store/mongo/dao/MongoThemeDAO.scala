@@ -24,13 +24,6 @@ private[mongo] class MongoThemeDAO
   /**
    *
    */
-  def allSortedByUseDate: Iterator[Theme] = {
-    findByExample(MongoDBObject(), MongoDBObject("lastUseDate" -> 1))
-  }
-
-  /**
-   *
-   */
   def allWithParams(
     cultureId: Option[String],
     sorted: Boolean,

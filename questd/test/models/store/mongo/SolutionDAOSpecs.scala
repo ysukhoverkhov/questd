@@ -3,13 +3,7 @@
 package models.store.mongo
 
 import org.specs2.mutable._
-import org.specs2.runner._
-import org.junit.runner._
 import play.api.test._
-import play.api.test.Helpers._
-import play.Logger
-import com.mongodb.casbah.commons.MongoDBObject
-import models.store._
 import models.domain._
 import java.util.Date
 
@@ -19,7 +13,7 @@ class SolutionDAOSpecs extends Specification
   with BaseDAOSpecs {
 
   private[this] def clearDB() = {
-    db.solution.clear
+    db.solution.clear()
   }
 
   private def createSolution(
@@ -43,7 +37,7 @@ class SolutionDAOSpecs extends Specification
         themeId = themeId),
       status = status,
       lastModDate = lastModDate,
-      voteEndDate = new Date((new Date).getTime() + 100000))
+      voteEndDate = new Date((new Date).getTime + 100000))
   }
 
   private def createSolutionInDB(
@@ -110,9 +104,9 @@ class SolutionDAOSpecs extends Specification
 
       // Preparing quests to store in db.
       val qs = List(
-        createSolution("q1", "t1", "q1_author id", "q1_theme_id", 3, false, QuestSolutionStatus.OnVoting, new Date(5)),
-        createSolution("q2", "t2", "q2_author id", "q2_theme_id", 13, true, QuestSolutionStatus.Won, new Date(3)),
-        createSolution("q3", "t3", "q3_author id", "q3_theme_id", 7, true, QuestSolutionStatus.OnVoting, new Date(4)))
+        createSolution("q1", "t1", "q1_author id", "q1_theme_id", 3, vip = false, QuestSolutionStatus.OnVoting, new Date(5)),
+        createSolution("q2", "t2", "q2_author id", "q2_theme_id", 13, vip = true, QuestSolutionStatus.Won, new Date(3)),
+        createSolution("q3", "t3", "q3_author id", "q3_theme_id", 7, vip = true, QuestSolutionStatus.OnVoting, new Date(4)))
 
       qs.foreach(db.solution.create)
 
