@@ -4,6 +4,7 @@ import controllers.domain.{InternalErrorApiResult, NotAuthorisedApiResult, _}
 import controllers.sn.client.SNUser
 import models.domain._
 import models.store._
+import org.mockito.Matchers
 
 
 class AuthAPISpecs extends BaseAPISpecs {
@@ -18,22 +19,29 @@ class AuthAPISpecs extends BaseAPISpecs {
       val userfb = mock[SNUser]
       userfb.snId returns fbid
 
-      val u = Some(User("", AuthInfo(snids = Map("FB" -> fbid)), demo = UserDemographics(cultureId = candc)))
+      val u = Some(User(
+        id = "userid",
+        auth = AuthInfo(snids = Map("FB" -> fbid)),
+        demo = UserDemographics(cultureId = candc),
+        profile = Profile(
+          publicProfile = PublicProfile(
+            bio = Bio(
+              country = candc)))))
 
       db.user.readBySNid("FB", fbid) returns None thenReturns u
-      db.user.levelup(anyString, anyInt) returns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
+      db.user.levelup(anyString, anyInt) returns u
       db.user.setNextLevelRatingAndRights(
         anyString,
         anyInt,
-        any) returns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
-      db.culture.findByCountry("") returns Some(Culture(id = candc, name = candc))
+        any) returns u
+      db.culture.findByCountry(candc) returns Some(Culture(id = candc, name = candc))
 
       val rv = api.login(LoginRequest("FB", userfb))
 
       // Update allowed.
       there were two(user).readBySNid("FB", fbid)
-      //      there were one(user).create(u.get)
-      //      there were one(user).update(u.get)
+//      there were one(user).create(any)
+//      there were one(user).update(any)
 
       rv must beAnInstanceOf[OkApiResult[LoginResult]]
       rv.body must beSome[LoginResult]
@@ -44,14 +52,20 @@ class AuthAPISpecs extends BaseAPISpecs {
       val fbid = "fbid"
       val candc = "country_name"
 
+      val u = Some(User(
+        id = "userid",
+        auth = AuthInfo(snids = Map("FB" -> fbid)),
+        demo = UserDemographics(cultureId = candc),
+        profile = Profile(
+          publicProfile = PublicProfile(
+            bio = Bio(
+              country = candc)))))
+
       val userfb = mock[SNUser]
 
       userfb.snId returns fbid
-      db.user.readBySNid("FB", fbid) returns Some(User(
-        "",
-        auth = AuthInfo(snids = Map("FB" -> fbid)),
-        demo = UserDemographics(cultureId = candc)))
-      db.culture.findByCountry("") returns Some(Culture(id = candc, name = candc))
+      db.user.readBySNid("FB", fbid) returns u
+      db.culture.findByCountry(candc) returns Some(Culture(id = candc, name = candc))
 
       val rv = api.login(LoginRequest("FB", userfb))
 
@@ -100,8 +114,70 @@ class AuthAPISpecs extends BaseAPISpecs {
       rv must beAnInstanceOf[NotAuthorisedApiResult]
       rv.body must beNone
     }
-  }
 
+    "Update culture on login" in context {
+      val fbid = "fbid"
+      val userid = "uid"
+      val currentCulture = "country_name_current"
+      val actualCulture = "country_name_actual"
+
+      val u = Some(User(
+        id = userid,
+        auth = AuthInfo(snids = Map("FB" -> fbid)),
+        demo = UserDemographics(cultureId = currentCulture),
+        profile = Profile(
+          publicProfile = PublicProfile(
+            bio = Bio(
+              country = currentCulture)))))
+
+      val userfb = mock[SNUser]
+
+      userfb.snId returns fbid
+      db.user.readBySNid("FB", fbid) returns u
+      db.culture.findByCountry(currentCulture) returns Some(Culture(id = actualCulture, name = actualCulture))
+      db.user.updateCultureId(userid, actualCulture) returns u
+
+      val rv = api.login(LoginRequest("FB", userfb))
+
+      there was one(user).readBySNid("FB", fbid)
+      there was one(user).updateCultureId(userid, actualCulture)
+
+      rv must beAnInstanceOf[OkApiResult[LoginResult]]
+      rv.body must beSome[LoginResult]
+    }
+
+    "Create culture if it's missing" in context {
+      val fbid = "fbid"
+      val userid = "uid"
+      val currentCulture = "country_name_current"
+
+      val u = Some(User(
+        id = userid,
+        auth = AuthInfo(snids = Map("FB" -> fbid)),
+        demo = UserDemographics(cultureId = currentCulture),
+        profile = Profile(
+          publicProfile = PublicProfile(
+            bio = Bio(
+              country = currentCulture)))))
+
+      val userfb = mock[SNUser]
+
+      userfb.snId returns fbid
+      db.user.readBySNid("FB", fbid) returns u
+      db.culture.findByCountry(currentCulture) returns None
+
+      db.user.updateCultureId(userid, currentCulture) returns u
+
+      val rv = api.login(LoginRequest("FB", userfb))
+
+      there was one(user).readBySNid("FB", fbid)
+      there was one(user).updateCultureId(Matchers.eq(userid), any)
+      there was one(culture).create(any)
+
+      rv must beAnInstanceOf[OkApiResult[LoginResult]]
+      rv.body must beSome[LoginResult]
+    }
+  }
 }
 
 
