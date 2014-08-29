@@ -22,7 +22,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       val u = Some(User(
         id = "userid",
         auth = AuthInfo(snids = Map("FB" -> fbid)),
-        demo = UserDemographics(cultureId = candc),
+        demo = UserDemographics(cultureId = Some(candc)),
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(
@@ -55,7 +55,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       val u = Some(User(
         id = "userid",
         auth = AuthInfo(snids = Map("FB" -> fbid)),
-        demo = UserDemographics(cultureId = candc),
+        demo = UserDemographics(cultureId = Some(candc)),
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(
@@ -124,7 +124,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       val u = Some(User(
         id = userid,
         auth = AuthInfo(snids = Map("FB" -> fbid)),
-        demo = UserDemographics(cultureId = currentCulture),
+        demo = UserDemographics(cultureId = Some(currentCulture)),
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(
@@ -154,7 +154,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       val u = Some(User(
         id = userid,
         auth = AuthInfo(snids = Map("FB" -> fbid)),
-        demo = UserDemographics(cultureId = currentCulture),
+        demo = UserDemographics(cultureId = Some(currentCulture)),
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(

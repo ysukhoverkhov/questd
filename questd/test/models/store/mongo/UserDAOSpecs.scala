@@ -410,6 +410,7 @@ class UserDAOSpecs
     }
 
     "updateCultureId works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
 
       val userid = "updateCultureId"
 
@@ -421,7 +422,7 @@ class UserDAOSpecs
       val ou = db.user.updateCultureId(userid, cultureId)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.demo.cultureId == cultureId)
+      ou must beSome.which((u: User) => u.demo.cultureId == Some(cultureId))
     }
   }
 }

@@ -1,11 +1,11 @@
 package logic.user
 
-import controllers.domain.app.theme.GetAllThemesForCultureResult
-import models.domain._
-import controllers.domain.admin._
 import controllers.domain.OkApiResult
-import models.domain.admin.ConfigSection
+import controllers.domain.admin._
+import controllers.domain.app.theme.GetAllThemesForCultureResult
 import controllers.domain.config._ConfigParams
+import models.domain._
+import models.domain.admin.ConfigSection
 import models.domain.stubCreators._
 
 class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
@@ -35,7 +35,10 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
    * Creates user we will test algorithm with
    */
   private def createUser(themes: List[Theme], favTheme: Int) = {
-    User(history = UserHistory(selectedThemeIds = List(themes(favTheme).id, themes(1).id)))
+    User(
+      demo = UserDemographics(cultureId = Some("cultureId")),
+      history = UserHistory(
+        selectedThemeIds = List(themes(favTheme).id, themes(1).id)))
   }
 
   "User Logic" should {

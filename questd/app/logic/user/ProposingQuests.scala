@@ -122,10 +122,15 @@ trait ProposingQuests { this: UserLogic =>
     /**
      * Select a theme from global list of themes.
      */
-    def themeFromGlobal = {
-      val themes = api.getAllThemesForCulture(GetAllThemesForCultureRequest(cultureId = user.demo.cultureId)).body.get.themes
-
-      selectTheme(themes, user.profile.questProposalContext.todayReviewedThemeIds)
+    def themeFromGlobal: Option[Theme] = {
+      user.demo.cultureId match {
+        case Some(c) =>
+          val themes = api.getAllThemesForCulture(GetAllThemesForCultureRequest(cultureId = c)).body.get.themes
+          selectTheme(themes, user.profile.questProposalContext.todayReviewedThemeIds)
+        case None =>
+          Logger.error("User with culture set to None requesting culture.")
+          None
+      }
     }
 
     val probabilityOfRecentList = {
