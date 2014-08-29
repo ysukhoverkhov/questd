@@ -10,11 +10,11 @@
 			@inputText(newThemeForm("name"), 'size -> 20, 'placeholder -> "Name") <br />
 			@inputText(newThemeForm("description"), 'size -> 100, 'placeholder -> "Description") <br />
 			@select(newThemeForm("cultureId"), options(cultures.foldLeft(Map[String,String]())((r, v) => r + (v.id -> v.name)))) <br />
-			
+
 			@select(newThemeForm("iconType"), options(List("Photo", "Video"))) <br />
 			@inputText(newThemeForm("iconStorage"), 'size -> 20, 'placeholder -> "Storage") <br />
 			@inputText(newThemeForm("iconReference"), 'size -> 100, 'placeholder -> "Reference") <br />
-			
+
 			@select(newThemeForm("mediaType"), options(List("Photo", "Video"))) <br />
 			@inputText(newThemeForm("mediaStorage"), 'size -> 20, 'placeholder -> "Storage") <br />
 			@inputText(newThemeForm("mediaReference"), 'size -> 100, 'placeholder -> "Reference") <br />
@@ -26,7 +26,7 @@
 			}
    		}
 	</p>
-	
+
     <table border="1">
         <tr>
             <td>id</td>
@@ -74,13 +74,5 @@
             </tr>
         }
     </table>
-
-	<script>
-		function deleteFun(url) {
-			if (confirm("Are you sure want to delete it?")) {
-				window.open(url, "_self");
-			}
-		}
-	</script>
 }
 
