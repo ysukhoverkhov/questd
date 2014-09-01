@@ -17,7 +17,7 @@ POST	/rest/getProfile								controllers.web.rest.ProfileWS.getProfile
 POST	/rest/setGender									controllers.web.rest.ProfileWS.setGender
 POST	/rest/setDebug									controllers.web.rest.ProfileWS.setDebug
 
-# Generating quests 
+# Generating quests
 POST	/rest/getQuestThemeCost							controllers.web.rest.ProposeQuestWS.getQuestThemeCost
 POST	/rest/purchaseQuestTheme						controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
 
@@ -106,7 +106,7 @@ POST	/rest/debug/test								controllers.web.rest.DebugWS.test
 #######################
 GET		/admin											controllers.web.admin.AdminApp.index
 
-GET		/admin/loginJ0hETru60HiWwmEywG2q	controllers.web.admin.AdminApp.login
+GET		/admin/loginJ0hETru60HiWwmEywG2q	            controllers.web.admin.AdminApp.login
 
 GET		/admin/themes									controllers.web.admin.ThemesCRUD.themes(id = "")
 GET		/admin/themes/byid/:id							controllers.web.admin.ThemesCRUD.themes(id)

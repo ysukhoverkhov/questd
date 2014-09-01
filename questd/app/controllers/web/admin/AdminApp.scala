@@ -10,7 +10,7 @@ object AdminApp extends Controller {
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
   def index = admin.app.index
-  
-  def login = admin.login
+
+  def login = admin.app.login
 }
 

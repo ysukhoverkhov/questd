@@ -13,3 +13,4 @@ questd/project/project/target
 syntax: glob
 questd/RUNNING_PID
 questd/.idea
+questd/.idea_modules
