@@ -7,11 +7,17 @@
 	<p>
 		@form(action = controllers.web.admin.routes.ThemesCRUD.createThemeCB()) {
 			@inputText(newThemeForm("id"), 'size -> 50, 'readonly -> "readonly")
-			@inputText(newThemeForm("text"), 'size -> 20, 'placeholder -> "Text")
-			@inputText(newThemeForm("comment"), 'size -> 100, 'placeholder -> "Comment")
+			@inputText(newThemeForm("name"), 'size -> 20, 'placeholder -> "Name")
+			@inputText(newThemeForm("description"), 'size -> 100, 'placeholder -> "Description")
+			
 			@select(newThemeForm("iconType"), options(List("Photo", "Video")))
 			@inputText(newThemeForm("iconStorage"), 'size -> 20, 'placeholder -> "Storage")
 			@inputText(newThemeForm("iconReference"), 'size -> 100, 'placeholder -> "Reference")
+			
+			@select(newThemeForm("mediaType"), options(List("Photo", "Video")))
+			@inputText(newThemeForm("mediaStorage"), 'size -> 20, 'placeholder -> "Storage")
+			@inputText(newThemeForm("mediaReference"), 'size -> 100, 'placeholder -> "Reference")
+
 			@if(newThemeForm("id").value == None) {
 				<input type="submit" value="Create">
 			} else {
@@ -26,21 +32,40 @@
     		<td>id</td>
     		<td>text</td>
     		<td>comment</td>
+
     		<td>icon.contentType</td>
     		<td>icon.storage</td>
     		<td>icon.reference</td>
     		<td>icon</td>
+
+    		<td>media.contentType</td>
+    		<td>media.storage</td>
+    		<td>media.reference</td>
+    		<td>media</td>
     	</tr>
 
 		@for(t <- themes) {
 	    	<tr>
 	    		<td>@t.id</td>
-	    		<td>@t.text</td>
-	    		<td>@t.comment</td>
-	    		<td>@t.icon.contentType.toString</td>
-	    		<td>@t.icon.storage</td>
-	    		<td>@t.icon.reference</td>
-	    		<td><img src="@t.icon.reference" alt="@t.icon.reference" width="102" height="77"></td>
+	    		<td>@t.info.name</td>
+	    		<td>@t.info.description</td>
+	    		
+				@if(t.info.icon != None) {
+		    		<td>@t.info.icon.get.contentType.toString</td>
+		    		<td>@t.info.icon.get.storage</td>
+		    		<td>@t.info.icon.get.reference</td>
+	    			<td><img src="@t.info.icon.get.reference" alt="@t.info.icon.get.reference" width="102" height="77"></td>
+		    	} else {
+		    		<td>None</td>
+		    		<td>None</td>
+		    		<td>None</td>
+		    		<td>None</td>
+		    	}
+
+	    		<td>@t.info.media.contentType.toString</td>
+	    		<td>@t.info.media.storage</td>
+	    		<td>@t.info.media.reference</td>
+	    		<td><img src="@t.info.media.reference" alt="@t.info.media.reference" width="102" height="77"></td>
 	    		
 				<td><a href="@controllers.web.admin.routes.ThemesCRUD.themes(t.id.toString)">edit</a></td>
 				<td><a onClick='deleteFun("@controllers.web.admin.routes.ThemesCRUD.deleteThemeCB(t.id.toString)")' >delete</a></td>

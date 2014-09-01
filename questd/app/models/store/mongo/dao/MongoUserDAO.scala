@@ -8,9 +8,18 @@ import models.domain._
 import models.domain.view._
 import play.Logger
 import com.mongodb.casbah.commons._
-
 import com.novus.salat._
 import models.store.mongo.SalatContext._
+
+/**
+ * Test version of dao what fails all the time
+ */
+
+import com.novus.salat.dao.SalatDAO
+import org.bson.types.ObjectId
+import models.store.mongo.SalatContext._
+import com.mongodb.casbah.MongoConnection
+import com.mongodb.casbah.MongoClient
 
 /**
  * DOA for User objects
@@ -29,8 +38,8 @@ private[mongo] class MongoUserDAO
   /**
    * Read by fb id
    */
-  def readByFBid(fbid: String): Option[User] = {
-    readByExample("auth.fbid", fbid)
+  def readBySNid(snName:String, snid: String): Option[User] = {
+    readByExample(s"auth.snids.$snName", snid)
   }
 
   /**
@@ -279,7 +288,7 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def resetCounters(id: String, resetPurchasesTimeout: Date): Option[User] = {
+  def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
@@ -596,19 +605,114 @@ private[mongo] class MongoUserDAO
           "messages" -> MongoDBObject("id" -> messageId)))))
   }
 
+  /**
+   *
+   */
+  def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.dailyTasks" -> grater[DailyTasks].asDBObject(newTasks),
+          "schedules.dailyTasks" -> resetTasksTimeout))))
+  }
+
+  /**
+   * 
+   */
+  def addTasks(id: String, newTasks: List[Task], additionalReward: Assets): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.reward.coins" -> additionalReward.coins,
+          "profile.dailyTasks.reward.money" -> additionalReward.money,
+          "profile.dailyTasks.reward.rating" -> additionalReward.rating)),
+        ("$push" -> MongoDBObject(
+          "profile.dailyTasks.tasks" -> MongoDBObject(
+            "$each" -> newTasks.map(grater[Task].asDBObject(_)))))))
+  }
+
+  /**
+   *
+   */
+  def incTask(id: String, taskType: String, completed: Float, rewardReceived: Boolean): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "profile.dailyTasks.tasks.taskType" -> taskType),
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.tasks.$.currentCount" -> 1)),
+        ("$set" -> MongoDBObject(
+          "profile.dailyTasks.completed" -> completed,
+          "profile.dailyTasks.rewardReceived" -> rewardReceived))))
+  }
+
+  /**
+   *
+   */
+  def incTutorialTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "profile.dailyTasks.tasks.tutorialTask.id" -> taskId),
+      MongoDBObject(
+        ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.tasks.$.currentCount" -> 1)),
+        ("$set" -> MongoDBObject(
+          "profile.dailyTasks.completed" -> completed,
+          "profile.dailyTasks.rewardReceived" -> rewardReceived))))
+  }
+  
+  /**
+   *
+   */
+  def setGender(id: String, gender: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.publicProfile.bio.gender" -> gender))))
+  }
+
+  /**
+   *
+   */
+  def setDebug(id: String, debug: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          "profile.debug" -> debug))))
+  }
+
+  /**
+   *
+   */
+  def setTutorialState(id: String, platform: String, state: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$set" -> MongoDBObject(
+          s"tutorial.clientTutorialState.$platform" -> state))))
+  }
+  
+  /**
+   * 
+   */
+  def addTutorialTaskAssigned(id: String, taskId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        ("$addToSet" -> MongoDBObject(
+          "tutorial.assignedTutorialTaskIds" -> taskId))))
+  }
+
 }
 
-/**
- * Test version of dao what fails all the time
- */
-
-import com.novus.salat.dao.SalatDAO
-import org.bson.types.ObjectId
-import models.store.mongo.SalatContext._
-import com.mongodb.casbah.MongoConnection
-
 class MongoUserDAOForTest extends MongoUserDAO {
-  override val dao = new QSalatDAO[User, ObjectId](collection = MongoConnection("localhost", 55555)("test_db")("test_coll")) {}
+  override val dao = new QSalatDAO[User, ObjectId](collection = MongoClient("localhost", 55555)("test_db")("test_coll")) {}
 
 }
 

@@ -23,10 +23,10 @@ object spendcoinsfunctions {
    * How much coins per day player should spend on shuffling themes for quest proposals.
    */
   def coinsShuffleTheme(level: Int): Double = {
-    val k = 157.364
-    val d = 11.542
-    val b = -228.653 
-    val y = -13.223
+    val k = 27.273588
+    val d = 6.395583
+    val b = -130.255489 
+    val y = -3.699747e-7
     
     if (level < levelFor(SubmitPhotoQuests))
       0
@@ -38,10 +38,10 @@ object spendcoinsfunctions {
    * How much coin per day we should spend on skipping quests.
    */
   def coinShuffleQuest(level: Int): Double = {
-    val k = 87.556
-    val d = 6.396
-    val b = -20.037
-    val y = 1.387e-6
+    val k = 87.55513
+    val d = 6.395567
+    val b = 102.373491
+    val y = 4.336504e-5
     
     def coinShuffleQuestInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
       level match {
@@ -101,16 +101,16 @@ object spendcoinsfunctions {
    * How much coins we should spend on adding shortlist each day.
    */
   def coinAddShort(level: Int): Double = {
-    val k = 65.766
-    val d = 8.788
-    val b = -102.658
-    val y = -3.933
+    val k = 29.186304
+    val d = 1
+    val b = 1
+    val y = 1
     
     def coinAddShortInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
       level match {
         case _ if level < levelFor(AddToShortList) => 0
-        case _ if (level < levelFor(SubmitPhotoQuests)) && (level >= levelFor(AddToShortList)) => megaf(level, k, d, b, y)
-        case _ => coinAddShortInt(levelFor(SubmitPhotoQuests) - 1, k, d, b, y)/* * 1.00 + megaf(level, k, d, b, y) * 0.0*/
+        case _ if (level < levelFor(SubmitPhotoResults)) && (level >= levelFor(AddToShortList)) => megaf(level, k, d, b, y)
+        case _ => coinAddShortInt(levelFor(SubmitPhotoResults) - 1, k, d, b, y)
       }
     }
     
@@ -121,16 +121,16 @@ object spendcoinsfunctions {
    * How much coins we should spend on adding friends each day.
    */
   def coinAddFriend(level: Int): Double = {
-    val k = 55.587
-    val d = 5.695
-    val b = -128.005
-    val y = 3.154
+    val k = 77.924446
+    val d = 6.39558
+    val b = -145.644936
+    val y = 2.815498e-6
     
     def coinAddFriendInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
       level match {
         case _ if level < levelFor(InviteFriends) => 0
-        case _ if (level < levelFor(AddToShortList)) && (level >= levelFor(InviteFriends)) => megaf(level, k, d, b, y)
-        case _ => coinAddFriendInt(levelFor(AddToShortList) - 1, k, d, b, y) * 0.35 + megaf(level, k, d, b, y) * 0.65
+        case _ if (level < levelFor(SubmitPhotoQuests)) && (level >= levelFor(InviteFriends)) => megaf(level, k, d, b, y)
+        case _ => coinAddFriendInt(levelFor(SubmitPhotoQuests) - 1, k, d, b, y) * 0.35 + megaf(level, k, d, b, y) * 0.65
       }
     }
     
