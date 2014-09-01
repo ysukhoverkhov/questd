@@ -78,6 +78,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val (u, newOne) = if (request.user.privateDailyResults.length > 1) {
       val u = db.user.movePrivateDailyResultsToPublic(request.user.id, request.user.privateDailyResults.tail)
 
+      // TODO: check we have here ifSome
       if (u != None) {
         applyDailyResults(u.get)
         (u.get, true)
