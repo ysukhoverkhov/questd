@@ -22,7 +22,7 @@ case class QuestForm(
   cheating: Int,
   votersCount: Int)
 
-trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
+trait QuestsCRUDImpl extends Controller with SecurityAdminImpl { this: APIAccessor =>
 
   val form = Form(
     mapping(
@@ -38,7 +38,7 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
   /**
    * Get all quests
    */
-  def quests(id: String) = Action { implicit request =>
+  def quests(id: String) = Authenticated { implicit request =>
 
     // Filling form.
     val f = if (id == "") {
@@ -76,7 +76,7 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
   /**
    * Updates quest status by request from CRUD
    */
-  def updateQuest = Action { implicit request =>
+  def updateQuest = Authenticated { implicit request =>
     form.bindFromRequest.fold(
 
       formWithErrors => {
