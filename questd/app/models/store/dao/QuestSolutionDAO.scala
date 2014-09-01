@@ -15,10 +15,11 @@ trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
     vip: Option[Boolean] = None,
     ids: List[String] = List(),
     questIds: List[String] = List(),
-    themeIds: List[String] = List()): Iterator[QuestSolution]
+    themeIds: List[String] = List(),
+    cultureId: Option[String] = None): Iterator[QuestSolution]
 
   def updateStatus(id: String, newStatus: String, rivalId: Option[String] = None): Option[QuestSolution]
-  
+
   def updatePoints(
     id: String,
 

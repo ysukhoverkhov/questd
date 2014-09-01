@@ -22,7 +22,8 @@ private[mongo] class MongoQuestSolutionDAO
     vip: Option[Boolean] = None,
     ids: List[String] = List(),
     questIds: List[String] = List(),
-    themeIds: List[String] = List()): Iterator[QuestSolution] = {
+    themeIds: List[String] = List(),
+    cultureId: Option[String] = None): Iterator[QuestSolution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -54,6 +55,10 @@ private[mongo] class MongoQuestSolutionDAO
 
     if (themeIds.length > 0) {
       queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
+    }
+
+    if (cultureId != None) {
+      queryBuilder += ("cultureId" -> cultureId.get)
     }
 
     Logger.trace("MongoQuestSolutionDAO - allWithParams - " + queryBuilder.result)

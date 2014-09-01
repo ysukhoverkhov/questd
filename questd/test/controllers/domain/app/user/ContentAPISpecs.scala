@@ -10,9 +10,11 @@ class ContentAPISpecs extends BaseAPISpecs {
   "Content API" should {
 
     "Make correct db call in getSolutionsForQuest" in context {
+      val u = createUserStub()
+
       db.solution.allWithParams(List(QuestSolutionStatus.OnVoting.toString), null, null, 10, null, null, List("qid"), null) returns List[QuestSolution]().iterator
 
-      val result = api.getSolutionsForQuest(GetSolutionsForQuestRequest(User(), "qid", List(QuestSolutionStatus.OnVoting), 2, 5))
+      val result = api.getSolutionsForQuest(GetSolutionsForQuestRequest(u, "qid", List(QuestSolutionStatus.OnVoting), 2, 5))
 
       there was one(solution).allWithParams(
         List(QuestSolutionStatus.OnVoting.toString),
@@ -22,21 +24,34 @@ class ContentAPISpecs extends BaseAPISpecs {
         null,
         null,
         List("qid"),
+        null,
         null)
 
       result.body must beSome[GetSolutionsForQuestResult].which(_.solutions == List())
     }
 
     "Make correct db call in getSolutionsForUser" in context {
-      db.solution.allWithParams(List(QuestSolutionStatus.OnVoting.toString), List("qid"), null, 10, null, null, null) returns List[QuestSolution]().iterator
+      val u = createUserStub()
 
-      val result = api.getSolutionsForUser(GetSolutionsForUserRequest(User(), "qid", List(QuestSolutionStatus.OnVoting), 2, 5))
+      db.solution.allWithParams(
+        List(QuestSolutionStatus.OnVoting.toString),
+        List("qid"),
+        null,
+        10,
+        null,
+        null,
+        null,
+        null,
+        null) returns List[QuestSolution]().iterator
+
+      val result = api.getSolutionsForUser(GetSolutionsForUserRequest(u, "qid", List(QuestSolutionStatus.OnVoting), 2, 5))
 
       there was one(solution).allWithParams(
         List(QuestSolutionStatus.OnVoting.toString),
         List("qid"),
         null,
         10,
+        null,
         null,
         null,
         null,

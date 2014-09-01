@@ -28,31 +28,9 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
     config
   }
 
-  /**
-   * Creates user we will test algorithm with
-   */
-//  private def createUser(friends: List[Friendship]) = {
-//    User(friends = friends)
-//  }
-
   private def createFriend(newid: String) = {
     User(id = newid)
   }
-
-//  private def createQuestSolution(newid: String, authorid: String) = {
-//    QuestSolution(
-//      id = newid,
-//      questLevel = 10,
-//      info = QuestSolutionInfo(
-//        authorId = authorid,
-//        themeId = "theme_id",
-//        questId = "quest_id",
-//        content = QuestSolutionInfoContent(
-//          media = ContentReference(ContentType.Video, "", ""),
-//          icon = None),
-//        vip = false),
-//      voteEndDate = new Date((new Date).getTime() + 100000))
-//  }
 
   "User Logic solution selector" should {
 
@@ -158,13 +136,13 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.95
       rand.nextInt(4) returns 1
 
-      api.getAllSolutions(GetAllSolutionsRequest(QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2"))) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
+      api.getAllSolutions(GetAllSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2"))) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val q = u.getRandomSolution
 
       there was one(rand).nextDouble
       there was one(rand).nextInt(4)
-      there was one(api).getAllSolutions(GetAllSolutionsRequest(QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2")))
+      there was one(api).getAllSolutions(GetAllSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2")))
 
       q must beSome.which(q => q.id == qid)
     }
