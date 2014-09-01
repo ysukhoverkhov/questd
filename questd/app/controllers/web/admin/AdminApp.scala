@@ -11,5 +11,7 @@ object AdminApp extends Controller {
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
   def index = admin.index
+  
+  def login = admin.login
 }
 

@@ -7,10 +7,14 @@ import play.api.data.Forms._
 import play.api.libs.ws._
 import play.api.libs.json._
 
-trait AdminAppImpl extends Controller {
+trait AdminAppImpl extends Controller with SecurityAdminImpl {
 
-  def index = Action {implicit request => 
+  def index = Authenticated {implicit request => 
     Ok(views.html.admin.index(Menu(request)))
+  }
+  
+  def login = Action {implicit request => 
+    storeAuthInfoInResult(Ok(views.html.admin.index(Menu(request))))
   }
 }
 

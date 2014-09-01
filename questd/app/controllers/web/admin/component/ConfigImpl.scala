@@ -11,7 +11,7 @@ import controllers.domain._
 import models.domain.admin._
 import controllers.domain.admin._
 
-trait ConfigImpl extends Controller { this: APIAccessor =>
+trait ConfigImpl extends Controller with SecurityAdminImpl { this: APIAccessor =>
 
   def leftMenu(implicit request: RequestHeader): Map[String, String] = {
     api.getConfiguration(GetConfigurationRequest()) match {
@@ -22,14 +22,14 @@ trait ConfigImpl extends Controller { this: APIAccessor =>
     }
   }
 
-  def config(sectionName: String) = Action { implicit request =>
+  def config(sectionName: String) = Authenticated { implicit request =>
     api.getConfigSection(GetConfigSectionRequest(sectionName)) match {
       case OkApiResult(Some(GetConfigSectionResult(Some(r)))) => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, r.values.toSeq.sortBy(_._1)))
       case _ => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, Map().toSeq))
     }
   }
 
-  def configUpdate(sectionName: String) = Action { implicit request =>
+  def configUpdate(sectionName: String) = Authenticated { implicit request =>
 
     val values: Map[String, String] = request.body.asFormUrlEncoded match {
       case Some(m) => {

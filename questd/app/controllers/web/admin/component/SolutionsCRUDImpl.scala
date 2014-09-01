@@ -12,12 +12,12 @@ import controllers.domain._
 import controllers.domain.admin._
 import components._
 
-trait SolutionsCRUDImpl extends Controller { this: APIAccessor =>
+trait SolutionsCRUDImpl extends Controller with SecurityAdminImpl { this: APIAccessor =>
 
   /**
    * Get all solutions
    */
-  def solutions(id: String) = Action { implicit request =>
+  def solutions(id: String) = Authenticated { implicit request =>
 
     // Filling table.
     api.allSolutions(AllSolutionsRequest()) match {

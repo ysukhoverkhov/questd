@@ -12,12 +12,12 @@ import controllers.domain._
 import controllers.domain.admin._
 import components._
 
-trait UsersCRUDImpl extends Controller { this: APIAccessor =>
+trait UsersCRUDImpl extends Controller with SecurityAdminImpl { this: APIAccessor =>
 
   /**
    * Get all users action
    */
-  def users(id: String) = Action { implicit request =>
+  def users(id: String) = Authenticated { implicit request =>
 
     // Filling table.
     api.allUsers(AllUsersRequest()) match {

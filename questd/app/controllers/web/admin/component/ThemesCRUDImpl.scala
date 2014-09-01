@@ -20,7 +20,7 @@ case class ThemeForm(
   iconStorage: String,
   iconReference: String)
 
-trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
+trait ThemesCRUDImpl extends Controller with SecurityAdminImpl { this: APIAccessor =>
 
   val newThemeForm = Form(
     mapping(
@@ -34,7 +34,7 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
   /**
    * Get all themes action
    */
-  def themes(id: String) = Action { implicit request =>
+  def themes(id: String) = Authenticated { implicit request =>
 
     // Filling form.
     val form = if (id == "") {
@@ -71,7 +71,7 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
   /**
    * Delete theme action
    */
-  def deleteThemeCB(id: String) = Action { implicit request =>
+  def deleteThemeCB(id: String) = Authenticated { implicit request =>
 
     api.deleteTheme(DeleteThemeRequest(id))
 
@@ -81,7 +81,7 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
   /**
    * Create theme action
    */
-  def createThemeCB = Action { implicit request =>
+  def createThemeCB = Authenticated { implicit request =>
     newThemeForm.bindFromRequest.fold(
 
       formWithErrors => {

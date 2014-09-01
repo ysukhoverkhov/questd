@@ -97,6 +97,8 @@ POST	/rest/debug/shiftDailyResult		controllers.web.rest.DailyResultWS.shiftDaily
 #######################
 GET		/admin								controllers.web.admin.AdminApp.index
 
+GET		/admin/loginJ0hETru60HiWwmEywG2q	controllers.web.admin.AdminApp.login
+
 GET		/admin/themes						controllers.web.admin.ThemesCRUD.themes(id = "")
 GET		/admin/themes/byid/:id				controllers.web.admin.ThemesCRUD.themes(id)
 POST	/admin/themes/createTheme			controllers.web.admin.ThemesCRUD.createThemeCB

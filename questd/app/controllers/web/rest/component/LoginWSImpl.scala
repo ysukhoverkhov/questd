@@ -74,7 +74,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: FBAccessor
 
             api.loginfb(params) match {
               case OkApiResult(Some(loginResult: LoginFBResult)) =>
-                storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session.toString))).as(JSON), loginResult)
+                storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session))).as(JSON), loginResult.session)
 
               case _ => ServerError
             }
