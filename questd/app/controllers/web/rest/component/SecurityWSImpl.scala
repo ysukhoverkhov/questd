@@ -24,8 +24,8 @@ object SecurityWSImpl {
 trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
 
   // Store Auth Info
-  def storeAuthInfoInResult(result: Result, loginResult: LoginResult) = {
-    result.withSession(SecurityWSImpl.SessionIdKey -> loginResult.session.toString)
+  def storeAuthInfoInResult(result: Result, session: String) = {
+    result.withSession(SecurityWSImpl.SessionIdKey -> session)
   }
 
   // Configure Authorized check 

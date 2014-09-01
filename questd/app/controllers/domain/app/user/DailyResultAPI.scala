@@ -78,6 +78,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
           applyDailyResults(us)
           (us, true, false)
 
+      // TODO: check we have here ifSome
         case None =>
           Logger.error("API - getDailyResult. Unable to find user for getting daily result")
           (request.user, false, true)

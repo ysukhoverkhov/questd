@@ -17,7 +17,7 @@ case class QuestForm(
   cheating: Int,
   votersCount: Int)
 
-class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller {
+class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   private val form = Form(
     mapping(
@@ -33,7 +33,7 @@ class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller {
   /**
    * Get all quests
    */
-  def quests(id: String) = Action { implicit request =>
+  def quests(id: String) = Authenticated { implicit request =>
 
     // Filling form.
     val f = if (id == "") {
@@ -70,7 +70,7 @@ class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller {
   /**
    * Updates quest status by request from CRUD
    */
-  def updateQuest() = Action { implicit request =>
+  def updateQuest() = Authenticated { implicit request =>
     form.bindFromRequest.fold(
 
       formWithErrors => {

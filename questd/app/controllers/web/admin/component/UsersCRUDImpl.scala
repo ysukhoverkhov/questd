@@ -4,12 +4,12 @@ import controllers.domain.admin.{AllUsersRequest, AllUsersResult}
 import controllers.domain.{DomainAPIComponent, OkApiResult}
 import play.api.mvc._
 
-class UsersCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller {
+class UsersCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   /**
    * Get all users action
    */
-  def users(id: String) = Action { implicit request =>
+  def users(id: String) = Authenticated { implicit request =>
 
     // Filling table.
     api.allUsers(AllUsersRequest()) match {

@@ -6,7 +6,7 @@ import play.api._
 import play.api.mvc._
 import models.domain.admin._
 
-class ConfigImpl (val api: DomainAPIComponent#DomainAPI) extends Controller {
+class ConfigImpl (val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   def leftMenu(implicit request: RequestHeader): Map[String, String] = {
     api.getConfiguration(GetConfigurationRequest()) match {
@@ -17,14 +17,14 @@ class ConfigImpl (val api: DomainAPIComponent#DomainAPI) extends Controller {
     }
   }
 
-  def config(sectionName: String) = Action { implicit request =>
+  def config(sectionName: String) = Authenticated { implicit request =>
     api.getConfigSection(GetConfigSectionRequest(sectionName)) match {
       case OkApiResult(GetConfigSectionResult(Some(r))) => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, r.values.toSeq.sortBy(_._1)))
       case _ => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, Map().toSeq))
     }
   }
 
-  def configUpdate(sectionName: String) = Action { implicit request =>
+  def configUpdate(sectionName: String) = Authenticated { implicit request =>
 
     val values: Map[String, String] = request.body.asFormUrlEncoded match {
       case Some(m) =>

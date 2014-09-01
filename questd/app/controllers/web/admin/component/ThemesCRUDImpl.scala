@@ -25,7 +25,8 @@ case class ThemeForm(
 class ThemesCRUDImpl(
   val api: DomainAPIComponent#DomainAPI)
   extends Controller
-  with BaseCRUDImpl[Theme, ThemeForm] {
+  with BaseCRUDImpl[Theme, ThemeForm]
+   with SecurityAdminImpl {
 
   protected final val emptyForm = Form(
     mapping(
