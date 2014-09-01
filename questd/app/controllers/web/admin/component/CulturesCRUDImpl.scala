@@ -3,7 +3,6 @@ package controllers.web.admin.component
 import controllers.domain.admin._
 import controllers.domain.{DomainAPIComponent, OkApiResult}
 import models.domain._
-import play.api._
 import play.api.data.Forms._
 import play.api.data._
 import play.api.mvc._

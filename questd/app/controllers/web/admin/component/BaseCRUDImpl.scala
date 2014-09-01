@@ -1,19 +1,10 @@
 package controllers.web.admin.component
 
-import play.api._
 import play.api.mvc._
-import play.api.mvc.Results._
 import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.ws._
-import play.api.libs.json._
-import models.domain._
-import controllers.domain._
-import controllers.domain.admin._
-import components._
 import play.twirl.api.HtmlFormat.Appendable
 
-trait BaseCRUDImpl[DT, FT] {
+trait BaseCRUDImpl[DT, FT] extends SecurityAdminImpl {
 
   protected def emptyForm: Form[FT]
   protected def formFilledWithObject(id: String): Form[FT]
@@ -26,7 +17,7 @@ trait BaseCRUDImpl[DT, FT] {
   /**
    * Get all objects action
    */
-  def objects(id: String) = Action { implicit request =>
+  def objects(id: String) = Authenticated { implicit request =>
 
     // Filling form.
     val form = if (id == "") {
@@ -45,7 +36,7 @@ trait BaseCRUDImpl[DT, FT] {
   /**
    * Delete object action
    */
-  def deleteObjectCB(id: String) = Action { implicit request =>
+  def deleteObjectCB(id: String) = Authenticated { implicit request =>
     deleteObjectWithId(id)
     Redirect(callToHomePage)
   }
@@ -53,7 +44,7 @@ trait BaseCRUDImpl[DT, FT] {
   /**
    * Create theme action
    */
-  def createObjectCB = Action { implicit request =>
+  def createObjectCB = Authenticated { implicit request =>
     emptyForm.bindFromRequest.fold(
 
       formWithErrors => {

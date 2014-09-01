@@ -2,7 +2,6 @@ package controllers.web.admin.component
 
 import controllers.domain.{OkApiResult, DomainAPIComponent}
 import controllers.domain.admin._
-import play.api._
 import play.api.mvc._
 import models.domain.admin._
 

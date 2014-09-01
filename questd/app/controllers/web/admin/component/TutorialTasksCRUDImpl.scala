@@ -17,7 +17,7 @@ case class TutorialTaskForm(
   rewardMoney: Int,
   rewardRating: Int)
 
-class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller {
+class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   private val form = Form(
     mapping(
@@ -32,7 +32,7 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
   /**
    * Get all tutorial tasks
    */
-  def tutorialTasks(id: String) = Action { implicit request =>
+  def tutorialTasks(id: String) = Authenticated { implicit request =>
 
     // Filling form.
     val f = if (id == "") {
@@ -68,7 +68,7 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
   /**
    * Updates task from CRUD
    */
-  def updateTutorialTask() = Action { implicit request =>
+  def updateTutorialTask() = Authenticated { implicit request =>
     form.bindFromRequest.fold(
 
       formWithErrors => {

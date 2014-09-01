@@ -2,7 +2,6 @@ package controllers.web.admin.component
 
 import controllers.domain._
 import controllers.domain.admin._
-import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
@@ -25,8 +24,7 @@ case class ThemeForm(
 class ThemesCRUDImpl(
   val api: DomainAPIComponent#DomainAPI)
   extends Controller
-  with BaseCRUDImpl[Theme, ThemeForm]
-   with SecurityAdminImpl {
+  with BaseCRUDImpl[Theme, ThemeForm] {
 
   protected final val emptyForm = Form(
     mapping(
