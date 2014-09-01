@@ -6,12 +6,12 @@ import java.util.Date
 
 import com.mongodb.BasicDBList
 import models.domain._
-import models.domain.stubCreators._
 import models.domain.view._
 import models.store._
 import org.specs2.mutable._
 import play.Logger
 import play.api.test._
+import testhelpers.domainstubs._
 
 //@RunWith(classOf[JUnitRunner])
 class UserDAOSpecs

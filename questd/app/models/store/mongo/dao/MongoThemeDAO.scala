@@ -17,7 +17,7 @@ private[mongo] class MongoThemeDAO
   /**
    *
    */
-  def count(): Long = {
+  def count: Long = {
     countByExample(MongoDBObject())
   }
 

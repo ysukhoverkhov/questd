@@ -6,7 +6,7 @@ import controllers.domain.app.theme.GetAllThemesForCultureResult
 import controllers.domain.config._ConfigParams
 import models.domain._
 import models.domain.admin.ConfigSection
-import models.domain.stubCreators._
+import testhelpers.domainstubs._
 
 class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
 

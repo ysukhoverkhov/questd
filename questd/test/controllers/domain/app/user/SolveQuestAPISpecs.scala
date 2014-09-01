@@ -7,6 +7,7 @@ import java.util.Date
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.OkApiResult
 import org.mockito.Matchers
+import testhelpers.domainstubs._
 
 class SolveQuestAPISpecs extends BaseAPISpecs {
 
@@ -55,24 +56,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       status = status,
       rating = QuestSolutionRating(
         pointsRandom = points),
-      voteEndDate = new Date((new Date).getTime() + 100000))
-  }
-
-  def createQuest(id: String) = {
-    Quest(
-      id = id,
-      approveReward = Assets(1, 2, 3),
-      info = QuestInfo(
-        authorId = "aid",
-        themeId = "tid",
-        vip = false,
-        content = QuestInfoContent(
-          media = ContentReference(
-            contentType = ContentType.Photo,
-            storage = "la",
-            reference = "tu"),
-          icon = None,
-          description = "desc")))
+      voteEndDate = new Date((new Date).getTime + 100000))
   }
 
   "Solve Quest API" should {
@@ -144,7 +128,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
     "Receive reward for winning quest battle" in context {
 
-      val quest = createQuest("qid")
+      val quest = createQuestStub("qid")
       val user1 = createUser("user1")
       val mySolution = createSolution("solId1", user1.id, quest.id, points = 1)
       val user2 = createUser("user2")
