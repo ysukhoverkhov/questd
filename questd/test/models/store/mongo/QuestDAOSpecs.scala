@@ -77,8 +77,9 @@ class QuestDAOSpecs extends Specification
           authorId = "q1_author id",
           themeId = "t1",
           status = QuestStatus.OnVoting,
-        level = 3,
-        vip = false),
+          level = 3,
+          vip = false,
+          cultureId = "c1"),
 
         createQuestStub(
           id = "q2",
@@ -86,7 +87,8 @@ class QuestDAOSpecs extends Specification
           themeId = "t2",
           status = QuestStatus.InRotation,
           level = 13,
-          vip = true),
+          vip = true,
+          cultureId = "c2"),
 
         createQuestStub(
           id = "q3",
@@ -94,7 +96,8 @@ class QuestDAOSpecs extends Specification
           themeId = "t3",
           status = QuestStatus.OnVoting,
           level = 7,
-          vip = true))
+          vip = true,
+          cultureId = "c3"))
 
       qs.foreach(db.quest.create)
 
@@ -135,6 +138,10 @@ class QuestDAOSpecs extends Specification
       val themeIdsAndIds = db.quest.allWithParams(ids = List("q1", "q2"), themeIds = List("t1", "t3")).toList
       themeIdsAndIds.map(_.id).size must beEqualTo(1)
       themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))
+
+      val culture = db.quest.allWithParams(cultureId = Some(qs(2).cultureId)).toList
+      culture.map(_.id).size must beEqualTo(1)
+      culture.map(_.id) must beEqualTo(List(qs(2).id))
     }
 
   }

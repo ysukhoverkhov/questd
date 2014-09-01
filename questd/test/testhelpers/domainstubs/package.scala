@@ -36,11 +36,12 @@ package object domainstubs {
     themeId: String = "themeId",
     status: QuestStatus.Value = QuestStatus.OnVoting,
     level: Int = 10,
-    vip: Boolean = false) = {
+    vip: Boolean = false,
+    cultureId: String = "cultureId") = {
 
     Quest(
       id = id,
-      cultureId = "cultureId",
+      cultureId = cultureId,
       approveReward = Assets(1, 2, 3),
       info = QuestInfo(
         authorId = authorId,

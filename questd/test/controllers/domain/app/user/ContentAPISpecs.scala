@@ -32,7 +32,7 @@ class ContentAPISpecs extends BaseAPISpecs {
         10,
         null,
         null,
-        List("qid"), 
+        List("qid"),
         null)
 
       result.body must beSome[GetSolutionsForQuestResult].which(_.solutions == List())
@@ -55,7 +55,7 @@ class ContentAPISpecs extends BaseAPISpecs {
 
       result.body must beSome[GetSolutionsForUserResult].which(_.solutions == List())
     }
-    
+
     "getLikedQuests calls db correctly" in context {
 
       db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator
@@ -73,6 +73,7 @@ class ContentAPISpecs extends BaseAPISpecs {
         0,
         null,
         List("1", "2", "3", "4"),
+        null,
         null)
     }
 
@@ -89,7 +90,8 @@ class ContentAPISpecs extends BaseAPISpecs {
         0,
         Some(true),
         null,
-        List("a"))
+        List("a"),
+        null)
     }
 
     "getAllQuests calls db correctly" in context {
@@ -105,9 +107,9 @@ class ContentAPISpecs extends BaseAPISpecs {
         0,
         null,
         null,
-        List("a"))
+        List("a"),
+        null)
     }
   }
 }
-
 

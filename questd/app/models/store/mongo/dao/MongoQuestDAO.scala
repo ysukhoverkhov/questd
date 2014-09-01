@@ -3,7 +3,6 @@ package models.store.mongo.dao
 import play.Logger
 import models.store.mongo.helpers._
 import models.store.dao._
-import models.store._
 import models.domain._
 import com.mongodb.casbah.commons.MongoDBObject
 import java.util.Date
@@ -17,26 +16,27 @@ private[mongo] class MongoQuestDAO
 
   def countWithStatus(status: String): Long = {
     countByExample(
-      MongoDBObject(("status" -> status)))
+      MongoDBObject("status" -> status))
   }
 
   def allWithStatusAndThemeByPoints(status: String, themeId: String): Iterator[Quest] = {
     findByExample(
       MongoDBObject(
-        ("status" -> status),
-        ("info.themeId" -> themeId)),
+        "status" -> status,
+        "info.themeId" -> themeId),
       MongoDBObject("rating.points" -> -1))
   }
 
   def allWithParams(
-      status: List[String] = List(), 
-      authorIds: List[String] = List(), 
-      levels: Option[(Int, Int)] = None, 
-      skip: Int = 0,
-      vip: Option[Boolean] = None,
-      ids: List[String] = List(),
-      themeIds: List[String] = List()): Iterator[Quest] = {
-    
+    status: List[String] = List(),
+    authorIds: List[String] = List(),
+    levels: Option[(Int, Int)] = None,
+    skip: Int = 0,
+    vip: Option[Boolean] = None,
+    ids: List[String] = List(),
+    themeIds: List[String] = List(),
+    cultureId: Option[String] = None): Iterator[Quest] = {
+
     val queryBuilder = MongoDBObject.newBuilder
 
     if (status.length > 0) {
@@ -52,7 +52,7 @@ private[mongo] class MongoQuestDAO
         MongoDBObject("info.level" -> MongoDBObject("$gte" -> levels.get._1)),
         MongoDBObject("info.level" -> MongoDBObject("$lte" -> levels.get._2))))
     }
-    
+
     if (vip != None) {
       queryBuilder += ("info.vip" -> vip.get)
     }
@@ -65,10 +65,14 @@ private[mongo] class MongoQuestDAO
       queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
     }
 
-    Logger.trace("DB - allWithParams - " + queryBuilder.result);
-    
+    if (cultureId != None) {
+      queryBuilder += ("cultureId" -> cultureId.get)
+    }
+
+    Logger.trace("DB - allWithParams - " + queryBuilder.result)
+
     findByExample(
-      queryBuilder.result,
+      queryBuilder.result(),
       MongoDBObject("lastModDate" -> 1),
       skip)
   }
@@ -95,7 +99,7 @@ private[mongo] class MongoQuestDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$inc" -> MongoDBObject(
+        "$inc" -> MongoDBObject(
           "rating.points" -> pointsChange,
           "rating.votersCount" -> votersCountChange,
           "rating.cheating" -> cheatingChange,
@@ -111,9 +115,9 @@ private[mongo] class MongoQuestDAO
           "rating.durationRating.mins" -> minsChange,
           "rating.durationRating.hour" -> hourChange,
           "rating.durationRating.day" -> dayChange,
-          "rating.durationRating.week" -> weekChange)),
-        ("$set" -> MongoDBObject(
-          "lastModDate" -> new Date()))))
+          "rating.durationRating.week" -> weekChange),
+        "$set" -> MongoDBObject(
+          "lastModDate" -> new Date())))
   }
 
   /**
@@ -123,9 +127,9 @@ private[mongo] class MongoQuestDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
+        "$set" -> MongoDBObject(
           "status" -> newStatus,
-          "lastModDate" -> new Date()))))
+          "lastModDate" -> new Date())))
   }
 
   /**
@@ -135,11 +139,11 @@ private[mongo] class MongoQuestDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
+        "$set" -> MongoDBObject(
           "info.level" -> newLevel,
           "info.duration" -> duration,
           "info.difficulty" -> difficulty,
-          "lastModDate" -> new Date()))))
+          "lastModDate" -> new Date())))
   }
 }
 
