@@ -49,12 +49,13 @@ private[mongo] class MongoUserDAO
   /**
    * Update user's session id
    */
-  def updateSessionId(id: String, sessionid: String): Option[User] = {
+  def updateSessionId(id: String, sessionid: String, token: String): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         ("$set" -> MongoDBObject(
           "auth.session" -> sessionid,
+          "auth.fbtoken" -> token,
           "auth.lastLogin" -> new Date))))
   }
 

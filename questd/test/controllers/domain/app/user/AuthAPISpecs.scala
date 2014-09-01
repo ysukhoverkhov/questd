@@ -32,7 +32,7 @@ class AuthAPISpecs extends BaseAPISpecs {
         anyInt,
         any) returns Some(User("", AuthInfo(fbid = Some(fbid))))
       
-      val rv = api.loginfb(LoginFBRequest(userfb))
+      val rv = api.loginfb(LoginFBRequest(userfb, ""))
 
       // Update allowed.
       there was one(user).readByFBid(fbid) andThen 
@@ -52,7 +52,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       db.user.readByFBid(anyString) returns Some(User("", AuthInfo(fbid = Some(fbid))))
 
-      val rv = api.loginfb(LoginFBRequest(userfb))
+      val rv = api.loginfb(LoginFBRequest(userfb, ""))
 
       there was one(user).readByFBid(fbid) andThen one(user).create(any[User])
 
@@ -67,7 +67,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       val userfb = mock[UserFB]
       userfb.getId returns "1"
 
-      val rv = api.loginfb(LoginFBRequest(userfb))
+      val rv = api.loginfb(LoginFBRequest(userfb, ""))
 
       there was one(user).readByFBid(anyString)
 
