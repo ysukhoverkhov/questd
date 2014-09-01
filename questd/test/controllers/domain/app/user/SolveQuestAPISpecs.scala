@@ -110,7 +110,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         one(solution).updateStatus(mySolution.id, QuestSolutionStatus.Won.toString, Some(rivalSolution.id)) andThen
         one(solution).updateStatus(rivalSolution.id, QuestSolutionStatus.Lost.toString, Some(mySolution.id))
       there were two(user).readById(any)
-//      there were two(user).storeSolutionInDailyResult(any, any)
+      there were two(user).storeSolutionInDailyResult(any, any)
     }
   }
 }
