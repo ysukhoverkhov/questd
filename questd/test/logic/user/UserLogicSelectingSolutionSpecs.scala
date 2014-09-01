@@ -1,31 +1,11 @@
 package logic.user
 
-import org.specs2.mutable._
-import org.specs2.runner._
-import org.specs2.mock.Mockito
-import org.junit.runner._
-import logic._
-import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
-import org.joda.time.Hours
-import components.APIAccessor
-import controllers.domain.DomainAPIComponent
-import models.store.DatabaseComponent
-import components.random.RandomComponent
-import components.RandomAccessor
-import controllers.domain.admin._
-import controllers.domain.app.user._
-import controllers.domain.app.quest._
 import controllers.domain.OkApiResult
 import models.domain.admin.ConfigSection
-import controllers.domain.DomainAPIComponent
 import controllers.domain.config._ConfigParams
-import com.github.nscala_time.time.Imports.DateTime
-import com.github.nscala_time.time.Imports.richDateTime
-import logic.LogicBootstrapper
-import java.util.Date
 import controllers.domain.app.questsolution._
-import models.domain.QuestSolution
+import testhelpers.domainstubs._
 
 class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
@@ -51,28 +31,28 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
   /**
    * Creates user we will test algorithm with
    */
-  private def createUser(friends: List[Friendship]) = {
-    User(friends = friends)
-  }
+//  private def createUser(friends: List[Friendship]) = {
+//    User(friends = friends)
+//  }
 
   private def createFriend(newid: String) = {
     User(id = newid)
   }
 
-  private def createQuestSolution(newid: String, authorid: String) = {
-    QuestSolution(
-      id = newid,
-      questLevel = 10,
-      info = QuestSolutionInfo(
-        authorId = authorid,
-        themeId = "theme_id",
-        questId = "quest_id",
-        content = QuestSolutionInfoContent(
-          media = ContentReference(ContentType.Video, "", ""),
-          icon = None),
-        vip = false),
-      voteEndDate = new Date((new Date).getTime() + 100000))
-  }
+//  private def createQuestSolution(newid: String, authorid: String) = {
+//    QuestSolution(
+//      id = newid,
+//      questLevel = 10,
+//      info = QuestSolutionInfo(
+//        authorId = authorid,
+//        themeId = "theme_id",
+//        questId = "quest_id",
+//        content = QuestSolutionInfoContent(
+//          media = ContentReference(ContentType.Video, "", ""),
+//          icon = None),
+//        vip = false),
+//      voteEndDate = new Date((new Date).getTime() + 100000))
+//  }
 
   "User Logic solution selector" should {
 
@@ -83,7 +63,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
-      api.getFriendsSolutions(any[GetFriendsSolutionsRequest]) returns OkApiResult(GetFriendsSolutionsResult(List(createQuestSolution(qid, "author")).iterator))
+      api.getFriendsSolutions(any[GetFriendsSolutionsRequest]) returns OkApiResult(GetFriendsSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val u = User()
       val q = u.getRandomSolution
@@ -100,7 +80,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
-      api.getShortlistSolutions(any[GetShortlistSolutionsRequest]) returns OkApiResult(GetShortlistSolutionsResult(List(createQuestSolution(qid, "author")).iterator))
+      api.getShortlistSolutions(any[GetShortlistSolutionsRequest]) returns OkApiResult(GetShortlistSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val u = User()
       val q = u.getRandomSolution
@@ -117,7 +97,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
-      api.getSolutionsForLikedQuests(any[GetSolutionsForLikedQuestsRequest]) returns OkApiResult(GetSolutionsForLikedQuestsResult(List(createQuestSolution(qid, "author")).iterator))
+      api.getSolutionsForLikedQuests(any[GetSolutionsForLikedQuestsRequest]) returns OkApiResult(GetSolutionsForLikedQuestsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val u = User()
       val q = u.getRandomSolution
@@ -134,7 +114,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
-      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List(createQuestSolution(qid, "author")).iterator))
+      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val u = User()
       val q = u.getRandomSolution
@@ -157,7 +137,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.75
       rand.nextInt(4) returns 0 thenReturns 1 thenReturns 2
 
-      api.getVIPSolutions(GetVIPSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-20, 12)), List("1", "2", "3"))) returns OkApiResult(GetVIPSolutionsResult(List(createQuestSolution(qid, "author")).iterator))
+      api.getVIPSolutions(GetVIPSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-20, 12)), List("1", "2", "3"))) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val q = u.getRandomSolution
 
@@ -178,7 +158,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.95
       rand.nextInt(4) returns 1
 
-      api.getAllSolutions(GetAllSolutionsRequest(QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2"))) returns OkApiResult(GetAllSolutionsResult(List(createQuestSolution(qid, "author")).iterator))
+      api.getAllSolutions(GetAllSolutionsRequest(QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2"))) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val q = u.getRandomSolution
 
@@ -198,7 +178,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.0
 
-      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List(createQuestSolution(qid, "author")).iterator))
+      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       u.getRandomSolution
 
@@ -215,7 +195,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 1.0
 
-      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List(createQuestSolution(qid, "author")).iterator))
+      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       u.getRandomSolution
 
@@ -231,7 +211,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.75
 
       api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List().iterator))
-      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List(createQuestSolution(qid, "author")).iterator))
+      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       u.getRandomSolution
 
@@ -248,7 +228,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.75
 
       api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List().iterator))
-      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List().iterator)) thenReturns OkApiResult(GetAllSolutionsResult(List(createQuestSolution(qid, "author")).iterator))
+      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List().iterator)) thenReturns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       u.getRandomSolution
 

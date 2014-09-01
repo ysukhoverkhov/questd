@@ -1,18 +1,15 @@
 package controllers.domain.app.user
 
+import scala.annotation.tailrec
 import scala.language.postfixOps
 import models.domain._
 import models.domain.view._
-import models.store._
 import play.Logger
-import helpers._
 import controllers.domain.helpers._
 import controllers.domain._
 import components._
-import logic._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.quest._
-import java.util.Date
 
 case class GetQuestCostRequest(user: User)
 case class GetQuestCostResult(allowed: ProfileModificationResult, cost: Assets)
@@ -63,17 +60,16 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     val user = ensureNoDeadlineQuest(request.user)
 
     user.canPurchaseQuest match {
-      case OK => {
+      case OK =>
 
         // Updating quest info.
         val v = if ((user.profile.questSolutionContext.purchasedQuest != None) && (user.stats.questsAcceptedPast > 0)) {
           val quest = db.quest.readById(user.profile.questSolutionContext.purchasedQuest.get.id)
 
           quest match {
-            case None => {
+            case None =>
               Logger.error("Quest by id not found in purchaseQuest")
               InternalErrorApiResult()
-            }
 
             case Some(q) => skipQuest(SkipQuestRequest(q))
           }
@@ -86,32 +82,29 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           // Updating user profile.
           user.getRandomQuestForSolution match {
             case None => OkApiResult(PurchaseQuestResult(OutOfContent))
-            case Some(q) => {
-              {
-                val questCost = user.costOfPurchasingQuest
-                val author = db.user.readById(q.info.authorId).map(x => PublicProfileWithID(q.info.authorId, x.profile.publicProfile))
 
-                if (author == None) {
-                  Logger.error("API - purchaseQuest. Unable to find quest author")
-                  InternalErrorApiResult()
-                } else {
-                  adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) ifOk { r =>
+            case Some(q) =>
+              val questCost = user.costOfPurchasingQuest
+              val author = db.user.readById(q.info.authorId).map(x => PublicProfileWithID(q.info.authorId, x.profile.publicProfile))
 
-                    val u = db.user.purchaseQuest(
-                      r.user.id,
-                      QuestInfoWithID(q.id, q.info),
-                      author.get,
-                      r.user.rewardForLosingQuest(q),
-                      r.user.rewardForWinningQuest(q))
+              if (author == None) {
+                Logger.error("API - purchaseQuest. Unable to find quest author")
+                InternalErrorApiResult()
+              } else {
+                adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) ifOk { r =>
 
-                    OkApiResult(PurchaseQuestResult(OK, u.map(_.profile)))
-                  }
+                  val u = db.user.purchaseQuest(
+                    r.user.id,
+                    QuestInfoWithID(q.id, q.info),
+                    author.get,
+                    r.user.rewardForLosingQuest(q),
+                    r.user.rewardForWinningQuest(q))
+
+                  OkApiResult(PurchaseQuestResult(OK, u.map(_.profile)))
                 }
               }
-            }
           }
         }
-      }
 
       case a => OkApiResult(PurchaseQuestResult(a))
     }
@@ -132,23 +125,21 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def takeQuest(request: TakeQuestRequest): ApiResult[TakeQuestResult] = handleDbException {
     request.user.canTakeQuest match {
 
-      case OK => {
+      case OK =>
 
         // Updating quest info.
         val v = if (request.user.stats.questsAcceptedPast > 0) {
           val quest = db.quest.readById(request.user.profile.questSolutionContext.purchasedQuest.get.id)
 
           quest match {
-            case None => {
+            case None =>
               Logger.error("Quest by id not found n purchaseQuest")
               InternalErrorApiResult()
-            }
 
-            case Some(q) => {
+            case Some(q) =>
               val ratio = Math.round(request.user.stats.questsReviewedPast.toFloat / request.user.stats.questsAcceptedPast) - 1
 
               takeQuestUpdate(TakeQuestUpdateRequest(q, ratio))
-            }
           }
         } else {
           OkApiResult(TakeQuestUpdateResult)
@@ -172,7 +163,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               }
           }
         }
-      }
 
       case (a: ProfileModificationResult) => OkApiResult(TakeQuestResult(a))
     }
@@ -186,42 +176,43 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     val user = ensureNoDeadlineQuest(request.user)
 
     user.canResolveQuest(request.solution.media.contentType) match {
-      case OK => {
+      case OK =>
 
         def content = if (request.user.payedAuthor) {
           request.solution
         } else {
           request.solution
         }
-        
+
         {
           makeTask(MakeTaskRequest(user, taskType = Some(TaskType.SubmitQuestResult)))
         } ifOk { r =>
 
           r.user.profile.questSolutionContext.takenQuest ifSome { takenQuest =>
-        
-        
-            db.solution.create(
-              QuestSolution(
-                questLevel = takenQuest.obj.level,
-                info = QuestSolutionInfo(
-              content = content,
-                  authorId = r.user.id,
-                  themeId = takenQuest.obj.themeId,
-                  questId = takenQuest.id,
-                  vip = user.profile.publicProfile.vip),
-                voteEndDate = user.solutionVoteEndDate(takenQuest.obj)))
+            r.user.demo.cultureId ifSome { culture =>
 
-            db.user.resetQuestSolution(
-              user.id,
-              config(api.ConfigParams.DebugDisableSolutionCooldown) == "1") ifSome { u =>
+              db.solution.create(
+                QuestSolution(
+                  cultureId = culture,
+                  questLevel = takenQuest.obj.level,
+                  info = QuestSolutionInfo(
+                    content = content,
+                    authorId = r.user.id,
+                    themeId = takenQuest.obj.themeId,
+                    questId = takenQuest.id,
+                    vip = user.profile.publicProfile.vip),
+                  voteEndDate = user.solutionVoteEndDate(takenQuest.obj)))
+
+              db.user.resetQuestSolution(
+                user.id,
+                config(api.ConfigParams.DebugDisableSolutionCooldown) == "1") ifSome { u =>
 
                 OkApiResult(ProposeSolutionResult(OK, Some(u.profile)))
 
               }
+            }
           }
         }
-      }
 
       case (a: ProfileModificationResult) => OkApiResult(ProposeSolutionResult(a))
     }
@@ -241,7 +232,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    */
   def giveUpQuest(request: GiveUpQuestRequest): ApiResult[GiveUpQuestResult] = handleDbException {
     request.user.canGiveUpQuest match {
-      case OK => {
+      case OK =>
 
         adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) ifOk { r =>
           val u = db.user.resetQuestSolution(
@@ -249,7 +240,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
           OkApiResult(GiveUpQuestResult(OK, u.map(_.profile)))
         }
-      }
 
       case (a: ProfileModificationResult) => OkApiResult(GiveUpQuestResult(a))
     }
@@ -287,10 +277,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     // TODO: test banned users are penalized correctly.
     try {
       val r = solution.status match {
-        case QuestSolutionStatus.OnVoting => {
+        case QuestSolutionStatus.OnVoting =>
           Logger.error("We are rewarding player for solution what is on voting.")
           InternalErrorApiResult()
-        }
 
         case QuestSolutionStatus.WaitingForCompetitor =>
           tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
@@ -312,10 +301,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         OkApiResult(RewardQuestSolutionAuthorResult())
       }
     } catch {
-      case ex: QuestNotFoundException => {
+      case ex: QuestNotFoundException =>
         Logger.error("No quest found for updating player assets for changing solution state.")
         InternalErrorApiResult()
-      }
     }
   }
 
@@ -338,9 +326,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         (List(s2), List(s1))
     }
 
+    @tailrec
     def compete(solutions: Iterator[QuestSolution]): ApiResult[TryFightQuestResult] = {
       if (solutions.hasNext) {
-        val other = solutions.next
+        val other = solutions.next()
 
         if (other.info.authorId != request.solution.info.authorId) {
 
@@ -355,7 +344,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           // Compare two solutions.
           val (winners, losers) = fight(otherSol, ourSol)
 
-          // update solutions, winners 
+          // update solutions, winners
           for (curSol <- winners) {
             Logger.debug("  winner id=" + curSol.id)
 

@@ -9,6 +9,7 @@ object QuestSolutionStatus extends Enumeration {
 
 case class QuestSolution(
   id: String = ID.generateUUID(),
+  cultureId: String,
   lastModDate: Date = new Date(),
   rivalSolutionId: Option[String] = None,
   questLevel: Int,

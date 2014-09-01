@@ -6,38 +6,9 @@ import controllers.domain._
 import controllers.domain.app.user._
 import models.domain._
 import logic.QuestSolutionLogic
-import java.util.Date
 import testhelpers.domainstubs._
 
 class QuestSolutionAPISpecs extends BaseAPISpecs {
-
-  def createSolutionInfoContent = {
-    QuestSolutionInfoContent(ContentReference(ContentType.Photo, "", ""), None)
-  }
-
-  def createSolution(
-    solutionId: String,
-    userId: String,
-    questId: String,
-    status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting,
-    questLevel: Int = 1,
-    themeId: String = "tid",
-    points: Int = 0) = {
-
-    QuestSolution(
-      id = solutionId,
-      questLevel = questLevel,
-      info = QuestSolutionInfo(
-        content = createSolutionInfoContent,
-        vip = true,
-        authorId = userId,
-        themeId = themeId,
-        questId = questId),
-      status = status,
-      rating = QuestSolutionRating(
-        pointsRandom = points),
-      voteEndDate = new Date((new Date).getTime + 100000))
-  }
 
   "Quest solution API" should {
 
@@ -45,7 +16,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
       val q = createQuestStub(id = "qid")
       val user1 = User(id = "uid")
-      val sol = createSolution("sid", user1.id, q.id)
+      val sol = createSolutionStub(id = "sid", userId = user1.id, questId = q.id)
 
       val spiedQuestSolutionLogic = spy(new QuestSolutionLogic(sol, api.api))
       when(api.questSolution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)

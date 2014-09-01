@@ -6,6 +6,7 @@ import org.specs2.mutable._
 import play.api.test._
 import models.domain._
 import java.util.Date
+import testhelpers.domainstubs._
 
 //@RunWith(classOf[JUnitRunner])
 class SolutionDAOSpecs extends Specification
@@ -14,30 +15,6 @@ class SolutionDAOSpecs extends Specification
 
   private[this] def clearDB() = {
     db.solution.clear()
-  }
-
-  private def createSolution(
-    id: String,
-    questId: String = "quest id",
-    userId: String = "user id",
-    themeId: String = "theme id",
-    questLevel: Int = 5,
-    vip: Boolean = false,
-    status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting,
-    lastModDate: Date = new Date()) = {
-
-    QuestSolution(
-      id = id,
-      questLevel = questLevel,
-      info = QuestSolutionInfo(
-        content = QuestSolutionInfoContent(media = ContentReference(ContentType.Video, "", "")),
-        vip = vip,
-        authorId = userId,
-        questId = questId,
-        themeId = themeId),
-      status = status,
-      lastModDate = lastModDate,
-      voteEndDate = new Date((new Date).getTime + 100000))
   }
 
   private def createSolutionInDB(
@@ -49,7 +26,14 @@ class SolutionDAOSpecs extends Specification
     vip: Boolean = false,
     status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting) = {
 
-    db.solution.create(createSolution(id, questId, userId, themeId, questLevel, vip, status))
+    db.solution.create(createSolutionStub(
+      id = id,
+      questId = questId,
+      userId = userId,
+      themeId = themeId,
+      level = questLevel,
+      vip = vip,
+      status = status))
   }
 
   "Mongo Quest Solution DAO" should {
@@ -104,9 +88,36 @@ class SolutionDAOSpecs extends Specification
 
       // Preparing quests to store in db.
       val qs = List(
-        createSolution("q1", "t1", "q1_author id", "q1_theme_id", 3, vip = false, QuestSolutionStatus.OnVoting, new Date(5)),
-        createSolution("q2", "t2", "q2_author id", "q2_theme_id", 13, vip = true, QuestSolutionStatus.Won, new Date(3)),
-        createSolution("q3", "t3", "q3_author id", "q3_theme_id", 7, vip = true, QuestSolutionStatus.OnVoting, new Date(4)))
+        createSolutionStub(
+          id = "q1",
+          questId = "t1",
+          userId = "q1_author id",
+          themeId = "q1_theme_id",
+          level = 3,
+          vip = false,
+          status = QuestSolutionStatus.OnVoting,
+          voteEndDate = new Date(5000),
+          lastModDate = new Date(5000)),
+        createSolutionStub(
+          id = "q2",
+          questId = "t2",
+          userId = "q2_author id",
+          themeId = "q2_theme_id",
+          level = 13,
+          vip = true,
+          status = QuestSolutionStatus.Won,
+          voteEndDate = new Date(3000),
+          lastModDate = new Date(3000)),
+        createSolutionStub(
+          id = "q3",
+          questId = "t3",
+          userId  = "q3_author id",
+          themeId = "q3_theme_id",
+          level = 7,
+          vip = true,
+          status = QuestSolutionStatus.OnVoting,
+          voteEndDate = new Date(4000),
+          lastModDate = new Date(4000)))
 
       qs.foreach(db.solution.create)
 
