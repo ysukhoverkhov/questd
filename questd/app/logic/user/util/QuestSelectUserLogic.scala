@@ -1,18 +1,9 @@
 package logic.user.util
 
-import org.joda.time.DateTime
-import com.github.nscala_time.time.Imports._
-import logic._
 import logic.constants._
-import logic.functions._
-import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
-import models.domain.base._
-import models.domain.ContentType._
-import controllers.domain._
 import logic.UserLogic
 import play.Logger
-import controllers.domain.app.user._
 import controllers.domain.app.quest._
 
 trait QuestSelectUserLogic { this: UserLogic =>
@@ -143,6 +134,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
 
     Some(api.getAllQuests(GetAllQuestsRequest(
+      user,
       reason,
       levels(reason),
       themeIds)).body.get.quests)
@@ -152,6 +144,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning from all quests")
 
     Some(api.getAllQuests(GetAllQuestsRequest(
+      user,
       reason,
       levels(reason))).body.get.quests)
   }

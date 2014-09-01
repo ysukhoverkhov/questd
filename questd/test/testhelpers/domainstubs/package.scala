@@ -58,12 +58,16 @@ package object domainstubs {
       status = status)
   }
 
-  def createUserStub(vip: Boolean) = {
+  def createUserStub(
+    cultureId: String = "cultureId",
+    vip: Boolean = false,
+    likedQuestProposalIds: List[List[String]] = List()) = {
 
     User(
       id = "user_id",
       demo = UserDemographics(
-        cultureId = Some("cultureId")),
+        cultureId = Some(cultureId)),
+      history = UserHistory(likedQuestProposalIds = likedQuestProposalIds),
       profile = Profile(
         questProposalContext = QuestProposalConext(
           approveReward = Assets(1, 2, 3),

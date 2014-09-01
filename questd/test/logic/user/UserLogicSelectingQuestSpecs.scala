@@ -161,13 +161,17 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.95
       rand.nextInt(4) returns 1
 
-      api.getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, Some((-2, 19)), List("2"))) returns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
+      api.getAllQuests(GetAllQuestsRequest(
+        u,
+        QuestStatus.InRotation,
+        Some((-2, 19)),
+        List("2"))) returns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       val q = u.getRandomQuestForSolution
 
       there was one(rand).nextDouble
       there was one(rand).nextInt(4)
-      there was one(api).getAllQuests(GetAllQuestsRequest(QuestStatus.InRotation, Some((-2, 19)), List("2")))
+      there was one(api).getAllQuests(GetAllQuestsRequest(u, QuestStatus.InRotation, Some((-2, 19)), List("2")))
 
       q must beSome.which(q => q.id == qid)
     }
@@ -275,6 +279,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       rand.nextInt(4) returns 1
 
       api.getAllQuests(GetAllQuestsRequest(
+        u,
         QuestStatus.OnVoting,
         None,
         List("2"))) returns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
@@ -284,6 +289,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       there was one(rand).nextDouble
       there was one(rand).nextInt(4)
       there was one(api).getAllQuests(GetAllQuestsRequest(
+        u,
         QuestStatus.OnVoting,
         None,
         List("2")))
