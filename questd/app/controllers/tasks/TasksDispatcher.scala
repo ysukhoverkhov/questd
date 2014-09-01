@@ -39,7 +39,7 @@ class TasksDispatcher(config: ConfigSection) extends EasyRestartActor {
   def printScheduledJobs = {
     // http://www.mkyong.com/java/how-to-list-all-jobs-in-the-quartz-scheduler/
 
-   import org.quartz.impl.StdSchedulerFactory
+    import org.quartz.impl.StdSchedulerFactory
     import org.quartz.impl.matchers.GroupMatcher
     import java.util.Date
 

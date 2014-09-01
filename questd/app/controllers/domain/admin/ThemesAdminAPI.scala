@@ -5,7 +5,7 @@ import play.Logger
 import components.DBAccessor
 import models.store._
 import models.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import controllers.domain._
 
 case class AllThemesRequest(sorted: Boolean)
@@ -32,9 +32,9 @@ private[domain] trait ThemesAdminAPI { this: DBAccessor =>
     Logger.debug("Admin request for all themes.")
 
     if (request.sorted)
-      OkApiResult(Some(AllThemesResult(db.theme.allSortedByUseDate)))
+      OkApiResult(AllThemesResult(db.theme.allSortedByUseDate))
     else
-      OkApiResult(Some(AllThemesResult(db.theme.all)))
+      OkApiResult(AllThemesResult(db.theme.all))
   }
 
   /**
@@ -47,7 +47,7 @@ private[domain] trait ThemesAdminAPI { this: DBAccessor =>
 
     db.theme.create(request.theme.copy(id = ID.generateUUID()))
 
-    OkApiResult(Some(CreateThemeResult()))
+    OkApiResult(CreateThemeResult())
   }
 
   /**
@@ -59,7 +59,7 @@ private[domain] trait ThemesAdminAPI { this: DBAccessor =>
     // Update allowed here.
     db.theme.update(request.theme)
 
-    OkApiResult(Some(UpdateThemeResult()))
+    OkApiResult(UpdateThemeResult())
   }
 
   /**
@@ -69,7 +69,7 @@ private[domain] trait ThemesAdminAPI { this: DBAccessor =>
     Logger.debug("Admin request for getting theme by id.")
 
     db.theme.readById(request.id) match {
-      case Some(r) => OkApiResult(Some(GetThemeResult(r)))
+      case Some(r) => OkApiResult(GetThemeResult(r))
       case None => NotFoundApiResult()
     }
   }
@@ -81,7 +81,7 @@ private[domain] trait ThemesAdminAPI { this: DBAccessor =>
     Logger.debug("Admin request for delete theme " + request.id.toString)
     db.theme.delete(request.id)
 
-    OkApiResult(Some(DeleteThemeResult()))
+    OkApiResult(DeleteThemeResult())
   }
 
 }

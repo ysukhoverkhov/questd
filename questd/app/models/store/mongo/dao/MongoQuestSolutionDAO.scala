@@ -9,7 +9,7 @@ import com.mongodb.casbah.commons.MongoDBObject
 import java.util.Date
 
 /**
- * DOA for Config objects
+ * DOA for Quest solution objects
  */
 private[mongo] class MongoQuestSolutionDAO
   extends BaseMongoDAO[QuestSolution](collectionName = "solutions")
@@ -17,7 +17,7 @@ private[mongo] class MongoQuestSolutionDAO
 
   def allWithParams(
     status: List[String] = List(),
-    userIds: List[String] = List(),
+    authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
     vip: Option[Boolean] = None,
@@ -31,8 +31,8 @@ private[mongo] class MongoQuestSolutionDAO
       queryBuilder += ("status" -> MongoDBObject("$in" -> status))
     }
 
-    if (userIds.length > 0) {
-      queryBuilder += ("userId" -> MongoDBObject("$in" -> userIds))
+    if (authorIds.length > 0) {
+      queryBuilder += ("info.authorId" -> MongoDBObject("$in" -> authorIds))
     }
 
     if (levels != None) {

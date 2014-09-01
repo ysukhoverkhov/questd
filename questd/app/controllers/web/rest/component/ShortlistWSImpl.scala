@@ -25,11 +25,16 @@ trait ShortlistWSImpl extends QuestController with SecurityWSImpl { this: WSComp
     api.addToShortlist(AddToShortlistRequest(r.user, v.id))
   }
   
-  
   def removeFromShortlist = wrapJsonApiCallReturnBody[WSRemoveFromShortlistResult] { (js, r) =>
     val v = Json.read[WSRemoveFromShortlistRequest](js.toString)
 
     api.removeFromShortlist(RemoveFromShortlistRequest(r.user, v.id))
+  }
+
+  def getSuggestsForShortlist = wrapJsonApiCallReturnBody[WSGetSuggestsForShortlistResult] { (js, r) =>
+    val v = Json.read[WSGetSuggestsForShortlistRequest](js.toString)
+
+    api.getSuggestsForShortlist(GetSuggestsForShortlistRequest(r.user, v.tokens))
   }
 
 }

@@ -24,7 +24,7 @@ object SecurityWSImpl {
 trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
 
   // Store Auth Info
-  def storeAuthInfoInResult(result: SimpleResult, session: String) = {
+  def storeAuthInfoInResult(result: Result, session: String) = {
     result.withSession(SecurityWSImpl.SessionIdKey -> session)
   }
 
@@ -32,17 +32,14 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
   class AuthenticatedRequest[A](val user: User, request: Request[A]) extends WrappedRequest[A](request)
 
   object Authenticated extends ActionBuilder[AuthenticatedRequest] {
-    def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
+    def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
       request.session.get(SecurityWSImpl.SessionIdKey) match {
 
         case Some(sessionid: String) => {
           Future {
 
             api.getUser(UserRequest(sessionId = Some(sessionid))) match {
-              case OkApiResult(body) => body match {
-                case Some(result: UserResult) => result.user
-                case None => ServerError
-              }
+              case OkApiResult(body) => body.user
 
               case NotAuthorisedApiResult() => {
                 Unauthorized(
@@ -62,7 +59,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
             newUser match {
               case user: User => block(new AuthenticatedRequest(user, request))
               case er: Status => Future.successful(er)
-              case er: SimpleResult => Future.successful(er)
+              case er: Result => Future.successful(er)
             }
           }
         }
@@ -73,7 +70,5 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
         }
       }
     }
-
   }
-
 }

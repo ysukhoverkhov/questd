@@ -24,7 +24,7 @@ case class QuestForm(
 
 trait QuestsCRUDImpl extends Controller with SecurityAdminImpl { this: APIAccessor =>
 
-  val form = Form(
+  private val form = Form(
     mapping(
       "id" -> text,
       "status" -> nonEmptyText,
@@ -45,7 +45,7 @@ trait QuestsCRUDImpl extends Controller with SecurityAdminImpl { this: APIAccess
       form
     } else {
       api.getQuestAdmin(GetQuestAdminRequest(id)) match {
-        case OkApiResult(Some(GetQuestAdminResult(Some(quest)))) => {
+        case OkApiResult(GetQuestAdminResult(Some(quest))) => {
           form.fill(QuestForm(
             id = quest.id,
             status = quest.status.toString,
@@ -63,7 +63,7 @@ trait QuestsCRUDImpl extends Controller with SecurityAdminImpl { this: APIAccess
     // Filling table.
     api.allQuests(AllQuestsRequest()) match {
 
-      case OkApiResult(Some(a: AllQuestsResult)) => Ok(
+      case OkApiResult(a: AllQuestsResult) => Ok(
         views.html.admin.quests(
           Menu(request),
           a.quests.toList,

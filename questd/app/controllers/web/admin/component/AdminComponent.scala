@@ -1,6 +1,5 @@
 package controllers.web.admin.component
 
-import controllers.domain.libs.facebook.FacebookComponent
 import controllers.domain.DomainAPIComponent
 import components._
 
@@ -14,6 +13,7 @@ trait AdminComponent { component: DomainAPIComponent =>
     with ThemesCRUDImpl 
     with UsersCRUDImpl
     with QuestsCRUDImpl
+    with TutorialTasksCRUDImpl
     with SolutionsCRUDImpl
     with ConfigImpl
     with APIAccessor {

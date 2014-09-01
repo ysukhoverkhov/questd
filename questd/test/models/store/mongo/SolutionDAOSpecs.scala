@@ -19,7 +19,7 @@ class SolutionDAOSpecs extends Specification
   with BaseDAOSpecs {
 
   private[this] def clearDB() = {
-    db.solution.all.foreach((x) => db.solution.delete(x.id))
+    db.solution.clear
   }
 
   private def createSolution(
@@ -29,16 +29,16 @@ class SolutionDAOSpecs extends Specification
     themeId: String = "theme id",
     questLevel: Int = 5,
     vip: Boolean = false,
-    status: String = QuestSolutionStatus.OnVoting.toString,
+    status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting,
     lastModDate: Date = new Date()) = {
 
     QuestSolution(
       id = id,
-      userId = userId,
       questLevel = questLevel,
       info = QuestSolutionInfo(
-        content = QuestSolutionInfoContent(media = ContentReference(ContentType.Video.toString, "", "")),
+        content = QuestSolutionInfoContent(media = ContentReference(ContentType.Video, "", "")),
         vip = vip,
+        authorId = userId,
         questId = questId,
         themeId = themeId),
       status = status,
@@ -53,7 +53,7 @@ class SolutionDAOSpecs extends Specification
     themeId: String = "theme id",
     questLevel: Int = 5,
     vip: Boolean = false,
-    status: String = QuestSolutionStatus.OnVoting.toString) = {
+    status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting) = {
 
     db.solution.create(createSolution(id, questId, userId, themeId, questLevel, vip, status))
   }
@@ -83,7 +83,7 @@ class SolutionDAOSpecs extends Specification
 
       db.solution.update(q.get.copy(info = q.get.info.copy(
         content = q.get.info.content.copy(
-          media = ContentReference(ContentType.Video.toString, "2", "3")))))
+          media = ContentReference(ContentType.Video, "2", "3")))))
 
       val q2 = db.solution.readById(id)
 
@@ -110,9 +110,9 @@ class SolutionDAOSpecs extends Specification
 
       // Preparing quests to store in db.
       val qs = List(
-        createSolution("q1", "t1", "q1_author id", "q1_theme_id", 3, false, QuestStatus.OnVoting.toString, new Date(5)),
-        createSolution("q2", "t2", "q2_author id", "q2_theme_id", 13, true, QuestStatus.InRotation.toString, new Date(3)),
-        createSolution("q3", "t3", "q3_author id", "q3_theme_id", 7, true, QuestStatus.OnVoting.toString, new Date(4)))
+        createSolution("q1", "t1", "q1_author id", "q1_theme_id", 3, false, QuestSolutionStatus.OnVoting, new Date(5)),
+        createSolution("q2", "t2", "q2_author id", "q2_theme_id", 13, true, QuestSolutionStatus.Won, new Date(3)),
+        createSolution("q3", "t3", "q3_author id", "q3_theme_id", 7, true, QuestSolutionStatus.OnVoting, new Date(4)))
 
       qs.foreach(db.solution.create)
 
@@ -125,7 +125,7 @@ class SolutionDAOSpecs extends Specification
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
 
-      val userids = db.solution.allWithParams(userIds = List("q2_author id")).toList
+      val userids = db.solution.allWithParams(authorIds = List("q2_author id")).toList
       userids.map(_.id) must beEqualTo(List(qs(1).id))
 
       val levels = db.solution.allWithParams(levels = Some((1, 10))).toList
@@ -165,22 +165,21 @@ class SolutionDAOSpecs extends Specification
       ids.map(_.id) must beEqualTo(List(qs(1).id))
     }
 
-    
     "updateStatus for solution updates rival correctly" in new WithApplication(appWithTestDatabase) {
       clearDB()
-      
+
       val id1 = "id1"
       val id2 = "id2"
       createSolutionInDB(id1)
       createSolutionInDB(id2)
-      
+
       val su1 = db.solution.updateStatus(id1, QuestSolutionStatus.Lost.toString)
       val su2 = db.solution.updateStatus(id2, QuestSolutionStatus.Won.toString, Some(id1))
-      
-      su1 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Lost.toString && s.rivalSolutionId == None)
-      su2 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Won.toString && s.rivalSolutionId == Some(id1))
+
+      su1 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Lost && s.rivalSolutionId == None)
+      su2 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Won && s.rivalSolutionId == Some(id1))
     }
-    
+
   }
 
 }
