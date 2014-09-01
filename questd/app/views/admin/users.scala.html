@@ -17,7 +17,7 @@
 		@for(u <- users) {
 	    	<tr>
 	    		<td>@u.id.toString</td>
-	    		<td>@u.auth.fbid.toString</td>
+	    		<td>@u.auth.snids("FB").toString</td>
 	    		<td>@u.auth.lastLogin</td>
 	    		<td>@u.profile.publicProfile.bio.name</td>
 	    		<td>@u.profile.publicProfile.level.toString</td>

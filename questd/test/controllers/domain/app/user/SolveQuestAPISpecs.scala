@@ -18,32 +18,38 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         dailyAssetsDecrease = Assets())),
       profile = Profile(
         questSolutionContext = QuestSolutionContext(
-          takenQuest = Some(QuestInfoWithID("quest_id", QuestInfo(themeId = "theme_id", vip = false, content = QuestInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None, "")))),
+          takenQuest = Some(QuestInfoWithID(
+            "quest_id",
+            QuestInfo(
+              authorId = "author_id",
+              themeId = "theme_id",
+              vip = false,
+              content = QuestInfoContent(ContentReference(ContentType.Photo, "", ""), None, "")))),
           questDeadline = new Date(Long.MaxValue)),
         publicProfile = PublicProfile(vip = vip),
         rights = Rights.full))
   }
 
   def createSolutionInfoContent = {
-    QuestSolutionInfoContent(ContentReference(ContentType.Photo.toString(), "", ""), None)
+    QuestSolutionInfoContent(ContentReference(ContentType.Photo, "", ""), None)
   }
 
   def createSolution(
     solutionId: String,
     userId: String,
     questId: String,
-    status: String = QuestSolutionStatus.WaitingForCompetitor.toString,
+    status: QuestSolutionStatus.Value = QuestSolutionStatus.WaitingForCompetitor,
     questLevel: Int = 1,
     themeId: String = "tid",
     points: Int = 0) = {
 
     QuestSolution(
       id = solutionId,
-      userId = userId,
       questLevel = questLevel,
       info = QuestSolutionInfo(
         content = createSolutionInfoContent,
         vip = true,
+        authorId = userId,
         themeId = themeId,
         questId = questId),
       status = status,
@@ -55,14 +61,14 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
   def createQuest(id: String) = {
     Quest(
       id = id,
-      authorUserId = "aid",
       approveReward = Assets(1, 2, 3),
       info = QuestInfo(
+        authorId = "aid",
         themeId = "tid",
         vip = false,
         content = QuestInfoContent(
           media = ContentReference(
-            contentType = "type",
+            contentType = ContentType.Photo,
             storage = "la",
             reference = "tu"),
           icon = None,
@@ -85,10 +91,10 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(solution).create(
         QuestSolution(
           id = anyString,
-          userId = u.id,
           questLevel = u.profile.questSolutionContext.takenQuest.get.obj.level,
           info = QuestSolutionInfo(
             content = s,
+            authorId = u.id,
             themeId = u.profile.questSolutionContext.takenQuest.get.obj.themeId,
             questId = u.profile.questSolutionContext.takenQuest.get.id,
             vip = false),
@@ -109,10 +115,10 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(solution).create(
         QuestSolution(
           id = anyString,
-          userId = u.id,
           questLevel = u.profile.questSolutionContext.takenQuest.get.obj.level,
           info = QuestSolutionInfo(
             content = s,
+            authorId = u.id,
             themeId = u.profile.questSolutionContext.takenQuest.get.obj.themeId,
             questId = u.profile.questSolutionContext.takenQuest.get.id,
             vip = true),
@@ -130,7 +136,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
 
-      result must beEqualTo(OkApiResult(Some(TryFightQuestResult())))
+      result must beEqualTo(OkApiResult(TryFightQuestResult()))
 
       there were no(solution).updateStatus(any, any, any)
       there were no(user).storeSolutionInDailyResult(any, any)
@@ -148,20 +154,20 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         status = List(QuestSolutionStatus.WaitingForCompetitor.toString),
         questIds = List(mySolution.info.questId)) returns List(mySolution, rivalSolution).iterator
 
-      solution.updateStatus(mySolution.id, QuestSolutionStatus.Won.toString, Some(rivalSolution.id)) returns Some(mySolution.copy(status = QuestSolutionStatus.Won.toString))
-      solution.updateStatus(rivalSolution.id, QuestSolutionStatus.Lost.toString, Some(mySolution.id)) returns Some(rivalSolution.copy(status = QuestSolutionStatus.Lost.toString))
+      solution.updateStatus(mySolution.id, QuestSolutionStatus.Won.toString, Some(rivalSolution.id)) returns Some(mySolution.copy(status = QuestSolutionStatus.Won))
+      solution.updateStatus(rivalSolution.id, QuestSolutionStatus.Lost.toString, Some(mySolution.id)) returns Some(rivalSolution.copy(status = QuestSolutionStatus.Lost))
 
-      user.readById(mySolution.userId) returns Some(user1)
-      user.readById(rivalSolution.userId) returns Some(user2)
-
-      db.quest.readById(quest.id) returns Some(quest)
+      user.readById(mySolution.info.authorId) returns Some(user1)
+      user.readById(rivalSolution.info.authorId) returns Some(user2)
 
       db.user.storeSolutionInDailyResult(Matchers.eq(user1.id), any) returns Some(user1)
       db.user.storeSolutionInDailyResult(Matchers.eq(user2.id), any) returns Some(user2)
 
+      db.quest.readById(quest.id) returns Some(quest)
+
       val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
 
-      result must beEqualTo(OkApiResult(Some(TryFightQuestResult())))
+      result must beEqualTo(OkApiResult(TryFightQuestResult()))
 
       there was
         one(solution).updateStatus(mySolution.id, QuestSolutionStatus.Won.toString, Some(rivalSolution.id)) andThen

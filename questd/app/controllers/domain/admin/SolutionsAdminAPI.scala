@@ -5,7 +5,7 @@ import play.Logger
 import components.DBAccessor
 import models.store._
 import models.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import controllers.domain._
 
 case class AllSolutionsRequest()
@@ -19,7 +19,7 @@ private[domain] trait SolutionsAdminAPI { this: DBAccessor =>
   def allSolutions(request: AllSolutionsRequest): ApiResult[AllSolutionsResult] = handleDbException {
     Logger.debug("Admin request for all Solutions.")
 
-    OkApiResult(Some(AllSolutionsResult(db.solution.all)))
+    OkApiResult(AllSolutionsResult(db.solution.all))
   }
 
 }

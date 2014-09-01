@@ -1,17 +1,17 @@
 package components.componentregistry
 
 import controllers.web.rest.component.WSComponent
-import controllers.domain.libs.facebook.FacebookComponent
 import models.store.DatabaseComponent
 import controllers.domain.DomainAPIComponent
 import models.store.mongo.MongoDatabaseComponent
 import controllers.web.admin.component.AdminComponent
 import controllers.tasks.TasksComponent
 import components.random.RandomComponent
+import controllers.sn.component.SocialNetworkComponent
 
 trait ComponentRegistry
   extends WSComponent
-  with FacebookComponent
+  with SocialNetworkComponent
   with MongoDatabaseComponent
   with DomainAPIComponent 
   with AdminComponent 
@@ -21,7 +21,7 @@ trait ComponentRegistry
   protected lazy val rand = new Random
   protected lazy val db: Database = new MongoDatabase
   protected lazy val api = new DomainAPI
-  protected lazy val fb = new Facebook
+  protected lazy val sn = new SocialNetwork
   lazy val ws = new WS
   lazy val admin = new Admin
   protected lazy val tasks = new Tasks

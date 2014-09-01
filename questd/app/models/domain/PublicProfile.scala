@@ -10,6 +10,5 @@ case class PublicProfile(
   publicProfileVersion: Int = 1,
   level: Int = 18, // Should be 0 here.
   bio: Bio = Bio(),
-  vip: Boolean = false,
-  debug: String = "") // TODO: remove me in 0.20.2
+  vip: Boolean = false)
 

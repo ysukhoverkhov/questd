@@ -4,7 +4,6 @@ import scala.concurrent.Future
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.specs2.mock.Mockito
-import org.junit.runner._
 import play.Logger
 import play.api.test._
 import play.api.test.Helpers._
@@ -12,7 +11,6 @@ import play.api.libs.json._
 import components.componentregistry._
 import controllers.domain._
 import controllers.domain.app.user._
-import controllers.domain.libs.facebook._
 import controllers.web.rest.component._
 import models.store._
 import models.domain._
@@ -21,11 +19,14 @@ import com.restfb.exception._
 import controllers.web.rest.protocol._
 import play.api.mvc._
 import components.random.RandomComponent
+import controllers.sn.component.SocialNetworkComponent
+import controllers.sn.client._
+import controllers.sn.exception._
 
 class LoginWSSpecs extends Specification
   with RandomComponent
   with WSComponent
-  with FacebookComponent
+  with SocialNetworkComponent
   with DatabaseComponent
   with DomainAPIComponent
   with Mockito {
@@ -34,7 +35,7 @@ class LoginWSSpecs extends Specification
 
   val db = mock[Database]
   val api = mock[DomainAPI]
-  val fb = mock[Facebook]
+  val sn = mock[SocialNetwork]
   val rand = mock[Random]
   lazy val ws = new WS
 
@@ -44,12 +45,13 @@ class LoginWSSpecs extends Specification
       val facebookToken = "Facebook token"
       val sessid = "sess id"
 
-      val user = mock[UserFB]
-      fb.fetchObject(facebookToken, "me", classOf[UserFB]) returns user
-      api.loginfb(LoginFBRequest(user)) returns OkApiResult(Some(LoginFBResult(sessid)))
+      val user = mock[SNUser]
+      val fbsn = mock[SocialNetworkClient]
+      sn.clientForName("FB") returns fbsn 
+      fbsn.fetchUserByToken(facebookToken) returns user
+      api.login(LoginRequest("FB", user)) returns OkApiResult(LoginResult(sessid))
 
-
-      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1))))
+      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
       
       val fakeRequest = FakeRequest(
         Helpers.POST,
@@ -57,7 +59,7 @@ class LoginWSSpecs extends Specification
         FakeHeaders(),
         data)
 
-      val r: Future[SimpleResult] = ws.loginfb()(fakeRequest)
+      val r: Future[Result] = ws.login()(fakeRequest)
 
       status(r) must equalTo(OK)
       contentType(r) must beSome("application/json")
@@ -69,9 +71,13 @@ class LoginWSSpecs extends Specification
 
       val facebookToken = "Facebook token"
 
-      fb.fetchObject(facebookToken, "me", classOf[UserFB]) throws new FacebookOAuthException("", "", 1, 1, 1)
+      val user = mock[SNUser]
+      val fbsn = mock[SocialNetworkClient]
+      sn.clientForName("FB") returns fbsn 
+      fbsn.fetchUserByToken(facebookToken) throws new AuthException()
+      
 
-      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1))))
+      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,
@@ -79,7 +85,7 @@ class LoginWSSpecs extends Specification
         FakeHeaders(),
         data)
 
-      val r = ws.loginfb()(fakeRequest)
+      val r = ws.login()(fakeRequest)
 
       status(r) must equalTo(UNAUTHORIZED)
     }
@@ -88,9 +94,12 @@ class LoginWSSpecs extends Specification
 
       val facebookToken = "Facebook token"
 
-      fb.fetchObject(facebookToken, "me", classOf[UserFB]) throws new FacebookNetworkException("", null, 1)
+      val user = mock[SNUser]
+      val fbsn = mock[SocialNetworkClient]
+      sn.clientForName("FB") returns fbsn 
+      fbsn.fetchUserByToken(facebookToken) throws new NetworkException()
 
-      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginFBRequest](WSLoginFBRequest(facebookToken, 1))))
+      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,
@@ -98,12 +107,33 @@ class LoginWSSpecs extends Specification
         FakeHeaders(),
         data)
 
-      val r = ws.loginfb()(fakeRequest)
+      val r = ws.login()(fakeRequest)
 
       status(r) must equalTo(SERVICE_UNAVAILABLE)
     }
 
-  }
+    "Workout incorect SN name" in new WithApplication {
 
+      val facebookToken = "Facebook token"
+
+      val user = mock[SNUser]
+      val fbsn = mock[SocialNetworkClient]
+      sn.clientForName("FB") returns fbsn 
+      fbsn.fetchUserByToken(facebookToken) throws new SocialNetworkClientNotFound()
+
+      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
+
+      val fakeRequest = FakeRequest(
+        Helpers.POST,
+        "",
+        FakeHeaders(),
+        data)
+
+      val r = ws.login()(fakeRequest)
+
+      status(r) must equalTo(BAD_REQUEST)
+    }
+    
+  }
 }
 
