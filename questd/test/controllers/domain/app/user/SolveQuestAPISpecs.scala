@@ -112,5 +112,39 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there were two(user).readById(any)
       there were two(user).storeSolutionInDailyResult(any, any)
     }
+
+    "Nominate both as winners in case of equal points" in context {
+
+      val quest = createQuestStub("qid")
+      val user1 = createUserStub(id = "user1")
+      val mySolution = createSolutionStub(id = "solId1", userId = user1.id, questId = quest.id, points = 5, status = QuestSolutionStatus.WaitingForCompetitor)
+      val user2 = createUserStub(id = "user2")
+      val rivalSolution = createSolutionStub(id = "solId2", userId = user2.id, questId = quest.id, points = 5, status = QuestSolutionStatus.WaitingForCompetitor)
+
+      solution.allWithParams(
+        status = List(QuestSolutionStatus.WaitingForCompetitor.toString),
+        questIds = List(mySolution.info.questId)) returns List(mySolution, rivalSolution).iterator
+
+      solution.updateStatus(mySolution.id, QuestSolutionStatus.Won.toString, Some(rivalSolution.id)) returns Some(mySolution.copy(status = QuestSolutionStatus.Won))
+      solution.updateStatus(rivalSolution.id, QuestSolutionStatus.Won.toString, Some(mySolution.id)) returns Some(rivalSolution.copy(status = QuestSolutionStatus.Won))
+
+      user.readById(mySolution.info.authorId) returns Some(user1)
+      user.readById(rivalSolution.info.authorId) returns Some(user2)
+
+      db.user.storeSolutionInDailyResult(Matchers.eq(user1.id), any) returns Some(user1)
+      db.user.storeSolutionInDailyResult(Matchers.eq(user2.id), any) returns Some(user2)
+
+      db.quest.readById(quest.id) returns Some(quest)
+
+      val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
+
+      result must beEqualTo(OkApiResult(TryFightQuestResult()))
+
+      there was
+        one(solution).updateStatus(mySolution.id, QuestSolutionStatus.Won.toString, Some(rivalSolution.id)) andThen
+        one(solution).updateStatus(rivalSolution.id, QuestSolutionStatus.Won.toString, Some(mySolution.id))
+      there were two(user).readById(any)
+      there were two(user).storeSolutionInDailyResult(any, any)
+    }
   }
 }
