@@ -5,7 +5,7 @@ import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
-import controllers.domain.helpers.exceptionwrappers._
+import controllers.domain.helpers._
 import logic._
 import play.Logger
 
@@ -40,7 +40,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val u = db.user.addPrivateDailyResult(user.id, DailyResult(user.getStartOfCurrentDailyResultPeriod, dailyAssetsDecrease))
 
     u match {
-      case Some(u: User) => OkApiResult(Some(ShiftDailyResultResult(u)))
+      case Some(u: User) => OkApiResult(ShiftDailyResultResult(u))
       case _ => {
         Logger.error("API - shiftDailyResult. user is not in db after update.")
         InternalErrorApiResult()
@@ -65,39 +65,45 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
           a + dqs.reward.getOrElse(Assets()) - dqs.penalty.getOrElse(Assets())
         }
 
-        assetsAfterSolutions - 
-        dr.dailyAssetsDecrease - 
-        dr.questGiveUpAssetsDecrease.getOrElse(Assets()) - 
-        dr.proposalGiveUpAssetsDecrease.getOrElse(Assets())
+        assetsAfterSolutions -
+          dr.dailyAssetsDecrease -
+          dr.questGiveUpAssetsDecrease.getOrElse(Assets()) -
+          dr.proposalGiveUpAssetsDecrease.getOrElse(Assets())
       }
 
       adjustAssets(AdjustAssetsRequest(user = u, reward = Some(deltaAssets)))
     }
 
     // Check replace old public daily results with new daily results.
-    val (u, newOne) = if (request.user.privateDailyResults.length > 1) {
-      val u = db.user.movePrivateDailyResultsToPublic(request.user.id, request.user.privateDailyResults.tail)
+    val (u, newOne, internalError) = if (request.user.privateDailyResults.length > 1) {
+      db.user.movePrivateDailyResultsToPublic(request.user.id, request.user.privateDailyResults.tail) match {
+        case Some(us) => {
+          applyDailyResults(us)
+          (us, true, false)
+        }
 
       // TODO: check we have here ifSome
-      if (u != None) {
-        applyDailyResults(u.get)
-        (u.get, true)
-      } else {
-        Logger.error("API - getDailyResult. Unable to find user for getting daily result")
-        (request.user, false)
+        case None => {
+          Logger.error("API - getDailyResult. Unable to find user for getting daily result")
+          (request.user, false, true)
+        }
       }
 
     } else {
-      (request.user, false)
+      (request.user, false, false)
     }
 
-    OkApiResult(Some(GetDailyResultResult(u.profile, newOne)))
+    if (internalError) {
+      InternalErrorApiResult();
+    } else {
+      OkApiResult(GetDailyResultResult(u.profile, newOne))
+    }
   }
 
   /**
    * Stores result of voting of quest proposal in db
    */
-  def storeProposalInDailyResult(request: StoreProposalInDailyResultRequest): ApiResult[StoreProposalInDailyResultResult] = handleDbException ({
+  def storeProposalInDailyResult(request: StoreProposalInDailyResultRequest): ApiResult[StoreProposalInDailyResultResult] = handleDbException({
     import request._
 
     val u = ensurePrivateDailyResultExists(user)
@@ -106,10 +112,10 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
         questProposalId = request.quest.id,
         reward = request.reward,
         penalty = request.penalty,
+    db.user.storeProposalInDailyResult(user.id, qpr) ifSome { v =>
+      OkApiResult(StoreProposalInDailyResultResult(v))
+    }
         status = Some(request.quest.status))
-    val u2 = db.user.storeProposalInDailyResult(user.id, qpr)
-
-    OkApiResult(Some(StoreProposalInDailyResultResult(u2.get)))
   })
 
   /**
@@ -121,22 +127,24 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val u = ensurePrivateDailyResultExists(user)
 
     val qpr = QuestSolutionResult(
+    db.user.storeSolutionInDailyResult(user.id, qpr) ifSome { v =>
+      OkApiResult(StoreSolutionInDailyResultResult(v))
+    }
         questSolutionId = request.solution.id, 
         reward = request.reward, 
         penalty = request.penalty,
         status = Some(request.solution.status))
-    val u2 = db.user.storeSolutionInDailyResult(user.id, qpr)
 
-    OkApiResult(Some(StoreSolutionInDailyResultResult(u2.get)))
   }
-  
+
   def storeProposalOutOfTimePenalty(request: StoreProposalOutOfTimePenaltyReqest): ApiResult[StoreProposalOutOfTimePenaltyResult] = handleDbException {
     import request._
 
     val u = ensurePrivateDailyResultExists(user)
-    
-    val u2 = db.user.storeProposalOutOfTimePenalty(user.id, penalty)
-    OkApiResult(Some(StoreProposalOutOfTimePenaltyResult(u2.get)))
+
+    db.user.storeProposalOutOfTimePenalty(user.id, penalty) ifSome { v =>
+      OkApiResult(StoreProposalOutOfTimePenaltyResult(v))
+    }
   }
 
   def storeSolutionOutOfTimePenalty(request: StoreSolutionOutOfTimePenaltyReqest): ApiResult[StoreSolutionOutOfTimePenaltyResult] = handleDbException {
@@ -144,10 +152,12 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val u = ensurePrivateDailyResultExists(user)
 
-    val u2 = db.user.storeSolutionOutOfTimePenalty(user.id, penalty)
-    OkApiResult(Some(StoreSolutionOutOfTimePenaltyResult(u2.get)))
+    db.user.storeSolutionOutOfTimePenalty(user.id, penalty) ifSome { v =>
+      OkApiResult(StoreSolutionOutOfTimePenaltyResult(v))
+    }
+
   }
-  
+
   private def ensurePrivateDailyResultExists(user: User): User = {
     if (user.privateDailyResults.length == 0) {
       shiftDailyResult(ShiftDailyResultRequest(user)).body.get.user
@@ -155,6 +165,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       user
     }
   }
+
 }
 
 

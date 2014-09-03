@@ -13,7 +13,6 @@ import models.store._
 import models.domain._
 import models.store.mongo._
 import models.store.dao.UserDAO
-import controllers.domain.libs.facebook.UserFB
 import components.random.RandomComponent
 import controllers.domain.app.quest._
 

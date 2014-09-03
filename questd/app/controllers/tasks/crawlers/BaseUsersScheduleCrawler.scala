@@ -26,7 +26,7 @@ abstract class BaseUsersScheduleCrawler(api: DomainAPIComponent#DomainAPI, rand:
       Logger.debug("Users crawler " + self.path.toString)
 
       api.getAllUsers(GetAllUsersRequest()) match {
-        case OkApiResult(Some(result)) => doCrawl(result.users)
+        case OkApiResult(result) => doCrawl(result.users)
         case _ => Logger.error("Unable to get users from Db to crawl them")
       }
     }

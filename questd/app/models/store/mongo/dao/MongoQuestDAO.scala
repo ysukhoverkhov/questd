@@ -30,7 +30,7 @@ private[mongo] class MongoQuestDAO
 
   def allWithParams(
       status: List[String] = List(), 
-      userIds: List[String] = List(), 
+      authorIds: List[String] = List(), 
       levels: Option[(Int, Int)] = None, 
       skip: Int = 0,
       vip: Option[Boolean] = None,
@@ -43,8 +43,8 @@ private[mongo] class MongoQuestDAO
       queryBuilder += ("status" -> MongoDBObject("$in" -> status))
     }
 
-    if (userIds.length > 0) {
-      queryBuilder += ("authorUserId" -> MongoDBObject("$in" -> userIds))
+    if (authorIds.length > 0) {
+      queryBuilder += ("info.authorId" -> MongoDBObject("$in" -> authorIds))
     }
 
     if (levels != None) {

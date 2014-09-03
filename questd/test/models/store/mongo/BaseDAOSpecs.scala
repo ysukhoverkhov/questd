@@ -5,7 +5,7 @@ import play.api.test.FakeApplication
 trait BaseDAOSpecs { this: MongoDatabaseComponent => 
   
   def testMongoDatabase(name: String = "default"): Map[String, String] = {
-    val dbname: String = "questdb-test-0-10"
+    val dbname: String = "questdb-test-0-20"
     Map(
       ("mongodb." + name + ".db" -> dbname))
   }
