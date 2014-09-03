@@ -15,10 +15,10 @@ case class ShiftDailyResultResult(user: User)
 case class GetDailyResultRequest(user: User)
 case class GetDailyResultResult(profile: Profile, hasNewResult: Boolean)
 
-case class StoreProposalInDailyResultRequest(user: User, questId: String, reward: Option[Assets] = None, penalty: Option[Assets] = None)
+case class StoreProposalInDailyResultRequest(user: User, quest: Quest, reward: Option[Assets] = None, penalty: Option[Assets] = None)
 case class StoreProposalInDailyResultResult(user: User)
 
-case class StoreSolutionInDailyResultRequest(user: User, solutionId: String, reward: Option[Assets] = None, penalty: Option[Assets] = None)
+case class StoreSolutionInDailyResultRequest(user: User, solution: QuestSolution, reward: Option[Assets] = None, penalty: Option[Assets] = None)
 case class StoreSolutionInDailyResultResult(user: User)
 
 case class StoreProposalOutOfTimePenaltyReqest(user: User, penalty: Assets)
@@ -102,7 +102,11 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val u = ensurePrivateDailyResultExists(user)
 
-    val qpr = QuestProposalResult(questProposalId = request.questId, reward = request.reward, penalty = request.penalty)
+    val qpr = QuestProposalResult(
+        questProposalId = request.quest.id,
+        reward = request.reward,
+        penalty = request.penalty,
+        status = Some(request.quest.status))
     val u2 = db.user.storeProposalInDailyResult(user.id, qpr)
 
     OkApiResult(Some(StoreProposalInDailyResultResult(u2.get)))
@@ -116,7 +120,11 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val u = ensurePrivateDailyResultExists(user)
 
-    val qpr = QuestSolutionResult(questSolutionId = request.solutionId, reward = request.reward, penalty = request.penalty)
+    val qpr = QuestSolutionResult(
+        questSolutionId = request.solution.id, 
+        reward = request.reward, 
+        penalty = request.penalty,
+        status = Some(request.solution.status))
     val u2 = db.user.storeSolutionInDailyResult(user.id, qpr)
 
     OkApiResult(Some(StoreSolutionInDailyResultResult(u2.get)))

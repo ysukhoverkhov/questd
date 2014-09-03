@@ -17,10 +17,16 @@ case class DailyResult(
 case class QuestSolutionResult(
     questSolutionId: String,
     reward: Option[Assets],
-    penalty: Option[Assets])
+    penalty: Option[Assets],
+    // TODO: make me not optional in 0.20. Make it not string.
+    status: Option[String])
+//    status: Option[QuestSolutionStatus.Value])
   
 case class QuestProposalResult(
     questProposalId: String,
     reward: Option[Assets],
-    penalty: Option[Assets])
+    penalty: Option[Assets],
+    // TODO: make me not optional in 0.20. Make it not string.
+    status: Option[String])
+//    status: Option[QuestStatus.Value])
   
