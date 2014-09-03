@@ -79,8 +79,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
           case Left(params) => {
             api.login(params) match {
               case OkApiResult(loginResult: LoginResult) =>
-                storeAuthInfoInResult(Ok(Json.write(WSLoginResult(loginResult.session.toString))).as(JSON), loginResult)
-                storeAuthInfoInResult(Ok(Json.write(WSLoginFBResult(loginResult.session))).as(JSON), loginResult.session)
+                storeAuthInfoInResult(Ok(Json.write(WSLoginResult(loginResult.session))).as(JSON), loginResult.session)
 
               case _ => ServerError
             }

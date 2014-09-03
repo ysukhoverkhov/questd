@@ -82,7 +82,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
           (us, true, false)
         }
 
-      // TODO: check we have here ifSome
+        // TODO: check we have here ifSome
         case None => {
           Logger.error("API - getDailyResult. Unable to find user for getting daily result")
           (request.user, false, true)
@@ -109,13 +109,14 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val u = ensurePrivateDailyResultExists(user)
 
     val qpr = QuestProposalResult(
-        questProposalId = request.quest.id,
-        reward = request.reward,
-        penalty = request.penalty,
+      questProposalId = request.quest.id,
+      reward = request.reward,
+      penalty = request.penalty,
+      status = request.quest.status)
+      
     db.user.storeProposalInDailyResult(user.id, qpr) ifSome { v =>
       OkApiResult(StoreProposalInDailyResultResult(v))
     }
-        status = Some(request.quest.status))
   })
 
   /**
@@ -127,15 +128,15 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val u = ensurePrivateDailyResultExists(user)
 
     val qpr = QuestSolutionResult(
-    db.user.storeSolutionInDailyResult(user.id, qpr) ifSome { v =>
-      OkApiResult(StoreSolutionInDailyResultResult(v))
-    }
-        questSolutionId = request.solution.id, 
-        reward = request.reward, 
-        penalty = request.penalty,
-        status = Some(request.solution.status))
+      questSolutionId = request.solution.id,
+      reward = request.reward,
+      penalty = request.penalty,
+      status = request.solution.status)
 
-  }
+      db.user.storeSolutionInDailyResult(user.id, qpr) ifSome { v =>
+        OkApiResult(StoreSolutionInDailyResultResult(v))
+      }
+    }
 
   def storeProposalOutOfTimePenalty(request: StoreProposalOutOfTimePenaltyReqest): ApiResult[StoreProposalOutOfTimePenaltyResult] = handleDbException {
     import request._
