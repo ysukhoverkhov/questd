@@ -38,7 +38,7 @@ case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, 
 case class RewardQuestProposalAuthorRequest(quest: Quest, author: User)
 case class RewardQuestProposalAuthorResult()
 
-private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
+private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor with FBAccessor =>
 
   /**
    * Get cost of next quest purchase.
@@ -54,7 +54,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    * Returns purchased quest theme.
    */
   def purchaseQuestTheme(request: PurchaseQuestThemeRequest): ApiResult[PurchaseQuestThemeResult] = handleDbException {
-    
+
     val user = ensureNoDeadlineProposal(request.user)
 
     user.canPurchaseQuestProposals match {
@@ -88,7 +88,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                 if (user.profile.questProposalContext.todayReviewedThemeIds.size == 0) {
                   OkApiResult(Some(PurchaseQuestThemeResult(OutOfContent)))
                 } else {
-                  
+
                   val userWithoutReviewdThemes = db.user.resetTodayReviewedThemes(user.id)
                   // TODO: ifSome
                   selectRandomThemeToPresentUser(userWithoutReviewdThemes.get)
@@ -150,10 +150,70 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
     user.canProposeQuest(ContentType.withName(request.quest.media.contentType)) match {
       case OK => {
-        
+
         def content = if (request.user.payedAuthor) {
-          // TODO: insert here downlading of content.
-          request.quest
+
+          try {
+            import com.restfb.types.Photo
+            import play.api.Play.current
+            import play.api.libs.ws._
+            import scala.concurrent._
+            import scala.concurrent.duration._
+            import scala.concurrent.ExecutionContext.Implicits.global
+            import play.api.libs.iteratee._
+            import scalax.io._
+            import java.io._
+            import java.util.UUID
+            import scala.language.postfixOps
+
+            val rv = fb.fetchObject(
+              request.user.auth.fbtoken.getOrElse(""),
+              request.quest.media.reference,
+              classOf[Photo])
+
+            Logger.error(rv.getImages().get(0).getSource())
+
+            def fromStream(stream: OutputStream): Iteratee[Array[Byte], Unit] = Cont {
+              case e @ Input.EOF =>
+                stream.close()
+                Logger.error("Done")
+                Done((), e)
+              case Input.El(data) =>
+                stream.write(data)
+                fromStream(stream)
+              case Input.Empty =>
+                fromStream(stream)
+            }
+
+            val fileName = s"${UUID.randomUUID().toString()}.jpg"
+            val path = s"/var/www/vhosts/questmeapp.com/static-1.questmeapp.com/files/$fileName"
+            val url = s"http://static-1.questmeapp.com/files/$fileName"
+
+            Logger.error(s"Saving to file $path and url $url")
+
+            val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(path))
+
+            Logger.error("Starting")
+
+            val futureResponse = WS.url(rv.getImages().get(0).getSource()).get {
+              headers =>
+                fromStream(outputStream)
+            }.map(_.run)
+
+            Await.ready(futureResponse, 20 seconds)
+
+            Logger.error("Exited")
+
+            request.quest.copy(
+              media = request.quest.media.copy(
+                storage = "url",
+                reference = url))
+          } catch {
+            case ex: Throwable => {
+              Logger.error("unable to get content for store for payed user.")
+              request.quest
+            }
+          }
         } else {
           request.quest
         }

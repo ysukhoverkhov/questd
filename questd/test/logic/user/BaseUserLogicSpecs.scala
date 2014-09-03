@@ -9,6 +9,7 @@ import controllers.domain.DomainAPIComponent
 import models.store.DatabaseComponent
 import controllers.domain.admin._
 import logic.LogicBootstrapper
+import controllers.domain.libs.facebook.FacebookComponent
 
 private[user] abstract class BaseUserLogicSpecs extends Specification 
   with Mockito 
@@ -18,9 +19,11 @@ private[user] abstract class BaseUserLogicSpecs extends Specification
   
   with RandomComponent
   with DatabaseComponent
-  with DomainAPIComponent {
+  with DomainAPIComponent
+  with FacebookComponent {
   
   val db = mock[Database]
   val api = mock[DomainAPI]
   val rand = mock[Random]
+  val fb = mock[Facebook]
 }
