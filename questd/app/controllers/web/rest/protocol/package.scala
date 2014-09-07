@@ -62,6 +62,13 @@ package object protocol {
   case class WSSetDebugRequest(debug: String)
 
   /**
+   * Set city protocol.
+   */
+  type WSSetCityResult = SetCityResult
+  case class WSSetCityRequest(city: String)
+
+
+  /**
    * Get Quest theme cost result
    */
   type WSGetQuestThemeCostResult = GetQuestThemeCostResult
@@ -344,7 +351,7 @@ package object protocol {
     platformId: String,
     state: String)
 
-  /// may return LimitExceeded in "allowed" field if there are too many platforms (logic.constants.NumberOfStoredTutorialPlatforms) 
+  /// may return LimitExceeded in "allowed" field if there are too many platforms (logic.constants.NumberOfStoredTutorialPlatforms)
   /// or state is too long (logic.constants.MaxLengthOfTutorlaPlatformState).
   type WSSetTutorialStateResult = SetTutorialStateResult
 

@@ -1,7 +1,6 @@
 package controllers.domain.app.user
 
 import models.domain._
-import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
@@ -33,14 +32,15 @@ case class SetDebugResult(user: User)
 case class SetGenderRequest(user: User, gender: Gender.Value)
 case class SetGenderResult(user: User)
 
+case class SetCityRequest(user: User, city: String)
+case class SetCityResult(user: User)
+
 private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Get iterator for all users.
    */
   def getAllUsers(request: GetAllUsersRequest): ApiResult[GetAllUsersResult] = handleDbException {
-    import request._
-
     OkApiResult(GetAllUsersResult(db.user.all))
   }
 
@@ -118,8 +118,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get level required to get a right.
    */
   def getLevelsForRights(request: GetLevelsForRightsRequest): ApiResult[GetLevelsForRightsResult] = handleDbException {
-    import request._
-
     val rv = constants.restrictions.filterKeys(request.functionality.contains(_))
 
     OkApiResult(GetLevelsForRightsResult(rv))
@@ -146,7 +144,17 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     db.user.setGender(user.id, gender.toString) ifSome { v =>
       OkApiResult(SetGenderResult(v))
     }
+  }
 
+  /**
+   * Updates user city.
+   */
+  def setCity(request: SetCityRequest): ApiResult[SetCityResult] = handleDbException {
+    import request._
+
+    db.user.setCity(user.id, city) ifSome { v =>
+      OkApiResult(SetCityResult(v))
+    }
   }
 
 }

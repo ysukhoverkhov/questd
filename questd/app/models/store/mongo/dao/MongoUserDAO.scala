@@ -684,6 +684,17 @@ private[mongo] class MongoUserDAO
   }
 
   /**
+   * // TODO: test me.
+   */
+  def setCity(id: String, city: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "profile.publicProfile.bio.city" -> city)))
+  }
+
+  /**
    *
    */
   def setTutorialState(id: String, platform: String, state: String): Option[User] = {

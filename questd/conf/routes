@@ -16,6 +16,9 @@ POST	/rest/login										controllers.web.rest.LoginWS.login
 POST	/rest/getProfile								controllers.web.rest.ProfileWS.getProfile
 POST	/rest/setGender									controllers.web.rest.ProfileWS.setGender
 POST	/rest/setDebug									controllers.web.rest.ProfileWS.setDebug
+POST    /rest/setCity                                   controllers.web.rest.ProfileWS.setCity
+#POST    /rest/setCountry                                controllers.web.rest.ProfileWS.setCountry
+#POST    /rest/getCountryList                            controllers.web.rest.ProfileWS.getCountryList
 
 # Generating quests
 POST	/rest/getQuestThemeCost							controllers.web.rest.ProposeQuestWS.getQuestThemeCost
@@ -59,8 +62,8 @@ POST	/rest/getQuest									controllers.web.rest.ContentWS.getQuest
 POST	/rest/getSolution								controllers.web.rest.ContentWS.getSolution
 POST	/rest/getPublicProfile							controllers.web.rest.ContentWS.getPublicProfile
 
-POST	/rest/getOwnSolutions				controllers.web.rest.ContentWS.getOwnSolutions
-POST	/rest/getOwnQuests					controllers.web.rest.ContentWS.getOwnQuests
+POST	/rest/getOwnSolutions				            controllers.web.rest.ContentWS.getOwnSolutions
+POST	/rest/getOwnQuests					            controllers.web.rest.ContentWS.getOwnQuests
 
 POST	/rest/getSolutionsForQuest						controllers.web.rest.ContentWS.getSolutionsForQuest
 POST	/rest/getSolutionsForUser						controllers.web.rest.ContentWS.getSolutionsForUser
