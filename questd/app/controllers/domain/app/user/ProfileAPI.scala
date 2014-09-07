@@ -1,5 +1,6 @@
 package controllers.domain.app.user
 
+import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
 import controllers.domain.DomainAPIComponent
 import components._
@@ -34,6 +35,9 @@ case class SetGenderResult(user: User)
 
 case class SetCityRequest(user: User, city: String)
 case class SetCityResult(user: User)
+
+case class SetCountryRequest(user: User, country: String)
+case class SetCountryResult(allowed: ProfileModificationResult, user: Option[User])
 
 case class GetCountryListRequest(user: User)
 case class GetCountryListResult(countries: List[String])
@@ -162,12 +166,29 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   }
 
   /**
+   * Updates user country.
+   */
+  def setCountry(request: SetCountryRequest): ApiResult[SetCountryResult] = handleDbException {
+    import request._
+
+    val countries = scala.io.Source.fromFile("conf/countries.txt").getLines().toList
+
+    if (!countries.contains(country)) {
+      OkApiResult(SetCountryResult(OutOfContent, None))
+    } else {
+      db.user.setCountry(user.id, country) ifSome { v =>
+        OkApiResult(SetCountryResult(OK, Some(v)))
+      }
+    }
+  }
+
+  /**
    * Get list of possible countries.
    */
   def getCountryList(request: GetCountryListRequest): ApiResult[GetCountryListResult] = handleDbException {
-    val rv = scala.io.Source.fromFile("conf/countries.txt").getLines().toList
+    val countries = scala.io.Source.fromFile("conf/countries.txt").getLines().toList
 
-    OkApiResult(GetCountryListResult(rv))
+    OkApiResult(GetCountryListResult(countries))
   }
 }
 

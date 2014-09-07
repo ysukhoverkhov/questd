@@ -71,6 +71,8 @@ package object protocol {
    * Set country protocol
    */
   type WSGetCountryListResult = GetCountryListResult
+  type WSSetCountryResult = SetCountryResult
+  case class WSSetCountryRequest(country: String)
 
   /**
    * Get Quest theme cost result

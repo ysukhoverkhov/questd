@@ -684,7 +684,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * // TODO: test me.
+   *
    */
   def setCity(id: String, city: String): Option[User] = {
     findAndModify(
@@ -692,6 +692,14 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         "$set" -> MongoDBObject(
           "profile.publicProfile.bio.city" -> city)))
+  }
+
+  def setCountry(id: String, country: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "profile.publicProfile.bio.country" -> country)))
   }
 
   /**

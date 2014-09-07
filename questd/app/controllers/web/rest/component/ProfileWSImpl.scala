@@ -1,5 +1,7 @@
 package controllers.web.rest.component
 
+import controllers.domain.OkApiResult
+
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.web.rest.component.helpers._
@@ -33,6 +35,12 @@ trait ProfileWSImpl extends QuestController with SecurityWSImpl { this: WSCompon
     val v = Json.read[WSSetCityRequest](js.toString)
 
     api.setCity(SetCityRequest(r.user, v.city))
+  }
+
+  def setCountry() = wrapJsonApiCallReturnBody[WSSetCountryResult] { (js, r) =>
+    val v = Json.read[WSSetCountryRequest](js.toString)
+
+    api.setCountry(SetCountryRequest(r.user, v.country))
   }
 
   def getCountryList = wrapJsonApiCallReturnBody[WSGetCountryListResult] { (js, r) =>
