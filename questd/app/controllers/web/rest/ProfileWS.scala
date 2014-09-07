@@ -13,5 +13,7 @@ object ProfileWS extends Controller with AccessToWSInstance {
   def setDebug() = ws.setDebug()
 
   def setCity() = ws.setCity()
+
+  def getCountryList = ws.getCountryList
 }
 

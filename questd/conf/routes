@@ -18,7 +18,7 @@ POST	/rest/setGender									controllers.web.rest.ProfileWS.setGender
 POST	/rest/setDebug									controllers.web.rest.ProfileWS.setDebug
 POST    /rest/setCity                                   controllers.web.rest.ProfileWS.setCity
 #POST    /rest/setCountry                                controllers.web.rest.ProfileWS.setCountry
-#POST    /rest/getCountryList                            controllers.web.rest.ProfileWS.getCountryList
+POST    /rest/getCountryList                            controllers.web.rest.ProfileWS.getCountryList
 
 # Generating quests
 POST	/rest/getQuestThemeCost							controllers.web.rest.ProposeQuestWS.getQuestThemeCost

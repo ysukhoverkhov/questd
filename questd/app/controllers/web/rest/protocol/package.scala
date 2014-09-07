@@ -67,6 +67,10 @@ package object protocol {
   type WSSetCityResult = SetCityResult
   case class WSSetCityRequest(city: String)
 
+  /**
+   * Set country protocol
+   */
+  type WSGetCountryListResult = GetCountryListResult
 
   /**
    * Get Quest theme cost result

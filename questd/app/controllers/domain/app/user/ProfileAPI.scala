@@ -35,6 +35,10 @@ case class SetGenderResult(user: User)
 case class SetCityRequest(user: User, city: String)
 case class SetCityResult(user: User)
 
+case class GetCountryListRequest(user: User)
+case class GetCountryListResult(countries: List[String])
+
+
 private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -157,5 +161,13 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     }
   }
 
+  /**
+   * Get list of possible countries.
+   */
+  def getCountryList(request: GetCountryListRequest): ApiResult[GetCountryListResult] = handleDbException {
+    val rv = scala.io.Source.fromFile("conf/countries.txt").getLines().toList
+
+    OkApiResult(GetCountryListResult(rv))
+  }
 }
 

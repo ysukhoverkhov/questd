@@ -34,5 +34,10 @@ trait ProfileWSImpl extends QuestController with SecurityWSImpl { this: WSCompon
 
     api.setCity(SetCityRequest(r.user, v.city))
   }
+
+  def getCountryList = wrapJsonApiCallReturnBody[WSGetCountryListResult] { (js, r) =>
+    api.getCountryList(GetCountryListRequest(r.user))
+  }
+
 }
 
