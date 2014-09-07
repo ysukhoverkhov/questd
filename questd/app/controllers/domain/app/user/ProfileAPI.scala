@@ -42,6 +42,9 @@ case class SetCountryResult(allowed: ProfileModificationResult, user: Option[Use
 case class GetCountryListRequest(user: User)
 case class GetCountryListResult(countries: List[String])
 
+case class UpdateUserCultureRequest(user: User)
+case class UpdateUserCultureResult(user: User)
+
 
 private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -177,7 +180,9 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       OkApiResult(SetCountryResult(OutOfContent, None))
     } else {
       db.user.setCountry(user.id, country) ifSome { v =>
-        OkApiResult(SetCountryResult(OK, Some(v)))
+        updateUserCulture(UpdateUserCultureRequest(v)) ifOk { r =>
+          OkApiResult(SetCountryResult(OK, Some(r.user)))
+        }
       }
     }
   }
@@ -189,6 +194,35 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val countries = scala.io.Source.fromFile("conf/countries.txt").getLines().toList
 
     OkApiResult(GetCountryListResult(countries))
+  }
+
+  /**
+   * Update culture if country changed.
+   */
+  def updateUserCulture(request: UpdateUserCultureRequest): ApiResult[UpdateUserCultureResult] = handleDbException {
+
+    db.culture.findByCountry(request.user.profile.publicProfile.bio.country) match {
+      case Some(c) =>
+        request.user.demo.cultureId match {
+          case Some(userC) =>
+            if (c.id != userC)
+              db.user.updateCultureId(request.user.id, c.id)
+
+          case None =>
+            db.user.updateCultureId(request.user.id, c.id)
+        }
+
+      case None =>
+        Logger.debug(s"Creating new culture ${request.user.profile.publicProfile.bio.country}")
+
+        val newCulture = Culture(
+          name = request.user.profile.publicProfile.bio.country,
+          countries = List(request.user.profile.publicProfile.bio.country))
+        db.culture.create(newCulture)
+        db.user.updateCultureId(request.user.id, newCulture.id)
+    }
+
+    OkApiResult(UpdateUserCultureResult(request.user))
   }
 }
 

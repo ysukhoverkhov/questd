@@ -23,31 +23,15 @@ private[domain] trait AuthAPI {
    */
   def login(params: LoginRequest): ApiResult[LoginResult] = handleDbException {
 
-    def dealWithUserCulture(user: User): Unit = {
-      db.culture.findByCountry(user.profile.publicProfile.bio.country) match {
-        case Some(c) =>
-          if (c.id != user.demo.cultureId)
-            db.user.updateCultureId(user.id, c.id)
-
-        case None =>
-          Logger.debug(s"Creating new culture ${user.profile.publicProfile.bio.country}")
-
-          val newCulture = Culture(
-            name = user.profile.publicProfile.bio.country,
-            countries = List(user.profile.publicProfile.bio.country))
-          db.culture.create(newCulture)
-          db.user.updateCultureId(user.id, newCulture.id)
-      }
-    }
-
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString
       db.user.updateSessionId(user.id, uuid)
 
       // Update here country from time to time.
-      dealWithUserCulture(user)
+      updateUserCulture(UpdateUserCultureRequest(user)) ifOk { r =>
+        OkApiResult(LoginResult(uuid))
+      }
 
-      OkApiResult(LoginResult(uuid))
     }
 
 
