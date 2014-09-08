@@ -4,6 +4,23 @@
 
 @main("Quests")(menuItems, Map()) {
 
+	@form(action = controllers.web.admin.routes.QuestsCRUD.updateQuest()) {
+		@inputText(newQuestForm("id"), 'size -> 18, 'readonly -> "readonly") <br />
+		@select(newQuestForm("status"), options(List("OnVoting", "InRotation", "RatingBanned", "CheatingBanned", "IACBanned", "OldBanned"))) <br />
+		@inputText(newQuestForm("description"), 'size -> 140) <br />
+		@inputText(newQuestForm("level"), 'size -> 5) <br />
+		@select(newQuestForm("difficulty"), options(List("Easy", "Normal", "Hard", "Extreme"))) <br />
+		@select(newQuestForm("duration"), options(List("Minutes", "Hour", "Day", "Week"))) <br />
+		@inputText(newQuestForm("points"), 'size -> 5) <br />
+		@inputText(newQuestForm("cheating"), 'size -> 5) <br />
+		@inputText(newQuestForm("votersCount"), 'size -> 5) <br />
+		@if(newQuestForm("id").value == None) {
+<!-- 		<input type="submit" value="Create">  -->
+		} else {
+			<input type="submit" value="Update">
+		}
+	}
+
 	<table border="0">
     	<tr>
     		<td>
@@ -18,6 +35,7 @@
 			    		<td>level</td>
 			    		<td>difficulty</td>
 			    		<td>duration</td>
+			    		<td>content</td>
 			    		<td>action</td>
 			    	</tr>
 			
@@ -32,29 +50,15 @@
 				    		<td>@q.info.level</td>
 				    		<td>@q.info.difficulty</td>
 				    		<td>@q.info.duration</td>
+				    		<td><img src="@q.info.content.media.reference" alt="@q.info.content.media.reference" width="102" height="77"></td>
 							<td><a href="@controllers.web.admin.routes.QuestsCRUD.quests(q.id)">edit</a></td>
 							
 	    				</tr>
 	   				}
 				</table>
     		</td>
-    		<td>
-				@form(action = controllers.web.admin.routes.QuestsCRUD.updateQuest()) {
-					@inputText(newQuestForm("id"), 'size -> 18, 'readonly -> "readonly")
-					@select(newQuestForm("status"), options(List("OnVoting", "InRotation", "RatingBanned", "CheatingBanned", "IACBanned", "OldBanned")))
-					@inputText(newQuestForm("level"), 'size -> 5)
-					@select(newQuestForm("difficulty"), options(List("Easy", "Normal", "Hard", "Extreme")))
-					@select(newQuestForm("duration"), options(List("Minutes", "Hour", "Day", "Week")))
-					@inputText(newQuestForm("points"), 'size -> 5)
-					@inputText(newQuestForm("cheating"), 'size -> 5)
-					@inputText(newQuestForm("votersCount"), 'size -> 5)
-					@if(newQuestForm("id").value == None) {
-		<!-- 			<input type="submit" value="Create">  -->
-					} else {
-						<input type="submit" value="Update">
-					}
-		   		}
-    		</td>
+    		<!-- td>
+    		</td -->
     	</tr>
 	</table>
 	
