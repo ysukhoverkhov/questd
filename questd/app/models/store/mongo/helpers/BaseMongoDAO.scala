@@ -67,10 +67,6 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
    */
   def create(o: T): Unit = wrapMongoException {
     val wr = save(o)
-
-    if (!wr.getLastError().ok) {
-      throw new DatabaseException(wr.getLastError().getErrorMessage())
-    }
   }
 
   /**
@@ -123,10 +119,6 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
 
   private def updateInt(key: String, u: T, upsert: Boolean): Unit = wrapMongoException {
     val wr = update(makeKeyDbObject(key), toDBObject(u), upsert, false)
-
-    if (!wr.getLastError().ok) {
-      throw new DatabaseException(wr.getLastError().getErrorMessage())
-    }
   }
 
   /**
@@ -148,12 +140,15 @@ abstract class BaseMongoDAO[T <: ID: Manifest](collectionName: String)
    */
   def delete(key: String): Unit = wrapMongoException {
     val wr = remove(makeKeyDbObject(key))
-
-    if (!wr.getLastError().ok) {
-      throw new DatabaseException(wr.getLastError().getErrorMessage())
-    }
   }
 
+  /**
+   * Clear all objects
+   */
+  def clear: Unit = wrapMongoException {
+    val wr = remove(MongoDBObject())
+  }
+  
   /**
    * All objects
    */

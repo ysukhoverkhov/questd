@@ -21,7 +21,7 @@ trait ConfigHolder { this: APIAccessor =>
    */
   def config: ConfigSection = {
     api.getConfigSection(GetConfigSectionRequest(configSectionName)) match {
-      case OkApiResult(Some(GetConfigSectionResult(Some(c: ConfigSection)))) => {
+      case OkApiResult(GetConfigSectionResult(Some(c: ConfigSection))) => {
         if (c.values.keySet == defaultConfiguration.values.keySet)
           c
         else {

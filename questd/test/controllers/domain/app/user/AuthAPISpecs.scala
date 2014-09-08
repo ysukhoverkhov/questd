@@ -10,9 +10,9 @@ import controllers.domain.app.user._
 import models.store._
 import models.domain._
 import models.store.mongo._
-import controllers.domain.libs.facebook.UserFB
 import controllers.domain.InternalErrorApiResult
 import controllers.domain.NotAuthorisedApiResult
+import controllers.sn.client.SNUser
 
 
 class AuthAPISpecs extends BaseAPISpecs {
@@ -22,54 +22,55 @@ class AuthAPISpecs extends BaseAPISpecs {
     "Register user with new FB id" in context {
 
       val fbid = "fbid"
-      val userfb = mock[UserFB]
-      userfb.getId returns fbid
+      val userfb = mock[SNUser]
+      userfb.snId returns fbid
+      
+      val u = Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
         
-      db.user.readByFBid(anyString) returns None thenReturns Some(User("", AuthInfo(fbid = Some(fbid))))
-      db.user.levelup(anyString, anyInt) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+      db.user.readBySNid("FB", fbid) returns None thenReturns u
+      db.user.levelup(anyString, anyInt) returns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
       db.user.setNextLevelRatingAndRights(
         anyString,
         anyInt,
-        any) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+        any) returns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
       
-      val rv = api.loginfb(LoginFBRequest(userfb))
+      val rv = api.login(LoginRequest("FB", userfb))
 
       // Update allowed.
-      there was one(user).readByFBid(fbid) andThen 
-        one(user).create(any[User]) andThen
-        one(user).readByFBid(fbid) andThen
-        one(user).update(any[User])
+      there were two(user).readBySNid("FB", fbid) 
+//      there were one(user).create(u.get)
+//      there were one(user).update(u.get)
 
-      rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
-      rv.body must beSome[LoginFBResult]
+      rv must beAnInstanceOf[OkApiResult[LoginResult]]
+      rv.body must beSome[LoginResult]
     }
 
     "Login existing user with new FB id" in context {
 
       val fbid = "fbid"
-      val userfb = mock[UserFB]
-      userfb.getId returns fbid
+      val userfb = mock[SNUser]
 
-      db.user.readByFBid(anyString) returns Some(User("", AuthInfo(fbid = Some(fbid))))
+      userfb.snId returns fbid
+      db.user.readBySNid("FB", fbid) returns Some(User("", AuthInfo(snids = Map("FB" -> fbid))))
 
-      val rv = api.loginfb(LoginFBRequest(userfb))
+      val rv = api.login(LoginRequest("FB", userfb))
 
-      there was one(user).readByFBid(fbid) andThen one(user).create(any[User])
+      there was one(user).readBySNid("FB", fbid)
 
-      rv must beAnInstanceOf[OkApiResult[LoginFBResult]]
-      rv.body must beSome[LoginFBResult]
+      rv must beAnInstanceOf[OkApiResult[LoginResult]]
+      rv.body must beSome[LoginResult]
     }
 
     "Behaves well with DB exception" in context {
 
-      db.user.readByFBid(anyString) throws new DatabaseException("Test exception")
+      db.user.readBySNid(anyString, anyString) throws new DatabaseException("Test exception")
 
-      val userfb = mock[UserFB]
-      userfb.getId returns "1"
+      val userfb = mock[SNUser]
+      userfb.snId returns "1"
 
-      val rv = api.loginfb(LoginFBRequest(userfb))
+      val rv = api.login(LoginRequest("FB", userfb))
 
-      there was one(user).readByFBid(anyString)
+      there was one(user).readBySNid(anyString, anyString)
 
       rv must beAnInstanceOf[InternalErrorApiResult]
       rv.body must beNone

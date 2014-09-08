@@ -9,21 +9,25 @@ import models.store.DatabaseComponent
 import controllers.domain.admin._
 import models.store.dao._
 import models.domain.admin.Configuration
+import controllers.sn.component.SocialNetworkComponent
 
 private[domain] abstract class BaseAPISpecs extends Specification 
   with RandomComponent
   with DatabaseComponent
   with DomainAPIComponent
+  with SocialNetworkComponent
   with Mockito {
   
   isolated
 
   // Constructing our cake
+  val sn = mock[SocialNetwork]
   val db = mock[Database]
   val user = mock[UserDAO]
   val quest = mock[QuestDAO]
   val solution = mock[QuestSolutionDAO]
   val config = mock[ConfigDAO]
+  val tutorialTask = mock[TutorialTaskDAO]
   
   val rand = mock[Random]
   
@@ -40,6 +44,7 @@ private[domain] abstract class BaseAPISpecs extends Specification
       db.quest returns quest
       db.solution returns solution
       db.config returns config
+      db.tutorialTask returns tutorialTask
       
       config.readConfig returns mockConfiguration
     } 
