@@ -18,6 +18,7 @@ case class UpdateQuestAdminRequest(
   id: String,
   status: String,
   level: Int,
+  description: String,
   difficulty: String,
   duration: String,
   points: Int,
@@ -72,11 +73,13 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
             info = q.info.copy(
               level = request.level,
               difficulty = QuestDifficulty.withName(request.difficulty).toString,
-              duration = QuestDuration.withName(request.duration).toString),
-          rating = q.rating.copy(
-            points = request.points,
-            cheating = request.cheating,
-            votersCount = request.votersCount)))
+              duration = QuestDuration.withName(request.duration).toString,
+              content = q.info.content.copy(
+                description = request.description)),
+            rating = q.rating.copy(
+              points = request.points,
+              cheating = request.cheating,
+              votersCount = request.votersCount)))
       }
 
       case _ =>
