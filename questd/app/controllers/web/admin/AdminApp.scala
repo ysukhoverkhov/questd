@@ -1,17 +1,16 @@
 package controllers.web.admin
 
-import play.api._
-import play.api.mvc._
-
 import controllers.web.admin.component.AdminComponent
 import components.componentregistry.ComponentRegistrySingleton
+import play.api.mvc._
+
 
 object AdminApp extends Controller {
 
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
-  def index = admin.index
-  
-  def login = admin.login
+  def index = admin.app.index
+
+  def login = admin.app.login
 }
 

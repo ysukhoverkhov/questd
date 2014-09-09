@@ -1,16 +1,11 @@
 package controllers.web.admin.component
 
-import play.api._
-import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.ws._
-import play.api.libs.json._
-
-import models.domain._
-import controllers.domain._
 import controllers.domain.admin._
-import components._
+import controllers.domain.{DomainAPIComponent, OkApiResult}
+import play.api._
+import play.api.data.Forms._
+import play.api.data._
+import play.api.mvc._
 
 case class QuestForm(
   id: String,
@@ -23,7 +18,7 @@ case class QuestForm(
   cheating: Int,
   votersCount: Int)
 
-trait QuestsCRUDImpl extends Controller with SecurityAdminImpl { this: APIAccessor =>
+class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   private val form = Form(
     mapping(
@@ -47,7 +42,7 @@ trait QuestsCRUDImpl extends Controller with SecurityAdminImpl { this: APIAccess
       form
     } else {
       api.getQuestAdmin(GetQuestAdminRequest(id)) match {
-        case OkApiResult(GetQuestAdminResult(Some(quest))) => {
+        case OkApiResult(GetQuestAdminResult(Some(quest))) =>
           form.fill(QuestForm(
             id = quest.id,
             status = quest.status.toString,
@@ -58,7 +53,6 @@ trait QuestsCRUDImpl extends Controller with SecurityAdminImpl { this: APIAccess
             points = quest.rating.points,
             cheating = quest.rating.cheating,
             votersCount = quest.rating.votersCount))
-        }
         case _ => form
       }
     }
@@ -79,12 +73,12 @@ trait QuestsCRUDImpl extends Controller with SecurityAdminImpl { this: APIAccess
   /**
    * Updates quest status by request from CRUD
    */
-  def updateQuest = Authenticated { implicit request =>
+  def updateQuest() = Authenticated { implicit request =>
     form.bindFromRequest.fold(
 
       formWithErrors => {
 
-        Logger.error(formWithErrors.errors.toString)
+        Logger.error(s"$formWithErrors.errors")
 
         BadRequest(views.html.admin.quests(
           Menu(request),

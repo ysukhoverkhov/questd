@@ -1,25 +1,21 @@
 package models.store.mongo.dao
 
 import java.util.Date
-import models.store.mongo.helpers._
-import models.store.dao._
-import models.store._
-import models.domain._
-import models.domain.view._
-import play.Logger
+
 import com.mongodb.casbah.commons._
 import com.novus.salat._
-import models.store.mongo.SalatContext._
+import models.domain._
+import models.domain.view._
+import models.store.dao._
+import models.store.mongo.helpers._
 
 /**
  * Test version of dao what fails all the time
  */
 
-import com.novus.salat.dao.SalatDAO
-import org.bson.types.ObjectId
-import models.store.mongo.SalatContext._
-import com.mongodb.casbah.MongoConnection
 import com.mongodb.casbah.MongoClient
+import models.store.mongo.SalatContext._
+import org.bson.types.ObjectId
 
 /**
  * DOA for User objects
@@ -38,7 +34,7 @@ private[mongo] class MongoUserDAO
   /**
    * Read by fb id
    */
-  def readBySNid(snName:String, snid: String): Option[User] = {
+  def readBySNid(snName: String, snid: String): Option[User] = {
     readByExample(s"auth.snids.$snName", snid)
   }
 
@@ -49,10 +45,10 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$inc" -> MongoDBObject(
+        "$inc" -> MongoDBObject(
           "profile.assets.coins" -> assets.coins,
           "profile.assets.money" -> assets.money,
-          "profile.assets.rating" -> assets.rating))))
+          "profile.assets.rating" -> assets.rating)))
   }
 
   /**
@@ -62,9 +58,9 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
+        "$set" -> MongoDBObject(
           "auth.session" -> sessionid,
-          "auth.lastLogin" -> new Date))))
+          "auth.lastLogin" -> new Date)))
   }
 
   /**
@@ -78,10 +74,10 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
+        "$set" -> MongoDBObject(
           "profile.questSolutionVoteContext.reviewingQuestSolution" -> grater[QuestSolutionInfoWithID].asDBObject(qsi),
           "profile.questSolutionVoteContext.authorOfQuestSolution" -> grater[PublicProfileWithID].asDBObject(qsa),
-          "profile.questSolutionVoteContext.questOfSolution" -> grater[QuestInfoWithID].asDBObject(qi)))))
+          "profile.questSolutionVoteContext.questOfSolution" -> grater[QuestInfoWithID].asDBObject(qi))))
   }
 
   /**
@@ -91,14 +87,14 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$inc" -> MongoDBObject(
-          "profile.questSolutionVoteContext.numberOfReviewedSolutions" -> 1)),
-        ("$unset" -> MongoDBObject(
+        "$inc" -> MongoDBObject(
+          "profile.questSolutionVoteContext.numberOfReviewedSolutions" -> 1),
+        "$unset" -> MongoDBObject(
           "profile.questSolutionVoteContext.reviewingQuestSolution" -> "",
           "profile.questSolutionVoteContext.authorOfQuestSolution" -> "",
-          "profile.questSolutionVoteContext.questOfSolution" -> "")),
-        ("$push" -> MongoDBObject(
-          "history.votedQuestSolutionIds.0" -> solutionId))))
+          "profile.questSolutionVoteContext.questOfSolution" -> ""),
+        "$push" -> MongoDBObject(
+          "history.votedQuestSolutionIds.0" -> solutionId)))
   }
 
   /**
@@ -108,11 +104,11 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
+        "$set" -> MongoDBObject(
           "profile.questProposalVoteContext.reviewingQuest" -> grater[QuestInfoWithID].asDBObject(qi),
-          "profile.questProposalVoteContext.themeOfQuest" -> grater[Theme].asDBObject(theme))),
-        ("$inc" -> MongoDBObject(
-          "stats.proposalsVoted" -> 1))))
+          "profile.questProposalVoteContext.themeOfQuest" -> grater[Theme].asDBObject(theme)),
+        "$inc" -> MongoDBObject(
+          "stats.proposalsVoted" -> 1)))
   }
 
   /**
@@ -140,7 +136,7 @@ private[mongo] class MongoUserDAO
 
     findAndModify(
       id,
-      queryBuilder.result)
+      queryBuilder.result())
   }
 
   /**
@@ -150,16 +146,16 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
+        "$set" -> MongoDBObject(
           "profile.questSolutionContext.purchasedQuest" -> grater[QuestInfoWithID].asDBObject(purchasedQuest),
           "profile.questSolutionContext.questAuthor" -> grater[PublicProfileWithID].asDBObject(author),
           "profile.questSolutionContext.defeatReward" -> grater[Assets].asDBObject(defeatReward),
-          "profile.questSolutionContext.victoryReward" -> grater[Assets].asDBObject(victoryReward))),
-        ("$inc" -> MongoDBObject(
+          "profile.questSolutionContext.victoryReward" -> grater[Assets].asDBObject(victoryReward)),
+        "$inc" -> MongoDBObject(
           "profile.questSolutionContext.numberOfPurchasedQuests" -> 1,
-          "stats.questsReviewed" -> 1)),
-        ("$push" -> MongoDBObject(
-          "history.solvedQuestIds.0" -> purchasedQuest.id))))
+          "stats.questsReviewed" -> 1),
+        "$push" -> MongoDBObject(
+          "history.solvedQuestIds.0" -> purchasedQuest.id)))
   }
 
   /**
@@ -169,17 +165,17 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
+        "$set" -> MongoDBObject(
           "profile.questSolutionContext.numberOfPurchasedQuests" -> 0,
           "profile.questSolutionContext.takenQuest" -> grater[QuestInfoWithID].asDBObject(takenQuest),
           "profile.questSolutionContext.questCooldown" -> cooldown,
-          "profile.questSolutionContext.questDeadline" -> deadline)),
-        ("$unset" -> MongoDBObject(
-          "profile.questSolutionContext.purchasedQuest" -> "")),
-        ("$inc" -> MongoDBObject(
-          "stats.questsAccepted" -> 1)),
-        ("$addToSet" -> MongoDBObject(
-          "history.themesOfSelectedQuests" -> takenQuest.obj.themeId))))
+          "profile.questSolutionContext.questDeadline" -> deadline),
+        "$unset" -> MongoDBObject(
+          "profile.questSolutionContext.purchasedQuest" -> ""),
+        "$inc" -> MongoDBObject(
+          "stats.questsAccepted" -> 1),
+        "$addToSet" -> MongoDBObject(
+          "history.themesOfSelectedQuests" -> takenQuest.obj.themeId)))
   }
 
   /**
@@ -207,7 +203,7 @@ private[mongo] class MongoUserDAO
 
     findAndModify(
       id,
-      queryBuilder.result)
+      queryBuilder.result())
   }
 
   /**
@@ -238,7 +234,7 @@ private[mongo] class MongoUserDAO
 
     findAndModify(
       id,
-      queryBuilder.result)
+      queryBuilder.result())
   }
 
   /**
@@ -248,14 +244,14 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
+        "$set" -> MongoDBObject(
           "profile.questProposalContext.numberOfPurchasedThemes" -> 0,
           "profile.questProposalContext.takenTheme" -> grater[ThemeWithID].asDBObject(takenTheme),
-          "profile.questProposalContext.questProposalCooldown" -> cooldown)),
-        ("$unset" -> MongoDBObject(
-          "profile.questProposalContext.purchasedTheme" -> "")),
-        ("$addToSet" -> MongoDBObject(
-          "history.selectedThemeIds" -> takenTheme.id))))
+          "profile.questProposalContext.questProposalCooldown" -> cooldown),
+        "$unset" -> MongoDBObject(
+          "profile.questProposalContext.purchasedTheme" -> ""),
+        "$addToSet" -> MongoDBObject(
+          "history.selectedThemeIds" -> takenTheme.id)))
   }
 
   /**
@@ -282,7 +278,7 @@ private[mongo] class MongoUserDAO
 
     findAndModify(
       id,
-      queryBuilder.result)
+      queryBuilder.result())
   }
 
   /**
@@ -292,29 +288,29 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
+        "$set" -> MongoDBObject(
           "profile.questSolutionContext.numberOfPurchasedQuests" -> 0,
           "profile.questProposalContext.numberOfPurchasedThemes" -> 0,
           "profile.questProposalVoteContext.numberOfReviewedQuests" -> 0,
           "profile.questSolutionVoteContext.numberOfReviewedSolutions" -> 0,
-          "schedules.purchases" -> resetPurchasesTimeout)),
-        ("$unset" -> MongoDBObject(
+          "schedules.purchases" -> resetPurchasesTimeout),
+        "$unset" -> MongoDBObject(
           "profile.questSolutionContext.purchasedQuest" -> "",
           "profile.questProposalContext.purchasedTheme" -> "",
           "profile.questProposalContext.todayReviewedThemeIds" -> "",
           "profile.questProposalVoteContext.reviewingQuest" -> "",
-          "profile.questSolutionVoteContext.reviewingQuestSolution" -> ""))))
+          "profile.questSolutionVoteContext.reviewingQuestSolution" -> "")))
   }
 
   /**
-   * 
+   *
    */
   def resetTodayReviewedThemes(id: String): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
-        ("$unset" -> MongoDBObject(
-          "profile.questProposalContext.todayReviewedThemeIds" -> ""))))
+        "$unset" -> MongoDBObject(
+          "profile.questProposalContext.todayReviewedThemeIds" -> "")))
   }
 
   /**
@@ -324,11 +320,11 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$push" -> MongoDBObject(
+        "$push" -> MongoDBObject(
           "privateDailyResults" ->
             MongoDBObject(
               "$each" -> List(grater[DailyResult].asDBObject(dailyResult)),
-              "$position" -> 0)))))
+              "$position" -> 0))))
   }
 
   /**
@@ -339,15 +335,15 @@ private[mongo] class MongoUserDAO
       findAndModify(
         id,
         MongoDBObject(
-          ("$pop" -> MongoDBObject(
-            "privateDailyResults" -> 1))))
+          "$pop" -> MongoDBObject(
+            "privateDailyResults" -> 1)))
     }
 
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "profile.dailyResults" -> dailyResults.map(grater[DailyResult].asDBObject(_))))))
+        "$set" -> MongoDBObject(
+          "profile.dailyResults" -> dailyResults.map(grater[DailyResult].asDBObject))))
   }
 
   /**
@@ -357,8 +353,8 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$push" -> MongoDBObject(
-          "privateDailyResults.0.decidedQuestProposals" -> grater[QuestProposalResult].asDBObject(proposal)))))
+        "$push" -> MongoDBObject(
+          "privateDailyResults.0.decidedQuestProposals" -> grater[QuestProposalResult].asDBObject(proposal))))
   }
 
   /**
@@ -368,8 +364,8 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$push" -> MongoDBObject(
-          "privateDailyResults.0.decidedQuestSolutions" -> grater[QuestSolutionResult].asDBObject(solution)))))
+        "$push" -> MongoDBObject(
+          "privateDailyResults.0.decidedQuestSolutions" -> grater[QuestSolutionResult].asDBObject(solution))))
   }
 
   /**
@@ -379,8 +375,8 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "privateDailyResults.0.proposalGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty)))))
+        "$set" -> MongoDBObject(
+          "privateDailyResults.0.proposalGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty))))
   }
 
   /**
@@ -390,8 +386,8 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "privateDailyResults.0.questGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty)))))
+        "$set" -> MongoDBObject(
+          "privateDailyResults.0.questGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty))))
   }
 
   /**
@@ -401,9 +397,9 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$inc" -> MongoDBObject(
+        "$inc" -> MongoDBObject(
           "profile.publicProfile.level" -> 1,
-          "profile.assets.rating" -> -ratingToNextlevel))))
+          "profile.assets.rating" -> -ratingToNextlevel)))
   }
 
   /**
@@ -413,9 +409,9 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
+        "$set" -> MongoDBObject(
           "profile.ratingToNextLevel" -> newRatingToNextlevel,
-          "profile.rights" -> grater[Rights].asDBObject(rights)))))
+          "profile.rights" -> grater[Rights].asDBObject(rights))))
   }
 
   /**
@@ -425,7 +421,7 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$push" -> MongoDBObject(
+        "$push" -> MongoDBObject(
           "history.votedQuestProposalIds" ->
             MongoDBObject(
               "$each" -> List(List()),
@@ -437,7 +433,7 @@ private[mongo] class MongoUserDAO
           "history.votedQuestSolutionIds" ->
             MongoDBObject(
               "$each" -> List(List()),
-              "$position" -> 0)))))
+              "$position" -> 0))))
   }
 
   /**
@@ -447,11 +443,11 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$pop" -> MongoDBObject(
+        "$pop" -> MongoDBObject(
           "history.votedQuestProposalIds" -> 1,
           "history.solvedQuestIds" -> 1,
           "history.votedQuestSolutionIds" -> 1,
-          "history.likedQuestProposalIds" -> 1))))
+          "history.likedQuestProposalIds" -> 1)))
   }
 
   /**
@@ -462,8 +458,8 @@ private[mongo] class MongoUserDAO
       findAndModify(
         id,
         MongoDBObject(
-          ("$pop" -> MongoDBObject(
-            "history.selectedThemeIds" -> -1))))
+          "$pop" -> MongoDBObject(
+            "history.selectedThemeIds" -> -1)))
     } reduce { (r, c) =>
       r
     }
@@ -477,8 +473,8 @@ private[mongo] class MongoUserDAO
       findAndModify(
         id,
         MongoDBObject(
-          ("$pop" -> MongoDBObject(
-            "history.themesOfSelectedQuests" -> -1))))
+          "$pop" -> MongoDBObject(
+            "history.themesOfSelectedQuests" -> -1)))
     } reduce { (r, c) =>
       r
     }
@@ -491,8 +487,8 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "stats" -> grater[UserStats].asDBObject(stats)))))
+        "$set" -> MongoDBObject(
+          "stats" -> grater[UserStats].asDBObject(stats))))
   }
 
   /**
@@ -502,8 +498,8 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$addToSet" -> MongoDBObject(
-          "shortlist" -> idToAdd))))
+        "$addToSet" -> MongoDBObject(
+          "shortlist" -> idToAdd)))
   }
 
   /**
@@ -513,8 +509,8 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$pull" -> MongoDBObject(
-          "shortlist" -> idToRemove))))
+        "$pull" -> MongoDBObject(
+          "shortlist" -> idToRemove)))
   }
 
   /**
@@ -524,14 +520,14 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$push" -> MongoDBObject(
-          "friends" -> grater[Friendship].asDBObject(myFriendship)))))
+        "$push" -> MongoDBObject(
+          "friends" -> grater[Friendship].asDBObject(myFriendship))))
 
     findAndModify(
       idToAdd,
       MongoDBObject(
-        ("$push" -> MongoDBObject(
-          "friends" -> grater[Friendship].asDBObject(hisFriendship)))))
+        "$push" -> MongoDBObject(
+          "friends" -> grater[Friendship].asDBObject(hisFriendship))))
   }
 
   /**
@@ -543,16 +539,16 @@ private[mongo] class MongoUserDAO
         "id" -> id,
         "friends.friendId" -> friendId),
       MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "friends.$.status" -> myStatus))))
+        "$set" -> MongoDBObject(
+          "friends.$.status" -> myStatus)))
 
     findAndModify(
       MongoDBObject(
         "id" -> friendId,
         "friends.friendId" -> id),
       MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "friends.$.status" -> friendStatus))))
+        "$set" -> MongoDBObject(
+          "friends.$.status" -> friendStatus)))
   }
 
   /**
@@ -562,14 +558,14 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$pull" -> MongoDBObject(
-          "friends" -> MongoDBObject("friendId" -> friendId)))))
+        "$pull" -> MongoDBObject(
+          "friends" -> MongoDBObject("friendId" -> friendId))))
 
     findAndModify(
       friendId,
       MongoDBObject(
-        ("$pull" -> MongoDBObject(
-          "friends" -> MongoDBObject("friendId" -> id)))))
+        "$pull" -> MongoDBObject(
+          "friends" -> MongoDBObject("friendId" -> id))))
   }
 
   /**
@@ -579,8 +575,8 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$push" -> MongoDBObject(
-          "messages" -> grater[Message].asDBObject(message)))))
+        "$push" -> MongoDBObject(
+          "messages" -> grater[Message].asDBObject(message))))
   }
 
   /**
@@ -590,8 +586,8 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$pop" -> MongoDBObject(
-          "messages" -> -1))))
+        "$pop" -> MongoDBObject(
+          "messages" -> -1)))
   }
 
   /**
@@ -601,8 +597,8 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$pull" -> MongoDBObject(
-          "messages" -> MongoDBObject("id" -> messageId)))))
+        "$pull" -> MongoDBObject(
+          "messages" -> MongoDBObject("id" -> messageId))))
   }
 
   /**
@@ -612,25 +608,25 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
+        "$set" -> MongoDBObject(
           "profile.dailyTasks" -> grater[DailyTasks].asDBObject(newTasks),
-          "schedules.dailyTasks" -> resetTasksTimeout))))
+          "schedules.dailyTasks" -> resetTasksTimeout)))
   }
 
   /**
-   * 
+   *
    */
   def addTasks(id: String, newTasks: List[Task], additionalReward: Assets): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
-        ("$inc" -> MongoDBObject(
+        "$inc" -> MongoDBObject(
           "profile.dailyTasks.reward.coins" -> additionalReward.coins,
           "profile.dailyTasks.reward.money" -> additionalReward.money,
-          "profile.dailyTasks.reward.rating" -> additionalReward.rating)),
-        ("$push" -> MongoDBObject(
+          "profile.dailyTasks.reward.rating" -> additionalReward.rating),
+        "$push" -> MongoDBObject(
           "profile.dailyTasks.tasks" -> MongoDBObject(
-            "$each" -> newTasks.map(grater[Task].asDBObject(_)))))))
+            "$each" -> newTasks.map(grater[Task].asDBObject)))))
   }
 
   /**
@@ -642,11 +638,11 @@ private[mongo] class MongoUserDAO
         "id" -> id,
         "profile.dailyTasks.tasks.taskType" -> taskType),
       MongoDBObject(
-        ("$inc" -> MongoDBObject(
-          "profile.dailyTasks.tasks.$.currentCount" -> 1)),
-        ("$set" -> MongoDBObject(
+        "$inc" -> MongoDBObject(
+          "profile.dailyTasks.tasks.$.currentCount" -> 1),
+        "$set" -> MongoDBObject(
           "profile.dailyTasks.completed" -> completed,
-          "profile.dailyTasks.rewardReceived" -> rewardReceived))))
+          "profile.dailyTasks.rewardReceived" -> rewardReceived)))
   }
 
   /**
@@ -658,13 +654,13 @@ private[mongo] class MongoUserDAO
         "id" -> id,
         "profile.dailyTasks.tasks.tutorialTask.id" -> taskId),
       MongoDBObject(
-        ("$inc" -> MongoDBObject(
-          "profile.dailyTasks.tasks.$.currentCount" -> 1)),
-        ("$set" -> MongoDBObject(
+        "$inc" -> MongoDBObject(
+          "profile.dailyTasks.tasks.$.currentCount" -> 1),
+        "$set" -> MongoDBObject(
           "profile.dailyTasks.completed" -> completed,
-          "profile.dailyTasks.rewardReceived" -> rewardReceived))))
+          "profile.dailyTasks.rewardReceived" -> rewardReceived)))
   }
-  
+
   /**
    *
    */
@@ -672,8 +668,8 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "profile.publicProfile.bio.gender" -> gender))))
+        "$set" -> MongoDBObject(
+          "profile.publicProfile.bio.gender" -> gender)))
   }
 
   /**
@@ -683,8 +679,27 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
-          "profile.debug" -> debug))))
+        "$set" -> MongoDBObject(
+          "profile.debug" -> debug)))
+  }
+
+  /**
+   *
+   */
+  def setCity(id: String, city: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "profile.publicProfile.bio.city" -> city)))
+  }
+
+  def setCountry(id: String, country: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "profile.publicProfile.bio.country" -> country)))
   }
 
   /**
@@ -694,21 +709,31 @@ private[mongo] class MongoUserDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$set" -> MongoDBObject(
-          s"tutorial.clientTutorialState.$platform" -> state))))
+        "$set" -> MongoDBObject(
+          s"tutorial.clientTutorialState.$platform" -> state)))
   }
-  
+
   /**
-   * 
+   *
    */
   def addTutorialTaskAssigned(id: String, taskId: String): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
-        ("$addToSet" -> MongoDBObject(
-          "tutorial.assignedTutorialTaskIds" -> taskId))))
+        "$addToSet" -> MongoDBObject(
+          "tutorial.assignedTutorialTaskIds" -> taskId)))
   }
 
+  /**
+   *
+   */
+  def updateCultureId(id: String, cultureId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "demo.cultureId" -> cultureId)))
+  }
 }
 
 class MongoUserDAOForTest extends MongoUserDAO {

@@ -1,7 +1,7 @@
 package controllers.domain.app.user
 
+import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
-import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
@@ -33,14 +33,25 @@ case class SetDebugResult(user: User)
 case class SetGenderRequest(user: User, gender: Gender.Value)
 case class SetGenderResult(user: User)
 
+case class SetCityRequest(user: User, city: String)
+case class SetCityResult(user: User)
+
+case class SetCountryRequest(user: User, country: String)
+case class SetCountryResult(allowed: ProfileModificationResult, user: Option[User])
+
+case class GetCountryListRequest(user: User)
+case class GetCountryListResult(countries: List[String])
+
+case class UpdateUserCultureRequest(user: User)
+case class UpdateUserCultureResult(user: User)
+
+
 private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Get iterator for all users.
    */
   def getAllUsers(request: GetAllUsersRequest): ApiResult[GetAllUsersResult] = handleDbException {
-    import request._
-
     OkApiResult(GetAllUsersResult(db.user.all))
   }
 
@@ -118,8 +129,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get level required to get a right.
    */
   def getLevelsForRights(request: GetLevelsForRightsRequest): ApiResult[GetLevelsForRightsResult] = handleDbException {
-    import request._
-
     val rv = constants.restrictions.filterKeys(request.functionality.contains(_))
 
     OkApiResult(GetLevelsForRightsResult(rv))
@@ -146,8 +155,74 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     db.user.setGender(user.id, gender.toString) ifSome { v =>
       OkApiResult(SetGenderResult(v))
     }
-
   }
 
+  /**
+   * Updates user city.
+   */
+  def setCity(request: SetCityRequest): ApiResult[SetCityResult] = handleDbException {
+    import request._
+
+    db.user.setCity(user.id, city) ifSome { v =>
+      OkApiResult(SetCityResult(v))
+    }
+  }
+
+  /**
+   * Updates user country.
+   */
+  def setCountry(request: SetCountryRequest): ApiResult[SetCountryResult] = handleDbException {
+    import request._
+
+    val countries = scala.io.Source.fromFile("conf/countries.txt").getLines().toList
+
+    if (!countries.contains(country)) {
+      OkApiResult(SetCountryResult(OutOfContent, None))
+    } else {
+      db.user.setCountry(user.id, country) ifSome { v =>
+        updateUserCulture(UpdateUserCultureRequest(v)) ifOk { r =>
+          OkApiResult(SetCountryResult(OK, Some(r.user)))
+        }
+      }
+    }
+  }
+
+  /**
+   * Get list of possible countries.
+   */
+  def getCountryList(request: GetCountryListRequest): ApiResult[GetCountryListResult] = handleDbException {
+    val countries = scala.io.Source.fromFile("conf/countries.txt").getLines().toList
+
+    OkApiResult(GetCountryListResult(countries))
+  }
+
+  /**
+   * Update culture if country changed.
+   */
+  def updateUserCulture(request: UpdateUserCultureRequest): ApiResult[UpdateUserCultureResult] = handleDbException {
+
+    db.culture.findByCountry(request.user.profile.publicProfile.bio.country) match {
+      case Some(c) =>
+        request.user.demo.cultureId match {
+          case Some(userC) =>
+            if (c.id != userC)
+              db.user.updateCultureId(request.user.id, c.id)
+
+          case None =>
+            db.user.updateCultureId(request.user.id, c.id)
+        }
+
+      case None =>
+        Logger.debug(s"Creating new culture ${request.user.profile.publicProfile.bio.country}")
+
+        val newCulture = Culture(
+          name = request.user.profile.publicProfile.bio.country,
+          countries = List(request.user.profile.publicProfile.bio.country))
+        db.culture.create(newCulture)
+        db.user.updateCultureId(request.user.id, newCulture.id)
+    }
+
+    OkApiResult(UpdateUserCultureResult(request.user))
+  }
 }
 

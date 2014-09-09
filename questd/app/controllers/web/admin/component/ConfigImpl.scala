@@ -1,17 +1,11 @@
 package controllers.web.admin.component
 
-import play.api._
-import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.ws._
-import play.api.libs.json._
-import components.APIAccessor
-import controllers.domain._
-import models.domain.admin._
+import controllers.domain.{OkApiResult, DomainAPIComponent}
 import controllers.domain.admin._
+import play.api.mvc._
+import models.domain.admin._
 
-trait ConfigImpl extends Controller with SecurityAdminImpl { this: APIAccessor =>
+class ConfigImpl (val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   def leftMenu(implicit request: RequestHeader): Map[String, String] = {
     api.getConfiguration(GetConfigurationRequest()) match {
@@ -32,11 +26,10 @@ trait ConfigImpl extends Controller with SecurityAdminImpl { this: APIAccessor =
   def configUpdate(sectionName: String) = Authenticated { implicit request =>
 
     val values: Map[String, String] = request.body.asFormUrlEncoded match {
-      case Some(m) => {
-        m.map((e) => e match {
-          case (k, v) => (k -> v.head)
-        })
-      }
+      case Some(m) =>
+        m.map {
+          case (k, v) => k -> v.head
+        }
       case _ => Map()
     }
 

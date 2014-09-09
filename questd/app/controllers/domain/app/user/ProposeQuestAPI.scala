@@ -2,13 +2,10 @@ package controllers.domain.app.user
 
 import models.domain._
 import models.domain.view._
-import models.store._
 import play.Logger
-import helpers._
 import controllers.domain.helpers._
 import controllers.domain._
 import components._
-import logic._
 import controllers.domain.app.protocol.ProfileModificationResult._
 
 case class GetQuestThemeCostRequest(user: User)
@@ -58,7 +55,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     val user = ensureNoDeadlineProposal(request.user)
 
     user.canPurchaseQuestProposals match {
-      case OK => {
+      case OK =>
 
         val themeCost = user.costOfPurchasingQuestProposal
 
@@ -70,11 +67,11 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
           // Recursion for reseting today selected themes.
           def selectRandomThemeToPresentUser(user: User): ApiResult[PurchaseQuestThemeResult] = {
             user.getRandomThemeForQuestProposal(themesCount) match {
-              case Some(t) => {
+              case Some(t) =>
                 val sampleQuest = {
                   val all = db.quest.allWithStatusAndThemeByPoints(QuestStatus.InRotation.toString, t.id)
                   if (all.hasNext) {
-                    Some(all.next.info)
+                    Some(all.next().info)
                   } else {
                     None
                   }
@@ -84,9 +81,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                   OkApiResult(PurchaseQuestThemeResult(OK, Some(v.profile)))
                 }
 
-              }
-
-              case None => {
+              case None =>
                 if (user.profile.questProposalContext.todayReviewedThemeIds.size == 0) {
                   OkApiResult(PurchaseQuestThemeResult(OutOfContent))
                 } else {
@@ -95,16 +90,33 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                     selectRandomThemeToPresentUser(v)
                   }
                 }
-              }
 
             }
           }
 
           selectRandomThemeToPresentUser(r.user)
         }
-
-      }
       case a => OkApiResult(PurchaseQuestThemeResult(a))
+    }
+  }
+
+  private def ensureNoDeadlineProposal(user: User): User = {
+    if (user.proposalDeadlineReached) {
+      deadlineQuestProposal(DeadlineQuestProposalRequest(user)).body.get.user.get
+    } else {
+      user
+    }
+  }
+
+  /**
+   * Stop from solving quests because its deadline reached.
+   */
+  def deadlineQuestProposal(request: DeadlineQuestProposalRequest): ApiResult[DeadlineQuestProposalResult] = handleDbException {
+    storeProposalOutOfTimePenalty(StoreProposalOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuestProposal)) ifOk { r =>
+      val u = db.user.resetQuestProposal(
+        r.user.id,
+        config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
+      OkApiResult(DeadlineQuestProposalResult(u))
     }
   }
 
@@ -125,16 +137,14 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     request.user.canTakeQuestTheme match {
 
       case OK => {
-        {
-          adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuestTheme)))
-        } ifOk { r =>
+        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuestTheme)))
+      } ifOk { r =>
 
-          r.user.profile.questProposalContext.purchasedTheme ifSome { v =>
+        r.user.profile.questProposalContext.purchasedTheme ifSome { v =>
 
-            val u = db.user.takeQuestTheme(r.user.id, v, r.user.getCooldownForTakeTheme)
-            db.theme.updateLastUseDate(v.id)
-            OkApiResult(TakeQuestThemeResult(OK, u.map(_.profile)))
-          }
+          val u = db.user.takeQuestTheme(r.user.id, v, r.user.getCooldownForTakeTheme)
+          db.theme.updateLastUseDate(v.id)
+          OkApiResult(TakeQuestThemeResult(OK, u.map(_.profile)))
         }
       }
 
@@ -150,7 +160,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     val user = ensureNoDeadlineProposal(request.user)
 
     user.canProposeQuest(request.quest.media.contentType) match {
-      case OK => {
+      case OK =>
 
         def content = if (request.user.payedAuthor) {
           request.quest
@@ -164,27 +174,28 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
         } ifOk { r =>
 
-          r.user.profile.questProposalContext.takenTheme ifSome { v =>
+          r.user.profile.questProposalContext.takenTheme ifSome { takenTheme =>
+            r.user.demo.cultureId ifSome { culture =>
+              db.quest.create(
+                Quest(
+                  cultureId = culture,
+                  approveReward = r.user.profile.questProposalContext.approveReward,
+                  info = QuestInfo(
+                    authorId = r.user.id,
+                    themeId = takenTheme.id,
+                    content = content,
 
-            db.quest.create(
-              Quest(
-                approveReward = r.user.profile.questProposalContext.approveReward,
-                info = QuestInfo(
-                  authorId = r.user.id,
-                  themeId = v.id,
-                  content = content,
+                    vip = r.user.profile.publicProfile.vip)))
 
-                  vip = r.user.profile.publicProfile.vip)))
+              val u = db.user.resetQuestProposal(
+                user.id,
+                config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
 
-            val u = db.user.resetQuestProposal(
-              user.id,
-              config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
+              OkApiResult(ProposeQuestResult(OK, u.map(_.profile)))
 
-            OkApiResult(ProposeQuestResult(OK, u.map(_.profile)))
-
+            }
           }
         }
-      }
       case (a: ProfileModificationResult) => OkApiResult(ProposeQuestResult(a))
     }
   }
@@ -196,7 +207,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     import request._
 
     user.canGiveUpQuestProposal match {
-      case OK => {
+      case OK =>
 
         adjustAssets(AdjustAssetsRequest(user = user, cost = Some(user.costOfGivingUpQuestProposal))) ifOk { r =>
           val u = db.user.resetQuestProposal(
@@ -205,21 +216,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
           OkApiResult(GiveUpQuestProposalResult(OK, u.map(_.profile)))
         }
 
-      }
-
       case (a: ProfileModificationResult) => OkApiResult(GiveUpQuestProposalResult(a))
-    }
-  }
-
-  /**
-   * Stop from solving quests because its deadline reached.
-   */
-  def deadlineQuestProposal(request: DeadlineQuestProposalRequest): ApiResult[DeadlineQuestProposalResult] = handleDbException {
-    storeProposalOutOfTimePenalty(StoreProposalOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuestProposal)) ifOk { r =>
-      val u = db.user.resetQuestProposal(
-        r.user.id,
-        config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
-      OkApiResult(DeadlineQuestProposalResult(u))
     }
   }
 
@@ -239,10 +236,9 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     import request._
 
     val r = quest.status match {
-      case QuestStatus.OnVoting => {
+      case QuestStatus.OnVoting =>
         Logger.error("We are rewarding player for proposal what is on voting.")
         InternalErrorApiResult()
-      }
       case QuestStatus.InRotation =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, reward = Some(quest.approveReward)))
 
@@ -261,14 +257,6 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
     r ifOk {
       OkApiResult(RewardQuestProposalAuthorResult())
-    }
-  }
-
-  private def ensureNoDeadlineProposal(user: User): User = {
-    if (user.proposalDeadlineReached) {
-      deadlineQuestProposal(DeadlineQuestProposalRequest(user)).body.get.user.get
-    } else {
-      user
     }
   }
 }

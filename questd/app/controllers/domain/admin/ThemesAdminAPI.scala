@@ -1,29 +1,33 @@
 package controllers.domain.admin
 
+import components.DBAccessor
+import controllers.domain._
+import controllers.domain.helpers._
+import models.domain._
 import play.Logger
 
-import components.DBAccessor
-import models.store._
-import models.domain._
-import controllers.domain.helpers._
-import controllers.domain._
-
 case class AllThemesRequest(sorted: Boolean)
+
 case class AllThemesResult(themes: Iterator[Theme])
 
 case class CreateThemeRequest(theme: Theme)
+
 case class CreateThemeResult()
 
 case class UpdateThemeRequest(theme: Theme)
+
 case class UpdateThemeResult()
 
 case class DeleteThemeRequest(id: String)
+
 case class DeleteThemeResult()
 
 case class GetThemeRequest(id: String)
+
 case class GetThemeResult(theme: Theme)
 
-private[domain] trait ThemesAdminAPI { this: DBAccessor =>
+private[domain] trait ThemesAdminAPI {
+  this: DBAccessor =>
 
   /**
    * List all themes
@@ -32,7 +36,7 @@ private[domain] trait ThemesAdminAPI { this: DBAccessor =>
     Logger.debug("Admin request for all themes.")
 
     if (request.sorted)
-      OkApiResult(AllThemesResult(db.theme.allSortedByUseDate))
+      OkApiResult(AllThemesResult(db.theme.allWithParams(sorted = true)))
     else
       OkApiResult(AllThemesResult(db.theme.all))
   }

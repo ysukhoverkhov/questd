@@ -1,13 +1,11 @@
 package controllers.domain.app.quest
 
 import models.domain._
-import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.domain.helpers._
-import logic._
 import play.Logger
 
 case class UpdateQuestStatusRequest(quest: Quest)
@@ -32,6 +30,21 @@ case class CalculateProposalThresholdsResult()
 private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
+   * User has skipped a quest. Update quest stats accordingly.
+   */
+  def skipQuest(request: SkipQuestRequest): ApiResult[SkipQuestResult] = handleDbException {
+    import request._
+
+    {
+      db.quest.updatePoints(quest.id, -1, 1)
+    } ifSome { v =>
+      updateQuestStatus(UpdateQuestStatusRequest(v))
+    } ifOk {
+      OkApiResult(SkipQuestResult())
+    }
+  }
+
+  /**
    * Updates quest status taking votes into account.
    */
   def updateQuestStatus(request: UpdateQuestStatusRequest): ApiResult[UpdateQuestStatusResult] = handleDbException {
@@ -49,9 +62,9 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       if (quest.shouldAddToRotation) {
         db.quest.updateStatus(quest.id, QuestStatus.InRotation.toString)
         db.quest.updateInfo(
-            quest.id, 
-            quest.calculateQuestLevel, 
-            quest.calculateDuration.toString, 
+            quest.id,
+            quest.calculateQuestLevel,
+            quest.calculateDuration.toString,
             quest.calculateDifficulty.toString)
       } else
         Some(quest)
@@ -94,39 +107,22 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       capPoints _)
 
     val updatedQuest = funcs.foldLeft[Option[Quest]](Some(quest))((r, f) => {
-      r.flatMap(f(_))
+      r.flatMap(f)
     })
 
     updatedQuest ifSome { q =>
       if (q.status != quest.status) {
         val authorId = quest.info.authorId
         db.user.readById(authorId) match {
-          case None => {
+          case None =>
             Logger.error("Unable to find author of quest user " + authorId)
             InternalErrorApiResult()
-          }
-          case Some(author) => {
+          case Some(author) =>
             rewardQuestProposalAuthor(RewardQuestProposalAuthorRequest(q, author))
-          }
         }
       }
 
       OkApiResult(UpdateQuestStatusResult())
-    }
-  }
-
-  /**
-   * User has skipped a quest. Update quest stats accordingly.
-   */
-  def skipQuest(request: SkipQuestRequest): ApiResult[SkipQuestResult] = handleDbException {
-    import request._
-
-    {
-      db.quest.updatePoints(quest.id, -1, 1)
-    } ifSome { v =>
-      updateQuestStatus(UpdateQuestStatusRequest(v))
-    } ifOk {
-      OkApiResult(SkipQuestResult())
     }
   }
 
@@ -150,7 +146,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
    */
   def voteQuest(request: VoteQuestUpdateRequest): ApiResult[VoteQuestUpdateResult] = handleDbException {
     import request._
-    import QuestProposalVote._
+    import models.domain.QuestProposalVote._
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
@@ -187,7 +183,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       q
     }
 
-    q ifSome { v => 
+    q ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } ifOk {
       OkApiResult(VoteQuestUpdateResult())
