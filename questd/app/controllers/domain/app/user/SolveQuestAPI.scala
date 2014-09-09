@@ -280,16 +280,16 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             tryFightQuest(TryFightQuestRequest(solution)) map OkApiResult(Some(StoreSolutionInDailyResultResult(author)))
 
           case QuestSolutionStatus.Won =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.victoryReward)))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(author.profile.questSolutionContext.victoryReward)))
 
           case QuestSolutionStatus.Lost =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, reward = Some(author.profile.questSolutionContext.defeatReward)))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(author.profile.questSolutionContext.defeatReward)))
 
           case QuestSolutionStatus.CheatingBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForCheatingSolution(q))))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(author.penaltyForCheatingSolution(q))))
 
           case QuestSolutionStatus.IACBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution.id, penalty = Some(author.penaltyForIACSolution(q))))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(author.penaltyForIACSolution(q))))
         }
 
         r map {

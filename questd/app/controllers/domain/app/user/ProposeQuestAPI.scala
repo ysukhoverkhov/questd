@@ -232,18 +232,18 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         InternalErrorApiResult()
       }
       case QuestStatus.InRotation =>
-        storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, reward = Some(quest.approveReward)))
+        storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, reward = Some(quest.approveReward)))
       //adjustAssets(AdjustAssetsRequest(user = author, reward = Some(quest.approveReward)))
 
       case QuestStatus.RatingBanned =>
         OkApiResult(Some(StoreProposalInDailyResultResult(author)))
 
       case QuestStatus.CheatingBanned =>
-        storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, penalty = Some(author.penaltyForCheatingQuest)))
+        storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForCheatingQuest)))
       //adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForCheatingQuest)))
 
       case QuestStatus.IACBanned =>
-        storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest.id, penalty = Some(author.penaltyForIACQuest)))
+        storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForIACQuest)))
       //adjustAssets(AdjustAssetsRequest(user = author, cost = Some(author.penaltyForIACQuest)))
 
       case QuestStatus.OldBanned =>
