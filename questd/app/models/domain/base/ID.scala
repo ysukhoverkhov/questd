@@ -1,11 +1,9 @@
 package models.domain.base
 
-trait ID {
+abstract class ID {
   val id: String
 }
 
 object ID {
-  def generateUUID(): String = {
-    java.util.UUID.randomUUID().toString()
-  }
+  def generateUUID(): String = java.util.UUID.randomUUID().toString
 }

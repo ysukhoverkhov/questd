@@ -16,8 +16,11 @@ POST	/rest/login										controllers.web.rest.LoginWS.login
 POST	/rest/getProfile								controllers.web.rest.ProfileWS.getProfile
 POST	/rest/setGender									controllers.web.rest.ProfileWS.setGender
 POST	/rest/setDebug									controllers.web.rest.ProfileWS.setDebug
+POST    /rest/setCity                                   controllers.web.rest.ProfileWS.setCity
+POST    /rest/setCountry                                controllers.web.rest.ProfileWS.setCountry
+POST    /rest/getCountryList                            controllers.web.rest.ProfileWS.getCountryList
 
-# Generating quests 
+# Generating quests
 POST	/rest/getQuestThemeCost							controllers.web.rest.ProposeQuestWS.getQuestThemeCost
 POST	/rest/purchaseQuestTheme						controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
 
@@ -59,8 +62,8 @@ POST	/rest/getQuest									controllers.web.rest.ContentWS.getQuest
 POST	/rest/getSolution								controllers.web.rest.ContentWS.getSolution
 POST	/rest/getPublicProfile							controllers.web.rest.ContentWS.getPublicProfile
 
-POST	/rest/getOwnSolutions				controllers.web.rest.ContentWS.getOwnSolutions
-POST	/rest/getOwnQuests					controllers.web.rest.ContentWS.getOwnQuests
+POST	/rest/getOwnSolutions				            controllers.web.rest.ContentWS.getOwnSolutions
+POST	/rest/getOwnQuests					            controllers.web.rest.ContentWS.getOwnQuests
 
 POST	/rest/getSolutionsForQuest						controllers.web.rest.ContentWS.getSolutionsForQuest
 POST	/rest/getSolutionsForUser						controllers.web.rest.ContentWS.getSolutionsForUser
@@ -106,12 +109,17 @@ POST	/rest/debug/test								controllers.web.rest.DebugWS.test
 #######################
 GET		/admin											controllers.web.admin.AdminApp.index
 
-GET		/admin/loginJ0hETru60HiWwmEywG2q	controllers.web.admin.AdminApp.login
+GET		/admin/loginJ0hETru60HiWwmEywG2q	            controllers.web.admin.AdminApp.login
 
 GET		/admin/themes									controllers.web.admin.ThemesCRUD.themes(id = "")
 GET		/admin/themes/byid/:id							controllers.web.admin.ThemesCRUD.themes(id)
 POST	/admin/themes/createTheme						controllers.web.admin.ThemesCRUD.createThemeCB
 GET		/admin/themes/deleteTheme/:id					controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
+
+GET		/admin/cultures									controllers.web.admin.CulturesCRUD.cultures(id = "")
+GET		/admin/cultures/byid/:id						controllers.web.admin.CulturesCRUD.cultures(id)
+GET		/admin/cultures/deleteCulture/:id				controllers.web.admin.CulturesCRUD.deleteCultureCB(id: String)
+POST	/admin/cultures/createCulture					controllers.web.admin.CulturesCRUD.createCultureCB
 
 GET		/admin/quests									controllers.web.admin.QuestsCRUD.quests(id = "")
 GET		/admin/quests/byid/:id							controllers.web.admin.QuestsCRUD.quests(id)

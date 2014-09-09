@@ -26,10 +26,10 @@ class FunctionsSpecs extends Specification {
     }
 
     "costToSkipTheme" in {
-      costToSkipTheme(12, 1) must beEqualTo(Math.round(0.384 * questProposalPeriod(12)))
-      costToSkipTheme(12, 12) must beEqualTo(Math.round(4.466 * questProposalPeriod(12)))
-      costToSkipTheme(20, 1) must beEqualTo(Math.round(5.96 * questProposalPeriod(20)))
-      costToSkipTheme(20, 12) must beEqualTo(Math.round(69.389 * questProposalPeriod(20)))
+      costToSkipTheme(12, 1) must beEqualTo(4/*Math.round(0.384 * questProposalPeriod(12))*/)
+      costToSkipTheme(12, 12) must beEqualTo(43/*Math.round(4.466 * questProposalPeriod(12))*/)
+      costToSkipTheme(20, 1) must beEqualTo(15/*Math.round(5.96 * questProposalPeriod(20))*/)
+      costToSkipTheme(20, 12) must beEqualTo(173/*Math.round(69.389 * questProposalPeriod(20))*/)
     }
     
     "costToTakeQuestTheme" in {
@@ -46,10 +46,10 @@ class FunctionsSpecs extends Specification {
     
     "costToSkipQuest" in {
       costToSkipQuest(3, 0, 1) must beEqualTo(0)
-      costToSkipQuest(3, 1, 1) must beEqualTo(4)
-      costToSkipQuest(3, 8, 1) must beEqualTo(28)
-      costToSkipQuest(20, 1, 1) must beEqualTo(12)
-      costToSkipQuest(20, 8, 1) must beEqualTo(87)
+      costToSkipQuest(3, 1, 1) must beEqualTo(8)
+      costToSkipQuest(3, 8, 1) must beEqualTo(62)
+      costToSkipQuest(20, 1, 1) must beEqualTo(16)
+      costToSkipQuest(20, 8, 1) must beEqualTo(121)
     }
     
 
@@ -115,11 +115,11 @@ class FunctionsSpecs extends Specification {
     
     "costToShortlistPerson" in {
       costToShortlistPerson(1) must beEqualTo(0)
-      costToShortlistPerson(7) must beEqualTo(0)
-      costToShortlistPerson(8) must beEqualTo(4)
-      costToShortlistPerson(10) must beEqualTo(14)
-      costToShortlistPerson(11) must beEqualTo(20)
-      costToShortlistPerson(20) must beEqualTo(20)
+      costToShortlistPerson(7) must beEqualTo(27)
+      costToShortlistPerson(8) must beEqualTo(27)
+      costToShortlistPerson(10) must beEqualTo(27)
+      costToShortlistPerson(11) must beEqualTo(27)
+      costToShortlistPerson(20) must beEqualTo(27)
     }
     
     "costToInviteFriend" in {
@@ -127,9 +127,9 @@ class FunctionsSpecs extends Specification {
       costToInviteFriend(5, 0) must beEqualTo(0)
       costToInviteFriend(6, 0) must beEqualTo(25)
       costToInviteFriend(6, 5) must beEqualTo(7)
-      costToInviteFriend(13, 0) must beEqualTo(259)
-      costToInviteFriend(13, 10) must beEqualTo(23)
-      costToInviteFriend(20, 0) must beEqualTo(992)
+      costToInviteFriend(13, 0) must beEqualTo(315)
+      costToInviteFriend(13, 10) must beEqualTo(28)
+      costToInviteFriend(20, 0) must beEqualTo(973)
       costToInviteFriend(20, 15) must beEqualTo(26)
     }
   }

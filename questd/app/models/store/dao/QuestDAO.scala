@@ -16,17 +16,18 @@ trait QuestDAO extends BaseDAO[Quest] {
 
   /**
    * All with status and users.
-   * 
-   * @param ids list of identifiers chose quest from. 
+   *
+   * @param ids list of identifiers chose quest from.
    */
   def allWithParams(
-      status: List[String] = List(), 
-      authorIds: List[String] = List(), 
-      levels: Option[(Int, Int)] = None, 
-      skip: Int = 0,
-      vip: Option[Boolean] = None,
-      ids: List[String] = List(),
-      themeIds: List[String] = List()): Iterator[Quest]
+    status: List[String] = List(),
+    authorIds: List[String] = List(),
+    levels: Option[(Int, Int)] = None,
+    skip: Int = 0,
+    vip: Option[Boolean] = None,
+    ids: List[String] = List(),
+    themeIds: List[String] = List(),
+    cultureId: Option[String] = None): Iterator[Quest]
 
   /**
    * Update quest's points.
@@ -50,6 +51,7 @@ trait QuestDAO extends BaseDAO[Quest] {
     weekChange: Int = 0): Option[Quest]
 
   def updateStatus(id: String, newStatus: String): Option[Quest]
+
   def updateInfo(id: String, newLevel: Int, duration: String, difficulty: String): Option[Quest]
 
 }

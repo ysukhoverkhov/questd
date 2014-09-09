@@ -10,6 +10,7 @@ object QuestStatus extends Enumeration {
 
 case class Quest(
   id: String = ID.generateUUID(),
+  cultureId: String,
   lastModDate: Date = new Date(),
   approveReward: Assets,
   info: QuestInfo,

@@ -15,6 +15,7 @@ trait DatabaseComponent {
     val config: ConfigDAO
     val quest: QuestDAO
     val solution: QuestSolutionDAO
+    val culture: CultureDAO
     val tutorialTask: TutorialTaskDAO
   }
 

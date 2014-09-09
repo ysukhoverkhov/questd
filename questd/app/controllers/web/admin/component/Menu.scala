@@ -11,6 +11,7 @@ private[admin] object Menu {
       "Users" -> controllers.web.admin.routes.UsersCRUD.users().absoluteURL(false),
       "Quests" -> controllers.web.admin.routes.QuestsCRUD.quests("").absoluteURL(false),
       "Solutions" -> controllers.web.admin.routes.SolutionsCRUD.solutions().absoluteURL(false),
+      "Cultures" -> controllers.web.admin.routes.CulturesCRUD.cultures("").absoluteURL(false),
       "Tutorial Tasks" -> controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks("").absoluteURL(false)
       )
 }

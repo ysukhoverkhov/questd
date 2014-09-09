@@ -64,7 +64,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
                 Right(BadRequest("Social network with provided name not found"))
               }
             }
-          } : Either[LoginRequest, Result] 
+          } : Either[LoginRequest, Result]
         } catch {
           case ex @ (_: MappingException | _: org.json4s.ParserUtil$ParseException) => {
             Right(BadRequest(ex.getMessage()))

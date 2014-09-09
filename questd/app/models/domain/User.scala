@@ -8,6 +8,7 @@ import models.domain.base.ID
 case class User(
   id: String = ID.generateUUID(),
   auth: AuthInfo = AuthInfo(),
+  demo: UserDemographics = UserDemographics(),
   profile: Profile = Profile(),
   schedules: UserSchedules = UserSchedules(),
   stats: UserStats = UserStats(),

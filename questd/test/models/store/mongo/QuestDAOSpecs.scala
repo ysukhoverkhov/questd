@@ -3,14 +3,9 @@
 package models.store.mongo
 
 import org.specs2.mutable._
-import org.specs2.runner._
-import org.junit.runner._
 import play.api.test._
-import play.api.test.Helpers._
-import play.Logger
-import com.mongodb.casbah.commons.MongoDBObject
-import models.store._
 import models.domain._
+import testhelpers.domainstubs._
 
 //@RunWith(classOf[JUnitRunner])
 class QuestDAOSpecs extends Specification
@@ -18,7 +13,7 @@ class QuestDAOSpecs extends Specification
   with BaseDAOSpecs {
 
   private[this] def clearDB() = {
-    db.quest.clear
+    db.quest.clear()
   }
 
   "Mongo Quest DAO" should {
@@ -27,18 +22,7 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.create(Quest(
-        id = id,
-        approveReward = Assets(),
-        info = QuestInfo(
-          authorId = "user id",
-          themeId = "theme_id",
-          content = QuestInfoContent(
-            media = ContentReference(ContentType.Video, "", ""),
-            icon = None,
-            description = "The description"),
-          vip = true),
-        status = QuestStatus.OnVoting))
+      db.quest.create(createQuestStub(id))
 
       val q = db.quest.readById(id)
 
@@ -50,20 +34,9 @@ class QuestDAOSpecs extends Specification
       clearDB()
       val id = "ididiid"
 
-      db.quest.create(Quest(
-        id = id,
-        approveReward = Assets(),
-        info = QuestInfo(
-          authorId = "user id",
-          themeId = "theme_id",
-          content = QuestInfoContent(
-            media = ContentReference(ContentType.Video, "", ""),
-            icon = None,
-            description = "The description"),
-          vip = true)))
+      db.quest.create(createQuestStub(id))
 
       val q = db.quest.readById(id)
-      q.get.info.content.media.reference must beEqualTo("")
 
       db.quest.update(q.get.copy(info = q.get.info.copy(
         content = q.get.info.content.copy(
@@ -81,17 +54,7 @@ class QuestDAOSpecs extends Specification
 
       val id = "ididiid"
 
-      db.quest.create(Quest(
-        id = id,
-        approveReward = Assets(),
-        info = QuestInfo(
-          authorId = "user id",
-          themeId = "theme_id",
-          content = QuestInfoContent(
-            media = ContentReference(ContentType.Video, "", ""),
-            icon = None,
-            description = "The description"),
-          vip = true)))
+      db.quest.create(createQuestStub(id))
 
       val q = db.quest.readById(id)
 
@@ -109,47 +72,32 @@ class QuestDAOSpecs extends Specification
       // Preparing quests to store in db.
 
       val qs = List(
-        Quest(
+        createQuestStub(
           id = "q1",
-          approveReward = Assets(),
-          info = QuestInfo(
-            authorId = "q1_author id",
-            themeId = "t1",
-            content = QuestInfoContent(
-              media = ContentReference(ContentType.Video, "", ""),
-              icon = None,
-              description = "The description"),
-            level = 3,
-            vip = false),
-          status = QuestStatus.OnVoting),
+          authorId = "q1_author id",
+          themeId = "t1",
+          status = QuestStatus.OnVoting,
+          level = 3,
+          vip = false,
+          cultureId = "c1"),
 
-        Quest(
+        createQuestStub(
           id = "q2",
-          approveReward = Assets(),
-          info = QuestInfo(
-            authorId = "q2_author id",
-            themeId = "t2",
-            content = QuestInfoContent(
-              media = ContentReference(ContentType.Video, "", ""),
-              icon = None,
-              description = "The description"),
-            level = 13,
-            vip = true),
-          status = QuestStatus.InRotation),
+          authorId = "q2_author id",
+          themeId = "t2",
+          status = QuestStatus.InRotation,
+          level = 13,
+          vip = true,
+          cultureId = "c2"),
 
-        Quest(
+        createQuestStub(
           id = "q3",
-          approveReward = Assets(),
-          info = QuestInfo(
-            authorId = "q3_author id",
-            themeId = "t3",
-            content = QuestInfoContent(
-              media = ContentReference(ContentType.Video, "", ""),
-              icon = None,
-              description = "The description"),
-            level = 7,
-            vip = true),
-          status = QuestStatus.OnVoting))
+          authorId = "q3_author id",
+          themeId = "t3",
+          status = QuestStatus.OnVoting,
+          level = 7,
+          vip = true,
+          cultureId = "c3"))
 
       qs.foreach(db.quest.create)
 
@@ -190,6 +138,10 @@ class QuestDAOSpecs extends Specification
       val themeIdsAndIds = db.quest.allWithParams(ids = List("q1", "q2"), themeIds = List("t1", "t3")).toList
       themeIdsAndIds.map(_.id).size must beEqualTo(1)
       themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))
+
+      val culture = db.quest.allWithParams(cultureId = Some(qs(2).cultureId)).toList
+      culture.map(_.id).size must beEqualTo(1)
+      culture.map(_.id) must beEqualTo(List(qs(2).id))
     }
 
   }

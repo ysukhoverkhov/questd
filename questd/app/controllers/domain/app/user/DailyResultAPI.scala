@@ -1,12 +1,10 @@
 package controllers.domain.app.user
 
 import models.domain._
-import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
-import logic._
 import play.Logger
 
 case class ShiftDailyResultRequest(user: User)
@@ -41,10 +39,9 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     u match {
       case Some(u: User) => OkApiResult(ShiftDailyResultResult(u))
-      case _ => {
+      case _ =>
         Logger.error("API - shiftDailyResult. user is not in db after update.")
         InternalErrorApiResult()
-      }
     }
   }
 
@@ -77,16 +74,13 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     // Check replace old public daily results with new daily results.
     val (u, newOne, internalError) = if (request.user.privateDailyResults.length > 1) {
       db.user.movePrivateDailyResultsToPublic(request.user.id, request.user.privateDailyResults.tail) match {
-        case Some(us) => {
+        case Some(us) =>
           applyDailyResults(us)
           (us, true, false)
-        }
 
-        // TODO: check we have here ifSome
-        case None => {
+        case None =>
           Logger.error("API - getDailyResult. Unable to find user for getting daily result")
           (request.user, false, true)
-        }
       }
 
     } else {
@@ -94,7 +88,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     }
 
     if (internalError) {
-      InternalErrorApiResult();
+      InternalErrorApiResult()
     } else {
       OkApiResult(GetDailyResultResult(u.profile, newOne))
     }
@@ -113,7 +107,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       reward = request.reward,
       penalty = request.penalty,
       status = request.quest.status)
-      
+
     db.user.storeProposalInDailyResult(user.id, qpr) ifSome { v =>
       OkApiResult(StoreProposalInDailyResultResult(v))
     }

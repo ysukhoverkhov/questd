@@ -3,7 +3,6 @@ package models.store.mongo.dao
 import play.Logger
 import models.store.mongo.helpers._
 import models.store.dao._
-import models.store._
 import models.domain._
 import com.mongodb.casbah.commons.MongoDBObject
 import java.util.Date
@@ -23,7 +22,8 @@ private[mongo] class MongoQuestSolutionDAO
     vip: Option[Boolean] = None,
     ids: List[String] = List(),
     questIds: List[String] = List(),
-    themeIds: List[String] = List()): Iterator[QuestSolution] = {
+    themeIds: List[String] = List(),
+    cultureId: Option[String] = None): Iterator[QuestSolution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -57,14 +57,18 @@ private[mongo] class MongoQuestSolutionDAO
       queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
     }
 
-    Logger.trace("MongoQuestSolutionDAO - allWithParams - " + queryBuilder.result);
+    if (cultureId != None) {
+      queryBuilder += ("cultureId" -> cultureId.get)
+    }
+
+    Logger.trace("MongoQuestSolutionDAO - allWithParams - " + queryBuilder.result)
 
     findByExample(
-      queryBuilder.result,
+      queryBuilder.result(),
       MongoDBObject("lastModDate" -> 1),
       skip)
   }
-  
+
   def updateStatus(id: String, newStatus: String, rivalId: Option[String] = None): Option[QuestSolution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
@@ -84,7 +88,7 @@ private[mongo] class MongoQuestSolutionDAO
 
     findAndModify(
       id,
-      queryBuilder.result)
+      queryBuilder.result())
   }
 
   def updatePoints(
@@ -102,7 +106,7 @@ private[mongo] class MongoQuestSolutionDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$inc" -> MongoDBObject(
+        "$inc" -> MongoDBObject(
           "rating.reviewsCount" -> reviewsCountChange,
           "rating.pointsRandom" -> pointsRandomChange,
 
@@ -112,9 +116,9 @@ private[mongo] class MongoQuestSolutionDAO
           "rating.cheating" -> cheatingChange,
 
           "rating.iacpoints.spam" -> spamChange,
-          "rating.iacpoints.porn" -> pornChange)),
-        ("$set" -> MongoDBObject(
-          "lastModDate" -> new Date()))))
+          "rating.iacpoints.porn" -> pornChange),
+        "$set" -> MongoDBObject(
+          "lastModDate" -> new Date())))
   }
 
 }
