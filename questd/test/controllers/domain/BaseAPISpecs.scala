@@ -27,6 +27,7 @@ private[domain] abstract class BaseAPISpecs
   val config = mock[ConfigDAO]
   val tutorialTask = mock[TutorialTaskDAO]
   val culture = mock[CultureDAO]
+  val theme = mock[ThemeDAO]
 
   val rand = mock[Random]
 
@@ -45,6 +46,7 @@ private[domain] abstract class BaseAPISpecs
       db.config returns config
       db.tutorialTask returns tutorialTask
       db.culture returns culture
+      db.theme returns theme
 
       config.readConfig returns mockConfiguration
     }

@@ -65,7 +65,6 @@ private[domain] trait CulturesAdminAPI { this: DBAccessor =>
    */
   def mergeCultureIntoCulture(request: MergeCultureIntoCultureRequest): ApiResult[MergeCultureIntoCultureResult] = handleDbException {
 
-    // TODO: test me. (countries merged, ids updated (for all items), old removed.)
     {
       getCulture(GetCultureRequest(id = request.idToMergeTo))
     } ifOk { res =>
