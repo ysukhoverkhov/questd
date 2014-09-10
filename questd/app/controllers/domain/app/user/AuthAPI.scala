@@ -79,24 +79,23 @@ private[domain] trait AuthAPI {
    */
   def getUser(params: UserRequest): ApiResult[UserResult] = handleDbException {
 
-    if (params.sessionId != None) {
-      db.user.readBySessionId(params.sessionId.get) match {
-        case None => NotAuthorisedApiResult()
+    (params.sessionId, params.userId) match {
+      case (Some(sessionId), None) =>
+        db.user.readBySessionId(sessionId) match {
+          case None => NotAuthorisedApiResult()
+          case Some(user: User) => OkApiResult(UserResult(user))
+        }
 
-        case Some(user: User) => OkApiResult(UserResult(user))
-      }
-    } else if (params.userId != null) {
-      db.user.readById(params.userId.get) match {
-        case None => NotFoundApiResult()
+      case (None, Some(userId)) =>
+        db.user.readById(userId) match {
+          case None => NotFoundApiResult()
+          case Some(user: User) => OkApiResult(UserResult(user))
+        }
 
-        case Some(user: User) => OkApiResult(UserResult(user))
-      }
-
-    } else {
-      Logger.error("Wrong request for user.")
-      InternalErrorApiResult()
+      case _ =>
+        Logger.error("Wrong request for user.")
+        InternalErrorApiResult()
     }
-
   }
 
 }

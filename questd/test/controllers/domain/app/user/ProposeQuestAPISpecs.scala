@@ -3,7 +3,6 @@ package controllers.domain.app.user
 import controllers.domain._
 import models.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
-import org.mockito.Matchers
 import testhelpers.domainstubs._
 
 class ProposeQuestAPISpecs extends BaseAPISpecs {
@@ -24,7 +23,7 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
 
       val result = api.proposeQuest(ProposeQuestRequest(u, q))
 
-      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
+      result.body must beSome[ProposeQuestResult].which(r => r.allowed == ProfileModificationResult.OK)
 
       there was one(quest).create(
         Quest(

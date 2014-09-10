@@ -63,15 +63,12 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       case OK =>
 
         // Updating quest info.
-        val v = if ((user.profile.questSolutionContext.purchasedQuest != None) && (user.stats.questsAcceptedPast > 0)) {
-          val quest = db.quest.readById(user.profile.questSolutionContext.purchasedQuest.get.id)
+        val v = if (user.stats.questsAcceptedPast > 0) {
 
-          quest match {
-            case None =>
-              Logger.error("Quest by id not found in purchaseQuest")
-              InternalErrorApiResult()
-
-            case Some(q) => skipQuest(SkipQuestRequest(q))
+          user.profile.questSolutionContext.purchasedQuest ifSome { q =>
+            db.quest.readById(q.id) ifSome { q =>
+              skipQuest(SkipQuestRequest(q))
+            }
           }
         } else {
           OkApiResult(SkipQuestResult())
@@ -85,18 +82,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
             case Some(q) =>
               val questCost = user.costOfPurchasingQuest
-              val author = db.user.readById(q.info.authorId).map(x => PublicProfileWithID(q.info.authorId, x.profile.publicProfile))
-
-              if (author == None) {
-                Logger.error("API - purchaseQuest. Unable to find quest author")
-                InternalErrorApiResult()
-              } else {
+              db.user.readById(q.info.authorId).map(x => PublicProfileWithID(q.info.authorId, x.profile.publicProfile)) ifSome { author =>
                 adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) ifOk { r =>
 
                   val u = db.user.purchaseQuest(
                     r.user.id,
                     QuestInfoWithID(q.id, q.info),
-                    author.get,
+                    author,
                     r.user.rewardForLosingQuest(q),
                     r.user.rewardForWinningQuest(q))
 
@@ -129,18 +121,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
         // Updating quest info.
         val v = if (request.user.stats.questsAcceptedPast > 0) {
-          val quest = db.quest.readById(request.user.profile.questSolutionContext.purchasedQuest.get.id)
 
-          quest match {
-            case None =>
-              Logger.error("Quest by id not found n purchaseQuest")
-              InternalErrorApiResult()
-
-            case Some(q) =>
+          request.user.profile.questSolutionContext.purchasedQuest ifSome { q =>
+            db.quest.readById(q.id) ifSome { q =>
               val ratio = Math.round(request.user.stats.questsReviewedPast.toFloat / request.user.stats.questsAcceptedPast) - 1
-
               takeQuestUpdate(TakeQuestUpdateRequest(q, ratio))
+            }
           }
+
         } else {
           OkApiResult(TakeQuestUpdateResult)
         }

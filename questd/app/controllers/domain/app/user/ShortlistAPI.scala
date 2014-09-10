@@ -136,7 +136,7 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
           // test batch call
 
           db.user.readBySNid(i.snName, i.snId)
-        }).filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
+        }).filter(_ != None).map(_.get).map(_.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
 
         OkApiResult(GetSuggestsForShortlistResult(OK, friends))
       case a => OkApiResult(GetSuggestsForShortlistResult(a))

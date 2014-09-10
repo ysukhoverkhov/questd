@@ -1,10 +1,8 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain._
 import controllers.domain.app.quest._
 import controllers.domain.helpers._
-import logic._
 import models.domain._
 import models.domain.view._
 import controllers.domain.app.protocol.ProfileModificationResult._
@@ -26,7 +24,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
     import request._
 
     user.canGetQuestProposalForVote match {
-      case OK => {
+      case OK =>
 
         Logger.trace("getQuestProposalToVote - we are eligable to vote quest.")
 
@@ -35,20 +33,13 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
 
         q match {
           case None => OkApiResult(GetQuestProposalToVoteResult(OutOfContent))
-          case Some(a) => {
+          case Some(a) =>
             val qi = QuestInfoWithID(a.id, a.info)
-            val theme = db.theme.readById(a.info.themeId)
-
-            if (theme == None) {
-              Logger.error("API - getQuestProposalToVote. Unable to find theme for quest.")
-              InternalErrorApiResult()
-            } else {
-              val u = db.user.selectQuestProposalVote(user.id, qi, theme.get)
+            db.theme.readById(a.info.themeId) ifSome { theme =>
+              val u = db.user.selectQuestProposalVote(user.id, qi, theme)
               OkApiResult(GetQuestProposalToVoteResult(OK, u.map(_.profile)))
             }
-          }
         }
-      }
       case a => OkApiResult(GetQuestProposalToVoteResult(a))
     }
 
@@ -60,46 +51,41 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
   def voteQuestProposal(request: VoteQuestProposalRequest): ApiResult[VoteQuestProposalResult] = handleDbException {
 
     request.user.canVoteQuestProposal match {
-      case OK => {
+      case OK =>
         // 1. get quest to vote.
         // 2. vote it.
         val reward = request.user.getQuestProposalVoteReward
 
         db.quest.readById(request.user.profile.questProposalVoteContext.reviewingQuest.get.id) match {
-          case None => {
+          case None =>
             Logger.error("Unable to find quest with id for voting " + request.user.profile.questProposalVoteContext.reviewingQuest.get.id)
             InternalErrorApiResult()
-          }
           case Some(q) => {
-            {
-              
-              voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
-              
-            } ifOk { r =>
-              
-              makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuestProposals)))
-              
-            } ifOk {
 
-              adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))
+            voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
 
-            } ifOk { r =>
+          } ifOk { r =>
 
-              val liked = (request.vote == QuestProposalVote.Cool)
-              val u = db.user.recordQuestProposalVote(r.user.id, q.id, liked)
+            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuestProposals)))
 
-              val author = if (liked) {
-                db.user.readById(q.info.authorId).map(a => PublicProfileWithID(a.id, a.profile.publicProfile))
-              } else {
-                None
-              }
+          } ifOk {
 
-              OkApiResult(VoteQuestProposalResult(OK, u.map(_.profile), Some(reward), author))
+            adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))
+
+          } ifOk { r =>
+
+            val liked = request.vote == QuestProposalVote.Cool
+            val u = db.user.recordQuestProposalVote(r.user.id, q.id, liked)
+
+            val author = if (liked) {
+              db.user.readById(q.info.authorId).map(a => PublicProfileWithID(a.id, a.profile.publicProfile))
+            } else {
+              None
             }
+
+            OkApiResult(VoteQuestProposalResult(OK, u.map(_.profile), Some(reward), author))
           }
         }
-
-      }
       case a => OkApiResult(VoteQuestProposalResult(a))
     }
   }
