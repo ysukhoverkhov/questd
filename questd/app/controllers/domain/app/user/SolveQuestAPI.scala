@@ -274,7 +274,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       }
     }
 
-    // TODO: test banned users are penalized correctly.
     try {
       val r = solution.status match {
         case QuestSolutionStatus.OnVoting =>

@@ -1,15 +1,11 @@
 package controllers.domain.app.user
 
 import models.domain._
-import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
-import logic._
-import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.sn.exception._
 import controllers.sn.client.SNUser
 
 case class GetShortlistRequest(
@@ -54,11 +50,10 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
   def getShortlist(request: GetShortlistRequest): ApiResult[GetShortlistResult] = handleDbException {
 
     request.user.canShortlist match {
-      case OK => {
+      case OK =>
         OkApiResult(GetShortlistResult(
           allowed = OK,
           userIds = Some(request.user.shortlist)))
-      }
       case a => OkApiResult(GetShortlistResult(a, None))
     }
 
@@ -85,21 +80,19 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
     } else {
       request.user.canShortlist match {
         case OK => {
-          {
 
-            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.AddToShortList)))
+          makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.AddToShortList)))
 
-          } ifOk { r =>
+        } ifOk { r =>
 
-            val cost = request.user.costToShortlist
-            adjustAssets(AdjustAssetsRequest(user = r.user, cost = Some(cost)))
+          val cost = request.user.costToShortlist
+          adjustAssets(AdjustAssetsRequest(user = r.user, cost = Some(cost)))
 
-          } ifOk { r =>
+        } ifOk { r =>
 
-            db.user.addToShortlist(r.user.id, request.userIdToAdd)
-            OkApiResult(AddToShortlistResult(OK, Some(r.user.profile.assets)))
+          db.user.addToShortlist(r.user.id, request.userIdToAdd)
+          OkApiResult(AddToShortlistResult(OK, Some(r.user.profile.assets)))
 
-          }
         }
         case a => OkApiResult(AddToShortlistResult(a))
       }
@@ -113,10 +106,9 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
   def removeFromShortlist(request: RemoveFromShortlistRequest): ApiResult[RemoveFromShortlistResult] = handleDbException {
 
     request.user.canShortlist match {
-      case OK => {
+      case OK =>
         db.user.removeFromShortlist(request.user.id, request.userIdToAdd)
         OkApiResult(RemoveFromShortlistResult(OK))
-      }
       case a => OkApiResult(RemoveFromShortlistResult(a))
     }
 
@@ -127,15 +119,14 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
    */
   def getSuggestsForShortlist(request: GetSuggestsForShortlistRequest): ApiResult[GetSuggestsForShortlistResult] = handleDbException {
     request.user.canShortlist match {
-      case OK => {
+      case OK =>
 
         val snFriends = request.tokens.foldLeft(List[SNUser]()) { (r, v) =>
           try {
             r ::: sn.clientForName(v._1).fetchFriendsByToken(v._2)
           } catch {
-            case _ : Throwable => {
+            case _ : Throwable =>
               r
-            }
           }
         }
 
@@ -147,11 +138,7 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
           db.user.readBySNid(i.snName, i.snId)
         }).filter(_ != None).map(_.get.id).filter(!request.user.friends.contains(_)).filter(!request.user.shortlist.contains(_))
 
-        // TODO: test each filter here.
-
         OkApiResult(GetSuggestsForShortlistResult(OK, friends))
-
-      }
       case a => OkApiResult(GetSuggestsForShortlistResult(a))
     }
   }
