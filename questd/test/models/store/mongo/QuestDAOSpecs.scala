@@ -144,6 +144,32 @@ class QuestDAOSpecs extends Specification
       culture.map(_.id) must beEqualTo(List(qs(2).id))
     }
 
+    "Replace cultures" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val t1 = createQuestStub(id = "id1", cultureId = "rus")
+      val t2 = createQuestStub(id = "id2", cultureId = "eng")
+      val t3 = createQuestStub(id = "id3", cultureId = "rus")
+
+      db.quest.create(t1)
+      db.quest.create(t2)
+      db.quest.create(t3)
+
+      db.quest.replaceCultureIds("rus", "eng")
+
+      val ou1 = db.quest.readById(t1.id)
+      ou1 must beSome.which((u: Quest) => u.id == t1.id)
+      ou1 must beSome.which((u: Quest) => u.cultureId == "eng")
+
+      val ou2 = db.quest.readById(t2.id)
+      ou2 must beSome.which((u: Quest) => u.id == t2.id)
+      ou2 must beSome.which((u: Quest) => u.cultureId == "eng")
+
+      val ou3 = db.quest.readById(t3.id)
+      ou3 must beSome.which((u: Quest) => u.id == t3.id)
+      ou3 must beSome.which((u: Quest) => u.cultureId == "eng")
+    }
+
   }
 
 }

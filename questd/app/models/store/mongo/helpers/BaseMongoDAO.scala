@@ -91,7 +91,13 @@ abstract class BaseMongoDAO[T <: ID : Manifest](collectionName: String)
   /**
    * Update object with new object
    */
-  def update(key: String, u: T): Unit = updateInt(key, u, upsert = false)
+  def update(query: DBObject, u: DBObject, multi: Boolean): Unit =
+    update(query, u, upsert = false, multi = multi)
+
+  /**
+   * Update object with new object
+   */
+  def update(key: String, u: T): Unit = updateInt(key, u, upsert = false, multi = false)
 
   /**
    * Update object with new object
@@ -108,8 +114,8 @@ abstract class BaseMongoDAO[T <: ID : Manifest](collectionName: String)
    */
   def upsert(u: T): Unit = updateInt(u.id, u, upsert = true)
 
-  private def updateInt(key: String, u: T, upsert: Boolean): Unit = wrapMongoException {
-    update(makeKeyDbObject(key), toDBObject(u), upsert, multi = false)
+  private def updateInt(key: String, u: T, upsert: Boolean, multi: Boolean = false): Unit = wrapMongoException {
+    update(makeKeyDbObject(key), toDBObject(u), upsert, multi = multi)
   }
 
   private def makeKeyDbObject(key: String): DBObject = {

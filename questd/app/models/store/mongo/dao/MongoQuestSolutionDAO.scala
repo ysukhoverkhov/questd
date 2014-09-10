@@ -121,5 +121,17 @@ private[mongo] class MongoQuestSolutionDAO
           "lastModDate" -> new Date())))
   }
 
+  /**
+   *
+   */
+  def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit = {
+    update(
+      query = MongoDBObject(
+        "cultureId" -> oldCultureId),
+      u = MongoDBObject(
+        "$set" -> MongoDBObject(
+          "cultureId" -> newCultureId)),
+      multi = true)
+  }
 }
 

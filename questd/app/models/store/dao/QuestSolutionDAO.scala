@@ -32,5 +32,7 @@ trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
     spamChange: Int = 0,
     pornChange: Int = 0): Option[QuestSolution]
 
+  def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit
+
 }
 

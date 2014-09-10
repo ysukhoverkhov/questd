@@ -70,4 +70,6 @@ trait UserDAO extends BaseDAO[User] {
 
   def setTutorialState(id: String, platform: String, state: String): Option[User]
   def addTutorialTaskAssigned(id: String, taskId: String): Option[User]
+
+  def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit
 }

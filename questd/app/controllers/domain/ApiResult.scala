@@ -1,15 +1,12 @@
 package controllers.domain
 
-import play.Logger
-
 sealed abstract class ApiResult[+T] {
   def body: Option[T]
 
   def ifOk[T2](f: T => ApiResult[T2]): ApiResult[T2] = {
     this match {
-      case OkApiResult(r) => {
+      case OkApiResult(r) =>
         f(r)
-      }
 
       case NotFoundApiResult() => NotFoundApiResult()
       case NotAuthorisedApiResult() => NotAuthorisedApiResult()

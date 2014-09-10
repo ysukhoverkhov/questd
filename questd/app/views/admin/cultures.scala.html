@@ -8,6 +8,7 @@
 		@form(action = controllers.web.admin.routes.CulturesCRUD.createCultureCB()) {
 			@inputText(newForm("id"), 'size -> 50, 'readonly -> "readonly")
 			@inputText(newForm("name"), 'size -> 20, 'placeholder -> "Name")
+            @select(newForm("cultureToMergeWith"), options(cultures.foldLeft[Map[String, String]](Map("" -> ""))((r, v) => if (v.name != newForm("name").value.get) r + (v.id -> v.name) else r))) <br />
 
 			@if(newForm("id").value == None) {
 				<input type="submit" value="Create">
@@ -31,7 +32,7 @@
 	    		<td>@t.countries.size</td>
 
 				<td><a href="@controllers.web.admin.routes.CulturesCRUD.cultures(t.id)">edit</a></td>
-				<td><a onClick='deleteFun("@controllers.web.admin.routes.CulturesCRUD.deleteCultureCB(t.id)")' >delete</a></td>
+				<!-- td><a onClick='deleteFun("@controllers.web.admin.routes.CulturesCRUD.deleteCultureCB(t.id)")' >delete</a></td -->
 	    	</tr>
 	    }
 

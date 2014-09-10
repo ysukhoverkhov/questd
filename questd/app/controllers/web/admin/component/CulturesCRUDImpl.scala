@@ -9,14 +9,16 @@ import play.api.mvc._
 
 case class CultureForm(
   id: String,
-  name: String)
+  name: String,
+  cultureToMergeWith: String)
 
 class CulturesCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with BaseCRUDImpl[Culture, CultureForm] {
 
   protected final val emptyForm: Form[CultureForm] = Form(
     mapping(
       "id" -> text,
-      "name" -> nonEmptyText)(CultureForm.apply)(CultureForm.unapply))
+      "name" -> nonEmptyText,
+      "cultureToMergeWith" -> text)(CultureForm.apply)(CultureForm.unapply))
 
   /**
    * Form willed with object.
@@ -26,7 +28,8 @@ class CulturesCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller
       case OkApiResult(GetCultureResult(c)) =>
         emptyForm.fill(CultureForm(
           id = c.id.toString,
-          name = c.name))
+          name = c.name,
+          cultureToMergeWith = ""))
 
       case _ => emptyForm
     }
@@ -76,11 +79,18 @@ class CulturesCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller
       id = form.id,
       name = form.name)
 
+    val mergeWith = form.cultureToMergeWith
+
     if (culture.id == "") {
       api.createCulture(CreateCultureRequest(culture))
     } else {
-      api.updateCulture(UpdateCultureRequest(culture))
+      if (mergeWith != "") {
+        api.mergeCultureIntoCulture(MergeCultureIntoCultureRequest(culture, mergeWith))
+      } else {
+        api.updateCulture(UpdateCultureRequest(culture))
+      }
     }
+
   }
 }
 

@@ -424,6 +424,44 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.demo.cultureId == Some(cultureId))
     }
+
+    "replaceCultureIds works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val userid1 = "replaceCultureIds1"
+      val userid2 = "replaceCultureIds2"
+      val userid3 = "replaceCultureIds3"
+
+      val oldC = "oldC"
+      val newC = "newC"
+
+      db.user.create(User(
+        id = userid1,
+        demo = UserDemographics(cultureId = Some(oldC))))
+
+      db.user.create(User(
+        id = userid2,
+        demo = UserDemographics(cultureId = Some(oldC))))
+
+      db.user.create(User(
+        id = userid3,
+        demo = UserDemographics(cultureId = Some(oldC + "1"))))
+
+      db.user.replaceCultureIds(oldC, newC)
+
+      val ou1 = db.user.readById(userid1)
+      ou1 must beSome.which((u: User) => u.id.toString == userid1)
+      ou1 must beSome.which((u: User) => u.demo.cultureId == Some(newC))
+
+      val ou2 = db.user.readById(userid2)
+      ou2 must beSome.which((u: User) => u.id.toString == userid2)
+      ou2 must beSome.which((u: User) => u.demo.cultureId == Some(newC))
+
+      val ou3 = db.user.readById(userid3)
+      ou3 must beSome.which((u: User) => u.id.toString == userid3)
+      ou3 must beSome.which((u: User) => u.demo.cultureId == Some(oldC + "1"))
+    }
+
   }
 }
 

@@ -53,4 +53,17 @@ private[mongo] class MongoThemeDAO
         "$set" -> MongoDBObject(
           "lastUseDate" -> new Date())))
   }
+
+  /**
+   *
+   */
+  def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit = {
+    update(
+      query = MongoDBObject(
+        "cultureId" -> oldCultureId),
+      u = MongoDBObject(
+        "$set" -> MongoDBObject(
+          "cultureId" -> newCultureId)),
+      multi = true)
+  }
 }

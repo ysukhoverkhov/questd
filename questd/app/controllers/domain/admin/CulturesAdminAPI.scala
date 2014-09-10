@@ -3,7 +3,6 @@ package controllers.domain.admin
 import play.Logger
 
 import components.DBAccessor
-import models.store._
 import models.domain._
 import controllers.domain.helpers._
 import controllers.domain._
@@ -16,6 +15,9 @@ case class CreateCultureResult()
 
 case class UpdateCultureRequest(culture: Culture)
 case class UpdateCultureResult()
+
+case class MergeCultureIntoCultureRequest(culture: Culture, idToMergeTo: String)
+case class MergeCultureIntoCultureResult()
 
 case class DeleteCultureRequest(id: String)
 case class DeleteCultureResult()
@@ -56,6 +58,39 @@ private[domain] trait CulturesAdminAPI { this: DBAccessor =>
     db.culture.update(request.culture)
 
     OkApiResult(UpdateCultureResult())
+  }
+
+  /**
+   * Merge culture.
+   */
+  def mergeCultureIntoCulture(request: MergeCultureIntoCultureRequest): ApiResult[MergeCultureIntoCultureResult] = handleDbException {
+
+    // TODO: test me. (countries merged, ids updated (for all items), old removed.)
+    {
+      getCulture(GetCultureRequest(id = request.idToMergeTo))
+    } ifOk { res =>
+      // 1. Add all countries from old culture to new culture.
+      updateCulture(UpdateCultureRequest(res.culture.copy(
+        countries = res.culture.countries ::: request.culture.countries)))
+    } ifOk {
+
+      // 2. update all themes for new culture id.
+      db.theme.replaceCultureIds(oldCultureId = request.culture.id, newCultureId = request.idToMergeTo)
+
+      // 3. update all quests for new culture id.
+      db.quest.replaceCultureIds(oldCultureId = request.culture.id, newCultureId = request.idToMergeTo)
+
+      // 4. update all solutions for new culture id.
+      db.solution.replaceCultureIds(oldCultureId = request.culture.id, newCultureId = request.idToMergeTo)
+
+      // 5. update all profiles for new culture id.
+      db.user.replaceCultureIds(oldCultureId = request.culture.id, newCultureId = request.idToMergeTo)
+
+      // 6. delete old culture.
+      deleteCulture(DeleteCultureRequest(id = request.culture.id))
+    } ifOk {
+      OkApiResult(MergeCultureIntoCultureResult())
+    }
   }
 
   /**

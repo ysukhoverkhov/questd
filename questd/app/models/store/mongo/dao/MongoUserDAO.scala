@@ -734,8 +734,23 @@ private[mongo] class MongoUserDAO
         "$set" -> MongoDBObject(
           "demo.cultureId" -> cultureId)))
   }
+
+  /**
+   *
+   */
+  def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit = {
+    update(
+      query = MongoDBObject(
+        "demo.cultureId" -> oldCultureId),
+      u = MongoDBObject(
+        "$set" -> MongoDBObject(
+          "demo.cultureId" -> newCultureId)),
+      multi = true)
+  }
+
 }
 
+// TODO: move me to good location.
 class MongoUserDAOForTest extends MongoUserDAO {
   override val dao = new QSalatDAO[User, ObjectId](collection = MongoClient("localhost", 55555)("test_db")("test_coll")) {}
 

@@ -185,7 +185,31 @@ class SolutionDAOSpecs extends Specification
       su2 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Won && s.rivalSolutionId == Some(id1))
     }
 
-  }
+    "Replace cultures" in new WithApplication(appWithTestDatabase) {
+      clearDB()
 
+      val t1 = createSolutionStub(id = "id1", cultureId = "rus")
+      val t2 = createSolutionStub(id = "id2", cultureId = "eng")
+      val t3 = createSolutionStub(id = "id3", cultureId = "rus")
+
+      db.solution.create(t1)
+      db.solution.create(t2)
+      db.solution.create(t3)
+
+      db.solution.replaceCultureIds("rus", "eng")
+
+      val ou1 = db.solution.readById(t1.id)
+      ou1 must beSome.which((u: QuestSolution) => u.id == t1.id)
+      ou1 must beSome.which((u: QuestSolution) => u.cultureId == "eng")
+
+      val ou2 = db.solution.readById(t2.id)
+      ou2 must beSome.which((u: QuestSolution) => u.id == t2.id)
+      ou2 must beSome.which((u: QuestSolution) => u.cultureId == "eng")
+
+      val ou3 = db.solution.readById(t3.id)
+      ou3 must beSome.which((u: QuestSolution) => u.id == t3.id)
+      ou3 must beSome.which((u: QuestSolution) => u.cultureId == "eng")
+    }
+  }
 }
 

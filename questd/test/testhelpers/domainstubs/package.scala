@@ -65,7 +65,7 @@ package object domainstubs {
   def createSolutionStub(
     id: String,
     cultureId: String = "cultureId",
-    userId: String,
+    userId: String = "uid",
     questId: String = "qid",
     status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting,
     level: Int = 1,
