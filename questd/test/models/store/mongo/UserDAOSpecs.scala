@@ -462,6 +462,27 @@ class UserDAOSpecs
       ou3 must beSome.which((u: User) => u.demo.cultureId == Some(oldC + "1"))
     }
 
+    "populate mustVoteSolutions list" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val userids = List("replaceCultureIds1", "replaceCultureIds2", "replaceCultureIds3")
+      val solIds = List("solId0", "solId1")
+
+      userids.foreach(v => db.user.create(User(id = v)))
+
+
+      db.user.populateMustVoteSolutionsList(userids, solIds(0))
+      db.user.populateMustVoteSolutionsList(userids.tail, solIds(1))
+
+      val ou1 = db.user.readById(userids(0))
+      ou1 must beSome.which((u: User) => u.mustVoteSolutions == List(solIds(0)))
+
+      val ou2 = db.user.readById(userids(1))
+      ou2 must beSome.which((u: User) => solIds forall u.mustVoteSolutions.contains)
+
+      val ou3 = db.user.readById(userids(1))
+      ou3 must beSome.which((u: User) => solIds forall u.mustVoteSolutions.contains)
+    }
   }
 }
 

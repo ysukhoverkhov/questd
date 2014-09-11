@@ -89,8 +89,8 @@ trait SolvingQuests { this: UserLogic =>
   /**
    * Is user can propose quest of given type.
    */
-  def canResolveQuest(conentType: ContentType) = {
-    val content = conentType match {
+  def canResolveQuest(contentType: ContentType, friendsInvited: Int) = { // TODO: take friends count into account here.
+    val content = contentType match {
       case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults)
       case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoResults)
     }

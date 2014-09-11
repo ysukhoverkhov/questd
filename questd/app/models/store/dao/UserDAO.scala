@@ -5,6 +5,7 @@ import models.domain.view._
 import java.util.Date
 
 trait UserDAO extends BaseDAO[User] {
+
   def updateSessionId(id: String, sessionid: String): Option[User]
 
   def readBySessionId(sessionid: String): Option[User]
@@ -14,6 +15,7 @@ trait UserDAO extends BaseDAO[User] {
 
   def selectQuestSolutionVote(id: String, qsi: QuestSolutionInfoWithID, qsa: PublicProfileWithID, qi: QuestInfoWithID): Option[User]
   def recordQuestSolutionVote(id: String, solutionId: String): Option[User]
+  def populateMustVoteSolutionsList(userIds: List[String], solutionId: String): Unit
 
   def selectQuestProposalVote(id: String, qi: QuestInfoWithID, theme: Theme): Option[User]
   def recordQuestProposalVote(id: String, questId: String, liked: Boolean): Option[User]

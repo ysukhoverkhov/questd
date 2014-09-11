@@ -21,7 +21,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val result = api.proposeSolution(ProposeSolutionRequest(u, s))
 
-      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
+      result must beEqualTo(OkApiResult(ProposeSolutionResult(ProfileModificationResult.OK, Some(u.profile))))
 
       there was one(solution).create(
         QuestSolution(

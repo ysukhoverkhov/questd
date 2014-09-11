@@ -8,14 +8,7 @@ import models.domain._
 import models.domain.view._
 import models.store.dao._
 import models.store.mongo.helpers._
-
-/**
- * Test version of dao what fails all the time
- */
-
-import com.mongodb.casbah.MongoClient
 import models.store.mongo.SalatContext._
-import org.bson.types.ObjectId
 
 /**
  * DOA for User objects
@@ -95,6 +88,22 @@ private[mongo] class MongoUserDAO
           "profile.questSolutionVoteContext.questOfSolution" -> ""),
         "$push" -> MongoDBObject(
           "history.votedQuestSolutionIds.0" -> solutionId)))
+  }
+
+  /**
+   *
+   */
+  def populateMustVoteSolutionsList(userIds: List[String], solutionId: String): Unit = {
+
+    update(
+      query = MongoDBObject(
+        "id" -> MongoDBObject(
+          "$in" -> userIds
+        )),
+      u = MongoDBObject(
+        "$addToSet" -> MongoDBObject(
+          "mustVoteSolutions" -> solutionId)),
+      multi = true)
   }
 
   /**

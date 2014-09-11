@@ -23,6 +23,9 @@ case class TakeQuestResult(allowed: ProfileModificationResult, profile: Option[P
 case class GetTakeQuestCostRequest(user: User)
 case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
 
+case class AddToMustVoteSolutionsRequest(user: User, friendIds: List[String], solutionId: String)
+case class AddToMustVoteSolutionsResult(user: User)
+
 case class ProposeSolutionRequest(user: User, solution: QuestSolutionInfoContent, friendsToHelp: List[String] = List())
 case class ProposeSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
@@ -160,13 +163,38 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   }
 
   /**
-   * Propose solution for quest.
+   * Add a quest to given friends "mustVote" list
    */
+  // TODO: test me.
+  def addToMustVoteSolutions(request: AddToMustVoteSolutionsRequest): ApiResult[AddToMustVoteSolutionsResult] = handleDbException {
+
+    if (request.friendIds.isEmpty) {
+      OkApiResult(AddToMustVoteSolutionsResult(request.user))
+    } else {
+      db.user.populateMustVoteSolutionsList(
+        userIds = request.friendIds,
+        solutionId = request.solutionId)
+
+      {
+        adjustAssets(AdjustAssetsRequest(
+          user = request.user,
+          cost = Some(request.user.costOfAskingForHelpWithSolution * request.friendIds.length)))
+      } ifOk { r =>
+        OkApiResult(AddToMustVoteSolutionsResult(r.user))
+      }
+    }
+  }
+
+  /**
+   * Propose solution for quest.
+   */ // TODO: test friends are added and they are in correct order (appended, not prepended).
   def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
 
     val user = ensureNoDeadlineQuest(request.user)
 
-    user.canResolveQuest(request.solution.media.contentType) match {
+    user.canResolveQuest(
+      contentType = request.solution.media.contentType,
+      friendsInvited = request.friendsToHelp.length) match {
       case OK =>
 
         def content = if (request.user.payedAuthor) {
@@ -182,24 +210,26 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           r.user.profile.questSolutionContext.takenQuest ifSome { takenQuest =>
             r.user.demo.cultureId ifSome { culture =>
 
-              db.solution.create(
-                QuestSolution(
-                  cultureId = culture,
-                  questLevel = takenQuest.obj.level,
-                  info = QuestSolutionInfo(
-                    content = content,
-                    authorId = r.user.id,
-                    themeId = takenQuest.obj.themeId,
-                    questId = takenQuest.id,
-                    vip = user.profile.publicProfile.vip),
-                  voteEndDate = user.solutionVoteEndDate(takenQuest.obj)))
+              val solution = QuestSolution(
+                cultureId = culture,
+                questLevel = takenQuest.obj.level,
+                info = QuestSolutionInfo(
+                  content = content,
+                  authorId = r.user.id,
+                  themeId = takenQuest.obj.themeId,
+                  questId = takenQuest.id,
+                  vip = user.profile.publicProfile.vip),
+                voteEndDate = user.solutionVoteEndDate(takenQuest.obj))
+
+              db.solution.create(solution)
 
               db.user.resetQuestSolution(
                 user.id,
                 config(api.ConfigParams.DebugDisableSolutionCooldown) == "1") ifSome { u =>
 
-                OkApiResult(ProposeSolutionResult(OK, Some(u.profile)))
-
+                addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id)) ifOk { r =>
+                  OkApiResult(ProposeSolutionResult(OK, Some(r.user.profile)))
+                }
               }
             }
           }
