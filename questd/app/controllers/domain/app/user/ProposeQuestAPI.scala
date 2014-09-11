@@ -9,13 +9,13 @@ import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 
 case class GetQuestThemeCostRequest(user: User)
-case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Assets) // TODO: here and in all results with modificationResult make result optional.
+case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
 
 case class PurchaseQuestThemeRequest(user: User)
 case class PurchaseQuestThemeResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetQuestThemeTakeCostRequest(user: User)
-case class GetQuestThemeTakeCostResult(allowed: ProfileModificationResult, cost: Assets)
+case class GetQuestThemeTakeCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
 
 case class TakeQuestThemeRequest(user: User)
 case class TakeQuestThemeResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -30,7 +30,7 @@ case class DeadlineQuestProposalRequest(user: User)
 case class DeadlineQuestProposalResult(user: Option[User])
 
 case class GetQuestProposalGiveUpCostRequest(user: User)
-case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets)
+case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
 
 case class GetQuestProposalHelpCostRequest(user: User)
 case class GetQuestProposalHelpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
@@ -46,7 +46,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
   def getQuestThemeCost(request: GetQuestThemeCostRequest): ApiResult[GetQuestThemeCostResult] = handleDbException {
     import request._
 
-    OkApiResult(GetQuestThemeCostResult(OK, user.costOfPurchasingQuestProposal))
+    OkApiResult(GetQuestThemeCostResult(OK, Some(user.costOfPurchasingQuestProposal)))
   }
 
   /**
@@ -129,7 +129,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
   def getQuestThemeTakeCost(request: GetQuestThemeTakeCostRequest): ApiResult[GetQuestThemeTakeCostResult] = handleDbException {
     import request._
 
-    OkApiResult(GetQuestThemeTakeCostResult(OK, user.costOfTakingQuestTheme))
+    OkApiResult(GetQuestThemeTakeCostResult(OK, Some(user.costOfTakingQuestTheme)))
   }
 
   /**
@@ -229,7 +229,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
   def getQuestProposalGiveUpCost(request: GetQuestProposalGiveUpCostRequest): ApiResult[GetQuestProposalGiveUpCostResult] = handleDbException {
     import request._
 
-    OkApiResult(GetQuestProposalGiveUpCostResult(OK, user.costOfGivingUpQuestProposal))
+    OkApiResult(GetQuestProposalGiveUpCostResult(OK, Some(user.costOfGivingUpQuestProposal)))
   }
 
   /**

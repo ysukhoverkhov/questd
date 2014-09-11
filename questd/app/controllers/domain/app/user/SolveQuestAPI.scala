@@ -12,7 +12,7 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.quest._
 
 case class GetQuestCostRequest(user: User)
-case class GetQuestCostResult(allowed: ProfileModificationResult, cost: Assets)
+case class GetQuestCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
 
 case class PurchaseQuestRequest(user: User)
 case class PurchaseQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -21,13 +21,13 @@ case class TakeQuestRequest(user: User)
 case class TakeQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetTakeQuestCostRequest(user: User)
-case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Assets)
+case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
 
 case class ProposeSolutionRequest(user: User, solution: QuestSolutionInfoContent, friendsToHelp: List[String] = List())
 case class ProposeSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetQuestGiveUpCostRequest(user: User)
-case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets)
+case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
 
 case class GiveUpQuestRequest(user: User)
 case class GiveUpQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -52,7 +52,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getQuestCost(request: GetQuestCostRequest): ApiResult[GetQuestCostResult] = handleDbException {
     import request._
 
-    OkApiResult(GetQuestCostResult(OK, user.costOfPurchasingQuest))
+    OkApiResult(GetQuestCostResult(OK, Some(user.costOfPurchasingQuest)))
   }
 
   /**
@@ -111,7 +111,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getTakeQuestCost(request: GetTakeQuestCostRequest): ApiResult[GetTakeQuestCostResult] = handleDbException {
     import request._
 
-    OkApiResult(GetTakeQuestCostResult(OK, user.costOfTakingQuest))
+    OkApiResult(GetTakeQuestCostResult(OK, Some(user.costOfTakingQuest)))
   }
 
   /**
@@ -215,7 +215,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def getQuestGiveUpCost(request: GetQuestGiveUpCostRequest): ApiResult[GetQuestGiveUpCostResult] = handleDbException {
     import request._
 
-    OkApiResult(GetQuestGiveUpCostResult(OK, user.costOfGivingUpQuest))
+    OkApiResult(GetQuestGiveUpCostResult(OK, Some(user.costOfGivingUpQuest)))
   }
 
   /**
