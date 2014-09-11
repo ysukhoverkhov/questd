@@ -110,6 +110,7 @@ package object domainstubs {
         dailyAssetsDecrease = Assets())),
       profile = Profile(
         assets = assets,
+        ratingToNextLevel = 100000,
         questSolutionContext = QuestSolutionContext(
           takenQuest = Some(QuestInfoWithID(
             "quest_id",

@@ -38,13 +38,49 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
     }
 
     "Report not enough assets for poor user if he wants to invite friends" in context {
-
       val u = createUserStub(assets = Assets(0, 0, 0))
       val s = createSolutionInfoContent
 
       val result = api.proposeSolution(ProposeSolutionRequest(u, s, List("1", "2", "3")))
 
       result must beEqualTo(OkApiResult(ProposeSolutionResult(ProfileModificationResult.NotEnoughAssets, None)))
+    }
+
+    "Do not store id of solution for help for not friends" in context {
+      val friendsIds = List("1", "2", "3")
+      val requestedFriendsIds = List("4")
+      val notFriends = List("5")
+
+      val u = createUserStub(
+        assets = Assets(30, 30, 30),
+        friends =
+          friendsIds.map(id => Friendship(friendId = id, status = FriendshipStatus.Accepted)) :::
+            requestedFriendsIds.map(id => Friendship(friendId = id, status = FriendshipStatus.Invited)))
+      val s = createSolutionInfoContent
+
+      user.resetQuestSolution(any, any) returns Some(u)
+      db.user.addToAssets(any, any) returns Some(u)
+
+//      db.solution.create(solution)
+//
+//      db.user.resetQuestSolution(
+//        user.id,
+//        config(api.ConfigParams.DebugDisableSolutionCooldown) == "1") ifSome { u =>
+
+//      db.user.populateMustVoteSolutionsList(
+//        userIds = filteredFriends,
+//        solutionId = request.solutionId)
+// db.user.addToAssets(user.id, del2)
+
+      val result = api.proposeSolution(ProposeSolutionRequest(u, s, friendsIds ::: requestedFriendsIds ::: notFriends))
+
+      result must beEqualTo(OkApiResult(ProposeSolutionResult(ProfileModificationResult.OK, Some(u.profile))))
+
+      there was one(solution).create(any)
+      there was one(user).resetQuestSolution(any, any)
+      there was one(user).populateMustVoteSolutionsList(Matchers.eq(friendsIds), any)
+      there was one(user).addToAssets(any, any)
+
     }
 
     "Create VIP solution for VIP users" in context {
