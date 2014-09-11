@@ -63,7 +63,6 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
         val themeCost = user.costOfPurchasingQuestProposal
 
         adjustAssets(AdjustAssetsRequest(user = user, cost = Some(themeCost))) ifOk { r =>
-          val user = r.user
           val reward = r.user.rewardForMakingApprovedQuest
           val themesCount = db.theme.count
 
