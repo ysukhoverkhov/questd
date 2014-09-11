@@ -237,20 +237,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   }
 
   def getQuestSolutionHelpCost(request: GetQuestSolutionHelpCostRequest): ApiResult[GetQuestSolutionHelpCostResult] = handleDbException {
-    // TODO: implement me.
-//    request.user.canGiveUpQuest match {
-//      case OK =>
-//
-//        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) ifOk { r =>
-//          val u = db.user.resetQuestSolution(
-//            r.user.id,
-//            config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
-//          OkApiResult(GiveUpQuestResult(OK, u.map(_.profile)))
-//        }
-//
-//      case (a: ProfileModificationResult) =>
-        OkApiResult(GetQuestSolutionHelpCostResult(OK, Some(Assets(coins = 3))))
-//    }
+    import request._
+
+    OkApiResult(GetQuestSolutionHelpCostResult(OK, Some(user.costOfAskingForHelpWithSolution)))
   }
 
   /**

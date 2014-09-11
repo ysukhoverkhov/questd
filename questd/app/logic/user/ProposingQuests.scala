@@ -215,6 +215,13 @@ trait ProposingQuests { this: UserLogic =>
   }
 
   /**
+   * How much it'll be for a single friend to help us with proposal.
+   */
+  def costOfAskingForHelpWithProposal = {
+    Assets(coins = coinsToInviteFriendForVoteQuestProposal(user.profile.publicProfile.level))
+  }
+
+  /**
    * Check is quest deadline passed and quest should be autogave up.
    */
   def proposalDeadlineReached = {

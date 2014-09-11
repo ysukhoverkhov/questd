@@ -236,8 +236,8 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
    */
   def getQuestProposalHelpCost(request: GetQuestProposalHelpCostRequest): ApiResult[GetQuestProposalHelpCostResult] = handleDbException {
     import request._
-// TODO: implement me.
-    OkApiResult(GetQuestProposalHelpCostResult(OK, Some(Assets())))
+
+    OkApiResult(GetQuestProposalHelpCostResult(OK, Some(user.costOfAskingForHelpWithProposal)))
   }
 
   /**
