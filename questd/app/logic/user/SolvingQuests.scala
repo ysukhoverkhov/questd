@@ -89,7 +89,7 @@ trait SolvingQuests { this: UserLogic =>
   /**
    * Is user can propose quest of given type.
    */
-  def canResolveQuest(contentType: ContentType, friendsInvited: Int) = { // TODO: take friends count into account here.
+  def canResolveQuest(contentType: ContentType, friendsInvited: Int) = {
     val content = contentType match {
       case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults)
       case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoResults)
@@ -99,6 +99,8 @@ trait SolvingQuests { this: UserLogic =>
       NotEnoughRights
     else if (user.profile.questSolutionContext.takenQuest == None)
       InvalidState
+    else if (!(user.profile.assets canAfford costOfAskingForHelpWithSolution * friendsInvited))
+      NotEnoughAssets
     else
       OK
   }

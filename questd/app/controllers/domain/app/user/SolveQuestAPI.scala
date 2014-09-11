@@ -165,9 +165,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   /**
    * Add a quest to given friends "mustVote" list
    */
-  // TODO: test me.
   def addToMustVoteSolutions(request: AddToMustVoteSolutionsRequest): ApiResult[AddToMustVoteSolutionsResult] = handleDbException {
-
+// TODO: check users are in our friends.
     if (request.friendIds.isEmpty) {
       OkApiResult(AddToMustVoteSolutionsResult(request.user))
     } else {
@@ -187,7 +186,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
   /**
    * Propose solution for quest.
-   */ // TODO: test friends are added and they are in correct order (appended, not prepended).
+   */
+  // TODO: test me with list of friends.
   def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
 
     val user = ensureNoDeadlineQuest(request.user)

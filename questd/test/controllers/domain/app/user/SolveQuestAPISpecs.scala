@@ -37,6 +37,16 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
           voteEndDate = new Date()))
     }
 
+    "Report not enough assets for poor user if he wants to invite friends" in context {
+
+      val u = createUserStub(assets = Assets(0, 0, 0))
+      val s = createSolutionInfoContent
+
+      val result = api.proposeSolution(ProposeSolutionRequest(u, s, List("1", "2", "3")))
+
+      result must beEqualTo(OkApiResult(ProposeSolutionResult(ProfileModificationResult.NotEnoughAssets, None)))
+    }
+
     "Create VIP solution for VIP users" in context {
 
       val u = createUserStub(vip = true)

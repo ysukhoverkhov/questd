@@ -97,7 +97,8 @@ package object domainstubs {
     cultureId: String = "cultureId",
     vip: Boolean = false,
     likedQuestProposalIds: List[List[String]] = List(),
-    friends: List[Friendship] = List()) = {
+    friends: List[Friendship] = List(),
+    assets: Assets = Assets(1000000, 1000000, 1000000)) = {
 
     User(
       id = id,
@@ -108,6 +109,7 @@ package object domainstubs {
         startOfPeriod = new Date(),
         dailyAssetsDecrease = Assets())),
       profile = Profile(
+        assets = assets,
         questSolutionContext = QuestSolutionContext(
           takenQuest = Some(QuestInfoWithID(
             "quest_id",
