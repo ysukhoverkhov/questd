@@ -23,7 +23,7 @@ case class TakeQuestResult(allowed: ProfileModificationResult, profile: Option[P
 case class GetTakeQuestCostRequest(user: User)
 case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Assets)
 
-case class ProposeSolutionRequest(user: User, solution: QuestSolutionInfoContent)
+case class ProposeSolutionRequest(user: User, solution: QuestSolutionInfoContent, friendsToHelp: List[String] = List())
 case class ProposeSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetQuestGiveUpCostRequest(user: User)

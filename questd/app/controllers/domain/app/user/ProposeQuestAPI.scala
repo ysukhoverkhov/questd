@@ -20,7 +20,7 @@ case class GetQuestThemeTakeCostResult(allowed: ProfileModificationResult, cost:
 case class TakeQuestThemeRequest(user: User)
 case class TakeQuestThemeResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class ProposeQuestRequest(user: User, quest: QuestInfoContent)
+case class ProposeQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List())
 case class ProposeQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GiveUpQuestProposalRequest(user: User)
