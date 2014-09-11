@@ -32,6 +32,9 @@ case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: As
 case class GiveUpQuestRequest(user: User)
 case class GiveUpQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
+case class GetQuestSolutionHelpCostRequest(user: User)
+case class GetQuestSolutionHelpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
+
 case class DeadlineQuestRequest(user: User)
 case class DeadlineQuestResult(user: Option[User])
 
@@ -231,6 +234,23 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
       case (a: ProfileModificationResult) => OkApiResult(GiveUpQuestResult(a))
     }
+  }
+
+  def getQuestSolutionHelpCost(request: GetQuestSolutionHelpCostRequest): ApiResult[GetQuestSolutionHelpCostResult] = handleDbException {
+    // TODO: implement me.
+//    request.user.canGiveUpQuest match {
+//      case OK =>
+//
+//        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) ifOk { r =>
+//          val u = db.user.resetQuestSolution(
+//            r.user.id,
+//            config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
+//          OkApiResult(GiveUpQuestResult(OK, u.map(_.profile)))
+//        }
+//
+//      case (a: ProfileModificationResult) =>
+        OkApiResult(GetQuestSolutionHelpCostResult(OK, Some(Assets(coins = 3))))
+//    }
   }
 
   /**

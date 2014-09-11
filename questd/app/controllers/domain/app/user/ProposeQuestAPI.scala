@@ -9,7 +9,7 @@ import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 
 case class GetQuestThemeCostRequest(user: User)
-case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Assets)
+case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Assets) // TODO: here and in all results with modificationResult make result optional.
 
 case class PurchaseQuestThemeRequest(user: User)
 case class PurchaseQuestThemeResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -31,6 +31,9 @@ case class DeadlineQuestProposalResult(user: Option[User])
 
 case class GetQuestProposalGiveUpCostRequest(user: User)
 case class GetQuestProposalGiveUpCostResult(allowed: ProfileModificationResult, cost: Assets)
+
+case class GetQuestProposalHelpCostRequest(user: User)
+case class GetQuestProposalHelpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
 
 case class RewardQuestProposalAuthorRequest(quest: Quest, author: User)
 case class RewardQuestProposalAuthorResult()
@@ -227,6 +230,15 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     import request._
 
     OkApiResult(GetQuestProposalGiveUpCostResult(OK, user.costOfGivingUpQuestProposal))
+  }
+
+  /**
+   * Get cost for asking a friend to help us.
+   */
+  def getQuestProposalHelpCost(request: GetQuestProposalHelpCostRequest): ApiResult[GetQuestProposalHelpCostResult] = handleDbException {
+    import request._
+// TODO: implement me.
+    OkApiResult(GetQuestProposalHelpCostResult(OK, Some(Assets())))
   }
 
   /**

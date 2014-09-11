@@ -1,11 +1,10 @@
 package controllers.web.rest
 
-import play.api._
 import play.api.mvc._
 import controllers.web.rest.component.helpers.AccessToWSInstance
 
 object SolveQuestWS extends Controller with AccessToWSInstance {
-  
+
   def getQuestCost = ws.getQuestCost
   def purchaseQuest = ws.purchaseQuest
 
@@ -17,5 +16,6 @@ object SolveQuestWS extends Controller with AccessToWSInstance {
   def getQuestGiveUpCost = ws.getQuestGiveUpCost
   def giveUpQuest = ws.giveUpQuest
 
+  def getQuestSolutionHelpCost = ws.getQuestSolutionHelpCost
 }
 
