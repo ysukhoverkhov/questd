@@ -214,6 +214,18 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       there was one(api).getVIPSolutions(any[GetVIPSolutionsRequest])
       there were two(api).getAllSolutions(any[GetAllSolutionsRequest])
     }
+
+    "Solution from musthelp list is returned if there is one" in {
+      val qid = "qid"
+      val u = User(mustVoteSolutions = List(qid))
+
+      api.config returns createStubConfig
+      api.getHelpWantedSolutions(any[GetHelpWantedSolutionsRequest]) returns OkApiResult(GetHelpWantedSolutionsResult(List(createSolutionStub(id = qid)).iterator))
+
+      u.getRandomSolution
+
+      there was one(api).getHelpWantedSolutions(any[GetHelpWantedSolutionsRequest])
+    }
   }
 }
 

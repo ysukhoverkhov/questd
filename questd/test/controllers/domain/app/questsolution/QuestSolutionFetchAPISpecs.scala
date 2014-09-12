@@ -86,7 +86,14 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
 
     "getVIPSolutions calls db correctly" in context {
 
-      db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List(), List("a")) returns List().iterator
+      db.solution.allWithParams(
+        List(QuestSolutionStatus.OnVoting.toString),
+        List(),
+        Some(1, 2),
+        0,
+        Some(true),
+        List(),
+        List("a")) returns List().iterator
 
       val result = api.getVIPSolutions(GetVIPSolutionsRequest(User(), QuestSolutionStatus.OnVoting, Some(1, 2), List("a")))
 
@@ -99,6 +106,63 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         null,
         null,
         List("a"))
+    }
+
+    "getHelpWantedSolutions calls db correctly with empty list" in context {
+
+//      db.solution.allWithParams(
+//        List(QuestSolutionStatus.OnVoting.toString),
+//        List(),
+//        Some(1, 2),
+//        0,
+//        Some(true),
+//        List(),
+//        List("a")) returns List(createSolutionStub()).iterator
+
+      val result = api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(User(), QuestSolutionStatus.OnVoting))
+
+//      result must beEqualTo(OkApiResult(GetHelpWantedSolutionsResult(List().iterator)))
+
+      there was no(solution).allWithParams(
+        List(QuestSolutionStatus.OnVoting.toString),
+        null,
+        null,
+        0,
+        Some(true),
+        null,
+        null,
+        List("a"))
+    }
+
+    "getHelpWantedSolutions calls db correctly with not empty list" in context {
+
+      val sol = createSolutionStub()
+
+      db.solution.allWithParams(
+        List(QuestSolutionStatus.OnVoting.toString),
+        null,
+        None,
+        0,
+        null,
+        List("solution_id"),
+        null,
+        null,
+        None) returns List(sol).iterator
+
+      val result = api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(User(mustVoteSolutions = List("solution_id")), QuestSolutionStatus.OnVoting))
+
+      result.body.get.quests.toList must beEqualTo(List(sol))
+
+      there was one(solution).allWithParams(
+        List(QuestSolutionStatus.OnVoting.toString),
+        null,
+        None,
+        0,
+        null,
+        List("solution_id"),
+        null,
+        null,
+        None)
     }
 
     "getAllSolutions calls db correctly" in context {

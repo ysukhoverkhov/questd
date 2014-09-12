@@ -63,7 +63,7 @@ package object domainstubs {
   }
 
   def createSolutionStub(
-    id: String,
+    id: String = "sol id",
     cultureId: String = "cultureId",
     userId: String = "uid",
     questId: String = "qid",

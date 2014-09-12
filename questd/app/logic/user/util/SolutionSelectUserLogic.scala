@@ -25,6 +25,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   def getSolutionsWithSuperAlgorithm: Iterator[QuestSolution] = {
     val algs = List(
       () => getTutorialSolutions,
+      () => getHelpWantedSolutions,
       () => getStartingSolutions,
       () => getDefaultSolutions)
 
@@ -34,6 +35,18 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   private[user] def getTutorialSolutions: Option[Iterator[QuestSolution]] = {
     Logger.trace("getTutorialSolutions")
     None
+  }
+
+  private[user] def getHelpWantedSolutions: Option[Iterator[QuestSolution]] = {
+    Logger.trace("getHelpWantedSolutions")
+
+    if (user.mustVoteSolutions.nonEmpty) {
+      Some(api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(
+        user,
+        QuestSolutionStatus.OnVoting)).body.get.quests)
+    } else {
+      None
+    }
   }
 
   private[user] def getStartingSolutions: Option[Iterator[QuestSolution]] = {
