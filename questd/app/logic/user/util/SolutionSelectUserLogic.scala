@@ -43,7 +43,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     if (user.mustVoteSolutions.nonEmpty) {
       Some(api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(
         user,
-        QuestSolutionStatus.OnVoting)).body.get.quests)
+        QuestSolutionStatus.OnVoting)).body.get.solutions)
     } else {
       None
     }

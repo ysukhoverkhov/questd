@@ -84,7 +84,6 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
     }
 
     "Create VIP solution for VIP users" in context {
-
       val u = createUserStub(vip = true)
       val s = createSolutionInfoContent
 

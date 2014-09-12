@@ -176,7 +176,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         solutionId = request.solutionId)
 
       {
-        Logger.error("!!!!!!!!!!!!!!!!! asdlsald !!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         adjustAssets(AdjustAssetsRequest(
           user = request.user,
           cost = Some(request.user.costOfAskingForHelpWithSolution * request.friendIds.length)))

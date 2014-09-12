@@ -151,7 +151,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
 
       val result = api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(User(mustVoteSolutions = List("solution_id")), QuestSolutionStatus.OnVoting))
 
-      result.body.get.quests.toList must beEqualTo(List(sol))
+      result.body.get.solutions.toList must beEqualTo(List(sol))
 
       there was one(solution).allWithParams(
         List(QuestSolutionStatus.OnVoting.toString),

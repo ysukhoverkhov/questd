@@ -5,7 +5,7 @@ import models.domain._
 import controllers.domain.helpers._
 import controllers.domain._
 import play.Logger
-
+// TODO: rename all quests to solutions.
 case class GetFriendsSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
 case class GetFriendsSolutionsResult(quests: Iterator[QuestSolution])
 
@@ -19,7 +19,7 @@ case class GetVIPSolutionsRequest(user: User, status: QuestSolutionStatus.Value,
 case class GetVIPSolutionsResult(quests: Iterator[QuestSolution])
 
 case class GetHelpWantedSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
-case class GetHelpWantedSolutionsResult(quests: Iterator[QuestSolution])
+case class GetHelpWantedSolutionsResult(solutions: Iterator[QuestSolution])
 
 case class GetAllSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None, themeIds: List[String] = List())
 case class GetAllSolutionsResult(quests: Iterator[QuestSolution])

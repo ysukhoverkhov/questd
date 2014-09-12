@@ -29,7 +29,7 @@ package object domainstubs {
         description = desc))
 
   def createQuestStub(
-    id: String,
+    id: String = "id",
     authorId: String = "authorId",
     themeId: String = "themeId",
     status: QuestStatus.Value = QuestStatus.OnVoting,
@@ -98,7 +98,8 @@ package object domainstubs {
     vip: Boolean = false,
     likedQuestProposalIds: List[List[String]] = List(),
     friends: List[Friendship] = List(),
-    assets: Assets = Assets(1000000, 1000000, 1000000)) = {
+    assets: Assets = Assets(1000000, 1000000, 1000000),
+    mustVoteSolutions: List[String] = List()) = {
 
     User(
       id = id,
@@ -126,7 +127,8 @@ package object domainstubs {
           questProposalCooldown = new Date(Long.MaxValue)),
         publicProfile = PublicProfile(vip = vip),
         rights = Rights.full),
-      friends = friends)
+      friends = friends,
+      mustVoteSolutions = mustVoteSolutions)
   }
 
 }

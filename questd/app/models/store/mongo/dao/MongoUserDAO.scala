@@ -109,6 +109,18 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
+  def removeMustVoteSolution(id: String, solutionId: String): Option[User] = {
+    // TODO: test me.
+    findAndModify(
+      id,
+      MongoDBObject(
+        "pull" -> MongoDBObject(
+          "mustVoteSolutions" -> solutionId)))
+  }
+
+  /**
+   *
+   */
   def selectQuestProposalVote(id: String, qi: QuestInfoWithID, theme: Theme): Option[User] = {
     findAndModify(
       id,

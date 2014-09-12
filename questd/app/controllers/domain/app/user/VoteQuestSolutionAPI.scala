@@ -29,20 +29,23 @@ private[domain] trait VoteQuestSolutionAPI {
     user.canGetQuestSolutionForVote match {
       case OK =>
 
-        // Updating user profile.
-        val q = user.getQuestSolutionToVote
-
-        q match {
-          case None => OkApiResult(GetQuestSolutionToVoteResult(OutOfContent))
-          case Some(a) =>
-            val qsi = QuestSolutionInfoWithID(a.id, a.info)
-            val qsa = db.user.readById(a.info.authorId).map(author => PublicProfileWithID(author.id, author.profile.publicProfile))
-            val questInfo = db.quest.readById(a.info.questId).map(qi => QuestInfoWithID(qi.id, qi.info))
-
+        user.getQuestSolutionToVote match {
+          case None =>
+            OkApiResult(GetQuestSolutionToVoteResult(OutOfContent))
+          case Some(solution) =>
+            val qsInfo = QuestSolutionInfoWithID(solution.id, solution.info)
+            val qsAuthor = db.user.readById(solution.info.authorId).map(author => PublicProfileWithID(author.id, author.profile.publicProfile))
+            val questInfo = db.quest.readById(solution.info.questId).map(qi => QuestInfoWithID(qi.id, qi.info))
             questInfo ifSome { questInfoValue =>
-              qsa ifSome { qsaValue =>
-                val u = db.user.selectQuestSolutionVote(user.id, qsi, qsaValue, questInfoValue)
-                OkApiResult(GetQuestSolutionToVoteResult(OK, u.map(_.profile)))
+              qsAuthor ifSome { qsaValue =>
+                db.user.selectQuestSolutionVote(user.id, qsInfo, qsaValue, questInfoValue) ifSome { u =>
+
+                  if (u.mustVoteSolutions.contains(solution)) {
+                    db.user.removeMustVoteSolution(u.id, solution.id)
+                  }
+
+                  OkApiResult(GetQuestSolutionToVoteResult(OK, Some(u.profile)))
+                }
               }
             }
         }
