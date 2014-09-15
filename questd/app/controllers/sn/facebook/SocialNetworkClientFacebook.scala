@@ -8,25 +8,22 @@ import com.restfb.exception._
 import play.Logger
 import controllers.sn.exception.AuthException
 import controllers.sn.exception.NetworkException
-import com.restfb.types.Location
 import controllers.sn.exception.LogicException
 
 private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
 
-  private val facebookClient = (x: String) => new FacebookClientRepeater(new DefaultFacebookClient(x))
+  private val facebookClient = (x: String) => new FacebookClientRepeater(new DefaultFacebookClient(x, Version.VERSION_2_0))
 
   /// Facebook exception handler.
   private def handleExceptions[T](f: => T): T = try {
     f
   } catch {
-    case ex: FacebookOAuthException => {
+    case ex: FacebookOAuthException =>
       Logger.debug("Facebook auth failed")
       throw new AuthException
-    }
-    case ex: FacebookNetworkException => {
+    case ex: FacebookNetworkException =>
       Logger.debug("Unable to connect to facebook")
       throw new NetworkException
-    }
   }
 
   /// Get user of social network.
@@ -43,7 +40,7 @@ private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
   /// Get all social networks friends.
   def fetchFriendsByToken(token: String): List[SNUser] = handleExceptions {
     import collection.JavaConversions._
-    facebookClient(token).fetchConnection("me/friends", classOf[com.restfb.types.User]).getData().toList.map(SNUserFacebook(_, this, ""))
+    facebookClient(token).fetchConnection("me/friends", classOf[com.restfb.types.User]).getData.toList.map(SNUserFacebook(_, this, ""))
   }
 
   /// Fetches location of user from FB.

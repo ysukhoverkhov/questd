@@ -20,7 +20,7 @@ libraryDependencies += "se.radley" %% "play-plugins-salat" % "1.5.0"
 
 libraryDependencies += "us.theatr" %% "akka-quartz" % "0.3.0-SNAPSHOT"
 
-libraryDependencies += "com.restfb" % "restfb" % "1.6.14"
+libraryDependencies += "com.restfb" % "restfb" % "1.6.15"
 
 libraryDependencies += "org.mockito" % "mockito-all" % "1.9.5"
 
