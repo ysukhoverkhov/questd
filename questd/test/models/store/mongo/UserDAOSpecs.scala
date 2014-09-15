@@ -34,8 +34,6 @@ class UserDAOSpecs
       db.user.create(User(user_id, AuthInfo(snids = Map("FB" -> fbid))))
       val u = db.user.readBySNid("FB", fbid)
 
-      Logger.error(u.toString)
-
       u must beSome
       u must beSome.which((u: User) => u.id == user_id)
     }
