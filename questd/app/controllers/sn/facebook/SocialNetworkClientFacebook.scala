@@ -44,7 +44,7 @@ private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
   }
 
   /// Fetches location of user from FB.
-  private[facebook] def fetchLocationFromFB(token: String): FQLLocation = {
+  private[facebook] def fetchLocationFromFB(token: String): FQLLocation = handleExceptions {
     val query = "SELECT current_location FROM user WHERE uid=me()"
 
     val locations = facebookClient(token).executeFqlQuery(query, classOf[FQLLocation])
@@ -55,7 +55,6 @@ private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
 
     locations.get(0)
   }
-
 }
 
 private[sn] object SocialNetworkClientFacebook {
