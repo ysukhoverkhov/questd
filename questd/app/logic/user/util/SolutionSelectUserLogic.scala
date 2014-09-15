@@ -84,7 +84,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Some(api.getFriendsSolutions(GetFriendsSolutionsRequest(
       user,
       QuestSolutionStatus.OnVoting,
-      levels)).body.get.quests)
+      levels)).body.get.solutions)
   }
 
   private[user] def getShortlistSolutions = {
@@ -92,7 +92,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Some(api.getShortlistSolutions(GetShortlistSolutionsRequest(
       user,
       QuestSolutionStatus.OnVoting,
-      levels)).body.get.quests)
+      levels)).body.get.solutions)
   }
 
   private[user] def getSolutionsForLikedQuests = {
@@ -100,7 +100,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Some(api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
       user,
       QuestSolutionStatus.OnVoting,
-      levels)).body.get.quests)
+      levels)).body.get.solutions)
   }
 
   private[user] def getVIPSolutions = {
@@ -113,7 +113,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user,
       QuestSolutionStatus.OnVoting,
       levels,
-      themeIds)).body.get.quests)
+      themeIds)).body.get.solutions)
   }
 
   private[user] def getOtherSolutions = {
@@ -126,7 +126,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user,
       QuestSolutionStatus.OnVoting,
       levels,
-      themeIds)).body.get.quests)
+      themeIds)).body.get.solutions)
   }
 
   private[user] def getAllSolutions = {
@@ -135,7 +135,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Some(api.getAllSolutions(GetAllSolutionsRequest(
       user,
       QuestSolutionStatus.OnVoting,
-      levels)).body.get.quests)
+      levels)).body.get.solutions)
   }
 
   /**

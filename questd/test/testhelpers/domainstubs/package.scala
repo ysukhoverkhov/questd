@@ -99,13 +99,16 @@ package object domainstubs {
     likedQuestProposalIds: List[List[String]] = List(),
     friends: List[Friendship] = List(),
     assets: Assets = Assets(1000000, 1000000, 1000000),
-    mustVoteSolutions: List[String] = List()) = {
+    mustVoteSolutions: List[String] = List(),
+    favThemes: List[String] = List()) = {
 
     User(
       id = id,
       demo = UserDemographics(
         cultureId = Some(cultureId)),
-      history = UserHistory(likedQuestProposalIds = likedQuestProposalIds),
+      history = UserHistory(
+        likedQuestProposalIds = likedQuestProposalIds,
+        selectedThemeIds = favThemes),
       privateDailyResults = List(DailyResult(
         startOfPeriod = new Date(),
         dailyAssetsDecrease = Assets())),

@@ -46,7 +46,7 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
       u.canPurchaseQuestProposals must beEqualTo(CoolDown)
     }
 
-    "Report different cooldowd for users in different timezone" in {
+    "Report different cooldown for users in different timezone" in {
 
       val u1 = User(
         id = "",

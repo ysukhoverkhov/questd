@@ -2,7 +2,7 @@ package logic.user
 
 import controllers.domain.OkApiResult
 import controllers.domain.admin._
-import controllers.domain.app.theme.GetAllThemesForCultureResult
+import controllers.domain.app.theme.{GetAllThemesForCultureRequest, GetAllThemesForCultureResult}
 import controllers.domain.config._ConfigParams
 import models.domain._
 import models.domain.admin.ConfigSection
@@ -31,16 +31,6 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
     config
   }
 
-  /**
-   * Creates user we will test algorithm with
-   */
-  private def createUser(themes: List[Theme], favTheme: Int) = {
-    User(
-      demo = UserDemographics(cultureId = Some("cultureId")),
-      history = UserHistory(
-        selectedThemeIds = List(themes(favTheme).id, themes(1).id)))
-  }
-
   "User Logic" should {
 
     "Return correct theme from favorite" in {
@@ -49,6 +39,7 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
       val favTheme = 4
 
       def fillMocks = {
+        api.getAllThemesForCulture(any[GetAllThemesForCultureRequest]) returns OkApiResult(GetAllThemesForCultureResult(themes.iterator))
         api.allThemes(AllThemesRequest(sorted = true)) returns OkApiResult(AllThemesResult(themes.iterator))
         api.getTheme(GetThemeRequest(themes(favTheme).id)) returns OkApiResult(GetThemeResult(themes(favTheme)))
 
@@ -60,7 +51,7 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
 
       fillMocks
 
-      val u = createUser(themes, favTheme)
+      val u = createUserStub(favThemes = List(themes(favTheme).id, themes(1).id))
       val ot = u.getRandomThemeForQuestProposal(createStubThemes.length)
       there was one(rand).nextDouble
       there was one(rand).nextInt(anyInt)
@@ -83,7 +74,7 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
 
       fillMocks
 
-      val u = createUser(themes, 4)
+      val u = createUserStub(favThemes = List(themes(4).id, themes(1).id))
       val ot = u.getRandomThemeForQuestProposal(createStubThemes.length)
       there was one(rand).nextDouble
       ot must beSome.which((t: Theme) => t.id == themes(0).id)
@@ -101,7 +92,7 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
 
       fillMocks
 
-      User().getRandomThemeForQuestProposal(10) must beNone
+      createUserStub().getRandomThemeForQuestProposal(10) must beNone
     }
 
   }

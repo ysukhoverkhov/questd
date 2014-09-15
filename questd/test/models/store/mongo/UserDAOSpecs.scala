@@ -483,6 +483,19 @@ class UserDAOSpecs
       val ou3 = db.user.readById(userids(1))
       ou3 must beSome.which((u: User) => solIds forall u.mustVoteSolutions.contains)
     }
+
+    "removeMustVoteSolution removes it actually" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val sol = "solid"
+      val u = User(id = "idid", mustVoteSolutions = List(sol))
+
+      db.user.create(u)
+      db.user.removeMustVoteSolution(u.id, sol)
+
+      val ou1 = db.user.readById(u.id)
+      ou1 must beSome//.which((u: User) => u.mustVoteSolutions == List())
+    }
   }
 }
 

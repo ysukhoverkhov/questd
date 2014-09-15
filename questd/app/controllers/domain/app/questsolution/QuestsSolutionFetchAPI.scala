@@ -5,24 +5,24 @@ import models.domain._
 import controllers.domain.helpers._
 import controllers.domain._
 import play.Logger
-// TODO: rename all quests to solutions.
+
 case class GetFriendsSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
-case class GetFriendsSolutionsResult(quests: Iterator[QuestSolution])
+case class GetFriendsSolutionsResult(solutions: Iterator[QuestSolution])
 
 case class GetShortlistSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
-case class GetShortlistSolutionsResult(quests: Iterator[QuestSolution])
+case class GetShortlistSolutionsResult(solutions: Iterator[QuestSolution])
 
 case class GetSolutionsForLikedQuestsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
-case class GetSolutionsForLikedQuestsResult(quests: Iterator[QuestSolution])
+case class GetSolutionsForLikedQuestsResult(solutions: Iterator[QuestSolution])
 
 case class GetVIPSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None, themeIds: List[String])
-case class GetVIPSolutionsResult(quests: Iterator[QuestSolution])
+case class GetVIPSolutionsResult(solutions: Iterator[QuestSolution])
 
 case class GetHelpWantedSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
 case class GetHelpWantedSolutionsResult(solutions: Iterator[QuestSolution])
 
 case class GetAllSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None, themeIds: List[String] = List())
-case class GetAllSolutionsResult(quests: Iterator[QuestSolution])
+case class GetAllSolutionsResult(solutions: Iterator[QuestSolution])
 
 
 private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>

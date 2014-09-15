@@ -94,7 +94,6 @@ private[mongo] class MongoUserDAO
    *
    */
   def populateMustVoteSolutionsList(userIds: List[String], solutionId: String): Unit = {
-
     update(
       query = MongoDBObject(
         "id" -> MongoDBObject(
@@ -110,11 +109,10 @@ private[mongo] class MongoUserDAO
    *
    */
   def removeMustVoteSolution(id: String, solutionId: String): Option[User] = {
-    // TODO: test me.
     findAndModify(
       id,
       MongoDBObject(
-        "pull" -> MongoDBObject(
+        "$pull" -> MongoDBObject(
           "mustVoteSolutions" -> solutionId)))
   }
 
