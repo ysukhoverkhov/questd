@@ -205,10 +205,10 @@ package object protocol {
 
   type WSGetSolutionResult = GetSolutionResult
 
-  case class WSGetPublicProfileRequest(
-    id: String)
+  case class WSGetPublicProfilesRequest(
+    ids: List[String])
 
-  type WSGetPublicProfileResult = GetPublicProfileResult
+  type WSGetPublicProfileResult = GetPublicProfilesResult
 
   case class WSGetSolutionsForQuestRequest(
     id: String,

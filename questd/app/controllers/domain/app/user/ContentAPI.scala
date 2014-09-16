@@ -1,13 +1,11 @@
 package controllers.domain.app.user
 
 import models.domain._
-import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import models.domain.view._
-import logic._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
 
@@ -28,10 +26,12 @@ case class GetSolutionResult(
   quest: Option[QuestInfoWithID] = None,
   questAuthor: Option[PublicProfileWithID] = None)
 
-case class GetPublicProfileRequest(user: User, userId: String)
-case class GetPublicProfileResult(
+case class GetPublicProfilesRequest(
+  user: User,
+  userIds: List[String])
+case class GetPublicProfilesResult(
   allowed: ProfileModificationResult,
-  publicProfile: Option[PublicProfile])
+  publicProfiles: List[PublicProfileWithID])
 
 case class GetOwnSolutionsRequest(
   user: User,
@@ -100,23 +100,19 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     import request._
 
     db.quest.readById(questId) match {
-      case Some(q) => {
+      case Some(q) =>
         db.theme.readById(q.info.themeId) match {
-          case Some(t) => {
+          case Some(t) =>
             OkApiResult(GetQuestResult(OK, Some(q.info), Some(t)))
-          }
 
-          case None => {
+          case None =>
             Logger.error("API - getQuest. Theme is missing for id = " + q.info.themeId)
             InternalErrorApiResult()
-          }
         }
-      }
 
-      case None => {
+      case None =>
         Logger.error("API - getQuest. Quest is missing for id = " + questId)
         InternalErrorApiResult()
-      }
     }
   }
 
@@ -133,7 +129,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
       val quest = db.quest.readById(s.info.questId)
       val questInfo = quest.map(q => QuestInfoWithID(q.id, q.info))
-      val questAuthor = quest.flatMap(q => db.user.readById(q.info.authorId).map (u => PublicProfileWithID(u.id, u.profile.publicProfile))) 
+      val questAuthor = quest.flatMap(q => db.user.readById(q.info.authorId).map (u => PublicProfileWithID(u.id, u.profile.publicProfile)))
       val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readById(id))
       val rivalSolutionInfo = rivalSolution.map(rs => QuestSolutionInfoWithID(rs.id, rs.info))
       val rivalRating = rivalSolution.map(rs => rs.rating)
@@ -154,13 +150,12 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   /**
    * Get public profile
    */
-  def getPublicProfile(request: GetPublicProfileRequest): ApiResult[GetPublicProfileResult] = handleDbException {
+  def getPublicProfiles(request: GetPublicProfilesRequest): ApiResult[GetPublicProfilesResult] = handleDbException {
+    val maxPageSize = 50
 
-    getUser(UserRequest(userId = Some(request.userId))) ifOk { r =>
-      OkApiResult(GetPublicProfileResult(
-        allowed = OK,
-        publicProfile = Some(r.user.profile.publicProfile)))
-    }
+    OkApiResult(GetPublicProfilesResult(
+      allowed = OK,
+      publicProfiles = db.user.readSomeByIds(request.userIds.take(maxPageSize)).toList.map(u => PublicProfileWithID(u.id, u.profile.publicProfile))))
   }
 
   /**
@@ -181,7 +176,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         quest = db.quest.readById(s.info.questId).map(qu => QuestInfoWithID(qu.id, qu.info)),
         author = None)
     })
-      
+
     OkApiResult(GetOwnSolutionsResult(
       allowed = OK,
       solutions = solutions,

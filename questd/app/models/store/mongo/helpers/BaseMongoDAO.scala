@@ -64,6 +64,18 @@ abstract class BaseMongoDAO[T <: ID : Manifest](collectionName: String)
   }
 
   /**
+   * Read several documents by their ids.
+   * @param ids Ids of documents to read.
+   * @param skip Number of documents to skip. 0 - do not skip.
+   * @return Iterator with found documents.
+   */
+  def readSomeByIds(ids: List[String], skip: Int = 0): Iterator[T] = wrapMongoException {
+    find(MongoDBObject(
+      keyFieldName -> MongoDBObject(
+        "$in" -> ids))).skip(skip)
+  }
+
+  /**
    * Searches for object by query object.
    */
   def readByExample[R](fieldName: String, key: String)(implicit view: T => R): Option[R] = wrapMongoException {

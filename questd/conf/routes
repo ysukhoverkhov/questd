@@ -64,7 +64,7 @@ POST	/rest/getLevelsForRights						controllers.web.rest.DailyResultWS.getLevelsF
 # Content requests
 POST	/rest/getQuest									controllers.web.rest.ContentWS.getQuest
 POST	/rest/getSolution								controllers.web.rest.ContentWS.getSolution
-POST	/rest/getPublicProfile							controllers.web.rest.ContentWS.getPublicProfile
+POST	/rest/getPublicProfiles							controllers.web.rest.ContentWS.getPublicProfiles
 
 POST	/rest/getOwnSolutions				            controllers.web.rest.ContentWS.getOwnSolutions
 POST	/rest/getOwnQuests					            controllers.web.rest.ContentWS.getOwnQuests
