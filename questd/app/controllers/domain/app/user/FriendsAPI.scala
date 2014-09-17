@@ -5,9 +5,7 @@ import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
-import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
-import play.api.i18n.Messages
 
 case class GetFriendsRequest(
   user: User)
@@ -135,20 +133,22 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
           FriendshipStatus.Accepted.toString,
           FriendshipStatus.Accepted.toString)
 
+        // TODO: remove friends.accepted from friendship.
+
         // Sending message about good response on friendship.
-        db.user.readById(request.friendId) match {
-          case Some(f) => sendMessage(SendMessageRequest(f, Message(text = Messages("friends.accepted", request.user.id))))
-          case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
+        db.user.readById(request.friendId) ifSome { f =>
+          sendMessage(SendMessageRequest(f, MessageFriendshipAccepted(request.user.id)))
         }
 
       } else {
 
         db.user.removeFriendship(request.user.id, request.friendId)
 
+        // TODO: remove friends.rejected from friendship.
+
         // sending message for rejected response.
-        db.user.readById(request.friendId) match {
-          case Some(f) => sendMessage(SendMessageRequest(f, Message(text = Messages("friends.rejected", request.user.id))))
-          case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
+        db.user.readById(request.friendId) ifSome { f =>
+          sendMessage(SendMessageRequest(f, MessageFriendshipRejected(request.user.id)))
         }
       }
 
@@ -170,12 +170,13 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
       db.user.removeFriendship(request.user.id, request.friendId)
 
+      // TODO: remove friends.removed from strings.
+
       request.user.friends.find(_.friendId == request.friendId) ifSome { v =>
         // Sending message about removed friend to friend.
         if (v.status == FriendshipStatus.Accepted) {
-          db.user.readById(request.friendId) match {
-            case Some(f) => sendMessage(SendMessageRequest(f, Message(text = Messages("friends.removed", request.user.id))))
-            case None => Logger.error("Unable to find friend for sending him a message " + request.friendId)
+          db.user.readById(request.friendId) ifSome { f =>
+            sendMessage(SendMessageRequest(f, MessageFriendshipRemoved(request.user.id)))
           }
         }
 
