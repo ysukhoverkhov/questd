@@ -164,9 +164,10 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     user.canProposeQuest(request.quest.media.contentType) match {
       case OK =>
 
-        if (request.quest.description.length > 140) { // TODO: move it to config.
+        if (request.quest.description.length > api.config(api.ConfigParams.ProposalMaxDescriptionLength).toInt) {
           OkApiResult(ProposeQuestResult(LimitExceeded, None))
         } else {
+
           def content = if (request.user.payedAuthor) {
             request.quest
           } else {
@@ -174,11 +175,8 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
           }
 
           {
-
             makeTask(MakeTaskRequest(user, taskType = Some(TaskType.SubmitQuestProposal)))
-
           } ifOk { r =>
-
             r.user.profile.questProposalContext.takenTheme ifSome { takenTheme =>
               r.user.demo.cultureId ifSome { culture =>
                 db.quest.create(
