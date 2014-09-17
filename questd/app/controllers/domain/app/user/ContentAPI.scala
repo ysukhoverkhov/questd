@@ -211,7 +211,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForQuest = db.solution.allWithParams(
-      status = request.status.map(_.toString),
+      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains).map(_.toString),
       questIds = List(request.questId),
       skip = pageNumber * pageSize)
 
@@ -237,7 +237,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForUser = db.solution.allWithParams(
-      status = request.status.map(_.toString),
+      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains).map(_.toString),
       authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
@@ -263,7 +263,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val questsForUser = db.quest.allWithParams(
-      request.status.map(_.toString),
+      request.status.filter(Set(QuestStatus.InRotation).contains).map(_.toString),
       List(request.userId),
       skip = pageNumber * pageSize)
 
