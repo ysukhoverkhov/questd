@@ -18,6 +18,8 @@ trait VotingQuestSolutions { this: UserLogic =>
       NotEnoughRights
     else if (user.profile.questSolutionVoteContext.reviewingQuestSolution != None)
       InvalidState
+    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+      IncompleteProfile
     else
       OK
   }

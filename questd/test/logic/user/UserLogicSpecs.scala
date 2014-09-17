@@ -3,17 +3,19 @@ package logic.user
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
 import org.joda.time.Hours
+import testhelpers.domainstubs._
+import java.util.Date
 
 class UserLogicSpecs extends BaseUserLogicSpecs {
 
   "User Logic" should {
 
     "Allow user without coins purchase themes" in {
-      val u = User(id = "",
-        profile = Profile(
-            publicProfile = PublicProfile(level = 20),
-            assets = Assets(0, 0, 0),
-            rights = Rights.full))
+      val u = createUserStub(
+        level = 20,
+        assets = Assets(0, 0, 0),
+        questProposalCooldown = new Date(0),
+        takenTheme = None)
 
       u.canPurchaseQuestProposals must beEqualTo(OK)
     }
@@ -26,8 +28,11 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
     }
 
     "Allow user with level and money purchase themes" in {
-      val u = User(id = "",
-        profile = Profile(publicProfile = PublicProfile(level = 12), assets = Assets(100000, 100000, 1000000), rights = Rights.full))
+      val u = createUserStub(
+        level = 12,
+        assets = Assets(100000, 100000, 1000000),
+        questProposalCooldown = new Date(0),
+        takenTheme = None)
 
       u.canPurchaseQuestProposals must beEqualTo(OK)
     }

@@ -1,7 +1,6 @@
 package testhelpers
 
 import java.util.Date
-
 import models.domain._
 import models.domain.base.ID
 import models.domain.view.{QuestInfoWithID, ThemeWithID}
@@ -100,7 +99,10 @@ package object domainstubs {
     friends: List[Friendship] = List(),
     assets: Assets = Assets(1000000, 1000000, 1000000),
     mustVoteSolutions: List[String] = List(),
-    favThemes: List[String] = List()) = {
+    favThemes: List[String] = List(),
+    level: Int = 18,
+    questProposalCooldown: Date = new Date(Long.MaxValue),
+    takenTheme: Option[ThemeWithID] = Some(ThemeWithID("theme_id", createThemeStub().info))) = {
 
     User(
       id = id,
@@ -126,9 +128,13 @@ package object domainstubs {
           questDeadline = new Date(Long.MaxValue)),
         questProposalContext = QuestProposalConext(
           approveReward = Assets(1, 2, 3),
-          takenTheme = Some(ThemeWithID("theme_id", createThemeStub().info)),
-          questProposalCooldown = new Date(Long.MaxValue)),
-        publicProfile = PublicProfile(vip = vip),
+          takenTheme = takenTheme,
+          questProposalCooldown = questProposalCooldown),
+        publicProfile = PublicProfile(
+          vip = vip,
+          level = level,
+          bio = Bio(
+            gender = Gender.Male)),
         rights = Rights.full),
       friends = friends,
       mustVoteSolutions = mustVoteSolutions)

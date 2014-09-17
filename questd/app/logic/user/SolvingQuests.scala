@@ -28,6 +28,8 @@ trait SolvingQuests { this: UserLogic =>
       CoolDown
     else if (user.profile.questSolutionContext.takenQuest != None)
       InvalidState
+    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+      IncompleteProfile
     else
       OK
   }

@@ -31,6 +31,8 @@ trait ProposingQuests { this: UserLogic =>
       CoolDown
     else if (user.profile.questProposalContext.takenTheme != None)
       InvalidState
+    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+      IncompleteProfile
     else
       OK
   }
