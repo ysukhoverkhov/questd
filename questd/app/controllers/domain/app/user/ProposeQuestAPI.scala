@@ -164,40 +164,45 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
     user.canProposeQuest(request.quest.media.contentType) match {
       case OK =>
 
-        def content = if (request.user.payedAuthor) {
-          request.quest
+        if (request.quest.description.length > 140) { // TODO: move it to config.
+          OkApiResult(ProposeQuestResult(LimitExceeded, None))
         } else {
-          request.quest
-        }
+          def content = if (request.user.payedAuthor) {
+            request.quest
+          } else {
+            request.quest
+          }
 
-        {
+          {
 
-          makeTask(MakeTaskRequest(user, taskType = Some(TaskType.SubmitQuestProposal)))
+            makeTask(MakeTaskRequest(user, taskType = Some(TaskType.SubmitQuestProposal)))
 
-        } ifOk { r =>
+          } ifOk { r =>
 
-          r.user.profile.questProposalContext.takenTheme ifSome { takenTheme =>
-            r.user.demo.cultureId ifSome { culture =>
-              db.quest.create(
-                Quest(
-                  cultureId = culture,
-                  approveReward = r.user.profile.questProposalContext.approveReward,
-                  info = QuestInfo(
-                    authorId = r.user.id,
-                    themeId = takenTheme.id,
-                    content = content,
+            r.user.profile.questProposalContext.takenTheme ifSome { takenTheme =>
+              r.user.demo.cultureId ifSome { culture =>
+                db.quest.create(
+                  Quest(
+                    cultureId = culture,
+                    approveReward = r.user.profile.questProposalContext.approveReward,
+                    info = QuestInfo(
+                      authorId = r.user.id,
+                      themeId = takenTheme.id,
+                      content = content,
 
-                    vip = r.user.profile.publicProfile.vip)))
+                      vip = r.user.profile.publicProfile.vip)))
 
-              val u = db.user.resetQuestProposal(
-                user.id,
-                config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
+                val u = db.user.resetQuestProposal(
+                  user.id,
+                  config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
 
-              OkApiResult(ProposeQuestResult(OK, u.map(_.profile)))
+                OkApiResult(ProposeQuestResult(OK, u.map(_.profile)))
 
+              }
             }
           }
         }
+
       case (a: ProfileModificationResult) => OkApiResult(ProposeQuestResult(a))
     }
   }

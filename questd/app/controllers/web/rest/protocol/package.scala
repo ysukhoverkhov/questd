@@ -94,6 +94,16 @@ package object protocol {
    */
   type WSProposeQuestResult = ProposeQuestResult
 
+  case class WSContentReference(
+    contentType: String,
+    storage: String,
+    reference: String)
+
+  case class WSProposeQuestRequest(
+    media: WSContentReference,
+    icon: Option[WSContentReference] = None,
+    description: String)
+
   /**
    *
    */

@@ -5,6 +5,7 @@ import controllers.web.rest.component.helpers._
 import controllers.web.rest.protocol._
 import models.domain._
 
+
 trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
   def getQuestThemeCost = wrapApiCallReturnBody[WSGetQuestThemeCostResult] { r =>
@@ -25,9 +26,23 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl with Common
 
 
   def proposeQuest = wrapJsonApiCallReturnBody[WSProposeQuestResult] { (js, r) =>
-      val v = Json.read[QuestInfoContent](js)
+    implicit def toContentReference(v: WSContentReference): ContentReference = {
+      ContentReference(
+        contentType = ContentType.withName(v.contentType),
+        storage = v.storage,
+        reference = v.reference
+      )
+    }
+    implicit def toQuestInfoContent(v: WSProposeQuestRequest): QuestInfoContent = {
+      QuestInfoContent(
+        media = v.media,
+        icon = v.icon.map(r => r),
+        description = v.description)
+    }
 
-      api.proposeQuest(ProposeQuestRequest(r.user, v))
+    val v = Json.read[WSProposeQuestRequest](js)
+
+    api.proposeQuest(ProposeQuestRequest(r.user, v))
   }
 
 
