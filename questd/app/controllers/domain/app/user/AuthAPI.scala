@@ -21,52 +21,51 @@ private[domain] trait AuthAPI {
   /**
    * Login with FB. Or create new one if it doesn't exists.
    */
-  def login(params: LoginRequest): ApiResult[LoginResult] = handleDbException {
+  def login(request: LoginRequest): ApiResult[LoginResult] = handleDbException {
 
     def login(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString
       db.user.updateSessionId(user.id, uuid)
 
       // Update here country from time to time.
-      updateUserCulture(UpdateUserCultureRequest(user)) ifOk { r =>
+      updateUserCulture(UpdateUserCultureRequest(user)) ifOk {
+        api.processFriendshipInvitationsFromSN(ProcessFriendshipInvitationsFromSNRequest(user, request.snuser))
         OkApiResult(LoginResult(uuid))
       }
-
     }
 
+    def createUserAndLogin = {
+      Logger.debug("No user with FB id found, creating new one " + request.snuser.snId)
 
-    Logger.debug("Searching for user in database for login with fbid " + params.snuser.snId)
+      val newUser = User(
+        auth = AuthInfo(
+          snids = Map(request.snName -> request.snuser.snId)),
+        profile = Profile(
+          publicProfile = PublicProfile(
+            bio = Bio(
+              name = request.snuser.firstName,
+              gender = request.snuser.gender,
+              timezone = request.snuser.timezone,
+              country = request.snuser.country,
+              city = request.snuser.city,
+              avatar = Some(
+                ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = request.snuser.snId))))))
 
-    db.user.readBySNid(params.snName, params.snuser.snId) match {
+      db.user.create(newUser)
+      checkIncreaseLevel(CheckIncreaseLevelRequest(newUser))
+
+      db.user.readBySNid(request.snName, request.snuser.snId) ifSome { user =>
+          Logger.debug("New user with FB created " + user)
+          login(user)
+      }
+    }
+
+    Logger.debug("Searching for user in database for login with fbid " + request.snuser.snId)
+
+    db.user.readBySNid(request.snName, request.snuser.snId) match {
       case None =>
-        Logger.debug("No user with FB id found, creating new one " + params.snuser.snId)
-
-        val newUser = User(
-          auth = AuthInfo(
-            snids = Map(params.snName -> params.snuser.snId)),
-          profile = Profile(
-            publicProfile = PublicProfile(
-              bio = Bio(
-                name = params.snuser.firstName,
-                gender = params.snuser.gender,
-                timezone = params.snuser.timezone,
-                country = params.snuser.country,
-                city = params.snuser.city,
-                avatar = Some(
-                  ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = params.snuser.snId))))))
-
-        db.user.create(newUser)
-        checkIncreaseLevel(CheckIncreaseLevelRequest(newUser))
-
-        db.user.readBySNid(params.snName, params.snuser.snId) match {
-          case None =>
-            Logger.error("Unable to find user just created in DB with fbid " + params.snuser.snId)
-            InternalErrorApiResult()
-
-          case Some(user) =>
-            Logger.debug("New user with FB created " + user)
-            login(user)
-        }
+        Logger.debug("New user login with FB")
+        createUserAndLogin
 
       case Some(user) =>
         Logger.debug("Existing user login with FB " + user)

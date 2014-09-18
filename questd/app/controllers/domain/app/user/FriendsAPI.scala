@@ -1,11 +1,13 @@
 package controllers.domain.app.user
 
+import controllers.sn.client.SNUser
 import models.domain._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import controllers.domain.app.protocol.ProfileModificationResult._
+import play.Logger
 
 case class GetFriendsRequest(
   user: User)
@@ -39,6 +41,11 @@ case class RemoveFromFriendsRequest(
   friendId: String)
 case class RemoveFromFriendsResult(
   allowed: ProfileModificationResult)
+
+case class ProcessFriendshipInvitationsFromSNRequest(
+  user: User,
+  snUser: SNUser)
+case class ProcessFriendshipInvitationsFromSNResult(user: User)
 
 private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#DomainAPI =>
 
@@ -177,6 +184,27 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
         OkApiResult(RemoveFromFriendsResult(OK))
       }
     }
+  }
+
+
+  /**
+   * Create friendships for invitation requests for given SN user.
+   * @param request Request what parametrizes our the API
+   * @return updated user.
+   */
+  def processFriendshipInvitationsFromSN(request: ProcessFriendshipInvitationsFromSNRequest): ApiResult[ProcessFriendshipInvitationsFromSNResult] = handleDbException {
+    // All exceptions are wrapped and returned as Internal error which is not clean for now but ok since we ignore errors for this call anyways.
+
+    val rv = request.snUser.invitations.foldLeft(request.user){(u, i) =>
+      i.delete()
+
+      // TODO: delete me.
+      Logger.error(s"invitation deleted ${i.toString}")
+      // TODO: do something useful here.
+      u
+    }
+
+    OkApiResult(ProcessFriendshipInvitationsFromSNResult(rv))
   }
 }
 

@@ -1,35 +1,33 @@
 package controllers.sn.facebook
 
-import controllers.sn.client.SNUser
+import controllers.sn.client.{Invitation, SNUser}
 import models.domain.Gender
-import play.Logger
 
-private[sn] class SNUserFacebook(u: com.restfb.types.User, c: SocialNetworkClientFacebook, t: String) extends SNUser {
+private[sn] class SNUserFacebook(fbUser: com.restfb.types.User,
+                                 client: SocialNetworkClientFacebook,
+                                 token: String) extends SNUser {
 
-  private val user = u
-  private val client = c
-  private val token = t
-  
+
   private var location: Option[FQLLocation] = None
 
   /// Name of social network.
   def snName: String = {
     SocialNetworkClientFacebook.Name
   }
-  
+
   /// Id of user in terms of social network.
   def snId: String = {
-    u.getId()
+    fbUser.getId
   }
-  
+
   /// First name of our user.
   def firstName: String = {
-    u.getFirstName()
+    fbUser.getFirstName
   }
-  
+
   /// Gender of a user.
   def gender: Gender.Value = {
-    (user.getGender()) match {
+    fbUser.getGender match {
       case "male" => Gender.Male
       case "female" => Gender.Female
       case _ => Gender.Unknown
@@ -38,31 +36,38 @@ private[sn] class SNUserFacebook(u: com.restfb.types.User, c: SocialNetworkClien
 
   /// Time zone offset of a user.
   def timezone: Int = {
-    user.getTimezone().toInt
+    fbUser.getTimezone.toInt
   }
 
   /// Country code of a user.
   def country: String = {
     if (location == None) {
-      location = Some(c.fetchLocationFromFB(token))
+      location = Some(client.fetchLocationFromFB(token))
     }
-    
-    location.get.current_location.getCountry()
+
+    location.get.current_location.getCountry
   }
-  
+
   /// City of a user.
   def city: String = {
     if (location == None) {
-      location = Some(c.fetchLocationFromFB(token))
+      location = Some(client.fetchLocationFromFB(token))
     }
-    
-    location.get.current_location.getCity()
+
+    location.get.current_location.getCity
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def invitations: List[Invitation] = {
+    client.fetchInvitations(token)
   }
 }
 
 private[sn] object SNUserFacebook {
   def apply(
-      u: com.restfb.types.User, 
+      u: com.restfb.types.User,
       c: SocialNetworkClientFacebook,
       t: String): SNUserFacebook = new SNUserFacebook(u, c, t)
 }

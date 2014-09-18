@@ -3,7 +3,6 @@ package controllers.sn.facebook
 import com.restfb._
 import com.restfb.exception._
 import play.Logger
-import com.restfb._
 
 private[facebook] class FacebookClientRepeater(private val client: FacebookClient) {
 
@@ -13,18 +12,29 @@ private[facebook] class FacebookClientRepeater(private val client: FacebookClien
   def fetchObject[T](obj: String, objectType: Class[T], parameters: Parameter*): T = {
     requestSeveralTimes(client.fetchObject(obj, objectType, parameters: _*))
   }
-  
+
   /**
    * Fetch connection from FB.
    */
   def fetchConnection[T](obj: String, objectType: Class[T], parameters: Parameter*): Connection[T] = {
     requestSeveralTimes(client.fetchConnection(obj, objectType, parameters: _*))
   }
-  
+
+  /**
+   * deletes object on FB
+   * @param obj id of object to delete
+   */
+  def deleteObject(obj: String): Unit = {
+    requestSeveralTimes(client.deleteObject(obj))
+  }
+
+  /**
+   * Executes FQL query on FB
+   */
   def executeFqlQuery[T](query: String, objectType: Class[T], parameters: Parameter*): java.util.List[T] = {
     requestSeveralTimes(client.executeFqlQuery(query, objectType, parameters: _*))
   }
-  
+
   /**
    * Repeat request several times.
    */
@@ -33,16 +43,14 @@ private[facebook] class FacebookClientRepeater(private val client: FacebookClien
       Logger.debug("Making request #" + i + " to FB")
       c match {
         case (Some(r), e) => (Some(r), e)
-        case (None, _) => {
+        case (None, _) =>
           try {
             (Some(fun), None)
           } catch {
-            case ex: FacebookNetworkException => {
+            case ex: FacebookNetworkException =>
               Logger.debug("Request to FB failed.")
               (None, Some(ex))
-            }
           }
-        }
       }
     }
 

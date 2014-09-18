@@ -1,9 +1,8 @@
 package controllers.sn.facebook
 
-import controllers.sn.client.SocialNetworkClient
+import controllers.sn.client.{Invitation, SocialNetworkClient, SNUser}
 import scala.language.implicitConversions
 import com.restfb._
-import controllers.sn.client.SNUser
 import com.restfb.exception._
 import play.Logger
 import controllers.sn.exception.AuthException
@@ -40,7 +39,30 @@ private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
   /// Get all social networks friends.
   def fetchFriendsByToken(token: String): List[SNUser] = handleExceptions {
     import collection.JavaConversions._
-    facebookClient(token).fetchConnection("me/friends", classOf[com.restfb.types.User]).getData.toList.map(SNUserFacebook(_, this, ""))
+    facebookClient(token).fetchConnection(
+      "me/friends", classOf[com.restfb.types.User]).getData.toList.map(SNUserFacebook(_, this, ""))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def fetchInvitations(token: String): List[Invitation] = {
+    import collection.JavaConversions._
+
+    facebookClient(token).fetchConnection(
+      "me/apprequests", classOf[com.restfb.types.AppRequest]).getData.toList.map(InvitationFacebook(_, this, token))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def deleteInvitation(token: String, invitation: Invitation): Unit = {
+    invitation match {
+      case fbi: InvitationFacebook =>
+        facebookClient(token).deleteObject(fbi.snId)
+      case _ =>
+        Logger.error("A try to delete not facebook invitation with facebook client, doing nothing")
+    }
   }
 
   /// Fetches location of user from FB.
