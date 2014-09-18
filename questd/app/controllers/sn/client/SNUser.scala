@@ -20,10 +20,10 @@ trait SNUser {
   def timezone: Int
 
   /// Country of a user.
-  def country: String
+  def country: Option[String]
 
   /// City of a user.
-  def city: String
+  def city: Option[String]
 
   /**
    * All user invitations.

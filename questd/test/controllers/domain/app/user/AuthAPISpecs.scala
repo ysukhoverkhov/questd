@@ -14,7 +14,7 @@ class AuthAPISpecs extends BaseAPISpecs {
     "Register user with new FB id" in context {
 
       val fbid = "fbid"
-      val candc = "country_name"
+      val countryName = "country_name"
 
       val userfb = mock[SNUser]
       userfb.snId returns fbid
@@ -22,11 +22,11 @@ class AuthAPISpecs extends BaseAPISpecs {
       val u = Some(User(
         id = "userid",
         auth = AuthInfo(snids = Map("FB" -> fbid)),
-        demo = UserDemographics(cultureId = Some(candc)),
+        demo = UserDemographics(cultureId = Some(countryName)),
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(
-              country = candc)))))
+              country = Some(countryName))))))
 
       db.user.readBySNid("FB", fbid) returns None thenReturns u
       db.user.levelup(anyString, anyInt) returns u
@@ -34,7 +34,7 @@ class AuthAPISpecs extends BaseAPISpecs {
         anyString,
         anyInt,
         any) returns u
-      db.culture.findByCountry(candc) returns Some(Culture(id = candc, name = candc))
+      db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
 
       val rv = api.login(LoginRequest("FB", userfb))
 
@@ -50,22 +50,22 @@ class AuthAPISpecs extends BaseAPISpecs {
     "Login existing user with new FB id" in context {
 
       val fbid = "fbid"
-      val candc = "country_name"
+      val countryName = "country_name"
 
       val u = Some(User(
         id = "userid",
         auth = AuthInfo(snids = Map("FB" -> fbid)),
-        demo = UserDemographics(cultureId = Some(candc)),
+        demo = UserDemographics(cultureId = Some(countryName)),
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(
-              country = candc)))))
+              country = Some(countryName))))))
 
       val userfb = mock[SNUser]
 
       userfb.snId returns fbid
       db.user.readBySNid("FB", fbid) returns u
-      db.culture.findByCountry(candc) returns Some(Culture(id = candc, name = candc))
+      db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
 
       val rv = api.login(LoginRequest("FB", userfb))
 
@@ -128,7 +128,7 @@ class AuthAPISpecs extends BaseAPISpecs {
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(
-              country = currentCulture)))))
+              country = Some(currentCulture))))))
 
       val userfb = mock[SNUser]
 
@@ -158,7 +158,7 @@ class AuthAPISpecs extends BaseAPISpecs {
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(
-              country = currentCulture)))))
+              country = Some(currentCulture))))))
 
       val userfb = mock[SNUser]
 

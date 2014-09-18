@@ -40,22 +40,27 @@ private[sn] class SNUserFacebook(fbUser: com.restfb.types.User,
   }
 
   /// Country code of a user.
-  def country: String = {
+  def country: Option[String] = {
     if (location == None) {
       location = Some(client.fetchLocationFromFB(token))
     }
 
-    // TODO:current_location may be null here, return option and deal with it.
-    location.get.current_location.getCountry
+    if (location.get.current_location == null)
+      None
+    else
+      Some(location.get.current_location.getCountry)
   }
 
   /// City of a user.
-  def city: String = {
+  def city: Option[String] = {
     if (location == None) {
       location = Some(client.fetchLocationFromFB(token))
     }
 
-    location.get.current_location.getCity
+    if (location.get.current_location == null)
+      None
+    else
+      Some(location.get.current_location.getCity)
   }
 
   /**

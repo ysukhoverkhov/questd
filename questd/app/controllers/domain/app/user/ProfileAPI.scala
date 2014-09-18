@@ -195,27 +195,30 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    */
   def updateUserCulture(request: UpdateUserCultureRequest): ApiResult[UpdateUserCultureResult] = handleDbException {
 
-    db.culture.findByCountry(request.user.profile.publicProfile.bio.country) match {
-      case Some(c) =>
-        request.user.demo.cultureId match {
-          case Some(userC) =>
-            if (c.id != userC)
+    if (request.user.profile.publicProfile.bio.country != None) {
+      val country = request.user.profile.publicProfile.bio.country.get
+
+      db.culture.findByCountry(country) match {
+        case Some(c) =>
+          request.user.demo.cultureId match {
+            case Some(userC) =>
+              if (c.id != userC)
+                db.user.updateCultureId(request.user.id, c.id)
+
+            case None =>
               db.user.updateCultureId(request.user.id, c.id)
+          }
 
-          case None =>
-            db.user.updateCultureId(request.user.id, c.id)
-        }
+        case None =>
+          Logger.debug(s"Creating new culture ${request.user.profile.publicProfile.bio.country}")
 
-      case None =>
-        Logger.debug(s"Creating new culture ${request.user.profile.publicProfile.bio.country}")
-
-        val newCulture = Culture(
-          name = request.user.profile.publicProfile.bio.country,
-          countries = List(request.user.profile.publicProfile.bio.country))
-        db.culture.create(newCulture)
-        db.user.updateCultureId(request.user.id, newCulture.id)
+          val newCulture = Culture(
+            name = country,
+            countries = List(country))
+          db.culture.create(newCulture)
+          db.user.updateCultureId(request.user.id, newCulture.id)
+      }
     }
-
     OkApiResult(UpdateUserCultureResult(request.user))
   }
 }
