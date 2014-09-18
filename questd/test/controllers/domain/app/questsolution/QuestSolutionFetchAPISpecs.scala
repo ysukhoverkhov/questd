@@ -2,7 +2,6 @@ package controllers.domain.app.questsolution
 
 import controllers.domain._
 import models.domain._
-import org.specs2.matcher.Matchers
 import play.Logger
 import testhelpers.domainstubs._
 
@@ -111,15 +110,6 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
     }
 
     "getHelpWantedSolutions calls db correctly with empty list" in context {
-
-//      db.solution.allWithParams(
-//        List(QuestSolutionStatus.OnVoting.toString),
-//        List(),
-//        Some(1, 2),
-//        0,
-//        Some(true),
-//        List(),
-//        List("a")) returns List(createSolutionStub()).iterator
 
       val result = api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(User(), QuestSolutionStatus.OnVoting))
 
