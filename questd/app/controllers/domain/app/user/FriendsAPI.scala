@@ -196,11 +196,26 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
     // All exceptions are wrapped and returned as Internal error which is not clean for now but ok since we ignore errors for this call anyways.
 
     val rv = request.snUser.invitations.foldLeft(request.user){(u, i) =>
-      i.delete()
+      Logger.error(s"Invitation from ${i.inviterSnId}")
 
-      // TODO: delete me.
-      Logger.error(s"invitation deleted ${i.toString}")
-      // TODO: do something useful here.
+      db.user.readBySNid(i.snName, i.inviterSnId) foreach { friend =>
+        Logger.error(s"becoming friends with ${friend.profile.publicProfile.bio.name}")
+
+        def becomeFriend(me: User, newfriend: User): Unit = {
+          if (me.friends.map(_.friendId).contains(newfriend.id)) {
+            Logger.error(s"updating friendship")
+            db.user.updateFriendship(me.id, newfriend.id, FriendshipStatus.Accepted.toString)
+          } else {
+            Logger.error(s"creating friendship")
+            db.user.addFriendship(me.id, Friendship(newfriend.id, FriendshipStatus.Accepted))
+          }
+        }
+
+        becomeFriend(request.user, friend)
+        becomeFriend(friend, request.user)
+      }
+
+      i.delete()
       u
     }
 

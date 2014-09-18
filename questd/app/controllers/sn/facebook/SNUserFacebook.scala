@@ -45,6 +45,7 @@ private[sn] class SNUserFacebook(fbUser: com.restfb.types.User,
       location = Some(client.fetchLocationFromFB(token))
     }
 
+    // TODO:current_location may be null here, return option and deal with it.
     location.get.current_location.getCountry
   }
 

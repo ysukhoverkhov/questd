@@ -7,10 +7,22 @@ package controllers.sn.client
  */
 trait Invitation {
 
+  // TODO: generalize snName and snId since they are common for all objects in sn.
+
+  /**
+   * @return name of our social network.
+   */
+  def snName: String
+
   /**
    * @return Identifier of the invitation in SN.
    */
   def snId: String
+
+  /**
+   * @return SN Id of user who invited us.
+   */
+  def inviterSnId: String
 
   /**
    * Deletes current invitation in SN

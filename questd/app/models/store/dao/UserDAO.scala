@@ -53,6 +53,8 @@ trait UserDAO extends BaseDAO[User] {
   def removeFromShortlist(id: String, idToRemove: String): Option[User]
 
   def askFriendship(id: String, idToAdd: String, myFriendship: Friendship, hisFriendship: Friendship): Option[User]
+  def updateFriendship(id: String, friendId: String, status: String): Option[User]
+  def addFriendship(id: String, friendship: Friendship): Option[User]
   def updateFriendship(id: String, friendId: String, myStatus: String, friendStatus: String): Option[User]
   def removeFriendship(id: String, friendId: String): Option[User]
 

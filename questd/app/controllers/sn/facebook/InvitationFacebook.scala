@@ -14,7 +14,17 @@ private[sn] class InvitationFacebook(appRequest: com.restfb.types.AppRequest,
   /**
    * @inheritdoc
    */
+  def snName: String = SocialNetworkClientFacebook.Name
+
+  /**
+   * @inheritdoc
+   */
   def snId = appRequest.getId
+
+  /**
+   * @inheritdoc
+   */
+  def inviterSnId: String = appRequest.getFrom.getId
 
   /**
    * @inheritdoc

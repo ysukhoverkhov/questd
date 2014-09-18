@@ -550,6 +550,30 @@ private[mongo] class MongoUserDAO
   }
 
   /**
+   * @inheritdoc
+   */
+  def updateFriendship(id: String, friendId: String, status: String): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "friends.friendId" -> friendId),
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "friends.$.status" -> status)))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def addFriendship(id: String, friendship: Friendship): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$push" -> MongoDBObject(
+          "friends" -> grater[Friendship].asDBObject(friendship))))
+  }
+
+  /**
    *
    */
   def updateFriendship(id: String, friendId: String, myStatus: String, friendStatus: String): Option[User] = {
