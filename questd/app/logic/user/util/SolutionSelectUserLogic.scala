@@ -26,6 +26,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     val algs = List(
       () => getTutorialSolutions,
       () => getHelpWantedSolutions,
+      () => getSolutionsOfOwnQuests,
       () => getStartingSolutions,
       () => getDefaultSolutions)
 
@@ -47,6 +48,16 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     } else {
       None
     }
+  }
+
+  private[user] def getSolutionsOfOwnQuests: Option[Iterator[QuestSolution]] = {
+    Logger.trace("getSolutionsOfOwnQuests")
+
+    val solutions = api.getSolutionsForOwnQuests(GetSolutionsForOwnQuestsRequest(
+      user,
+      QuestSolutionStatus.OnVoting)).body.get.solutions
+
+    if (solutions.isEmpty) None else Some(solutions)
   }
 
   private[user] def getStartingSolutions: Option[Iterator[QuestSolution]] = {

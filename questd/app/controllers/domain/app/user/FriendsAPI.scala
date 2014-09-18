@@ -133,8 +133,6 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
           FriendshipStatus.Accepted.toString,
           FriendshipStatus.Accepted.toString)
 
-        // TODO: remove friends.accepted from friendship.
-
         // Sending message about good response on friendship.
         db.user.readById(request.friendId) ifSome { f =>
           sendMessage(SendMessageRequest(f, MessageFriendshipAccepted(request.user.id)))
@@ -143,8 +141,6 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
       } else {
 
         db.user.removeFriendship(request.user.id, request.friendId)
-
-        // TODO: remove friends.rejected from friendship.
 
         // sending message for rejected response.
         db.user.readById(request.friendId) ifSome { f =>
@@ -169,8 +165,6 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
     } else {
 
       db.user.removeFriendship(request.user.id, request.friendId)
-
-      // TODO: remove friends.removed from strings.
 
       request.user.friends.find(_.friendId == request.friendId) ifSome { v =>
         // Sending message about removed friend to friend.

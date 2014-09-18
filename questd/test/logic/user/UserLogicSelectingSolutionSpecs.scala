@@ -41,6 +41,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getFriendsSolutions(any[GetFriendsSolutionsRequest]) returns OkApiResult(GetFriendsSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val u = User()
@@ -58,6 +59,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getShortlistSolutions(any[GetShortlistSolutionsRequest]) returns OkApiResult(GetShortlistSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val u = User()
@@ -75,6 +77,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getSolutionsForLikedQuests(any[GetSolutionsForLikedQuestsRequest]) returns OkApiResult(GetSolutionsForLikedQuestsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val u = User()
@@ -92,6 +95,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
       val qid = "qid"
 
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val u = User()
@@ -115,6 +119,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.75
       rand.nextInt(4) returns 0 thenReturns 1 thenReturns 2
 
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getVIPSolutions(GetVIPSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-20, 12)), List("1", "2", "3"))) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val q = u.getRandomSolution
@@ -136,6 +141,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       rand.nextDouble returns 0.95
       rand.nextInt(4) returns 1
 
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getAllSolutions(GetAllSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2"))) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val q = u.getRandomSolution
@@ -156,6 +162,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.0
 
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       u.getRandomSolution
@@ -173,6 +180,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 1.0
 
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       u.getRandomSolution
@@ -188,6 +196,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List().iterator))
       api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
@@ -205,6 +214,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List().iterator))
       api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List().iterator)) thenReturns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
@@ -215,7 +225,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       there were two(api).getAllSolutions(any[GetAllSolutionsRequest])
     }
 
-    "Solution from musthelp list is returned if there is one" in {
+    "Solution from must help list is returned if there is one" in {
       val qid = "qid"
       val u = User(mustVoteSolutions = List(qid))
 
@@ -226,6 +236,19 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
 
       there was one(api).getHelpWantedSolutions(any[GetHelpWantedSolutionsRequest])
     }
+
+    "Solutions for own quests are returned" in {
+      val qid = "qid"
+      val u = User()
+
+      api.config returns createStubConfig
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List(createSolutionStub(id = qid)).iterator))
+
+      u.getRandomSolution
+
+      there was one(api).getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest])
+    }
+
   }
 }
 

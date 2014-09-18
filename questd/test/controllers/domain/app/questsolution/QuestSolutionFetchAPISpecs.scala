@@ -2,6 +2,7 @@ package controllers.domain.app.questsolution
 
 import controllers.domain._
 import models.domain._
+import org.specs2.matcher.Matchers
 import testhelpers.domainstubs._
 
 class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
@@ -164,6 +165,61 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         null,
         None)
     }
+
+    // TODO: implement me.
+    "getSolutionsForOwnQuests calls db correctly" in context {
+
+      val qu = createQuestStub()
+      val sol = createSolutionStub()
+
+      db.quest.allWithParams(
+        status = any[List[String]],
+        authorIds = any[List[String]],
+        levels = any[Option[(Int, Int)]],
+        skip = any[Int],
+        vip = any[Option[Boolean]],
+        ids = any[List[String]],
+        themeIds = any[List[String]],
+        cultureId = any[Option[String]]
+      ) returns List(qu).iterator
+
+      db.solution.allWithParams(
+        List(QuestSolutionStatus.OnVoting.toString),
+        null,
+        None,
+        0,
+        null,
+        List("solution_id"),
+        null,
+        null,
+        None) returns List(sol).iterator
+
+      val result = api.getSolutionsForOwnQuests(GetSolutionsForOwnQuestsRequest(User(), QuestSolutionStatus.OnVoting))
+
+//      result.body.get.solutions.toList must beEqualTo(List(sol))
+
+      there was one(quest).allWithParams(
+        status = any[List[String]],
+        authorIds = any[List[String]],
+        levels = any[Option[(Int, Int)]],
+        skip = any[Int],
+        vip = any[Option[Boolean]],
+        ids = any[List[String]],
+        themeIds = any[List[String]],
+        cultureId = any[Option[String]])
+
+      there was one(solution).allWithParams(
+        List(QuestSolutionStatus.OnVoting.toString),
+        null,
+        None,
+        0,
+        null,
+        null,
+        List(qu.id),
+        null,
+        None)
+    }
+
 
     "getAllSolutions calls db correctly" in context {
       val u = createUserStub(cultureId = "cid")

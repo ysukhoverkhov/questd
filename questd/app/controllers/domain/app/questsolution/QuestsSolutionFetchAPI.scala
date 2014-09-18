@@ -21,6 +21,9 @@ case class GetVIPSolutionsResult(solutions: Iterator[QuestSolution])
 case class GetHelpWantedSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
 case class GetHelpWantedSolutionsResult(solutions: Iterator[QuestSolution])
 
+case class GetSolutionsForOwnQuestsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
+case class GetSolutionsForOwnQuestsResult(solutions: Iterator[QuestSolution])
+
 case class GetAllSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None, themeIds: List[String] = List())
 case class GetAllSolutionsResult(solutions: Iterator[QuestSolution])
 
@@ -71,6 +74,21 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
         levels = request.levels,
         cultureId = request.user.demo.cultureId,
         ids = request.user.mustVoteSolutions)))
+    }
+  }
+
+  def getSolutionsForOwnQuests(request: GetSolutionsForOwnQuestsRequest): ApiResult[GetSolutionsForOwnQuestsResult] = handleDbException {
+
+    val questIds = db.quest.allWithParams(authorIds = List(request.user.id)).toList.map(_.id)
+
+    if (questIds.nonEmpty) {
+      OkApiResult(GetSolutionsForOwnQuestsResult(db.solution.allWithParams(
+        status = List(request.status.toString),
+        levels = request.levels,
+        cultureId = request.user.demo.cultureId,
+        questIds = questIds)))
+    } else {
+      OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
     }
   }
 
