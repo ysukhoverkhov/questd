@@ -3,6 +3,7 @@ package controllers.domain.app.questsolution
 import controllers.domain._
 import models.domain._
 import org.specs2.matcher.Matchers
+import play.Logger
 import testhelpers.domainstubs._
 
 class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
@@ -166,7 +167,6 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         None)
     }
 
-    // TODO: implement me.
     "getSolutionsForOwnQuests calls db correctly" in context {
 
       val qu = createQuestStub()
@@ -189,14 +189,16 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         None,
         0,
         null,
-        List("solution_id"),
         null,
+        List(qu.id),
         null,
         None) returns List(sol).iterator
 
       val result = api.getSolutionsForOwnQuests(GetSolutionsForOwnQuestsRequest(User(), QuestSolutionStatus.OnVoting))
 
-//      result.body.get.solutions.toList must beEqualTo(List(sol))
+      Logger.error(result.toString)
+
+      result.body.get.solutions.toList must beEqualTo(List(sol))
 
       there was one(quest).allWithParams(
         status = any[List[String]],
@@ -219,7 +221,6 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         null,
         None)
     }
-
 
     "getAllSolutions calls db correctly" in context {
       val u = createUserStub(cultureId = "cid")
