@@ -3,7 +3,7 @@ package controllers.domain.app.user
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
-import controllers.sn.client.SNUser
+import controllers.sn.client.{User => SNUser}
 import models.domain._
 import play.Logger
 

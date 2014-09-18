@@ -1,6 +1,6 @@
 package controllers.sn.facebook
 
-import controllers.sn.client.{Invitation, SocialNetworkClient, SNUser}
+import controllers.sn.client.{Invitation, SocialNetworkClient, User}
 import scala.language.implicitConversions
 import com.restfb._
 import com.restfb.exception._
@@ -26,10 +26,10 @@ private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
   }
 
   /// Get user of social network.
-  def fetchUserByToken(token: String): SNUser = handleExceptions {
+  def fetchUserByToken(token: String): User = handleExceptions {
 
     val client = facebookClient(token)
-    return SNUserFacebook(
+    return UserFacebook(
       client.fetchObject("me", classOf[com.restfb.types.User]),
       this,
       token)
@@ -37,10 +37,10 @@ private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
   }
 
   /// Get all social networks friends.
-  def fetchFriendsByToken(token: String): List[SNUser] = handleExceptions {
+  def fetchFriendsByToken(token: String): List[User] = handleExceptions {
     import collection.JavaConversions._
     facebookClient(token).fetchConnection(
-      "me/friends", classOf[com.restfb.types.User]).getData.toList.map(SNUserFacebook(_, this, ""))
+      "me/friends", classOf[com.restfb.types.User]).getData.toList.map(UserFacebook(_, this, ""))
   }
 
   /**

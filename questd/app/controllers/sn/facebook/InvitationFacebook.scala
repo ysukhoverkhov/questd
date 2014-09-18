@@ -9,12 +9,7 @@ import controllers.sn.client.Invitation
  */
 private[sn] class InvitationFacebook(appRequest: com.restfb.types.AppRequest,
                                      client: SocialNetworkClientFacebook,
-                                     token: String) extends Invitation {
-
-  /**
-   * @inheritdoc
-   */
-  def snName: String = SocialNetworkClientFacebook.Name
+                                     token: String) extends ItemFacebook with Invitation {
 
   /**
    * @inheritdoc

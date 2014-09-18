@@ -5,19 +5,7 @@ package controllers.sn.client
  *
  * Created by Yury on 18.09.2014.
  */
-trait Invitation {
-
-  // TODO: generalize snName and snId since they are common for all objects in sn.
-
-  /**
-   * @return name of our social network.
-   */
-  def snName: String
-
-  /**
-   * @return Identifier of the invitation in SN.
-   */
-  def snId: String
+trait Invitation extends Item {
 
   /**
    * @return SN Id of user who invited us.

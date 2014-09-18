@@ -1,19 +1,14 @@
 package controllers.sn.facebook
 
-import controllers.sn.client.{Invitation, SNUser}
+import controllers.sn.client.{Invitation, User}
 import models.domain.Gender
 
-private[sn] class SNUserFacebook(fbUser: com.restfb.types.User,
-                                 client: SocialNetworkClientFacebook,
-                                 token: String) extends SNUser {
+private[sn] class UserFacebook(fbUser: com.restfb.types.User,
+                               client: SocialNetworkClientFacebook,
+                               token: String) extends ItemFacebook with User {
 
 
   private var location: Option[FQLLocation] = None
-
-  /// Name of social network.
-  def snName: String = {
-    SocialNetworkClientFacebook.Name
-  }
 
   /// Id of user in terms of social network.
   def snId: String = {
@@ -71,10 +66,10 @@ private[sn] class SNUserFacebook(fbUser: com.restfb.types.User,
   }
 }
 
-private[sn] object SNUserFacebook {
+private[sn] object UserFacebook {
   def apply(
       u: com.restfb.types.User,
       c: SocialNetworkClientFacebook,
-      t: String): SNUserFacebook = new SNUserFacebook(u, c, t)
+      t: String): UserFacebook = new UserFacebook(u, c, t)
 }
 

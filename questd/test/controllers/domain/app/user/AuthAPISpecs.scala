@@ -1,7 +1,7 @@
 package controllers.domain.app.user
 
 import controllers.domain.{InternalErrorApiResult, NotAuthorisedApiResult, _}
-import controllers.sn.client.SNUser
+import controllers.sn.client.User
 import models.domain._
 import models.store._
 import org.mockito.Matchers
@@ -16,7 +16,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       val fbid = "fbid"
       val countryName = "country_name"
 
-      val userfb = mock[SNUser]
+      val userfb = mock[User]
       userfb.snId returns fbid
 
       val u = Some(User(
@@ -61,7 +61,7 @@ class AuthAPISpecs extends BaseAPISpecs {
             bio = Bio(
               country = Some(countryName))))))
 
-      val userfb = mock[SNUser]
+      val userfb = mock[User]
 
       userfb.snId returns fbid
       db.user.readBySNid("FB", fbid) returns u
@@ -79,7 +79,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       db.user.readBySNid(anyString, anyString) throws new DatabaseException("Test exception")
 
-      val userfb = mock[SNUser]
+      val userfb = mock[User]
       userfb.snId returns "1"
 
       val rv = api.login(LoginRequest("FB", userfb))
@@ -130,7 +130,7 @@ class AuthAPISpecs extends BaseAPISpecs {
             bio = Bio(
               country = Some(currentCulture))))))
 
-      val userfb = mock[SNUser]
+      val userfb = mock[User]
 
       userfb.snId returns fbid
       db.user.readBySNid("FB", fbid) returns u
@@ -160,7 +160,7 @@ class AuthAPISpecs extends BaseAPISpecs {
             bio = Bio(
               country = Some(currentCulture))))))
 
-      val userfb = mock[SNUser]
+      val userfb = mock[User]
 
       userfb.snId returns fbid
       db.user.readBySNid("FB", fbid) returns u

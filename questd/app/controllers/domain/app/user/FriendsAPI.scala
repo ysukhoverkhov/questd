@@ -1,6 +1,6 @@
 package controllers.domain.app.user
 
-import controllers.sn.client.SNUser
+import controllers.sn.client.{User => SNUser}
 import models.domain._
 import controllers.domain.DomainAPIComponent
 import components._

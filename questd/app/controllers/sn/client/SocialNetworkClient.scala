@@ -2,9 +2,9 @@ package controllers.sn.client
 
 trait SocialNetworkClient {
 
-  def fetchUserByToken(token: String): SNUser
+  def fetchUserByToken(token: String): User
 
-  def fetchFriendsByToken(token: String): List[SNUser]
+  def fetchFriendsByToken(token: String): List[User]
 
   /**
    * Fetch all invitations from social network

@@ -6,7 +6,7 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.sn.client.SNUser
+import controllers.sn.client.{User => SNUser}
 
 case class GetShortlistRequest(
   user: User)
