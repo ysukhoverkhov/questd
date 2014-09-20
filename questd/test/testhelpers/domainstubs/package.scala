@@ -3,7 +3,7 @@ package testhelpers
 import java.util.Date
 import models.domain._
 import models.domain.base.ID
-import models.domain.view.{QuestInfoWithID, ThemeWithID}
+import models.domain.view.{QuestInfoWithID, ThemeInfoWithID}
 
 
 package object domainstubs {
@@ -102,7 +102,7 @@ package object domainstubs {
     favThemes: List[String] = List(),
     level: Int = 18,
     questProposalCooldown: Date = new Date(Long.MaxValue),
-    takenTheme: Option[ThemeWithID] = Some(ThemeWithID("theme_id", createThemeStub().info))) = {
+    takenTheme: Option[ThemeInfoWithID] = Some(ThemeInfoWithID("theme_id", createThemeStub().info))) = {
 
     User(
       id = id,

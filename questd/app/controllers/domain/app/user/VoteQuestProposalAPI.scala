@@ -36,7 +36,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
           case Some(a) =>
             val qi = QuestInfoWithID(a.id, a.info)
             db.theme.readById(a.info.themeId) ifSome { theme =>
-              val u = db.user.selectQuestProposalVote(user.id, qi, theme)
+              val u = db.user.selectQuestProposalVote(user.id, qi, ThemeInfoWithID(theme.id, theme.info))
               OkApiResult(GetQuestProposalToVoteResult(OK, u.map(_.profile)))
             }
         }

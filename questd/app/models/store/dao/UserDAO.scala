@@ -18,15 +18,15 @@ trait UserDAO extends BaseDAO[User] {
   def populateMustVoteSolutionsList(userIds: List[String], solutionId: String): Unit
   def removeMustVoteSolution(id: String, solutionId: String): Option[User]
 
-  def selectQuestProposalVote(id: String, qi: QuestInfoWithID, theme: Theme): Option[User]
+  def selectQuestProposalVote(id: String, questInfo: QuestInfoWithID, themeInfo: ThemeInfoWithID): Option[User]
   def recordQuestProposalVote(id: String, questId: String, liked: Boolean): Option[User]
 
   def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: PublicProfileWithID, defeatReward: Assets, victoryReward: Assets): Option[User]
   def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User]
   def resetQuestSolution(id: String, shouldResetCooldown: Boolean): Option[User]
 
-  def purchaseQuestTheme(id: String, purchasedTheme: ThemeWithID, sampleQuest: Option[QuestInfo], approveReward: Assets): Option[User]
-  def takeQuestTheme(id: String, takenTheme: ThemeWithID, cooldown: Date): Option[User]
+  def purchaseQuestTheme(id: String, purchasedTheme: ThemeInfoWithID, sampleQuest: Option[QuestInfo], approveReward: Assets): Option[User]
+  def takeQuestTheme(id: String, takenTheme: ThemeInfoWithID, cooldown: Date): Option[User]
   def resetQuestProposal(id: String, shouldResetCooldown: Boolean): Option[User]
 
   def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User]

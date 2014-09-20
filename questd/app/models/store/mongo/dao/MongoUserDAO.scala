@@ -119,13 +119,13 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def selectQuestProposalVote(id: String, qi: QuestInfoWithID, theme: Theme): Option[User] = {
+  def selectQuestProposalVote(id: String, questInfo: QuestInfoWithID, themeInfo: ThemeInfoWithID): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
-          "profile.questProposalVoteContext.reviewingQuest" -> grater[QuestInfoWithID].asDBObject(qi),
-          "profile.questProposalVoteContext.themeOfQuest" -> grater[Theme].asDBObject(theme)),
+          "profile.questProposalVoteContext.reviewingQuest" -> grater[QuestInfoWithID].asDBObject(questInfo),
+          "profile.questProposalVoteContext.themeOfQuest" -> grater[ThemeInfoWithID].asDBObject(themeInfo)),
         "$inc" -> MongoDBObject(
           "stats.proposalsVoted" -> 1)))
   }
@@ -228,18 +228,18 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def purchaseQuestTheme(id: String, purchasedTheme: ThemeWithID, sampleQuest: Option[QuestInfo], approveReward: Assets): Option[User] = {
+  def purchaseQuestTheme(id: String, purchasedTheme: ThemeInfoWithID, sampleQuest: Option[QuestInfo], approveReward: Assets): Option[User] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
     if (sampleQuest != None) {
       queryBuilder += ("$set" -> MongoDBObject(
-        "profile.questProposalContext.purchasedTheme" -> grater[ThemeWithID].asDBObject(purchasedTheme),
+        "profile.questProposalContext.purchasedTheme" -> grater[ThemeInfoWithID].asDBObject(purchasedTheme),
         "profile.questProposalContext.sampleQuest" -> grater[QuestInfo].asDBObject(sampleQuest.get),
         "profile.questProposalContext.approveReward" -> grater[Assets].asDBObject(approveReward)))
     } else {
       queryBuilder += ("$set" -> MongoDBObject(
-        "profile.questProposalContext.purchasedTheme" -> grater[ThemeWithID].asDBObject(purchasedTheme),
+        "profile.questProposalContext.purchasedTheme" -> grater[ThemeInfoWithID].asDBObject(purchasedTheme),
         "profile.questProposalContext.approveReward" -> grater[Assets].asDBObject(approveReward)))
       queryBuilder += ("$unset" -> MongoDBObject(
         "profile.questProposalContext.sampleQuest" -> ""))
@@ -259,13 +259,13 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def takeQuestTheme(id: String, takenTheme: ThemeWithID, cooldown: Date): Option[User] = {
+  def takeQuestTheme(id: String, takenTheme: ThemeInfoWithID, cooldown: Date): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
           "profile.questProposalContext.numberOfPurchasedThemes" -> 0,
-          "profile.questProposalContext.takenTheme" -> grater[ThemeWithID].asDBObject(takenTheme),
+          "profile.questProposalContext.takenTheme" -> grater[ThemeInfoWithID].asDBObject(takenTheme),
           "profile.questProposalContext.questProposalCooldown" -> cooldown),
         "$unset" -> MongoDBObject(
           "profile.questProposalContext.purchasedTheme" -> ""),

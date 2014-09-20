@@ -9,7 +9,6 @@ import models.domain._
 import models.domain.view._
 import models.store._
 import org.specs2.mutable._
-import play.Logger
 import play.api.test._
 import testhelpers.domainstubs._
 
@@ -118,7 +117,7 @@ class UserDAOSpecs
       db.user.create(User(userid))
       db.user.purchaseQuestTheme(
         userid,
-        ThemeWithID(themeid, createThemeStub().info),
+        ThemeInfoWithID(themeid, createThemeStub().info),
         Some(QuestInfo("authorId", "themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
         rew)
 
@@ -126,8 +125,8 @@ class UserDAOSpecs
 
       ou must beSome.which((u: User) => u.id.toString == userid)
 
-      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.id == themeid) and
-        beSome.which((t: ThemeWithID) => t.id == themeid)
+      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeInfoWithID) => t.id == themeid) and
+        beSome.which((t: ThemeInfoWithID) => t.id == themeid)
 
       ou.get.profile.questProposalContext.sampleQuest must beSome.which((q: QuestInfo) => q.content.description == questdescr)
 
@@ -147,12 +146,12 @@ class UserDAOSpecs
       db.user.create(User(userid))
       db.user.purchaseQuestTheme(
         userid,
-        ThemeWithID(themeid, createThemeStub().info),
+        ThemeInfoWithID(themeid, createThemeStub().info),
         Some(QuestInfo("authorId", "themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
         rew)
       db.user.purchaseQuestTheme(
         userid,
-        ThemeWithID(themeid, createThemeStub().info),
+        ThemeInfoWithID(themeid, createThemeStub().info),
         None,
         rew)
 
@@ -160,8 +159,8 @@ class UserDAOSpecs
 
       ou must beSome.which((u: User) => u.id.toString == userid)
 
-      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeWithID) => t.id == themeid) and
-        beSome.which((t: ThemeWithID) => t.id == themeid)
+      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeInfoWithID) => t.id == themeid) and
+        beSome.which((t: ThemeInfoWithID) => t.id == themeid)
 
       ou.get.profile.questProposalContext.sampleQuest must beNone
 

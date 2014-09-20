@@ -79,7 +79,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                   }
                 }
 
-                db.user.purchaseQuestTheme(user.id, ThemeWithID(t.id, t.info), sampleQuest, reward) ifSome { v =>
+                db.user.purchaseQuestTheme(user.id, ThemeInfoWithID(t.id, t.info), sampleQuest, reward) ifSome { v =>
                   OkApiResult(PurchaseQuestThemeResult(OK, Some(v.profile)))
                 }
 
