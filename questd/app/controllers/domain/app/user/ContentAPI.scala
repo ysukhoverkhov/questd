@@ -13,7 +13,7 @@ case class GetQuestRequest(user: User, questId: String)
 case class GetQuestResult(
   allowed: ProfileModificationResult,
   quest: Option[QuestInfo] = None,
-  theme: Option[Theme] = None)
+  theme: Option[ThemeInfo] = None)
 
 case class GetSolutionRequest(user: User, solutionId: String)
 case class GetSolutionResult(
@@ -99,20 +99,10 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def getQuest(request: GetQuestRequest): ApiResult[GetQuestResult] = handleDbException {
     import request._
 
-    db.quest.readById(questId) match {
-      case Some(q) =>
-        db.theme.readById(q.info.themeId) match {
-          case Some(t) =>
-            OkApiResult(GetQuestResult(OK, Some(q.info), Some(t)))
-
-          case None =>
-            Logger.error("API - getQuest. Theme is missing for id = " + q.info.themeId)
-            InternalErrorApiResult()
-        }
-
-      case None =>
-        Logger.error("API - getQuest. Quest is missing for id = " + questId)
-        InternalErrorApiResult()
+    db.quest.readById(questId) ifSome { quest =>
+      db.theme.readById(quest.info.themeId) ifSome { theme =>
+        OkApiResult(GetQuestResult(OK, Some(quest.info), Some(theme.info)))
+      }
     }
   }
 
