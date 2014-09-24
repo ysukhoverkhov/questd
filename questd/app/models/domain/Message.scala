@@ -1,5 +1,6 @@
 package models.domain
 
+import scala.language.implicitConversions
 import models.domain.base.ID
 
 object MessageType extends Enumeration {

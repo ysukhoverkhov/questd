@@ -26,6 +26,7 @@ trait ProposeQuestWSImpl extends QuestController with SecurityWSImpl with Common
 
 
   def proposeQuest = wrapJsonApiCallReturnBody[WSProposeQuestResult] { (js, r) =>
+    import scala.language.implicitConversions
     implicit def toContentReference(v: WSContentReference): ContentReference = {
       ContentReference(
         contentType = ContentType.withName(v.contentType),

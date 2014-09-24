@@ -55,9 +55,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
   def getFriends(request: GetFriendsRequest): ApiResult[GetFriendsResult] = handleDbException {
 
     {
-
       makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LookThroughFriendshipProposals)))
-
     } ifOk { r =>
 
       OkApiResult(GetFriendsResult(
