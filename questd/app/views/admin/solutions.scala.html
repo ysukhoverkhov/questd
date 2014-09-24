@@ -14,6 +14,7 @@
 	    		<td>pointsFriends</td>
 	    		<td>pointsInvited</td>
 	    		<td>cheating</td>
+	    		<td>content</td>
 	    	</tr>
 		@for(s <- solutions) {
 	    	<tr>
@@ -24,6 +25,7 @@
 	    		<td>@s.rating.pointsFriends</td>
 	    		<td>@s.rating.pointsInvited</td>
 	    		<td>@s.rating.cheating</td>
+	    		<td><img style="max-width: 204px; height: auto; " src="@s.info.content.media.reference" alt="@s.info.content.media.reference" ></td>
 	    	</tr>
 	    }
 	</table>

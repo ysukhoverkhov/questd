@@ -1,12 +1,10 @@
 package controllers.domain.app.user
 
 import models.domain._
-import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
-import logic._
 import play.Logger
 
 case class ShiftDailyResultRequest(user: User)
@@ -15,10 +13,10 @@ case class ShiftDailyResultResult(user: User)
 case class GetDailyResultRequest(user: User)
 case class GetDailyResultResult(profile: Profile, hasNewResult: Boolean)
 
-case class StoreProposalInDailyResultRequest(user: User, questId: String, reward: Option[Assets] = None, penalty: Option[Assets] = None)
+case class StoreProposalInDailyResultRequest(user: User, quest: Quest, reward: Option[Assets] = None, penalty: Option[Assets] = None)
 case class StoreProposalInDailyResultResult(user: User)
 
-case class StoreSolutionInDailyResultRequest(user: User, solutionId: String, reward: Option[Assets] = None, penalty: Option[Assets] = None)
+case class StoreSolutionInDailyResultRequest(user: User, solution: QuestSolution, reward: Option[Assets] = None, penalty: Option[Assets] = None)
 case class StoreSolutionInDailyResultResult(user: User)
 
 case class StoreProposalOutOfTimePenaltyReqest(user: User, penalty: Assets)
@@ -41,10 +39,9 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     u match {
       case Some(u: User) => OkApiResult(ShiftDailyResultResult(u))
-      case _ => {
+      case _ =>
         Logger.error("API - shiftDailyResult. user is not in db after update.")
         InternalErrorApiResult()
-      }
     }
   }
 
@@ -77,15 +74,13 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     // Check replace old public daily results with new daily results.
     val (u, newOne, internalError) = if (request.user.privateDailyResults.length > 1) {
       db.user.movePrivateDailyResultsToPublic(request.user.id, request.user.privateDailyResults.tail) match {
-        case Some(us) => {
+        case Some(us) =>
           applyDailyResults(us)
           (us, true, false)
-        }
 
-        case None => {
+        case None =>
           Logger.error("API - getDailyResult. Unable to find user for getting daily result")
           (request.user, false, true)
-        }
       }
 
     } else {
@@ -93,7 +88,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     }
 
     if (internalError) {
-      InternalErrorApiResult();
+      InternalErrorApiResult()
     } else {
       OkApiResult(GetDailyResultResult(u.profile, newOne))
     }
@@ -107,7 +102,12 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val u = ensurePrivateDailyResultExists(user)
 
-    val qpr = QuestProposalResult(questProposalId = request.questId, reward = request.reward, penalty = request.penalty)
+    val qpr = QuestProposalResult(
+      questProposalId = request.quest.id,
+      reward = request.reward,
+      penalty = request.penalty,
+      status = request.quest.status)
+
     db.user.storeProposalInDailyResult(user.id, qpr) ifSome { v =>
       OkApiResult(StoreProposalInDailyResultResult(v))
     }
@@ -121,12 +121,16 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val u = ensurePrivateDailyResultExists(user)
 
-    val qpr = QuestSolutionResult(questSolutionId = request.solutionId, reward = request.reward, penalty = request.penalty)
-    db.user.storeSolutionInDailyResult(user.id, qpr) ifSome { v =>
-      OkApiResult(StoreSolutionInDailyResultResult(v))
-    }
+    val qpr = QuestSolutionResult(
+      questSolutionId = request.solution.id,
+      reward = request.reward,
+      penalty = request.penalty,
+      status = request.solution.status)
 
-  }
+      db.user.storeSolutionInDailyResult(user.id, qpr) ifSome { v =>
+        OkApiResult(StoreSolutionInDailyResultResult(v))
+      }
+    }
 
   def storeProposalOutOfTimePenalty(request: StoreProposalOutOfTimePenaltyReqest): ApiResult[StoreProposalOutOfTimePenaltyResult] = handleDbException {
     import request._

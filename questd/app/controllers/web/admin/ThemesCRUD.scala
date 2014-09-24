@@ -10,9 +10,9 @@ object ThemesCRUD extends Controller {
 
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
-  def themes(id: String) = admin.themes(id)
-  def deleteThemeCB(id: String) = admin.deleteThemeCB(id)
-  def createThemeCB = admin.createThemeCB
+  def themes(id: String) = admin.themes.objects(id)
+  def deleteThemeCB(id: String) = admin.themes.deleteObjectCB(id)
+  def createThemeCB = admin.themes.createObjectCB
 
 }
 

@@ -10,14 +10,17 @@ GET     /                           					controllers.web.rest.Application.index
 #######################
 
 # Auth
-POST	/rest/loginfb									controllers.web.rest.LoginWS.loginfb
+POST	/rest/login										controllers.web.rest.LoginWS.login
 
 # Requesting profile
 POST	/rest/getProfile								controllers.web.rest.ProfileWS.getProfile
 POST	/rest/setGender									controllers.web.rest.ProfileWS.setGender
 POST	/rest/setDebug									controllers.web.rest.ProfileWS.setDebug
+POST    /rest/setCity                                   controllers.web.rest.ProfileWS.setCity
+POST    /rest/setCountry                                controllers.web.rest.ProfileWS.setCountry
+POST    /rest/getCountryList                            controllers.web.rest.ProfileWS.getCountryList
 
-# Generating quests 
+# Generating quests
 POST	/rest/getQuestThemeCost							controllers.web.rest.ProposeQuestWS.getQuestThemeCost
 POST	/rest/purchaseQuestTheme						controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
 
@@ -28,6 +31,8 @@ POST	/rest/proposeQuest								controllers.web.rest.ProposeQuestWS.proposeQuest
 
 POST	/rest/giveUpQuestProposal						controllers.web.rest.ProposeQuestWS.giveUpQuestProposal
 POST	/rest/getQuestProposalGiveUpCost				controllers.web.rest.ProposeQuestWS.getQuestProposalGiveUpCost
+
+POST	/rest/getQuestProposalHelpCost				    controllers.web.rest.ProposeQuestWS.getQuestProposalHelpCost
 
 # Solve quest
 POST	/rest/getQuestCost								controllers.web.rest.SolveQuestWS.getQuestCost
@@ -40,6 +45,8 @@ POST	/rest/proposeSolution							controllers.web.rest.SolveQuestWS.proposeSoluti
 
 POST	/rest/getQuestGiveUpCost						controllers.web.rest.SolveQuestWS.getQuestGiveUpCost
 POST	/rest/giveUpQuest								controllers.web.rest.SolveQuestWS.giveUpQuest
+
+POST	/rest/getQuestSolutionHelpCost				    controllers.web.rest.SolveQuestWS.getQuestSolutionHelpCost
 
 # Vote quest proposal
 POST	/rest/getQuestProposalToVote					controllers.web.rest.VoteQuestProposalWS.getQuestProposalToVote
@@ -57,7 +64,10 @@ POST	/rest/getLevelsForRights						controllers.web.rest.DailyResultWS.getLevelsF
 # Content requests
 POST	/rest/getQuest									controllers.web.rest.ContentWS.getQuest
 POST	/rest/getSolution								controllers.web.rest.ContentWS.getSolution
-POST	/rest/getPublicProfile							controllers.web.rest.ContentWS.getPublicProfile
+POST	/rest/getPublicProfiles							controllers.web.rest.ContentWS.getPublicProfiles
+
+POST	/rest/getOwnSolutions				            controllers.web.rest.ContentWS.getOwnSolutions
+POST	/rest/getOwnQuests					            controllers.web.rest.ContentWS.getOwnQuests
 
 POST	/rest/getSolutionsForQuest						controllers.web.rest.ContentWS.getSolutionsForQuest
 POST	/rest/getSolutionsForUser						controllers.web.rest.ContentWS.getSolutionsForUser
@@ -68,6 +78,7 @@ POST	/rest/getShortlist								controllers.web.rest.ShortlistWS.getShortlist
 POST	/rest/costToShortlist							controllers.web.rest.ShortlistWS.costToShortlist
 POST	/rest/addToShortlist							controllers.web.rest.ShortlistWS.addToShortlist
 POST	/rest/removeFromShortlist						controllers.web.rest.ShortlistWS.removeFromShortlist
+POST	/rest/getSuggestsForShortlist					controllers.web.rest.ShortlistWS.getSuggestsForShortlist
 
 # Friends requests
 POST	/rest/getFriends								controllers.web.rest.FriendsWS.getFriends
@@ -94,6 +105,7 @@ POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
 # Debug (Should be removed in production)
 #######################
 POST	/rest/debug/shiftDailyResult					controllers.web.rest.DailyResultWS.shiftDailyResult
+POST	/rest/debug/test								controllers.web.rest.DebugWS.test
 
 
 #######################
@@ -101,10 +113,17 @@ POST	/rest/debug/shiftDailyResult					controllers.web.rest.DailyResultWS.shiftDa
 #######################
 GET		/admin											controllers.web.admin.AdminApp.index
 
+GET		/admin/loginJ0hETru60HiWwmEywG2q	            controllers.web.admin.AdminApp.login
+
 GET		/admin/themes									controllers.web.admin.ThemesCRUD.themes(id = "")
 GET		/admin/themes/byid/:id							controllers.web.admin.ThemesCRUD.themes(id)
 POST	/admin/themes/createTheme						controllers.web.admin.ThemesCRUD.createThemeCB
 GET		/admin/themes/deleteTheme/:id					controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
+
+GET		/admin/cultures									controllers.web.admin.CulturesCRUD.cultures(id = "")
+GET		/admin/cultures/byid/:id						controllers.web.admin.CulturesCRUD.cultures(id)
+GET		/admin/cultures/deleteCulture/:id				controllers.web.admin.CulturesCRUD.deleteCultureCB(id: String)
+POST	/admin/cultures/createCulture					controllers.web.admin.CulturesCRUD.createCultureCB
 
 GET		/admin/quests									controllers.web.admin.QuestsCRUD.quests(id = "")
 GET		/admin/quests/byid/:id							controllers.web.admin.QuestsCRUD.quests(id)
@@ -121,16 +140,6 @@ GET		/admin/config									controllers.web.admin.Config.config(name = "")
 GET		/admin/config/byname/:name						controllers.web.admin.Config.config(name)
 POST	/admin/config/configUpdate/:name				controllers.web.admin.Config.configUpdate(name)
 
-
-#######################
-# Test client
-#######################
-GET     /testclient                 					controllers.web.testclient.Client.index
-GET     /testclient/loginfb           					controllers.web.testclient.Client.loginfb
-
-POST	/testclient/loginfbTarget						controllers.web.testclient.Client.loginfbTarget
-
-GET     /testclient/main            					controllers.web.testclient.App.main
 
 
 # Map static resources from the /public folder to the /assets URL path

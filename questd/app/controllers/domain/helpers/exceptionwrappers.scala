@@ -5,17 +5,16 @@ import play.Logger
 import controllers.domain._
 
 object exceptionwrappers {
-  
+
   /**
    * Wrapper for handling unknown exceptions.
    */
   private [helpers] def handleUnknownEx[P, T >: ApiResult[P]](f: => T): T = try {
     f
   } catch {
-    case ex: Throwable => {
+    case ex: Throwable =>
       Logger.error("Exceptionally unexpected exception", ex)
       InternalErrorApiResult()
-    }
   }
 
   /**
@@ -25,11 +24,10 @@ object exceptionwrappers {
     try {
       f
     } catch {
-      case ex: DatabaseException => {
+      case ex: DatabaseException =>
         Logger.error("DB error during login", ex)
         InternalErrorApiResult()
-      }
     }
   }
-  
+
 }

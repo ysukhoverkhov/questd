@@ -1,18 +1,9 @@
 package logic.user.util
 
-import org.joda.time.DateTime
-import com.github.nscala_time.time.Imports._
-import logic._
 import logic.constants._
-import logic.functions._
-import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
-import models.domain.base._
-import models.domain.ContentType._
-import controllers.domain._
 import logic.UserLogic
 import play.Logger
-import controllers.domain.app.user._
 import controllers.domain.app.questsolution._
 
 trait SolutionSelectUserLogic { this: UserLogic =>
@@ -31,20 +22,42 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       })
   }
 
-  def getSolutionsWithSuperAlgorithm = {
-    List(
+  def getSolutionsWithSuperAlgorithm: Iterator[QuestSolution] = {
+    val algs = List(
       () => getTutorialSolutions,
+      () => getHelpWantedSolutions,
+      () => getSolutionsOfOwnQuests,
       () => getStartingSolutions,
-      () => getDefaultSolutions).
-      foldLeft[Option[Iterator[QuestSolution]]](None)((run, fun) => {
-        if (run == None) fun() else run
-      }).
-      getOrElse(List().iterator)
+      () => getDefaultSolutions)
+
+      selectFromChain(algs, default = List().iterator)
   }
 
   private[user] def getTutorialSolutions: Option[Iterator[QuestSolution]] = {
     Logger.trace("getTutorialSolutions")
     None
+  }
+
+  private[user] def getHelpWantedSolutions: Option[Iterator[QuestSolution]] = {
+    Logger.trace("getHelpWantedSolutions")
+
+    if (user.mustVoteSolutions.nonEmpty) {
+      Some(api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(
+        user,
+        QuestSolutionStatus.OnVoting)).body.get.solutions)
+    } else {
+      None
+    }
+  }
+
+  private[user] def getSolutionsOfOwnQuests: Option[Iterator[QuestSolution]] = {
+    Logger.trace("getSolutionsOfOwnQuests")
+
+    val solutions = api.getSolutionsForOwnQuests(GetSolutionsForOwnQuestsRequest(
+      user,
+      QuestSolutionStatus.OnVoting)).body.get.solutions
+
+    if (solutions.isEmpty) None else Some(solutions)
   }
 
   private[user] def getStartingSolutions: Option[Iterator[QuestSolution]] = {
@@ -53,47 +66,28 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     if (user.profile.publicProfile.level > api.config(api.ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions).toInt) {
       None
     } else {
-      if (rand.nextDouble < api.config(api.ConfigParams.SolutionProbabilityStartingVIPSolutions).toDouble) {
-        getVIPSolutions
-      } else {
-        getOtherSolutions
-      }
+
+      val algs = List(
+        (api.config(api.ConfigParams.SolutionProbabilityStartingVIPSolutions).toDouble, () => getVIPSolutions),
+        (1.00, () => getOtherSolutions) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
+        )
+
+      selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
     }
   }
 
   private[user] def getDefaultSolutions: Option[Iterator[QuestSolution]] = {
     Logger.trace("getDefaultSolutions")
 
-    val dice = rand.nextDouble
-
-    List(
+    val algs = List(
       (api.config(api.ConfigParams.SolutionProbabilityFriends).toDouble, () => getFriendsSolutions),
       (api.config(api.ConfigParams.SolutionProbabilityShortlist).toDouble, () => getShortlistSolutions),
       (api.config(api.ConfigParams.SolutionProbabilityLiked).toDouble, () => getSolutionsForLikedQuests),
       (api.config(api.ConfigParams.SolutionProbabilityStar).toDouble, () => getVIPSolutions),
       (1.00, () => getOtherSolutions) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
-      ).foldLeft[Either[Double, Option[Iterator[QuestSolution]]]](Left(0))((run, fun) => {
-        run match {
-          case Left(p) => {
-            val curProbabiliy = p + fun._1
-            if (curProbabiliy > dice) {
-              Right(fun._2())
-            } else {
-              Left(curProbabiliy)
-            }
-          }
-          case _ => run
-        }
-      }) match {
-        case Right(oi) => oi match {
-          case Some(i) => if (i.hasNext) Some(i) else None
-          case None => None
-        }
-        case Left(_) => {
-          Logger.error("getDefaultSolutions - None of solution selector functions were called. Check probabilities.")
-          None
-        }
-      }
+      )
+
+    selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
   }
 
   private[user] def getFriendsSolutions = {
@@ -101,7 +95,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Some(api.getFriendsSolutions(GetFriendsSolutionsRequest(
       user,
       QuestSolutionStatus.OnVoting,
-      levels)).body.get.quests)
+      levels)).body.get.solutions)
   }
 
   private[user] def getShortlistSolutions = {
@@ -109,7 +103,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Some(api.getShortlistSolutions(GetShortlistSolutionsRequest(
       user,
       QuestSolutionStatus.OnVoting,
-      levels)).body.get.quests)
+      levels)).body.get.solutions)
   }
 
   private[user] def getSolutionsForLikedQuests = {
@@ -117,7 +111,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Some(api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
       user,
       QuestSolutionStatus.OnVoting,
-      levels)).body.get.quests)
+      levels)).body.get.solutions)
   }
 
   private[user] def getVIPSolutions = {
@@ -130,7 +124,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user,
       QuestSolutionStatus.OnVoting,
       levels,
-      themeIds)).body.get.quests)
+      themeIds)).body.get.solutions)
   }
 
   private[user] def getOtherSolutions = {
@@ -140,17 +134,19 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("    Selected themes of other solutions: " + themeIds.mkString(", "))
 
     Some(api.getAllSolutions(GetAllSolutionsRequest(
+      user,
       QuestSolutionStatus.OnVoting,
       levels,
-      themeIds)).body.get.quests)
+      themeIds)).body.get.solutions)
   }
 
   private[user] def getAllSolutions = {
     Logger.trace("  Returning from all solutions")
 
     Some(api.getAllSolutions(GetAllSolutionsRequest(
+      user,
       QuestSolutionStatus.OnVoting,
-      levels)).body.get.quests)
+      levels)).body.get.solutions)
   }
 
   /**

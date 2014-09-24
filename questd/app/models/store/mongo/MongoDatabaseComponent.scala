@@ -1,7 +1,6 @@
 package models.store.mongo
 
 import models.store._
-import models.store.dao._
 import dao._
 
 trait MongoDatabaseComponent extends DatabaseComponent {
@@ -15,6 +14,7 @@ trait MongoDatabaseComponent extends DatabaseComponent {
     val user = new MongoUserDAO
     val quest = new MongoQuestDAO
     val solution = new MongoQuestSolutionDAO
+    val culture = new MongoCultureDAO
   }
 
 }

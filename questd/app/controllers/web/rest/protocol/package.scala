@@ -1,7 +1,5 @@
 package controllers.web.rest
 
-import play.api.libs.json._
-import play.Logger
 import controllers.domain.app.user._
 import models.domain.Profile
 import controllers.domain.app.misc.GetTimeResult
@@ -36,21 +34,18 @@ package object protocol {
 
   /**
    * Login Request
-   * Single entry. Key - "token", value - value.
    */
-  case class WSLoginFBRequest(token: String, appVersion: Int)
+  case class WSLoginRequest(snName:String, token: String, appVersion: Int)
 
   /**
    * Login Result
-   * Single entry. Key - "token", value - value.
    */
-  case class WSLoginFBResult(sessionid: String)
+  case class WSLoginResult(sessionid: String)
 
   /**
    * Get profile response
    */
   type WSProfileResult = Profile
-
 
   /**
    * Set Gender protocol.
@@ -63,6 +58,19 @@ package object protocol {
    */
   type WSSetDebugResult = SetDebugResult
   case class WSSetDebugRequest(debug: String)
+
+  /**
+   * Set city protocol.
+   */
+  type WSSetCityResult = SetCityResult
+  case class WSSetCityRequest(city: String)
+
+  /**
+   * Set country protocol
+   */
+  type WSGetCountryListResult = GetCountryListResult
+  type WSSetCountryResult = SetCountryResult
+  case class WSSetCountryRequest(country: String)
 
   /**
    * Get Quest theme cost result
@@ -86,6 +94,16 @@ package object protocol {
    */
   type WSProposeQuestResult = ProposeQuestResult
 
+  case class WSContentReference(
+    contentType: String,
+    storage: String,
+    reference: String)
+
+  case class WSProposeQuestRequest(
+    media: WSContentReference,
+    icon: Option[WSContentReference] = None,
+    description: String)
+
   /**
    *
    */
@@ -95,6 +113,8 @@ package object protocol {
    *
    */
   type WSGetQuestProposalGiveUpCostResult = GetQuestProposalGiveUpCostResult
+
+  type WSGetQuestProposalHelpCostResult = GetQuestProposalHelpCostResult
 
   /**
    * *******************
@@ -115,6 +135,8 @@ package object protocol {
   type WSGetQuestGiveUpCostResult = GetQuestGiveUpCostResult
 
   type WSGiveUpQuestResult = GiveUpQuestResult
+
+  type WSGetQuestSolutionHelpCostResult = GetQuestSolutionHelpCostResult
 
   /**
    * ********************
@@ -174,10 +196,10 @@ package object protocol {
   type WSGetRightsAtLevelsResult = GetRightsAtLevelsResult
 
   type WSGetLevelsForRightsResult = GetLevelsForRightsResult
-  
+
   case class WSGetLevelsForRightsRequest(
-      functionality: List[String])
-  
+    functionality: List[String])
+
   /**
    * ********************
    * Content
@@ -193,16 +215,38 @@ package object protocol {
 
   type WSGetSolutionResult = GetSolutionResult
 
-  case class WSGetPublicProfileRequest(
-    id: String)
+  case class WSGetPublicProfilesRequest(
+    ids: List[String])
 
-  type WSGetPublicProfileResult = GetPublicProfileResult
+  type WSGetPublicProfileResult = GetPublicProfilesResult
 
   case class WSGetSolutionsForQuestRequest(
     id: String,
 
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: Option[String],
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+
+  type WSGetOwnSolutionsResult = GetOwnSolutionsResult
+  case class WSGetOwnSolutionsRequest(
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+
+  type WSGetOwnQuestsResult = GetOwnQuestsResult
+  case class WSGetOwnQuestsRequest(
+    // see QuestStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -216,7 +260,7 @@ package object protocol {
     id: String,
 
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: Option[String],
+    status: List[String] = List(),
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -230,7 +274,7 @@ package object protocol {
     id: String,
 
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: Option[String],
+    status: List[String] = List(),
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -260,7 +304,11 @@ package object protocol {
 
   type WSRemoveFromShortlistResult = RemoveFromShortlistResult
 
-  
+  case class WSGetSuggestsForShortlistRequest(
+    tokens: Map[String, String])
+
+  type WSGetSuggestsForShortlistResult = GetSuggestsForShortlistResult
+
   /**
    * Friends
    */
@@ -288,11 +336,10 @@ package object protocol {
     id: String)
   type WSRemoveFromFriendsResult = RemoveFromFriendsResult
 
-  
   /**
    * Messages
    */
-  
+
   type WSGetMessagesResult = GetMessagesResult
 
   case class WSRemoveMessageRequest(
@@ -300,46 +347,41 @@ package object protocol {
     id: String)
   type WSRemoveMessageResult = RemoveMessageResult
 
-
   /**
    * Misc
    */
-  
+
   type WSGetTimeResult = GetTimeResult
-  
-  
+
   /**
    * Tutorial
    */
-  
+
   case class WSGetTutorialStateRequest(
     /// Id of a platform to get state for.
     platformId: String)
-    
+
   /// if no state for platform present empty result will be returned.
   type WSGetTutorialStateResult = GetTutorialStateResult
 
-  
   case class WSSetTutorialStateRequest(
     /// Id of a platform to get state for.
     platformId: String,
     state: String)
-    
-  /// may return LimitExceeded in "allowed" field if there are too many platforms (logic.constants.NumberOfStoredTutorialPlatforms) 
+
+  /// may return LimitExceeded in "allowed" field if there are too many platforms (logic.constants.NumberOfStoredTutorialPlatforms)
   /// or state is too long (logic.constants.MaxLengthOfTutorlaPlatformState).
   type WSSetTutorialStateResult = SetTutorialStateResult
- 
-  
+
   case class WSAssignTutorialTaskRequest(
-      taskId: String)
-  
+    taskId: String)
+
   /// LimitExceeded if task was already requested.
   /// OutOfContent if task with this id is not exists.
   type WSAssignTutorialTaskResult = AssignTutorialTaskResult
-  
-  
+
   case class WSIncTutorialTaskRequest(
-      taskId: String)
+    taskId: String)
 
   /// OutOfContent if the task is not in active tasks.
   type WSIncTutorialTaskResult = IncTutorialTaskResult

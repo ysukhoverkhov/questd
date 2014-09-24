@@ -17,10 +17,12 @@ case class DailyResult(
 case class QuestSolutionResult(
     questSolutionId: String,
     reward: Option[Assets],
-    penalty: Option[Assets])
+    penalty: Option[Assets],
+    status: QuestSolutionStatus.Value)
   
 case class QuestProposalResult(
     questProposalId: String,
     reward: Option[Assets],
-    penalty: Option[Assets])
+    penalty: Option[Assets],
+    status: QuestStatus.Value)
   

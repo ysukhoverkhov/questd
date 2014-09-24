@@ -17,7 +17,7 @@ class _ConfigParams {
   val SolutionVoteTaskShare = "30 01 Solution Vote Task Share"
   val AddToShortlistTaskProbability = "30 02 Add To Shortlist Task Probability"
   val QuestVoteTaskShare = "30 03 Vote Quests task share"
-    
+
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
 
@@ -30,12 +30,13 @@ class _ConfigParams {
   val ProposalLikesToEnterRotation = "50 21 Proposal Likes To Enter Rotation (calculated)"
   val ProposalVotesToLeaveVoting = "50 22 Proposal Votes To Leave Voting (calculated)"
   val ProposalRatioToLeaveVoting = "50 23 Proposal Ratio To Leave Voting (calculated)"
+  val ProposalMaxDescriptionLength = "50 30 Proposal Max Description Length"
 
   val SolutionCheatingRatio = "60 10 Solution Cheating to Votes Ratio"
   val SolutionMinCheatingVotes = "60 11 Solution minimum votes to thing it's a cheating"
   val SolutionIACRatio = "60 15 Solution IAC to Votes Ratio"
   val SolutionMinIACVotes = "60 16 Solution min IAC Votes"
-    
+
   val QuestProbabilityLevelsToGiveStartingQuests = "71 01 Level to give starting quests"
   val QuestProbabilityStartingVIPQuests = "71 02 Probability of selecting VIP quests in initial stage"
 
@@ -61,7 +62,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
   val configSectionName = "API"
 
   def ConfigParams = _ConfigParams
-  
+
   val defaultConfiguration = ConfigSection(
     configSectionName,
     Map(
@@ -75,7 +76,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.SolutionVoteTaskShare -> "0.9",
       ConfigParams.AddToShortlistTaskProbability -> "0.3",
       ConfigParams.QuestVoteTaskShare -> "0.9",
-      
+
       ConfigParams.FavoriteThemesShare -> "0.2",
       ConfigParams.FavoriteThemesProbability -> "0.75",
 
@@ -89,12 +90,13 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.ProposalLikesToEnterRotation -> "10",
       ConfigParams.ProposalVotesToLeaveVoting -> "100",
       ConfigParams.ProposalRatioToLeaveVoting -> "0.05",
+      ConfigParams.ProposalMaxDescriptionLength -> "140",
 
       ConfigParams.SolutionCheatingRatio -> "0.1",
       ConfigParams.SolutionMinCheatingVotes -> "5",
       ConfigParams.SolutionIACRatio -> "0.03",
       ConfigParams.SolutionMinIACVotes -> "2",
-      
+
       ConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "5",
       ConfigParams.QuestProbabilityStartingVIPQuests -> "0.5",
 

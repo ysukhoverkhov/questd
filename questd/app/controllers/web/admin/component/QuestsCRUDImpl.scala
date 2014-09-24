@@ -1,34 +1,31 @@
 package controllers.web.admin.component
 
-import play.api._
-import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.ws._
-import play.api.libs.json._
-
-import models.domain._
-import controllers.domain._
 import controllers.domain.admin._
-import components._
+import controllers.domain.{DomainAPIComponent, OkApiResult}
+import play.api._
+import play.api.data.Forms._
+import play.api.data._
+import play.api.mvc._
 
 case class QuestForm(
   id: String,
   status: String,
   level: Int,
+  description: String,
   difficulty: String,
   duration: String,
   points: Int,
   cheating: Int,
   votersCount: Int)
 
-trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
+class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   private val form = Form(
     mapping(
       "id" -> text,
       "status" -> nonEmptyText,
       "level" -> number,
+      "description" -> nonEmptyText,
       "difficulty" -> nonEmptyText,
       "duration" -> nonEmptyText,
       "points" -> number,
@@ -38,24 +35,24 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
   /**
    * Get all quests
    */
-  def quests(id: String) = Action { implicit request =>
+  def quests(id: String) = Authenticated { implicit request =>
 
     // Filling form.
     val f = if (id == "") {
       form
     } else {
       api.getQuestAdmin(GetQuestAdminRequest(id)) match {
-        case OkApiResult(GetQuestAdminResult(Some(quest))) => {
+        case OkApiResult(GetQuestAdminResult(Some(quest))) =>
           form.fill(QuestForm(
             id = quest.id,
             status = quest.status.toString,
             level = quest.info.level,
+            description = quest.info.content.description,
             difficulty = quest.info.difficulty.toString,
             duration = quest.info.duration.toString,
             points = quest.rating.points,
             cheating = quest.rating.cheating,
             votersCount = quest.rating.votersCount))
-        }
         case _ => form
       }
     }
@@ -76,12 +73,12 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
   /**
    * Updates quest status by request from CRUD
    */
-  def updateQuest = Action { implicit request =>
+  def updateQuest() = Authenticated { implicit request =>
     form.bindFromRequest.fold(
 
       formWithErrors => {
 
-        Logger.error(formWithErrors.errors.toString)
+        Logger.error(s"$formWithErrors.errors")
 
         BadRequest(views.html.admin.quests(
           Menu(request),
@@ -99,6 +96,7 @@ trait QuestsCRUDImpl extends Controller { this: APIAccessor =>
             questForm.id,
             questForm.status,
             questForm.level,
+            questForm.description,
             questForm.difficulty,
             questForm.duration,
             questForm.points,

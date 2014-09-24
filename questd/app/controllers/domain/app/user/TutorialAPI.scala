@@ -1,13 +1,10 @@
 package controllers.domain.app.user
 
 import models.domain._
-import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
-import logic._
-import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
 
 case class GetTutorialStateRequest(user: User, platformId: String)
@@ -60,9 +57,9 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
       OkApiResult(AssignTutorialTaskResult(LimitExceeded))
     } else {
       db.tutorialTask.readById(taskId) match {
-        case Some(t) => {
+        case Some(t) =>
           // 2. If rewardReceived is true remove all tasks and give current one as a solely task.
-          if (user.profile.dailyTasks.rewardReceived == true) {
+          if (user.profile.dailyTasks.rewardReceived) {
             db.user.resetTasks(
               user.id,
               DailyTasks(tasks = List(), reward = Assets()),
@@ -84,10 +81,8 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
                 OkApiResult(AssignTutorialTaskResult(OK, Some(v.profile)))
               }
           }
-        }
-        case None => {
+        case None =>
           OkApiResult(AssignTutorialTaskResult(OutOfContent))
-        }
       }
     }
   }
@@ -97,7 +92,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
    */
   def incTutorialTask(request: IncTutorialTaskRequest): ApiResult[IncTutorialTaskResult] = handleDbException {
     import request._
-    if (user.profile.dailyTasks.tasks.count(t => t.tutorialTask != None && t.tutorialTask.get.id == taskId) > 0) {
+    if (user.profile.dailyTasks.tasks.count(t => t.tutorialTask.map(_.id) == Some(taskId)) > 0) {
       makeTask(MakeTaskRequest(user = user, tutorialTaskId = Some(taskId))) ifOk { r =>
         OkApiResult(IncTutorialTaskResult(OK, Some(r.user.profile)))
       }

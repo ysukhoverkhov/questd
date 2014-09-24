@@ -1,38 +1,21 @@
 package logic.user
 
-import org.specs2.mutable._
-import org.specs2.runner._
-import org.specs2.mock.Mockito
-import org.junit.runner._
-import logic._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
 import org.joda.time.Hours
-import components.APIAccessor
-import controllers.domain.DomainAPIComponent
-import models.store.DatabaseComponent
-import components.random.RandomComponent
-import components.RandomAccessor
-import controllers.domain.admin.AllThemesRequest
-import controllers.domain.admin.AllThemesResult
-import controllers.domain.OkApiResult
-import models.domain.admin.ConfigSection
-import controllers.domain.DomainAPIComponent
-import controllers.domain.config._ConfigParams
-import com.github.nscala_time.time.Imports.DateTime
-import com.github.nscala_time.time.Imports.richDateTime
-import logic.LogicBootstrapper
+import testhelpers.domainstubs._
+import java.util.Date
 
-class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
+class UserLogicSpecs extends BaseUserLogicSpecs {
 
   "User Logic" should {
 
     "Allow user without coins purchase themes" in {
-      val u = User(id = "",
-        profile = Profile(
-            publicProfile = PublicProfile(level = 20), 
-            assets = Assets(0, 0, 0), 
-            rights = Rights.full))
+      val u = createUserStub(
+        level = 20,
+        assets = Assets(0, 0, 0),
+        questProposalCooldown = new Date(0),
+        takenTheme = None)
 
       u.canPurchaseQuestProposals must beEqualTo(OK)
     }
@@ -45,15 +28,17 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
     }
 
     "Allow user with level and money purchase themes" in {
-      val u = User(id = "",
-        profile = Profile(publicProfile = PublicProfile(level = 12), assets = Assets(100000, 100000, 1000000), rights = Rights.full))
+      val u = createUserStub(
+        level = 12,
+        assets = Assets(100000, 100000, 1000000),
+        questProposalCooldown = new Date(0),
+        takenTheme = None)
 
       u.canPurchaseQuestProposals must beEqualTo(OK)
     }
 
     "Report cooldiwn if not enough time passed since last try" in {
       import com.github.nscala_time.time.Imports._
-      import java.util.Date
 
       val u = User(
         id = "",
@@ -66,10 +51,7 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
       u.canPurchaseQuestProposals must beEqualTo(CoolDown)
     }
 
-    "Report different cooldowd for users in different timezone" in {
-
-      import com.github.nscala_time.time.Imports._
-      import org.joda.time.DateTime
+    "Report different cooldown for users in different timezone" in {
 
       val u1 = User(
         id = "",
@@ -88,10 +70,10 @@ class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
           rights = Rights.full))
 
       val t2 = u2.getCooldownForTakeTheme
-      
+
       t2.before(t1) must beEqualTo(true)
     }
-    
+
   }
 }
 

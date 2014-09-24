@@ -1,23 +1,15 @@
 package controllers.web.admin.component
 
-import play.api._
+import controllers.domain.admin.{AllSolutionsRequest, AllSolutionsResult}
+import controllers.domain.{DomainAPIComponent, OkApiResult}
 import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.ws._
-import play.api.libs.json._
 
-import models.domain._
-import controllers.domain._
-import controllers.domain.admin._
-import components._
-
-trait SolutionsCRUDImpl extends Controller { this: APIAccessor =>
+class SolutionsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   /**
    * Get all solutions
    */
-  def solutions(id: String) = Action { implicit request =>
+  def solutions(id: String) = Authenticated { implicit request =>
 
     // Filling table.
     api.allSolutions(AllSolutionsRequest()) match {

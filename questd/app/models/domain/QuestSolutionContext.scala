@@ -1,7 +1,7 @@
 package models.domain
 
 import java.util.Date
-import models.domain.base._
+import models.domain.view._
 
 case class QuestSolutionContext(
   defeatReward: Assets = Assets(),

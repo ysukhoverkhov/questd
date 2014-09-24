@@ -1,7 +1,5 @@
 package controllers.web.rest.component
 
-import play.api._
-import play.api.mvc._
 import controllers.web.rest.component.helpers._
 import controllers.web.rest.protocol._
 import controllers.domain.app.user._
@@ -30,10 +28,36 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
   /**
    * Get profile by id.
    */
-  def getPublicProfile = wrapJsonApiCallReturnBody[WSGetPublicProfileResult] { (js, r) =>
-    val v = Json.read[WSGetPublicProfileRequest](js)
+  def getPublicProfiles = wrapJsonApiCallReturnBody[WSGetPublicProfileResult] { (js, r) =>
+    val v = Json.read[WSGetPublicProfilesRequest](js)
 
-    api.getPublicProfile(GetPublicProfileRequest(r.user, v.id))
+    api.getPublicProfiles(GetPublicProfilesRequest(r.user, v.ids))
+  }
+
+  /**
+   * Get own solutions.
+   */
+  def getOwnSolutions = wrapJsonApiCallReturnBody[WSGetOwnSolutionsResult] { (js, r) =>
+    val v = Json.read[WSGetOwnSolutionsRequest](js)
+
+    api.getOwnSolutions(GetOwnSolutionsRequest(
+      r.user,
+      v.status.map(QuestSolutionStatus.withName),
+      v.pageNumber,
+      v.pageSize))
+  }
+
+  /**
+   * Get own quests.
+   */
+  def getOwnQuests = wrapJsonApiCallReturnBody[WSGetOwnQuestsResult] { (js, r) =>
+    val v = Json.read[WSGetOwnQuestsRequest](js)
+
+    api.getOwnQuests(GetOwnQuestsRequest(
+      r.user,
+      v.status.map(QuestStatus.withName),
+      v.pageNumber,
+      v.pageSize))
   }
 
   /**
@@ -45,7 +69,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getSolutionsForQuest(GetSolutionsForQuestRequest(
       r.user,
       v.id,
-      v.status.map(QuestSolutionStatus.withName(_)),
+      v.status.map(QuestSolutionStatus.withName),
       v.pageNumber,
       v.pageSize))
   }
@@ -59,7 +83,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getSolutionsForUser(GetSolutionsForUserRequest(
       r.user,
       v.id,
-      v.status.map(QuestSolutionStatus.withName(_)),
+      v.status.map(QuestSolutionStatus.withName),
       v.pageNumber,
       v.pageSize))
   }
@@ -67,13 +91,13 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
   /**
    * Get quests for a given person.
    */
-  def getQuestsForUser  = wrapJsonApiCallReturnBody[WSGetQuestsForUserResult] { (js, r) =>
+  def getQuestsForUser = wrapJsonApiCallReturnBody[WSGetQuestsForUserResult] { (js, r) =>
     val v = Json.read[WSGetQuestsForUserRequest](js)
 
     api.getQuestsForUser(GetQuestsForUserRequest(
       r.user,
       v.id,
-      v.status.map(QuestStatus.withName(_)),
+      v.status.map(QuestStatus.withName),
       v.pageNumber,
       v.pageSize))
   }

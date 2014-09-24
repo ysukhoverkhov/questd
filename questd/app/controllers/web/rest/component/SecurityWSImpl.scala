@@ -24,15 +24,15 @@ object SecurityWSImpl {
 trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
 
   // Store Auth Info
-  def storeAuthInfoInResult(result: SimpleResult, loginResult: LoginFBResult) = {
-    result.withSession(SecurityWSImpl.SessionIdKey -> loginResult.session.toString)
+  def storeAuthInfoInResult(result: Result, session: String) = {
+    result.withSession(SecurityWSImpl.SessionIdKey -> session)
   }
 
   // Configure Authorized check 
   class AuthenticatedRequest[A](val user: User, request: Request[A]) extends WrappedRequest[A](request)
 
   object Authenticated extends ActionBuilder[AuthenticatedRequest] {
-    def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
+    def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
       request.session.get(SecurityWSImpl.SessionIdKey) match {
 
         case Some(sessionid: String) => {
@@ -59,7 +59,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
             newUser match {
               case user: User => block(new AuthenticatedRequest(user, request))
               case er: Status => Future.successful(er)
-              case er: SimpleResult => Future.successful(er)
+              case er: Result => Future.successful(er)
             }
           }
         }
@@ -70,7 +70,5 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
         }
       }
     }
-
   }
-
 }

@@ -7,7 +7,6 @@ import internal.spendratingfunctions._
 import logic.internal.basefunctions._
 import models.domain.Functionality._
 import constants._
-import play.Logger
 
 object functions {
 
@@ -58,6 +57,15 @@ object functions {
   }
 
   /**
+   * Takes proposal period into account.
+   * @return Cost for inviting one friend to help with proposal.
+   */
+  def coinsToInviteFriendForVoteQuestProposal(level: Int): Int = {
+    // THis will be redone anyways.
+    4
+  }
+
+  /**
    * Cost to give up quest proposal.
    */
   def ratingToGiveUpQuestProposal(level: Int): Int = {
@@ -99,6 +107,15 @@ object functions {
   }
 
   /**
+   * @return Cost for inviting one friend to help with solution.
+   */
+  def coinsToInviteFriendForVoteQuestSolution(level: Int): Int = {
+    // THis will be redone anyways.
+    4
+  }
+
+
+  /**
    * How much in rating we will lose in case of giving quest up.
    */
   def ratingToGiveUpQuest(level: Int, questDuration: Int): Int = {
@@ -129,7 +146,7 @@ object functions {
    * Number of rewarded proposal votes per level.
    */
   def rewardedProposalVotesPerLevel(level: Int): Int = {
-    math.floor(4 * math.pow((level + 1 - levelFor(VoteQuestProposals)), 0.39)).toInt
+    math.floor(4 * math.pow(level + 1 - levelFor(VoteQuestProposals), 0.39)).toInt
   }
 
   /**
@@ -156,7 +173,7 @@ object functions {
    * Number of rewarded solution votes per level.
    */
   def rewardedSolutionVotesPerLevel(level: Int): Int = {
-    math.floor(10 * math.pow((level + 1 - levelFor(VoteQuestSolutions)), 0.3)).toInt
+    math.floor(10 * math.pow(level + 1 - levelFor(VoteQuestSolutions), 0.3)).toInt
   }
 
   /**

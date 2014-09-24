@@ -8,6 +8,7 @@ import models.domain.base.ID
 case class User(
   id: String = ID.generateUUID(),
   auth: AuthInfo = AuthInfo(),
+  demo: UserDemographics = UserDemographics(),
   profile: Profile = Profile(),
   schedules: UserSchedules = UserSchedules(),
   stats: UserStats = UserStats(),
@@ -15,6 +16,8 @@ case class User(
   history: UserHistory = UserHistory(),
   shortlist: List[String] = List(),
   friends: List[Friendship] = List(),
+  mustVoteSolutions: List[String] = List(),
   messages: List[Message] = List(),
-  tutorial: TutorialState = TutorialState()) extends ID
+  tutorial: TutorialState = TutorialState(),
+  payedAuthor: Boolean = false) extends ID
 

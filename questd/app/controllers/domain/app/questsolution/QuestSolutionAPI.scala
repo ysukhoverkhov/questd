@@ -91,7 +91,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
     updatedSolution ifSome { s =>
       val authorUpdateResult =
         if (s.status != solution.status) {
-          val authorId = solution.userId
+          val authorId = solution.info.authorId
 
           db.user.readById(authorId) match {
             case None => {

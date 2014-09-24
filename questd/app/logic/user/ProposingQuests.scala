@@ -1,6 +1,7 @@
 package logic.user
 
 import java.util.Date
+import controllers.domain.app.theme.GetAllThemesForCultureRequest
 import play.Logger
 import logic._
 import logic.constants._
@@ -10,6 +11,8 @@ import models.domain._
 import models.domain.ContentType._
 import controllers.domain.admin._
 import controllers.domain._
+
+import scala.annotation.tailrec
 
 /**
  * All logic related to proposing quests.
@@ -28,6 +31,8 @@ trait ProposingQuests { this: UserLogic =>
       CoolDown
     else if (user.profile.questProposalContext.takenTheme != None)
       InvalidState
+    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+      IncompleteProfile
     else
       OK
   }
@@ -45,7 +50,7 @@ trait ProposingQuests { this: UserLogic =>
     else
       OK
   }
-  
+
   /**
    * Is user potentially eligible for proposing quest today.
    */
@@ -95,10 +100,39 @@ trait ProposingQuests { this: UserLogic =>
    */
   def getRandomThemeForQuestProposal(themesCount: Long): Option[Theme] = {
 
-    def themeFromGlobal = {
-      val themes = api.allThemes(AllThemesRequest(sorted = true)).body.get.themes
+    /**
+     * Select theme from returned iterator what is not contained in given list.
+     */
+    @tailrec
+    def selectTheme(i: Iterator[Theme], usedThemesIds: List[String]): Option[Theme] = {
+      Logger.trace("In selectTheme")
+      if (i.hasNext) {
+        val t = i.next()
 
-      selectTheme(themes, user.profile.questProposalContext.todayReviewedThemeIds)
+        Logger.trace("Checking used themes to have reviewed theme in: " + t.id + " IN " + usedThemesIds)
+        if (!usedThemesIds.contains(t.id)) {
+          Logger.trace("  Theme selected: " + t.id)
+          Some(t)
+        } else {
+          selectTheme(i, usedThemesIds)
+        }
+      } else {
+        None
+      }
+    }
+
+    /**
+     * Select a theme from global list of themes.
+     */
+    def themeFromGlobal: Option[Theme] = {
+      user.demo.cultureId match {
+        case Some(c) =>
+          val themes = api.getAllThemesForCulture(GetAllThemesForCultureRequest(cultureId = c)).body.get.themes
+          selectTheme(themes, user.profile.questProposalContext.todayReviewedThemeIds)
+        case None =>
+          Logger.error("User with culture set to None requesting culture.")
+          None
+      }
     }
 
     val probabilityOfRecentList = {
@@ -119,7 +153,7 @@ trait ProposingQuests { this: UserLogic =>
       Logger.debug("Using recent list")
       val id = user.history.selectedThemeIds(rand.nextInt(user.history.selectedThemeIds.length))
 
-      Logger.trace("  Selected id from themes in history: " + id)
+      Logger.debug("  Selected id from themes in history: " + id)
 
       if (user.profile.questProposalContext.todayReviewedThemeIds.contains(id)) {
         Logger.debug("Recent list returned theme we've used today, requesting from global one.")
@@ -127,7 +161,7 @@ trait ProposingQuests { this: UserLogic =>
       } else {
         api.getTheme(GetThemeRequest(id)) match {
           case OkApiResult(GetThemeResult(theme)) => Some(theme)
-          case _ => None
+          case _ => themeFromGlobal // If theme in history is removed from our themes - get from global list.
         }
       }
     } else {
@@ -183,31 +217,18 @@ trait ProposingQuests { this: UserLogic =>
   }
 
   /**
+   * How much it'll be for a single friend to help us with proposal.
+   */
+  def costOfAskingForHelpWithProposal = {
+    Assets(coins = coinsToInviteFriendForVoteQuestProposal(user.profile.publicProfile.level))
+  }
+
+  /**
    * Check is quest deadline passed and quest should be autogave up.
    */
   def proposalDeadlineReached = {
     ((user.profile.questProposalContext.takenTheme != None)
-      && (user.profile.questProposalContext.questProposalCooldown.before(new Date())))
-  }
-
-  /**
-   * Select theme from returned iterator what is not contained in given list.
-   */
-  private def selectTheme(i: Iterator[Theme], usedThemesIds: List[String]): Option[Theme] = {
-    Logger.trace("In selectTheme")
-    if (i.hasNext) {
-      val t = i.next()
-
-      Logger.trace("Checking used themes to have reviewed theme in: " + t.id + " IN " + usedThemesIds)
-      if (!usedThemesIds.contains(t.id)) {
-        Logger.trace("  Theme selected: " + t.id)
-        Some(t)
-      } else {
-        selectTheme(i, usedThemesIds)
-      }
-    } else {
-      None
-    }
+      && user.profile.questProposalContext.questProposalCooldown.before(new Date()))
   }
 
 }

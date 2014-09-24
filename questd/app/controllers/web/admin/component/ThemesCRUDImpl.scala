@@ -1,21 +1,17 @@
 package controllers.web.admin.component
 
-import play.api._
+import controllers.domain._
+import controllers.domain.admin._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
-import play.api.libs.ws._
-import play.api.libs.json._
-
 import models.domain._
-import controllers.domain._
-import controllers.domain.admin._
-import components._
 
 case class ThemeForm(
   id: String,
   name: String,
   description: String,
+  cultureId: String,
 
   iconType: String,
   iconStorage: String,
@@ -25,13 +21,17 @@ case class ThemeForm(
   mediaStorage: String,
   mediaReference: String)
 
-trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
+class ThemesCRUDImpl(
+  val api: DomainAPIComponent#DomainAPI)
+  extends Controller
+  with BaseCRUDImpl[Theme, ThemeForm] {
 
-  val newThemeForm = Form(
+  protected final val emptyForm = Form(
     mapping(
       "id" -> text,
       "name" -> nonEmptyText,
       "description" -> nonEmptyText,
+      "cultureId" -> nonEmptyText,
 
       "iconType" -> nonEmptyText,
       "iconStorage" -> nonEmptyText,
@@ -42,92 +42,94 @@ trait ThemesCRUDImpl extends Controller { this: APIAccessor =>
       "mediaReference" -> nonEmptyText)(ThemeForm.apply)(ThemeForm.unapply))
 
   /**
-   * Get all themes action
+   * Form willed with obect.
    */
-  def themes(id: String) = Action { implicit request =>
+  protected final def formFilledWithObject(id: String) = {
+    api.getTheme(GetThemeRequest(id)) match {
+      case OkApiResult(GetThemeResult(theme)) =>
+        emptyForm.fill(ThemeForm(
+          id = theme.id.toString,
+          name = theme.info.name,
+          description = theme.info.description,
+          cultureId = theme.cultureId,
+          iconType = theme.info.icon.get.contentType.toString,
+          iconStorage = theme.info.icon.get.storage,
+          iconReference = theme.info.icon.get.reference,
+          mediaType = theme.info.media.contentType.toString,
+          mediaStorage = theme.info.media.storage,
+          mediaReference = theme.info.media.reference))
 
-    // Filling form.
-    val form = if (id == "") {
-      newThemeForm
-    } else {
-      api.getTheme(GetThemeRequest(id)) match {
-        case OkApiResult(GetThemeResult(theme)) => {
-
-          newThemeForm.fill(ThemeForm(
-            id = theme.id.toString,
-            name = theme.info.name,
-            description = theme.info.description,
-            iconType = theme.info.icon.get.contentType.toString,
-            iconStorage = theme.info.icon.get.storage,
-            iconReference = theme.info.icon.get.reference,
-            mediaType = theme.info.media.contentType.toString,
-            mediaStorage = theme.info.media.storage,
-            mediaReference = theme.info.media.reference))
-        }
-        case _ => newThemeForm
-      }
+      case _ => emptyForm
     }
+  }
 
-    // Filling table.
+  /**
+   * All objects crud is for.
+   */
+  protected final def allObjects = {
     api.allThemes(AllThemesRequest(sorted = false)) match {
 
-      case OkApiResult(a: AllThemesResult) => Ok(
-        views.html.admin.themes(
-          Menu(request),
-          a.themes.toList,
-          form))
+      case OkApiResult(a: AllThemesResult) =>
+        Some(a.themes.toList)
 
-      case _ => Ok("Internal server error - themes not received.")
+      case _ => None
     }
   }
 
   /**
-   * Delete theme action
+   * Functions what renders HTML
    */
-  def deleteThemeCB(id: String) = Action { implicit request =>
+  protected final def renderFunction(request: Request[AnyContent]) = {
 
-    api.deleteTheme(DeleteThemeRequest(id))
+    val cultures = api.allCultures(AllCulturesRequest()) match {
+      case OkApiResult(a: AllCulturesResult) =>
+        a.cultures.toList
+      case _ => List()
+    }
 
-    Redirect(controllers.web.admin.routes.ThemesCRUD.themes(""))
+    views.html.admin.themes(
+      Menu(request),
+      _: List[Theme],
+      cultures,
+      _: Form[ThemeForm])
   }
 
   /**
-   * Create theme action
+   * Delete object.
    */
-  def createThemeCB = Action { implicit request =>
-    newThemeForm.bindFromRequest.fold(
+  protected def deleteObjectWithId(id: String): Unit = {
+    api.deleteTheme(DeleteThemeRequest(id))
+  }
 
-      formWithErrors => {
-        BadRequest(views.html.admin.themes(
-          Menu(request),
-          List(),
-          formWithErrors))
-      },
+  /**
+   * Home page of our CRUD
+   */
+  protected val callToHomePage = controllers.web.admin.routes.ThemesCRUD.themes("")
 
-      themeForm => {
+  /**
+   * Create culture from its form.
+   */
+  protected def updateObjectFromForm(form: ThemeForm): Unit = {
+    val theme = Theme(
+      id = form.id,
+      cultureId = form.cultureId,
+      info = ThemeInfo(
+        name = form.name,
+        description = form.description,
+        icon = Some(ContentReference(
+          contentType = ContentType.withName(form.iconType),
+          storage = form.iconStorage,
+          reference = form.iconReference)),
+        media = ContentReference(
+          contentType = ContentType.withName(form.mediaType),
+          storage = form.mediaStorage,
+          reference = form.mediaReference)))
 
-        val theme = Theme(
-          id = themeForm.id,
-          info = ThemeInfo(
-            name = themeForm.name,
-            description = themeForm.description,
-            icon = Some(ContentReference(
-              contentType = ContentType.withName(themeForm.iconType),
-              storage = themeForm.iconStorage,
-              reference = themeForm.iconReference)),
-            media = ContentReference(
-              contentType = ContentType.withName(themeForm.mediaType),
-              storage = themeForm.mediaStorage,
-              reference = themeForm.mediaReference)))
-
-        if (theme.id == "") {
-          api.createTheme(CreateThemeRequest(theme))
-        } else {
-          api.updateTheme(UpdateThemeRequest(theme))
-        }
-
-        Redirect(controllers.web.admin.routes.ThemesCRUD.themes(""))
-      })
+    if (theme.id == "") {
+      api.createTheme(CreateThemeRequest(theme))
+    } else {
+      api.updateTheme(UpdateThemeRequest(theme))
+    }
   }
 
 }

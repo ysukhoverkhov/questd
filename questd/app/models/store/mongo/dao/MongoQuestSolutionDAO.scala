@@ -3,36 +3,36 @@ package models.store.mongo.dao
 import play.Logger
 import models.store.mongo.helpers._
 import models.store.dao._
-import models.store._
 import models.domain._
 import com.mongodb.casbah.commons.MongoDBObject
 import java.util.Date
 
 /**
- * DOA for Config objects
+ * DOA for Quest solution objects
  */
 private[mongo] class MongoQuestSolutionDAO
   extends BaseMongoDAO[QuestSolution](collectionName = "solutions")
   with QuestSolutionDAO {
 
   def allWithParams(
-    status: Option[String] = None,
-    userIds: List[String] = List(),
+    status: List[String] = List(),
+    authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
     vip: Option[Boolean] = None,
     ids: List[String] = List(),
     questIds: List[String] = List(),
-    themeIds: List[String] = List()): Iterator[QuestSolution] = {
+    themeIds: List[String] = List(),
+    cultureId: Option[String] = None): Iterator[QuestSolution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (status != None) {
-      queryBuilder += ("status" -> status.get)
+    if (status.length > 0) {
+      queryBuilder += ("status" -> MongoDBObject("$in" -> status))
     }
 
-    if (userIds.length > 0) {
-      queryBuilder += ("userId" -> MongoDBObject("$in" -> userIds))
+    if (authorIds.length > 0) {
+      queryBuilder += ("info.authorId" -> MongoDBObject("$in" -> authorIds))
     }
 
     if (levels != None) {
@@ -56,22 +56,39 @@ private[mongo] class MongoQuestSolutionDAO
     if (themeIds.length > 0) {
       queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
     }
-    
-    Logger.trace("MongoQuestSolutionDAO - allWithParams - " + queryBuilder.result);
+
+    if (cultureId != None) {
+      queryBuilder += ("cultureId" -> cultureId.get)
+    }
+
+    Logger.trace("MongoQuestSolutionDAO - allWithParams - " + queryBuilder.result)
 
     findByExample(
-      queryBuilder.result,
+      queryBuilder.result(),
       MongoDBObject("lastModDate" -> 1),
       skip)
   }
 
-  def updateStatus(id: String, newStatus: String): Option[QuestSolution] = {
-    findAndModify(
-      id,
-      MongoDBObject(
+  def updateStatus(id: String, newStatus: String, rivalId: Option[String] = None): Option[QuestSolution] = {
+
+    val queryBuilder = MongoDBObject.newBuilder
+
+    if (rivalId != None) {
+      queryBuilder +=
         ("$set" -> MongoDBObject(
           "status" -> newStatus,
-          "lastModDate" -> new Date()))))
+          "lastModDate" -> new Date(),
+          "rivalSolutionId" -> rivalId.get))
+    } else {
+      queryBuilder +=
+        ("$set" -> MongoDBObject(
+          "status" -> newStatus,
+          "lastModDate" -> new Date()))
+    }
+
+    findAndModify(
+      id,
+      queryBuilder.result())
   }
 
   def updatePoints(
@@ -89,7 +106,7 @@ private[mongo] class MongoQuestSolutionDAO
     findAndModify(
       id,
       MongoDBObject(
-        ("$inc" -> MongoDBObject(
+        "$inc" -> MongoDBObject(
           "rating.reviewsCount" -> reviewsCountChange,
           "rating.pointsRandom" -> pointsRandomChange,
 
@@ -99,10 +116,22 @@ private[mongo] class MongoQuestSolutionDAO
           "rating.cheating" -> cheatingChange,
 
           "rating.iacpoints.spam" -> spamChange,
-          "rating.iacpoints.porn" -> pornChange)),
-        ("$set" -> MongoDBObject(
-          "lastModDate" -> new Date()))))
+          "rating.iacpoints.porn" -> pornChange),
+        "$set" -> MongoDBObject(
+          "lastModDate" -> new Date())))
   }
 
+  /**
+   *
+   */
+  def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit = {
+    update(
+      query = MongoDBObject(
+        "cultureId" -> oldCultureId),
+      u = MongoDBObject(
+        "$set" -> MongoDBObject(
+          "cultureId" -> newCultureId)),
+      multi = true)
+  }
 }
 

@@ -1,12 +1,10 @@
 package controllers.domain.app.user
 
 import models.domain._
-import models.store._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
-import logic._
 import play.Logger
 
 case class ResetDailyTasksRequest(user: User)
@@ -54,18 +52,15 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     def taskIsAlreadyCompleted = {
       (taskType, tutorialTaskId) match {
-        case (Some(tt), None) => {
+        case (Some(tt), None) =>
           user.profile.dailyTasks.tasks.count(t => t.taskType == tt && t.currentCount < t.requiredCount) <= 0
-        }
 
-        case (None, Some(ti)) => {
+        case (None, Some(ti)) =>
           user.profile.dailyTasks.tasks.count(t => t.tutorialTask != None && t.tutorialTask.get.id == ti && t.currentCount < t.requiredCount) <= 0
-        }
 
-        case _ => {
+        case _ =>
           Logger.error("Incorrect request to makeTest")
           true
-        }
       }
     }
 
@@ -78,20 +73,17 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
       def createUpdatedTasks = {
         (taskType, tutorialTaskId) match {
-          case (Some(tt), None) => {
+          case (Some(tt), None) =>
             user.profile.dailyTasks.copy(
               tasks = user.profile.dailyTasks.tasks.map(t => if (t.taskType == tt) t.copy(currentCount = t.currentCount + 1) else t))
-          }
 
-          case (None, Some(ti)) => {
+          case (None, Some(ti)) =>
             user.profile.dailyTasks.copy(
               tasks = user.profile.dailyTasks.tasks.map(t => if (t.tutorialTask != None && t.tutorialTask.get.id == ti) t.copy(currentCount = t.currentCount + 1) else t))
-          }
 
-          case _ => {
+          case _ =>
             Logger.error("Incorrect request to makeTest")
             user.profile.dailyTasks
-          }
         }
       }
 
@@ -117,18 +109,15 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
       r1 ifOk { r =>
         val u = (taskType, tutorialTaskId) match {
-          case (Some(tt), None) => {
+          case (Some(tt), None) =>
             db.user.incTask(user.id, tt.toString, newPercent, completed)
-          }
 
-          case (None, Some(ti)) => {
+          case (None, Some(ti)) =>
             db.user.incTutorialTask(user.id, ti, newPercent, completed)
-          }
 
-          case _ => {
+          case _ =>
             Logger.error("Incorrect request to makeTest")
             Some(user)
-          }
         }
 
         u ifSome { v =>
