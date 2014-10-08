@@ -107,8 +107,6 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
                   Friendship(request.friendId, FriendshipStatus.Invited),
                   Friendship(r.user.id, FriendshipStatus.Invites))
 
-                // TODO: Send message to person we invites about it.
-
                 OkApiResult(AskFriendshipResult(OK, Some(r.user.profile.assets)))
               }
             case a => OkApiResult(AskFriendshipResult(a))
@@ -213,21 +211,13 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
         // Autoaccept for newcomers.
         if (request.user.profile.publicProfile.level <= 1) {
-          // TODO: send messages about accepted friendship.
-          // TODO: Accepted to person who invited,
-          // TODO: Autoaccepted for person who was invited.
-
           becomeFriend(request.user, friend, FriendshipStatus.Accepted)
           becomeFriend(friend, request.user, FriendshipStatus.Accepted)
+          sendMessage(SendMessageRequest(
+            friend, MessageFriendshipAccepted(request.user.id)))
         } else {
-          // TODO: send message to me here.
-
-//          sendMessage(SendMessageRequest(
-//            request.user, ))
-
           becomeFriend(request.user, friend, FriendshipStatus.Invites)
-
-          // TODO: check should we send becomeFriend o friend with status "Invited".
+          becomeFriend(friend, request.user, FriendshipStatus.Invited)
         }
 
       }
