@@ -55,9 +55,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
   def getFriends(request: GetFriendsRequest): ApiResult[GetFriendsResult] = handleDbException {
 
     {
-
       makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LookThroughFriendshipProposals)))
-
     } ifOk { r =>
 
       OkApiResult(GetFriendsResult(
@@ -108,6 +106,8 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
                   request.friendId,
                   Friendship(request.friendId, FriendshipStatus.Invited),
                   Friendship(r.user.id, FriendshipStatus.Invites))
+
+                // TODO: Send message to person we invites about it.
 
                 OkApiResult(AskFriendshipResult(OK, Some(r.user.profile.assets)))
               }
@@ -195,24 +195,41 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
   def processFriendshipInvitationsFromSN(request: ProcessFriendshipInvitationsFromSNRequest): ApiResult[ProcessFriendshipInvitationsFromSNResult] = handleDbException {
     // All exceptions are wrapped and returned as Internal error which is not clean for now but ok since we ignore errors for this call anyways.
 
-    val rv = request.snUser.invitations.foldLeft(request.user){(u, i) =>
-      Logger.error(s"Invitation from ${i.inviterSnId}")
+    val rv = request.snUser.invitations.foldLeft(request.user) { (u, i) =>
+      Logger.trace(s"Invitation from ${i.inviterSnId}")
 
       db.user.readBySNid(i.snName, i.inviterSnId) foreach { friend =>
-        Logger.error(s"becoming friends with ${friend.profile.publicProfile.bio.name}")
+        Logger.trace(s"becoming friends with ${friend.profile.publicProfile.bio.name}")
 
-        def becomeFriend(me: User, newfriend: User): Unit = {
+        def becomeFriend(me: User, newfriend: User, status: FriendshipStatus.Value): Unit = {
           if (me.friends.map(_.friendId).contains(newfriend.id)) {
-            Logger.error(s"updating friendship")
-            db.user.updateFriendship(me.id, newfriend.id, FriendshipStatus.Accepted.toString)
+            Logger.trace(s"updating friendship")
+            db.user.updateFriendship(me.id, newfriend.id, status.toString)
           } else {
-            Logger.error(s"creating friendship")
-            db.user.addFriendship(me.id, Friendship(newfriend.id, FriendshipStatus.Accepted))
+            Logger.trace(s"creating friendship")
+            db.user.addFriendship(me.id, Friendship(newfriend.id, status))
           }
         }
 
-        becomeFriend(request.user, friend)
-        becomeFriend(friend, request.user)
+        // Autoaccept for newcomers.
+        if (request.user.profile.publicProfile.level <= 1) {
+          // TODO: send messages about accepted friendship.
+          // TODO: Accepted to person who invited,
+          // TODO: Autoaccepted for person who was invited.
+
+          becomeFriend(request.user, friend, FriendshipStatus.Accepted)
+          becomeFriend(friend, request.user, FriendshipStatus.Accepted)
+        } else {
+          // TODO: send message to me here.
+
+//          sendMessage(SendMessageRequest(
+//            request.user, ))
+
+          becomeFriend(request.user, friend, FriendshipStatus.Invites)
+
+          // TODO: check should we send becomeFriend o friend with status "Invited".
+        }
+
       }
 
       i.delete()

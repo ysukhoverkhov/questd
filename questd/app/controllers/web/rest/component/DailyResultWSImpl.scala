@@ -1,14 +1,8 @@
 package controllers.web.rest.component
 
-import play.api._
-import play.api.mvc._
 import controllers.domain.app.user._
-import controllers.domain._
 import controllers.web.rest.component.helpers._
-import controllers.web.rest.component._
 import controllers.web.rest.protocol._
-import models.domain._
-import org.json4s._
 
 trait DailyResultWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
@@ -25,8 +19,9 @@ trait DailyResultWSImpl extends QuestController with SecurityWSImpl with CommonF
     val v = Json.read[WSGetLevelsForRightsRequest](js)
     api.getLevelsForRights(GetLevelsForRightsRequest(r.user, v.functionality))
   }
-  
+
   def shiftDailyResult = wrapApiCallReturnBody[WSShiftDailyResultResult] { r =>
+    api.resetDailyTasks(ResetDailyTasksRequest(r.user))
     api.shiftDailyResult(ShiftDailyResultRequest(r.user))
   }
 }

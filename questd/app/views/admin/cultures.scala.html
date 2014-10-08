@@ -8,7 +8,7 @@
 		@form(action = controllers.web.admin.routes.CulturesCRUD.createCultureCB()) {
 			@inputText(newForm("id"), 'size -> 50, 'readonly -> "readonly")
 			@inputText(newForm("name"), 'size -> 20, 'placeholder -> "Name")
-            @select(newForm("cultureToMergeWith"), options(cultures.foldLeft[Map[String, String]](Map("" -> ""))((r, v) => if (v.name != newForm("name").value.get) r + (v.id -> v.name) else r))) <br />
+            @select(newForm("cultureToMergeWith"), options(cultures.foldLeft[Map[String, String]](Map("" -> ""))((r, v) => if (newForm("name").value == None || v.name != newForm("name").value.get) r + (v.id -> v.name) else r))) <br />
 
 			@if(newForm("id").value == None) {
 				<input type="submit" value="Create">
