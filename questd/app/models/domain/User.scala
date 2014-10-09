@@ -11,7 +11,7 @@ case class User(
   demo: UserDemographics = UserDemographics(),
   profile: Profile = Profile(),
   privateDailyResults: List[DailyResult] = List(),
-  privateTimeLine: List[TimeLineEntry] = List(),
+  timeLine: List[TimeLineEntry] = List(),
   schedules: UserSchedules = UserSchedules(),
   stats: UserStats = UserStats(),
   history: UserHistory = UserHistory(),

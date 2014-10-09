@@ -791,6 +791,19 @@ private[mongo] class MongoUserDAO
       multi = true)
   }
 
-}
+  /**
+   * @inheritdoc
+   */
+  def addEntryToTimeLine(id: String, entry: TimeLineEntry): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$push" -> MongoDBObject(
+          "timeLine" ->
+            MongoDBObject(
+              "$each" -> List(grater[TimeLineEntry].asDBObject(entry)),
+              "$position" -> 0))))
+  }
 
+}
 

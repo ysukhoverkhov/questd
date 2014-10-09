@@ -77,4 +77,12 @@ trait UserDAO extends BaseDAO[User] {
   def addTutorialTaskAssigned(id: String, taskId: String): Option[User]
 
   def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit
+
+  /**
+   * Adds one entry to time line.
+   * @param id Id of a user to add to.
+   * @param entry Entry to add.
+   * @return user after modifications.
+   */
+  def addEntryToTimeLine(id: String, entry: TimeLineEntry): Option[User]
 }

@@ -493,6 +493,25 @@ class UserDAOSpecs
       val ou1 = db.user.readById(u.id)
       ou1 must beSome//.which((u: User) => u.mustVoteSolutions == List())
     }
+
+    "Add entry to time line" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val u = User(id = "idid")
+      val tle = TimeLineEntry(
+        id = "id",
+        reason = TimeLineReason.Created,
+        entryAuthorId = u.id,
+        TimeLineType.Quest,
+        objectId = "oid")
+
+      db.user.create(u)
+      db.user.addEntryToTimeLine(u.id, tle)
+
+      val ou1 = db.user.readById(u.id)
+      ou1 must beSome[User]
+      ou1.get.timeLine must beEqualTo(List(tle))
+    }
   }
 }
 
