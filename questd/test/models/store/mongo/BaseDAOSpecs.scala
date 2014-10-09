@@ -2,10 +2,10 @@ package models.store.mongo
 
 import play.api.test.FakeApplication
 
-trait BaseDAOSpecs { this: MongoDatabaseComponent => 
-  
+trait BaseDAOSpecs { this: MongoDatabaseComponent =>
+
   def testMongoDatabase(name: String = "default"): Map[String, String] = {
-    val dbname: String = "questdb-test-0-20"
+    val dbname: String = "questdb-test-0-30"
     Map(
       ("mongodb." + name + ".db" -> dbname))
   }
