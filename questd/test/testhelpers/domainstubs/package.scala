@@ -112,8 +112,7 @@ package object domainstubs {
         likedQuestProposalIds = likedQuestProposalIds,
         selectedThemeIds = favThemes),
       privateDailyResults = List(DailyResult(
-        startOfPeriod = new Date(),
-        dailyAssetsDecrease = Assets())),
+        startOfPeriod = new Date())),
       profile = Profile(
         assets = assets,
         ratingToNextLevel = 100000,

@@ -63,9 +63,8 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         db.quest.updateStatus(quest.id, QuestStatus.InRotation.toString)
         db.quest.updateInfo(
             quest.id,
-            quest.calculateQuestLevel,
-            quest.calculateDuration.toString,
-            quest.calculateDifficulty.toString)
+            1 // TODO: get author level here.
+            )
       } else
         Some(quest)
     }
