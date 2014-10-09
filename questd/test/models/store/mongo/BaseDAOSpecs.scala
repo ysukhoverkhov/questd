@@ -7,7 +7,7 @@ trait BaseDAOSpecs { this: MongoDatabaseComponent =>
   def testMongoDatabase(name: String = "default"): Map[String, String] = {
     val dbname: String = "questdb-test-0-30"
     Map(
-      ("mongodb." + name + ".db" -> dbname))
+      "mongodb." + name + ".db" -> dbname)
   }
   val appWithTestDatabase = FakeApplication(additionalConfiguration = testMongoDatabase())
 
