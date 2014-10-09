@@ -242,7 +242,7 @@ object functions {
    * ********************
    */
   def costToShortlistPerson(level: Int): Int = {
-    math.round(coinAddShort(level) / 3).toInt
+    0
   }
 
 }
