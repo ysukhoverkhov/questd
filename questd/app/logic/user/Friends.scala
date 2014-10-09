@@ -41,6 +41,8 @@ trait Friends { this: UserLogic =>
       NotEnoughAssets
     else if (user.friends.length >= user.profile.rights.maxFriendsCount)
       LimitExceeded
+    else if (user.profile.publicProfile.level < potentialFriend.profile.publicProfile.level)
+      NotEnoughRights
     else
       OK
   }
