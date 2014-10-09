@@ -31,13 +31,13 @@ case class SetDebugRequest(user: User, debug: String)
 case class SetDebugResult(user: User)
 
 case class SetGenderRequest(user: User, gender: Gender.Value)
-case class SetGenderResult(user: User)
+case class SetGenderResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class SetCityRequest(user: User, city: String)
-case class SetCityResult(user: User)
+case class SetCityResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class SetCountryRequest(user: User, country: String)
-case class SetCountryResult(allowed: ProfileModificationResult, user: Option[User])
+case class SetCountryResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class GetCountryListRequest(user: User)
 case class GetCountryListResult(countries: List[String])
@@ -147,7 +147,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     import request._
 
     db.user.setGender(user.id, gender.toString) ifSome { v =>
-      OkApiResult(SetGenderResult(v))
+      OkApiResult(SetGenderResult(OK, Some(v.profile)))
     }
   }
 
@@ -158,7 +158,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     import request._
 
     db.user.setCity(user.id, city) ifSome { v =>
-      OkApiResult(SetCityResult(v))
+      OkApiResult(SetCityResult(OK, Some(v.profile)))
     }
   }
 
@@ -175,7 +175,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     } else {
       db.user.setCountry(user.id, country) ifSome { v =>
         updateUserCulture(UpdateUserCultureRequest(v)) ifOk { r =>
-          OkApiResult(SetCountryResult(OK, Some(r.user)))
+          OkApiResult(SetCountryResult(OK, Some(r.user.profile)))
         }
       }
     }
