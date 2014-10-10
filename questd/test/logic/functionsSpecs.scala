@@ -1,11 +1,6 @@
 package logic
 
 import org.specs2.mutable._
-import org.specs2.runner._
-import org.specs2.matcher._
-import org.specs2.mock.Mockito
-import org.junit.runner._
-import play.Logger
 import functions._
 
 class FunctionsSpecs extends Specification {
@@ -113,13 +108,13 @@ class FunctionsSpecs extends Specification {
       maxNumberOfFriendsOnLevel(20) must beEqualTo(100)
     }
 
-    "costToShortlistPerson" in {
-      costToShortlistPerson(1) must beEqualTo(0)
-      costToShortlistPerson(7) must beEqualTo(0)
-      costToShortlistPerson(8) must beEqualTo(0)
-      costToShortlistPerson(10) must beEqualTo(0)
-      costToShortlistPerson(11) must beEqualTo(0)
-      costToShortlistPerson(20) must beEqualTo(0)
+    "costToFollowingPerson" in {
+      costToFollowPerson(1) must beEqualTo(0)
+      costToFollowPerson(7) must beEqualTo(0)
+      costToFollowPerson(8) must beEqualTo(0)
+      costToFollowPerson(10) must beEqualTo(0)
+      costToFollowPerson(11) must beEqualTo(0)
+      costToFollowPerson(20) must beEqualTo(0)
     }
 
     "costToInviteFriend" in {

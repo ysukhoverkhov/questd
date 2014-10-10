@@ -8,7 +8,7 @@ object Functionality extends Enumeration {
   val SubmitVideoResults = Value
   val Report = Value
   val InviteFriends = Value
-  val AddToShortList = Value
+  val AddToFollowing = Value
   val VoteQuestProposals = Value
   val SubmitPhotoQuests = Value
   val SubmitVideoQuests = Value
@@ -22,8 +22,8 @@ object Functionality extends Enumeration {
  * What does user can do an what level.
  */
 case class Rights(
-  val unlockedFunctionality: Set[Functionality.Value] = Set(),
-  val maxFriendsCount: Int = 0)
+  unlockedFunctionality: Set[Functionality.Value] = Set(),
+  maxFriendsCount: Int = 0)
 
 
 object Rights {
@@ -38,7 +38,7 @@ object Rights {
     SubmitVideoResults,
     Report,
     InviteFriends,
-    AddToShortList,
+    AddToFollowing,
     VoteQuestProposals,
     SubmitPhotoQuests,
     SubmitVideoQuests,

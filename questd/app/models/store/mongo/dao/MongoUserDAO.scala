@@ -513,23 +513,23 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def addToShortlist(id: String, idToAdd: String): Option[User] = {
+  def addToFollowing(id: String, idToAdd: String): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$addToSet" -> MongoDBObject(
-          "shortlist" -> idToAdd)))
+          "following" -> idToAdd)))
   }
 
   /**
    *
    */
-  def removeFromShortlist(id: String, idToRemove: String): Option[User] = {
+  def removeFromFollowing(id: String, idToRemove: String): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$pull" -> MongoDBObject(
-          "shortlist" -> idToRemove)))
+          "following" -> idToRemove)))
   }
 
   /**

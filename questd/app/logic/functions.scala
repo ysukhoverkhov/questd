@@ -238,10 +238,10 @@ object functions {
 
   /**
    * ********************
-   * Shortlist
+   * Following
    * ********************
    */
-  def costToShortlistPerson(level: Int): Int = {
+  def costToFollowPerson(level: Int): Int = {
     0
   }
 

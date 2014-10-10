@@ -9,7 +9,7 @@ object constants {
   // user level restriction constants.
   val restrictions: Map[Functionality.Value, Int] = Map(
     Functionality.VoteQuestSolutions -> 1,
-    Functionality.AddToShortList -> 2,
+    Functionality.AddToFollowing -> 2,
     Functionality.SubmitPhotoResults -> 3,
     Functionality.SubmitVideoResults -> 4,
     Functionality.Report -> 5,

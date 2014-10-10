@@ -280,7 +280,7 @@ class UserDAOSpecs
       val tasks = DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.AddToShortList,
+            taskType = TaskType.AddToFollowing,
             description = "",
             requiredCount = 10),
           Task(
@@ -306,7 +306,7 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client)(0).currentCount == 1)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards)(0).currentCount == 0)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToShortList)(0).currentCount == 0)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToFollowing)(0).currentCount == 0)
     }
 
     "resetQuestProposal should reset cooldown if required" in new WithApplication(appWithTestDatabase) {

@@ -1,7 +1,6 @@
 package controllers.domain.app.quest
 
 import components.DBAccessor
-import models.store._
 import models.domain._
 import controllers.domain.helpers._
 import controllers.domain._
@@ -10,8 +9,8 @@ import play.Logger
 case class GetFriendsQuestsRequest(user: User, status: QuestStatus.Value, levels: Option[(Int, Int)] = None)
 case class GetFriendsQuestsResult(quests: Iterator[Quest])
 
-case class GetShortlistQuestsRequest(user: User, status: QuestStatus.Value, levels: Option[(Int, Int)] = None)
-case class GetShortlistQuestsResult(quests: Iterator[Quest])
+case class GetFollowingQuestsRequest(user: User, status: QuestStatus.Value, levels: Option[(Int, Int)] = None)
+case class GetFollowingQuestsResult(quests: Iterator[Quest])
 
 case class GetLikedQuestsRequest(user: User, status: QuestStatus.Value, levels: Option[(Int, Int)] = None)
 case class GetLikedQuestsResult(quests: Iterator[Quest])
@@ -32,10 +31,10 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
       cultureId = request.user.demo.cultureId)))
   }
 
-  def getShortlistQuests(request: GetShortlistQuestsRequest): ApiResult[GetShortlistQuestsResult] = handleDbException {
-    OkApiResult(GetShortlistQuestsResult(db.quest.allWithParams(
+  def getFollowingQuests(request: GetFollowingQuestsRequest): ApiResult[GetFollowingQuestsResult] = handleDbException {
+    OkApiResult(GetFollowingQuestsResult(db.quest.allWithParams(
       status = List(request.status.toString),
-      authorIds = request.user.shortlist,
+      authorIds = request.user.following,
       levels = request.levels,
       cultureId = request.user.demo.cultureId)))
   }

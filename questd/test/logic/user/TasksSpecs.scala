@@ -20,7 +20,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
     val config = mock[ConfigSection]
 
     config.apply(api.ConfigParams.SolutionVoteTaskShare) returns "0.9"
-    config.apply(api.ConfigParams.AddToShortlistTaskProbability) returns "0.3"
+    config.apply(api.ConfigParams.AddToFollowingTaskProbability) returns "0.3"
     config.apply(api.ConfigParams.QuestVoteTaskShare) returns "0.9"
 
     config
@@ -72,7 +72,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
       t.get.requiredCount must beEqualTo(1)
     }
 
-    "Generate tasks AddToShortList" in {
+    "Generate tasks AddToFollowing" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.2
 
@@ -81,14 +81,14 @@ class TasksSpecs extends BaseUserLogicSpecs {
 
       u.canSolveQuestToday must beEqualTo(true)
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToShortList)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToFollowing)
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(1)
-      
+
       there was one(rand).nextDouble
     }
 
-    "Do not generate tasks AddToShortList" in {
+    "Do not generate tasks AddToFollowing" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.5
 
@@ -97,9 +97,9 @@ class TasksSpecs extends BaseUserLogicSpecs {
 
       u.canSolveQuestToday must beEqualTo(true)
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToShortList)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToFollowing)
       t must beNone
-      
+
       there was one(rand).nextDouble
     }
 
@@ -139,7 +139,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(1)
     }
-    
+
     "Generate tasks for reviewing friendship if there are no requests" in {
       api.config returns createStubConfig
 

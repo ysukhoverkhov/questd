@@ -10,17 +10,17 @@ import models.domain._
  */
 trait Friends { this: UserLogic =>
 
-  def canShortlist = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.AddToShortList))
+  def canFollow = {
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.AddToFollowing))
       NotEnoughRights
-    else if (!(user.profile.assets canAfford costToShortlist))
+    else if (!(user.profile.assets canAfford costToFollowing))
       NotEnoughAssets
     else
       OK
   }
 
-  def costToShortlist = {
-    Assets(coins = costToShortlistPerson(user.profile.publicProfile.level))
+  def costToFollowing = {
+    Assets(coins = costToFollowPerson(user.profile.publicProfile.level))
   }
 
   def canAddFriend(potentialFriend: User) = {

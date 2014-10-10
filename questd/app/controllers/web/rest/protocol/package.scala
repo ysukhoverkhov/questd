@@ -285,29 +285,29 @@ package object protocol {
   type WSGetQuestsForUserResult = GetQuestsForUserResult
 
   /**
-   * Shortlist
+   * Following
    */
 
-  type WSGetShortlistResult = GetShortlistResult
+  type WSGetFollowingResult = GetFollowingResult
 
-  type WSCostToShortlistResult = CostToShortlistResult
+  type WSCostToFollowingResult = CostToFollowingResult
 
-  case class WSAddToShortlistRequest(
+  case class WSAddToFollowingRequest(
     /// Id of a person to add.
     id: String)
 
-  type WSAddToShortlistResult = AddToShortlistResult
+  type WSAddToFollowingResult = AddToFollowingResult
 
-  case class WSRemoveFromShortlistRequest(
+  case class WSRemoveFromFollowingRequest(
     /// Id of a person to remove.
     id: String)
 
-  type WSRemoveFromShortlistResult = RemoveFromShortlistResult
+  type WSRemoveFromFollowingResult = RemoveFromFollowingResult
 
-  case class WSGetSuggestsForShortlistRequest(
+  case class WSGetSuggestsForFollowingRequest(
     tokens: Map[String, String])
 
-  type WSGetSuggestsForShortlistResult = GetSuggestsForShortlistResult
+  type WSGetSuggestsForFollowingResult = GetSuggestsForFollowingResult
 
   /**
    * Friends
