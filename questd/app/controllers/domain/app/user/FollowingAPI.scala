@@ -14,6 +14,12 @@ case class GetFollowingResult(
   allowed: ProfileModificationResult,
   userIds: Option[List[String]])
 
+case class GetFollowersRequest(
+  user: User)
+case class GetFollowersResult(
+  allowed: ProfileModificationResult,
+  userIds: Option[List[String]])
+
 case class CostToFollowingRequest(
   user: User)
 case class CostToFollowingResult(
@@ -56,7 +62,15 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
           userIds = Some(request.user.following)))
       case a => OkApiResult(GetFollowingResult(a, None))
     }
+  }
 
+  /**
+   * Get ids of users who follows us.
+   */
+  def getFollowers(request: GetFollowersRequest): ApiResult[GetFollowersResult] = handleDbException {
+        OkApiResult(GetFollowersResult(
+          allowed = OK,
+          userIds = Some(request.user.followers)))
   }
 
   /**

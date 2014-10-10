@@ -290,6 +290,8 @@ package object protocol {
 
   type WSGetFollowingResult = GetFollowingResult
 
+  type WSGetFollowersResult = GetFollowersResult
+
   type WSCostToFollowingResult = CostToFollowingResult
 
   case class WSAddToFollowingRequest(

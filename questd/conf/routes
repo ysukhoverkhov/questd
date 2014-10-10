@@ -75,6 +75,7 @@ POST	/rest/getQuestsForUser							controllers.web.rest.ContentWS.getQuestsForUse
 
 # Following requests
 POST	/rest/getFollowing								controllers.web.rest.FollowingWS.getFollowing
+POST	/rest/getFollowers								controllers.web.rest.FollowingWS.getFollowers
 POST	/rest/costToFollow	    						controllers.web.rest.FollowingWS.costToFollow
 POST	/rest/addToFollowing							controllers.web.rest.FollowingWS.addToFollowing
 POST	/rest/removeFromFollowing						controllers.web.rest.FollowingWS.removeFromFollowing

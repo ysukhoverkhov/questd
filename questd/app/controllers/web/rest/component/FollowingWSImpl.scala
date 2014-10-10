@@ -11,6 +11,10 @@ trait FollowingWSImpl extends QuestController with SecurityWSImpl { this: WSComp
     api.getFollowing(GetFollowingRequest(r.user))
   }
 
+  def getFollowers = wrapApiCallReturnBody[WSGetFollowersResult] { r =>
+    api.getFollowers(GetFollowersRequest(r.user))
+  }
+
   def costToFollow = wrapApiCallReturnBody[WSCostToFollowingResult] { r =>
     api.costToFollowing(CostToFollowingRequest(r.user))
   }

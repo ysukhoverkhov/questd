@@ -6,6 +6,7 @@ import controllers.web.rest.component.helpers.AccessToWSInstance
 object FollowingWS extends Controller with AccessToWSInstance {
 
   def getFollowing = ws.getFollowing
+  def getFollowers = ws.getFollowers
   def costToFollow = ws.costToFollow
   def addToFollowing() = ws.addToFollowing()
   def removeFromFollowing() = ws.removeFromFollowing()

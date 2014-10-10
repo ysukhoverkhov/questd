@@ -1,6 +1,5 @@
 package models.domain
 
-import logic.constants
 
 object Functionality extends Enumeration {
   val VoteQuestSolutions = Value

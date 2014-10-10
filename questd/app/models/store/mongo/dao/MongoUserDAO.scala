@@ -515,6 +515,12 @@ private[mongo] class MongoUserDAO
    */
   def addToFollowing(id: String, idToAdd: String): Option[User] = {
     findAndModify(
+      idToAdd,
+      MongoDBObject(
+        "$addToSet" -> MongoDBObject(
+          "followers" -> id)))
+
+    findAndModify(
       id,
       MongoDBObject(
         "$addToSet" -> MongoDBObject(
@@ -525,6 +531,12 @@ private[mongo] class MongoUserDAO
    *
    */
   def removeFromFollowing(id: String, idToRemove: String): Option[User] = {
+    findAndModify(
+      idToRemove,
+      MongoDBObject(
+        "$pull" -> MongoDBObject(
+          "followers" -> id)))
+
     findAndModify(
       id,
       MongoDBObject(
