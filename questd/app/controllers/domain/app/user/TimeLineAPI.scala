@@ -12,7 +12,11 @@ case class AddToTimeLineRequest(
   objectId: String)
 case class AddToTimeLineResult(user: User)
 
-case class AddToWatchersTimeLineRequest(user: User, entry: TimeLineEntry)
+case class AddToWatchersTimeLineRequest(
+  user: User,
+  reason: TimeLineReason.Value,
+  objectType: TimeLineType.Value,
+  objectId: String)
 case class AddToWatchersTimeLineResult(user: User)
 
 private[domain] trait TimeLineAPI { this: DBAccessor =>
@@ -38,21 +42,19 @@ private[domain] trait TimeLineAPI { this: DBAccessor =>
   /**
    * Adds entry to time line of people who watch for us.
    */
-  // TODO: test me.
-  // TODO: implement me.
   def addToWatchersTimeLine(request: AddToWatchersTimeLineRequest): ApiResult[AddToWatchersTimeLineResult] = handleDbException {
     import request._
 
-    // 1. Do not add entry what is already in time line.
-    // 2. add it.
+    // TODO: add followers here.
+    db.user.addEntryToTimeLineMulti(
+      user.friends.map(_.friendId),
+      TimeLineEntry(
+        reason = reason,
+        entryAuthorId = user.id,
+        objectType = objectType,
+        objectId = objectId))
 
-    if (user.timeLine.map(_.objectId).contains(entry.objectId)) {
-      OkApiResult(AddToWatchersTimeLineResult(user))
-    } else {
-      db.user.addEntryToTimeLine(user.id, entry) ifSome { u =>
-        OkApiResult(AddToWatchersTimeLineResult(u))
-      }
-    }
+    OkApiResult(AddToWatchersTimeLineResult(user))
   }
 
 }

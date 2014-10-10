@@ -9,7 +9,6 @@ class TimeLineAPISpecs extends BaseAPISpecs {
   "TimeLine API" should {
 
     "Add item to time line when requested" in context {
-
       val u = createUserStub()
 
       user.addEntryToTimeLine(any, any) returns Some(u)
@@ -22,6 +21,19 @@ class TimeLineAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(AddToTimeLineResult(user = u)))
       there was one(user).addEntryToTimeLine(any, any)
+    }
+
+    "Add item to friends' and followers' time line when requested" in context {
+      val u = createUserStub()
+
+      val result = api.addToWatchersTimeLine(AddToWatchersTimeLineRequest(
+        user = u,
+        reason = TimeLineReason.Created,
+        objectType = TimeLineType.Quest,
+        objectId = ""))
+
+      result must beEqualTo(OkApiResult(AddToWatchersTimeLineResult(user = u)))
+      there was one(user).addEntryToTimeLineMulti(any, any)
     }
   }
 }
