@@ -45,9 +45,8 @@ private[domain] trait TimeLineAPI { this: DBAccessor =>
   def addToWatchersTimeLine(request: AddToWatchersTimeLineRequest): ApiResult[AddToWatchersTimeLineResult] = handleDbException {
     import request._
 
-    // TODO: add followers here.
     db.user.addEntryToTimeLineMulti(
-      user.friends.map(_.friendId),
+      user.friends.map(_.friendId) ::: user.followers,
       TimeLineEntry(
         reason = reason,
         entryAuthorId = user.id,
