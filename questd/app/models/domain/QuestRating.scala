@@ -12,6 +12,4 @@ case class QuestRating(
   points: Int = 0,
   cheating: Int = 0,
   iacpoints: IAContentRating = IAContentRating(),
-  difficultyRating: QuestDifficultyRating = QuestDifficultyRating(),
-  durationRating: QuestDurationRating = QuestDurationRating(), 
   votersCount: Int = 0)

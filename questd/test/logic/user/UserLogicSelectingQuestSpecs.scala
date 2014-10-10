@@ -21,7 +21,7 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
     config.apply(api.ConfigParams.QuestProbabilityStartingVIPQuests) returns "0.50"
 
     config.apply(api.ConfigParams.QuestProbabilityFriends) returns "0.25"
-    config.apply(api.ConfigParams.QuestProbabilityShortlist) returns "0.25"
+    config.apply(api.ConfigParams.QuestProbabilityFollowing) returns "0.25"
     config.apply(api.ConfigParams.QuestProbabilityLiked) returns "0.20"
     config.apply(api.ConfigParams.QuestProbabilityStar) returns "0.10"
 
@@ -59,19 +59,19 @@ class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
-    "Return quest from shortlist if dice rolls so" in {
+    "Return quest from following if dice rolls so" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.38
 
       val qid = "qid"
 
-      api.getShortlistQuests(any[GetShortlistQuestsRequest]) returns OkApiResult(GetShortlistQuestsResult(List(createQuestStub(qid, "author")).iterator))
+      api.getFollowingQuests(any[GetFollowingQuestsRequest]) returns OkApiResult(GetFollowingQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       val u = User()
       val q = u.getRandomQuestForSolution
 
       there was one(rand).nextDouble
-      there was one(api).getShortlistQuests(any[GetShortlistQuestsRequest])
+      there was one(api).getFollowingQuests(any[GetFollowingQuestsRequest])
 
       q must beSome.which(q => q.id == qid)
     }

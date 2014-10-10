@@ -11,7 +11,7 @@ object ProfileModificationResult extends Enumeration {
   /**
    * Profile is incomplete and this call is not allowed because of this.
    */
-  val IncompleteProfile = Value
+  val IncompleteBio = Value
 
   /**
    * We do not have rights to perform this actions.

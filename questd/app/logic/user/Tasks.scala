@@ -39,7 +39,7 @@ trait Tasks { this: UserLogic =>
 
     Map(TaskType.VoteQuestSolutions -> getVoteQuestSolutionsTask,
       TaskType.SubmitQuestResult -> getSubmitQuestResultTask,
-      TaskType.AddToShortList -> getAddToShortListTask,
+      TaskType.AddToFollowing -> getAddToFollowingTask,
       TaskType.VoteQuestProposals -> getVoteQuestProposalsTask,
       TaskType.SubmitQuestProposal -> getSubmitQuestProposalTask,
       TaskType.VoteReviews -> getVoteReviewsTask,
@@ -90,13 +90,13 @@ trait Tasks { this: UserLogic =>
   }
 
   /**
-   * Algorithm for generating tasks for shortlist.
+   * Algorithm for generating tasks for following.
    */
-  private def getAddToShortListTask(user: User) = ifHasRightTo(Functionality.AddToShortList) {
-    val prob = api.config(api.ConfigParams.AddToShortlistTaskProbability).toDouble
+  private def getAddToFollowingTask(user: User) = ifHasRightTo(Functionality.AddToFollowing) {
+    val prob = api.config(api.ConfigParams.AddToFollowingTaskProbability).toDouble
     if (rand.nextDouble < prob)
       Some(Task(
-        taskType = TaskType.AddToShortList,
+        taskType = TaskType.AddToFollowing,
         description = "",
         requiredCount = 1))
     else

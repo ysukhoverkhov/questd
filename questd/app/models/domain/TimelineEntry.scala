@@ -1,0 +1,47 @@
+package models.domain
+
+
+import models.domain.base.ID
+
+/**
+ * Reason why the entry is in time line.
+ */
+object TimeLineReason extends Enumeration {
+
+  /**
+   * Someone created something and it go to time line.
+   */
+  val Created = Value
+
+  /**
+   * Someone liked something and it got to time line.
+   */
+  val Liked = Value
+}
+
+/**
+ * Type of time line entry.
+ */
+object TimeLineType extends Enumeration {
+
+  val Quest = Value
+  val Solution = Value
+  val Battle = Value
+}
+
+/**
+ * A single entry from time line.
+ *
+ * @param id Id of time line entry.
+ * @param reason Reason why entry was created.
+ * @param entryAuthorId Id of author of the entry.
+ * @param objectType Type of object entry describes.
+ * @param objectId Id of object entry describes.
+ */
+case class TimeLineEntry  (
+  id: String = ID.generateUUID(),
+  reason: TimeLineReason.Value,
+  entryAuthorId: String,
+  objectType: TimeLineType.Value,
+  objectId: String)
+

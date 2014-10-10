@@ -35,7 +35,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val dailyAssetsDecrease = user.dailyAssetsDecrease
 
-    val u = db.user.addPrivateDailyResult(user.id, DailyResult(user.getStartOfCurrentDailyResultPeriod, dailyAssetsDecrease))
+    val u = db.user.addPrivateDailyResult(user.id, DailyResult(user.getStartOfCurrentDailyResultPeriod))
 
     u match {
       case Some(u: User) => OkApiResult(ShiftDailyResultResult(u))
@@ -63,7 +63,6 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
         }
 
         assetsAfterSolutions -
-          dr.dailyAssetsDecrease -
           dr.questGiveUpAssetsDecrease.getOrElse(Assets()) -
           dr.proposalGiveUpAssetsDecrease.getOrElse(Assets())
       }

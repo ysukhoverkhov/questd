@@ -98,7 +98,7 @@ object spendcoinsfunctions {
   }
 
   /**
-   * How much coins we should spend on adding shortlist each day.
+   * How much coins we should spend on adding following each day.
    */
   def coinAddShort(level: Int): Double = {
     val k = 29.186304
@@ -108,8 +108,8 @@ object spendcoinsfunctions {
 
     def coinAddShortInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
       level match {
-        case _ if level < levelFor(AddToShortList) => 0
-        case _ if (level < levelFor(SubmitPhotoResults)) && (level >= levelFor(AddToShortList)) => megaf(level, k, d, b, y)
+        case _ if level < levelFor(AddToFollowing) => 0
+        case _ if (level < levelFor(SubmitPhotoResults)) && (level >= levelFor(AddToFollowing)) => megaf(level, k, d, b, y)
         case _ => coinAddShortInt(levelFor(SubmitPhotoResults) - 1, k, d, b, y)
       }
     }

@@ -1,6 +1,5 @@
 package models.domain
 
-import models.domain.base.ID
 
 case class QuestSolutionInfoContent(
   media: ContentReference,

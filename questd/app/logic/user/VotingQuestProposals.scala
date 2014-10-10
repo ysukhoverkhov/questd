@@ -19,7 +19,7 @@ trait VotingQuestProposals { this: UserLogic =>
     else if (user.profile.questProposalVoteContext.reviewingQuest != None)
       InvalidState
     else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
-      IncompleteProfile
+      IncompleteBio
     else
       OK
   }
