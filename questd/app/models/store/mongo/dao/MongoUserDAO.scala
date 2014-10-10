@@ -805,5 +805,21 @@ private[mongo] class MongoUserDAO
               "$position" -> 0))))
   }
 
+  /**
+   * @inheritdoc
+   */
+  def addEntryToTimeLineMulti(ids: List[String], entry: TimeLineEntry): Unit = {
+    update(
+      query = MongoDBObject(
+        "id" -> MongoDBObject(
+          "$in" -> ids)),
+      u = MongoDBObject(
+        "$push" -> MongoDBObject(
+          "timeLine" ->
+            MongoDBObject(
+              "$each" -> List(grater[TimeLineEntry].asDBObject(entry)),
+              "$position" -> 0))),
+      multi = true)
+  }
 }
 

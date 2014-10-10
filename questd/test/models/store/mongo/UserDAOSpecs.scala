@@ -512,6 +512,29 @@ class UserDAOSpecs
       ou1 must beSome[User]
       ou1.get.timeLine must beEqualTo(List(tle))
     }
+
+    "Add entry to time line multi" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val u = List(User(), User())
+      val tle = TimeLineEntry(
+        id = "id",
+        reason = TimeLineReason.Created,
+        entryAuthorId = u(0).id,
+        TimeLineType.Quest,
+        objectId = "oid")
+
+      u.foreach(db.user.create)
+      db.user.addEntryToTimeLineMulti(u.map(_.id), tle)
+
+      val ou1 = db.user.readById(u(0).id)
+      ou1 must beSome[User]
+      ou1.get.timeLine must beEqualTo(List(tle))
+
+      val ou2 = db.user.readById(u(1).id)
+      ou2 must beSome[User]
+      ou2.get.timeLine must beEqualTo(List(tle))
+    }
   }
 }
 

@@ -85,4 +85,11 @@ trait UserDAO extends BaseDAO[User] {
    * @return user after modifications.
    */
   def addEntryToTimeLine(id: String, entry: TimeLineEntry): Option[User]
+
+  /**
+   * Adds single time line entry to several users.
+   * @param ids Ids of users to add to.
+   * @param entry Entry to add.
+   */
+  def addEntryToTimeLineMulti(ids: List[String], entry: TimeLineEntry): Unit
 }
