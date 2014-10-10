@@ -519,7 +519,7 @@ class UserDAOSpecs
  * Spec with another component setup for testing
  */
 class UserDAOFailSpecs extends Specification
-with MongoDatabaseForTestComponent {
+  with MongoDatabaseForTestComponent {
 
   /*
    * Initializing components. It's lazy to let app start first and bring up db driver.

@@ -1,6 +1,7 @@
 package models.domain
 
-import java.util.Date
+
+import models.domain.base.ID
 
 /**
  * Reason why the entry is in time line.
@@ -37,8 +38,8 @@ object TimeLineType extends Enumeration {
  * @param objectType Type of object entry describes.
  * @param objectId Id of object entry describes.
  */
-case class TimeLineEntry (
-  id: String,
+case class TimeLineEntry  (
+  id: String = ID.generateUUID(),
   reason: TimeLineReason.Value,
   entryAuthorId: String,
   objectType: TimeLineType.Value,
