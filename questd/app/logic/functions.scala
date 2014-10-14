@@ -238,11 +238,11 @@ object functions {
 
   /**
    * ********************
-   * Shortlist
+   * Following
    * ********************
    */
-  def costToShortlistPerson(level: Int): Int = {
-    math.round(coinAddShort(level) / 3).toInt
+  def costToFollowPerson(level: Int): Int = {
+    0
   }
 
 }

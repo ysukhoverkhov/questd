@@ -280,7 +280,7 @@ class UserDAOSpecs
       val tasks = DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.AddToShortList,
+            taskType = TaskType.AddToFollowing,
             description = "",
             requiredCount = 10),
           Task(
@@ -306,7 +306,7 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client)(0).currentCount == 1)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards)(0).currentCount == 0)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToShortList)(0).currentCount == 0)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToFollowing)(0).currentCount == 0)
     }
 
     "resetQuestProposal should reset cooldown if required" in new WithApplication(appWithTestDatabase) {
@@ -493,6 +493,48 @@ class UserDAOSpecs
       val ou1 = db.user.readById(u.id)
       ou1 must beSome//.which((u: User) => u.mustVoteSolutions == List())
     }
+
+    "Add entry to time line" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val u = User(id = "idid")
+      val tle = TimeLineEntry(
+        id = "id",
+        reason = TimeLineReason.Created,
+        entryAuthorId = u.id,
+        TimeLineType.Quest,
+        objectId = "oid")
+
+      db.user.create(u)
+      db.user.addEntryToTimeLine(u.id, tle)
+
+      val ou1 = db.user.readById(u.id)
+      ou1 must beSome[User]
+      ou1.get.timeLine must beEqualTo(List(tle))
+    }
+
+    "Add entry to time line multi" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val u = List(User(), User())
+      val tle = TimeLineEntry(
+        id = "id",
+        reason = TimeLineReason.Created,
+        entryAuthorId = u(0).id,
+        TimeLineType.Quest,
+        objectId = "oid")
+
+      u.foreach(db.user.create)
+      db.user.addEntryToTimeLineMulti(u.map(_.id), tle)
+
+      val ou1 = db.user.readById(u(0).id)
+      ou1 must beSome[User]
+      ou1.get.timeLine must beEqualTo(List(tle))
+
+      val ou2 = db.user.readById(u(1).id)
+      ou2 must beSome[User]
+      ou2.get.timeLine must beEqualTo(List(tle))
+    }
   }
 }
 
@@ -500,7 +542,7 @@ class UserDAOSpecs
  * Spec with another component setup for testing
  */
 class UserDAOFailSpecs extends Specification
-with MongoDatabaseForTestComponent {
+  with MongoDatabaseForTestComponent {
 
   /*
    * Initializing components. It's lazy to let app start first and bring up db driver.

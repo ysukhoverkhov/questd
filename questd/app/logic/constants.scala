@@ -9,14 +9,14 @@ object constants {
   // user level restriction constants.
   val restrictions: Map[Functionality.Value, Int] = Map(
     Functionality.VoteQuestSolutions -> 1,
-    Functionality.AddToShortList -> 2,
+    Functionality.AddToFollowing -> 2,
     Functionality.SubmitPhotoResults -> 3,
     Functionality.SubmitVideoResults -> 4,
     Functionality.Report -> 5,
     Functionality.InviteFriends -> 6,
+    Functionality.SubmitPhotoQuests -> 7,
+    Functionality.SubmitVideoQuests -> 8,
     Functionality.VoteQuestProposals -> 10,
-    Functionality.SubmitPhotoQuests -> 12,
-    Functionality.SubmitVideoQuests -> 13,
     Functionality.VoteReviews -> 14,
     Functionality.SubmitReviewsForResults -> 16,
     Functionality.SubmitReviewsForProposals -> 18,
@@ -87,13 +87,13 @@ object constants {
   val NumberOfFavoriteThemesForVIPSolutions = 3
   val NumberOfFavoriteThemesForOtherSolutions = 1
 
-  
+
   /**
    * Messages
    */
   val NumberOfStoredMessages = 100
-  
-  
+
+
   // Constants bellow are used in algorithms and should not be changed.
 
   /**
@@ -110,13 +110,13 @@ object constants {
    * Friends
    */
   val NumberOfFreindsOnLastLevel = 100
-  
-  
+
+
   /**
    * Tasks
    */
   val RatingForCompletingDailyTasks = 500
-  
+
   /**
    * Tutorial
    */

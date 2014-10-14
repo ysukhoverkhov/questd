@@ -513,23 +513,35 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def addToShortlist(id: String, idToAdd: String): Option[User] = {
+  def addToFollowing(id: String, idToAdd: String): Option[User] = {
+    findAndModify(
+      idToAdd,
+      MongoDBObject(
+        "$addToSet" -> MongoDBObject(
+          "followers" -> id)))
+
     findAndModify(
       id,
       MongoDBObject(
         "$addToSet" -> MongoDBObject(
-          "shortlist" -> idToAdd)))
+          "following" -> idToAdd)))
   }
 
   /**
    *
    */
-  def removeFromShortlist(id: String, idToRemove: String): Option[User] = {
+  def removeFromFollowing(id: String, idToRemove: String): Option[User] = {
+    findAndModify(
+      idToRemove,
+      MongoDBObject(
+        "$pull" -> MongoDBObject(
+          "followers" -> id)))
+
     findAndModify(
       id,
       MongoDBObject(
         "$pull" -> MongoDBObject(
-          "shortlist" -> idToRemove)))
+          "following" -> idToRemove)))
   }
 
   /**
@@ -791,6 +803,35 @@ private[mongo] class MongoUserDAO
       multi = true)
   }
 
-}
+  /**
+   * @inheritdoc
+   */
+  def addEntryToTimeLine(id: String, entry: TimeLineEntry): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$push" -> MongoDBObject(
+          "timeLine" ->
+            MongoDBObject(
+              "$each" -> List(grater[TimeLineEntry].asDBObject(entry)),
+              "$position" -> 0))))
+  }
 
+  /**
+   * @inheritdoc
+   */
+  def addEntryToTimeLineMulti(ids: List[String], entry: TimeLineEntry): Unit = {
+    update(
+      query = MongoDBObject(
+        "id" -> MongoDBObject(
+          "$in" -> ids)),
+      u = MongoDBObject(
+        "$push" -> MongoDBObject(
+          "timeLine" ->
+            MongoDBObject(
+              "$each" -> List(grater[TimeLineEntry].asDBObject(entry)),
+              "$position" -> 0))),
+      multi = true)
+  }
+}
 

@@ -73,12 +73,13 @@ POST	/rest/getSolutionsForQuest						controllers.web.rest.ContentWS.getSolutions
 POST	/rest/getSolutionsForUser						controllers.web.rest.ContentWS.getSolutionsForUser
 POST	/rest/getQuestsForUser							controllers.web.rest.ContentWS.getQuestsForUser
 
-# Shortlist requests
-POST	/rest/getShortlist								controllers.web.rest.ShortlistWS.getShortlist
-POST	/rest/costToShortlist							controllers.web.rest.ShortlistWS.costToShortlist
-POST	/rest/addToShortlist							controllers.web.rest.ShortlistWS.addToShortlist
-POST	/rest/removeFromShortlist						controllers.web.rest.ShortlistWS.removeFromShortlist
-POST	/rest/getSuggestsForShortlist					controllers.web.rest.ShortlistWS.getSuggestsForShortlist
+# Following requests
+POST	/rest/getFollowing								controllers.web.rest.FollowingWS.getFollowing
+POST	/rest/getFollowers								controllers.web.rest.FollowingWS.getFollowers
+POST	/rest/costToFollow	    						controllers.web.rest.FollowingWS.costToFollow
+POST	/rest/addToFollowing							controllers.web.rest.FollowingWS.addToFollowing
+POST	/rest/removeFromFollowing						controllers.web.rest.FollowingWS.removeFromFollowing
+POST	/rest/getSuggestsForFollowing					controllers.web.rest.FollowingWS.getSuggestsForFollowing
 
 # Friends requests
 POST	/rest/getFriends								controllers.web.rest.FriendsWS.getFriends

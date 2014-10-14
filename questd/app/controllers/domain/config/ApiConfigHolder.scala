@@ -15,7 +15,7 @@ class _ConfigParams {
   val UserHistoryDays = "20 01 User History Days"
 
   val SolutionVoteTaskShare = "30 01 Solution Vote Task Share"
-  val AddToShortlistTaskProbability = "30 02 Add To Shortlist Task Probability"
+  val AddToFollowingTaskProbability = "30 02 Add To Following Task Probability"
   val QuestVoteTaskShare = "30 03 Vote Quests task share"
 
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
@@ -41,7 +41,7 @@ class _ConfigParams {
   val QuestProbabilityStartingVIPQuests = "71 02 Probability of selecting VIP quests in initial stage"
 
   val QuestProbabilityFriends = "72 01 Probability of quests from friends"
-  val QuestProbabilityShortlist = "72 02 Probability of quests from shortlist"
+  val QuestProbabilityFollowing = "72 02 Probability of quests from Following"
   val QuestProbabilityLiked = "72 03 Probability of liked quests"
   val QuestProbabilityStar = "72 04 Probability of quests from stars"
 
@@ -49,7 +49,7 @@ class _ConfigParams {
   val SolutionProbabilityStartingVIPSolutions = "91 02 Probability of selecting VIP Solutions in initial stage"
 
   val SolutionProbabilityFriends = "92 01 Probability of Solutions from friends"
-  val SolutionProbabilityShortlist = "92 02 Probability of Solutions from shortlist"
+  val SolutionProbabilityFollowing = "92 02 Probability of Solutions from Following"
   val SolutionProbabilityLiked = "92 03 Probability of liked Solutions"
   val SolutionProbabilityStar = "92 04 Probability of quests from Solutions"
 
@@ -74,7 +74,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.UserHistoryDays -> "15",
 
       ConfigParams.SolutionVoteTaskShare -> "0.9",
-      ConfigParams.AddToShortlistTaskProbability -> "0.3",
+      ConfigParams.AddToFollowingTaskProbability -> "0.3",
       ConfigParams.QuestVoteTaskShare -> "0.9",
 
       ConfigParams.FavoriteThemesShare -> "0.2",
@@ -101,7 +101,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.QuestProbabilityStartingVIPQuests -> "0.5",
 
       ConfigParams.QuestProbabilityFriends -> "0.25",
-      ConfigParams.QuestProbabilityShortlist -> "0.25",
+      ConfigParams.QuestProbabilityFollowing -> "0.25",
       ConfigParams.QuestProbabilityLiked -> "0.20",
       ConfigParams.QuestProbabilityStar -> "0.10",
 
@@ -109,7 +109,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.SolutionProbabilityStartingVIPSolutions -> "0.5",
 
       ConfigParams.SolutionProbabilityFriends -> "0.25",
-      ConfigParams.SolutionProbabilityShortlist -> "0.25",
+      ConfigParams.SolutionProbabilityFollowing -> "0.25",
       ConfigParams.SolutionProbabilityLiked -> "0.20",
       ConfigParams.SolutionProbabilityStar -> "0.10"))
 }

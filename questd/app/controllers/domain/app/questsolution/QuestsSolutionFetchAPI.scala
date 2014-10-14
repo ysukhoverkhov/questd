@@ -9,8 +9,8 @@ import play.Logger
 case class GetFriendsSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
 case class GetFriendsSolutionsResult(solutions: Iterator[QuestSolution])
 
-case class GetShortlistSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
-case class GetShortlistSolutionsResult(solutions: Iterator[QuestSolution])
+case class GetFollowingSolutionsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
+case class GetFollowingSolutionsResult(solutions: Iterator[QuestSolution])
 
 case class GetSolutionsForLikedQuestsRequest(user: User, status: QuestSolutionStatus.Value, levels: Option[(Int, Int)] = None)
 case class GetSolutionsForLikedQuestsResult(solutions: Iterator[QuestSolution])
@@ -38,10 +38,10 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
       cultureId = request.user.demo.cultureId)))
   }
 
-  def getShortlistSolutions(request: GetShortlistSolutionsRequest): ApiResult[GetShortlistSolutionsResult] = handleDbException {
-    OkApiResult(GetShortlistSolutionsResult(db.solution.allWithParams(
+  def getFollowingSolutions(request: GetFollowingSolutionsRequest): ApiResult[GetFollowingSolutionsResult] = handleDbException {
+    OkApiResult(GetFollowingSolutionsResult(db.solution.allWithParams(
       status = List(request.status.toString),
-      authorIds = request.user.shortlist,
+      authorIds = request.user.following,
       levels = request.levels,
       cultureId = request.user.demo.cultureId)))
   }

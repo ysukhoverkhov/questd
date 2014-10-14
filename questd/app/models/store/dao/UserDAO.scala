@@ -49,8 +49,8 @@ trait UserDAO extends BaseDAO[User] {
 
   def updateStats(id: String, stats: UserStats): Option[User]
 
-  def addToShortlist(id: String, idToAdd: String): Option[User]
-  def removeFromShortlist(id: String, idToRemove: String): Option[User]
+  def addToFollowing(id: String, idToAdd: String): Option[User]
+  def removeFromFollowing(id: String, idToRemove: String): Option[User]
 
   def askFriendship(id: String, idToAdd: String, myFriendship: Friendship, hisFriendship: Friendship): Option[User]
   def updateFriendship(id: String, friendId: String, status: String): Option[User]
@@ -77,4 +77,19 @@ trait UserDAO extends BaseDAO[User] {
   def addTutorialTaskAssigned(id: String, taskId: String): Option[User]
 
   def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit
+
+  /**
+   * Adds one entry to time line.
+   * @param id Id of a user to add to.
+   * @param entry Entry to add.
+   * @return user after modifications.
+   */
+  def addEntryToTimeLine(id: String, entry: TimeLineEntry): Option[User]
+
+  /**
+   * Adds single time line entry to several users.
+   * @param ids Ids of users to add to.
+   * @param entry Entry to add.
+   */
+  def addEntryToTimeLineMulti(ids: List[String], entry: TimeLineEntry): Unit
 }

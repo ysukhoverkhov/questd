@@ -76,7 +76,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
     val algs = List(
       (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests(reason)),
-      (api.config(api.ConfigParams.QuestProbabilityShortlist).toDouble, () => getShortlistQuests(reason)),
+      (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests(reason)),
       (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests(reason)),
       (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPQuests(reason)),
       (1.00, () => getOtherQuests(reason)) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
@@ -93,9 +93,9 @@ trait QuestSelectUserLogic { this: UserLogic =>
       levels(reason))).body.get.quests)
   }
 
-  private[user] def getShortlistQuests(reason: QuestGetReason) = {
-    Logger.trace("  Returning quest from shortlist")
-    Some(api.getShortlistQuests(GetShortlistQuestsRequest(
+  private[user] def getFollowingQuests(reason: QuestGetReason) = {
+    Logger.trace("  Returning quest from Following")
+    Some(api.getFollowingQuests(GetFollowingQuestsRequest(
       user,
       reason,
       levels(reason))).body.get.quests)

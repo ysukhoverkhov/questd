@@ -1,11 +1,6 @@
 package logic
 
 import org.specs2.mutable._
-import org.specs2.runner._
-import org.specs2.matcher._
-import org.specs2.mock.Mockito
-import org.junit.runner._
-import play.Logger
 import functions._
 
 class FunctionsSpecs extends Specification {
@@ -31,7 +26,7 @@ class FunctionsSpecs extends Specification {
       costToSkipTheme(20, 1) must beEqualTo(15/*Math.round(5.96 * questProposalPeriod(20))*/)
       costToSkipTheme(20, 12) must beEqualTo(173/*Math.round(69.389 * questProposalPeriod(20))*/)
     }
-    
+
     "costToTakeQuestTheme" in {
       costToTakeQuestTheme(12) must beEqualTo(66 * 9)
       costToTakeQuestTheme(13) must beEqualTo(1002)
@@ -42,8 +37,8 @@ class FunctionsSpecs extends Specification {
       ratingToGiveUpQuestProposal(12) must beBetween(4360, 4370)
       ratingToGiveUpQuestProposal(20) must beBetween(15260, 15280)
     }
-    
-    
+
+
     "costToSkipQuest" in {
       costToSkipQuest(3, 0, 1) must beEqualTo(0)
       costToSkipQuest(3, 1, 1) must beEqualTo(8)
@@ -51,7 +46,7 @@ class FunctionsSpecs extends Specification {
       costToSkipQuest(20, 1, 1) must beEqualTo(16)
       costToSkipQuest(20, 8, 1) must beEqualTo(121)
     }
-    
+
 
     "costToTakeQuestToSolve" in {
       costToTakeQuestToSolve(3, 1) must beEqualTo(148)
@@ -66,7 +61,7 @@ class FunctionsSpecs extends Specification {
       ratingToGiveUpQuest(12, 1) must beEqualTo(4814)
       ratingToGiveUpQuest(20, 1) must beEqualTo(7465)
     }
-    
+
     "ratingToLoseQuest" in {
       ratingToLoseQuest(3, 1) must beEqualTo(496)
       ratingToLoseQuest(11, 1) must beEqualTo(1534)
@@ -92,36 +87,36 @@ class FunctionsSpecs extends Specification {
       rewardForVotingSolution(20, 10) must beEqualTo(33)
       rewardForVotingSolution(20, 20) must beEqualTo(9)
     }
-    
+
     "dailyRatingDecrease" in {
       dailyRatingDecrease(1) must beEqualTo(0)
       dailyRatingDecrease(3) must beEqualTo(302)
       dailyRatingDecrease(10) must beEqualTo(939)
       dailyRatingDecrease(20) must beEqualTo(4024)
     }
-    
+
     "ratToGainLevel" in {
       ratToGainLevel(2) must beEqualTo(246)
       ratToGainLevel(10) must beEqualTo(10000)
       ratToGainLevel(20) must beEqualTo(500000)
     }
-    
+
     "maxNumberOfFriendsOnLevel" in {
       maxNumberOfFriendsOnLevel(1) must beEqualTo(4)
       maxNumberOfFriendsOnLevel(2) must beEqualTo(5)
       maxNumberOfFriendsOnLevel(10) must beEqualTo(20)
       maxNumberOfFriendsOnLevel(20) must beEqualTo(100)
     }
-    
-    "costToShortlistPerson" in {
-      costToShortlistPerson(1) must beEqualTo(0)
-      costToShortlistPerson(7) must beEqualTo(27)
-      costToShortlistPerson(8) must beEqualTo(27)
-      costToShortlistPerson(10) must beEqualTo(27)
-      costToShortlistPerson(11) must beEqualTo(27)
-      costToShortlistPerson(20) must beEqualTo(27)
+
+    "costToFollowingPerson" in {
+      costToFollowPerson(1) must beEqualTo(0)
+      costToFollowPerson(7) must beEqualTo(0)
+      costToFollowPerson(8) must beEqualTo(0)
+      costToFollowPerson(10) must beEqualTo(0)
+      costToFollowPerson(11) must beEqualTo(0)
+      costToFollowPerson(20) must beEqualTo(0)
     }
-    
+
     "costToInviteFriend" in {
       costToInviteFriend(1, 0) must beEqualTo(0)
       costToInviteFriend(5, 0) must beEqualTo(0)
