@@ -244,4 +244,3 @@ Wallis and Futuna
 Yemen
 Zambia
 Zimbabwe
-country_name

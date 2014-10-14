@@ -168,7 +168,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def setCountry(request: SetCountryRequest): ApiResult[SetCountryResult] = handleDbException {
     import request._
 
-    val countries = scala.io.Source.fromFile("conf/countries.txt").getLines().toList
+    val countries = scala.io.Source.fromFile("conf/countries.txt", "utf-8").getLines().toList
 
     if (!countries.contains(country)) {
       OkApiResult(SetCountryResult(OutOfContent, None))
