@@ -202,6 +202,19 @@ package object protocol {
 
   /**
    * ********************
+   * Time Line
+   * ********************
+   */
+  type WSGetTimeLineResult = GetTimeLineResult
+  case class WSGetTimeLineRequest (
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+
+  /**
+   * ********************
    * Content
    * ********************
    */

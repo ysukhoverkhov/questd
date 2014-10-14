@@ -19,6 +19,12 @@ case class AddToWatchersTimeLineRequest(
   objectId: String)
 case class AddToWatchersTimeLineResult(user: User)
 
+case class GetTimeLineRequest(
+  user: User,
+  pageNumber: Int,
+  pageSize: Int)
+case class GetTimeLineResult()
+
 private[domain] trait TimeLineAPI { this: DBAccessor =>
 
   /**
@@ -56,5 +62,11 @@ private[domain] trait TimeLineAPI { this: DBAccessor =>
     OkApiResult(AddToWatchersTimeLineResult(user))
   }
 
+  /**
+   * Returns portion of time line.
+   */
+  def getTimeLine(request: GetTimeLineRequest): ApiResult[GetTimeLineResult] = handleDbException {
+    OkApiResult(GetTimeLineResult())
+  }
 }
 

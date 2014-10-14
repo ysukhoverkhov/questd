@@ -56,6 +56,9 @@ POST	/rest/voteQuestProposal							controllers.web.rest.VoteQuestProposalWS.vote
 POST	/rest/getQuestSolutionToVote					controllers.web.rest.VoteQuestSolutionWS.getQuestSolutionToVote
 POST	/rest/voteQuestSolution							controllers.web.rest.VoteQuestSolutionWS.voteQuestSolution
 
+# Time line
+POST	/rest/getTimeLine	    						controllers.web.rest.TimeLineWS.getTimeLine
+
 # Daily result
 POST	/rest/getDailyResult							controllers.web.rest.DailyResultWS.getDailyResult
 POST	/rest/getRightsAtLevel							controllers.web.rest.DailyResultWS.getRightsAtLevel
