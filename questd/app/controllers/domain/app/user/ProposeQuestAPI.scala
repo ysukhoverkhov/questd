@@ -179,23 +179,38 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
           } ifOk { r =>
             r.user.profile.questProposalContext.takenTheme ifSome { takenTheme =>
               r.user.demo.cultureId ifSome { culture =>
-                db.quest.create(
-                  Quest(
-                    cultureId = culture,
-                    approveReward = r.user.profile.questProposalContext.approveReward,
-                    info = QuestInfo(
-                      authorId = r.user.id,
-                      themeId = takenTheme.id,
-                      content = content,
 
-                      vip = r.user.profile.publicProfile.vip)))
+                val q = Quest(
+                  cultureId = culture,
+                  approveReward = r.user.profile.questProposalContext.approveReward,
+                  info = QuestInfo(
+                    authorId = r.user.id,
+                    themeId = takenTheme.id,
+                    content = content,
+                    vip = r.user.profile.publicProfile.vip))
 
-                val u = db.user.resetQuestProposal(
+                db.quest.create(q)
+
+                db.user.resetQuestProposal(
                   user.id,
-                  config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
+                  config(api.ConfigParams.DebugDisableProposalCooldown) == "1") ifSome { u =>
 
-                OkApiResult(ProposeQuestResult(OK, u.map(_.profile)))
-
+                  {
+                    addToTimeLine(AddToTimeLineRequest(
+                      user = u,
+                      reason = TimeLineReason.Created,
+                      objectType = TimeLineType.Quest,
+                      objectId = q.id))
+                  } ifOk { r =>
+                    addToWatchersTimeLine(AddToWatchersTimeLineRequest(
+                      user = u,
+                      reason = TimeLineReason.Created,
+                      objectType = TimeLineType.Quest,
+                      objectId = q.id))
+                  } ifOk { r =>
+                    OkApiResult(ProposeQuestResult(OK, Some(r.user.profile)))
+                  }
+                }
               }
             }
           }

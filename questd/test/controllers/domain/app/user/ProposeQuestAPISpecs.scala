@@ -20,11 +20,14 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
       val q = createQuest
 
       user.resetQuestProposal(any, any) returns Some(u)
+      user.addEntryToTimeLine(any, any) returns Some(u)
 
       val result = api.proposeQuest(ProposeQuestRequest(u, q))
 
       result.body must beSome[ProposeQuestResult].which(r => r.allowed == ProfileModificationResult.OK)
 
+      there was one(user).addEntryToTimeLine(any, any)
+      there was one(user).addEntryToTimeLineMulti(any, any)
       there was one(quest).create(
         Quest(
           id = anyString,
@@ -42,11 +45,14 @@ class ProposeQuestAPISpecs extends BaseAPISpecs {
       val q = createQuest
 
       user.resetQuestProposal(any, any) returns Some(u)
+      user.addEntryToTimeLine(any, any) returns Some(u)
 
       val result = api.proposeQuest(ProposeQuestRequest(u, q))
 
       result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
 
+      there was one(user).addEntryToTimeLine(any, any)
+      there was one(user).addEntryToTimeLineMulti(any, any)
       there was one(quest).create(
         Quest(
           id = anyString,
