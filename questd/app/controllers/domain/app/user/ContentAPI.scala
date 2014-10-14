@@ -8,6 +8,7 @@ import controllers.domain.helpers._
 import models.domain.view._
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.helpers.PagerHelper._
 
 case class GetQuestRequest(user: User, questId: String)
 case class GetQuestResult(
@@ -262,31 +263,6 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       quests = questsForUser.take(pageSize).toList.map(q => QuestInfoWithID(q.id, q.info)),
       pageSize,
       questsForUser.hasNext))
-  }
-
-  /**
-   * Make page of correct size correcting client's request.
-   */
-  private def adjustedPageSize(pageSize: Int): Int = {
-    val maxPageSize = 50
-    val defaultPageSize = 10
-
-    if (pageSize <= 0)
-      defaultPageSize
-    else if (pageSize > maxPageSize)
-      maxPageSize
-    else
-      pageSize
-  }
-
-  /**
-   * Make page number of correct number correcting client's request.
-   */
-  private def adjustedPageNumber(pageNumber: Int): Int = {
-    if (pageNumber < 0)
-      0
-    else
-      pageNumber
   }
 
 }

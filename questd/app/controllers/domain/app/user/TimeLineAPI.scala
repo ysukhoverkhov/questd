@@ -4,6 +4,8 @@ import models.domain._
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
+import controllers.domain.helpers.PagerHelper._
+
 
 case class AddToTimeLineRequest(
   user: User,
@@ -23,7 +25,7 @@ case class GetTimeLineRequest(
   user: User,
   pageNumber: Int,
   pageSize: Int)
-case class GetTimeLineResult()
+case class GetTimeLineResult(timeLine: List[TimeLineEntry])
 
 private[domain] trait TimeLineAPI { this: DBAccessor =>
 
@@ -66,7 +68,12 @@ private[domain] trait TimeLineAPI { this: DBAccessor =>
    * Returns portion of time line.
    */
   def getTimeLine(request: GetTimeLineRequest): ApiResult[GetTimeLineResult] = handleDbException {
-    OkApiResult(GetTimeLineResult())
+    import request._
+
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
+    OkApiResult(GetTimeLineResult(user.timeLine.iterator.drop(pageSize * pageNumber).take(pageSize).toList))
   }
 }
 
