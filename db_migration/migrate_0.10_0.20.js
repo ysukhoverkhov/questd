@@ -79,3 +79,10 @@ db.users.find().forEach(
         db.users.save(doc);
    }
 )
+
+db.users.find({"profile.publicProfile.publicProfileId" : {$exists : false}}).forEach(
+    function(doc) {
+        doc.profile.publicProfile.publicProfileId = doc.profile.profileId;
+        db.users.save(doc);
+   }
+)
