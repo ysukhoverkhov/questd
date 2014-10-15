@@ -180,7 +180,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
             r.user.profile.questProposalContext.takenTheme ifSome { takenTheme =>
               r.user.demo.cultureId ifSome { culture =>
 
-                val q = Quest(
+                val quest = Quest(
                   cultureId = culture,
                   approveReward = r.user.profile.questProposalContext.approveReward,
                   info = QuestInfo(
@@ -189,7 +189,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                     content = content,
                     vip = r.user.profile.publicProfile.vip))
 
-                db.quest.create(q)
+                db.quest.create(quest)
 
                 db.user.resetQuestProposal(
                   user.id,
@@ -200,13 +200,13 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
                       user = u,
                       reason = TimeLineReason.Created,
                       objectType = TimeLineType.Quest,
-                      objectId = q.id))
+                      objectId = quest.id))
                   } ifOk { r =>
                     addToWatchersTimeLine(AddToWatchersTimeLineRequest(
                       user = u,
                       reason = TimeLineReason.Created,
                       objectType = TimeLineType.Quest,
-                      objectId = q.id))
+                      objectId = quest.id))
                   } ifOk { r =>
                     OkApiResult(ProposeQuestResult(OK, Some(r.user.profile)))
                   }

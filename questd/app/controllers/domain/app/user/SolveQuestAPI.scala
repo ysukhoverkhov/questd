@@ -227,7 +227,21 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 user.id,
                 config(api.ConfigParams.DebugDisableSolutionCooldown) == "1") ifSome { u =>
 
-                addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id)) ifOk { r =>
+                {
+                  addToTimeLine(AddToTimeLineRequest(
+                    user = u,
+                    reason = TimeLineReason.Created,
+                    objectType = TimeLineType.Solution,
+                    objectId = solution.id))
+                } ifOk { r =>
+                  addToWatchersTimeLine(AddToWatchersTimeLineRequest(
+                    user = u,
+                    reason = TimeLineReason.Created,
+                    objectType = TimeLineType.Solution,
+                    objectId = solution.id))
+                } ifOk { r =>
+                  addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id))
+                } ifOk { r =>
                   OkApiResult(ProposeSolutionResult(OK, Some(r.user.profile)))
                 }
               }
