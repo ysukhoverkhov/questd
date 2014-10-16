@@ -27,6 +27,9 @@ case class GetTimeLineRequest(
   pageSize: Int)
 case class GetTimeLineResult(timeLine: List[TimeLineEntry])
 
+case class PopulateTimeLineWithRandomThingsRequest(user: User)
+case class PopulateTimeLineWithRandomThingsResult(user: User)
+
 private[domain] trait TimeLineAPI { this: DBAccessor =>
 
   /**
@@ -74,6 +77,15 @@ private[domain] trait TimeLineAPI { this: DBAccessor =>
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     OkApiResult(GetTimeLineResult(user.timeLine.iterator.drop(pageSize * pageNumber).take(pageSize).toList))
+  }
+
+  /**
+   * Populates time line of user with random quests and solutions.
+   */
+  def populateTimeLineWithRandomThings(request: PopulateTimeLineWithRandomThingsRequest): ApiResult[PopulateTimeLineWithRandomThingsResult] = handleDbException {
+    import request._
+
+    OkApiResult(PopulateTimeLineWithRandomThingsResult(user))
   }
 }
 
