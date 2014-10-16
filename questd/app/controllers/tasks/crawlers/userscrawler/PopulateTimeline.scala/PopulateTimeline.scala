@@ -1,12 +1,12 @@
 package controllers.tasks.crawlers.userscrawler
 
 import akka.actor.Props
+import components.random.RandomComponent
 import controllers.domain._
 import controllers.domain.app.user._
 import models.domain._
-import components.random.RandomComponent
 
-object ShiftUserStats {
+object PopulateTimeLine {
   def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
     Props(classOf[PopulateTimeLine], api, rand)
   }
@@ -14,7 +14,7 @@ object ShiftUserStats {
   def name = "ShiftUserStats"
 }
 
-class ShiftUserStats(
+class PopulateTimeLine(
     apiPar: DomainAPIComponent#DomainAPI,
     randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
 
