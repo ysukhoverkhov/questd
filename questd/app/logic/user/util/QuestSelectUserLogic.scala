@@ -16,6 +16,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
   import QuestGetReason._
 
+  // TODO: remove reason here.
   def getRandomQuest(reason: QuestGetReason): Option[Quest] = {
     val algorithms = List(
       () => getQuestsWithSuperAlgorithm(reason),

@@ -11,7 +11,8 @@ case class AddToTimeLineRequest(
   user: User,
   reason: TimeLineReason.Value,
   objectType: TimeLineType.Value,
-  objectId: String)
+  objectId: String,
+  entryAuthorId: Option[String] = None)
 case class AddToTimeLineResult(user: User)
 
 case class AddToWatchersTimeLineRequest(
@@ -30,7 +31,7 @@ case class GetTimeLineResult(timeLine: List[TimeLineEntry])
 case class PopulateTimeLineWithRandomThingsRequest(user: User)
 case class PopulateTimeLineWithRandomThingsResult(user: User)
 
-private[domain] trait TimeLineAPI { this: DBAccessor =>
+private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Adds entry to time line.
@@ -43,7 +44,7 @@ private[domain] trait TimeLineAPI { this: DBAccessor =>
       user.id,
       TimeLineEntry(
         reason = reason,
-        entryAuthorId = user.id,
+        entryAuthorId = entryAuthorId.getOrElse(user.id),
         objectType = objectType,
         objectId = objectId)) ifSome { u =>
       OkApiResult(AddToTimeLineResult(u))
@@ -84,6 +85,34 @@ private[domain] trait TimeLineAPI { this: DBAccessor =>
    */
   def populateTimeLineWithRandomThings(request: PopulateTimeLineWithRandomThingsRequest): ApiResult[PopulateTimeLineWithRandomThingsResult] = handleDbException {
     import request._
+
+    val questsCount = config(api.ConfigParams.TimeLineRandomQuestsDaily).toInt
+    (1 to questsCount).foreach { x =>
+      user.getQuestProposalToVote match {
+        case Some(q) =>
+          addToTimeLine(AddToTimeLineRequest(
+            user = user,
+            reason = TimeLineReason.Has,
+            objectType = TimeLineType.Quest,
+            objectId = q.id,
+            entryAuthorId = Some(q.info.authorId)))
+        case None =>
+      }
+    }
+
+    val solutionsCount = config(api.ConfigParams.TimeLineRandomSolutionsDaily).toInt
+    (1 to solutionsCount).foreach { x =>
+      user.getQuestSolutionToVote match {
+        case Some(s) =>
+          addToTimeLine(AddToTimeLineRequest(
+            user = user,
+            reason = TimeLineReason.Has,
+            objectType = TimeLineType.Solution,
+            objectId = s.id,
+            entryAuthorId = Some(s.info.authorId)))
+        case None =>
+      }
+    }
 
     OkApiResult(PopulateTimeLineWithRandomThingsResult(user))
   }

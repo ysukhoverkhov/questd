@@ -39,6 +39,7 @@ trait VotingQuestProposals { this: UserLogic =>
   /**
    * @return None if no more quests to vote for today.
    */
+  // TODO: rename me since we are just getting quests now without any proposals.
   def getQuestProposalToVote: Option[Quest] = {
     getRandomQuest(QuestGetReason.ForVoting)
   }
