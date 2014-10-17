@@ -41,7 +41,7 @@ trait Tasks { this: UserLogic =>
       TaskType.SubmitQuestResult -> getSubmitQuestResultTask,
       TaskType.AddToFollowing -> getAddToFollowingTask,
       TaskType.VoteQuestProposals -> getVoteQuestProposalsTask,
-      TaskType.SubmitQuestProposal -> getSubmitQuestProposalTask,
+      TaskType.CreateQuest -> getSubmitQuestProposalTask,
       TaskType.VoteReviews -> getVoteReviewsTask,
       TaskType.SubmitReviewsForResults -> getSubmitReviewsForResultsTask,
       TaskType.SubmitReviewsForProposals -> getSubmitReviewsForProposalsTask,
@@ -125,7 +125,7 @@ trait Tasks { this: UserLogic =>
   private def getSubmitQuestProposalTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
     if (canProposeQuestToday)
       Some(Task(
-        taskType = TaskType.SubmitQuestProposal,
+        taskType = TaskType.CreateQuest,
         description = "",
         requiredCount = 1))
     else

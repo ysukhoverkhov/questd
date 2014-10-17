@@ -114,8 +114,8 @@ package object domainstubs {
         assets = assets,
         ratingToNextLevel = 100000,
         questSolutionContext = QuestSolutionContext(),
-        questProposalContext = QuestProposalConext(
-          questProposalCooldown = questProposalCooldown),
+        questCreationContext = QuestCreationContext(
+          questCreationCoolDown = questProposalCooldown),
         publicProfile = PublicProfile(
           vip = vip,
           level = level,

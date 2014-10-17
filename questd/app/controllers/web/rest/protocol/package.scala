@@ -73,23 +73,6 @@ package object protocol {
   case class WSSetCountryRequest(country: String)
 
   /**
-   * Get Quest theme cost result
-   */
-  type WSGetQuestThemeCostResult = GetQuestThemeCostResult
-
-  /**
-   * Result for purchase quest.
-   */
-  type WSPurchaseQuestThemeResult = PurchaseQuestThemeResult
-
-  /**
-   * Take theme for inventing quest.
-   */
-  type WSTakeQuestThemeResult = TakeQuestThemeResult
-
-  type WSGetQuestThemeTakeCostResult = GetQuestThemeTakeCostResult
-
-  /**
    *
    */
   type WSCreateQuestResult = CreateQuestResult
@@ -103,18 +86,6 @@ package object protocol {
     media: WSContentReference,
     icon: Option[WSContentReference] = None,
     description: String)
-
-  /**
-   *
-   */
-  type WSGiveUpQuestProposalResult = GiveUpQuestProposalResult
-
-  /**
-   *
-   */
-  type WSGetQuestProposalGiveUpCostResult = GetQuestProposalGiveUpCostResult
-
-  type WSGetQuestProposalHelpCostResult = GetQuestProposalHelpCostResult
 
   /**
    * *******************

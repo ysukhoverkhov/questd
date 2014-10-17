@@ -30,5 +30,5 @@ final case class OkApiResult[T](value: T) extends ApiResult[T] {
 }
 final case class NotFoundApiResult() extends ApiResult[Nothing] { val body = None }
 final case class NotAuthorisedApiResult() extends ApiResult[Nothing] { val body = None }
-final case class InternalErrorApiResult() extends ApiResult[Nothing] { val body = None }
+final case class InternalErrorApiResult[T]() extends ApiResult[T] { val body = None }
 

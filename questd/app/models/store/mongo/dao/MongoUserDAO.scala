@@ -230,64 +230,12 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-//  def purchaseQuestTheme(id: String, purchasedTheme: ThemeInfoWithID, sampleQuest: Option[QuestInfo], approveReward: Assets): Option[User] = {
-//
-//    val queryBuilder = MongoDBObject.newBuilder
-//
-//    if (sampleQuest != None) {
-//      queryBuilder += ("$set" -> MongoDBObject(
-//        "profile.questProposalContext.purchasedTheme" -> grater[ThemeInfoWithID].asDBObject(purchasedTheme),
-//        "profile.questProposalContext.sampleQuest" -> grater[QuestInfo].asDBObject(sampleQuest.get),
-//        "profile.questProposalContext.approveReward" -> grater[Assets].asDBObject(approveReward)))
-//    } else {
-//      queryBuilder += ("$set" -> MongoDBObject(
-//        "profile.questProposalContext.purchasedTheme" -> grater[ThemeInfoWithID].asDBObject(purchasedTheme),
-//        "profile.questProposalContext.approveReward" -> grater[Assets].asDBObject(approveReward)))
-//      queryBuilder += ("$unset" -> MongoDBObject(
-//        "profile.questProposalContext.sampleQuest" -> ""))
-//    }
-//
-//    queryBuilder += ("$inc" -> MongoDBObject(
-//      "profile.questProposalContext.numberOfPurchasedThemes" -> 1))
-//
-//    queryBuilder += ("$addToSet" -> MongoDBObject(
-//      "profile.questProposalContext.todayReviewedThemeIds" -> purchasedTheme.id))
-//
-//    findAndModify(
-//      id,
-//      queryBuilder.result())
-//  }
-
-  /**
-   *
-   */
-//  def takeQuestTheme(id: String, takenTheme: ThemeInfoWithID, cooldown: Date): Option[User] = {
-//    findAndModify(
-//      id,
-//      MongoDBObject(
-//        "$set" -> MongoDBObject(
-//          "profile.questProposalContext.numberOfPurchasedThemes" -> 0,
-//          "profile.questProposalContext.takenTheme" -> grater[ThemeInfoWithID].asDBObject(takenTheme),
-//          "profile.questProposalContext.questProposalCooldown" -> cooldown),
-//        "$unset" -> MongoDBObject(
-//          "profile.questProposalContext.purchasedTheme" -> ""),
-//        "$addToSet" -> MongoDBObject(
-//          "history.selectedThemeIds" -> takenTheme.id)))
-//  }
-
-  /**
-   *
-   */
-  def resetQuestProposal(id: String, shouldResetCooldown: Boolean, cooldown: Date): Option[User] = {
+  // TODO: test me.
+  def updateQuestCreationCoolDown(id: String, coolDown: Date): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (shouldResetCooldown) {
-      queryBuilder += ("$unset" -> MongoDBObject(
-        "profile.questProposalContext.questProposalCooldown" -> ""))
-    } else {
-      queryBuilder += ("$set" -> MongoDBObject(
-        "profile.questProposalContext.questProposalCooldown" -> cooldown))
-    }
+    queryBuilder += ("$set" -> MongoDBObject(
+      "profile.questCreationContext.questCreationCoolDown" -> coolDown))
 
     findAndModify(
       id,
@@ -297,7 +245,7 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  // TODO: check everything is in the place.
+  // TODO: check everything is in the place (everything is present in model).
   def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User] = {
     findAndModify(
       id,

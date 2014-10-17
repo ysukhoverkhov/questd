@@ -50,7 +50,7 @@ trait ProposingQuests { this: UserLogic =>
    */
   def canProposeQuestToday = {
     user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests) &&
-    user.profile.questProposalContext.questProposalCooldown.before(new Date())
+    user.profile.questCreationContext.questCreationCoolDown.before(new Date())
   }
 
   /**
@@ -168,7 +168,7 @@ trait ProposingQuests { this: UserLogic =>
   /**
    *
    */
-  def getCooldownForTakeTheme: Date = {
+  def getCooldownForQuestCreation: Date = {
     import com.github.nscala_time.time.Imports._
     import org.joda.time.DateTime
 

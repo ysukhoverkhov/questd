@@ -14,6 +14,5 @@ case class Quest(
   lastModDate: Date = new Date(),
   info: QuestInfo,
   rating: QuestRating = QuestRating(),
-  // The field is by group.
   status: QuestStatus.Value = QuestStatus.InRotation) extends ID
 

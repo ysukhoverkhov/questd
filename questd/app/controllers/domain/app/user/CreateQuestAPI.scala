@@ -5,6 +5,7 @@ import controllers.domain.helpers._
 import controllers.domain._
 import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
+import play.Logger
 
 case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List())
 case class CreateQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -18,6 +19,14 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
    * Takes currently purchased theme to make a quest with it.
    */
   def createQuest(request: CreateQuestRequest): ApiResult[CreateQuestResult] = handleDbException {
+
+    /* TODO: list of tests to create:
+      1. Can create quest in normal situation.
+      2. Unable to create Quest in lack of rights.
+      3. unable to create quest in cool down.
+      4. description length is checked.
+      5. test updateQuestCreationCoolDown
+     */
 
     request.user.canProposeQuest(request.quest.media.contentType) match {
       case OK =>
@@ -33,7 +42,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
           }
 
           {
-            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.SubmitQuestProposal)))
+            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.CreateQuest)))
           } ifOk { r =>
               r.user.demo.cultureId ifSome { culture =>
 
@@ -46,10 +55,13 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
 
                 db.quest.create(quest)
 
-                db.user.resetQuestProposal(
-                  request.user.id,
-                  config(api.ConfigParams.DebugDisableProposalCooldown) == "1",
-                  request.user.getCooldownForTakeTheme) ifSome { u =>
+                (if ((config(api.ConfigParams.DebugDisableProposalCooldown) == "1") || r.user.profile.publicProfile.vip) {
+                  db.user.updateQuestCreationCoolDown(
+                    request.user.id,
+                    request.user.getCooldownForQuestCreation)
+                } else {
+                  Some(request.user)
+                }) ifSome { u =>
 
                   {
                     addToTimeLine(AddToTimeLineRequest(
@@ -75,54 +87,16 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
     }
   }
 
-  /**
-   * Give up quest proposal for the user if he is going to make one.
-   */
-//  def giveUpQuestProposal(request: GiveUpQuestProposalRequest): ApiResult[GiveUpQuestProposalResult] = handleDbException {
-//    import request._
-//
-//    user.canGiveUpQuestProposal match {
-//      case OK =>
-//
-//        adjustAssets(AdjustAssetsRequest(user = user, cost = Some(user.costOfGivingUpQuestProposal))) ifOk { r =>
-//          val u = db.user.resetQuestProposal(
-//            r.user.id,
-//            config(api.ConfigParams.DebugDisableProposalCooldown) == "1")
-//          OkApiResult(GiveUpQuestProposalResult(OK, u.map(_.profile)))
-//        }
-//
-//      case (a: ProfileModificationResult) => OkApiResult(GiveUpQuestProposalResult(a))
-//    }
-//  }
-
-  /**
-   * Get cost for giving up quest proposal.
-   */
-//  def getQuestProposalGiveUpCost(request: GetQuestProposalGiveUpCostRequest): ApiResult[GetQuestProposalGiveUpCostResult] = handleDbException {
-//    import request._
-//
-//    OkApiResult(GetQuestProposalGiveUpCostResult(OK, Some(user.costOfGivingUpQuestProposal)))
-//  }
-
-  /**
-   * Get cost for asking a friend to help us.
-   */
-//  def getQuestProposalHelpCost(request: GetQuestProposalHelpCostRequest): ApiResult[GetQuestProposalHelpCostResult] = handleDbException {
-//    import request._
-//
-//    OkApiResult(GetQuestProposalHelpCostResult(OK, Some(user.costOfAskingForHelpWithProposal)))
-//  }
 
   /**
    * Give quest proposal author a reward on quest status change
    */
+  // TODO: move me to anoher aPi. perhaps it should be something banning related.
+  // TODO: store in dail reult only banning.
   def rewardQuestProposalAuthor(request: RewardQuestProposalAuthorRequest): ApiResult[RewardQuestProposalAuthorResult] = handleDbException {
     import request._
 
     val r = quest.status match {
-//      case QuestStatus.InRotation =>
-//        storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, reward = Some(quest.approveReward)))
-
       case QuestStatus.RatingBanned =>
         OkApiResult(StoreProposalInDailyResultResult(author))
 
@@ -134,6 +108,10 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
 
       case QuestStatus.OldBanned =>
         OkApiResult(StoreProposalInDailyResultResult(author))
+
+      case _ =>
+        Logger.error("Rewarding quest author but quest status is Unexpected")
+        InternalErrorApiResult[StoreProposalInDailyResultResult]()
     }
 
     r ifOk {

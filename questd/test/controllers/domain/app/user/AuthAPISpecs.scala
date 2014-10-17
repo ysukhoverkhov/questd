@@ -86,7 +86,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       there was one(user).readBySNid(anyString, anyString)
 
-      rv must beAnInstanceOf[InternalErrorApiResult]
+      rv must beAnInstanceOf[InternalErrorApiResult[LoginResult]]
       rv.body must beNone
     }
 
