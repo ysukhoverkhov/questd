@@ -48,12 +48,13 @@ class FunctionsSpecs extends Specification {
     }
 
 
-    "costToTakeQuestToSolve" in {
-      costToTakeQuestToSolve(3, 1) must beEqualTo(148)
-      costToTakeQuestToSolve(11, 1) must beEqualTo(590)
-      costToTakeQuestToSolve(12, 1) must beEqualTo(628)
-      costToTakeQuestToSolve(20, 1) must beEqualTo(1296)
-    }
+    // TODO: clean me up.
+//    "costToTakeQuestToSolve" in {
+//      costToTakeQuestToSolve(3, 1) must beEqualTo(148)
+//      costToTakeQuestToSolve(11, 1) must beEqualTo(590)
+//      costToTakeQuestToSolve(12, 1) must beEqualTo(628)
+//      costToTakeQuestToSolve(20, 1) must beEqualTo(1296)
+//    }
 
     "ratingToGiveUpQuest" in {
       ratingToGiveUpQuest(3, 1) must beEqualTo(1488)

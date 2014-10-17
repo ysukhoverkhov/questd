@@ -102,8 +102,11 @@ object functions {
   /**
    * How much coins does it takes to take quest for solving.
    */
-  def costToTakeQuestToSolve(level: Int, questDuration: Int): Int = {
-    math.round(coinSelectQuest(level) * questDuration).toInt
+  def costToTakeQuestToSolve(level: Int/*, questDuration: Int*/): Int = {
+
+    // TODO: implement me.
+    //math.round(coinSelectQuest(level) * questDuration).toInt
+    100
   }
 
   /**

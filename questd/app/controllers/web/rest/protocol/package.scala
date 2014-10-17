@@ -1,7 +1,7 @@
 package controllers.web.rest
 
 import controllers.domain.app.user._
-import models.domain.Profile
+import models.domain.{QuestSolutionInfoContent, Profile}
 import controllers.domain.app.misc.GetTimeResult
 
 package object protocol {
@@ -129,7 +129,9 @@ package object protocol {
 
   type WSTakeQuestResult = TakeQuestResult
 
-  type WSProposeSolutionRequest = ProposeSolutionRequest
+  case class WSProposeSolutionRequest(
+    questId: String,
+    solutionContent: QuestSolutionInfoContent)
   type WSProposeSolutionResult = ProposeSolutionResult
 
   type WSGetQuestGiveUpCostResult = GetQuestGiveUpCostResult

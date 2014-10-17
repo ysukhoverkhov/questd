@@ -113,14 +113,7 @@ package object domainstubs {
       profile = Profile(
         assets = assets,
         ratingToNextLevel = 100000,
-        questSolutionContext = QuestSolutionContext(
-          takenQuest = Some(QuestInfoWithID(
-            "quest_id",
-            QuestInfo(
-              authorId = "author_id",
-              vip = false,
-              content = QuestInfoContent(ContentReference(ContentType.Photo, "", ""), None, "")))),
-          questDeadline = new Date(Long.MaxValue)),
+        questSolutionContext = QuestSolutionContext(),
         questProposalContext = QuestProposalConext(
           questProposalCooldown = questProposalCooldown),
         publicProfile = PublicProfile(

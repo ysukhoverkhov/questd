@@ -35,18 +35,18 @@ POST	/rest/proposeQuest								controllers.web.rest.ProposeQuestWS.proposeQuest
 #POST	/rest/getQuestProposalHelpCost				    controllers.web.rest.ProposeQuestWS.getQuestProposalHelpCost
 
 # Solve quest
-POST	/rest/getQuestCost								controllers.web.rest.SolveQuestWS.getQuestCost
-POST	/rest/purchaseQuest								controllers.web.rest.SolveQuestWS.purchaseQuest
+#POST	/rest/getQuestCost								controllers.web.rest.SolveQuestWS.getQuestCost
+#POST	/rest/purchaseQuest								controllers.web.rest.SolveQuestWS.purchaseQuest
 
 POST	/rest/getTakeQuestCost							controllers.web.rest.SolveQuestWS.getTakeQuestCost
-POST	/rest/takeQuest									controllers.web.rest.SolveQuestWS.takeQuest
+#POST	/rest/takeQuest									controllers.web.rest.SolveQuestWS.takeQuest
 
 POST	/rest/proposeSolution							controllers.web.rest.SolveQuestWS.proposeSolution
 
-POST	/rest/getQuestGiveUpCost						controllers.web.rest.SolveQuestWS.getQuestGiveUpCost
-POST	/rest/giveUpQuest								controllers.web.rest.SolveQuestWS.giveUpQuest
+#POST	/rest/getQuestGiveUpCost						controllers.web.rest.SolveQuestWS.getQuestGiveUpCost
+#POST	/rest/giveUpQuest								controllers.web.rest.SolveQuestWS.giveUpQuest
 
-POST	/rest/getQuestSolutionHelpCost				    controllers.web.rest.SolveQuestWS.getQuestSolutionHelpCost
+#POST	/rest/getQuestSolutionHelpCost				    controllers.web.rest.SolveQuestWS.getQuestSolutionHelpCost
 
 # Vote quest proposal
 #POST	/rest/getQuestProposalToVote					controllers.web.rest.VoteQuestProposalWS.getQuestProposalToVote
