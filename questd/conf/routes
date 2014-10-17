@@ -21,18 +21,18 @@ POST    /rest/setCountry                                controllers.web.rest.Pro
 POST    /rest/getCountryList                            controllers.web.rest.ProfileWS.getCountryList
 
 # Generating quests
-POST	/rest/getQuestThemeCost							controllers.web.rest.ProposeQuestWS.getQuestThemeCost
-POST	/rest/purchaseQuestTheme						controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
+#POST	/rest/getQuestThemeCost							controllers.web.rest.ProposeQuestWS.getQuestThemeCost
+#POST	/rest/purchaseQuestTheme						controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
 
-POST	/rest/getQuestThemeTakeCost						controllers.web.rest.ProposeQuestWS.getQuestThemeTakeCost
-POST	/rest/takeQuestTheme							controllers.web.rest.ProposeQuestWS.takeQuestTheme
+#POST	/rest/getQuestThemeTakeCost						controllers.web.rest.ProposeQuestWS.getQuestThemeTakeCost
+#POST	/rest/takeQuestTheme							controllers.web.rest.ProposeQuestWS.takeQuestTheme
 
 POST	/rest/proposeQuest								controllers.web.rest.ProposeQuestWS.proposeQuest
 
-POST	/rest/giveUpQuestProposal						controllers.web.rest.ProposeQuestWS.giveUpQuestProposal
-POST	/rest/getQuestProposalGiveUpCost				controllers.web.rest.ProposeQuestWS.getQuestProposalGiveUpCost
+#POST	/rest/giveUpQuestProposal						controllers.web.rest.ProposeQuestWS.giveUpQuestProposal
+#POST	/rest/getQuestProposalGiveUpCost				controllers.web.rest.ProposeQuestWS.getQuestProposalGiveUpCost
 
-POST	/rest/getQuestProposalHelpCost				    controllers.web.rest.ProposeQuestWS.getQuestProposalHelpCost
+#POST	/rest/getQuestProposalHelpCost				    controllers.web.rest.ProposeQuestWS.getQuestProposalHelpCost
 
 # Solve quest
 POST	/rest/getQuestCost								controllers.web.rest.SolveQuestWS.getQuestCost
@@ -49,7 +49,7 @@ POST	/rest/giveUpQuest								controllers.web.rest.SolveQuestWS.giveUpQuest
 POST	/rest/getQuestSolutionHelpCost				    controllers.web.rest.SolveQuestWS.getQuestSolutionHelpCost
 
 # Vote quest proposal
-POST	/rest/getQuestProposalToVote					controllers.web.rest.VoteQuestProposalWS.getQuestProposalToVote
+#POST	/rest/getQuestProposalToVote					controllers.web.rest.VoteQuestProposalWS.getQuestProposalToVote
 POST	/rest/voteQuestProposal							controllers.web.rest.VoteQuestProposalWS.voteQuestProposal
 
 # Vote quest solution

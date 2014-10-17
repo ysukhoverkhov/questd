@@ -9,5 +9,4 @@ case class QuestSolutionInfo(
   content: QuestSolutionInfoContent,
   vip: Boolean,
   authorId: String,
-  themeId: String,
   questId: String)

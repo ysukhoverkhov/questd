@@ -13,16 +13,17 @@ trait VotingQuestProposals { this: UserLogic =>
   /**
    *
    */
-  def canGetQuestProposalForVote = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestProposals))
-      NotEnoughRights
-    else if (user.profile.questProposalVoteContext.reviewingQuest != None)
-      InvalidState
-    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
-      IncompleteBio
-    else
-      OK
-  }
+  // TODO: clean me up.
+//  def canGetQuestProposalForVote = {
+//    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestProposals))
+//      NotEnoughRights
+//    else if (user.profile.questProposalVoteContext.reviewingQuest != None)
+//      InvalidState
+//    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+//      IncompleteBio
+//    else
+//      OK
+//  }
 
   /**
    *
@@ -32,6 +33,8 @@ trait VotingQuestProposals { this: UserLogic =>
       NotEnoughRights
     else if (user.profile.questProposalVoteContext.reviewingQuest == None)
       InvalidState
+    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+      IncompleteBio
     else
       OK
   }
@@ -39,9 +42,9 @@ trait VotingQuestProposals { this: UserLogic =>
   /**
    * @return None if no more quests to vote for today.
    */
-  // TODO: rename me since we are just getting quests now without any proposals.
-  def getQuestProposalToVote: Option[Quest] = {
-    getRandomQuest(QuestGetReason.ForVoting)
+  def getRandomQuestForTimeLine: Option[Quest] = {
+    // TODO: remove reason here.
+    getRandomQuest()
   }
 
   /**

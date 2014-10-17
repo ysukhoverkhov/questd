@@ -10,23 +10,16 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
   import scala.language.implicitConversions
 
-  object QuestGetReason extends Enumeration {
-    type QuestGetReason = QuestGetReason.Value
-    val ForVoting, ForSolving = Value
-  }
-  import QuestGetReason._
-
-  // TODO: remove reason here.
-  def getRandomQuest(reason: QuestGetReason): Option[Quest] = {
+  def getRandomQuest(): Option[Quest] = {
     val algorithms = List(
-      () => getQuestsWithSuperAlgorithm(reason),
-      () => getOtherQuests(reason).getOrElse(List().iterator),
-      () => getAllQuests(reason).getOrElse(List().iterator))
+      () => getQuestsWithSuperAlgorithm(),
+      () => getOtherQuests().getOrElse(List().iterator),
+      () => getAllQuests().getOrElse(List().iterator))
 
     {
       algorithms.foldLeft[Option[Quest]](None)((run, fun) => {
         if (run == None) {
-          selectQuest(fun(), questIdsToExclude(reason))
+          selectQuest(fun(), List(questIdsToExclude()))
         } else {
           run
         }
@@ -34,28 +27,30 @@ trait QuestSelectUserLogic { this: UserLogic =>
     }
   }
 
-  private def questIdsToExclude(reason: QuestGetReason) = {
-    reason match {
-      case ForSolving => user.history.solvedQuestIds
-      case ForVoting => user.history.votedQuestProposalIds
-    }
+  private def questIdsToExclude() = {
+//    reason match {
+//      case ForSolving => user.history.solvedQuestIds
+//      case ForVoting => user.history.votedQuestProposalIds
+//    }
+
+    user.timeLine.map(_.objectId)
   }
 
-  def getQuestsWithSuperAlgorithm(reason: QuestGetReason) = {
-    val algs = List(
-      () => getTutorialQuests(reason),
-      () => getStartingQuests(reason),
-      () => getDefaultQuests(reason))
+  def getQuestsWithSuperAlgorithm() = {
+    val algorithms = List(
+      () => getTutorialQuests(),
+      () => getStartingQuests(),
+      () => getDefaultQuests())
 
-    selectFromChain(algs, default = List().iterator)
+    selectFromChain(algorithms, default = List().iterator)
   }
 
-  private[user] def getTutorialQuests(reason: QuestGetReason): Option[Iterator[Quest]] = {
+  private[user] def getTutorialQuests(): Option[Iterator[Quest]] = {
     Logger.trace("getTutorialQuests")
     None
   }
 
-  private[user] def getStartingQuests(reason: QuestGetReason): Option[Iterator[Quest]] = {
+  private[user] def getStartingQuests(): Option[Iterator[Quest]] = {
     Logger.trace("getStartingQuests")
 
     if (user.profile.publicProfile.level > api.config(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
@@ -63,8 +58,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
     } else {
 
       val algs = List(
-        (api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests(reason)),
-        (1.00, () => getOtherQuests(reason)) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
+        (api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests()),
+        (1.00, () => getOtherQuests()) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
       selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
@@ -72,50 +67,46 @@ trait QuestSelectUserLogic { this: UserLogic =>
     }
   }
 
-  private[user] def getDefaultQuests(reason: QuestGetReason): Option[Iterator[Quest]] = {
+  private[user] def getDefaultQuests(): Option[Iterator[Quest]] = {
     Logger.trace("getDefaultQuests")
 
-    val algs = List(
-      (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests(reason)),
-      (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests(reason)),
-      (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests(reason)),
-      (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPQuests(reason)),
-      (1.00, () => getOtherQuests(reason)) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
+    val algorithms = List(
+      (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests()),
+      (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests()),
+      (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests()),
+      (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPQuests()),
+      (1.00, () => getOtherQuests()) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 
-    selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
+    selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
   }
 
-  private[user] def getFriendsQuests(reason: QuestGetReason) = {
+  private[user] def getFriendsQuests() = {
     Logger.trace("  Returning quest from friends")
     Some(api.getFriendsQuests(GetFriendsQuestsRequest(
       user,
-      reason,
-      levels(reason))).body.get.quests)
+      QuestStatus.InRotation,
+      levels)).body.get.quests)
   }
 
-  private[user] def getFollowingQuests(reason: QuestGetReason) = {
+  private[user] def getFollowingQuests() = {
     Logger.trace("  Returning quest from Following")
     Some(api.getFollowingQuests(GetFollowingQuestsRequest(
       user,
-      reason,
-      levels(reason))).body.get.quests)
+      QuestStatus.InRotation,
+      levels)).body.get.quests)
   }
 
-  private[user] def getLikedQuests(reason: QuestGetReason) = {
+  private[user] def getLikedQuests() = {
     Logger.trace("  Returning quests we liked recently")
 
-    // If we already liked the quest we are unable to like it once again anymore.
-    if (reason == QuestGetReason.ForVoting)
-      None
-    else
-      Some(api.getLikedQuests(GetLikedQuestsRequest(
-        user,
-        reason,
-        levels(reason))).body.get.quests)
+    Some(api.getLikedQuests(GetLikedQuestsRequest(
+      user,
+      QuestStatus.InRotation,
+      levels)).body.get.quests)
   }
 
-  private[user] def getVIPQuests(reason: QuestGetReason) = {
+  private[user] def getVIPQuests() = {
     Logger.trace("  Returning VIP quests")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPQuests)
@@ -123,12 +114,12 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
     Some(api.getVIPQuests(GetVIPQuestsRequest(
       user,
-      reason,
-      levels(reason),
+      QuestStatus.InRotation,
+      levels,
       themeIds)).body.get.quests)
   }
 
-  private[user] def getOtherQuests(reason: QuestGetReason) = {
+  private[user] def getOtherQuests() = {
     Logger.trace("  Returning from all quests with favorite themes")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
@@ -136,35 +127,25 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
     Some(api.getAllQuests(GetAllQuestsRequest(
       user,
-      reason,
-      levels(reason),
+      QuestStatus.InRotation,
+      levels,
       themeIds)).body.get.quests)
   }
 
-  private[user] def getAllQuests(reason: QuestGetReason) = {
+  private[user] def getAllQuests() = {
     Logger.trace("  Returning from all quests")
 
     Some(api.getAllQuests(GetAllQuestsRequest(
       user,
-      reason,
-      levels(reason))).body.get.quests)
+      QuestStatus.InRotation,
+      levels)).body.get.quests)
   }
 
   /**
    * Tells what level we should give quests based on reason of getting quest.
    */
-  private def levels(reason: QuestGetReason): Option[(Int, Int)] = {
-    reason match {
-      case ForSolving => Some((user.profile.publicProfile.level - QuestForSolveLevelToleranceDown, user.profile.publicProfile.level + QuestForSolveLevelToleranceUp))
-      case ForVoting => None
-    }
-  }
-
-  implicit private def reasonToStatus(reason: QuestGetReason): QuestStatus.Value = {
-    reason match {
-      case ForSolving => QuestStatus.InRotation
-      case ForVoting => QuestStatus.OnVoting
-    }
+  private def levels: Option[(Int, Int)] = {
+    None
   }
 
   private def selectRandomThemes(count: Int): List[String] = {

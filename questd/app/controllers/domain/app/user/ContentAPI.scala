@@ -13,8 +13,7 @@ import controllers.domain.helpers.PagerHelper._
 case class GetQuestRequest(user: User, questId: String)
 case class GetQuestResult(
   allowed: ProfileModificationResult,
-  quest: Option[QuestInfo] = None,
-  theme: Option[ThemeInfo] = None)
+  quest: Option[QuestInfo] = None)
 
 case class GetSolutionRequest(user: User, solutionId: String)
 case class GetSolutionResult(
@@ -101,9 +100,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     import request._
 
     db.quest.readById(questId) ifSome { quest =>
-      db.theme.readById(quest.info.themeId) ifSome { theme =>
-        OkApiResult(GetQuestResult(OK, Some(quest.info), Some(theme.info)))
-      }
+      OkApiResult(GetQuestResult(OK, Some(quest.info)))
     }
   }
 

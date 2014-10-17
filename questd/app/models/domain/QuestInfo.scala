@@ -15,7 +15,6 @@ case class QuestInfoContent(
 
 case class QuestInfo(
   authorId: String,
-  themeId: String,
   content: QuestInfoContent,
   level: Int = 0,
   duration: QuestDuration.Value = QuestDuration.Minutes,
@@ -36,4 +35,4 @@ case class QuestInfo(
     case QuestDuration.Week => 60 * 34 * 7
   }
 }
-    
+

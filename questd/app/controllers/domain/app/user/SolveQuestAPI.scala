@@ -3,7 +3,6 @@ package controllers.domain.app.user
 import scala.annotation.tailrec
 import scala.language.postfixOps
 import models.domain._
-import models.domain.view._
 import play.Logger
 import controllers.domain.helpers._
 import controllers.domain._
@@ -61,51 +60,53 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   /**
    * Purchase an option of quest to chose.
    */
+  // TODO: clean me up.
   def purchaseQuest(request: PurchaseQuestRequest): ApiResult[PurchaseQuestResult] = handleDbException {
 
-    val user = ensureNoDeadlineQuest(request.user)
-
-    user.canPurchaseQuest match {
-      case OK =>
-
-        // Updating quest info.
-        val v = if (user.stats.questsAcceptedPast > 0) {
-
-          user.profile.questSolutionContext.purchasedQuest ifSome { q =>
-            db.quest.readById(q.id) ifSome { q =>
-              skipQuest(SkipQuestRequest(q))
-            }
-          }
-        } else {
-          OkApiResult(SkipQuestResult())
-        }
-
-        v ifOk {
-
-          // Updating user profile.
-          user.getRandomQuestForSolution match {
-            case None => OkApiResult(PurchaseQuestResult(OutOfContent))
-
-            case Some(q) =>
-              val questCost = user.costOfPurchasingQuest
-              db.user.readById(q.info.authorId).map(x => PublicProfileWithID(q.info.authorId, x.profile.publicProfile)) ifSome { author =>
-                adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) ifOk { r =>
-
-                  val u = db.user.purchaseQuest(
-                    r.user.id,
-                    QuestInfoWithID(q.id, q.info),
-                    author,
-                    r.user.rewardForLosingQuest(q),
-                    r.user.rewardForWinningQuest(q))
-
-                  OkApiResult(PurchaseQuestResult(OK, u.map(_.profile)))
-                }
-              }
-          }
-        }
-
-      case a => OkApiResult(PurchaseQuestResult(a))
-    }
+//    val user = ensureNoDeadlineQuest(request.user)
+//
+//    user.canPurchaseQuest match {
+//      case OK =>
+//
+//        // Updating quest info.
+//        val v = if (user.stats.questsAcceptedPast > 0) {
+//
+//          user.profile.questSolutionContext.purchasedQuest ifSome { q =>
+//            db.quest.readById(q.id) ifSome { q =>
+//              skipQuest(SkipQuestRequest(q))
+//            }
+//          }
+//        } else {
+//          OkApiResult(SkipQuestResult())
+//        }
+//
+//        v ifOk {
+//
+//          // Updating user profile.
+//          user.getRandomQuestForSolution match {
+//            case None => OkApiResult(PurchaseQuestResult(OutOfContent))
+//
+//            case Some(q) =>
+//              val questCost = user.costOfPurchasingQuest
+//              db.user.readById(q.info.authorId).map(x => PublicProfileWithID(q.info.authorId, x.profile.publicProfile)) ifSome { author =>
+//                adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) ifOk { r =>
+//
+//                  val u = db.user.purchaseQuest(
+//                    r.user.id,
+//                    QuestInfoWithID(q.id, q.info),
+//                    author,
+//                    r.user.rewardForLosingQuest(q),
+//                    r.user.rewardForWinningQuest(q))
+//
+//                  OkApiResult(PurchaseQuestResult(OK, u.map(_.profile)))
+//                }
+//              }
+//          }
+//        }
+//
+//      case a => OkApiResult(PurchaseQuestResult(a))
+//    }
+    OkApiResult(PurchaseQuestResult(OK))
   }
 
   /**
@@ -216,7 +217,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 info = QuestSolutionInfo(
                   content = content,
                   authorId = r.user.id,
-                  themeId = takenQuest.obj.themeId,
                   questId = takenQuest.id,
                   vip = user.profile.publicProfile.vip),
                 voteEndDate = user.solutionVoteEndDate(takenQuest.obj))

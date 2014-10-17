@@ -88,7 +88,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
     val questsCount = config(api.ConfigParams.TimeLineRandomQuestsDaily).toInt
     (1 to questsCount).foreach { x =>
-      user.getQuestProposalToVote match {
+      user.getRandomQuestForTimeLine match {
         case Some(q) =>
           addToTimeLine(AddToTimeLineRequest(
             user = user,

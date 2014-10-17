@@ -31,7 +31,6 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
           info = QuestSolutionInfo(
             content = s,
             authorId = u.id,
-            themeId = u.profile.questSolutionContext.takenQuest.get.obj.themeId,
             questId = u.profile.questSolutionContext.takenQuest.get.id,
             vip = false),
           voteEndDate = new Date()))
@@ -101,7 +100,6 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
           info = QuestSolutionInfo(
             content = s,
             authorId = u.id,
-            themeId = u.profile.questSolutionContext.takenQuest.get.obj.themeId,
             questId = u.profile.questSolutionContext.takenQuest.get.id,
             vip = true),
           voteEndDate = new Date()))

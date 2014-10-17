@@ -63,9 +63,10 @@ trait SolvingQuests { this: UserLogic =>
   /**
    * Takes everything into account and returns possible quest to be solved by user.
    */
-  def getRandomQuestForSolution: Option[Quest] = {
-    getRandomQuest(QuestGetReason.ForSolving)
-  }
+  // TODO: clean me up.
+//  def getRandomQuestForSolution: Option[Quest] = {
+//    getRandomQuest(QuestGetReason.ForSolving)
+//  }
 
   /**
    * Check are we able to take quest.

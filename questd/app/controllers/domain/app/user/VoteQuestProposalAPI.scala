@@ -20,30 +20,31 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
   /**
    * Get cost of quest to shuffle.
    */
-  def getQuestProposalToVote(request: GetQuestProposalToVoteRequest): ApiResult[GetQuestProposalToVoteResult] = handleDbException {
-    import request._
-
-    user.canGetQuestProposalForVote match {
-      case OK =>
-
-        Logger.trace("getQuestProposalToVote - we are eligable to vote quest.")
-
-        // Updating user profile.
-        val q = user.getQuestProposalToVote
-
-        q match {
-          case None => OkApiResult(GetQuestProposalToVoteResult(OutOfContent))
-          case Some(a) =>
-            val qi = QuestInfoWithID(a.id, a.info)
-            db.theme.readById(a.info.themeId) ifSome { theme =>
-              val u = db.user.selectQuestProposalVote(user.id, qi, ThemeInfoWithID(theme.id, theme.info))
-              OkApiResult(GetQuestProposalToVoteResult(OK, u.map(_.profile)))
-            }
-        }
-      case a => OkApiResult(GetQuestProposalToVoteResult(a))
-    }
-
-  }
+  // TODO: clean me up.
+//  def getQuestProposalToVote(request: GetQuestProposalToVoteRequest): ApiResult[GetQuestProposalToVoteResult] = handleDbException {
+//    import request._
+//
+//    user.canGetQuestProposalForVote match {
+//      case OK =>
+//
+//        Logger.trace("getQuestProposalToVote - we are eligable to vote quest.")
+//
+//        // Updating user profile.
+//        val q = user.getRandomQuestForTimeLine
+//
+//        q match {
+//          case None => OkApiResult(GetQuestProposalToVoteResult(OutOfContent))
+//          case Some(a) =>
+//            val qi = QuestInfoWithID(a.id, a.info)
+//            db.theme.readById(a.info.themeId) ifSome { theme =>
+//              val u = db.user.selectQuestProposalVote(user.id, qi, ThemeInfoWithID(theme.id, theme.info))
+//              OkApiResult(GetQuestProposalToVoteResult(OK, u.map(_.profile)))
+//            }
+//        }
+//      case a => OkApiResult(GetQuestProposalToVoteResult(a))
+//    }
+//
+//  }
 
   /**
    * Get cost of quest to shuffle.
