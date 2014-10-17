@@ -19,9 +19,7 @@ case class TakeQuestUpdateResult()
 
 case class VoteQuestUpdateRequest(
   quest: Quest,
-  vote: QuestProposalVote.Value,
-  duration: QuestDuration.Value,
-  difficulty: QuestDifficulty.Value)
+  vote: QuestProposalVote.Value)
 case class VoteQuestUpdateResult()
 
 case class CalculateProposalThresholdsRequest(proposalsVoted: Double, proposalsLiked: Double)
@@ -149,6 +147,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
+    // TODO: review it.
     val q = db.quest.updatePoints(
       quest.id,
       checkInc(vote, Cool),
@@ -158,35 +157,37 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       checkInc(vote, IASpam),
       checkInc(vote, IAPorn))
 
-    val q2 = if (vote == QuestProposalVote.Cool) {
+    // TODO: increase points for the quest if liked.
 
-      db.quest.updatePoints(
-        quest.id,
-        0,
-        0,
-        0,
-
-        0,
-        0,
-
-        checkInc(difficulty, QuestDifficulty.Easy),
-        checkInc(difficulty, QuestDifficulty.Normal),
-        checkInc(difficulty, QuestDifficulty.Hard),
-        checkInc(difficulty, QuestDifficulty.Extreme),
-
-        checkInc(duration, QuestDuration.Minutes),
-        checkInc(duration, QuestDuration.Hour),
-        checkInc(duration, QuestDuration.Day),
-        checkInc(duration, QuestDuration.Week))
-    } else {
-      q
-    }
+//    val q2 = if (vote == QuestProposalVote.Cool) {
+//
+//      db.quest.updatePoints(
+//        quest.id,
+//        0,
+//        0,
+//        0,
+//
+//        0,
+//        0,
+//
+//        checkInc(difficulty, QuestDifficulty.Easy),
+//        checkInc(difficulty, QuestDifficulty.Normal),
+//        checkInc(difficulty, QuestDifficulty.Hard),
+//        checkInc(difficulty, QuestDifficulty.Extreme),
+//
+//        checkInc(duration, QuestDuration.Minutes),
+//        checkInc(duration, QuestDuration.Hour),
+//        checkInc(duration, QuestDuration.Day),
+//        checkInc(duration, QuestDuration.Week))
+//    } else {
+//      q
+//    }
 
     q ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } ifOk {
       OkApiResult(VoteQuestUpdateResult())
-     }
+    }
 }
 
   def calculateProposalThresholds(request: CalculateProposalThresholdsRequest): ApiResult[CalculateProposalThresholdsResult] = handleDbException {

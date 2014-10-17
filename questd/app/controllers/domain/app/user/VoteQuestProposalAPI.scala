@@ -12,8 +12,13 @@ import controllers.domain._
 case class GetQuestProposalToVoteRequest(user: User)
 case class GetQuestProposalToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class VoteQuestProposalRequest(user: User, vote: QuestProposalVote.Value, duration: QuestDuration.Value, difficulty: QuestDifficulty.Value)
-case class VoteQuestProposalResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, author: Option[PublicProfileWithID] = None)
+case class VoteQuestProposalRequest(
+  user: User,
+  questId: String,
+  vote: QuestProposalVote.Value)
+case class VoteQuestProposalResult(
+  allowed: ProfileModificationResult,
+  profile: Option[Profile] = None)
 
 private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -51,40 +56,41 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
    */
   def voteQuestProposal(request: VoteQuestProposalRequest): ApiResult[VoteQuestProposalResult] = handleDbException {
 
-    request.user.canVoteQuestProposal match {
+    request.user.canVoteQuestProposal(request.questId) match {
       case OK =>
         // 1. get quest to vote.
         // 2. vote it.
-        val reward = request.user.getQuestProposalVoteReward
+//        val reward = request.user.getQuestProposalVoteReward
 
-        db.quest.readById(request.user.profile.questProposalVoteContext.reviewingQuest.get.id) match {
-          case None =>
-            Logger.error("Unable to find quest with id for voting " + request.user.profile.questProposalVoteContext.reviewingQuest.get.id)
-            InternalErrorApiResult()
-          case Some(q) => {
+        db.quest.readById(request.questId) ifSome { q =>
+          {
 
-            voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))
+            voteQuest(VoteQuestUpdateRequest(q, request.vote))
 
           } ifOk { r =>
 
             makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuestProposals)))
 
-          } ifOk {
-
-            adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))
-
+//          } ifOk {
+//
+//            adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(reward)))
+//
           } ifOk { r =>
 
             val liked = request.vote == QuestProposalVote.Cool
+
+            // TODO: review it.
             val u = db.user.recordQuestProposalVote(r.user.id, q.id, liked)
 
-            val author = if (liked) {
-              db.user.readById(q.info.authorId).map(a => PublicProfileWithID(a.id, a.profile.publicProfile))
-            } else {
-              None
-            }
+            // TODO: add it to my friend's time line.
 
-            OkApiResult(VoteQuestProposalResult(OK, u.map(_.profile), Some(reward), author))
+//            val author = if (liked) {
+//              db.user.readById(q.info.authorId).map(a => PublicProfileWithID(a.id, a.profile.publicProfile))
+//            } else {
+//              None
+//            }
+
+            OkApiResult(VoteQuestProposalResult(OK, u.map(_.profile)))
           }
         }
       case a => OkApiResult(VoteQuestProposalResult(a))

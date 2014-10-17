@@ -27,11 +27,11 @@ trait VotingQuestProposals { this: UserLogic =>
 
   /**
    *
-   */
-  def canVoteQuestProposal = {
+   */// TODO: rename me to "VoteQuest".
+  def canVoteQuestProposal(questId: String) = {
     if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestProposals))
       NotEnoughRights
-    else if (user.profile.questProposalVoteContext.reviewingQuest == None)
+    else if (!user.timeLine.map(_.objectId).contains(questId))
       InvalidState
     else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
       IncompleteBio
@@ -43,21 +43,20 @@ trait VotingQuestProposals { this: UserLogic =>
    * @return None if no more quests to vote for today.
    */
   def getRandomQuestForTimeLine: Option[Quest] = {
-    // TODO: remove reason here.
     getRandomQuest()
   }
 
   /**
    * Reward for voting for quest proposal.
    */
-  def getQuestProposalVoteReward = {
-    val level = user.profile.publicProfile.level
-    val count = user.profile.questProposalVoteContext.numberOfReviewedQuests
-
-    if (count < rewardedProposalVotesPerLevel(level))
-      Assets(coins = rewardForVotingProposal(level, count + 1)).clampBot
-    else
-      Assets()
-  }
+//  def getQuestProposalVoteReward = {
+//    val level = user.profile.publicProfile.level
+//    val count = user.profile.questProposalVoteContext.numberOfReviewedQuests
+//
+//    if (count < rewardedProposalVotesPerLevel(level))
+//      Assets(coins = rewardForVotingProposal(level, count + 1)).clampBot
+//    else
+//      Assets()
+//  }
 }
 

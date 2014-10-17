@@ -50,6 +50,8 @@ POST	/rest/getQuestSolutionHelpCost				    controllers.web.rest.SolveQuestWS.get
 
 # Vote quest proposal
 #POST	/rest/getQuestProposalToVote					controllers.web.rest.VoteQuestProposalWS.getQuestProposalToVote
+
+# TODO: rename me to voteQuest
 POST	/rest/voteQuestProposal							controllers.web.rest.VoteQuestProposalWS.voteQuestProposal
 
 # Vote quest solution
