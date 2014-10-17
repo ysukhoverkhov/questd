@@ -92,14 +92,14 @@ package object protocol {
   /**
    *
    */
-  type WSProposeQuestResult = ProposeQuestResult
+  type WSCreateQuestResult = CreateQuestResult
 
   case class WSContentReference(
     contentType: String,
     storage: String,
     reference: String)
 
-  case class WSProposeQuestRequest(
+  case class WSCreateQuestRequest(
     media: WSContentReference,
     icon: Option[WSContentReference] = None,
     description: String)
