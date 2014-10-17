@@ -55,7 +55,7 @@ POST	/rest/proposeSolution							controllers.web.rest.SolveQuestWS.proposeSoluti
 POST	/rest/voteQuestProposal							controllers.web.rest.VoteQuestProposalWS.voteQuestProposal
 
 # Vote quest solution
-POST	/rest/getQuestSolutionToVote					controllers.web.rest.VoteQuestSolutionWS.getQuestSolutionToVote
+#POST	/rest/getQuestSolutionToVote					controllers.web.rest.VoteQuestSolutionWS.getQuestSolutionToVote
 POST	/rest/voteQuestSolution							controllers.web.rest.VoteQuestSolutionWS.voteQuestSolution
 
 # Time line

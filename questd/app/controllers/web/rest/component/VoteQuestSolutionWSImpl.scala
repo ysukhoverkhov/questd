@@ -12,14 +12,14 @@ import org.json4s._
 
 trait VoteQuestSolutionWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
-  def getQuestSolutionToVote = wrapApiCallReturnBody[WSGetQuestSolutionToVoteResult] { r =>
-    api.getQuestSolutionToVote(GetQuestSolutionToVoteRequest(r.user))
-  }
+//  def getQuestSolutionToVote = wrapApiCallReturnBody[WSGetQuestSolutionToVoteResult] { r =>
+//    api.getQuestSolutionToVote(GetQuestSolutionToVoteRequest(r.user))
+//  }
 
   def voteQuestSolution = wrapJsonApiCallReturnBody[WSVoteQuestSolutionResult] { (js, r) =>
-    
+
     Logger.debug("REST - Voting quest solution")
-    
+
     val v = Json.read[WSQuestSolutionVoteRequest](js)
     val vote = QuestSolutionVote.withName(v.vote)
 

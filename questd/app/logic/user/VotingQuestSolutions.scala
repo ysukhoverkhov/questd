@@ -27,7 +27,7 @@ trait VotingQuestSolutions { this: UserLogic =>
   /**
    * @return None if no more quests to vote for today.
    */
-  def getQuestSolutionToVote: Option[QuestSolution] = {
+  def getQuestSolutionForTimeLine: Option[QuestSolution] = {
     getRandomSolution
   }
 
@@ -35,6 +35,8 @@ trait VotingQuestSolutions { this: UserLogic =>
    *
    */
   def canVoteQuestSolution = {
+
+    // TODO: check we have the solution in time line.
     if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuestSolutions))
       NotEnoughRights
     else if (user.profile.questSolutionVoteContext.reviewingQuestSolution == None)
