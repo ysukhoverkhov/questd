@@ -228,9 +228,8 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
-  // TODO: test me.
   def updateQuestCreationCoolDown(id: String, coolDown: Date): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 

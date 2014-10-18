@@ -16,7 +16,7 @@ class UserDAOSpecs
   with BaseDAOSpecs {
 
   "Mongo User DAO" should {
-    "Create new User in DB and find it by userid" in new WithApplication(appWithTestDatabase) {
+    "Create new User in DB and find it by userId" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
       val userid = "lalala"
       db.user.create(User(userid))
@@ -107,21 +107,21 @@ class UserDAOSpecs
 
     // TODO: clean m up.
 //    "Purchase quest theme with sample quest" in new WithApplication(appWithTestDatabase) {
-//      val userid = "lalala2"
+//      val userId = "lalala2"
 //      val themeid = "themeid"
 //      val questdescr = "questdescr"
 //      val rew = Assets(1, 2, 3)
 //
-//      db.user.create(User(userid))
+//      db.user.create(User(userId))
 //      db.user.purchaseQuestTheme(
-//        userid,
+//        userId,
 //        ThemeInfoWithID(themeid, createThemeStub().info),
 //        Some(QuestInfo("authorId", "themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
 //        rew)
 //
-//      val ou = db.user.readById(userid)
+//      val ou = db.user.readById(userId)
 //
-//      ou must beSome.which((u: User) => u.id.toString == userid)
+//      ou must beSome.which((u: User) => u.id.toString == userId)
 //
 //      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeInfoWithID) => t.id == themeid) and
 //        beSome.which((t: ThemeInfoWithID) => t.id == themeid)
@@ -136,26 +136,26 @@ class UserDAOSpecs
 //    }
 //
 //    "Purchase quest theme without sample quest" in new WithApplication(appWithTestDatabase) {
-//      val userid = "lalala3"
+//      val userId = "lalala3"
 //      val themeid = "themeid"
 //      val questdescr = "questdescr"
 //      val rew = Assets(1, 2, 3)
 //
-//      db.user.create(User(userid))
+//      db.user.create(User(userId))
 //      db.user.purchaseQuestTheme(
-//        userid,
+//        userId,
 //        ThemeInfoWithID(themeid, createThemeStub().info),
 //        Some(QuestInfo("authorId", "themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
 //        rew)
 //      db.user.purchaseQuestTheme(
-//        userid,
+//        userId,
 //        ThemeInfoWithID(themeid, createThemeStub().info),
 //        None,
 //        rew)
 //
-//      val ou = db.user.readById(userid)
+//      val ou = db.user.readById(userId)
 //
-//      ou must beSome.which((u: User) => u.id.toString == userid)
+//      ou must beSome.which((u: User) => u.id.toString == userId)
 //
 //      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeInfoWithID) => t.id == themeid) and
 //        beSome.which((t: ThemeInfoWithID) => t.id == themeid)
@@ -170,17 +170,17 @@ class UserDAOSpecs
 //    }
 //
 //    "recordQuestProposalVote should remember liked proposals" in new WithApplication(appWithTestDatabase) {
-//      val userid = "rememberProposalVotingInHistory"
+//      val userId = "rememberProposalVotingInHistory"
 //      val q1id = "q1id"
 //      val q2id = "q2id"
 //
-//      db.user.create(User(userid))
+//      db.user.create(User(userId))
 //
-//      db.user.recordQuestProposalVote(userid, q1id, liked = true)
-//      db.user.recordQuestProposalVote(userid, q2id, liked = false)
+//      db.user.recordQuestProposalVote(userId, q1id, liked = true)
+//      db.user.recordQuestProposalVote(userId, q2id, liked = false)
 //
-//      val ou = db.user.readById(userid)
-//      ou must beSome.which((u: User) => u.id.toString == userid && u.profile.questProposalVoteContext.numberOfReviewedQuests == 2)
+//      val ou = db.user.readById(userId)
+//      ou must beSome.which((u: User) => u.id.toString == userId && u.profile.questProposalVoteContext.numberOfReviewedQuests == 2)
 //
 //      val arr1 = ou.get.history.likedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray.collect { case s: String => s}
 //      arr1.size must beEqualTo(3) // 2 is "", "" stub in list of lists.
@@ -193,13 +193,13 @@ class UserDAOSpecs
 //    }
 //
 //    "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {
-//      val userid = "takeQuest2"
+//      val userId = "takeQuest2"
 //      val themeId = "tid"
 //
-//      db.user.create(User(userid))
+//      db.user.create(User(userId))
 //
 //      db.user.takeQuest(
-//        userid,
+//        userId,
 //        QuestInfoWithID(
 //          "q",
 //          QuestInfo(
@@ -216,8 +216,8 @@ class UserDAOSpecs
 //        new Date(),
 //        new Date())
 //
-//      val ou = db.user.readById(userid)
-//      ou must beSome.which((u: User) => u.id.toString == userid)
+//      val ou = db.user.readById(userId)
+//      ou must beSome.which((u: User) => u.id.toString == userId)
 //      ou must beSome.which((u: User) => u.history.themesOfSelectedQuests.contains(themeId))
 //    }
 
@@ -307,55 +307,40 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToFollowing)(0).currentCount == 0)
     }
 
+    "updateQuestCreationCoolDown should reset cool down" in new WithApplication(appWithTestDatabase) {
+      val userId = "resetQuestProposal"
+      val date = new Date(1000)
+      val dateNew = new Date(2000)
+
+      db.user.clear()
+
+      db.user.create(User(
+        id = userId,
+        profile = Profile(
+          questCreationContext = QuestCreationContext(
+            questCreationCoolDown = date))))
+
+      val ou = db.user.updateQuestCreationCoolDown(userId, dateNew)
+
+      ou must beSome.which((u: User) => u.id.toString == userId)
+      ou must beSome.which((u: User) => u.profile.questCreationContext.questCreationCoolDown == dateNew)
+    }
+
     // TODO: clean me up.
-//    "resetQuestProposal should reset cooldown if required" in new WithApplication(appWithTestDatabase) {
-//      val userid = "resetQuestProposal"
-//      val date = new Date(1000)
-//
-//      db.user.delete(userid)
-//      db.user.create(User(
-//        id = userid,
-//        profile = Profile(
-//          questProposalContext = QuestProposalConext(
-//            questProposalCooldown = date))))
-//
-//      val ou = db.user.resetQuestProposal(userid, shouldResetCooldown = true)
-//
-//      ou must beSome.which((u: User) => u.id.toString == userid)
-//      ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown != date)
-//    }
-//
-//    "resetQuestProposal should reset cooldown if not required" in new WithApplication(appWithTestDatabase) {
-//      val userid = "resetQuestProposal"
-//      val date = new Date(1000)
-//
-//      db.user.delete(userid)
-//      db.user.create(User(
-//        id = userid,
-//        profile = Profile(
-//          questProposalContext = QuestProposalConext(
-//            questProposalCooldown = date))))
-//
-//      val ou = db.user.resetQuestProposal(userid, shouldResetCooldown = false)
-//
-//      ou must beSome.which((u: User) => u.id.toString == userid)
-//      ou must beSome.which((u: User) => u.profile.questProposalContext.questProposalCooldown == date)
-//    }
-//
 //    "resetTodayReviewedThemes do its work" in new WithApplication(appWithTestDatabase) {
-//      val userid = "resetTodayReviewedThemes"
+//      val userId = "resetTodayReviewedThemes"
 //      val date = new Date(1000)
 //
-//      db.user.delete(userid)
+//      db.user.delete(userId)
 //      db.user.create(User(
-//        id = userid,
+//        id = userId,
 //        profile = Profile(
 //          questProposalContext = QuestProposalConext(
 //            todayReviewedThemeIds = List("lala")))))
 //
-//      val ou = db.user.resetTodayReviewedThemes(userid)
+//      val ou = db.user.resetTodayReviewedThemes(userId)
 //
-//      ou must beSome.which((u: User) => u.id.toString == userid)
+//      ou must beSome.which((u: User) => u.id.toString == userId)
 //      ou must beSome.which((u: User) => u.profile.questProposalContext.todayReviewedThemeIds == List())
 //    }
 

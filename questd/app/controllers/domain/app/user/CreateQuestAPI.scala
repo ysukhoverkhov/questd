@@ -25,7 +25,6 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
       2. Unable to create Quest in lack of rights.
       3. unable to create quest in cool down.
       4. description length is checked.
-      5. test updateQuestCreationCoolDown
      */
 
     request.user.canProposeQuest(request.quest.media.contentType) match {

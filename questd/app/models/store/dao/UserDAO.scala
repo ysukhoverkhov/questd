@@ -25,6 +25,12 @@ trait UserDAO extends BaseDAO[User] {
   def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User]
   def resetQuestSolution(id: String, shouldResetCooldown: Boolean): Option[User]
 
+  /**
+   *
+   * @param id If of a user to update for.
+   * @param coolDown New cool down date.
+   * @return Modified user.
+   */
   def updateQuestCreationCoolDown(id: String, coolDown: Date): Option[User]
 
   def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User]
