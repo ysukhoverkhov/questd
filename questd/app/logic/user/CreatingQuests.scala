@@ -11,7 +11,7 @@ import models.domain.ContentType._
 /**
  * All logic related to proposing quests.
  */
-trait ProposingQuests { this: UserLogic =>
+trait CreatingQuests { this: UserLogic =>
 
   /**
    * Check is the user can purchase quest proposals.
@@ -56,8 +56,8 @@ trait ProposingQuests { this: UserLogic =>
   /**
    * Is user can propose quest of given type.
    */
-  def canProposeQuest(conentType: ContentType) = {
-    val content = conentType match {
+  def canCreateQuest(questContent: QuestInfoContent) = {
+    val content = questContent.media.contentType match {
       case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests)
       case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoQuests)
     }
@@ -66,11 +66,13 @@ trait ProposingQuests { this: UserLogic =>
       NotEnoughRights
     else if (!canProposeQuestToday)
       CoolDown
+    else if (questContent.description.length > api.config(api.ConfigParams.ProposalMaxDescriptionLength).toInt)
+      LimitExceeded
     else
       OK
   }
 
-  /**
+    /**
    * Tells cost of next theme purchase
    */
 //  def costOfPurchasingQuestProposal = {
@@ -168,15 +170,14 @@ trait ProposingQuests { this: UserLogic =>
   /**
    *
    */
-  def getCooldownForQuestCreation: Date = {
+  def getCoolDownForQuestCreation: Date = {
     import com.github.nscala_time.time.Imports._
     import org.joda.time.DateTime
 
-    // TODO: it should return 7 all the time.
-    val daysToSkipt = questProposalPeriod(user.profile.publicProfile.level)
+    val daysToSkip = questProposalPeriod(user.profile.publicProfile.level)
 
     val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + daysToSkipt.days).hour(constants.FlipHour).minute(0).second(0) toDate ()
+    (DateTime.now(tz) + daysToSkip.days).hour(constants.FlipHour).minute(0).second(0) toDate ()
   }
 
   /**

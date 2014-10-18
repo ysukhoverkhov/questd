@@ -57,7 +57,7 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
           assets = Assets(100000, 100000, 1000000),
           rights = Rights.full))
 
-      val t1 = u1.getCooldownForQuestCreation
+      val t1 = u1.getCoolDownForQuestCreation
 
       val u2 = User(
         id = "",
@@ -66,7 +66,7 @@ class UserLogicSpecs extends BaseUserLogicSpecs {
           assets = Assets(100000, 100000, 1000000),
           rights = Rights.full))
 
-      val t2 = u2.getCooldownForQuestCreation
+      val t2 = u2.getCoolDownForQuestCreation
 
       t2.before(t1) must beEqualTo(true)
     }

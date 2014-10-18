@@ -45,5 +45,7 @@ object Rights {
     SubmitReviewsForResults,
     SubmitReviewsForProposals,
     GiveRewards))
+
+  val none: Rights = Rights(Set())
 }
 

@@ -13,7 +13,7 @@ class UserLogic(
     val rand: RandomComponent#Random)
 
     extends CalculatingRights
-    with ProposingQuests
+    with CreatingQuests
     with SolvingQuests
     with VotingQuestProposals
     with VotingQuestSolutions

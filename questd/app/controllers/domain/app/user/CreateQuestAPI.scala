@@ -20,65 +20,53 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
    */
   def createQuest(request: CreateQuestRequest): ApiResult[CreateQuestResult] = handleDbException {
 
-    /* TODO: list of tests to create:
-      1. Can create quest in normal situation.
-      2. Unable to create Quest in lack of rights.
-      3. unable to create quest in cool down.
-      4. description length is checked.
-     */
-
-    request.user.canProposeQuest(request.quest.media.contentType) match {
+    request.user.canCreateQuest(request.quest) match {
       case OK =>
 
-        if (request.quest.description.length > api.config(api.ConfigParams.ProposalMaxDescriptionLength).toInt) {
-          OkApiResult(CreateQuestResult(LimitExceeded, None))
+        def content = if (request.user.payedAuthor) {
+          request.quest
         } else {
+          request.quest
+        }
 
-          def content = if (request.user.payedAuthor) {
-            request.quest
-          } else {
-            request.quest
-          }
+        {
+          makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.CreateQuest)))
+        } ifOk { r =>
+          r.user.demo.cultureId ifSome { culture =>
 
-          {
-            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.CreateQuest)))
-          } ifOk { r =>
-              r.user.demo.cultureId ifSome { culture =>
+            val quest = Quest(
+              cultureId = culture,
+              info = QuestInfo(
+                authorId = r.user.id,
+                content = content,
+                vip = r.user.profile.publicProfile.vip))
 
-                val quest = Quest(
-                  cultureId = culture,
-                  info = QuestInfo(
-                    authorId = r.user.id,
-                    content = content,
-                    vip = r.user.profile.publicProfile.vip))
+            db.quest.create(quest)
 
-                db.quest.create(quest)
+            (if ((config(api.ConfigParams.DebugDisableProposalCooldown) == "1") || r.user.profile.publicProfile.vip) {
+              db.user.updateQuestCreationCoolDown(
+                request.user.id,
+                request.user.getCoolDownForQuestCreation)
+            } else {
+              Some(request.user)
+            }) ifSome { u =>
 
-                (if ((config(api.ConfigParams.DebugDisableProposalCooldown) == "1") || r.user.profile.publicProfile.vip) {
-                  db.user.updateQuestCreationCoolDown(
-                    request.user.id,
-                    request.user.getCooldownForQuestCreation)
-                } else {
-                  Some(request.user)
-                }) ifSome { u =>
-
-                  {
-                    addToTimeLine(AddToTimeLineRequest(
-                      user = u,
-                      reason = TimeLineReason.Created,
-                      objectType = TimeLineType.Quest,
-                      objectId = quest.id))
-                  } ifOk { r =>
-                    addToWatchersTimeLine(AddToWatchersTimeLineRequest(
-                      user = u,
-                      reason = TimeLineReason.Created,
-                      objectType = TimeLineType.Quest,
-                      objectId = quest.id))
-                  } ifOk { r =>
-                    OkApiResult(CreateQuestResult(OK, Some(r.user.profile)))
-                  }
-                }
+              {
+                addToTimeLine(AddToTimeLineRequest(
+                  user = u,
+                  reason = TimeLineReason.Created,
+                  objectType = TimeLineType.Quest,
+                  objectId = quest.id))
+              } ifOk { r =>
+                addToWatchersTimeLine(AddToWatchersTimeLineRequest(
+                  user = u,
+                  reason = TimeLineReason.Created,
+                  objectType = TimeLineType.Quest,
+                  objectId = quest.id))
+              } ifOk { r =>
+                OkApiResult(CreateQuestResult(OK, Some(r.user.profile)))
               }
+            }
           }
         }
 

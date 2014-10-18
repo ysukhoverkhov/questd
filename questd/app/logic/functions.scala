@@ -28,7 +28,7 @@ object functions {
   /**
    * Period in days to give players a task to make quest.
    */
-  def questProposalPeriod(level: Int): Int = math.round(ratingForProposalAtLevel(level).toFloat / ratingForSubmitProposal(level).toFloat)
+  def questProposalPeriod(level: Int): Int = 7
 
   /**
    * Cost to skip a single theme for proposal.
