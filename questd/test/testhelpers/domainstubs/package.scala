@@ -88,6 +88,21 @@ package object domainstubs {
       lastModDate = lastModDate)
   }
 
+  def createTimeLineEntryStub(
+    reason: TimeLineReason.Value = TimeLineReason.Created,
+    entryAuthorId: String = "authorId",
+    objectType: TimeLineType.Value = TimeLineType.Quest,
+    objectId: String = "objectId",
+    ourVote: Option[ContentVote.Value] = None) = {
+    TimeLineEntry(
+      reason = reason,
+      entryAuthorId = entryAuthorId,
+      objectType = objectType,
+      objectId = objectId,
+      ourVote = ourVote
+    )
+  }
+
   def createUserStub(
     id: String = "uid",
     cultureId: String = "cultureId",
@@ -100,7 +115,8 @@ package object domainstubs {
     level: Int = 18,
     questCreationCoolDown: Date = new Date(Long.MaxValue),
     takenTheme: Option[ThemeInfoWithID] = Some(ThemeInfoWithID("theme_id", createThemeStub().info)),
-    rights: Rights = Rights.full) = {
+    rights: Rights = Rights.full,
+    timeLine: List[TimeLineEntry] = List()) = {
 
     User(
       id = id,
@@ -124,7 +140,8 @@ package object domainstubs {
             gender = Gender.Male)),
         rights = rights),
       friends = friends,
-      mustVoteSolutions = mustVoteSolutions)
+      mustVoteSolutions = mustVoteSolutions,
+      timeLine = timeLine)
   }
 
 }

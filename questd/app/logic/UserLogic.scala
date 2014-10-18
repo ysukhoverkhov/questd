@@ -15,7 +15,7 @@ class UserLogic(
     extends CalculatingRights
     with CreatingQuests
     with SolvingQuests
-    with VotingQuestProposals
+    with VotingQuests
     with VotingQuestSolutions
     with DailyResults
     with Friends

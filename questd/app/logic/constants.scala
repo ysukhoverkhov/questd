@@ -16,7 +16,7 @@ object constants {
     Functionality.InviteFriends -> 6,
     Functionality.SubmitPhotoQuests -> 7,
     Functionality.SubmitVideoQuests -> 8,
-    Functionality.VoteQuestProposals -> 10,
+    Functionality.VoteQuests -> 10,
     Functionality.VoteReviews -> 14,
     Functionality.SubmitReviewsForResults -> 16,
     Functionality.SubmitReviewsForProposals -> 18,

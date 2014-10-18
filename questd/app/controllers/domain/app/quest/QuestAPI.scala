@@ -19,7 +19,7 @@ case class TakeQuestUpdateResult()
 
 case class VoteQuestUpdateRequest(
   quest: Quest,
-  vote: QuestProposalVote.Value)
+  vote: ContentVote.Value)
 case class VoteQuestUpdateResult()
 
 case class CalculateProposalThresholdsRequest(proposalsVoted: Double, proposalsLiked: Double)
@@ -143,7 +143,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
    */
   def voteQuest(request: VoteQuestUpdateRequest): ApiResult[VoteQuestUpdateResult] = handleDbException {
     import request._
-    import models.domain.QuestProposalVote._
+    import models.domain.ContentVote._
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
@@ -153,35 +153,8 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       checkInc(vote, Cool),
       1,
       checkInc(vote, Cheating),
-
       checkInc(vote, IASpam),
       checkInc(vote, IAPorn))
-
-    // TODO: increase points for the quest if liked.
-
-//    val q2 = if (vote == QuestProposalVote.Cool) {
-//
-//      db.quest.updatePoints(
-//        quest.id,
-//        0,
-//        0,
-//        0,
-//
-//        0,
-//        0,
-//
-//        checkInc(difficulty, QuestDifficulty.Easy),
-//        checkInc(difficulty, QuestDifficulty.Normal),
-//        checkInc(difficulty, QuestDifficulty.Hard),
-//        checkInc(difficulty, QuestDifficulty.Extreme),
-//
-//        checkInc(duration, QuestDuration.Minutes),
-//        checkInc(duration, QuestDuration.Hour),
-//        checkInc(duration, QuestDuration.Day),
-//        checkInc(duration, QuestDuration.Week))
-//    } else {
-//      q
-//    }
 
     q ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))

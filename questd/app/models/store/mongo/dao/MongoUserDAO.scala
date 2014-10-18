@@ -117,41 +117,24 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
-  def selectQuestProposalVote(id: String, questInfo: QuestInfoWithID, themeInfo: ThemeInfoWithID): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$set" -> MongoDBObject(
-          "profile.questProposalVoteContext.reviewingQuest" -> grater[QuestInfoWithID].asDBObject(questInfo),
-          "profile.questProposalVoteContext.themeOfQuest" -> grater[ThemeInfoWithID].asDBObject(themeInfo)),
-        "$inc" -> MongoDBObject(
-          "stats.proposalsVoted" -> 1)))
-  }
-
-  /**
-   *
-   */
-  def recordQuestProposalVote(id: String, questId: String, liked: Boolean): Option[User] = {
+  def recordQuestProposalVote(id: String, questId: String, vote: ContentVote.Value): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (liked) {
+    // TODO: just record vote in timeline and that's it.
+
+    if (vote == ContentVote.Cool) {
       queryBuilder += ("$push" -> MongoDBObject(
         "history.votedQuestProposalIds.0" -> questId,
         "history.likedQuestProposalIds.0" -> questId))
+
+      queryBuilder += ("$inc" -> MongoDBObject(
+        "stats.proposalsLiked" -> 1))
     } else {
       queryBuilder += ("$push" -> MongoDBObject(
         "history.votedQuestProposalIds.0" -> questId))
     }
-
-    queryBuilder += ("$inc" -> MongoDBObject(
-      "profile.questProposalVoteContext.numberOfReviewedQuests" -> 1,
-      "stats.proposalsLiked" -> (if (liked) 1 else 0)))
-
-    queryBuilder += ("$unset" -> MongoDBObject(
-      "profile.questProposalVoteContext.reviewingQuest" -> "",
-      "profile.questProposalVoteContext.themeOfQuest" -> ""))
 
     findAndModify(
       id,

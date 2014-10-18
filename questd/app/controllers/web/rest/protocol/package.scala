@@ -117,7 +117,7 @@ package object protocol {
    * ********************
    */
 
-  case class WSQuestProposalVoteRequest(
+  case class WSVoteQuestRequest(
 
     questId: String,
 
@@ -126,9 +126,7 @@ package object protocol {
      */
     vote: String)
 
-  type WSGetQuestProposalToVoteResult = GetQuestProposalToVoteResult
-
-  type WSVoteQuestProposalResult = VoteQuestProposalResult
+  type WSVoteQuestResult = VoteQuestByUserResult
 
   /**
    * ********************

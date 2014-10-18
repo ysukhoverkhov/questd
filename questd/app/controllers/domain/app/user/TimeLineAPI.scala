@@ -19,7 +19,8 @@ case class AddToWatchersTimeLineRequest(
   user: User,
   reason: TimeLineReason.Value,
   objectType: TimeLineType.Value,
-  objectId: String)
+  objectId: String,
+  entryAuthorId: Option[String] = None)
 case class AddToWatchersTimeLineResult(user: User)
 
 case class GetTimeLineRequest(
@@ -61,7 +62,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
       user.friends.map(_.friendId) ::: user.followers,
       TimeLineEntry(
         reason = reason,
-        entryAuthorId = user.id,
+        entryAuthorId = entryAuthorId.getOrElse(user.id),
         objectType = objectType,
         objectId = objectId))
 

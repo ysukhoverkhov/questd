@@ -149,7 +149,7 @@ object functions {
    * Number of rewarded proposal votes per level.
    */
   def rewardedProposalVotesPerLevel(level: Int): Int = {
-    math.floor(4 * math.pow(level + 1 - levelFor(VoteQuestProposals), 0.39)).toInt
+    math.floor(4 * math.pow(level + 1 - levelFor(VoteQuests), 0.39)).toInt
   }
 
   /**

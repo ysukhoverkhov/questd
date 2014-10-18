@@ -18,15 +18,21 @@ trait UserDAO extends BaseDAO[User] {
   def populateMustVoteSolutionsList(userIds: List[String], solutionId: String): Unit
   def removeMustVoteSolution(id: String, solutionId: String): Option[User]
 
-  def selectQuestProposalVote(id: String, questInfo: QuestInfoWithID, themeInfo: ThemeInfoWithID): Option[User]
-  def recordQuestProposalVote(id: String, questId: String, liked: Boolean): Option[User]
+  /**
+   * Records vote for quest proposal.
+   * @param id Id of user maing a vote.
+   * @param questId id of quest we vote for.
+   * @param vote our vote.
+   * @return Modified user.
+   */
+  def recordQuestProposalVote(id: String, questId: String, vote: ContentVote.Value): Option[User]
 
   def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: PublicProfileWithID, defeatReward: Assets, victoryReward: Assets): Option[User]
   def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User]
   def resetQuestSolution(id: String, shouldResetCooldown: Boolean): Option[User]
 
   /**
-   *
+   * Updates cool down for inventing quests.
    * @param id If of a user to update for.
    * @param coolDown New cool down date.
    * @return Modified user.

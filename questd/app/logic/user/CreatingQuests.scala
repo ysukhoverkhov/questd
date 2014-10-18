@@ -12,7 +12,7 @@ import models.domain.ContentType._
  * All logic related to proposing quests.
  */
 trait CreatingQuests { this: UserLogic =>
-
+// TODO: clean me up.
   /**
    * Check is the user can purchase quest proposals.
    */

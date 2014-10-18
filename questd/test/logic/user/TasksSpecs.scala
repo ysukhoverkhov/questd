@@ -112,7 +112,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
       val dailyResult = u.getTasksForTomorrow
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuestProposals)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuests)
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(3) // 90% from 4
     }

@@ -8,7 +8,7 @@ object Functionality extends Enumeration {
   val Report = Value
   val InviteFriends = Value
   val AddToFollowing = Value
-  val VoteQuestProposals = Value
+  val VoteQuests = Value
   val SubmitPhotoQuests = Value
   val SubmitVideoQuests = Value
   val VoteReviews = Value
@@ -38,7 +38,7 @@ object Rights {
     Report,
     InviteFriends,
     AddToFollowing,
-    VoteQuestProposals,
+    VoteQuests,
     SubmitPhotoQuests,
     SubmitVideoQuests,
     VoteReviews,

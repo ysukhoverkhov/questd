@@ -31,7 +31,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     with StatsAPI
     with CreateQuestAPI
     with SolveQuestAPI
-    with VoteQuestProposalAPI
+    with VoteQuestAPI
     with VoteQuestSolutionAPI
     with ContentAPI
     with FollowingAPI
