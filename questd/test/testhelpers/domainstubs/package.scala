@@ -107,7 +107,7 @@ package object domainstubs {
     id: String = "uid",
     cultureId: String = "cultureId",
     vip: Boolean = false,
-    likedQuestProposalIds: List[List[String]] = List(),
+    likedQuestProposalIds: List[List[String]] = List(List("", ""), List("", "")),
     friends: List[Friendship] = List(),
     assets: Assets = Assets(1000000, 1000000, 1000000),
     mustVoteSolutions: List[String] = List(),

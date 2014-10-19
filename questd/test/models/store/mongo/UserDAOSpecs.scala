@@ -4,10 +4,12 @@ package models.store.mongo
 
 import java.util.Date
 
+import com.mongodb.BasicDBList
 import models.domain._
 import models.store._
 import org.specs2.mutable._
 import play.api.test._
+import testhelpers.domainstubs._
 
 //@RunWith(classOf[JUnitRunner])
 class UserDAOSpecs
@@ -105,93 +107,31 @@ class UserDAOSpecs
       u must beNone
     }
 
-    // TODO: clean m up.
-//    "Purchase quest theme with sample quest" in new WithApplication(appWithTestDatabase) {
-//      val userId = "lalala2"
-//      val themeid = "themeid"
-//      val questdescr = "questdescr"
-//      val rew = Assets(1, 2, 3)
-//
-//      db.user.create(User(userId))
-//      db.user.purchaseQuestTheme(
-//        userId,
-//        ThemeInfoWithID(themeid, createThemeStub().info),
-//        Some(QuestInfo("authorId", "themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
-//        rew)
-//
-//      val ou = db.user.readById(userId)
-//
-//      ou must beSome.which((u: User) => u.id.toString == userId)
-//
-//      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeInfoWithID) => t.id == themeid) and
-//        beSome.which((t: ThemeInfoWithID) => t.id == themeid)
-//
-//      ou.get.profile.questProposalContext.sampleQuest must beSome.which((q: QuestInfo) => q.content.description == questdescr)
-//
-//      ou.get.profile.questProposalContext.approveReward must beEqualTo(rew)
-//
-//      ou.get.profile.questProposalContext.numberOfPurchasedThemes must beEqualTo(1)
-//
-//      ou.get.profile.questProposalContext.todayReviewedThemeIds must contain(themeid)
-//    }
-//
-//    "Purchase quest theme without sample quest" in new WithApplication(appWithTestDatabase) {
-//      val userId = "lalala3"
-//      val themeid = "themeid"
-//      val questdescr = "questdescr"
-//      val rew = Assets(1, 2, 3)
-//
-//      db.user.create(User(userId))
-//      db.user.purchaseQuestTheme(
-//        userId,
-//        ThemeInfoWithID(themeid, createThemeStub().info),
-//        Some(QuestInfo("authorId", "themeId", QuestInfoContent(ContentReference(ContentType.Photo, "storage", "reference"), None, questdescr), vip = false)),
-//        rew)
-//      db.user.purchaseQuestTheme(
-//        userId,
-//        ThemeInfoWithID(themeid, createThemeStub().info),
-//        None,
-//        rew)
-//
-//      val ou = db.user.readById(userId)
-//
-//      ou must beSome.which((u: User) => u.id.toString == userId)
-//
-//      ou.get.profile.questProposalContext.purchasedTheme must beSome.which((t: ThemeInfoWithID) => t.id == themeid) and
-//        beSome.which((t: ThemeInfoWithID) => t.id == themeid)
-//
-//      ou.get.profile.questProposalContext.sampleQuest must beNone
-//
-//      ou.get.profile.questProposalContext.approveReward must beEqualTo(rew)
-//
-//      ou.get.profile.questProposalContext.numberOfPurchasedThemes must beEqualTo(2)
-//
-//      ou.get.profile.questProposalContext.todayReviewedThemeIds must contain(themeid)
-//    }
-//
-//    "recordQuestProposalVote should remember liked proposals" in new WithApplication(appWithTestDatabase) {
-//      val userId = "rememberProposalVotingInHistory"
-//      val q1id = "q1id"
-//      val q2id = "q2id"
-//
-//      db.user.create(User(userId))
-//
-//      db.user.recordQuestProposalVote(userId, q1id, liked = true)
-//      db.user.recordQuestProposalVote(userId, q2id, liked = false)
-//
-//      val ou = db.user.readById(userId)
-//      ou must beSome.which((u: User) => u.id.toString == userId && u.profile.questProposalVoteContext.numberOfReviewedQuests == 2)
-//
-//      val arr1 = ou.get.history.likedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray.collect { case s: String => s}
-//      arr1.size must beEqualTo(3) // 2 is "", "" stub in list of lists.
-//      arr1(2) must beEqualTo(q1id)
-//
-//      val arr2 = ou.get.history.votedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray.collect { case s: String => s}
-//      arr2.size must beEqualTo(4) // 2 is "", "" stub in list of lists.
-//      arr2(2) must beEqualTo(q1id)
-//      arr2(3) must beEqualTo(q2id)
-//    }
-//
+    "recordQuestProposalVote should remember liked proposals" in new WithApplication(appWithTestDatabase) {
+      val entry1 = createTimeLineEntryStub()
+      val entry2 = createTimeLineEntryStub()
+      val user = createUserStub(timeLine = List(entry1, entry2))
+
+      db.user.create(user)
+
+      db.user.recordQuestVote(user.id, entry1.objectId, ContentVote.Cool)
+      db.user.recordQuestVote(user.id, entry2.objectId, ContentVote.Cheating)
+
+      val ou = db.user.readById(user.id)
+      val arr1 = ou.get.history.likedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray.collect { case s: String => s}
+      arr1.size must beEqualTo(3) // 2 is "", "" stub in list of lists.
+      arr1(2) must beEqualTo(entry1.objectId)
+
+      val arr2 = ou.get.history.votedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray.collect { case s: String => s}
+      arr2.size must beEqualTo(4) // 2 is "", "" stub in list of lists.
+      arr2(2) must beEqualTo(entry1.objectId)
+      arr2(3) must beEqualTo(entry2.objectId)
+
+      val tl = ou.get.timeLine
+      tl.filter(_.ourVote == ContentVote.Cool) must beEqualTo(List(entry1))
+      tl.filter(_.ourVote == ContentVote.Cheating) must beEqualTo(List(entry2))
+    }
+
 //    "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {
 //      val userId = "takeQuest2"
 //      val themeId = "tid"

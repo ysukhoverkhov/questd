@@ -119,10 +119,10 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def recordQuestProposalVote(id: String, questId: String, vote: ContentVote.Value): Option[User] = {
+  def recordQuestVote(id: String, questId: String, vote: ContentVote.Value): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 
-    // TODO: just record vote in timeline and that's it.
+    // TODO: perhaps change it to "recordTimelineVote"
 
     if (vote == ContentVote.Cool) {
       queryBuilder += ("$push" -> MongoDBObject(
@@ -135,10 +135,19 @@ private[mongo] class MongoUserDAO
       queryBuilder += ("$push" -> MongoDBObject(
         "history.votedQuestProposalIds.0" -> questId))
     }
+    queryBuilder += ("$set" -> MongoDBObject(
+      "timeLine.$.ourVote" -> vote.toString))
 
-    findAndModify(
-      id,
+    val u = findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "timeLine.objectId" -> questId),
       queryBuilder.result())
+
+    play.Logger.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    play.Logger.error(u.get.timeLine.toString())
+
+    u
   }
 
   /**

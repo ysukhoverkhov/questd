@@ -24,10 +24,9 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
 
     /*
     TODO: tests:
+    6. test user.recordQuestProposalVote
     3. voting for quest increase its point.
     3. quest we liked added to watcher's time line.
-    6. test user.recordQuestProposalVote
-    6. test it's added to watchers time line.
     8. put to user's time line if quests were banned.
      */
 
@@ -40,7 +39,7 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
           } ifOk { r =>
             makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuests)))
           } ifOk { r =>
-            db.user.recordQuestProposalVote(r.user.id, q.id, request.vote) ifSome { u =>
+            db.user.recordQuestVote(r.user.id, q.id, request.vote) ifSome { u =>
 
               (if (request.vote == ContentVote.Cool) {
                 addToWatchersTimeLine(AddToWatchersTimeLineRequest(
