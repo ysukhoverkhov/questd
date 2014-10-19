@@ -34,7 +34,6 @@ private[mongo] class MongoQuestDAO
     skip: Int = 0,
     vip: Option[Boolean] = None,
     ids: List[String] = List(),
-    themeIds: List[String] = List(),
     cultureId: Option[String] = None): Iterator[Quest] = {
 
     val queryBuilder = MongoDBObject.newBuilder
@@ -61,10 +60,6 @@ private[mongo] class MongoQuestDAO
       queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
     }
 
-    if (themeIds.length > 0) {
-      queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
-    }
-
     if (cultureId != None) {
       queryBuilder += ("cultureId" -> cultureId.get)
     }
@@ -73,7 +68,9 @@ private[mongo] class MongoQuestDAO
 
     findByExample(
       queryBuilder.result(),
-      MongoDBObject("lastModDate" -> 1),
+      MongoDBObject(
+        "rating.points" -> -1,
+        "lastModDate" -> 1),
       skip)
   }
 
@@ -84,17 +81,7 @@ private[mongo] class MongoQuestDAO
     cheatingChange: Int = 0,
 
     spamChange: Int = 0,
-    pornChange: Int = 0,
-
-    easyChange: Int = 0,
-    normalChange: Int = 0,
-    hardChange: Int = 0,
-    extremeChange: Int = 0,
-
-    minsChange: Int = 0,
-    hourChange: Int = 0,
-    dayChange: Int = 0,
-    weekChange: Int = 0): Option[Quest] = {
+    pornChange: Int = 0): Option[Quest] = {
 
     findAndModify(
       id,
@@ -105,17 +92,7 @@ private[mongo] class MongoQuestDAO
           "rating.cheating" -> cheatingChange,
 
           "rating.iacpoints.spam" -> spamChange,
-          "rating.iacpoints.porn" -> pornChange,
-
-          "rating.difficultyRating.easy" -> easyChange,
-          "rating.difficultyRating.normal" -> normalChange,
-          "rating.difficultyRating.hard" -> hardChange,
-          "rating.difficultyRating.extreme" -> extremeChange,
-
-          "rating.durationRating.mins" -> minsChange,
-          "rating.durationRating.hour" -> hourChange,
-          "rating.durationRating.day" -> dayChange,
-          "rating.durationRating.week" -> weekChange),
+          "rating.iacpoints.porn" -> pornChange),
         "$set" -> MongoDBObject(
           "lastModDate" -> new Date())))
   }

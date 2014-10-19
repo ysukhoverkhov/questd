@@ -32,7 +32,7 @@ trait VotingQuests { this: UserLogic =>
    */
   // TODO: move me to time line logic
   def getRandomQuestForTimeLine: Option[Quest] = {
-    getRandomQuest()
+    getRandomQuest
   }
 
 }

@@ -24,10 +24,10 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
 
     /*
     TODO: tests:
-    6. test user.recordQuestProposalVote
-    3. voting for quest increase its point.
+    4. selecting quest to time line decrease it's points.
     3. quest we liked added to watcher's time line.
-    8. put to user's time line if quests were banned.
+    4. banned quests should be banned.
+    5. quests by cheaters should be banned.
      */
 
     request.user.canVoteQuest(request.questId, request.vote) match {

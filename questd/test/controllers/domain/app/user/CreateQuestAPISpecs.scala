@@ -30,6 +30,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
           cultureId = "cultureId",
           info = QuestInfo(
             authorId = u.id,
+            level = 10,
             content = q.info.content,
             vip = false)))
     }
@@ -53,6 +54,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
           cultureId = "cultureId",
           info = QuestInfo(
             authorId = u.id,
+            level = 10,
             content = q.info.content,
             vip = true)))
     }

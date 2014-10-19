@@ -10,11 +10,11 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
   import scala.language.implicitConversions
 
-  def getRandomQuest(): Option[Quest] = {
+  def getRandomQuest: Option[Quest] = {
     val algorithms = List(
-      () => getQuestsWithSuperAlgorithm(),
-      () => getOtherQuests().getOrElse(List().iterator),
-      () => getAllQuests().getOrElse(List().iterator))
+      () => getQuestsWithSuperAlgorithm,
+      () => getOtherQuests.getOrElse(List().iterator),
+      () => getAllQuests.getOrElse(List().iterator))
 
     {
       algorithms.foldLeft[Option[Quest]](None)((run, fun) => {
@@ -36,21 +36,21 @@ trait QuestSelectUserLogic { this: UserLogic =>
     user.timeLine.map(_.objectId)
   }
 
-  def getQuestsWithSuperAlgorithm() = {
+  def getQuestsWithSuperAlgorithm = {
     val algorithms = List(
-      () => getTutorialQuests(),
-      () => getStartingQuests(),
-      () => getDefaultQuests())
+      () => getTutorialQuests,
+      () => getStartingQuests,
+      () => getDefaultQuests)
 
     selectFromChain(algorithms, default = List().iterator)
   }
 
-  private[user] def getTutorialQuests(): Option[Iterator[Quest]] = {
+  private[user] def getTutorialQuests: Option[Iterator[Quest]] = {
     Logger.trace("getTutorialQuests")
     None
   }
 
-  private[user] def getStartingQuests(): Option[Iterator[Quest]] = {
+  private[user] def getStartingQuests: Option[Iterator[Quest]] = {
     Logger.trace("getStartingQuests")
 
     if (user.profile.publicProfile.level > api.config(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
@@ -58,8 +58,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
     } else {
 
       val algs = List(
-        (api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests()),
-        (1.00, () => getOtherQuests()) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
+        (api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests),
+        (1.00, () => getOtherQuests) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
       selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
@@ -67,21 +67,21 @@ trait QuestSelectUserLogic { this: UserLogic =>
     }
   }
 
-  private[user] def getDefaultQuests(): Option[Iterator[Quest]] = {
+  private[user] def getDefaultQuests: Option[Iterator[Quest]] = {
     Logger.trace("getDefaultQuests")
 
     val algorithms = List(
-      (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests()),
-      (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests()),
-      (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests()),
-      (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPQuests()),
-      (1.00, () => getOtherQuests()) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
+      (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests),
+      (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests),
+      (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests),
+      (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPQuests),
+      (1.00, () => getOtherQuests) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 
     selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
   }
 
-  private[user] def getFriendsQuests() = {
+  private[user] def getFriendsQuests = {
     Logger.trace("  Returning quest from friends")
     Some(api.getFriendsQuests(GetFriendsQuestsRequest(
       user,
@@ -89,7 +89,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
       levels)).body.get.quests)
   }
 
-  private[user] def getFollowingQuests() = {
+  private[user] def getFollowingQuests = {
     Logger.trace("  Returning quest from Following")
     Some(api.getFollowingQuests(GetFollowingQuestsRequest(
       user,
@@ -97,7 +97,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
       levels)).body.get.quests)
   }
 
-  private[user] def getLikedQuests() = {
+  private[user] def getLikedQuests = {
     Logger.trace("  Returning quests we liked recently")
 
     Some(api.getLikedQuests(GetLikedQuestsRequest(
@@ -106,7 +106,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
       levels)).body.get.quests)
   }
 
-  private[user] def getVIPQuests() = {
+  private[user] def getVIPQuests = {
     Logger.trace("  Returning VIP quests")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPQuests)
@@ -115,11 +115,10 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some(api.getVIPQuests(GetVIPQuestsRequest(
       user,
       QuestStatus.InRotation,
-      levels,
-      themeIds)).body.get.quests)
+      levels)).body.get.quests)
   }
 
-  private[user] def getOtherQuests() = {
+  private[user] def getOtherQuests = {
     Logger.trace("  Returning from all quests with favorite themes")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
@@ -128,11 +127,10 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some(api.getAllQuests(GetAllQuestsRequest(
       user,
       QuestStatus.InRotation,
-      levels,
-      themeIds)).body.get.quests)
+      levels)).body.get.quests)
   }
 
-  private[user] def getAllQuests() = {
+  private[user] def getAllQuests = {
     Logger.trace("  Returning from all quests")
 
     Some(api.getAllQuests(GetAllQuestsRequest(

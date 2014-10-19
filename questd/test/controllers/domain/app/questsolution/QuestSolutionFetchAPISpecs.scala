@@ -169,7 +169,6 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         skip = any[Int],
         vip = any[Option[Boolean]],
         ids = any[List[String]],
-        themeIds = any[List[String]],
         cultureId = any[Option[String]]
       ) returns List(qu).iterator
 
@@ -197,7 +196,6 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         skip = any[Int],
         vip = any[Option[Boolean]],
         ids = any[List[String]],
-        themeIds = any[List[String]],
         cultureId = any[Option[String]])
 
       there was one(solution).allWithParams(

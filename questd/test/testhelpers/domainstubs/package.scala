@@ -30,11 +30,11 @@ package object domainstubs {
   def createQuestStub(
     id: String = "id",
     authorId: String = "authorId",
-    themeId: String = "themeId",
     status: QuestStatus.Value = QuestStatus.InRotation,
     level: Int = 10,
     vip: Boolean = false,
-    cultureId: String = "cultureId") = {
+    cultureId: String = "cultureId",
+    points: Int = 0) = {
 
     Quest(
       id = id,
@@ -50,6 +50,7 @@ package object domainstubs {
             reference = "tu"),
           icon = None,
           description = "desc")),
+      rating = QuestRating(points = points),
       status = status)
   }
 

@@ -1,6 +1,5 @@
 package logic.user
 
-import java.util.Date
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 import logic._
@@ -8,7 +7,6 @@ import logic.constants._
 import logic.functions._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
-import models.domain.view._
 import models.domain.ContentType._
 
 /**
@@ -135,25 +133,26 @@ trait SolvingQuests { this: UserLogic =>
     Assets(coins = coinsToInviteFriendForVoteQuestSolution(user.profile.publicProfile.level))
   }
 
-  /**
-   * Cooldown for taking quest.
-   */
-  def getCooldownForTakeQuest(qi: QuestInfo) = {
-    val daysToSkipt = qi.daysDuration
+  // TODO: clean me up.
+//  /**
+//   * Cooldown for taking quest.
+//   */
+//  def getCooldownForTakeQuest(qi: QuestInfo) = {
+//    val daysToSkipt = qi.daysDuration
+//
+//    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
+//    (DateTime.now(tz) + daysToSkipt.days).hour(constants.FlipHour).minute(0).second(0) toDate ()
+//  }
 
-    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + daysToSkipt.days).hour(constants.FlipHour).minute(0).second(0) toDate ()
-  }
-
-  /**
-   * Time to solve quest.
-   */
-  def getDeadlineForTakeQuest(qi: QuestInfo) = {
-    val minutesToSolveQuest = qi.minutesDuration
-
-    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + minutesToSolveQuest.minutes) toDate ()
-  }
+//  /**
+//   * Time to solve quest.
+//   */
+//  def getDeadlineForTakeQuest(qi: QuestInfo) = {
+//    val minutesToSolveQuest = qi.minutesDuration
+//
+//    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
+//    (DateTime.now(tz) + minutesToSolveQuest.minutes) toDate ()
+//  }
 
   /**
    * Cooldown for reseting purchases. Purchases should be reset in nearest 5am at user's time.
@@ -175,16 +174,18 @@ trait SolvingQuests { this: UserLogic =>
 
   /**
    * Reward for lost quest.
-   */
+   */ // TODO: implement me.
   def rewardForLosingQuest(quest: Quest) = {
-    Assets(rating = ratingToLoseQuest(user.profile.publicProfile.level, quest.info.daysDuration)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+//    Assets(rating = ratingToLoseQuest(user.profile.publicProfile.level, quest.info.daysDuration)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+    Assets()
   }
 
   /**
    * Reward for won quest.
-   */
+   */ // TODO: implement me.
   def rewardForWinningQuest(quest: Quest) = {
-    Assets(rating = ratingToWinQuest(user.profile.publicProfile.level, quest.info.daysDuration)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+//    Assets(rating = ratingToWinQuest(user.profile.publicProfile.level, quest.info.daysDuration)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+    Assets()
   }
 
   /**

@@ -26,7 +26,6 @@ trait QuestDAO extends BaseDAO[Quest] {
     skip: Int = 0,
     vip: Option[Boolean] = None,
     ids: List[String] = List(),
-    themeIds: List[String] = List(),
     cultureId: Option[String] = None): Iterator[Quest]
 
   /**
@@ -38,17 +37,7 @@ trait QuestDAO extends BaseDAO[Quest] {
     votersCountChange: Int,
     cheatingChange: Int = 0,
     spamChange: Int = 0,
-    pornChange: Int = 0,
-
-    easyChange: Int = 0,
-    normalChange: Int = 0,
-    hardChange: Int = 0,
-    extremeChange: Int = 0,
-
-    minsChange: Int = 0,
-    hourChange: Int = 0,
-    dayChange: Int = 0,
-    weekChange: Int = 0): Option[Quest]
+    pornChange: Int = 0): Option[Quest]
 
   def updateStatus(id: String, newStatus: String): Option[Quest]
 

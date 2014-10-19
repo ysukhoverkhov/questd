@@ -38,6 +38,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
               cultureId = culture,
               info = QuestInfo(
                 authorId = r.user.id,
+                level = r.user.profile.publicProfile.level,
                 content = content,
                 vip = r.user.profile.publicProfile.vip))
 

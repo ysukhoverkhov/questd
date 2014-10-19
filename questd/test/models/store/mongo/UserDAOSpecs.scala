@@ -108,8 +108,8 @@ class UserDAOSpecs
     }
 
     "recordQuestProposalVote should remember liked proposals" in new WithApplication(appWithTestDatabase) {
-      val entry1 = createTimeLineEntryStub()
-      val entry2 = createTimeLineEntryStub()
+      val entry1 = createTimeLineEntryStub(objectId = "oid1")
+      val entry2 = createTimeLineEntryStub(objectId = "oid2")
       val user = createUserStub(timeLine = List(entry1, entry2))
 
       db.user.create(user)
@@ -128,8 +128,8 @@ class UserDAOSpecs
       arr2(3) must beEqualTo(entry2.objectId)
 
       val tl = ou.get.timeLine
-      tl.filter(_.ourVote == ContentVote.Cool) must beEqualTo(List(entry1))
-      tl.filter(_.ourVote == ContentVote.Cheating) must beEqualTo(List(entry2))
+      tl.filter(_.ourVote == Some(ContentVote.Cool)).map(_.id) must beEqualTo(List(entry1.id))
+      tl.filter(_.ourVote == Some(ContentVote.Cheating)).map(_.id) must beEqualTo(List(entry2.id))
     }
 
 //    "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {

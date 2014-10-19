@@ -27,24 +27,24 @@ case class CalculateProposalThresholdsResult()
 
 private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
-  /**
-   * User has skipped a quest. Update quest stats accordingly.
-   */
-  def skipQuest(request: SkipQuestRequest): ApiResult[SkipQuestResult] = handleDbException {
-    import request._
-
-    {
-      db.quest.updatePoints(quest.id, -1, 1)
-    } ifSome { v =>
-      updateQuestStatus(UpdateQuestStatusRequest(v))
-    } ifOk {
-      OkApiResult(SkipQuestResult())
-    }
-  }
+//  /**
+//   * User has skipped a quest. Update quest stats accordingly.
+//   */// TODO: remove me.
+//  def skipQuest(request: SkipQuestRequest): ApiResult[SkipQuestResult] = handleDbException {
+//    import request._
+//
+//    {
+//      db.quest.updatePoints(quest.id, -1, 1)
+//    } ifSome { v =>
+//      updateQuestStatus(UpdateQuestStatusRequest(v))
+//    } ifOk {
+//      OkApiResult(SkipQuestResult())
+//    }
+//  }
 
   /**
    * Updates quest status taking votes into account.
-   */
+   */ // TODO: implement me.
   def updateQuestStatus(request: UpdateQuestStatusRequest): ApiResult[UpdateQuestStatusResult] = handleDbException {
     import request._
 
@@ -123,20 +123,20 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     }
   }
 
-  /**
-   * Update quest params on taking quest.
-   */
-  def takeQuestUpdate(request: TakeQuestUpdateRequest): ApiResult[TakeQuestUpdateResult] = handleDbException {
-    import request._
-
-    {
-      db.quest.updatePoints(quest.id, ratio, 1)
-    } ifSome { v =>
-      updateQuestStatus(UpdateQuestStatusRequest(v))
-    } ifOk {
-      OkApiResult(TakeQuestUpdateResult())
-    }
-  }
+//  /**
+//   * Update quest params on taking quest.
+//   */ // TODO: remove me.
+//  def takeQuestUpdate(request: TakeQuestUpdateRequest): ApiResult[TakeQuestUpdateResult] = handleDbException {
+//    import request._
+//
+//    {
+//      db.quest.updatePoints(quest.id, ratio, 1)
+//    } ifSome { v =>
+//      updateQuestStatus(UpdateQuestStatusRequest(v))
+//    } ifOk {
+//      OkApiResult(TakeQuestUpdateResult())
+//    }
+//  }
 
   /**
    * Updates quest according to vote.
@@ -147,7 +147,6 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
-    // TODO: review it.
     val q = db.quest.updatePoints(
       quest.id,
       checkInc(vote, Cool),
