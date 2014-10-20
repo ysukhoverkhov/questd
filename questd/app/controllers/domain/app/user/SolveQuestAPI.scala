@@ -8,7 +8,6 @@ import controllers.domain.helpers._
 import controllers.domain._
 import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.domain.app.quest._
 
 case class GetQuestCostRequest(user: User)
 case class GetQuestCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)

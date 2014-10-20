@@ -22,20 +22,12 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
    */
   def voteQuestByUser(request: VoteQuestByUserRequest): ApiResult[VoteQuestByUserResult] = handleDbException {
 
-    /*
-    TODO: tests:
-    4. selecting quest to time line decrease it's points.
-    3. quest we liked added to watcher's time line.
-    4. banned quests should be banned.
-    5. quests by cheaters should be banned.
-     */
-
     request.user.canVoteQuest(request.questId, request.vote) match {
       case OK =>
 
         db.quest.readById(request.questId) ifSome { q =>
           {
-            voteQuest(VoteQuestUpdateRequest(q, request.vote))
+            voteQuest(VoteQuestRequest(q, request.vote))
           } ifOk { r =>
             makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuests)))
           } ifOk { r =>

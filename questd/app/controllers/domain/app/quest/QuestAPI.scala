@@ -11,36 +11,21 @@ import play.Logger
 case class UpdateQuestStatusRequest(quest: Quest)
 case class UpdateQuestStatusResult()
 
-case class SkipQuestRequest(quest: Quest)
-case class SkipQuestResult()
+case class SelectQuestToTimeLineRequest(quest: Quest)
+case class SelectQuestToTimeLineResult()
 
 case class TakeQuestUpdateRequest(quest: Quest, ratio: Int)
 case class TakeQuestUpdateResult()
 
-case class VoteQuestUpdateRequest(
+case class VoteQuestRequest(
   quest: Quest,
   vote: ContentVote.Value)
-case class VoteQuestUpdateResult()
+case class VoteQuestResult()
 
 case class CalculateProposalThresholdsRequest(proposalsVoted: Double, proposalsLiked: Double)
 case class CalculateProposalThresholdsResult()
 
 private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
-
-//  /**
-//   * User has skipped a quest. Update quest stats accordingly.
-//   */// TODO: remove me.
-//  def skipQuest(request: SkipQuestRequest): ApiResult[SkipQuestResult] = handleDbException {
-//    import request._
-//
-//    {
-//      db.quest.updatePoints(quest.id, -1, 1)
-//    } ifSome { v =>
-//      updateQuestStatus(UpdateQuestStatusRequest(v))
-//    } ifOk {
-//      OkApiResult(SkipQuestResult())
-//    }
-//  }
 
   /**
    * Updates quest status taking votes into account.
@@ -123,6 +108,21 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     }
   }
 
+  /**
+   * Quest was randomly selected for time line, update its stats accordingly
+   */
+  def selectQuestToTimeLine(request: SelectQuestToTimeLineRequest): ApiResult[SelectQuestToTimeLineResult] = handleDbException {
+    import request._
+
+    {
+      db.quest.updatePoints(quest.id, -1)
+    } ifSome { v =>
+      updateQuestStatus(UpdateQuestStatusRequest(v))
+    } ifOk {
+      OkApiResult(SelectQuestToTimeLineResult())
+    }
+  }
+
 //  /**
 //   * Update quest params on taking quest.
 //   */ // TODO: remove me.
@@ -141,7 +141,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   /**
    * Updates quest according to vote.
    */
-  def voteQuest(request: VoteQuestUpdateRequest): ApiResult[VoteQuestUpdateResult] = handleDbException {
+  def voteQuest(request: VoteQuestRequest): ApiResult[VoteQuestResult] = handleDbException {
     import request._
     import models.domain.ContentVote._
 
@@ -158,7 +158,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     q ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } ifOk {
-      OkApiResult(VoteQuestUpdateResult())
+      OkApiResult(VoteQuestResult())
     }
 }
 

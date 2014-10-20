@@ -77,7 +77,7 @@ private[mongo] class MongoQuestDAO
   def updatePoints(
     id: String,
     pointsChange: Int,
-    votersCountChange: Int,
+    votersCountChange: Int = 0,
     cheatingChange: Int = 0,
 
     spamChange: Int = 0,

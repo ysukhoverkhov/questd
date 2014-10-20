@@ -1,5 +1,6 @@
 package controllers.domain.app.user
 
+import controllers.domain.app.quest.SelectQuestToTimeLineRequest
 import models.domain._
 import components._
 import controllers.domain._
@@ -87,6 +88,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def populateTimeLineWithRandomThings(request: PopulateTimeLineWithRandomThingsRequest): ApiResult[PopulateTimeLineWithRandomThingsResult] = handleDbException {
     import request._
 
+    // BATCH
     val questsCount = config(api.ConfigParams.TimeLineRandomQuestsDaily).toInt
     (1 to questsCount).foreach { x =>
       user.getRandomQuestForTimeLine match {
@@ -96,11 +98,15 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
             reason = TimeLineReason.Has,
             objectType = TimeLineType.Quest,
             objectId = q.id,
-            entryAuthorId = Some(q.info.authorId)))
+            entryAuthorId = Some(q.info.authorId))) ifOk { r =>
+
+            selectQuestToTimeLine(SelectQuestToTimeLineRequest(q))
+          }
         case None =>
       }
     }
 
+    // BATCH
     val solutionsCount = config(api.ConfigParams.TimeLineRandomSolutionsDaily).toInt
     (1 to solutionsCount).foreach { x =>
       user.getQuestSolutionForTimeLine match {
