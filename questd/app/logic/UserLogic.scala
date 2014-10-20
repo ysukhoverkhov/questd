@@ -20,6 +20,7 @@ class UserLogic(
     with DailyResults
     with Friends
     with Tasks
+    with TimeLineLogic
     with MiscUserLogic
     with QuestSelectUserLogic
     with SolutionSelectUserLogic

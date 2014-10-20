@@ -143,9 +143,12 @@ trait QuestSelectUserLogic { this: UserLogic =>
    * Tells what level we should give quests based on reason of getting quest.
    */
   private def levels: Option[(Int, Int)] = {
-    None
+    Some((
+      user.profile.publicProfile.level - TimeLineContentLevelSigma,
+      user.profile.publicProfile.level + TimeLineContentLevelSigma))
   }
 
+  // TODO: looks like it's not used.
   private def selectRandomThemes(count: Int): List[String] = {
     if (user.history.themesOfSelectedQuests.length > 0) {
       for (i <- (1 to count).toList) yield {

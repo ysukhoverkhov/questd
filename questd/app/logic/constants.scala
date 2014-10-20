@@ -2,6 +2,7 @@ package logic
 
 import models.domain._
 
+// TODO: check clean up here all constants (most of them are not used now).
 object constants {
 
   val MaxLevel = 20
@@ -26,7 +27,18 @@ object constants {
     restrictions(f)
   }
 
+  /**
+   * Misc
+   */
+
   val FlipHour = 5
+
+  /**
+   * Time line
+   */
+
+  val TimeLineContentLevelSigma = 2
+
 
   /**
    * Quest proposing.

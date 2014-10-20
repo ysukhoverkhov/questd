@@ -1,10 +1,6 @@
 package logic
 
-import components.componentregistry.ComponentRegistrySingleton
-import play.Logger
 import models.domain._
-import controllers.domain.app.user._
-import controllers.domain.OkApiResult
 import controllers.domain.DomainAPIComponent
 import java.util.Date
 
@@ -16,14 +12,14 @@ class QuestSolutionLogic(
    * We check is time come to stop voting for the solution.
    */
   def shouldStopVoting = {
-    (qs.status == QuestSolutionStatus.OnVoting.toString) && ((new Date()).after(qs.voteEndDate))
+    (qs.status == QuestSolutionStatus.OnVoting) && new Date().after(qs.voteEndDate)
   }
 
   /**
    * Should we ban quest for cheating and stop displaying it to everyone.
    */
   def shouldBanCheating = {
-    (qs.status == QuestSolutionStatus.OnVoting.toString) && {
+    (qs.status == QuestSolutionStatus.OnVoting) && {
       val votesToThreatAsCheating = Math.max(
         api.config(api.ConfigParams.SolutionCheatingRatio).toDouble * qs.rating.reviewsCount,
         api.config(api.ConfigParams.SolutionMinCheatingVotes).toLong)
