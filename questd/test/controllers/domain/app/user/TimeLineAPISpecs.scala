@@ -35,6 +35,22 @@ class TimeLineAPISpecs extends BaseAPISpecs {
       result must beEqualTo(OkApiResult(AddToWatchersTimeLineResult(user = u)))
       there was one(user).addEntryToTimeLineMulti(any, any)
     }
+
+    "getTimeLine should not return banned entries" in context {
+      val entries = List(
+        createTimeLineEntryStub(ourVote = Some(ContentVote.Cheating)),
+        createTimeLineEntryStub(ourVote = Some(ContentVote.Cool))
+      )
+
+      val u = createUserStub(timeLine = entries)
+
+      val result = api.getTimeLine(GetTimeLineRequest(
+        user = u,
+        pageNumber = 0,
+        pageSize = 20))
+
+      result must beEqualTo(OkApiResult(GetTimeLineResult(entries.tail)))
+    }
   }
 }
 

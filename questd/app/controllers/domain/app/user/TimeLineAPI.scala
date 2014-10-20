@@ -79,7 +79,13 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
-    OkApiResult(GetTimeLineResult(user.timeLine.iterator.drop(pageSize * pageNumber).take(pageSize).toList))
+    OkApiResult(GetTimeLineResult(user.timeLine.filter(
+      _.ourVote match {
+        case None => true
+        case Some(ContentVote.Cool) => true
+        case _ => false
+      }
+    ).iterator.drop(pageSize * pageNumber).take(pageSize).toList))
   }
 
   /**
