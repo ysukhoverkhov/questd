@@ -31,7 +31,7 @@ package object domainstubs {
     id: String = "id",
     authorId: String = "authorId",
     themeId: String = "themeId",
-    status: QuestStatus.Value = QuestStatus.OnVoting,
+    status: QuestStatus.Value = QuestStatus.InRotation,
     level: Int = 10,
     vip: Boolean = false,
     cultureId: String = "cultureId") = {
@@ -39,10 +39,8 @@ package object domainstubs {
     Quest(
       id = id,
       cultureId = cultureId,
-      approveReward = Assets(1, 2, 3),
       info = QuestInfo(
         authorId = authorId,
-        themeId = themeId,
         vip = vip,
         level = level,
         content = QuestInfoContent(
@@ -82,7 +80,6 @@ package object domainstubs {
         content = createSolutionInfoContent,
         vip = vip,
         authorId = userId,
-        themeId = themeId,
         questId = questId),
       status = status,
       rating = QuestSolutionRating(
@@ -112,23 +109,12 @@ package object domainstubs {
         likedQuestProposalIds = likedQuestProposalIds,
         selectedThemeIds = favThemes),
       privateDailyResults = List(DailyResult(
-        startOfPeriod = new Date(),
-        dailyAssetsDecrease = Assets())),
+        startOfPeriod = new Date())),
       profile = Profile(
         assets = assets,
         ratingToNextLevel = 100000,
-        questSolutionContext = QuestSolutionContext(
-          takenQuest = Some(QuestInfoWithID(
-            "quest_id",
-            QuestInfo(
-              authorId = "author_id",
-              themeId = "theme_id",
-              vip = false,
-              content = QuestInfoContent(ContentReference(ContentType.Photo, "", ""), None, "")))),
-          questDeadline = new Date(Long.MaxValue)),
+        questSolutionContext = QuestSolutionContext(),
         questProposalContext = QuestProposalConext(
-          approveReward = Assets(1, 2, 3),
-          takenTheme = takenTheme,
           questProposalCooldown = questProposalCooldown),
         publicProfile = PublicProfile(
           vip = vip,

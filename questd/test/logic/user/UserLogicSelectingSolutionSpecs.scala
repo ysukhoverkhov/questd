@@ -21,7 +21,7 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
     config.apply(api.ConfigParams.SolutionProbabilityStartingVIPSolutions) returns "0.50"
 
     config.apply(api.ConfigParams.SolutionProbabilityFriends) returns "0.25"
-    config.apply(api.ConfigParams.SolutionProbabilityShortlist) returns "0.25"
+    config.apply(api.ConfigParams.SolutionProbabilityFollowing) returns "0.25"
     config.apply(api.ConfigParams.SolutionProbabilityLiked) returns "0.20"
     config.apply(api.ConfigParams.SolutionProbabilityStar) returns "0.10"
 
@@ -53,20 +53,20 @@ class UserLogicSelectingSolutionSpecs extends BaseUserLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
-    "Return solution from shortlist if dice rolls so" in {
+    "Return solution from following if dice rolls so" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.38
 
       val qid = "qid"
 
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
-      api.getShortlistSolutions(any[GetShortlistSolutionsRequest]) returns OkApiResult(GetShortlistSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
+      api.getFollowingSolutions(any[GetFollowingSolutionsRequest]) returns OkApiResult(GetFollowingSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 
       val u = User()
       val q = u.getRandomSolution
 
       there was one(rand).nextDouble
-      there was one(api).getShortlistSolutions(any[GetShortlistSolutionsRequest])
+      there was one(api).getFollowingSolutions(any[GetFollowingSolutionsRequest])
 
       q must beSome.which(q => q.id == qid)
     }

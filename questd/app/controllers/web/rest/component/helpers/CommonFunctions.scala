@@ -16,9 +16,8 @@ private[component] trait CommonFunctions { this: QuestController with SecurityWS
 
       try {
         apiCall(request) match {
-          case OkApiResult(r) => {
+          case OkApiResult(r) =>
             body(r)
-          }
 
           case NotAuthorisedApiResult() => Unauthorized(
             Json.write(WSUnauthorisedResult(UnauthorisedReason.SessionNotFound))).as(JSON)
@@ -27,12 +26,11 @@ private[component] trait CommonFunctions { this: QuestController with SecurityWS
         }
       } catch {
         case ex @ (_: MappingException | _: org.json4s.ParserUtil$ParseException) => {
-          BadRequest(ex.getMessage())
+          BadRequest(ex.getMessage)
         }
-        case ex: Throwable => {
+        case ex: Throwable =>
           Logger.error("Api calling exception", ex)
           ServerError
-        }
       }
     }
   }
@@ -48,7 +46,7 @@ private[component] trait CommonFunctions { this: QuestController with SecurityWS
     r.body.asJson.fold {
       throw new org.json4s.ParserUtil$ParseException("Empty request", null)
     } { js =>
-      jsonApiCall(js.toString, r)
+      jsonApiCall(js.toString(), r)
     }
 
   }(writeBodyInResponse)

@@ -15,6 +15,5 @@ case class QuestSolution(
   questLevel: Int,
   info: QuestSolutionInfo,
   rating: QuestSolutionRating = QuestSolutionRating(),
-  // TODO: remove = new Date() in 0.30
-  voteEndDate: Date = new Date(),
+  voteEndDate: Date,
   status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting) extends ID

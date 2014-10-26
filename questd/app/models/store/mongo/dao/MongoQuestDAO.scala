@@ -135,14 +135,12 @@ private[mongo] class MongoQuestDAO
   /**
    *
    */
-  def updateInfo(id: String, newLevel: Int, duration: String, difficulty: String): Option[Quest] = {
+  def updateInfo(id: String, newLevel: Int): Option[Quest] = {
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
           "info.level" -> newLevel,
-          "info.duration" -> duration,
-          "info.difficulty" -> difficulty,
           "lastModDate" -> new Date())))
   }
 

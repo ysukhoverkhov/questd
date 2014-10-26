@@ -1,7 +1,7 @@
 package controllers.web.rest
 
 import controllers.domain.app.user._
-import models.domain.Profile
+import models.domain.{QuestSolutionInfoContent, Profile}
 import controllers.domain.app.misc.GetTimeResult
 
 package object protocol {
@@ -129,7 +129,9 @@ package object protocol {
 
   type WSTakeQuestResult = TakeQuestResult
 
-  type WSProposeSolutionRequest = ProposeSolutionRequest
+  case class WSProposeSolutionRequest(
+    questId: String,
+    solutionContent: QuestSolutionInfoContent)
   type WSProposeSolutionResult = ProposeSolutionResult
 
   type WSGetQuestGiveUpCostResult = GetQuestGiveUpCostResult
@@ -145,20 +147,13 @@ package object protocol {
    */
 
   case class WSQuestProposalVoteRequest(
+
+    questId: String,
+
     /**
      * @see controllers.domain.user.QuestProposalVote
      */
-    vote: String,
-
-    /**
-     * @see QuestDuration
-     */
-    duration: String,
-
-    /**
-     * @see QuestDifficulty
-     */
-    difficulty: String)
+    vote: String)
 
   type WSGetQuestProposalToVoteResult = GetQuestProposalToVoteResult
 
@@ -199,6 +194,19 @@ package object protocol {
 
   case class WSGetLevelsForRightsRequest(
     functionality: List[String])
+
+  /**
+   * ********************
+   * Time Line
+   * ********************
+   */
+  type WSGetTimeLineResult = GetTimeLineResult
+  case class WSGetTimeLineRequest (
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
 
   /**
    * ********************
@@ -285,29 +293,31 @@ package object protocol {
   type WSGetQuestsForUserResult = GetQuestsForUserResult
 
   /**
-   * Shortlist
+   * Following
    */
 
-  type WSGetShortlistResult = GetShortlistResult
+  type WSGetFollowingResult = GetFollowingResult
 
-  type WSCostToShortlistResult = CostToShortlistResult
+  type WSGetFollowersResult = GetFollowersResult
 
-  case class WSAddToShortlistRequest(
+  type WSCostToFollowingResult = CostToFollowingResult
+
+  case class WSAddToFollowingRequest(
     /// Id of a person to add.
     id: String)
 
-  type WSAddToShortlistResult = AddToShortlistResult
+  type WSAddToFollowingResult = AddToFollowingResult
 
-  case class WSRemoveFromShortlistRequest(
+  case class WSRemoveFromFollowingRequest(
     /// Id of a person to remove.
     id: String)
 
-  type WSRemoveFromShortlistResult = RemoveFromShortlistResult
+  type WSRemoveFromFollowingResult = RemoveFromFollowingResult
 
-  case class WSGetSuggestsForShortlistRequest(
+  case class WSGetSuggestsForFollowingRequest(
     tokens: Map[String, String])
 
-  type WSGetSuggestsForShortlistResult = GetSuggestsForShortlistResult
+  type WSGetSuggestsForFollowingResult = GetSuggestsForFollowingResult
 
   /**
    * Friends

@@ -81,7 +81,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     val algs = List(
       (api.config(api.ConfigParams.SolutionProbabilityFriends).toDouble, () => getFriendsSolutions),
-      (api.config(api.ConfigParams.SolutionProbabilityShortlist).toDouble, () => getShortlistSolutions),
+      (api.config(api.ConfigParams.SolutionProbabilityFollowing).toDouble, () => getFollowingSolutions),
       (api.config(api.ConfigParams.SolutionProbabilityLiked).toDouble, () => getSolutionsForLikedQuests),
       (api.config(api.ConfigParams.SolutionProbabilityStar).toDouble, () => getVIPSolutions),
       (1.00, () => getOtherSolutions) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
@@ -98,9 +98,9 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       levels)).body.get.solutions)
   }
 
-  private[user] def getShortlistSolutions = {
-    Logger.trace("  Returning solutions from shortlist")
-    Some(api.getShortlistSolutions(GetShortlistSolutionsRequest(
+  private[user] def getFollowingSolutions = {
+    Logger.trace("  Returning solutions from Following")
+    Some(api.getFollowingSolutions(GetFollowingSolutionsRequest(
       user,
       QuestSolutionStatus.OnVoting,
       levels)).body.get.solutions)

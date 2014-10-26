@@ -3,8 +3,8 @@ package controllers.web.rest
 import play.api.mvc._
 import controllers.web.rest.component.helpers.AccessToWSInstance
 
-object DebugWS extends Controller with AccessToWSInstance {
+object TimeLineWS extends Controller with AccessToWSInstance {
 
-  def test = ws.test
+  def getTimeLine = ws.getTimeLine
 }
 

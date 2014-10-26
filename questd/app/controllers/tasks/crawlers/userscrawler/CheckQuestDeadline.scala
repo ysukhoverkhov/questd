@@ -25,10 +25,11 @@ class CheckQuestDeadline(
     apiPar: DomainAPIComponent#DomainAPI,
     randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
 
+  // TODO: remove this crawler.
   protected def check(user: User) = {
-    if (user.questDeadlineReached) {
-      api.deadlineQuest(DeadlineQuestRequest(user))
-    }
+//    if (user.questDeadlineReached) {
+//      api.deadlineQuest(DeadlineQuestRequest(user))
+//    }
   }
 
 }

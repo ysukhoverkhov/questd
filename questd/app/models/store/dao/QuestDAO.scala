@@ -52,7 +52,7 @@ trait QuestDAO extends BaseDAO[Quest] {
 
   def updateStatus(id: String, newStatus: String): Option[Quest]
 
-  def updateInfo(id: String, newLevel: Int, duration: String, difficulty: String): Option[Quest]
+  def updateInfo(id: String, newLevel: Int): Option[Quest]
 
   def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit
 }

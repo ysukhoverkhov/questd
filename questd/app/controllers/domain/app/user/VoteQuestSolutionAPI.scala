@@ -23,35 +23,35 @@ private[domain] trait VoteQuestSolutionAPI {
   /**
    * Get quest solution to vote for.
    */
-  def getQuestSolutionToVote(request: GetQuestSolutionToVoteRequest): ApiResult[GetQuestSolutionToVoteResult] = handleDbException {
-    import request._
-
-    user.canGetQuestSolutionForVote match {
-      case OK =>
-
-        user.getQuestSolutionToVote match {
-          case None =>
-            OkApiResult(GetQuestSolutionToVoteResult(OutOfContent))
-          case Some(solution) =>
-            val qsInfo = QuestSolutionInfoWithID(solution.id, solution.info)
-            val qsAuthor = db.user.readById(solution.info.authorId).map(author => PublicProfileWithID(author.id, author.profile.publicProfile))
-            val questInfo = db.quest.readById(solution.info.questId).map(qi => QuestInfoWithID(qi.id, qi.info))
-            questInfo ifSome { questInfoValue =>
-              qsAuthor ifSome { qsaValue =>
-                db.user.selectQuestSolutionVote(user.id, qsInfo, qsaValue, questInfoValue) ifSome { u =>
-
-                  if (u.mustVoteSolutions.contains(solution)) {
-                    db.user.removeMustVoteSolution(u.id, solution.id)
-                  }
-
-                  OkApiResult(GetQuestSolutionToVoteResult(OK, Some(u.profile)))
-                }
-              }
-            }
-        }
-      case a => OkApiResult(GetQuestSolutionToVoteResult(a))
-    }
-  }
+//  def getQuestSolutionToVote(request: GetQuestSolutionToVoteRequest): ApiResult[GetQuestSolutionToVoteResult] = handleDbException {
+//    import request._
+//
+//    user.canGetQuestSolutionForVote match {
+//      case OK =>
+//
+//        user.getQuestSolutionForTimeLine match {
+//          case None =>
+//            OkApiResult(GetQuestSolutionToVoteResult(OutOfContent))
+//          case Some(solution) =>
+//            val qsInfo = QuestSolutionInfoWithID(solution.id, solution.info)
+//            val qsAuthor = db.user.readById(solution.info.authorId).map(author => PublicProfileWithID(author.id, author.profile.publicProfile))
+//            val questInfo = db.quest.readById(solution.info.questId).map(qi => QuestInfoWithID(qi.id, qi.info))
+//            questInfo ifSome { questInfoValue =>
+//              qsAuthor ifSome { qsaValue =>
+//                db.user.selectQuestSolutionVote(user.id, qsInfo, qsaValue, questInfoValue) ifSome { u =>
+//
+//                  if (u.mustVoteSolutions.contains(solution)) {
+//                    db.user.removeMustVoteSolution(u.id, solution.id)
+//                  }
+//
+//                  OkApiResult(GetQuestSolutionToVoteResult(OK, Some(u.profile)))
+//                }
+//              }
+//            }
+//        }
+//      case a => OkApiResult(GetQuestSolutionToVoteResult(a))
+//    }
+//  }
 
   /**
    * Get cost of quest to shuffle.
