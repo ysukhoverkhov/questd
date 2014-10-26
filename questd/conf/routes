@@ -25,7 +25,11 @@ POST    /rest/getCountryList                            controllers.web.rest.Pro
 POST	/rest/createQuest								controllers.web.rest.CreateQuestWS.createQuest
 
 # Solve quest
+
+# TODO: remove me, quest cost will be in quest info.
 POST	/rest/getSolveQuestCost							controllers.web.rest.SolveQuestWS.getSolveQuestCost
+
+
 POST	/rest/proposeSolution							controllers.web.rest.SolveQuestWS.proposeSolution
 
 # Vote quest
