@@ -25,7 +25,7 @@ case class AddToShortlistRequest(
   userIdToAdd: String)
 case class AddToShortlistResult(
   allowed: ProfileModificationResult,
-  assets: Option[Assets] = None)
+  profile: Option[Profile] = None)
 
 case class RemoveFromShortlistRequest(
   user: User,
@@ -91,7 +91,7 @@ private[domain] trait ShortlistAPI { this: DBAccessor with DomainAPIComponent#Do
         } ifOk { r =>
 
           db.user.addToShortlist(r.user.id, request.userIdToAdd)
-          OkApiResult(AddToShortlistResult(OK, Some(r.user.profile.assets)))
+          OkApiResult(AddToShortlistResult(OK, Some(r.user.profile)))
 
         }
         case a => OkApiResult(AddToShortlistResult(a))
