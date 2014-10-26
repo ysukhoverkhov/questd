@@ -35,10 +35,9 @@ trait SolvingQuests { this: UserLogic =>
   /**
    * Checks is user potentially able to solve quests today (disregarding coins and other things).
    */
-//  def canSolveQuestToday = {
-//    user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults) &&
-//    user.profile.questSolutionContext.questCooldown.before(new Date())
-//  }
+  def canSolveQuestToday = {
+    user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults)
+  }
 
   /**
    * Tells cost of next quest purchase
@@ -83,8 +82,7 @@ trait SolvingQuests { this: UserLogic =>
   /**
    * Get cost of taking quest to resolve.
    */
-  // TODO: rename to costOfSolvingQuest
-  def costOfTakingQuest = {
+  def costOfSolvingQuest = {
     Assets(coins = costToTakeQuestToSolve(user.profile.publicProfile.level/*, purchasedQuestDuration*/))
   }
 
@@ -110,30 +108,12 @@ trait SolvingQuests { this: UserLogic =>
   }
 
   /**
-   * Is user can give up quest.
-   */
-//  def canGiveUpQuest = {
-//    if (user.profile.questSolutionContext.takenQuest == None)
-//      InvalidState
-//    else
-//      OK
-//  }
-
-  /**
-   * How much it'll cost to give up taken quest.
-   */
-//  def costOfGivingUpQuest = {
-//    Assets(rating = ratingToGiveUpQuest(user.profile.publicProfile.level, takenQuestDuration)) clampTop user.profile.assets
-//  }
-
-  /**
    * How much it'll be for a single friend to help us with proposal.
    */
-  def costOfAskingForHelpWithSolution = {
-    Assets(coins = coinsToInviteFriendForVoteQuestSolution(user.profile.publicProfile.level))
-  }
+//  def costOfAskingForHelpWithSolution = {
+//    Assets(coins = coinsToInviteFriendForVoteQuestSolution(user.profile.publicProfile.level))
+//  }
 
-  // TODO: clean me up.
 //  /**
 //   * Cooldown for taking quest.
 //   */
@@ -160,16 +140,16 @@ trait SolvingQuests { this: UserLogic =>
   def getResetPurchasesTimeout = getNextFlipHourDate
 
   /**
-   * Time when to stop voring for solution.
+   * Time when to stop voting for solution.
    */
   def solutionVoteEndDate(qi: QuestInfo) = {
-    val mult = qi.level match {
+    val coef = qi.level match {
       case x if 1 to 10 contains x => 1
       case x if 11 to 16 contains x => 2
       case _ => 3
     }
 
-    DateTime.now + mult.days toDate ()
+    DateTime.now + coef.days toDate ()
   }
 
   /**
@@ -201,34 +181,5 @@ trait SolvingQuests { this: UserLogic =>
   def penaltyForIACSolution(quest: Quest) = {
     (rewardForLosingQuest(quest) * QuestSolutionIACPenalty) clampTop user.profile.assets
   }
-
-  /**
-   * Returns taken quest duration in days.
-   */
-//  private def takenQuestDuration = {
-//    questDuration(user.profile.questSolutionContext.takenQuest)
-//  }
-
-  /**
-   * Returns purchased quest duration in days.
-   */
-//  private def purchasedQuestDuration = {
-//    questDuration(user.profile.questSolutionContext.purchasedQuest)
-//  }
-
-//  private def questDuration(q: Option[QuestInfoWithID]) = {
-//    q match {
-//      case Some(QuestInfoWithID(_, i)) => i.daysDuration
-//      case None => 0
-//    }
-//  }
-
-  /**
-   * Check is quest deadline passed and quest should be autogave up.
-   */
-//  def questDeadlineReached = {
-//    ((user.profile.questSolutionContext.takenQuest != None)
-//      && user.profile.questSolutionContext.questDeadline.before(new Date()))
-//  }
 
 }

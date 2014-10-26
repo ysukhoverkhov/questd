@@ -16,8 +16,8 @@ trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFu
 //  }
 
   // TODO: rename me to getQuestSolveCost
-  def getTakeQuestCost = wrapApiCallReturnBody[WSGetTakeQuestCostResult] { r =>
-    api.getTakeQuestCost(GetTakeQuestCostRequest(r.user))
+  def getSolveQuestCost = wrapApiCallReturnBody[WSGetTakeQuestCostResult] { r =>
+    api.getSolveQuestCost(GetSolveQuestCostRequest(r.user))
   }
 
 //  def takeQuest = wrapApiCallReturnBody[WSTakeQuestResult] { r =>

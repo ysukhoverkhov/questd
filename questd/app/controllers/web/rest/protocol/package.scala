@@ -96,7 +96,7 @@ package object protocol {
 
   type WSPurchaseQuestResult = PurchaseQuestResult
 
-  type WSGetTakeQuestCostResult = GetTakeQuestCostResult
+  type WSGetTakeQuestCostResult = GetSolveQuestCostResult
 
   type WSTakeQuestResult = TakeQuestResult
 

@@ -25,25 +25,14 @@ POST    /rest/getCountryList                            controllers.web.rest.Pro
 POST	/rest/createQuest								controllers.web.rest.CreateQuestWS.createQuest
 
 # Solve quest
-#POST	/rest/getQuestCost								controllers.web.rest.SolveQuestWS.getQuestCost
-#POST	/rest/purchaseQuest								controllers.web.rest.SolveQuestWS.purchaseQuest
-
-POST	/rest/getTakeQuestCost							controllers.web.rest.SolveQuestWS.getTakeQuestCost
-#POST	/rest/takeQuest									controllers.web.rest.SolveQuestWS.takeQuest
-
+POST	/rest/getSolveQuestCost							controllers.web.rest.SolveQuestWS.getSolveQuestCost
 POST	/rest/proposeSolution							controllers.web.rest.SolveQuestWS.proposeSolution
-
-#POST	/rest/getQuestGiveUpCost						controllers.web.rest.SolveQuestWS.getQuestGiveUpCost
-#POST	/rest/giveUpQuest								controllers.web.rest.SolveQuestWS.giveUpQuest
-
-#POST	/rest/getQuestSolutionHelpCost				    controllers.web.rest.SolveQuestWS.getQuestSolutionHelpCost
 
 # Vote quest
 
 POST	/rest/voteQuest     							controllers.web.rest.VoteQuestWS.voteQuest
 
 # Vote quest solution
-#POST	/rest/getQuestSolutionToVote					controllers.web.rest.VoteQuestSolutionWS.getQuestSolutionToVote
 POST	/rest/voteQuestSolution							controllers.web.rest.VoteQuestSolutionWS.voteQuestSolution
 
 # Time line
