@@ -27,7 +27,7 @@ case class AskFriendshipRequest(
   friendId: String)
 case class AskFriendshipResult(
   allowed: ProfileModificationResult,
-  assets: Option[Assets] = None)
+  profile: Option[Profile] = None)
 
 case class RespondFriendshipRequest(
   user: User,
@@ -107,7 +107,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
                   Friendship(request.friendId, FriendshipStatus.Invited),
                   Friendship(r.user.id, FriendshipStatus.Invites))
 
-                OkApiResult(AskFriendshipResult(OK, Some(r.user.profile.assets)))
+                OkApiResult(AskFriendshipResult(OK, Some(r.user.profile)))
               }
             case a => OkApiResult(AskFriendshipResult(a))
           }

@@ -31,7 +31,7 @@ case class AddToFollowingRequest(
   userIdToAdd: String)
 case class AddToFollowingResult(
   allowed: ProfileModificationResult,
-  assets: Option[Assets] = None)
+  profile: Option[Profile] = None)
 
 case class RemoveFromFollowingRequest(
   user: User,
@@ -105,7 +105,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
         } ifOk { r =>
 
           db.user.addToFollowing(r.user.id, request.userIdToAdd)
-          OkApiResult(AddToFollowingResult(OK, Some(r.user.profile.assets)))
+          OkApiResult(AddToFollowingResult(OK, Some(r.user.profile)))
 
         }
         case a => OkApiResult(AddToFollowingResult(a))
