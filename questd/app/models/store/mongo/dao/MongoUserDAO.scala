@@ -138,16 +138,11 @@ private[mongo] class MongoUserDAO
     queryBuilder += ("$set" -> MongoDBObject(
       "timeLine.$.ourVote" -> vote.toString))
 
-    val u = findAndModify(
+    findAndModify(
       MongoDBObject(
         "id" -> id,
         "timeLine.objectId" -> questId),
       queryBuilder.result())
-
-    play.Logger.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    play.Logger.error(u.get.timeLine.toString())
-
-    u
   }
 
   /**

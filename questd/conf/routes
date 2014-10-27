@@ -21,19 +21,12 @@ POST    /rest/setCountry                                controllers.web.rest.Pro
 POST    /rest/getCountryList                            controllers.web.rest.ProfileWS.getCountryList
 
 # Generating quests
-
 POST	/rest/createQuest								controllers.web.rest.CreateQuestWS.createQuest
 
 # Solve quest
-
-# TODO: remove me, quest cost will be in quest info.
-POST	/rest/getSolveQuestCost							controllers.web.rest.SolveQuestWS.getSolveQuestCost
-
-
 POST	/rest/proposeSolution							controllers.web.rest.SolveQuestWS.proposeSolution
 
 # Vote quest
-
 POST	/rest/voteQuest     							controllers.web.rest.VoteQuestWS.voteQuest
 
 # Vote quest solution

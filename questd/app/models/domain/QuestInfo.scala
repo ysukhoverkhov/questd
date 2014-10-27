@@ -9,7 +9,6 @@ case class QuestInfo(
   authorId: String,
   content: QuestInfoContent,
   level: Int,
-  vip: Boolean) {
-
-}
+  vip: Boolean,
+  solveCost: Assets)
 

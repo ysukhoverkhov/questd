@@ -2,11 +2,12 @@ package logic.user
 
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.config._ConfigParams
+import logic.BaseLogicSpecs
 import models.domain.{ContentVote, Rights}
 import models.domain.admin.ConfigSection
 import testhelpers.domainstubs._
 
-class VotingForQuestSpecs extends BaseUserLogicSpecs {
+class VotingForQuestSpecs extends BaseLogicSpecs {
 
   /**
    * Creates stub config for our tests.

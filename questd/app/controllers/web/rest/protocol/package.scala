@@ -92,24 +92,12 @@ package object protocol {
    * Solving quests
    * *******************
    */
-  type WSGetQuestCostResult = GetQuestCostResult
-
-  type WSPurchaseQuestResult = PurchaseQuestResult
-
-  type WSGetTakeQuestCostResult = GetSolveQuestCostResult
-
-  type WSTakeQuestResult = TakeQuestResult
 
   case class WSProposeSolutionRequest(
     questId: String,
     solutionContent: QuestSolutionInfoContent)
   type WSProposeSolutionResult = ProposeSolutionResult
 
-  type WSGetQuestGiveUpCostResult = GetQuestGiveUpCostResult
-
-  type WSGiveUpQuestResult = GiveUpQuestResult
-
-  type WSGetQuestSolutionHelpCostResult = GetQuestSolutionHelpCostResult
 
   /**
    * ********************

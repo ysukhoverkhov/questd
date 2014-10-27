@@ -1,11 +1,19 @@
 package logic
 
+import logic.functions._
 import models.domain._
 import controllers.domain.DomainAPIComponent
 
 class QuestLogic(
   val quest: Quest,
   val api: DomainAPIComponent#DomainAPI) {
+
+  /**
+   * Get cost of solving the quest.
+   */
+  def costOfSolving: Assets = {
+    QuestLogic.costOfSolvingQuest(quest.info.level)
+  }
 
   /**
    * Are we able to add quest to rotation.
@@ -49,7 +57,7 @@ class QuestLogic(
   // TODO: clean me up.
   def shouldBanCheating = {
     val maxCheatingVotes = api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
-    (quest.rating.cheating > maxCheatingVotes)// && (quest.status == QuestStatus.OnVoting)
+    quest.rating.cheating > maxCheatingVotes // && (quest.status == QuestStatus.OnVoting)
   }
 
   /**
@@ -63,3 +71,11 @@ class QuestLogic(
 //  }
 }
 
+object QuestLogic {
+  /**
+   * Get cost of solving the quest.
+   */
+  def costOfSolvingQuest(questLevel: Int) = {
+    Assets(coins = coinSelectQuest(questLevel))
+  }
+}

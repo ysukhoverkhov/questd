@@ -1,11 +1,12 @@
 package logic.user
 
 import controllers.domain.config._ConfigParams
+import logic.BaseLogicSpecs
 import models.domain._
 import models.domain.admin.ConfigSection
 import testhelpers.domainstubs._
 
-class UserLogicSelectingThemeSpecs extends BaseUserLogicSpecs {
+class UserLogicSelectingThemeSpecs extends BaseLogicSpecs {
 
   /**
    * Creates 10 themes for mocking

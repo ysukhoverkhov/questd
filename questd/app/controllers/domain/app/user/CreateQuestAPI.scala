@@ -1,5 +1,6 @@
 package controllers.domain.app.user
 
+import logic.QuestLogic
 import models.domain._
 import controllers.domain.helpers._
 import controllers.domain._
@@ -40,7 +41,8 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
                 authorId = r.user.id,
                 level = r.user.profile.publicProfile.level,
                 content = content,
-                vip = r.user.profile.publicProfile.vip))
+                vip = r.user.profile.publicProfile.vip,
+                solveCost = QuestLogic.costOfSolvingQuest(r.user.profile.publicProfile.level)))
 
             db.quest.create(quest)
 

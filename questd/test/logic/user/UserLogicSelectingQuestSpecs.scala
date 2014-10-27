@@ -1,5 +1,6 @@
 package logic.user
 
+import logic.BaseLogicSpecs
 import models.domain._
 import controllers.domain.app.quest._
 import controllers.domain.OkApiResult
@@ -7,7 +8,7 @@ import models.domain.admin.ConfigSection
 import controllers.domain.config._ConfigParams
 import testhelpers.domainstubs._
 
-class UserLogicSelectingQuestSpecs extends BaseUserLogicSpecs {
+class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
   /**
    * Creates stub config for our tests.

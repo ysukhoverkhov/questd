@@ -80,13 +80,6 @@ trait SolvingQuests { this: UserLogic =>
 //  }
 
   /**
-   * Get cost of taking quest to resolve.
-   */
-  def costOfSolvingQuest = {
-    Assets(coins = costToTakeQuestToSolve(user.profile.publicProfile.level/*, purchasedQuestDuration*/))
-  }
-
-  /**
    * Is user can propose quest of given type.
    */// TODO: rename me to "canSolveQuest"
   def canResolveQuest(contentType: ContentType, questId: String /*, friendsInvited: Int*/) = {

@@ -1,10 +1,11 @@
 package logic.user
 
+import logic.BaseLogicSpecs
 import models.domain._
 import controllers.domain.config._ConfigParams
 import models.domain.admin.ConfigSection
 
-class TasksSpecs extends BaseUserLogicSpecs {
+class TasksSpecs extends BaseLogicSpecs {
 
   private def createUser(level: Int) = {
     val u = User(profile = Profile(publicProfile = PublicProfile(level = level)))

@@ -1,8 +1,9 @@
 package logic.user
 
+import logic.BaseLogicSpecs
 import models.domain._
 
-class UserLogicSpecs extends BaseUserLogicSpecs {
+class UserLogicSpecs extends BaseLogicSpecs {
 
   "User Logic" should {
 

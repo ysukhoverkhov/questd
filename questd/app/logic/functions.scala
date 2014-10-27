@@ -102,11 +102,15 @@ object functions {
   /**
    * How much coins does it takes to take quest for solving.
    */
-  def costToTakeQuestToSolve(level: Int/*, questDuration: Int*/): Int = {
+  def coinSelectQuest(level: Int): Int = {
 
-    // TODO: implement me.
-    //math.round(coinSelectQuest(level) * questDuration).toInt
-    100
+    def coinSelectQuestInt(level: Int, k: Double, d: Double, b: Double) = megaf(level, k, d, b, 0)
+
+    val k = 162.15924
+    val d = 4.593018
+    val b = -150.641173
+
+    math.round(coinSelectQuestInt(level, k, d, b)).toInt
   }
 
   /**

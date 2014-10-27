@@ -18,9 +18,6 @@ case class PurchaseQuestResult(allowed: ProfileModificationResult, profile: Opti
 case class TakeQuestRequest(user: User)
 case class TakeQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class GetSolveQuestCostRequest(user: User)
-case class GetSolveQuestCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
-
 case class AddToMustVoteSolutionsRequest(user: User, friendIds: List[String], solutionId: String)
 case class AddToMustVoteSolutionsResult(user: User)
 
@@ -109,17 +106,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 //      case a => OkApiResult(PurchaseQuestResult(a))
 //    }
     OkApiResult(PurchaseQuestResult(OK))
-  }
-
-  /**
-   * Get cost of solvng a quest.
-   */
-  def getSolveQuestCost(request: GetSolveQuestCostRequest): ApiResult[GetSolveQuestCostResult] = handleDbException {
-    import request._
-
-    // TODO: change cost here to new in desdoc.
-
-    OkApiResult(GetSolveQuestCostResult(OK, Some(user.costOfSolvingQuest)))
   }
 
   /**

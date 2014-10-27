@@ -4,11 +4,12 @@ import java.util.Date
 
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.config._ConfigParams
+import logic.BaseLogicSpecs
 import models.domain.Rights
 import models.domain.admin.ConfigSection
 import testhelpers.domainstubs._
 
-class CreatingQuestSpecs extends BaseUserLogicSpecs {
+class CreatingQuestSpecs extends BaseLogicSpecs {
 
   /**
    * Creates stub config for our tests.
