@@ -148,6 +148,7 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
+  // TODO: remove me.
   def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: PublicProfileWithID, defeatReward: Assets, victoryReward: Assets): Option[User] = {
     findAndModify(
       id,

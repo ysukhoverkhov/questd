@@ -39,10 +39,6 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         user.id,
         UserStats (
           lastStatShift = new Date(),
-          questsReviewed = 0,
-          questsAccepted = 0,
-          questsReviewedPast = (user.stats.questsReviewedPast * 3) / 4 + user.stats.questsReviewed,
-          questsAcceptedPast = (user.stats.questsAcceptedPast * 3) / 4 + user.stats.questsAccepted,
           proposalsVoted = 0,
           proposalsVotedPerDay = if (deltaDays == Double.NaN) 0 else user.stats.proposalsVoted / deltaDays,
           proposalsLiked = 0,

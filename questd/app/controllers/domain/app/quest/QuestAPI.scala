@@ -14,8 +14,8 @@ case class UpdateQuestStatusResult()
 case class SelectQuestToTimeLineRequest(quest: Quest)
 case class SelectQuestToTimeLineResult()
 
-case class TakeQuestUpdateRequest(quest: Quest, ratio: Int)
-case class TakeQuestUpdateResult()
+case class SolveQuestUpdateRequest(quest: Quest, ratio: Int)
+case class SolveQuestUpdateResult()
 
 case class VoteQuestRequest(
   quest: Quest,
@@ -123,20 +123,20 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     }
   }
 
-//  /**
-//   * Update quest params on taking quest.
-//   */ // TODO: remove me.
-//  def takeQuestUpdate(request: TakeQuestUpdateRequest): ApiResult[TakeQuestUpdateResult] = handleDbException {
-//    import request._
-//
-//    {
-//      db.quest.updatePoints(quest.id, ratio, 1)
-//    } ifSome { v =>
-//      updateQuestStatus(UpdateQuestStatusRequest(v))
-//    } ifOk {
-//      OkApiResult(TakeQuestUpdateResult())
-//    }
-//  }
+  /**
+   * Update quest if someone solves it.
+   */
+  def solveQuestUpdate(request: SolveQuestUpdateRequest): ApiResult[SolveQuestUpdateResult] = handleDbException {
+    import request._
+
+    {
+      db.quest.updatePoints(quest.id, ratio, 1)
+    } ifSome { v =>
+      updateQuestStatus(UpdateQuestStatusRequest(v))
+    } ifOk {
+      OkApiResult(SolveQuestUpdateResult())
+    }
+  }
 
   /**
    * Updates quest according to vote.

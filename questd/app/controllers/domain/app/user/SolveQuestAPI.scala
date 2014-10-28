@@ -1,5 +1,7 @@
 package controllers.domain.app.user
 
+import controllers.domain.app.quest.SolveQuestUpdateRequest
+
 import scala.annotation.tailrec
 import scala.language.postfixOps
 import models.domain._
@@ -61,7 +63,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     // TODO: tests:
     // 1. canSolveQuest
-    // 2. solve quest in general
+    // 2. updating quest points with correct amount.
 
 
     db.quest.readById(questId) match {
@@ -70,10 +72,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         user.canSolveQuest(contentType = solution.media.contentType, questToSolve = questToSolve) match {
           case OK =>
 
-            def content = if (request.user.payedAuthor) {
-              request.solution
+            def content = if (user.payedAuthor) {
+              solution
             } else {
-              request.solution
+              solution
             }
 
             {
@@ -89,10 +91,23 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                     content = content,
                     authorId = r.user.id,
                     questId = questToSolve.id,
-                    vip = request.user.profile.publicProfile.vip),
-                  voteEndDate = request.user.solutionVoteEndDate(questToSolve.info))
+                    vip = user.profile.publicProfile.vip),
+                  voteEndDate = user.solutionVoteEndDate(questToSolve.info))
 
+                // Creating solution.
                 db.solution.create(solution)
+
+                val numberOfReviewedQuests = user.timeLine.count(_.objectType == TimeLineType.Quest)
+                val numberOfSolvedQuests = user.timeLine.count(te => (te.objectType == TimeLineType.Solution)
+                  && (te.reason == TimeLineReason.Created)
+                  && (te.entryAuthorId == user.id))
+
+                // Updating quest points.
+                val ratio = if (numberOfSolvedQuests == 0)
+                  1
+                else
+                  Math.round(numberOfReviewedQuests / numberOfSolvedQuests) - 1
+                solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio))
 
                 {
                   if (user.profile.questSolutionContext.bookmarkedQuest.map(_.id) == Some(questToSolve.id))

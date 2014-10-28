@@ -12,7 +12,7 @@ import testhelpers.domainstubs._
 class SolveQuestAPISpecs extends BaseAPISpecs {
 
   "Solve Quest API" should {
-
+// TODO: check here increase in points for quest.
     "Create regular solution for regular users" in context {
 
       val q = createQuestStub()
@@ -44,6 +44,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(user).resetQuestBookmark(Matchers.eq(u.id))
       there was one(user).addEntryToTimeLine(Matchers.eq(u.id), any)
       there was one(user).addEntryToTimeLineMulti(Matchers.eq(List("fid1")), any)
+      there was one(quest).updatePoints(q.id, 1, 1)
     }
 
     // TODO: clean me up.
