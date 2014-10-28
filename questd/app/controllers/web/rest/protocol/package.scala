@@ -93,10 +93,10 @@ package object protocol {
    * *******************
    */
 
-  case class WSProposeSolutionRequest(
+  case class WSSolveQuestRequest(
     questId: String,
     solutionContent: QuestSolutionInfoContent)
-  type WSProposeSolutionResult = ProposeSolutionResult
+  type WSSolveQuestResult = SolveQuestResult
 
 
   /**

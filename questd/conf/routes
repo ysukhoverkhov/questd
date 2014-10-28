@@ -24,7 +24,7 @@ POST    /rest/getCountryList                            controllers.web.rest.Pro
 POST	/rest/createQuest								controllers.web.rest.CreateQuestWS.createQuest
 
 # Solve quest
-POST	/rest/proposeSolution							controllers.web.rest.SolveQuestWS.proposeSolution
+POST	/rest/solveQuest		    					controllers.web.rest.SolveQuestWS.solveQuest
 
 # Vote quest
 POST	/rest/voteQuest     							controllers.web.rest.VoteQuestWS.voteQuest

@@ -60,7 +60,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
     import request._
 
     db.user.addEntryToTimeLineMulti(
-      user.friends.map(_.friendId) ::: user.followers,
+      user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId) ::: user.followers,
       TimeLineEntry(
         reason = reason,
         entryAuthorId = entryAuthorId.getOrElse(user.id),

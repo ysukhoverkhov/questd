@@ -4,7 +4,6 @@ import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 import logic._
 import logic.constants._
-import logic.functions._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
 import models.domain.ContentType._
@@ -81,21 +80,19 @@ trait SolvingQuests { this: UserLogic =>
 
   /**
    * Is user can propose quest of given type.
-   */// TODO: rename me to "canSolveQuest"
-  def canResolveQuest(contentType: ContentType, questId: String /*, friendsInvited: Int*/) = {
+   */
+  def canSolveQuest(contentType: ContentType, questToSolve: Quest) = {
     val content = contentType match {
       case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults)
       case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoResults)
     }
 
-    // TODO check cost of solving quest here.
-    // TODO: check we have this quest in time line.
     if (!content)
       NotEnoughRights
-//    else if (user.profile.questSolutionContext.takenQuest == None)
-//      InvalidState
-//    else if (!(user.profile.assets canAfford costOfAskingForHelpWithSolution * friendsInvited))
-//      NotEnoughAssets
+    else if (!user.timeLine.map(_.objectId).contains(questToSolve.id))
+      InvalidState
+    else if (!(user.profile.assets canAfford questToSolve.info.solveCost))
+      NotEnoughAssets
     else
       OK
   }

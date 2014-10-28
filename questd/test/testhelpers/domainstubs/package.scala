@@ -3,7 +3,7 @@ package testhelpers
 import java.util.Date
 import models.domain._
 import models.domain.base.ID
-import models.domain.view.ThemeInfoWithID
+import models.domain.view.{QuestInfoWithID, ThemeInfoWithID}
 
 
 package object domainstubs {
@@ -118,7 +118,8 @@ package object domainstubs {
     questCreationCoolDown: Date = new Date(Long.MaxValue),
     takenTheme: Option[ThemeInfoWithID] = Some(ThemeInfoWithID("theme_id", createThemeStub().info)),
     rights: Rights = Rights.full,
-    timeLine: List[TimeLineEntry] = List()) = {
+    timeLine: List[TimeLineEntry] = List(),
+    questBookmark: Option[String] = None) = {
 
     User(
       id = id,
@@ -132,7 +133,8 @@ package object domainstubs {
       profile = Profile(
         assets = assets,
         ratingToNextLevel = 100000,
-        questSolutionContext = QuestSolutionContext(),
+        questSolutionContext = QuestSolutionContext(
+          bookmarkedQuest = questBookmark.map(QuestInfoWithID(_, createQuestStub().info))),
         questCreationContext = QuestCreationContext(
           questCreationCoolDown = questCreationCoolDown),
         publicProfile = PublicProfile(

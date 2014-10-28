@@ -29,7 +29,7 @@ trait UserDAO extends BaseDAO[User] {
 
   def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: PublicProfileWithID, defeatReward: Assets, victoryReward: Assets): Option[User]
   def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User]
-  def resetQuestSolution(id: String, shouldResetCooldown: Boolean): Option[User]
+  def resetQuestBookmark(id: String): Option[User]
 
   /**
    * Updates cool down for inventing quests.

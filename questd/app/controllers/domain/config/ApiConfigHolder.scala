@@ -8,7 +8,6 @@ class _ConfigParams {
 
   val DebugExpMultiplier = "01 01 Debug Exp Multiplier"
   val DebugDisableProposalCooldown = "01 02 Debug Disable Proposal Cooldown"
-  val DebugDisableSolutionCooldown = "01 03 Debug Disable Solution Cooldown"
 
   val ActiveUserDays = "10 01 Active User Days"
 
@@ -71,7 +70,6 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     Map(
       ConfigParams.DebugExpMultiplier -> "1",
       ConfigParams.DebugDisableProposalCooldown -> "0",
-      ConfigParams.DebugDisableSolutionCooldown -> "0",
 
       ConfigParams.ActiveUserDays -> "7",
       ConfigParams.UserHistoryDays -> "15",

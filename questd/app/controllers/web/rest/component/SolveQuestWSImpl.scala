@@ -6,10 +6,10 @@ import controllers.web.rest.protocol._
 
 trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
-  def proposeSolution = wrapJsonApiCallReturnBody[WSProposeSolutionResult] { (js, r) =>
-    val v = Json.read[WSProposeSolutionRequest](js.toString)
+  def solveQuest = wrapJsonApiCallReturnBody[WSSolveQuestResult] { (js, r) =>
+    val v = Json.read[WSSolveQuestRequest](js.toString)
 
-    api.proposeSolution(ProposeSolutionRequest(r.user, v.questId, v.solutionContent))
+    api.solveQuest(SolveQuestRequest(r.user, v.questId, v.solutionContent))
   }
 }
 

@@ -1,6 +1,9 @@
 package controllers.domain.app.user
 
+import java.util.Date
+
 import controllers.domain.BaseAPISpecs
+import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain._
 import controllers.domain.OkApiResult
 import org.mockito.Matchers
@@ -10,37 +13,45 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
   "Solve Quest API" should {
 
-    // TODO: clean me up.
-//    "Create regular solution for regular users" in context {
-//
-//      val u = createUserStub(cultureId = "cid", vip = false)
-//      val s = createSolutionInfoContent
-//
-//      user.resetQuestSolution(any, any) returns Some(u)
-//
-//      val result = api.proposeSolution(ProposeSolutionRequest(u, s))
-//
-//      result must beEqualTo(OkApiResult(ProposeSolutionResult(ProfileModificationResult.OK, Some(u.profile))))
-//
-//      there was one(solution).create(
-//        QuestSolution(
-//          id = anyString,
-//          u.demo.cultureId.get,
-//          questLevel = u.profile.questSolutionContext.takenQuest.get.obj.level,
-//          info = QuestSolutionInfo(
-//            content = s,
-//            authorId = u.id,
-//            questId = u.profile.questSolutionContext.takenQuest.get.id,
-//            vip = false),
-//          voteEndDate = new Date()))
-//    }
+    "Create regular solution for regular users" in context {
+
+      val q = createQuestStub()
+      val tl = createTimeLineEntryStub(objectId = q.id)
+      val friends = List(Friendship("fid1", FriendshipStatus.Accepted), Friendship("fid2", FriendshipStatus.Invited))
+      val u = createUserStub(cultureId = "cid", vip = true, timeLine = List(tl), friends = friends, questBookmark = Some(q.id))
+      val s = createSolutionInfoContent
+
+      quest.readById(q.id) returns Some(q)
+      user.resetQuestBookmark(Matchers.eq(u.id)) returns Some(u)
+      user.addEntryToTimeLine(Matchers.eq(u.id), any) returns Some(u)
+
+      val result = api.solveQuest(SolveQuestRequest(u, q.id, s))
+
+      result must beEqualTo(OkApiResult(SolveQuestResult(ProfileModificationResult.OK, Some(u.profile))))
+
+      there was one(solution).create(
+        QuestSolution(
+          id = anyString,
+          u.demo.cultureId.get,
+          questLevel = q.info.level,
+          info = QuestSolutionInfo(
+            content = s,
+            authorId = u.id,
+            questId = q.id,
+            vip = true),
+          voteEndDate = new Date()))
+      there was one(quest).readById(q.id)
+      there was one(user).resetQuestBookmark(Matchers.eq(u.id))
+      there was one(user).addEntryToTimeLine(Matchers.eq(u.id), any)
+      there was one(user).addEntryToTimeLineMulti(Matchers.eq(List("fid1")), any)
+    }
 
     // TODO: clean me up.
 //    "Report not enough assets for poor user if he wants to invite friends" in context {
 //      val u = createUserStub(assets = Assets(0, 0, 0))
 //      val s = createSolutionInfoContent
 //
-//      val result = api.proposeSolution(ProposeSolutionRequest(u, s, List("1", "2", "3")))
+//      val result = api.solveQuest(ProposeSolutionRequest(u, s, List("1", "2", "3")))
 //
 //      result must beEqualTo(OkApiResult(ProposeSolutionResult(ProfileModificationResult.NotEnoughAssets, None)))
 //    }
@@ -81,30 +92,6 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 //      there was one(user).populateMustVoteSolutionsList(Matchers.eq(friendsIds), any)
 //      there was one(user).addToAssets(any, any)
 //
-//    }
-
-    // TODO: clean me up.
-//    "Create VIP solution for VIP users" in context {
-//      val u = createUserStub(vip = true)
-//      val s = createSolutionInfoContent
-//
-//      user.resetQuestSolution(any, any) returns Some(u)
-//
-//      val result = api.proposeSolution(ProposeSolutionRequest(u, s))
-//
-//      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
-//
-//      there was one(solution).create(
-//        QuestSolution(
-//          id = anyString,
-//          cultureId = u.demo.cultureId.get,
-//          questLevel = u.profile.questSolutionContext.takenQuest.get.obj.level,
-//          info = QuestSolutionInfo(
-//            content = s,
-//            authorId = u.id,
-//            questId = u.profile.questSolutionContext.takenQuest.get.id,
-//            vip = true),
-//          voteEndDate = new Date()))
 //    }
 
     "Do not fight with himself in quest" in context {

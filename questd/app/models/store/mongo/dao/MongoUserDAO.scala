@@ -189,25 +189,12 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def resetQuestSolution(id: String, shouldResetCooldown: Boolean): Option[User] = {
+  def resetQuestBookmark(id: String): Option[User] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    queryBuilder += ("$set" -> MongoDBObject(
-      "profile.questSolutionContext.numberOfPurchasedQuests" -> 0))
-
-    if (shouldResetCooldown) {
-      queryBuilder += ("$unset" -> MongoDBObject(
-        "profile.questSolutionContext.purchasedQuest" -> "",
-        "profile.questSolutionContext.takenQuest" -> "",
-        "profile.questSolutionContext.questAuthor" -> "",
-        "profile.questSolutionContext.questCooldown" -> ""))
-    } else {
-      queryBuilder += ("$unset" -> MongoDBObject(
-        "profile.questSolutionContext.purchasedQuest" -> "",
-        "profile.questSolutionContext.takenQuest" -> "",
-        "profile.questSolutionContext.questAuthor" -> ""))
-    }
+    queryBuilder += ("unset" -> MongoDBObject(
+      "profile.questSolutionContext.bookmarkedQuest" -> ""))
 
     findAndModify(
       id,
