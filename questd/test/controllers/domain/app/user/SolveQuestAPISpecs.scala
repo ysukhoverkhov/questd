@@ -12,16 +12,22 @@ import testhelpers.domainstubs._
 class SolveQuestAPISpecs extends BaseAPISpecs {
 
   "Solve Quest API" should {
-// TODO: check here increase in points for quest.
+
     "Create regular solution for regular users" in context {
 
+      val uid = "uid"
+
       val q = createQuestStub()
-      val tl = createTimeLineEntryStub(objectId = q.id)
+      val tl = createTimeLineEntryStub(entryAuthorId = uid, objectId = q.id, objectType = TimeLineType.Quest)
+      val t2 = createTimeLineEntryStub(objectType = TimeLineType.Solution, entryAuthorId = "uid", reason = TimeLineReason.Created)
+      val t3 = createTimeLineEntryStub(objectType = TimeLineType.Quest)
+      val t4 = createTimeLineEntryStub(objectType = TimeLineType.Quest)
       val friends = List(Friendship("fid1", FriendshipStatus.Accepted), Friendship("fid2", FriendshipStatus.Invited))
-      val u = createUserStub(cultureId = "cid", vip = true, timeLine = List(tl), friends = friends, questBookmark = Some(q.id))
+      val u = createUserStub(id = uid, cultureId = "cid", vip = true, timeLine = List(tl, t2, t3, t4), friends = friends, questBookmark = Some(q.id))
       val s = createSolutionInfoContent
 
-      quest.readById(q.id) returns Some(q)
+      quest.readById(Matchers.eq(q.id)) returns Some(q)
+      quest.updatePoints(Matchers.eq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
       user.resetQuestBookmark(Matchers.eq(u.id)) returns Some(u)
       user.addEntryToTimeLine(Matchers.eq(u.id), any) returns Some(u)
 
@@ -44,7 +50,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(user).resetQuestBookmark(Matchers.eq(u.id))
       there was one(user).addEntryToTimeLine(Matchers.eq(u.id), any)
       there was one(user).addEntryToTimeLineMulti(Matchers.eq(List("fid1")), any)
-      there was one(quest).updatePoints(q.id, 1, 1)
+      there was one(quest).updatePoints(Matchers.eq(q.id), Matchers.eq(2), anyInt, anyInt, anyInt, anyInt)
     }
 
     // TODO: clean me up.

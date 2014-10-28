@@ -97,16 +97,21 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 // Creating solution.
                 db.solution.create(solution)
 
-                val numberOfReviewedQuests = user.timeLine.count(_.objectType == TimeLineType.Quest)
-                val numberOfSolvedQuests = user.timeLine.count(te => (te.objectType == TimeLineType.Solution)
-                  && (te.reason == TimeLineReason.Created)
-                  && (te.entryAuthorId == user.id))
+                val numberOfReviewedQuests = user.timeLine.count { te =>
+                  ((te.objectType == TimeLineType.Quest)
+                    && (te.entryAuthorId != user.id || te.reason != TimeLineReason.Created))
+                }
+                val numberOfSolvedQuests = user.timeLine.count { te =>
+                  ((te.objectType == TimeLineType.Solution)
+                    && (te.reason == TimeLineReason.Created)
+                    && (te.entryAuthorId == user.id))
+                }
 
                 // Updating quest points.
                 val ratio = if (numberOfSolvedQuests == 0)
                   1
                 else
-                  Math.round(numberOfReviewedQuests / numberOfSolvedQuests) - 1
+                  Math.round(numberOfReviewedQuests / numberOfSolvedQuests)
                 solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio))
 
                 {
