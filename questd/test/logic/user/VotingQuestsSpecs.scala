@@ -7,7 +7,7 @@ import models.domain.{ContentVote, Rights}
 import models.domain.admin.ConfigSection
 import testhelpers.domainstubs._
 
-class VotingForQuestSpecs extends BaseLogicSpecs {
+class VotingQuestsSpecs extends BaseLogicSpecs {
 
   /**
    * Creates stub config for our tests.
@@ -38,7 +38,7 @@ class VotingForQuestSpecs extends BaseLogicSpecs {
       val user = createUserStub(rights = Rights.none)
       val q = createQuestStub()
 
-      val rv = user.canVoteQuest(q.id, ContentVote.Cool)
+      val rv = user.canVoteQuest(q.id)
 
       rv must beEqualTo(ProfileModificationResult.NotEnoughRights)
     }
@@ -49,7 +49,7 @@ class VotingForQuestSpecs extends BaseLogicSpecs {
       val user = createUserStub()
       val q = createQuestStub()
 
-      val rv = user.canVoteQuest(q.id, ContentVote.Cool)
+      val rv = user.canVoteQuest(q.id)
 
       rv must beEqualTo(ProfileModificationResult.OutOfContent)
     }
@@ -60,7 +60,7 @@ class VotingForQuestSpecs extends BaseLogicSpecs {
       val q = createQuestStub()
       val user = createUserStub(timeLine = List(createTimeLineEntryStub(objectId = q.id, ourVote = Some(ContentVote.Cool))))
 
-      val rv = user.canVoteQuest(q.id, ContentVote.Cool)
+      val rv = user.canVoteQuest(q.id)
 
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
@@ -71,7 +71,7 @@ class VotingForQuestSpecs extends BaseLogicSpecs {
       val q = createQuestStub()
       val user = createUserStub(timeLine = List(createTimeLineEntryStub(objectId = q.id)))
 
-      val rv = user.canVoteQuest(q.id, ContentVote.Cool)
+      val rv = user.canVoteQuest(q.id)
 
       rv must beEqualTo(ProfileModificationResult.OK)
     }

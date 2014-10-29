@@ -1,10 +1,5 @@
 package models.domain
 
-import java.util.Date
-
-object QuestSolutionVote extends Enumeration {
-  val Cool, SoSo, Cheating, IASpam, IAPorn = Value
-}
 
 /**
  * Rating of a quest used during voting.

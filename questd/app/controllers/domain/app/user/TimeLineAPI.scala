@@ -13,7 +13,7 @@ case class AddToTimeLineRequest(
   reason: TimeLineReason.Value,
   objectType: TimeLineType.Value,
   objectId: String,
-  entryAuthorId: Option[String] = None)
+  objectAuthorId: Option[String] = None)
 case class AddToTimeLineResult(user: User)
 
 case class AddToWatchersTimeLineRequest(
@@ -21,7 +21,7 @@ case class AddToWatchersTimeLineRequest(
   reason: TimeLineReason.Value,
   objectType: TimeLineType.Value,
   objectId: String,
-  entryAuthorId: Option[String] = None)
+  objectAuthorId: Option[String] = None)
 case class AddToWatchersTimeLineResult(user: User)
 
 case class GetTimeLineRequest(
@@ -46,7 +46,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
       user.id,
       TimeLineEntry(
         reason = reason,
-        entryAuthorId = entryAuthorId.getOrElse(user.id),
+        objectAuthorId = objectAuthorId.getOrElse(user.id),
         objectType = objectType,
         objectId = objectId)) ifSome { u =>
       OkApiResult(AddToTimeLineResult(u))
@@ -63,7 +63,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
       user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId) ::: user.followers,
       TimeLineEntry(
         reason = reason,
-        entryAuthorId = entryAuthorId.getOrElse(user.id),
+        objectAuthorId = objectAuthorId.getOrElse(user.id),
         objectType = objectType,
         objectId = objectId))
 
@@ -104,7 +104,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
             reason = TimeLineReason.Has,
             objectType = TimeLineType.Quest,
             objectId = q.id,
-            entryAuthorId = Some(q.info.authorId))) ifOk { r =>
+            objectAuthorId = Some(q.info.authorId))) ifOk { r =>
 
             selectQuestToTimeLine(SelectQuestToTimeLineRequest(q))
           }
@@ -122,7 +122,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
             reason = TimeLineReason.Has,
             objectType = TimeLineType.Solution,
             objectId = s.id,
-            entryAuthorId = Some(s.info.authorId)))
+            objectAuthorId = Some(s.info.authorId)))
         case None =>
       }
     }

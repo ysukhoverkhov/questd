@@ -61,11 +61,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def solveQuest(request: SolveQuestRequest): ApiResult[SolveQuestResult] = handleDbException {
     import request._
 
-    // TODO: tests:
-    // 1. canSolveQuest
-    // 2. updating quest points with correct amount.
-
-
     db.quest.readById(questId) match {
       case None => OkApiResult(SolveQuestResult(OutOfContent))
       case Some(questToSolve) =>
@@ -99,12 +94,12 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
                 val numberOfReviewedQuests = user.timeLine.count { te =>
                   ((te.objectType == TimeLineType.Quest)
-                    && (te.entryAuthorId != user.id || te.reason != TimeLineReason.Created))
+                    && (te.objectAuthorId != user.id || te.reason != TimeLineReason.Created))
                 }
                 val numberOfSolvedQuests = user.timeLine.count { te =>
                   ((te.objectType == TimeLineType.Solution)
                     && (te.reason == TimeLineReason.Created)
-                    && (te.entryAuthorId == user.id))
+                    && (te.objectAuthorId == user.id))
                 }
 
                 // Updating quest points.

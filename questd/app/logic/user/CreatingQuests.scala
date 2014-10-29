@@ -12,38 +12,6 @@ import models.domain.ContentType._
  * All logic related to proposing quests.
  */
 trait CreatingQuests { this: UserLogic =>
-// TODO: clean me up.
-  /**
-   * Check is the user can purchase quest proposals.
-   */
-//  def canPurchaseQuestProposals = {
-//    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests))
-//      NotEnoughRights
-//    else if (!(user.profile.assets canAfford costOfPurchasingQuestProposal))
-//      NotEnoughAssets
-//    else if (user.profile.questProposalContext.questProposalCooldown.after(new Date()))
-//      CoolDown
-//    else if (user.profile.questProposalContext.takenTheme != None)
-//      InvalidState
-//    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
-//      IncompleteBio
-//    else
-//      OK
-//  }
-
-  /**
-   * Is user can propose quest of given type.
-   */
-//  def canTakeQuestTheme = {
-//    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests))
-//      NotEnoughRights
-//    else if (user.profile.questProposalContext.purchasedTheme == None)
-//      InvalidState
-//    else if (!(user.profile.assets canAfford costOfTakingQuestTheme))
-//      NotEnoughAssets
-//    else
-//      OK
-//  }
 
   /**
    * Is user potentially eligible for proposing quest today.
@@ -68,10 +36,13 @@ trait CreatingQuests { this: UserLogic =>
       CoolDown
     else if (questContent.description.length > api.config(api.ConfigParams.ProposalMaxDescriptionLength).toInt)
       LimitExceeded
+    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+      IncompleteBio
     else
       OK
   }
 
+  // TODO: clean me up.
     /**
    * Tells cost of next theme purchase
    */

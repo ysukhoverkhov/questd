@@ -90,9 +90,11 @@ trait SolvingQuests { this: UserLogic =>
     if (!content)
       NotEnoughRights
     else if (!user.timeLine.map(_.objectId).contains(questToSolve.id))
-      InvalidState
+      OutOfContent
     else if (!(user.profile.assets canAfford questToSolve.info.solveCost))
       NotEnoughAssets
+    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+      IncompleteBio
     else
       OK
   }

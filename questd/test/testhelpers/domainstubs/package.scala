@@ -34,7 +34,8 @@ package object domainstubs {
     level: Int = 10,
     vip: Boolean = false,
     cultureId: String = "cultureId",
-    points: Int = 0) = {
+    points: Int = 0,
+    solveCost: Assets = Assets(0, 0, 0)) = {
 
     Quest(
       id = id,
@@ -50,7 +51,7 @@ package object domainstubs {
             reference = "tu"),
           icon = None,
           description = "desc"),
-          solveCost = Assets()),
+          solveCost = solveCost),
       rating = QuestRating(points = points),
       status = status)
   }
@@ -92,13 +93,13 @@ package object domainstubs {
 
   def createTimeLineEntryStub(
     reason: TimeLineReason.Value = TimeLineReason.Created,
-    entryAuthorId: String = "authorId",
+    objectAuthorId: String = "authorId",
     objectType: TimeLineType.Value = TimeLineType.Quest,
     objectId: String = "objectId",
     ourVote: Option[ContentVote.Value] = None) = {
     TimeLineEntry(
       reason = reason,
-      entryAuthorId = entryAuthorId,
+      objectAuthorId = objectAuthorId,
       objectType = objectType,
       objectId = objectId,
       ourVote = ourVote

@@ -22,7 +22,7 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
    */
   def voteQuestByUser(request: VoteQuestByUserRequest): ApiResult[VoteQuestByUserResult] = handleDbException {
 
-    request.user.canVoteQuest(request.questId, request.vote) match {
+    request.user.canVoteQuest(request.questId) match {
       case OK =>
 
         db.quest.readById(request.questId) ifSome { q =>
@@ -39,7 +39,7 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
                   reason = TimeLineReason.Liked,
                   objectType = TimeLineType.Quest,
                   objectId = q.id,
-                  entryAuthorId = Some(q.info.authorId)
+                  objectAuthorId = Some(q.info.authorId)
                 ))
               } else {
                 OkApiResult(AddToWatchersTimeLineResult(u))

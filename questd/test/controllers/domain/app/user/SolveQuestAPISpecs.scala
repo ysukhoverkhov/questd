@@ -18,8 +18,8 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val uid = "uid"
 
       val q = createQuestStub()
-      val tl = createTimeLineEntryStub(entryAuthorId = uid, objectId = q.id, objectType = TimeLineType.Quest)
-      val t2 = createTimeLineEntryStub(objectType = TimeLineType.Solution, entryAuthorId = "uid", reason = TimeLineReason.Created)
+      val tl = createTimeLineEntryStub(objectAuthorId = uid, objectId = q.id, objectType = TimeLineType.Quest)
+      val t2 = createTimeLineEntryStub(objectType = TimeLineType.Solution, objectAuthorId = "uid", reason = TimeLineReason.Created)
       val t3 = createTimeLineEntryStub(objectType = TimeLineType.Quest)
       val t4 = createTimeLineEntryStub(objectType = TimeLineType.Quest)
       val friends = List(Friendship("fid1", FriendshipStatus.Accepted), Friendship("fid2", FriendshipStatus.Invited))

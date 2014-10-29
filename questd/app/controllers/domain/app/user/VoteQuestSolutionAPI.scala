@@ -1,21 +1,15 @@
 package controllers.domain.app.user
 
-import play.Logger
 import components._
 import controllers.domain.helpers._
 import models.domain._
-import models.domain.view._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.questsolution.VoteQuestSolutionUpdateRequest
 
-case class GetQuestSolutionToVoteRequest(user: User)
+case class VoteQuestSolutionRequest(user: User, solutionId: String, vote: ContentVote.Value)
 
-case class GetQuestSolutionToVoteResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
-
-case class VoteQuestSolutionRequest(user: User, vote: QuestSolutionVote.Value)
-
-case class VoteQuestSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, reward: Option[Assets] = None, solver: Option[PublicProfileWithID] = None)
+case class VoteQuestSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 private[domain] trait VoteQuestSolutionAPI {
   this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -23,6 +17,7 @@ private[domain] trait VoteQuestSolutionAPI {
   /**
    * Get quest solution to vote for.
    */
+  // TODO: remove me.
 //  def getQuestSolutionToVote(request: GetQuestSolutionToVoteRequest): ApiResult[GetQuestSolutionToVoteResult] = handleDbException {
 //    import request._
 //
@@ -54,21 +49,24 @@ private[domain] trait VoteQuestSolutionAPI {
 //  }
 
   /**
-   * Get cost of quest to shuffle.
+   * Vote for a solution.
    */
   def voteQuestSolution(request: VoteQuestSolutionRequest): ApiResult[VoteQuestSolutionResult] = handleDbException {
+    import request._
 
-    Logger.debug("API - voteQuestSolution")
+    // TODO: tests:
+    // 1. this function works in general
 
-    request.user.canVoteQuestSolution match {
+    user.canVoteSolution(solutionId) match {
       case OK =>
         // 1. get quest to vote.
         // 2. update quest params.
         // 3. check change quest state
         // 4. save quest in db.
-        val reward = request.user.getQuestSolutionVoteReward
 
-        request.user.profile.questSolutionVoteContext.reviewingQuestSolution ifSome { qs =>
+
+
+        db.solution.readById(solutionId) ifSome { qs =>
           db.solution.readById(qs.id) ifSome { s => {
             voteQuestSolutionUpdate(VoteQuestSolutionUpdateRequest(s, request.vote))
 
@@ -78,19 +76,13 @@ private[domain] trait VoteQuestSolutionAPI {
 
           } ifOk { r =>
 
-            adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(reward)))
-
-          } ifOk { r =>
-
+            // TODO: check wht it's doing
             val u = db.user.recordQuestSolutionVote(r.user.id, s.id)
 
-            val solver = if (request.vote == QuestSolutionVote.Cool) {
-              db.user.readById(s.info.authorId).map(a => PublicProfileWithID(a.id, a.profile.publicProfile))
-            } else {
-              None
-            }
+            // TODO: add to friend's time line.
+            // TODO: check liked quests are added to friend's time line.
 
-            OkApiResult(VoteQuestSolutionResult(OK, u.map(_.profile), Some(reward), solver))
+            OkApiResult(VoteQuestSolutionResult(OK, u.map(_.profile)))
           }
           }
         }

@@ -16,7 +16,7 @@ class UserLogic(
     with CreatingQuests
     with SolvingQuests
     with VotingQuests
-    with VotingQuestSolutions
+    with VotingSolutions
     with DailyResults
     with Friends
     with Tasks

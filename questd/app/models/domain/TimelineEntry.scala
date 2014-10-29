@@ -40,14 +40,14 @@ object TimeLineType extends Enumeration {
  *
  * @param id Id of time line entry.
  * @param reason Reason why entry was created.
- * @param entryAuthorId Id of author of the entry.
+ * @param objectAuthorId Id of author of the entry.
  * @param objectType Type of object entry describes.
  * @param objectId Id of object entry describes.
  */
 case class TimeLineEntry  (
   id: String = ID.generateUUID(),
   reason: TimeLineReason.Value,
-  entryAuthorId: String,
+  objectAuthorId: String,
   objectType: TimeLineType.Value,
   objectId: String,
   ourVote: Option[ContentVote.Value] = None)

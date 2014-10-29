@@ -12,8 +12,10 @@ trait VotingQuests { this: UserLogic =>
   /**
    * Check is our user can vote for given quest with given vote.
    */
-  def canVoteQuest(questId: String, vote: ContentVote.Value) = {
-    val questFromTimeLine = user.timeLine.find(_.objectId == questId)
+  def canVoteQuest(questId: String) = {
+    val questFromTimeLine = user.timeLine.find { te =>
+      (te.objectId == questId) && (te.objectAuthorId != user.id)
+    }
 
     if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuests))
       NotEnoughRights
@@ -26,6 +28,5 @@ trait VotingQuests { this: UserLogic =>
     else
       OK
   }
-
 }
 
