@@ -7,12 +7,12 @@ import models.domain._
 
 trait VoteQuestSolutionWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
-  def voteQuestSolution = wrapJsonApiCallReturnBody[WSVoteQuestSolutionResult] { (js, r) =>
+  def voteSolution = wrapJsonApiCallReturnBody[WSVoteSolutionResult] { (js, r) =>
 
     val v = Json.read[WSVoteQuestSolutionRequest](js)
     val vote = ContentVote.withName(v.vote)
 
-    api.voteQuestSolution(VoteQuestSolutionRequest(r.user, v.solutionId, vote))
+    api.voteSolution(VoteSolutionRequest(r.user, v.solutionId, vote))
 
   }
 

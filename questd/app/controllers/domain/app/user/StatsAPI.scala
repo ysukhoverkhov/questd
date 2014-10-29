@@ -58,17 +58,8 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     val themesHistoryDepth: Int = Math.max(1, Math.round(db.theme.count * config(ConfigParams.FavoriteThemesShare).toFloat))
 
     db.user.addFreshDayToHistory(user.id)
-    clearOldDaysHistory(user)
     clearOldThemesSelectedHistory(user)
     clearOldQuestThemesHistory(user)
-
-    def clearOldDaysHistory(u: User): Option[User] = {
-      if (u.history.votedQuestProposalIds.length > daysHistoryDepth) {
-        db.user.removeLastDayFromHistory(u.id).flatMap(clearOldDaysHistory)
-      } else {
-        Some(u)
-      }
-    }
 
     def clearOldThemesSelectedHistory(u: User): Option[User] = {
       if (u.history.selectedThemeIds.length > themesHistoryDepth)

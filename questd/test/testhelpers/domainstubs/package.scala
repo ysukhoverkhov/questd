@@ -110,7 +110,6 @@ package object domainstubs {
     id: String = "uid",
     cultureId: String = "cultureId",
     vip: Boolean = false,
-    likedQuestProposalIds: List[List[String]] = List(List("", ""), List("", "")),
     friends: List[Friendship] = List(),
     assets: Assets = Assets(1000000, 1000000, 1000000),
     mustVoteSolutions: List[String] = List(),
@@ -127,7 +126,6 @@ package object domainstubs {
       demo = UserDemographics(
         cultureId = Some(cultureId)),
       history = UserHistory(
-        likedQuestProposalIds = likedQuestProposalIds,
         selectedThemeIds = favThemes),
       privateDailyResults = List(DailyResult(
         startOfPeriod = new Date())),

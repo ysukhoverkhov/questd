@@ -76,23 +76,6 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def recordQuestSolutionVote(id: String, solutionId: String): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$inc" -> MongoDBObject(
-          "profile.questSolutionVoteContext.numberOfReviewedSolutions" -> 1),
-        "$unset" -> MongoDBObject(
-          "profile.questSolutionVoteContext.reviewingQuestSolution" -> "",
-          "profile.questSolutionVoteContext.authorOfQuestSolution" -> "",
-          "profile.questSolutionVoteContext.questOfSolution" -> ""),
-        "$push" -> MongoDBObject(
-          "history.votedQuestSolutionIds.0" -> solutionId)))
-  }
-
-  /**
-   *
-   */
   def populateMustVoteSolutionsList(userIds: List[String], solutionId: String): Unit = {
     update(
       query = MongoDBObject(
@@ -119,29 +102,16 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def recordQuestVote(id: String, questId: String, vote: ContentVote.Value): Option[User] = {
+  def recordTimeLineVote(id: String, objectId: String, vote: ContentVote.Value): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 
-    // TODO: perhaps change it to "recordTimelineVote"
-
-    if (vote == ContentVote.Cool) {
-      queryBuilder += ("$push" -> MongoDBObject(
-        "history.votedQuestProposalIds.0" -> questId,
-        "history.likedQuestProposalIds.0" -> questId))
-
-      queryBuilder += ("$inc" -> MongoDBObject(
-        "stats.proposalsLiked" -> 1))
-    } else {
-      queryBuilder += ("$push" -> MongoDBObject(
-        "history.votedQuestProposalIds.0" -> questId))
-    }
     queryBuilder += ("$set" -> MongoDBObject(
       "timeLine.$.ourVote" -> vote.toString))
 
     findAndModify(
       MongoDBObject(
         "id" -> id,
-        "timeLine.objectId" -> questId),
+        "timeLine.objectId" -> objectId),
       queryBuilder.result())
   }
 

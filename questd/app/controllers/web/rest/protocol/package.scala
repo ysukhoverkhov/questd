@@ -134,7 +134,7 @@ package object protocol {
      */
     vote: String)
 
-  type WSVoteQuestSolutionResult = VoteQuestSolutionResult
+  type WSVoteSolutionResult = VoteSolutionResult
 
   /**
    * ********************

@@ -31,7 +31,7 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
           } ifOk { r =>
             makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuests)))
           } ifOk { r =>
-            db.user.recordQuestVote(r.user.id, q.id, request.vote) ifSome { u =>
+            db.user.recordTimeLineVote(r.user.id, q.id, request.vote) ifSome { u =>
 
               (if (request.vote == ContentVote.Cool) {
                 addToWatchersTimeLine(AddToWatchersTimeLineRequest(

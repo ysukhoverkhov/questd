@@ -30,7 +30,7 @@ POST	/rest/solveQuest		    					controllers.web.rest.SolveQuestWS.solveQuest
 POST	/rest/voteQuest     							controllers.web.rest.VoteQuestWS.voteQuest
 
 # Vote quest solution
-POST	/rest/voteQuestSolution							controllers.web.rest.VoteQuestSolutionWS.voteQuestSolution
+POST	/rest/voteSolution						    	controllers.web.rest.VoteQuestSolutionWS.voteSolution
 
 # Time line
 POST	/rest/getTimeLine	    						controllers.web.rest.TimeLineWS.getTimeLine

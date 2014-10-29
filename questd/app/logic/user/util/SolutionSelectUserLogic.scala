@@ -8,6 +8,7 @@ import controllers.domain.app.questsolution._
 
 trait SolutionSelectUserLogic { this: UserLogic =>
 
+  // TODO: clean me up.
   def getRandomSolution: Option[QuestSolution] = {
     List(
       () => getSolutionsWithSuperAlgorithm,
@@ -15,7 +16,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       () => getAllSolutions.getOrElse(List().iterator)).
       foldLeft[Option[QuestSolution]](None)((run, fun) => {
         if (run == None) {
-          selectQuestSolution(fun(), user.history.votedQuestSolutionIds)
+          selectQuestSolution(fun(), List()/*user.history.votedQuestSolutionIds*/)
         } else {
           run
         }
@@ -106,12 +107,14 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       levels)).body.get.solutions)
   }
 
+  // TODO: clean me up.
   private[user] def getSolutionsForLikedQuests = {
-    Logger.trace("  Returning solutions for quests we liked recently")
-    Some(api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
-      user,
-      QuestSolutionStatus.OnVoting,
-      levels)).body.get.solutions)
+//    Logger.trace("  Returning solutions for quests we liked recently")
+//    Some(api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
+//      user,
+//      QuestSolutionStatus.OnVoting,
+//      levels)).body.get.solutions)
+    Some(List().iterator)
   }
 
   private[user] def getVIPSolutions = {

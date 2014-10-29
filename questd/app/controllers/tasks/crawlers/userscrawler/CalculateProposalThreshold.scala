@@ -19,11 +19,11 @@ object CalculateProposalThreshold {
   def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
     Props(classOf[CalculateProposalThreshold], api, rand: RandomComponent#Random)
   }
-
+// TODO: remove this since proposals thresholds are redundant now.
   def name = "CalculateProposalThreshold"
 
-  @volatile var proposalsVoted: Double = 0;
-  @volatile var proposalsLiked: Double = 0;
+  @volatile var proposalsVoted: Double = 0
+  @volatile var proposalsLiked: Double = 0
 }
 
 class CalculateProposalThreshold(
@@ -31,10 +31,10 @@ class CalculateProposalThreshold(
     randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
 
   protected override def start(): Unit = {
-    CalculateProposalThreshold.proposalsVoted = 0;
-    CalculateProposalThreshold.proposalsLiked = 0;
+    CalculateProposalThreshold.proposalsVoted = 0
+    CalculateProposalThreshold.proposalsLiked = 0
   }
-  
+
   protected def check(user: User) = {
     if (user.userActive)
     {

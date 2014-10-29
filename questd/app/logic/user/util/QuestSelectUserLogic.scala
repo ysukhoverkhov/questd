@@ -28,11 +28,6 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private def questIdsToExclude() = {
-//    reason match {
-//      case ForSolving => user.history.solvedQuestIds
-//      case ForVoting => user.history.votedQuestProposalIds
-//    }
-
     user.timeLine.map(_.objectId)
   }
 
