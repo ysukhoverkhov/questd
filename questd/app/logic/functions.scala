@@ -207,6 +207,10 @@ object functions {
     math.round(ratDecrease(level)).toInt
   }
 
+  def dailyCoinsSalary(level: Int): Int = {
+    math.round(coinForVoteResult(level)).toInt
+  }
+
   /**
    * ********************
    * Leveling up

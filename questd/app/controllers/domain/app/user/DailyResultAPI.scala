@@ -33,15 +33,13 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   def shiftDailyResult(request: ShiftDailyResultRequest): ApiResult[ShiftDailyResultResult] = handleDbException {
     import request._
 
-    val dailyAssetsDecrease = user.dailyAssetsDecrease
+    val dailySalary = user.dailySalary
 
-    val u = db.user.addPrivateDailyResult(user.id, DailyResult(user.getStartOfCurrentDailyResultPeriod))
+    db.user.addPrivateDailyResult(
+      user.id,
+      DailyResult(user.getStartOfCurrentDailyResultPeriod, dailySalary)) ifSome { u =>
 
-    u match {
-      case Some(u: User) => OkApiResult(ShiftDailyResultResult(u))
-      case _ =>
-        Logger.error("API - shiftDailyResult. user is not in db after update.")
-        InternalErrorApiResult()
+      OkApiResult(ShiftDailyResultResult(u))
     }
   }
 
@@ -62,9 +60,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
           a + dqs.reward.getOrElse(Assets()) - dqs.penalty.getOrElse(Assets())
         }
 
-        assetsAfterSolutions -
-          dr.questGiveUpAssetsDecrease.getOrElse(Assets()) -
-          dr.proposalGiveUpAssetsDecrease.getOrElse(Assets())
+        assetsAfterSolutions
       }
 
       adjustAssets(AdjustAssetsRequest(user = u, reward = Some(deltaAssets)))

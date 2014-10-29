@@ -7,11 +7,9 @@ import java.util.Date
  */
 case class DailyResult(
   startOfPeriod: Date,
+  dailySalary: Assets,
   decidedQuestSolutions: List[QuestSolutionResult] = List(),
-  decidedQuestProposals: List[QuestProposalResult] = List(),
-  questGiveUpAssetsDecrease: Option[Assets] = None,
-  proposalGiveUpAssetsDecrease: Option[Assets] = None
-  )
+  decidedQuestProposals: List[QuestProposalResult] = List())
 
 case class QuestSolutionResult(
     questSolutionId: String,

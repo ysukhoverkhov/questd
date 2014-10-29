@@ -1,5 +1,6 @@
 package logic
 
+import models.domain.Assets
 import org.specs2.mutable._
 import functions._
 
@@ -79,14 +80,12 @@ class FunctionsSpecs extends Specification {
       rewardForVotingProposal(20, 10) must beEqualTo(8)
     }
 
-    "rewardForVotingSolution" in {
-      rewardForVotingSolution(1, 1) must beEqualTo(4)
-      rewardForVotingSolution(1, 5) must beEqualTo(2)
-      rewardForVotingSolution(1, 10) must beEqualTo(1)
-      rewardForVotingSolution(10, 8) must beEqualTo(30)
-      rewardForVotingSolution(20, 1) must beEqualTo(68)
-      rewardForVotingSolution(20, 10) must beEqualTo(33)
-      rewardForVotingSolution(20, 20) must beEqualTo(9)
+    "dailySalary" in {
+      dailyCoinsSalary(1) must beEqualTo(12)
+      dailyCoinsSalary(6) must beEqualTo(331)
+      dailyCoinsSalary(10) must beEqualTo(398)
+      dailyCoinsSalary(16) must beEqualTo(708)
+      dailyCoinsSalary(20) must beEqualTo(1298)
     }
 
     "dailyRatingDecrease" in {

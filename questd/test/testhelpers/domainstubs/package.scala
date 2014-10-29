@@ -128,7 +128,8 @@ package object domainstubs {
       history = UserHistory(
         selectedThemeIds = favThemes),
       privateDailyResults = List(DailyResult(
-        startOfPeriod = new Date())),
+        startOfPeriod = new Date(),
+        dailySalary = Assets())),
       profile = Profile(
         assets = assets,
         ratingToNextLevel = 100000,

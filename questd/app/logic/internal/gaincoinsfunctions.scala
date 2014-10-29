@@ -25,16 +25,16 @@ object gaincoinsfunctions {
 
 
   def coinForVoteResult(level: Int): Double = {
-    val k = 554.199
-    val d = 12.978
-    val b = -536.643
-    val y = -8.684E-6
+    val k = 162.15924
+    val d = 4.593018
+    val b = -150.641173
+    val y = 4.989512E-9
 
     def coinForVoteResultInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
       level match {
         case _ if level < levelFor(VoteQuestSolutions) => 0
-        case _ if (level < levelFor(VoteQuests)) && (level >= levelFor(VoteQuestSolutions)) => megaf(level, k, d, b, y)
-        case _ => coinForVoteResultInt(levelFor(VoteQuests) - 1, k, d, b, y) * 0.85 + megaf(level, k, d, b, y) * 0.15
+        case _ if (level < levelFor(SubmitPhotoQuests)) && (level >= levelFor(VoteQuestSolutions)) => megaf(level, k, d, b, y)
+        case _ => coinForVoteResultInt(levelFor(SubmitPhotoQuests) - 1, k, d, b, y) * 0.90 + megaf(level, k, d, b, y) * 0.10
       }
     }
 
