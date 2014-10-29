@@ -9,6 +9,7 @@ import play.Logger
 
 case class VoteQuestSolutionUpdateRequest(
   solution: QuestSolution,
+  isFriend: Boolean,
   vote: ContentVote.Value)
 case class VoteQuestSolutionUpdateResult()
 
@@ -33,9 +34,8 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         solution.id,
 
         reviewsCountChange = 1,
-        pointsRandomChange = checkInc(vote, Cool),
-        pointsFriendsChange = 0,
-        pointsInvitedChange = 0,
+        pointsRandomChange = if (isFriend) 0 else checkInc(vote, Cool),
+        pointsFriendsChange = if (isFriend) checkInc(vote, Cool) else 0,
         cheatingChange = checkInc(vote, Cheating),
 
         spamChange = checkInc(vote, IASpam),

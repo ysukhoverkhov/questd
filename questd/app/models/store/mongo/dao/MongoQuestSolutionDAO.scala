@@ -97,7 +97,6 @@ private[mongo] class MongoQuestSolutionDAO
     reviewsCountChange: Int = 0,
     pointsRandomChange: Int = 0,
     pointsFriendsChange: Int = 0,
-    pointsInvitedChange: Int = 0,
     cheatingChange: Int = 0,
 
     spamChange: Int = 0,
@@ -111,7 +110,6 @@ private[mongo] class MongoQuestSolutionDAO
           "rating.pointsRandom" -> pointsRandomChange,
 
           "rating.pointsFriends" -> pointsFriendsChange,
-          "rating.pointsInvited" -> pointsInvitedChange,
 
           "rating.cheating" -> cheatingChange,
 

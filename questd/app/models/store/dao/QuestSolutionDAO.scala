@@ -26,7 +26,6 @@ trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
     reviewsCountChange: Int = 0,
     pointsRandomChange: Int = 0,
     pointsFriendsChange: Int = 0,
-    pointsInvitedChange: Int = 0,
     cheatingChange: Int = 0,
 
     spamChange: Int = 0,
