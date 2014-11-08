@@ -94,8 +94,6 @@ object constants {
 
   val FriendsVoteMult = 2
 
-  val InvitedVoteMult = 2
-
   val NumberOfFavoriteThemesForVIPSolutions = 3
   val NumberOfFavoriteThemesForOtherSolutions = 1
 

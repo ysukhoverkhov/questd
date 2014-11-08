@@ -49,8 +49,7 @@ class QuestSolutionLogic(
   def calculatePoints = {
     List(
       qs.rating.pointsRandom,
-      qs.rating.pointsFriends * constants.FriendsVoteMult,
-      qs.rating.pointsInvited * constants.InvitedVoteMult).sum
+      qs.rating.pointsFriends * constants.FriendsVoteMult).sum
   }
 }
 
