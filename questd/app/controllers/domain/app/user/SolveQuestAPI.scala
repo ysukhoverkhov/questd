@@ -55,8 +55,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   //    }
   //  }
 
+
   /**
-   * Propose solution for quest.
+   * Solve a quest.
    */
   def solveQuest(request: SolveQuestRequest): ApiResult[SolveQuestResult] = handleDbException {
     import request._
@@ -73,21 +74,27 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               solution
             }
 
-            {
-              makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.SubmitQuestResult)))
-            } ifOk { r =>
 
-              r.user.demo.cultureId ifSome { culture =>
+            user.demo.cultureId ifSome { culture =>
 
-                val solution = QuestSolution(
-                  cultureId = culture,
-                  questLevel = questToSolve.info.level,
-                  info = QuestSolutionInfo(
-                    content = content,
-                    authorId = r.user.id,
-                    questId = questToSolve.id,
-                    vip = user.profile.publicProfile.vip),
-                  voteEndDate = user.solutionVoteEndDate(questToSolve.info))
+              val solution = QuestSolution(
+                cultureId = culture,
+                questLevel = questToSolve.info.level,
+                info = QuestSolutionInfo(
+                  content = content,
+                  authorId = user.id,
+                  questId = questToSolve.id,
+                  vip = user.profile.publicProfile.vip),
+                voteEndDate = user.solutionVoteEndDate(questToSolve.info))
+
+              {
+                // Adjusting assets for solving quests.
+                adjustAssets(AdjustAssetsRequest(
+                  user = user,
+                  cost = Some(questToSolve.info.solveCost)))
+              } ifOk { r =>
+                makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.SubmitQuestResult)))
+              } ifOk { r =>
 
                 // Creating solution.
                 db.solution.create(solution)
@@ -108,31 +115,25 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 else
                   Math.round(numberOfReviewedQuests / numberOfSolvedQuests)
                 solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio))
+              } ifOk { sqr =>
+                if (user.profile.questSolutionContext.bookmarkedQuest.map(_.id) == Some(questToSolve.id))
+                  db.user.resetQuestBookmark(user.id)
 
-                {
-                  if (user.profile.questSolutionContext.bookmarkedQuest.map(_.id) == Some(questToSolve.id))
-                    db.user.resetQuestBookmark(user.id)
-                  else
-                    Some(user)
-                } ifSome { u =>
-                  {
-                    addToTimeLine(AddToTimeLineRequest(
-                      user = u,
-                      reason = TimeLineReason.Created,
-                      objectType = TimeLineType.Solution,
-                      objectId = solution.id))
-                  } ifOk { r =>
-                    addToWatchersTimeLine(AddToWatchersTimeLineRequest(
-                      user = u,
-                      reason = TimeLineReason.Created,
-                      objectType = TimeLineType.Solution,
-                      objectId = solution.id))
-                    //                } ifOk { r =>
-                    //                  addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id))
-                  } ifOk { r =>
-                    OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
-                  }
-                }
+                addToTimeLine(AddToTimeLineRequest(
+                  user = user,
+                  reason = TimeLineReason.Created,
+                  objectType = TimeLineType.Solution,
+                  objectId = solution.id))
+              } ifOk { r =>
+                addToWatchersTimeLine(AddToWatchersTimeLineRequest(
+                  user = r.user,
+                  reason = TimeLineReason.Created,
+                  objectType = TimeLineType.Solution,
+                  objectId = solution.id))
+                //                } ifOk { r =>
+                //                  addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id))
+              } ifOk { r =>
+                OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
               }
             }
 
