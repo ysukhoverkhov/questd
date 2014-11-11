@@ -47,11 +47,11 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
             db.quest.create(quest)
 
             (if ((config(api.ConfigParams.DebugDisableProposalCooldown) == "1") || r.user.profile.publicProfile.vip) {
+              Some(request.user)
+            } else {
               db.user.updateQuestCreationCoolDown(
                 request.user.id,
                 request.user.getCoolDownForQuestCreation)
-            } else {
-              Some(request.user)
             }) ifSome { u =>
 
               {
