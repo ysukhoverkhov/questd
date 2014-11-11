@@ -12,7 +12,7 @@ libraryDependencies ++= Seq(
 )
 
 
-libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.10"
+libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
 
 libraryDependencies += "se.radley" %% "play-plugins-salat" % "1.5.0"
 
