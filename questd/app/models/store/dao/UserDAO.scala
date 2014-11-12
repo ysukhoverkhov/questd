@@ -24,7 +24,7 @@ trait UserDAO extends BaseDAO[User] {
    */
   def recordTimeLineVote(id: String, questId: String, vote: ContentVote.Value): Option[User]
 
-  def resetQuestBookmark(id: String): Option[User]
+  def recordQuestSolving(id: String, questId: String): Option[User]
 
   /**
    * Updates cool down for inventing quests.

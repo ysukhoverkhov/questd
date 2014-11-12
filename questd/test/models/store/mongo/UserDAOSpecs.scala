@@ -4,7 +4,6 @@ package models.store.mongo
 
 import java.util.Date
 
-import com.mongodb.BasicDBList
 import models.domain._
 import models.store._
 import org.specs2.mutable._
@@ -459,6 +458,21 @@ class UserDAOSpecs
       val ou2 = db.user.readById(u(1).id)
       ou2 must beSome[User]
       ou2.get.timeLine must beEqualTo(List(tle))
+    }
+
+    "recordQuestSolving do its work" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val questId = "qiq"
+      val user = createUserStub(questBookmark = Some(questId))
+      db.user.create(user)
+
+      db.user.recordQuestSolving(user.id, questId)
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User]
+      ou1.get.stats.solvedQuests must beEqualTo(List(questId))
+      ou1.get.profile.questSolutionContext.bookmarkedQuest must beNone
     }
   }
 }

@@ -93,7 +93,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio))
               } ifOk { sqr =>
                 if (user.profile.questSolutionContext.bookmarkedQuest.map(_.id) == Some(questToSolve.id))
-                  db.user.resetQuestBookmark(user.id)
+                  db.user.recordQuestSolving(user.id, questToSolve.id)
 
                 addToTimeLine(AddToTimeLineRequest(
                   user = user,

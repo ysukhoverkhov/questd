@@ -28,7 +28,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       quest.readById(Matchers.eq(q.id)) returns Some(q)
       quest.updatePoints(Matchers.eq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
-      user.resetQuestBookmark(Matchers.eq(u.id)) returns Some(u)
+      user.recordQuestSolving(Matchers.eq(u.id), Matchers.eq(q.id)) returns Some(u)
       user.addEntryToTimeLine(Matchers.eq(u.id), any) returns Some(u)
       user.addToAssets(Matchers.eq(u.id), any) returns Some(u)
 
@@ -48,7 +48,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
             vip = true),
           voteEndDate = new Date()))
       there was one(quest).readById(q.id)
-      there was one(user).resetQuestBookmark(Matchers.eq(u.id))
+      there was one(user).recordQuestSolving(Matchers.eq(u.id), Matchers.eq(q.id))
       there was one(user).addEntryToTimeLine(Matchers.eq(u.id), any)
       there was one(user).addToAssets(Matchers.eq(u.id), any)
       there was one(user).addEntryToTimeLineMulti(Matchers.eq(List("fid1")), any)
