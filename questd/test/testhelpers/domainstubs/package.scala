@@ -116,6 +116,7 @@ package object domainstubs {
     mustVoteSolutions: List[String] = List(),
     level: Int = 18,
     questCreationCoolDown: Date = new Date(Long.MaxValue),
+    solvedQuests: List[String] = List(),
     takenTheme: Option[ThemeInfoWithID] = Some(ThemeInfoWithID("theme_id", createThemeStub().info)),
     rights: Rights = Rights.full,
     timeLine: List[TimeLineEntry] = List(),
@@ -143,7 +144,8 @@ package object domainstubs {
         rights = rights),
       friends = friends,
       mustVoteSolutions = mustVoteSolutions,
-      timeLine = timeLine)
+      timeLine = timeLine,
+      stats = UserStats(solvedQuests = solvedQuests))
   }
 
 }

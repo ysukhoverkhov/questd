@@ -8,7 +8,7 @@ import models.domain.{ContentVote, Rights}
 import testhelpers.domainstubs._
 
 class VotingSolutionsSpecs extends BaseLogicSpecs {
-// TODO: implement me.
+
   /**
    * Creates stub config for our tests.
    */

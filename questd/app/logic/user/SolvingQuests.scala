@@ -95,6 +95,8 @@ trait SolvingQuests { this: UserLogic =>
       NotEnoughAssets
     else if (questToSolve.info.authorId == user.id)
       InvalidState
+    else if (user.stats.solvedQuests.contains(questToSolve.id))
+      InvalidState
     else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
       IncompleteBio
     else

@@ -13,6 +13,12 @@ case class UserStats (
   lastStatShift: Date = new Date(0),
 
   /**
+   * List of all solved quests.
+   */
+  solvedQuests: List[String] = List(),
+
+// TODO: check remove all 4 bellow.
+  /**
    * How many proposals reviewed since last stats update during voting.
    */
   proposalsVoted: Int = 0,
