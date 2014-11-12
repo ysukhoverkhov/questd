@@ -62,14 +62,15 @@ package object domainstubs {
       None)
   }
 
+  // TODO: replace themeId with tags.
   def createSolutionStub(
     id: String = "sol id",
     cultureId: String = "cultureId",
     userId: String = "uid",
     questId: String = "qid",
+    themeId: String = "themeId",
     status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting,
     level: Int = 1,
-    themeId: String = "tid",
     points: Int = 0,
     vip: Boolean = false,
     voteEndDate: Date = new Date((new Date).getTime + 100000),
@@ -113,7 +114,6 @@ package object domainstubs {
     friends: List[Friendship] = List(),
     assets: Assets = Assets(1000000, 1000000, 1000000),
     mustVoteSolutions: List[String] = List(),
-    favThemes: List[String] = List(),
     level: Int = 18,
     questCreationCoolDown: Date = new Date(Long.MaxValue),
     takenTheme: Option[ThemeInfoWithID] = Some(ThemeInfoWithID("theme_id", createThemeStub().info)),
@@ -125,8 +125,6 @@ package object domainstubs {
       id = id,
       demo = UserDemographics(
         cultureId = Some(cultureId)),
-      history = UserHistory(
-        selectedThemeIds = favThemes),
       privateDailyResults = List(DailyResult(
         startOfPeriod = new Date(),
         dailySalary = Assets())),

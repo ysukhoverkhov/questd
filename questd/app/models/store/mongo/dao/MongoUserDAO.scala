@@ -5,7 +5,6 @@ import java.util.Date
 import com.mongodb.casbah.commons._
 import com.novus.salat._
 import models.domain._
-import models.domain.view._
 import models.store.dao._
 import models.store.mongo.helpers._
 import models.store.mongo.SalatContext._
@@ -59,23 +58,6 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def selectQuestSolutionVote(
-    id: String,
-    qsi: QuestSolutionInfoWithID,
-    qsa: PublicProfileWithID,
-    qi: QuestInfoWithID): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$set" -> MongoDBObject(
-          "profile.questSolutionVoteContext.reviewingQuestSolution" -> grater[QuestSolutionInfoWithID].asDBObject(qsi),
-          "profile.questSolutionVoteContext.authorOfQuestSolution" -> grater[PublicProfileWithID].asDBObject(qsa),
-          "profile.questSolutionVoteContext.questOfSolution" -> grater[QuestInfoWithID].asDBObject(qi))))
-  }
-
-  /**
-   *
-   */
   def populateMustVoteSolutionsList(userIds: List[String], solutionId: String): Unit = {
     update(
       query = MongoDBObject(
@@ -118,48 +100,6 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  // TODO: remove me.
-  def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: PublicProfileWithID, defeatReward: Assets, victoryReward: Assets): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$set" -> MongoDBObject(
-          "profile.questSolutionContext.purchasedQuest" -> grater[QuestInfoWithID].asDBObject(purchasedQuest),
-          "profile.questSolutionContext.questAuthor" -> grater[PublicProfileWithID].asDBObject(author),
-          "profile.questSolutionContext.defeatReward" -> grater[Assets].asDBObject(defeatReward),
-          "profile.questSolutionContext.victoryReward" -> grater[Assets].asDBObject(victoryReward)),
-        "$inc" -> MongoDBObject(
-          "profile.questSolutionContext.numberOfPurchasedQuests" -> 1,
-          "stats.questsReviewed" -> 1),
-        "$push" -> MongoDBObject(
-          "history.solvedQuestIds.0" -> purchasedQuest.id)))
-  }
-
-  /**
-   *
-   */
-  def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$set" -> MongoDBObject(
-          "profile.questSolutionContext.numberOfPurchasedQuests" -> 0,
-          "profile.questSolutionContext.takenQuest" -> grater[QuestInfoWithID].asDBObject(takenQuest),
-          "profile.questSolutionContext.questCooldown" -> cooldown,
-          "profile.questSolutionContext.questDeadline" -> deadline),
-        "$unset" -> MongoDBObject(
-          "profile.questSolutionContext.purchasedQuest" -> ""),
-        "$inc" -> MongoDBObject(
-          "stats.questsAccepted" -> 1)
-//        ,
-//        "$addToSet" -> MongoDBObject(
-//          "history.themesOfSelectedQuests" -> takenQuest.obj.themeId))
-    ))
-  }
-
-  /**
-   *
-   */
   def resetQuestBookmark(id: String): Option[User] = {
 
     val queryBuilder = MongoDBObject.newBuilder
@@ -189,34 +129,12 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  // TODO: check everything is in the place (everything is present in model).
   def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
-          "profile.questSolutionContext.numberOfPurchasedQuests" -> 0,
-          "profile.questProposalContext.numberOfPurchasedThemes" -> 0,
-          "profile.questProposalVoteContext.numberOfReviewedQuests" -> 0,
-          "profile.questSolutionVoteContext.numberOfReviewedSolutions" -> 0,
-          "schedules.purchases" -> resetPurchasesTimeout),
-        "$unset" -> MongoDBObject(
-          "profile.questSolutionContext.purchasedQuest" -> "",
-          "profile.questProposalContext.purchasedTheme" -> "",
-          "profile.questProposalContext.todayReviewedThemeIds" -> "",
-          "profile.questProposalVoteContext.reviewingQuest" -> "",
-          "profile.questSolutionVoteContext.reviewingQuestSolution" -> "")))
-  }
-
-  /**
-   *
-   */
-  def resetTodayReviewedThemes(id: String): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$unset" -> MongoDBObject(
-          "profile.questProposalContext.todayReviewedThemeIds" -> "")))
+          "schedules.purchases" -> resetPurchasesTimeout)))
   }
 
   /**
@@ -277,28 +195,6 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def storeProposalOutOfTimePenalty(id: String, penalty: Assets): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$set" -> MongoDBObject(
-          "privateDailyResults.0.proposalGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty))))
-  }
-
-  /**
-   *
-   */
-  def storeSolutionOutOfTimePenalty(id: String, penalty: Assets): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$set" -> MongoDBObject(
-          "privateDailyResults.0.questGiveUpAssetsDecrease" -> grater[Assets].asDBObject(penalty))))
-  }
-
-  /**
-   *
-   */
   def levelup(id: String, ratingToNextlevel: Int): Option[User] = {
     findAndModify(
       id,
@@ -318,72 +214,6 @@ private[mongo] class MongoUserDAO
         "$set" -> MongoDBObject(
           "profile.ratingToNextLevel" -> newRatingToNextlevel,
           "profile.rights" -> grater[Rights].asDBObject(rights))))
-  }
-
-  /**
-   *
-   */
-  def addFreshDayToHistory(id: String): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$push" -> MongoDBObject(
-          "history.votedQuestProposalIds" ->
-            MongoDBObject(
-              "$each" -> List(List()),
-              "$position" -> 0),
-          "history.solvedQuestIds" ->
-            MongoDBObject(
-              "$each" -> List(List()),
-              "$position" -> 0),
-          "history.votedQuestSolutionIds" ->
-            MongoDBObject(
-              "$each" -> List(List()),
-              "$position" -> 0))))
-  }
-
-  /**
-   *
-   */
-  def removeLastDayFromHistory(id: String): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$pop" -> MongoDBObject(
-          "history.votedQuestProposalIds" -> 1,
-          "history.solvedQuestIds" -> 1,
-          "history.votedQuestSolutionIds" -> 1,
-          "history.likedQuestProposalIds" -> 1)))
-  }
-
-  /**
-   *
-   */
-  def removeLastThemesFromHistory(id: String, themesToRemove: Int): Option[User] = {
-    (1 to themesToRemove) map { a: Int =>
-      findAndModify(
-        id,
-        MongoDBObject(
-          "$pop" -> MongoDBObject(
-            "history.selectedThemeIds" -> -1)))
-    } reduce { (r, c) =>
-      r
-    }
-  }
-
-  /**
-   *
-   */
-  def removeLastQuestThemesFromHistory(id: String, themesToRemove: Int): Option[User] = {
-    (1 to themesToRemove) map { a: Int =>
-      findAndModify(
-        id,
-        MongoDBObject(
-          "$pop" -> MongoDBObject(
-            "history.themesOfSelectedQuests" -> -1)))
-    } reduce { (r, c) =>
-      r
-    }
   }
 
   /**

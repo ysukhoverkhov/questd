@@ -20,7 +20,6 @@ class ShiftUserStats(
 
   protected def check(user: User) = {
     api.shiftStats(ShiftStatsRequest(user))
-    api.shiftHistory(ShiftHistoryRequest(user))
   }
 
 }

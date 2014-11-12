@@ -161,14 +161,15 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user.profile.publicProfile.level + SolutionLevelUpTolerance))
   }
 
+  // TODO: change it to tags.
   private def selectRandomThemes(count: Int): List[String] = {
-    if (user.history.themesOfSelectedQuests.length > 0) {
-      for (i <- (1 to count).toList) yield {
-        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
-      }
-    } else {
+//    if (user.history.themesOfSelectedQuests.length > 0) {
+//      for (i <- (1 to count).toList) yield {
+//        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
+//      }
+//    } else {
       List()
-    }
+//    }
   }
 
 }

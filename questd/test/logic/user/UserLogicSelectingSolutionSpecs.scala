@@ -109,51 +109,53 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
-    "Return VIP solutions with favorite theme ids if dice rolls so" in {
-      val qid = "qid"
-      val u = User(
-        profile = Profile(
-          publicProfile = PublicProfile(level = 10)),
-        history = UserHistory(
-          themesOfSelectedQuests = List("1", "2", "3", "4")))
+    // TODO: uncomment it for tags.
+//    "Return VIP solutions with favorite theme ids if dice rolls so" in {
+//      val qid = "qid"
+//      val u = User(
+//        profile = Profile(
+//          publicProfile = PublicProfile(level = 10)),
+//        history = UserHistory(
+//          themesOfSelectedQuests = List("1", "2", "3", "4")))
+//
+//      api.config returns createStubConfig
+//      rand.nextDouble returns 0.75
+//      rand.nextInt(4) returns 0 thenReturns 1 thenReturns 2
+//
+//      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+//      api.getVIPSolutions(GetVIPSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-20, 12)), List("1", "2", "3"))) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
+//
+//      val q = u.getRandomSolution
+//
+//      there was one(rand).nextDouble
+//      there were three(rand).nextInt(4)
+//      there was one(api).getVIPSolutions(GetVIPSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-20, 12)), List("1", "2", "3")))
+//
+//      q must beSome.which(q => q.id == qid)
+//    }
 
-      api.config returns createStubConfig
-      rand.nextDouble returns 0.75
-      rand.nextInt(4) returns 0 thenReturns 1 thenReturns 2
-
-      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
-      api.getVIPSolutions(GetVIPSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-20, 12)), List("1", "2", "3"))) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
-
-      val q = u.getRandomSolution
-
-      there was one(rand).nextDouble
-      there were three(rand).nextInt(4)
-      there was one(api).getVIPSolutions(GetVIPSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-20, 12)), List("1", "2", "3")))
-
-      q must beSome.which(q => q.id == qid)
-    }
-
-    "Return All solutions with favorite theme ids if dice rolls so" in {
-      val qid = "qid"
-      val u = User(
-        history = UserHistory(
-          themesOfSelectedQuests = List("1", "2", "3", "4")))
-
-      api.config returns createStubConfig
-      rand.nextDouble returns 0.95
-      rand.nextInt(4) returns 1
-
-      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
-      api.getAllSolutions(GetAllSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2"))) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
-
-      val q = u.getRandomSolution
-
-      there was one(rand).nextDouble
-      there was one(rand).nextInt(4)
-      there was one(api).getAllSolutions(GetAllSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2")))
-
-      q must beSome.which(q => q.id == qid)
-    }
+    // TODO: uncomment it for tags.
+//    "Return All solutions with favorite theme ids if dice rolls so" in {
+//      val qid = "qid"
+//      val u = User(
+//        history = UserHistory(
+//          themesOfSelectedQuests = List("1", "2", "3", "4")))
+//
+//      api.config returns createStubConfig
+//      rand.nextDouble returns 0.95
+//      rand.nextInt(4) returns 1
+//
+//      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+//      api.getAllSolutions(GetAllSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2"))) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
+//
+//      val q = u.getRandomSolution
+//
+//      there was one(rand).nextDouble
+//      there was one(rand).nextInt(4)
+//      there was one(api).getAllSolutions(GetAllSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2")))
+//
+//      q must beSome.which(q => q.id == qid)
+//    }
 
     "Starting solutions return vip solutions" in {
       val qid = "qid"

@@ -14,7 +14,6 @@ case class User(
   timeLine: List[TimeLineEntry] = List(),
   schedules: UserSchedules = UserSchedules(),
   stats: UserStats = UserStats(),
-  history: UserHistory = UserHistory(),
   following: List[String] = List(),
   followers: List[String] = List(),
   friends: List[Friendship] = List(),

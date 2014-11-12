@@ -143,15 +143,15 @@ trait QuestSelectUserLogic { this: UserLogic =>
       user.profile.publicProfile.level + TimeLineContentLevelSigma))
   }
 
-  // TODO: looks like it's not used.
+  // TODO: change it to tags when they will be ready.
   private def selectRandomThemes(count: Int): List[String] = {
-    if (user.history.themesOfSelectedQuests.length > 0) {
-      for (i <- (1 to count).toList) yield {
-        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
-      }
-    } else {
+//    if (user.history.themesOfSelectedQuests.length > 0) {
+//      for (i <- (1 to count).toList) yield {
+//        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
+//      }
+//    } else {
       List()
-    }
+//    }
   }
 
 }

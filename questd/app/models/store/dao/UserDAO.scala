@@ -1,7 +1,6 @@
 package models.store.dao
 
 import models.domain._
-import models.domain.view._
 import java.util.Date
 
 trait UserDAO extends BaseDAO[User] {
@@ -13,7 +12,6 @@ trait UserDAO extends BaseDAO[User] {
 
   def addToAssets(id: String, assets: Assets): Option[User]
 
-  def selectQuestSolutionVote(id: String, qsi: QuestSolutionInfoWithID, qsa: PublicProfileWithID, qi: QuestInfoWithID): Option[User]
   def populateMustVoteSolutionsList(userIds: List[String], solutionId: String): Unit
   def removeMustVoteSolution(id: String, solutionId: String): Option[User]
 
@@ -26,8 +24,6 @@ trait UserDAO extends BaseDAO[User] {
    */
   def recordTimeLineVote(id: String, questId: String, vote: ContentVote.Value): Option[User]
 
-  def purchaseQuest(id: String, purchasedQuest: QuestInfoWithID, author: PublicProfileWithID, defeatReward: Assets, victoryReward: Assets): Option[User]
-  def takeQuest(id: String, takenQuest: QuestInfoWithID, cooldown: Date, deadline: Date): Option[User]
   def resetQuestBookmark(id: String): Option[User]
 
   /**
@@ -39,24 +35,14 @@ trait UserDAO extends BaseDAO[User] {
   def updateQuestCreationCoolDown(id: String, coolDown: Date): Option[User]
 
   def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User]
-  def resetTodayReviewedThemes(id: String): Option[User]
 
   def addPrivateDailyResult(id: String, dailyResult: DailyResult): Option[User]
   def movePrivateDailyResultsToPublic(id: String, dailyResults: List[DailyResult]): Option[User]
   def storeProposalInDailyResult(id: String, proposal: QuestProposalResult): Option[User]
   def storeSolutionInDailyResult(id: String, solution: QuestSolutionResult): Option[User]
-  def storeProposalOutOfTimePenalty(id: String, penalty: Assets): Option[User]
-  def storeSolutionOutOfTimePenalty(id: String, penalty: Assets): Option[User]
 
   def levelup(id: String, ratingToNextlevel: Int): Option[User]
   def setNextLevelRatingAndRights(id: String, newRatingToNextlevel: Int, rights: Rights): Option[User]
-
-  // TODO: remove these two functions
-  def addFreshDayToHistory(id: String): Option[User]
-  def removeLastDayFromHistory(id: String): Option[User]
-
-  def removeLastThemesFromHistory(id: String, themesToRemove: Int): Option[User]
-  def removeLastQuestThemesFromHistory(id: String, themesToRemove: Int): Option[User]
 
   def updateStats(id: String, stats: UserStats): Option[User]
 
