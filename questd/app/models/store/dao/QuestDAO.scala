@@ -10,11 +10,6 @@ trait QuestDAO extends BaseDAO[Quest] {
   def countWithStatus(status: String): Long
 
   /**
-   * All quests with status for theme id ordered by points.
-   */
-  def allWithStatusAndThemeByPoints(status: String, themeId: String): Iterator[Quest]
-
-  /**
    * All with status and users.
    *
    * @param ids list of identifiers chose quest from.

@@ -19,14 +19,6 @@ private[mongo] class MongoQuestDAO
       MongoDBObject("status" -> status))
   }
 
-  def allWithStatusAndThemeByPoints(status: String, themeId: String): Iterator[Quest] = {
-    findByExample(
-      MongoDBObject(
-        "status" -> status,
-        "info.themeId" -> themeId),
-      MongoDBObject("rating.points" -> -1))
-  }
-
   def allWithParams(
     status: List[String] = List(),
     authorIds: List[String] = List(),
