@@ -65,6 +65,20 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
 
+    "Do not allow voting for own quests" in {
+      api.config returns createStubConfig
+
+      val userId = "userId"
+      val q = createQuestStub()
+      val user = createUserStub(
+        id = userId,
+        timeLine = List(createTimeLineEntryStub(objectId = q.id, objectAuthorId = userId)))
+
+      val rv = user.canVoteQuest(q.id)
+
+      rv must beEqualTo(ProfileModificationResult.OutOfContent)
+    }
+
     "Allow voting for quests in normal situations" in {
       api.config returns createStubConfig
 
