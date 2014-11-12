@@ -3,7 +3,7 @@ package logic.user
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.config._ConfigParams
 import logic.BaseLogicSpecs
-import models.domain.{Assets, ContentType, Rights}
+import models.domain.{TimeLineReason, Assets, ContentType, Rights}
 import models.domain.admin.ConfigSection
 import testhelpers.domainstubs._
 
@@ -65,6 +65,34 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
 
       rv must beEqualTo(ProfileModificationResult.OutOfContent)
     }
+
+    "Do not allow solving of own quests" in {
+      api.config returns createStubConfig
+
+      val questId = "qid"
+      val tl = List(createTimeLineEntryStub(objectId = questId))
+      val user = createUserStub(timeLine = tl)
+      val q = createQuestStub(id = questId, authorId = user.id)
+
+      val rv = user.canSolveQuest(ContentType.Photo, q)
+
+      rv must beEqualTo(ProfileModificationResult.InvalidState)
+    }
+
+    // TODO: store all solved quests in
+//    "Do not allow solving of quests already solved" in {
+//      api.config returns createStubConfig
+//
+//      val questId = "qid"
+//      val user = createUserStub(timeLine = List(createTimeLineEntryStub(
+//      reason = TimeLineReason.cre
+//      )))
+//      val q = createQuestStub(id = questId, authorId = user.id)
+//
+//      val rv = user.canSolveQuest(ContentType.Photo, q)
+//
+//      rv must beEqualTo(ProfileModificationResult.InvalidState)
+//    }
 
     "Allow creating of quests in normal situations" in {
       api.config returns createStubConfig

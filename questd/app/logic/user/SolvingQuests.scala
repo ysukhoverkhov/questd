@@ -93,6 +93,8 @@ trait SolvingQuests { this: UserLogic =>
       OutOfContent
     else if (!(user.profile.assets canAfford questToSolve.info.solveCost))
       NotEnoughAssets
+    else if (questToSolve.info.authorId == user.id)
+      InvalidState
     else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
       IncompleteBio
     else
