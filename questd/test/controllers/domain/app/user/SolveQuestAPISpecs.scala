@@ -30,6 +30,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       quest.updatePoints(Matchers.eq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
       user.resetQuestBookmark(Matchers.eq(u.id)) returns Some(u)
       user.addEntryToTimeLine(Matchers.eq(u.id), any) returns Some(u)
+      user.addToAssets(Matchers.eq(u.id), any) returns Some(u)
 
       val result = api.solveQuest(SolveQuestRequest(u, q.id, s))
 
@@ -49,6 +50,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(quest).readById(q.id)
       there was one(user).resetQuestBookmark(Matchers.eq(u.id))
       there was one(user).addEntryToTimeLine(Matchers.eq(u.id), any)
+      there was one(user).addToAssets(Matchers.eq(u.id), any)
       there was one(user).addEntryToTimeLineMulti(Matchers.eq(List("fid1")), any)
       there was one(quest).updatePoints(Matchers.eq(q.id), Matchers.eq(2), anyInt, anyInt, anyInt, anyInt)
     }

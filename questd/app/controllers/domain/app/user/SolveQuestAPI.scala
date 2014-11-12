@@ -11,17 +11,11 @@ import controllers.domain._
 import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 
-case class AddToMustVoteSolutionsRequest(user: User, friendIds: List[String], solutionId: String)
-case class AddToMustVoteSolutionsResult(user: User)
-
 case class SolveQuestRequest(
   user: User,
   questId: String,
   solution: QuestSolutionInfoContent)
 case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
-
-case class GetQuestSolutionHelpCostRequest(user: User)
-case class GetQuestSolutionHelpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
 
 case class RewardQuestSolutionAuthorRequest(solution: QuestSolution, author: User)
 case class RewardQuestSolutionAuthorResult()
@@ -29,31 +23,14 @@ case class RewardQuestSolutionAuthorResult()
 case class TryFightQuestRequest(solution: QuestSolution)
 case class TryFightQuestResult()
 
+//case class GetQuestSolutionHelpCostRequest(user: User)
+//case class GetQuestSolutionHelpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
+
+//case class AddToMustVoteSolutionsRequest(user: User, friendIds: List[String], solutionId: String)
+//case class AddToMustVoteSolutionsResult(user: User)
+
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
-
-  /**
-   * Add a quest to given friends "mustVote" list
-   */
-  //  def addToMustVoteSolutions(request: AddToMustVoteSolutionsRequest): ApiResult[AddToMustVoteSolutionsResult] = handleDbException {
-  //    val filteredFriends = request.friendIds.filter( request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId).contains(_) )
-  //
-  //    if (request.friendIds.isEmpty) {
-  //      OkApiResult(AddToMustVoteSolutionsResult(request.user))
-  //    } else {
-  //      db.user.populateMustVoteSolutionsList(
-  //        userIds = filteredFriends,
-  //        solutionId = request.solutionId)
-  //
-  //      {
-  //        adjustAssets(AdjustAssetsRequest(
-  //          user = request.user,
-  //          cost = Some(request.user.costOfAskingForHelpWithSolution * request.friendIds.length)))
-  //      } ifOk { r =>
-  //        OkApiResult(AddToMustVoteSolutionsResult(r.user))
-  //      }
-  //    }
-  //  }
 
 
   /**
@@ -73,7 +50,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             } else {
               solution
             }
-
 
             user.demo.cultureId ifSome { culture =>
 
@@ -141,12 +117,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         }
     }
   }
-
-  //  def getQuestSolutionHelpCost(request: GetQuestSolutionHelpCostRequest): ApiResult[GetQuestSolutionHelpCostResult] = handleDbException {
-  //    import request._
-  //
-  //    OkApiResult(GetQuestSolutionHelpCostResult(OK, Some(user.costOfAskingForHelpWithSolution)))
-  //  }
 
   /**
    * Give quest solution author a reward on quest status change
@@ -276,6 +246,37 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     compete(solutionsForQuest)
   }
+
+
+  /**
+   * Add a quest to given friends "mustVote" list
+   */
+  //  def addToMustVoteSolutions(request: AddToMustVoteSolutionsRequest): ApiResult[AddToMustVoteSolutionsResult] = handleDbException {
+  //    val filteredFriends = request.friendIds.filter( request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId).contains(_) )
+  //
+  //    if (request.friendIds.isEmpty) {
+  //      OkApiResult(AddToMustVoteSolutionsResult(request.user))
+  //    } else {
+  //      db.user.populateMustVoteSolutionsList(
+  //        userIds = filteredFriends,
+  //        solutionId = request.solutionId)
+  //
+  //      {
+  //        adjustAssets(AdjustAssetsRequest(
+  //          user = request.user,
+  //          cost = Some(request.user.costOfAskingForHelpWithSolution * request.friendIds.length)))
+  //      } ifOk { r =>
+  //        OkApiResult(AddToMustVoteSolutionsResult(r.user))
+  //      }
+  //    }
+  //  }
+
+
+  //  def getQuestSolutionHelpCost(request: GetQuestSolutionHelpCostRequest): ApiResult[GetQuestSolutionHelpCostResult] = handleDbException {
+  //    import request._
+  //
+  //    OkApiResult(GetQuestSolutionHelpCostResult(OK, Some(user.costOfAskingForHelpWithSolution)))
+  //  }
 
 }
 

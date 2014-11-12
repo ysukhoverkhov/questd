@@ -112,7 +112,7 @@ package object domainstubs {
     cultureId: String = "cultureId",
     vip: Boolean = false,
     friends: List[Friendship] = List(),
-    assets: Assets = Assets(1000000, 1000000, 1000000),
+    assets: Assets = Assets(100000, 100000, 100000),
     mustVoteSolutions: List[String] = List(),
     level: Int = 18,
     questCreationCoolDown: Date = new Date(Long.MaxValue),
@@ -130,7 +130,7 @@ package object domainstubs {
         dailySalary = Assets())),
       profile = Profile(
         assets = assets,
-        ratingToNextLevel = 100000,
+        ratingToNextLevel = 1000000,
         questSolutionContext = QuestSolutionContext(
           bookmarkedQuest = questBookmark.map(QuestInfoWithID(_, createQuestStub().info))),
         questCreationContext = QuestCreationContext(
