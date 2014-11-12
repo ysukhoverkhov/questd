@@ -125,7 +125,7 @@ object constants {
   /**
    * Tasks
    */
-  val RatingForCompletingDailyTasks = 500
+  val RatingForCompletingDailyTasks = 300
 
   /**
    * Tutorial
