@@ -37,13 +37,7 @@ trait Friends { this: UserLogic =>
   }
 
   def costToAddFriend(potentialFriend: User) = {
-    val friendAhead = potentialFriend.profile.publicProfile.level - user.profile.publicProfile.level
-
-    if (friendAhead > 0) {
-      Assets(money = friendAhead)
-    } else {
-      Assets(coins = costToInviteFriend(user.profile.publicProfile.level, -friendAhead))
-    }
+    Assets(coins = costToInviteFriend(potentialFriend.profile.publicProfile.level))
   }
 
 }

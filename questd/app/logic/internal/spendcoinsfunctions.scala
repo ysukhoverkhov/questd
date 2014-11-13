@@ -10,14 +10,23 @@ object spendcoinsfunctions {
    * How much player will spend daily.
    */
   def coinToSpentDaily(level: Int): Double = {
-    val k = 129.676794
-    val d = 6.39558
-    val b = -29.676794
+    val k = 162.15924
+    val d = 4.593018
+    val b = -150.641173
 
     def coinToSpentDailyInt(level: Int, k: Double, d: Double, b: Double) = megaf(level, k, d, b, 0)
 
     coinToSpentDailyInt(level, k, d, b)
   }
+
+  /**
+   * How much player will spend daily.
+   */
+  def coinToSpentDailyAll(level: Int): Double = {
+    coinToSpentDaily(level) * PremiumIncomeMultiplier
+  }
+
+
 
   /**
    * How much coins we should spend daily on selecting quests.
@@ -43,8 +52,7 @@ object spendcoinsfunctions {
    * How much we spend on friends daily.
    */
   def coinToSpentDailyFriendsOnly(level: Int): Double = {
-    val k = 0.17555787
-    coinToSpentDaily(level) * k
+    coinToSpentDailyAll(level) - coinToSpentDaily(level)
   }
 
   /**
@@ -71,20 +79,7 @@ object spendcoinsfunctions {
    * How much coins we should spend on adding friends each day.
    */
   def coinAddFriend(level: Int): Double = {
-    val k = 77.924446
-    val d = 6.39558
-    val b = -145.644936
-    val y = 2.815498e-6
-
-    def coinAddFriendInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
-      level match {
-        case _ if level < levelFor(InviteFriends) => 0
-        case _ if (level < levelFor(SubmitPhotoQuests)) && (level >= levelFor(InviteFriends)) => megaf(level, k, d, b, y)
-        case _ => coinAddFriendInt(levelFor(SubmitPhotoQuests) - 1, k, d, b, y) * 0.35 + megaf(level, k, d, b, y) * 0.65
-      }
-    }
-
-    coinAddFriendInt(level, k, d, b, y)
+    coinToSpentDailyFriendsOnly(level)
   }
 
 }

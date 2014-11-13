@@ -13,13 +13,12 @@ class functionsSpecs extends Specification {
       questProposalPeriod(20) must beEqualTo(7)
     }
 
-    // TODO: implement me.
-//    "costToTakeQuestToSolve" in {
-//      costToTakeQuestToSolve(3, 1) must beEqualTo(148)
-//      costToTakeQuestToSolve(11, 1) must beEqualTo(590)
-//      costToTakeQuestToSolve(12, 1) must beEqualTo(628)
-//      costToTakeQuestToSolve(20, 1) must beEqualTo(1296)
-//    }
+    "coinSelectQuest" in {
+      coinSelectQuest(3) must beEqualTo(100)
+      coinSelectQuest(11) must beEqualTo(1280)
+      coinSelectQuest(12) must beEqualTo(1628)
+      coinSelectQuest(20) must beEqualTo(10000)
+    }
 
     "ratingToLoseQuest" in {
       ratingToLoseQuest(3) must beEqualTo(75)
@@ -59,9 +58,11 @@ class functionsSpecs extends Specification {
     }
 
     "maxNumberOfFriendsOnLevel" in {
-      maxNumberOfFriendsOnLevel(1) must beEqualTo(4)
-      maxNumberOfFriendsOnLevel(2) must beEqualTo(5)
-      maxNumberOfFriendsOnLevel(10) must beEqualTo(20)
+      maxNumberOfFriendsOnLevel(1) must beEqualTo(1)
+      maxNumberOfFriendsOnLevel(2) must beEqualTo(1)
+      maxNumberOfFriendsOnLevel(6) must beEqualTo(4)
+      maxNumberOfFriendsOnLevel(10) must beEqualTo(10)
+      maxNumberOfFriendsOnLevel(15) must beEqualTo(33)
       maxNumberOfFriendsOnLevel(20) must beEqualTo(100)
     }
 
@@ -75,14 +76,11 @@ class functionsSpecs extends Specification {
     }
 
     "costToInviteFriend" in {
-      costToInviteFriend(1, 0) must beEqualTo(0)
-      costToInviteFriend(5, 0) must beEqualTo(0)
-      costToInviteFriend(6, 0) must beEqualTo(25)
-      costToInviteFriend(6, 5) must beEqualTo(7)
-      costToInviteFriend(13, 0) must beEqualTo(315)
-      costToInviteFriend(13, 10) must beEqualTo(28)
-      costToInviteFriend(20, 0) must beEqualTo(973)
-      costToInviteFriend(20, 15) must beEqualTo(26)
+      costToInviteFriend(1) must beEqualTo(6)
+      costToInviteFriend(5) must beEqualTo(118)
+      costToInviteFriend(6) must beEqualTo(165)
+      costToInviteFriend(13) must beEqualTo(1030)
+      costToInviteFriend(20) must beEqualTo(5000)
     }
   }
 

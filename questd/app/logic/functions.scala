@@ -166,16 +166,16 @@ object functions {
    */
 
   def maxNumberOfFriendsOnLevel(level: Int): Int = {
-    math.round((NumberOfFreindsOnLastLevel / coinToSpentDailyFriendsOnly(MaxLevel)) * coinToSpentDailyFriendsOnly(level)).toInt
+    math.floor(((NumberOfFreindsOnLastLevel - 1) / coinToSpentDailyFriendsOnly(MaxLevel)) * coinToSpentDailyFriendsOnly(level) + 1).toInt
   }
 
-  def costToInviteFriend(level: Int, levelDifference: Int): Int = {
-
-    def costToInviteFriendCoef(levelDif: Int) = {
-      math.pow(0.78475, levelDif)
-    }
-
-    math.round(costToInviteFriendCoef(levelDifference) * coinAddFriend(level)).toInt
+  /**
+   * Calculates cost to invite a friend to become our friend.
+   * @param level level of a potential friend.
+   * @return cost in coins.
+   */
+  def costToInviteFriend(level: Int): Int = {
+    math.round(coinAddFriend(level)).toInt
   }
 
   /**

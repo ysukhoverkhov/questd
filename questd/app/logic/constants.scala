@@ -39,6 +39,11 @@ object constants {
 
   val TimeLineContentLevelSigma = 2
 
+  /**
+   * Income
+   */
+
+  val PremiumIncomeMultiplier = 1.5
 
   /**
    * Quest proposing.
