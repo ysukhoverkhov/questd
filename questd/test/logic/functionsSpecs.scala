@@ -1,19 +1,11 @@
 package logic
 
-import models.domain.Assets
 import org.specs2.mutable._
 import functions._
 
-class FunctionsSpecs extends Specification {
+class functionsSpecs extends Specification {
 
   "Functions should" should {
-
-    "ratingForProposalAtLevel" in {
-      ratingForProposalAtLevel(1) must beEqualTo(0)
-      ratingForProposalAtLevel(11) must beEqualTo(0)
-      ratingForProposalAtLevel(12) must beBetween(2240, 2250)
-      ratingForProposalAtLevel(20) must beBetween(7630, 7640)
-    }.pendingUntilFixed
 
     "questProposalPeriod" in {
       questProposalPeriod(12) must beEqualTo(7)
@@ -21,35 +13,7 @@ class FunctionsSpecs extends Specification {
       questProposalPeriod(20) must beEqualTo(7)
     }
 
-    "costToSkipTheme" in {
-      costToSkipTheme(12, 1) must beEqualTo(4/*Math.round(0.384 * questProposalPeriod(12))*/)
-      costToSkipTheme(12, 12) must beEqualTo(43/*Math.round(4.466 * questProposalPeriod(12))*/)
-      costToSkipTheme(20, 1) must beEqualTo(15/*Math.round(5.96 * questProposalPeriod(20))*/)
-      costToSkipTheme(20, 12) must beEqualTo(173/*Math.round(69.389 * questProposalPeriod(20))*/)
-    }.pendingUntilFixed
-
-    "costToTakeQuestTheme" in {
-      costToTakeQuestTheme(12) must beEqualTo(66 * 9)
-      costToTakeQuestTheme(13) must beEqualTo(1002)
-      costToTakeQuestTheme(20) must beEqualTo(1203 * 2)
-    }.pendingUntilFixed
-
-    "ratingToGiveUpQuestProposal" in {
-      ratingToGiveUpQuestProposal(12) must beBetween(4360, 4370)
-      ratingToGiveUpQuestProposal(20) must beBetween(15260, 15280)
-    }.pendingUntilFixed
-
-
-    "costToSkipQuest" in {
-      costToSkipQuest(3, 0, 1) must beEqualTo(0)
-      costToSkipQuest(3, 1, 1) must beEqualTo(8)
-      costToSkipQuest(3, 8, 1) must beEqualTo(62)
-      costToSkipQuest(20, 1, 1) must beEqualTo(16)
-      costToSkipQuest(20, 8, 1) must beEqualTo(121)
-    }
-
-
-    // TODO: clean me up.
+    // TODO: implement me.
 //    "costToTakeQuestToSolve" in {
 //      costToTakeQuestToSolve(3, 1) must beEqualTo(148)
 //      costToTakeQuestToSolve(11, 1) must beEqualTo(590)
@@ -57,19 +21,12 @@ class FunctionsSpecs extends Specification {
 //      costToTakeQuestToSolve(20, 1) must beEqualTo(1296)
 //    }
 
-    "ratingToGiveUpQuest" in {
-      ratingToGiveUpQuest(3, 1) must beEqualTo(1488)
-      ratingToGiveUpQuest(11, 1) must beEqualTo(4601)
-      ratingToGiveUpQuest(12, 1) must beEqualTo(4814)
-      ratingToGiveUpQuest(20, 1) must beEqualTo(7465)
-    }.pendingUntilFixed
-
     "ratingToLoseQuest" in {
-      ratingToLoseQuest(3, 1) must beEqualTo(496)
-      ratingToLoseQuest(11, 1) must beEqualTo(1534)
-      ratingToLoseQuest(12, 1) must beEqualTo(1605)
-      ratingToLoseQuest(20, 1) must beEqualTo(2488)
-    }.pendingUntilFixed
+      ratingToLoseQuest(3) must beEqualTo(75)
+      ratingToLoseQuest(11) must beEqualTo(567)
+      ratingToLoseQuest(12) must beEqualTo(709)
+      ratingToLoseQuest(20) must beEqualTo(3800)
+    }
 
     "rewardForVotingProposal" in {
       rewardForVotingProposal(10, 1) must beEqualTo(32)
@@ -126,7 +83,7 @@ class FunctionsSpecs extends Specification {
       costToInviteFriend(13, 10) must beEqualTo(28)
       costToInviteFriend(20, 0) must beEqualTo(973)
       costToInviteFriend(20, 15) must beEqualTo(26)
-    }.pendingUntilFixed
+    }
   }
 
 }

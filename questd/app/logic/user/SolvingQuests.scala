@@ -4,6 +4,7 @@ import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 import logic._
 import logic.constants._
+import logic.functions._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
 import models.domain.ContentType._
@@ -150,18 +151,17 @@ trait SolvingQuests { this: UserLogic =>
 
   /**
    * Reward for lost quest.
-   */ // TODO: implement me.
+   */
   def rewardForLosingQuest(quest: Quest) = {
-//    Assets(rating = ratingToLoseQuest(user.profile.publicProfile.level, quest.info.daysDuration)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+    Assets(rating = ratingToLoseQuest(quest.info.level)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
     Assets()
   }
 
   /**
    * Reward for won quest.
-   */ // TODO: implement me.
+   */
   def rewardForWinningQuest(quest: Quest) = {
-//    Assets(rating = ratingToWinQuest(user.profile.publicProfile.level, quest.info.daysDuration)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
-    Assets()
+    Assets(rating = ratingToWinQuest(quest.info.level)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
   }
 
   /**

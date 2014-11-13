@@ -2,7 +2,6 @@ package logic.user
 
 import java.util.Date
 import logic._
-import logic.constants._
 import logic.functions._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
@@ -164,24 +163,28 @@ trait CreatingQuests { this: UserLogic =>
   /**
    * Reward for approving quest.
    */
-  def rewardForMakingApprovedQuest = {
-    Assets(rating = ratingForProposalAtLevel(user.profile.publicProfile.level)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
-  }
+//  def rewardForMakingApprovedQuest = {
+//    Assets(rating = ratingForProposalAtLevel(user.profile.publicProfile.level)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+//  }
 
+  // TODO: invent me and write in desdoc as well.
   def penaltyForCheatingQuest = {
-    (rewardForMakingApprovedQuest * QuestProposalCheatingPenalty) clampTop user.profile.assets
+    Assets()
+    //(rewardForMakingApprovedQuest * QuestProposalCheatingPenalty) clampTop user.profile.assets
   }
 
+  // TODO: invent me and write in desdoc as well.
   def penaltyForIACQuest = {
-    (rewardForMakingApprovedQuest * QuestProposalIACPenalty) clampTop user.profile.assets
+    Assets()
+//    (rewardForMakingApprovedQuest * QuestProposalIACPenalty) clampTop user.profile.assets
   }
 
   /**
    *
    */
-  def costOfGivingUpQuestProposal = {
-    Assets(rating = ratingToGiveUpQuestProposal(user.profile.publicProfile.level)) clampTop user.profile.assets
-  }
+//  def costOfGivingUpQuestProposal = {
+//    Assets(rating = ratingToGiveUpQuestProposal(user.profile.publicProfile.level)) clampTop user.profile.assets
+//  }
 
   /**
    * How much it'll be for a single friend to help us with proposal.

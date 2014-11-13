@@ -17,44 +17,9 @@ object functions {
    */
 
   /**
-   * Rating to give user for successful (approved) proposal at a level.
-   */
-  def ratingForProposalAtLevel(level: Int): Int = {
-    val proposalPeriodAtMaxLevel = 2
-
-    (proposalPeriodAtMaxLevel * ratingForSubmitProposal(level) * math.pow(MaxLevel.toDouble / level, 3)).toInt
-  }
-
-  /**
    * Period in days to give players a task to make quest.
    */
   def questProposalPeriod(level: Int): Int = 7
-
-  /**
-   * Cost to skip a single theme for proposal.
-   */
-  def costToSkipTheme(level: Int, skipNumber: Int): Int = {
-    if (skipNumber == 0) {
-      0
-    } else {
-      def costToSkipProposalInt(level: Int, skipNumber: Int, k: Double) = {
-        k * math.pow(40.0 / 32.0, skipNumber)
-      }
-
-      def kf(level: Int) = {
-        coinsShuffleTheme(level) / (1 to NumberOfThemesSkipsForCoins).map(x => costToSkipProposalInt(level, x, 1)).sum
-      }
-
-      math.round(costToSkipProposalInt(level, skipNumber, kf(level)) * questProposalPeriod(level)).toInt
-    }
-  }
-
-  /**
-   * Cost to propose a single quest.
-   */
-  def costToTakeQuestTheme(level: Int): Int = {
-    math.round(coinProposeQuest(level) * questProposalPeriod(level)).toInt
-  }
 
   /**
    * Takes proposal period into account.
@@ -66,38 +31,10 @@ object functions {
   }
 
   /**
-   * Cost to give up quest proposal.
-   */
-  def ratingToGiveUpQuestProposal(level: Int): Int = {
-    math.round(ratingForSubmitProposal(level) * questProposalPeriod(level) * QuestProposalGiveUpPenalty).toInt
-  }
-
-  /**
    * *********************
    * Purchasing of quests.
    * *********************
    */
-
-  /**
-   * Cost to skip a single proposal
-   */
-  def costToSkipQuest(level: Int, skipNumber: Int, currentQuestDuration: Int): Int = {
-    assert(skipNumber >= 0)
-
-    if (skipNumber == 0) {
-      0
-    } else {
-      def costToSkipQuestInt(level: Int, skipNumber: Int, k: Double) = {
-        k * math.pow(4.0 / 3.0, skipNumber)
-      }
-
-      def kf(level: Int) = {
-        coinShuffleQuest(level) / (1 to NumberOfQuestsSkipsForCoins).map(x => costToSkipQuestInt(level, x, 1)).sum
-      }
-
-      math.round(costToSkipQuestInt(level, skipNumber, kf(level)) * currentQuestDuration).toInt
-    }
-  }
 
   /**
    * How much coins does it takes to take quest for solving.
@@ -121,26 +58,20 @@ object functions {
     4
   }
 
-
   /**
-   * How much in rating we will lose in case of giving quest up.
-   */
-  def ratingToGiveUpQuest(level: Int, questDuration: Int): Int = {
-    math.round(ratingForSubmitResult(level) * questDuration * QuestSolutionGiveUpPenalty).toInt
-  }
-
-  /**
+   * @param level level of the quest.
    * How much rating we will receive for losing quest.
    */
-  def ratingToLoseQuest(level: Int, questDuration: Int): Int = {
-    math.round(ratingForSubmitResult(level) * questDuration * QuestLosingMultiplier).toInt
+  def ratingToLoseQuest(level: Int): Int = {
+    math.round(ratingForSubmitResult(level) * QuestLosingMultiplier).toInt
   }
 
   /**
+   * @param level level of the quest.
    * How much rating we will receive for winning quest.
    */
-  def ratingToWinQuest(level: Int, questDuration: Int): Int = {
-    ratingToLoseQuest(level, questDuration) * QuestVictoryMultiplier
+  def ratingToWinQuest(level: Int): Int = {
+    ratingToLoseQuest(level) * QuestVictoryMultiplier
   }
 
   /**
