@@ -16,28 +16,6 @@ class QuestLogic(
   }
 
   /**
-   * Are we able to add quest to rotation.
-   */
-  // TODO: clean me up.
-//  def shouldAddToRotation = {
-//    if ((quest.rating.points > api.config(api.ConfigParams.ProposalLikesToEnterRotation).toLong) && (quest.status == QuestStatus.OnVoting))
-//      true
-//    else
-//      false
-//  }
-
-  /**
-   * Should we remove quest from rotation.
-   */
-  // TODO: clean me up.
-//  def shouldRemoveFromRotation = {
-//    if ((quest.rating.points < api.config(api.ConfigParams.ProposalLikesToEnterRotation).toLong / 2) && (quest.status == QuestStatus.InRotation))
-//      true
-//    else
-//      false
-//  }
-
-  /**
    * Should we ban quest.
    */
   def shouldBanIAC = {
@@ -54,21 +32,14 @@ class QuestLogic(
   /**
    * Should we decide user is a cheater.
    */
-  // TODO: clean me up.
   def shouldBanCheating = {
-    val maxCheatingVotes = api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
-    quest.rating.cheating > maxCheatingVotes // && (quest.status == QuestStatus.OnVoting)
-  }
 
-  /**
-   * Should we remove it because it's with us for too long without a reason.
-   */
-  // TODO: clean me up.
-//  def shouldRemoveQuestFromVotingByTime = {
-//    (quest.rating.votersCount > api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong) &&
-//      ((quest.rating.points.toDouble / quest.rating.votersCount.toDouble) < api.config(api.ConfigParams.ProposalRatioToLeaveVoting).toDouble) &&
-//      (quest.status == QuestStatus.OnVoting)
-//  }
+    val maxCheatingVotes = Math.max(
+      api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * quest.rating.votersCount,
+      api.config(api.ConfigParams.ProposalMinCheatingVotes).toLong)
+
+    quest.rating.cheating > maxCheatingVotes
+  }
 }
 
 object QuestLogic {

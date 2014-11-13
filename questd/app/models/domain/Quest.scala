@@ -5,7 +5,7 @@ import java.util.Date
 
 
 object QuestStatus extends Enumeration {
-  val InRotation, RatingBanned, CheatingBanned, IACBanned, OldBanned = Value
+  val InRotation, CheatingBanned, IACBanned, OldBanned = Value
 }
 
 case class Quest(

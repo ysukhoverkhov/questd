@@ -24,6 +24,7 @@ class _ConfigParams {
   val ProposalMinVotesToTakeRemovalDecision = "50 02 Min Votes To Take Removal Decision"
   val ProposalWorstLikesRatio = "50 11 Proposal Worst Likes Ratio" // If proposal has fewer than current ration multiplied by average votes/likes ratio and more than min votes count is reached it is removed from voting.
   val ProposalCheatingRatio = "50 12 Proposal Cheating to Votes Ratio"
+  val ProposalMinCheatingVotes = "50 13 Proposal Min Cheating Votes"
   val ProposalIACRatio = "50 13 Proposal IAC to Total Votes Ratio"
   val ProposalMinIACVotes = "50 14 Proposal min IAC Votes"
   val ProposalLikesToEnterRotation = "50 21 Proposal Likes To Enter Rotation (calculated)"
@@ -86,8 +87,9 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
 
       ConfigParams.ProposalWorstLikesRatio -> "0.1",
       ConfigParams.ProposalCheatingRatio -> "0.1",
+      ConfigParams.ProposalMinCheatingVotes -> "10",
       ConfigParams.ProposalIACRatio -> "0.03",
-      ConfigParams.ProposalMinIACVotes -> "2",
+      ConfigParams.ProposalMinIACVotes -> "10",
       ConfigParams.ProposalLikesToEnterRotation -> "10",
       ConfigParams.ProposalVotesToLeaveVoting -> "100",
       ConfigParams.ProposalRatioToLeaveVoting -> "0.05",

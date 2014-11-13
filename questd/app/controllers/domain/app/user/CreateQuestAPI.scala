@@ -11,8 +11,8 @@ import play.Logger
 case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List())
 case class CreateQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class RewardQuestProposalAuthorRequest(quest: Quest, author: User)
-case class RewardQuestProposalAuthorResult()
+case class RewardQuestAuthorRequest(quest: Quest, author: User)
+case class RewardQuestAuthorResult()
 
 private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -81,14 +81,10 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
   /**
    * Give quest proposal author a reward on quest status change
    */
-  // TODO: move me to anoher aPi. perhaps it should be something banning related.
-  // TODO: store in dail reult only banning.
-  def rewardQuestProposalAuthor(request: RewardQuestProposalAuthorRequest): ApiResult[RewardQuestProposalAuthorResult] = handleDbException {
+  def rewardQuestAuthor(request: RewardQuestAuthorRequest): ApiResult[RewardQuestAuthorResult] = handleDbException {
     import request._
 
-    val r = quest.status match {
-      case QuestStatus.RatingBanned =>
-        OkApiResult(StoreProposalInDailyResultResult(author))
+    (quest.status match {
 
       case QuestStatus.CheatingBanned =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForCheatingQuest)))
@@ -102,10 +98,8 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
       case _ =>
         Logger.error("Rewarding quest author but quest status is Unexpected")
         InternalErrorApiResult[StoreProposalInDailyResultResult]()
-    }
-
-    r ifOk {
-      OkApiResult(RewardQuestProposalAuthorResult())
+    }) ifOk {
+      OkApiResult(RewardQuestAuthorResult())
     }
   }
 }
