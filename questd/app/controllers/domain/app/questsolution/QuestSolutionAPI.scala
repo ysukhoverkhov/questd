@@ -95,7 +95,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
               Logger.error("Unable to find author of quest solution user " + authorId)
               InternalErrorApiResult()
             case Some(author) =>
-              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(s, author))
+              rewardSolutionAuthor(RewardSolutionAuthorRequest(s, author))
           }
         } else {
           OkApiResult(None)

@@ -1,6 +1,7 @@
 package logic
 
 import logic.functions._
+import logic.constants._
 import models.domain._
 import controllers.domain.DomainAPIComponent
 
@@ -13,6 +14,20 @@ class QuestLogic(
    */
   def costOfSolving: Assets = {
     QuestLogic.costOfSolvingQuest(quest.info.level)
+  }
+
+  /**
+   * Penalty for cheating solution
+   */
+  def penaltyForCheatingSolution = {
+    QuestLogic.rewardForLosingQuest(quest.info.level, api) * QuestSolutionCheatingPenalty
+  }
+
+  /**
+   * Penalty for IAC solution
+   */
+  def penaltyForIACSolution = {
+    QuestLogic.rewardForLosingQuest(quest.info.level, api) * QuestSolutionIACPenalty
   }
 
   /**
@@ -49,4 +64,19 @@ object QuestLogic {
   def costOfSolvingQuest(questLevel: Int) = {
     Assets(coins = coinSelectQuest(questLevel))
   }
+
+  /**
+   * Reward for lost quest.
+   */
+  def rewardForLosingQuest(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
+    Assets(rating = ratingToLoseQuest(questLevel)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+  }
+
+  /**
+   * Reward for won quest.
+   */
+  def rewardForWinningQuest(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
+    Assets(rating = ratingToWinQuest(questLevel)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+  }
+
 }

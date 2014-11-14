@@ -10,5 +10,7 @@ case class QuestInfo(
   content: QuestInfoContent,
   level: Int,
   vip: Boolean,
-  solveCost: Assets)
+  solveCost: Assets,
+  solveRewardWon: Assets,
+  solveRewardLost: Assets)
 

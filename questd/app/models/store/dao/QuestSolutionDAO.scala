@@ -7,6 +7,7 @@ trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
   /**
    * Get solutions what meets following optional parameters.
    */
+  // TODO: here and in all similar functions statuses should not be list of strings.
   def allWithParams(
     status: List[String] = List(),
     authorIds: List[String] = List(),

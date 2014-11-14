@@ -17,8 +17,8 @@ case class SolveQuestRequest(
   solution: QuestSolutionInfoContent)
 case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class RewardQuestSolutionAuthorRequest(solution: QuestSolution, author: User)
-case class RewardQuestSolutionAuthorResult()
+case class RewardSolutionAuthorRequest(solution: QuestSolution, author: User)
+case class RewardSolutionAuthorResult()
 
 case class TryFightQuestRequest(solution: QuestSolution)
 case class TryFightQuestResult()
@@ -121,52 +121,51 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   /**
    * Give quest solution author a reward on quest status change
    */
-  def rewardQuestSolutionAuthor(request: RewardQuestSolutionAuthorRequest): ApiResult[RewardQuestSolutionAuthorResult] = handleDbException {
-    // TODO: implement me.
-    //    import request._
-    //
-    //    Logger.debug("API - rewardQuestSolutionAuthor")
-    //
-    //    case class QuestNotFoundException() extends Throwable
-    //
-    //    def q = {
-    //      db.quest.readById(solution.info.questId) match {
-    //        case Some(qu) => qu
-    //        case None => throw QuestNotFoundException()
-    //      }
-    //    }
-    //
-    //    try {
-    //      val r = solution.status match {
-    //        case QuestSolutionStatus.OnVoting =>
-    //          Logger.error("We are rewarding player for solution what is on voting.")
-    //          InternalErrorApiResult()
-    //
-    //        case QuestSolutionStatus.WaitingForCompetitor =>
-    //          tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
-    //
-    //        case QuestSolutionStatus.Won =>
-    //            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(author.profile.questSolutionContext.victoryReward)))
-    //
-    //        case QuestSolutionStatus.Lost =>
-    //            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(author.profile.questSolutionContext.defeatReward)))
-    //
-    //        case QuestSolutionStatus.CheatingBanned =>
-    //            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(author.penaltyForCheatingSolution(q))))
-    //
-    //        case QuestSolutionStatus.IACBanned =>
-    //            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(author.penaltyForIACSolution(q))))
-    //      }
-    //
-    //      r ifOk {
-    //        OkApiResult(RewardQuestSolutionAuthorResult())
-    //      }
-    //    } catch {
-    //      case ex: QuestNotFoundException =>
-    //        Logger.error("No quest found for updating player assets for changing solution state.")
-    //        InternalErrorApiResult()
-    //    }
-    OkApiResult(RewardQuestSolutionAuthorResult())
+  def rewardSolutionAuthor(request: RewardSolutionAuthorRequest): ApiResult[RewardSolutionAuthorResult] = handleDbException {
+    import request._
+
+    Logger.debug("API - rewardQuestSolutionAuthor")
+
+    class QuestNotFoundException() extends Throwable
+
+    def q = {
+      db.quest.readById(solution.info.questId) match {
+        case Some(qu) => qu
+        case None => throw new QuestNotFoundException()
+      }
+    }
+
+    try {
+      val r = solution.status match {
+          // TODO: implement this part.
+//        case QuestSolutionStatus.OnVoting =>
+//          Logger.error("We are rewarding player for solution what is on voting.")
+//          InternalErrorApiResult()
+//
+//        case QuestSolutionStatus.WaitingForCompetitor =>
+//          tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
+
+        case QuestSolutionStatus.Won =>
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(q.info.solveRewardWon)))
+
+        case QuestSolutionStatus.Lost =>
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(q.info.solveRewardLost)))
+
+        case QuestSolutionStatus.CheatingBanned =>
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(q.penaltyForCheatingSolution)))
+
+        case QuestSolutionStatus.IACBanned =>
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(q.penaltyForIACSolution)))
+      }
+
+      r ifOk {
+        OkApiResult(RewardSolutionAuthorResult())
+      }
+    } catch {
+      case ex: QuestNotFoundException =>
+        Logger.error("No quest found for updating player assets for changing solution state.")
+        InternalErrorApiResult()
+    }
   }
 
   /**
@@ -212,7 +211,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
             db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString, curSol.rivalSolutionId) ifSome { s =>
               db.user.readById(curSol.info.authorId) ifSome { u =>
-                rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u))
+                rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = u))
               }
             }
 
@@ -224,7 +223,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
             db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString, curSol.rivalSolutionId) ifSome { s =>
               db.user.readById(curSol.info authorId) ifSome { u =>
-                rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u))
+                rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = u))
               }
             }
 

@@ -33,7 +33,9 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
             level = 10,
             content = q.info.content,
             vip = false,
-            solveCost = Assets())))
+            solveCost = Assets(),
+            solveRewardWon = Assets(),
+            solveRewardLost = Assets())))
     }
 
     "Create VIP quests for VIP users" in context {
@@ -58,7 +60,9 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
             level = 10,
             content = q.info.content,
             vip = true,
-            solveCost = Assets())))
+            solveCost = Assets(),
+            solveRewardWon = Assets(),
+            solveRewardLost = Assets())))
     }
   }
 }

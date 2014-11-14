@@ -19,6 +19,7 @@ class PopulateTimeLine(
     randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
 
   protected def check(user: User) = {
+    // TODO: add here a time check for timeline population.
     api.populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user))
   }
 

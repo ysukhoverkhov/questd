@@ -149,33 +149,4 @@ trait SolvingQuests { this: UserLogic =>
     DateTime.now + coef.days toDate ()
   }
 
-  /**
-   * Reward for lost quest.
-   */
-  def rewardForLosingQuest(quest: Quest) = {
-    Assets(rating = ratingToLoseQuest(quest.info.level)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
-    Assets()
-  }
-
-  /**
-   * Reward for won quest.
-   */
-  def rewardForWinningQuest(quest: Quest) = {
-    Assets(rating = ratingToWinQuest(quest.info.level)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
-  }
-
-  /**
-   * Penalty for cheating solution
-   */
-  def penaltyForCheatingSolution(quest: Quest) = {
-    (rewardForLosingQuest(quest) * QuestSolutionCheatingPenalty) clampTop user.profile.assets
-  }
-
-  /**
-   * Penalty for IAC solution
-   */
-  def penaltyForIACSolution(quest: Quest) = {
-    (rewardForLosingQuest(quest) * QuestSolutionIACPenalty) clampTop user.profile.assets
-  }
-
 }

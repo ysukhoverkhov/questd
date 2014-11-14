@@ -19,13 +19,11 @@ class QuestSolutionLogic(
    * Should we ban quest for cheating and stop displaying it to everyone.
    */
   def shouldBanCheating = {
-    (qs.status == QuestSolutionStatus.OnVoting) && {
-      val votesToThreatAsCheating = Math.max(
-        api.config(api.ConfigParams.SolutionCheatingRatio).toDouble * qs.rating.reviewsCount,
-        api.config(api.ConfigParams.SolutionMinCheatingVotes).toLong)
+    val votesToThreatAsCheating = Math.max(
+      api.config(api.ConfigParams.SolutionCheatingRatio).toDouble * qs.rating.reviewsCount,
+      api.config(api.ConfigParams.SolutionMinCheatingVotes).toLong)
 
-      qs.rating.cheating > votesToThreatAsCheating
-    }
+    qs.rating.cheating > votesToThreatAsCheating
   }
 
   /**

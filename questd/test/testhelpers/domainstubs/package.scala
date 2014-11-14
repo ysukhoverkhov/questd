@@ -51,7 +51,9 @@ package object domainstubs {
             reference = "tu"),
           icon = None,
           description = "desc"),
-          solveCost = solveCost),
+          solveCost = solveCost,
+          solveRewardWon = Assets(),
+          solveRewardLost = Assets()),
       rating = QuestRating(points = points),
       status = status)
   }

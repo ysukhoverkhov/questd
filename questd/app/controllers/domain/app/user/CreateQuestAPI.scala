@@ -35,14 +35,18 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
         } ifOk { r =>
           r.user.demo.cultureId ifSome { culture =>
 
+            val questLevel = r.user.profile.publicProfile.level
+
             val quest = Quest(
               cultureId = culture,
               info = QuestInfo(
                 authorId = r.user.id,
-                level = r.user.profile.publicProfile.level,
+                level = questLevel,
                 content = content,
                 vip = r.user.profile.publicProfile.vip,
-                solveCost = QuestLogic.costOfSolvingQuest(r.user.profile.publicProfile.level)))
+                solveCost = QuestLogic.costOfSolvingQuest(questLevel),
+                solveRewardWon = QuestLogic.rewardForWinningQuest(questLevel, this),
+                solveRewardLost = QuestLogic.rewardForLosingQuest(questLevel, this)))
 
             db.quest.create(quest)
 

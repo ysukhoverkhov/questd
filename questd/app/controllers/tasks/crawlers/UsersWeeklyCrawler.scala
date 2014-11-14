@@ -17,8 +17,6 @@ object UsersWeeklyCrawler {
 class UsersWeeklyCrawler(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) extends BaseUsersScheduleCrawler(api, rand) {
 
   protected val userActors = List(
-      classOf[ShiftUserStats],
-      classOf[PopulateTimeLine],
-      classOf[CalculateProposalThreshold])
+      classOf[ShiftUserStats])
 }
 

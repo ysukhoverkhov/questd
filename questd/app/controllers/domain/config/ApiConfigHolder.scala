@@ -98,7 +98,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.SolutionCheatingRatio -> "0.1",
       ConfigParams.SolutionMinCheatingVotes -> "5",
       ConfigParams.SolutionIACRatio -> "0.03",
-      ConfigParams.SolutionMinIACVotes -> "2",
+      ConfigParams.SolutionMinIACVotes -> "5",
 
       ConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "5",
       ConfigParams.QuestProbabilityStartingVIPQuests -> "0.5",
