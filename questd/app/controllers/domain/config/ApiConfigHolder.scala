@@ -11,8 +11,6 @@ class _ConfigParams {
 
   val ActiveUserDays = "10 01 Active User Days"
 
-  val UserHistoryDays = "20 01 User History Days"
-
   val SolutionVoteTaskShare = "30 01 Solution Vote Task Share"
   val AddToFollowingTaskProbability = "30 02 Add To Following Task Probability"
   val QuestVoteTaskShare = "30 03 Vote Quests task share"
@@ -20,16 +18,10 @@ class _ConfigParams {
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
 
-  val ProposalNormalDaysToEnterRotation = "50 01 Proposal Normal Days To Enter Rotation"
-  val ProposalMinVotesToTakeRemovalDecision = "50 02 Min Votes To Take Removal Decision"
-  val ProposalWorstLikesRatio = "50 11 Proposal Worst Likes Ratio" // If proposal has fewer than current ration multiplied by average votes/likes ratio and more than min votes count is reached it is removed from voting.
   val ProposalCheatingRatio = "50 12 Proposal Cheating to Votes Ratio"
   val ProposalMinCheatingVotes = "50 13 Proposal Min Cheating Votes"
   val ProposalIACRatio = "50 13 Proposal IAC to Total Votes Ratio"
   val ProposalMinIACVotes = "50 14 Proposal min IAC Votes"
-  val ProposalLikesToEnterRotation = "50 21 Proposal Likes To Enter Rotation (calculated)"
-  val ProposalVotesToLeaveVoting = "50 22 Proposal Votes To Leave Voting (calculated)"
-  val ProposalRatioToLeaveVoting = "50 23 Proposal Ratio To Leave Voting (calculated)"
   val ProposalMaxDescriptionLength = "50 30 Proposal Max Description Length"
 
   val SolutionCheatingRatio = "60 10 Solution Cheating to Votes Ratio"
@@ -55,7 +47,6 @@ class _ConfigParams {
   val SolutionProbabilityFollowing = "92 02 Probability of Solutions from Following"
   val SolutionProbabilityLiked = "92 03 Probability of liked Solutions"
   val SolutionProbabilityStar = "92 04 Probability of quests from Solutions"
-
 }
 
 object _ConfigParams extends _ConfigParams
@@ -73,7 +64,6 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.DebugDisableProposalCooldown -> "0",
 
       ConfigParams.ActiveUserDays -> "7",
-      ConfigParams.UserHistoryDays -> "15",
 
       ConfigParams.SolutionVoteTaskShare -> "0.9",
       ConfigParams.AddToFollowingTaskProbability -> "0.3",
@@ -82,17 +72,10 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.FavoriteThemesShare -> "0.2",
       ConfigParams.FavoriteThemesProbability -> "0.75",
 
-      ConfigParams.ProposalNormalDaysToEnterRotation -> "7",
-      ConfigParams.ProposalMinVotesToTakeRemovalDecision -> "10",
-
-      ConfigParams.ProposalWorstLikesRatio -> "0.1",
       ConfigParams.ProposalCheatingRatio -> "0.1",
       ConfigParams.ProposalMinCheatingVotes -> "10",
       ConfigParams.ProposalIACRatio -> "0.03",
       ConfigParams.ProposalMinIACVotes -> "10",
-      ConfigParams.ProposalLikesToEnterRotation -> "10",
-      ConfigParams.ProposalVotesToLeaveVoting -> "100",
-      ConfigParams.ProposalRatioToLeaveVoting -> "0.05",
       ConfigParams.ProposalMaxDescriptionLength -> "140",
 
       ConfigParams.SolutionCheatingRatio -> "0.1",
