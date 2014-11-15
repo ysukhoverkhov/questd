@@ -13,11 +13,21 @@ class functionsSpecs extends Specification {
       questProposalPeriod(20) must beEqualTo(7)
     }
 
+    "coinsToInviteFriendForVoteQuestProposal" in {
+      coinsToInviteFriendForVoteQuestProposal(1) must beEqualTo(4)
+      coinsToInviteFriendForVoteQuestProposal(20) must beEqualTo(4)
+    }
+
     "coinSelectQuest" in {
       coinSelectQuest(3) must beEqualTo(100)
       coinSelectQuest(11) must beEqualTo(1280)
       coinSelectQuest(12) must beEqualTo(1628)
       coinSelectQuest(20) must beEqualTo(10000)
+    }
+
+    "coinsToInviteFriendForVoteQuestSolution" in {
+      coinsToInviteFriendForVoteQuestSolution(1) must beEqualTo(4)
+      coinsToInviteFriendForVoteQuestSolution(20) must beEqualTo(4)
     }
 
     "ratingToLoseQuest" in {
@@ -27,13 +37,11 @@ class functionsSpecs extends Specification {
       ratingToLoseQuest(20) must beEqualTo(3800)
     }
 
-    "rewardForVotingProposal" in {
-      rewardForVotingProposal(10, 1) must beEqualTo(32)
-      rewardForVotingProposal(10, 4) must beEqualTo(5)
-      rewardForVotingProposal(15, 1) must beEqualTo(102)
-      rewardForVotingProposal(15, 6) must beEqualTo(26)
-      rewardForVotingProposal(20, 1) must beEqualTo(136)
-      rewardForVotingProposal(20, 10) must beEqualTo(8)
+    "ratingToWinQuest" in {
+      ratingToWinQuest(3) must beEqualTo(150)
+      ratingToWinQuest(11) must beEqualTo(1134)
+      ratingToWinQuest(12) must beEqualTo(1418)
+      ratingToWinQuest(20) must beEqualTo(7600)
     }
 
     "dailySalary" in {
@@ -42,13 +50,6 @@ class functionsSpecs extends Specification {
       dailyCoinsSalary(10) must beEqualTo(398)
       dailyCoinsSalary(16) must beEqualTo(708)
       dailyCoinsSalary(20) must beEqualTo(1298)
-    }
-
-    "dailyRatingDecrease" in {
-      dailyRatingDecrease(1) must beEqualTo(0)
-      dailyRatingDecrease(3) must beEqualTo(302)
-      dailyRatingDecrease(10) must beEqualTo(939)
-      dailyRatingDecrease(20) must beEqualTo(4024)
     }
 
     "ratToGainLevel" in {

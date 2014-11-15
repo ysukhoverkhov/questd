@@ -3,16 +3,14 @@ package logic
 import internal.gainratingfunctions._
 import internal.gaincoinsfunctions._
 import internal.spendcoinsfunctions._
-import internal.spendratingfunctions._
 import logic.internal.basefunctions._
-import models.domain.Functionality._
 import constants._
 
 object functions {
 
   /**
    * ************************
-   * Proposing quests.
+   * Creating quests.
    * ************************
    */
 
@@ -32,12 +30,12 @@ object functions {
 
   /**
    * *********************
-   * Purchasing of quests.
+   * Solving quests.
    * *********************
    */
 
   /**
-   * How much coins does it takes to take quest for solving.
+   * How much coins does it takes to solve quest.
    */
   def coinSelectQuest(level: Int): Int = {
 
@@ -75,68 +73,10 @@ object functions {
   }
 
   /**
-   * ***********************
-   * Voting quest proposals.
-   * ***********************
-   */
-
-  /**
-   * Number of rewarded proposal votes per level.
-   */
-  def rewardedProposalVotesPerLevel(level: Int): Int = {
-    math.floor(4 * math.pow(level + 1 - levelFor(VoteQuests), 0.39)).toInt
-  }
-
-  /**
-   * How much rating we will receive for voting quest proposal.
-   */
-  def rewardForVotingProposal(level: Int, voteNumber: Int): Int = {
-
-    def kf(level: Int): Double = coinForVoteProposal(level) / (1 to rewardedProposalVotesPerLevel(level)).map(x => rewardForVotingProposalInt(level, x, 1)).sum
-
-    def rewardForVotingProposalInt(level: Int, voteNumber: Int, k: Double) = {
-      k * rewardFunction(voteNumber.toDouble / (rewardedProposalVotesPerLevel(level) + 1))
-    }
-
-    math.round(rewardForVotingProposalInt(level, voteNumber, kf(level)).toFloat)
-  }
-
-  /**
-   * ***********************
-   * Voting quest solutions.
-   * ***********************
-   */
-
-  /**
-   * Number of rewarded solution votes per level.
-   */
-  def rewardedSolutionVotesPerLevel(level: Int): Int = {
-    math.floor(10 * math.pow(level + 1 - levelFor(VoteQuestSolutions), 0.3)).toInt
-  }
-
-  /**
-   * How much rating we will receive for voting quest solution.
-   */
-  def rewardForVotingSolution(level: Int, voteNumber: Int): Int = {
-
-    def kf(level: Int): Double = coinForVoteResult(level) / (1 to rewardedSolutionVotesPerLevel(level)).map(x => rewardForVotingSolutionInt(level, x, 1)).sum
-
-    def rewardForVotingSolutionInt(level: Int, voteNumber: Int, k: Double) = {
-      k * rewardFunction(voteNumber.toDouble / (rewardedSolutionVotesPerLevel(level) + 1))
-    }
-
-    math.max(1, math.round(rewardForVotingSolutionInt(level, voteNumber, kf(level)).toFloat))
-  }
-
-  /**
    * *************************
    * Daily results
    * *************************
    */
-
-  def dailyRatingDecrease(level: Int): Int = {
-    math.round(ratDecrease(level)).toInt
-  }
 
   def dailyCoinsSalary(level: Int): Int = {
     math.round(coinForVoteResult(level)).toInt
@@ -186,6 +126,5 @@ object functions {
   def costToFollowPerson(level: Int): Int = {
     0
   }
-
 }
 

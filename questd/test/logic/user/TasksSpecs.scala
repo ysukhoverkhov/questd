@@ -38,17 +38,17 @@ class TasksSpecs extends BaseLogicSpecs {
       dailyResult.tasks.length must beGreaterThan(0)
     }
 
-    "Generate tasks for voting for soluions" in {
-      api.config returns createStubConfig
-
-      val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
-      val dailyResult = u.getTasksForTomorrow
-
-      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuestSolutions)
-      t must beSome[Task]
-      t.get.currentCount must beEqualTo(0)
-      t.get.requiredCount must beEqualTo(17) // 90% from 19
-    }
+//    "Generate tasks for voting for soluions" in {
+//      api.config returns createStubConfig
+//
+//      val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
+//      val dailyResult = u.getTasksForTomorrow
+//
+//      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuestSolutions)
+//      t must beSome[Task]
+//      t.get.currentCount must beEqualTo(0)
+//      t.get.requiredCount must beEqualTo(17) // 90% from 19
+//    }
 
     "Do not Generate tasks SubmitQuestResult for low level users" in {
       api.config returns createStubConfig
@@ -107,16 +107,16 @@ class TasksSpecs extends BaseLogicSpecs {
 //      there was one(rand).nextDouble
 //    }
 
-    "Generate tasks for voting for proposals" in {
-      api.config returns createStubConfig
-
-      val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
-      val dailyResult = u.getTasksForTomorrow
-
-      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuests)
-      t must beSome[Task]
-      t.get.requiredCount must beEqualTo(3) // 90% from 4
-    }
+//    "Generate tasks for voting for proposals" in {
+//      api.config returns createStubConfig
+//
+//      val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
+//      val dailyResult = u.getTasksForTomorrow
+//
+//      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuests)
+//      t must beSome[Task]
+//      t.get.requiredCount must beEqualTo(3) // 90% from 4
+//    }
 
     // TODO: clean me up.
 //    "Generate tasks for submitting proposals" in {

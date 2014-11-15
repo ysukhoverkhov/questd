@@ -2,7 +2,6 @@ package logic.user
 
 import logic._
 import logic.constants._
-import logic.functions._
 import models.domain._
 
 trait Tasks { this: UserLogic =>
@@ -65,15 +64,16 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating task for voting quests.
    */
   private def getVoteQuestSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
-    def calculateCount = {
-      val share = api.config(api.ConfigParams.SolutionVoteTaskShare).toDouble
-      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
-    }
-
-    Some(Task(
-      taskType = TaskType.VoteQuestSolutions,
-      description = "",
-      requiredCount = calculateCount))
+//    def calculateCount = {
+//      val share = api.config(api.ConfigParams.SolutionVoteTaskShare).toDouble
+//      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
+//    }
+//
+//    Some(Task(
+//      taskType = TaskType.VoteQuestSolutions,
+//      description = "",
+//      requiredCount = calculateCount))
+    None
   }
 
   /**
@@ -108,15 +108,16 @@ trait Tasks { this: UserLogic =>
    * Algorithm for creating task for votes for proposals.
    */
   private def getVoteQuestProposalsTask(user: User) = ifHasRightTo(Functionality.VoteQuests) {
-    def calculateCount = {
-      val share = api.config(api.ConfigParams.QuestVoteTaskShare).toDouble
-      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
-    }
-
-    Some(Task(
-      taskType = TaskType.VoteQuests,
-      description = "",
-      requiredCount = calculateCount))
+//    def calculateCount = {
+//      val share = api.config(api.ConfigParams.QuestVoteTaskShare).toDouble
+//      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
+//    }
+//
+//    Some(Task(
+//      taskType = TaskType.VoteQuests,
+//      description = "",
+//      requiredCount = calculateCount))
+    None
   }
 
   /**
