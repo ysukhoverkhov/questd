@@ -27,7 +27,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
       db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0, None, List(), List(), cultureId = u.demo.cultureId) returns List().iterator
       db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0, None, List(), List(), cultureId = u.demo.cultureId) returns List().iterator
 
-      val result = api.getFriendsSolutions(GetFriendsSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some(1, 2)))
+      val result = api.getFriendsSolutions(GetFriendsSolutionsRequest(u, List(QuestSolutionStatus.OnVoting), Some(1, 2)))
 
       there was one(solution).allWithParams(
         List(QuestSolutionStatus.OnVoting.toString),
@@ -95,7 +95,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         List(),
         List("a")) returns List().iterator
 
-      val result = api.getVIPSolutions(GetVIPSolutionsRequest(User(), QuestSolutionStatus.OnVoting, Some(1, 2), List("a")))
+      val result = api.getVIPSolutions(GetVIPSolutionsRequest(User(), List(QuestSolutionStatus.OnVoting), Some(1, 2), List("a")))
 
       there was one(solution).allWithParams(
         List(QuestSolutionStatus.OnVoting.toString),
@@ -110,7 +110,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
 
     "getHelpWantedSolutions calls db correctly with empty list" in context {
 
-      val result = api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(User(), QuestSolutionStatus.OnVoting))
+      val result = api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(User(), List(QuestSolutionStatus.OnVoting)))
 
 //      result must beEqualTo(OkApiResult(GetHelpWantedSolutionsResult(List().iterator)))
 
@@ -140,7 +140,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         null,
         None) returns List(sol).iterator
 
-      val result = api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(User(mustVoteSolutions = List("solution_id")), QuestSolutionStatus.OnVoting))
+      val result = api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(User(mustVoteSolutions = List("solution_id")), List(QuestSolutionStatus.OnVoting)))
 
       result.body.get.solutions.toList must beEqualTo(List(sol))
 
@@ -182,7 +182,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         null,
         None) returns List(sol).iterator
 
-      val result = api.getSolutionsForOwnQuests(GetSolutionsForOwnQuestsRequest(User(), QuestSolutionStatus.OnVoting))
+      val result = api.getSolutionsForOwnQuests(GetSolutionsForOwnQuestsRequest(User(), List(QuestSolutionStatus.OnVoting)))
 
       Logger.error(result.toString)
 
@@ -223,7 +223,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         themeIds = List("b"),
         cultureId = u.demo.cultureId) returns List().iterator
 
-      val result = api.getAllSolutions(GetAllSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some(1, 2), List("b")))
+      val result = api.getAllSolutions(GetAllSolutionsRequest(u, List(QuestSolutionStatus.OnVoting), Some(1, 2), List("b")))
 
       there was one(solution).allWithParams(
         List(QuestSolutionStatus.OnVoting.toString),

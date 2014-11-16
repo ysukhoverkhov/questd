@@ -91,8 +91,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.QuestProbabilityLiked -> "0.20",
       ConfigParams.QuestProbabilityStar -> "0.10",
 
-      ConfigParams.TimeLineRandomQuestsDaily -> "30",
-      ConfigParams.TimeLineRandomSolutionsDaily -> "20",
+      ConfigParams.TimeLineRandomQuestsDaily -> "5",
+      ConfigParams.TimeLineRandomSolutionsDaily -> "5",
 
       ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions -> "5",
       ConfigParams.SolutionProbabilityStartingVIPSolutions -> "0.5",

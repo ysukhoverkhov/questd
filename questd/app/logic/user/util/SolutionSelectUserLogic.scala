@@ -8,30 +8,34 @@ import controllers.domain.app.questsolution._
 
 trait SolutionSelectUserLogic { this: UserLogic =>
 
-  // TODO: clean me up.
   def getRandomSolution: Option[QuestSolution] = {
     List(
       () => getSolutionsWithSuperAlgorithm,
       () => getOtherSolutions.getOrElse(List().iterator),
-      () => getAllSolutions.getOrElse(List().iterator)).
+      () => getAnySolutions.getOrElse(List().iterator),
+      () => getAnySolutionsIgnoringLevels.getOrElse(List().iterator)).
       foldLeft[Option[QuestSolution]](None)((run, fun) => {
         if (run == None) {
-          selectQuestSolution(fun(), List()/*user.history.votedQuestSolutionIds*/)
+          selectQuestSolution(fun(), List(solutionIdsToExclude()))
         } else {
           run
         }
       })
   }
 
-  def getSolutionsWithSuperAlgorithm: Iterator[QuestSolution] = {
-    val algs = List(
+  private def solutionIdsToExclude() = {
+    user.timeLine.map(_.objectId)
+  }
+
+  private def getSolutionsWithSuperAlgorithm: Iterator[QuestSolution] = {
+    val algorithms = List(
       () => getTutorialSolutions,
       () => getHelpWantedSolutions,
       () => getSolutionsOfOwnQuests,
       () => getStartingSolutions,
       () => getDefaultSolutions)
 
-      selectFromChain(algs, default = List().iterator)
+      selectFromChain(algorithms, default = List().iterator)
   }
 
   private[user] def getTutorialSolutions: Option[Iterator[QuestSolution]] = {
@@ -45,7 +49,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     if (user.mustVoteSolutions.nonEmpty) {
       Some(api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(
         user,
-        QuestSolutionStatus.OnVoting)).body.get.solutions)
+        List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost))).body.get.solutions)
     } else {
       None
     }
@@ -56,7 +60,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     val solutions = api.getSolutionsForOwnQuests(GetSolutionsForOwnQuestsRequest(
       user,
-      QuestSolutionStatus.OnVoting)).body.get.solutions
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost))).body.get.solutions
 
     if (solutions.isEmpty) None else Some(solutions)
   }
@@ -95,7 +99,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning Solutions from friends")
     Some(api.getFriendsSolutions(GetFriendsSolutionsRequest(
       user,
-      QuestSolutionStatus.OnVoting,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
       levels)).body.get.solutions)
   }
 
@@ -103,7 +107,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning solutions from Following")
     Some(api.getFollowingSolutions(GetFollowingSolutionsRequest(
       user,
-      QuestSolutionStatus.OnVoting,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
       levels)).body.get.solutions)
   }
 
@@ -125,7 +129,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     Some(api.getVIPSolutions(GetVIPSolutionsRequest(
       user,
-      QuestSolutionStatus.OnVoting,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
       levels,
       themeIds)).body.get.solutions)
   }
@@ -138,18 +142,27 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     Some(api.getAllSolutions(GetAllSolutionsRequest(
       user,
-      QuestSolutionStatus.OnVoting,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
       levels,
       themeIds)).body.get.solutions)
   }
 
-  private[user] def getAllSolutions = {
-    Logger.trace("  Returning from all solutions")
+  private[user] def getAnySolutions = {
+    Logger.trace("  Returning from all solutions (not ignoring levels)")
 
     Some(api.getAllSolutions(GetAllSolutionsRequest(
       user,
-      QuestSolutionStatus.OnVoting,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
       levels)).body.get.solutions)
+  }
+
+  private[user] def getAnySolutionsIgnoringLevels = {
+    Logger.trace("  Returning from all solutions (not ignoring levels)")
+
+    Some(api.getAllSolutions(GetAllSolutionsRequest(
+      user,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
+      None)).body.get.solutions)
   }
 
   /**

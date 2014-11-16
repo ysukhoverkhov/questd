@@ -12,7 +12,7 @@ trait VotingSolutions { this: UserLogic =>
   /**
    * @return None if no more quests to vote for today.
    */
-  def getQuestSolutionForTimeLine: Option[QuestSolution] = {
+  def getRandomSolutionForTimeLine: Option[QuestSolution] = {
     getRandomSolution
   }
 

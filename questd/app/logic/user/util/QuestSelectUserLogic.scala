@@ -13,8 +13,9 @@ trait QuestSelectUserLogic { this: UserLogic =>
   def getRandomQuest: Option[Quest] = {
     val algorithms = List(
       () => getQuestsWithSuperAlgorithm,
-      () => getOtherQuests.getOrElse(List().iterator),
-      () => getAllQuests.getOrElse(List().iterator))
+      () => getQuestsWithMyTags.getOrElse(List().iterator),
+      () => getAnyQuests.getOrElse(List().iterator),
+      () => getAnyQuestsIgnoringLevels.getOrElse(List().iterator))
 
     {
       algorithms.foldLeft[Option[Quest]](None)((run, fun) => {
@@ -31,7 +32,10 @@ trait QuestSelectUserLogic { this: UserLogic =>
     user.timeLine.map(_.objectId)
   }
 
-  def getQuestsWithSuperAlgorithm = {
+  private def getQuestsWithSuperAlgorithm = {
+
+    Logger.trace("getQuestsWithSuperAlgorithm")
+
     val algorithms = List(
       () => getTutorialQuests,
       () => getStartingQuests,
@@ -41,7 +45,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private[user] def getTutorialQuests: Option[Iterator[Quest]] = {
-    Logger.trace("getTutorialQuests")
+    Logger.trace("getTutorialQuests returns None since does not implemented")
     None
   }
 
@@ -49,16 +53,16 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("getStartingQuests")
 
     if (user.profile.publicProfile.level > api.config(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
+      Logger.trace("  returns None because of high level")
       None
     } else {
 
-      val algs = List(
+      val algorithms = List(
         (api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests),
-        (1.00, () => getOtherQuests) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
+        (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
-      selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
-
+      selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
     }
   }
 
@@ -70,7 +74,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
       (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests),
       (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests),
       (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPQuests),
-      (1.00, () => getOtherQuests) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
+      (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 
     selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
@@ -113,8 +117,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
       levels)).body.get.quests)
   }
 
-  private[user] def getOtherQuests = {
-    Logger.trace("  Returning from all quests with favorite themes")
+  private[user] def getQuestsWithMyTags = {
+    Logger.trace("  Returning quests with my tags")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
     Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
@@ -125,8 +129,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
       levels)).body.get.quests)
   }
 
-  private[user] def getAllQuests = {
-    Logger.trace("  Returning from all quests")
+  private[user] def getAnyQuests = {
+    Logger.trace("  Returning from any quests (but respecting levels)")
 
     Some(api.getAllQuests(GetAllQuestsRequest(
       user,
@@ -134,8 +138,17 @@ trait QuestSelectUserLogic { this: UserLogic =>
       levels)).body.get.quests)
   }
 
+  private[user] def getAnyQuestsIgnoringLevels = {
+    Logger.trace("  Returning from any quests ignoring levels")
+
+    Some(api.getAllQuests(GetAllQuestsRequest(
+      user,
+      QuestStatus.InRotation,
+      None)).body.get.quests)
+  }
+
   /**
-   * Tells what level we should give quests based on reason of getting quest.
+   * Tells what level we should give quests.
    */
   private def levels: Option[(Int, Int)] = {
     Some((
