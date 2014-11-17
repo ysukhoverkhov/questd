@@ -32,14 +32,14 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       quest.readById(q.id) returns Some(q)
 
       solution.allWithParams(
-        status = List(QuestSolutionStatus.CheatingBanned.toString),
+        status = List(QuestSolutionStatus.CheatingBanned),
         questIds = List(sol.info.questId)) returns List(sol).iterator
 
       val result = api.updateQuestSolutionState(UpdateQuestSolutionStateRequest(sol))
 
       result must beEqualTo(OkApiResult(UpdateQuestSolutionStateResult()))
 
-      there was one(solution).updateStatus(Matchers.eq(sol.id), Matchers.eq(QuestSolutionStatus.CheatingBanned.toString), Matchers.eq(null))
+      there was one(solution).updateStatus(Matchers.eq(sol.id), Matchers.eq(QuestSolutionStatus.CheatingBanned), Matchers.eq(null))
       there was one(user).readById(user1.id)
       there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = QuestSolutionStatus.CheatingBanned), user1))
     }

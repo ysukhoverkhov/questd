@@ -106,7 +106,7 @@ class QuestDAOSpecs extends Specification
       all.size must beEqualTo(qs.size)
       all.map(_.id) must beEqualTo(List(qs(0).id, qs(2).id, qs(1).id))
 
-      val status = db.quest.allWithParams(status = List(QuestStatus.CheatingBanned.toString)).toList
+      val status = db.quest.allWithParams(status = List(QuestStatus.CheatingBanned)).toList
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
 
@@ -125,7 +125,7 @@ class QuestDAOSpecs extends Specification
       vip.map(_.id).size must beEqualTo(2)
       vip.map(_.id) must contain(qs(1).id) and contain(qs(2).id)
 
-      val statusVip = db.quest.allWithParams(status = List(QuestStatus.CheatingBanned.toString), vip = Some(false)).toList
+      val statusVip = db.quest.allWithParams(status = List(QuestStatus.CheatingBanned), vip = Some(false)).toList
       statusVip.map(_.id).size must beEqualTo(1)
       statusVip.map(_.id) must beEqualTo(List(qs(0).id))
 

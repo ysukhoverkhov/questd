@@ -15,7 +15,7 @@ private[mongo] class MongoQuestSolutionDAO
   with QuestSolutionDAO {
 
   def allWithParams(
-    status: List[String] = List(),
+    status: List[QuestSolutionStatus.Value] = List(),
     authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
@@ -28,7 +28,7 @@ private[mongo] class MongoQuestSolutionDAO
     val queryBuilder = MongoDBObject.newBuilder
 
     if (status.length > 0) {
-      queryBuilder += ("status" -> MongoDBObject("$in" -> status))
+      queryBuilder += ("status" -> MongoDBObject("$in" -> status.map(_.toString)))
     }
 
     if (authorIds.length > 0) {
@@ -69,20 +69,20 @@ private[mongo] class MongoQuestSolutionDAO
       skip)
   }
 
-  def updateStatus(id: String, newStatus: String, rivalId: Option[String] = None): Option[QuestSolution] = {
+  def updateStatus(id: String, newStatus: QuestSolutionStatus.Value, rivalId: Option[String] = None): Option[QuestSolution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
     if (rivalId != None) {
       queryBuilder +=
         ("$set" -> MongoDBObject(
-          "status" -> newStatus,
+          "status" -> newStatus.toString,
           "lastModDate" -> new Date(),
           "rivalSolutionId" -> rivalId.get))
     } else {
       queryBuilder +=
         ("$set" -> MongoDBObject(
-          "status" -> newStatus,
+          "status" -> newStatus.toString,
           "lastModDate" -> new Date()))
     }
 

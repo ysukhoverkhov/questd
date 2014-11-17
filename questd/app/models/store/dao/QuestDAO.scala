@@ -15,7 +15,7 @@ trait QuestDAO extends BaseDAO[Quest] {
    * @param ids list of identifiers chose quest from.
    */
   def allWithParams(
-    status: List[String] = List(),
+    status: List[QuestStatus.Value] = List(),
     authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
@@ -34,7 +34,7 @@ trait QuestDAO extends BaseDAO[Quest] {
     spamChange: Int = 0,
     pornChange: Int = 0): Option[Quest]
 
-  def updateStatus(id: String, newStatus: String): Option[Quest]
+  def updateStatus(id: String, newStatus: QuestStatus.Value): Option[Quest]
 
   def updateInfo(id: String, newLevel: Int): Option[Quest]
 

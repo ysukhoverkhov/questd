@@ -25,7 +25,7 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
 
   def getFriendsQuests(request: GetFriendsQuestsRequest): ApiResult[GetFriendsQuestsResult] = handleDbException {
     OkApiResult(GetFriendsQuestsResult(db.quest.allWithParams(
-      status = List(request.status.toString),
+      status = List(request.status),
       authorIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
       levels = request.levels,
       cultureId = request.user.demo.cultureId)))
@@ -33,7 +33,7 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
 
   def getFollowingQuests(request: GetFollowingQuestsRequest): ApiResult[GetFollowingQuestsResult] = handleDbException {
     OkApiResult(GetFollowingQuestsResult(db.quest.allWithParams(
-      status = List(request.status.toString),
+      status = List(request.status),
       authorIds = request.user.following,
       levels = request.levels,
       cultureId = request.user.demo.cultureId)))
@@ -47,7 +47,7 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
       .map(_.objectId)
 
     OkApiResult(GetLikedQuestsResult(db.quest.allWithParams(
-      status = List(request.status.toString),
+      status = List(request.status),
       levels = request.levels,
       ids = ids,
       cultureId = request.user.demo.cultureId)))
@@ -55,7 +55,7 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
 
   def getVIPQuests(request: GetVIPQuestsRequest): ApiResult[GetVIPQuestsResult] = handleDbException {
     OkApiResult(GetVIPQuestsResult(db.quest.allWithParams(
-      status = List(request.status.toString),
+      status = List(request.status),
       levels = request.levels,
       vip = Some(true),
       cultureId = request.user.demo.cultureId)))
@@ -65,7 +65,7 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
     Logger.trace("getAllQuests - " + request.toString)
 
     OkApiResult(GetAllQuestsResult(db.quest.allWithParams(
-      status = List(request.status.toString),
+      status = List(request.status),
       levels = request.levels,
       cultureId = request.user.demo.cultureId)))
   }

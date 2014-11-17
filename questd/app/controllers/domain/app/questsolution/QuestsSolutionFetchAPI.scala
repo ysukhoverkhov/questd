@@ -55,7 +55,7 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
 
   def getFriendsSolutions(request: GetFriendsSolutionsRequest): ApiResult[GetFriendsSolutionsResult] = handleDbException {
     OkApiResult(GetFriendsSolutionsResult(db.solution.allWithParams(
-      status = request.status.map(_.toString),
+      status = request.status,
       authorIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
       levels = request.levels,
       cultureId = request.user.demo.cultureId)))
@@ -63,7 +63,7 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
 
   def getFollowingSolutions(request: GetFollowingSolutionsRequest): ApiResult[GetFollowingSolutionsResult] = handleDbException {
     OkApiResult(GetFollowingSolutionsResult(db.solution.allWithParams(
-      status = request.status.map(_.toString),
+      status = request.status,
       authorIds = request.user.following,
       levels = request.levels,
       cultureId = request.user.demo.cultureId)))
@@ -77,7 +77,7 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
       .map(_.objectId)
 
     OkApiResult(GetSolutionsForLikedQuestsResult(db.solution.allWithParams(
-      status = request.status.map(_.toString),
+      status = request.status,
       levels = request.levels,
       questIds = ids,
       cultureId = request.user.demo.cultureId)))
@@ -85,7 +85,7 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
 
   def getVIPSolutions(request: GetVIPSolutionsRequest): ApiResult[GetVIPSolutionsResult] = handleDbException {
     OkApiResult(GetVIPSolutionsResult(db.solution.allWithParams(
-      status = request.status.map(_.toString),
+      status = request.status,
       levels = request.levels,
       vip = Some(true),
       themeIds = request.themeIds,
@@ -97,7 +97,7 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
       OkApiResult(GetHelpWantedSolutionsResult(List().iterator))
     } else {
       OkApiResult(GetHelpWantedSolutionsResult(db.solution.allWithParams(
-        status = request.status.map(_.toString),
+        status = request.status,
         levels = request.levels,
         cultureId = request.user.demo.cultureId,
         ids = request.user.mustVoteSolutions)))
@@ -110,7 +110,7 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
 
     if (questIds.nonEmpty) {
       OkApiResult(GetSolutionsForOwnQuestsResult(db.solution.allWithParams(
-        status = request.status.map(_.toString),
+        status = request.status,
         levels = request.levels,
         cultureId = request.user.demo.cultureId,
         questIds = questIds)))
@@ -123,7 +123,7 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
     Logger.trace("getAllSolutions - " + request.toString)
 
     OkApiResult(GetAllSolutionsResult(db.solution.allWithParams(
-      status = request.status.map(_.toString),
+      status = request.status,
       levels = request.levels,
       themeIds = request.themeIds,
       cultureId = request.user.demo.cultureId)))

@@ -175,7 +175,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     // 1. find all solutions with the same quest id with status waiting for competitor.
 
     val solutionsForQuest = db.solution.allWithParams(
-      status = List(QuestSolutionStatus.WaitingForCompetitor.toString),
+      status = List(QuestSolutionStatus.WaitingForCompetitor),
       questIds = List(request.solution.info.questId))
 
     def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {
@@ -209,7 +209,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- winners) {
             Logger.debug("  winner id=" + curSol.id)
 
-            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString, curSol.rivalSolutionId) ifSome { s =>
+            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won, curSol.rivalSolutionId) ifSome { s =>
               db.user.readById(curSol.info.authorId) ifSome { u =>
                 rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = u))
               }
@@ -221,7 +221,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- losers) {
             Logger.debug("  loser id=" + curSol.id)
 
-            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString, curSol.rivalSolutionId) ifSome { s =>
+            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost, curSol.rivalSolutionId) ifSome { s =>
               db.user.readById(curSol.info authorId) ifSome { u =>
                 rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = u))
               }

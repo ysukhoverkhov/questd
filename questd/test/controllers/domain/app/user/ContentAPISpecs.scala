@@ -2,7 +2,6 @@ package controllers.domain.app.user
 
 import controllers.domain._
 import models.domain._
-import controllers.domain.app.quest._
 import testhelpers.domainstubs._
 
 class ContentAPISpecs extends BaseAPISpecs {
@@ -12,12 +11,12 @@ class ContentAPISpecs extends BaseAPISpecs {
     "Make correct db call in getSolutionsForQuest" in context {
       val u = createUserStub()
 
-      db.solution.allWithParams(List(QuestSolutionStatus.Won.toString), null, null, 10, null, null, List("qid"), null) returns List[QuestSolution]().iterator
+      db.solution.allWithParams(List(QuestSolutionStatus.Won), null, null, 10, null, null, List("qid"), null) returns List[QuestSolution]().iterator
 
       val result = api.getSolutionsForQuest(GetSolutionsForQuestRequest(u, "qid", List(QuestSolutionStatus.Won), 2, 5))
 
       there was one(solution).allWithParams(
-        List(QuestSolutionStatus.Won.toString),
+        List(QuestSolutionStatus.Won),
         null,
         null,
         10,
@@ -34,7 +33,7 @@ class ContentAPISpecs extends BaseAPISpecs {
       val u = createUserStub()
 
       db.solution.allWithParams(
-        List(QuestSolutionStatus.Won.toString),
+        List(QuestSolutionStatus.Won),
         List("qid"),
         null,
         10,
@@ -47,7 +46,7 @@ class ContentAPISpecs extends BaseAPISpecs {
       val result = api.getSolutionsForUser(GetSolutionsForUserRequest(u, "qid", List(QuestSolutionStatus.Won), 2, 5))
 
       there was one(solution).allWithParams(
-        List(QuestSolutionStatus.Won.toString),
+        List(QuestSolutionStatus.Won),
         List("qid"),
         null,
         10,

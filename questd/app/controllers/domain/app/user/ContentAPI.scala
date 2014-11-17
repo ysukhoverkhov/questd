@@ -154,7 +154,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForUser = db.solution.allWithParams(
-      status = request.status.map(_.toString),
+      status = request.status,
       authorIds = List(request.user.id),
       skip = pageNumber * pageSize)
 
@@ -180,7 +180,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val questsForUser = db.quest.allWithParams(
-      status = request.status.map(_.toString),
+      status = request.status,
       authorIds = List(request.user.id),
       skip = pageNumber * pageSize)
 
@@ -199,7 +199,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForQuest = db.solution.allWithParams(
-      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains).map(_.toString),
+      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains),
       questIds = List(request.questId),
       skip = pageNumber * pageSize)
 
@@ -225,7 +225,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForUser = db.solution.allWithParams(
-      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains).map(_.toString),
+      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains),
       authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
@@ -251,7 +251,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val questsForUser = db.quest.allWithParams(
-      request.status.filter(Set(QuestStatus.InRotation).contains).map(_.toString),
+      request.status.filter(Set(QuestStatus.InRotation).contains),
       List(request.userId),
       skip = pageNumber * pageSize)
 

@@ -24,13 +24,13 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
 
       val u = createUser(List(Friendship(f1.id, FriendshipStatus.Accepted), Friendship(f2.id, FriendshipStatus.Invited)))
 
-      db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(f1.id), Some(1, 2), 0, None, List(), List(), cultureId = u.demo.cultureId) returns List().iterator
-      db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(f1.id, f2.id), Some(1, 2), 0, None, List(), List(), cultureId = u.demo.cultureId) returns List().iterator
+      db.solution.allWithParams(List(QuestSolutionStatus.OnVoting), List(f1.id), Some(1, 2), 0, None, List(), List(), cultureId = u.demo.cultureId) returns List().iterator
+      db.solution.allWithParams(List(QuestSolutionStatus.OnVoting), List(f1.id, f2.id), Some(1, 2), 0, None, List(), List(), cultureId = u.demo.cultureId) returns List().iterator
 
       val result = api.getFriendsSolutions(GetFriendsSolutionsRequest(u, List(QuestSolutionStatus.OnVoting), Some(1, 2)))
 
       there was one(solution).allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         List(f1.id),
         Some(1, 2),
         0,
@@ -41,7 +41,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         u.demo.cultureId)
 
       there was no(solution).allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         List(),
         Some(1, 2),
         0,
@@ -52,7 +52,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         u.demo.cultureId)
 
       there was no(solution).allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         List(f1.id, f2.id),
         Some(1, 2),
         0,
@@ -64,7 +64,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
     }
 
     "getSolutionsForLikedQuests calls db correctly" in context {
-      db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator
+      db.solution.allWithParams(List(QuestSolutionStatus.OnVoting), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator
 
       val liked = List("1", "2", "3", "4")
       val u = createUserStub(
@@ -74,7 +74,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
 
       result must beAnInstanceOf[OkApiResult[GetSolutionsForLikedQuestsResult]]
       there was one(solution).allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         null,
         Some(1, 2),
         0,
@@ -87,7 +87,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
     "getVIPSolutions calls db correctly" in context {
 
       db.solution.allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         List(),
         Some(1, 2),
         0,
@@ -98,7 +98,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
       val result = api.getVIPSolutions(GetVIPSolutionsRequest(User(), List(QuestSolutionStatus.OnVoting), Some(1, 2), List("a")))
 
       there was one(solution).allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         null,
         Some(1, 2),
         0,
@@ -115,7 +115,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
 //      result must beEqualTo(OkApiResult(GetHelpWantedSolutionsResult(List().iterator)))
 
       there was no(solution).allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         null,
         null,
         0,
@@ -130,7 +130,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
       val sol = createSolutionStub()
 
       db.solution.allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         null,
         None,
         0,
@@ -145,7 +145,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
       result.body.get.solutions.toList must beEqualTo(List(sol))
 
       there was one(solution).allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         null,
         None,
         0,
@@ -162,7 +162,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
       val sol = createSolutionStub()
 
       db.quest.allWithParams(
-        status = any[List[String]],
+        status = any[List[QuestStatus.Value]],
         authorIds = any[List[String]],
         levels = any[Option[(Int, Int)]],
         skip = any[Int],
@@ -172,7 +172,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
       ) returns List(qu).iterator
 
       db.solution.allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         null,
         None,
         0,
@@ -189,7 +189,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
       result.body.get.solutions.toList must beEqualTo(List(sol))
 
       there was one(quest).allWithParams(
-        status = any[List[String]],
+        status = any[List[QuestStatus.Value]],
         authorIds = any[List[String]],
         levels = any[Option[(Int, Int)]],
         skip = any[Int],
@@ -198,7 +198,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         cultureId = any[Option[String]])
 
       there was one(solution).allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         null,
         None,
         0,
@@ -213,7 +213,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
       val u = createUserStub(cultureId = "cid")
 
       db.solution.allWithParams(
-        status = List(QuestStatus.InRotation.toString),
+        status = List(QuestSolutionStatus.OnVoting),
         authorIds = List(),
         levels = Some(1, 2),
         skip = 0,
@@ -226,7 +226,7 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
       val result = api.getAllSolutions(GetAllSolutionsRequest(u, List(QuestSolutionStatus.OnVoting), Some(1, 2), List("b")))
 
       there was one(solution).allWithParams(
-        List(QuestSolutionStatus.OnVoting.toString),
+        List(QuestSolutionStatus.OnVoting),
         null,
         Some(1, 2),
         0,

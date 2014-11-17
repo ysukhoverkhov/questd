@@ -20,7 +20,7 @@ private[mongo] class MongoQuestDAO
   }
 
   def allWithParams(
-    status: List[String] = List(),
+    status: List[QuestStatus.Value] = List(),
     authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
@@ -31,7 +31,7 @@ private[mongo] class MongoQuestDAO
     val queryBuilder = MongoDBObject.newBuilder
 
     if (status.length > 0) {
-      queryBuilder += ("status" -> MongoDBObject("$in" -> status))
+      queryBuilder += ("status" -> MongoDBObject("$in" -> status.map(_.toString)))
     }
 
     if (authorIds.length > 0) {
@@ -92,12 +92,12 @@ private[mongo] class MongoQuestDAO
   /**
    *
    */
-  def updateStatus(id: String, newStatus: String): Option[Quest] = {
+  def updateStatus(id: String, newStatus: QuestStatus.Value): Option[Quest] = {
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
-          "status" -> newStatus,
+          "status" -> newStatus.toString,
           "lastModDate" -> new Date())))
   }
 

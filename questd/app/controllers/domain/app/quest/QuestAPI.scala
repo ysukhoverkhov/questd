@@ -43,14 +43,14 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     def checkBanQuest(quest: Quest): Option[Quest] = {
       if (quest.shouldBanIAC)
-        db.quest.updateStatus(quest.id, QuestStatus.IACBanned.toString)
+        db.quest.updateStatus(quest.id, QuestStatus.IACBanned)
       else
         Some(quest)
     }
 
     def checkCheatingQuest(quest: Quest): Option[Quest] = {
       if (quest.shouldBanCheating)
-        db.quest.updateStatus(quest.id, QuestStatus.CheatingBanned.toString)
+        db.quest.updateStatus(quest.id, QuestStatus.CheatingBanned)
       else
         Some(quest)
     }

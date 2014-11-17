@@ -57,21 +57,21 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
 
     def checkWaitCompetitor(qs: QuestSolution) = {
       if (qs.shouldStopVoting)
-        db.solution.updateStatus(solution.id, QuestSolutionStatus.WaitingForCompetitor.toString)
+        db.solution.updateStatus(solution.id, QuestSolutionStatus.WaitingForCompetitor)
       else
         Some(qs)
     }
 
     def checkCheatingSolution(qs: QuestSolution) = {
       if (qs.shouldBanCheating)
-        db.solution.updateStatus(solution.id, QuestSolutionStatus.CheatingBanned.toString)
+        db.solution.updateStatus(solution.id, QuestSolutionStatus.CheatingBanned)
       else
         Some(qs)
     }
 
     def checkAICSolution(qs: QuestSolution) = {
       if (qs.shouldBanIAC)
-        db.solution.updateStatus(solution.id, QuestSolutionStatus.IACBanned.toString)
+        db.solution.updateStatus(solution.id, QuestSolutionStatus.IACBanned)
       else
         Some(qs)
     }
