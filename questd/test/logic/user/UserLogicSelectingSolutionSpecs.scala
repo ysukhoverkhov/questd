@@ -72,24 +72,23 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
-    // TODO: clean me up.
-//    "Return liked quest if dice rolls so" in {
-//      api.config returns createStubConfig
-//      rand.nextDouble returns 0.58
-//
-//      val qid = "qid"
-//
-//      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
-//      api.getSolutionsForLikedQuests(any[GetSolutionsForLikedQuestsRequest]) returns OkApiResult(GetSolutionsForLikedQuestsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
-//
-//      val u = User()
-//      val q = u.getRandomSolution
-//
-//      there was one(rand).nextDouble
-//      there was one(api).getSolutionsForLikedQuests(any[GetSolutionsForLikedQuestsRequest])
-//
-//      q must beSome.which(q => q.id == qid)
-//    }
+    "Return liked quest if dice rolls so" in {
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.58
+
+      val qid = "qid"
+
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+      api.getSolutionsForLikedQuests(any[GetSolutionsForLikedQuestsRequest]) returns OkApiResult(GetSolutionsForLikedQuestsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
+
+      val u = User()
+      val q = u.getRandomSolution
+
+      there was one(rand).nextDouble
+      there was one(api).getSolutionsForLikedQuests(any[GetSolutionsForLikedQuestsRequest])
+
+      q must beSome.which(q => q.id == qid)
+    }
 
     "Return VIP solutions if dice rolls so" in {
       api.config returns createStubConfig

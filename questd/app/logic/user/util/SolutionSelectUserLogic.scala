@@ -111,14 +111,12 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       levels)).body.get.solutions)
   }
 
-  // TODO: clean me up.
   private[user] def getSolutionsForLikedQuests = {
-//    Logger.trace("  Returning solutions for quests we liked recently")
-//    Some(api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
-//      user,
-//      QuestSolutionStatus.OnVoting,
-//      levels)).body.get.solutions)
-    Some(List().iterator)
+    Logger.trace("  Returning solutions for quests we liked recently")
+    Some(api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
+      user,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
+      levels)).body.get.solutions)
   }
 
   private[user] def getVIPSolutions = {

@@ -63,26 +63,26 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         u.demo.cultureId)
     }
 
-    // TODO: clean me up.
-//    "getSolutionsForLikedQuests calls db correctly" in context {
-//      db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator
-//
-//      val liked = List(
-//          List("1", "2"),
-//          List("3", "4"))
-//      val u = User(history = UserHistory(likedQuestProposalIds = liked))
-//      val result = api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(u, QuestSolutionStatus.OnVoting, Some(1, 2)))
-//
-//      there was one(solution).allWithParams(
-//        List(QuestSolutionStatus.OnVoting.toString),
-//        null,
-//        Some(1, 2),
-//        0,
-//        null,
-//        null,
-//        List("1", "2", "3", "4"),
-//        null)
-//    }
+    "getSolutionsForLikedQuests calls db correctly" in context {
+      db.solution.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator
+
+      val liked = List("1", "2", "3", "4")
+      val u = createUserStub(
+        timeLine = liked.map(id => createTimeLineEntryStub(objectId = id, objectType = TimeLineType.Quest, ourVote = Some(ContentVote.Cool)))
+      )
+      val result = api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(u, List(QuestSolutionStatus.OnVoting), Some(1, 2)))
+
+      result must beAnInstanceOf[OkApiResult[GetSolutionsForLikedQuestsResult]]
+      there was one(solution).allWithParams(
+        List(QuestSolutionStatus.OnVoting.toString),
+        null,
+        Some(1, 2),
+        0,
+        null,
+        null,
+        List("1", "2", "3", "4"),
+        null)
+    }
 
     "getVIPSolutions calls db correctly" in context {
 

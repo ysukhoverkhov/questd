@@ -69,16 +69,19 @@ private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
       cultureId = request.user.demo.cultureId)))
   }
 
-  // TODO: refactor me and check is I'm required.
-//  def getSolutionsForLikedQuests(request: GetSolutionsForLikedQuestsRequest): ApiResult[GetSolutionsForLikedQuestsResult] = handleDbException {
-//    import models.store.mongo.helpers._
-//
-//    OkApiResult(GetSolutionsForLikedQuestsResult(db.solution.allWithParams(
-//      status = List(request.status.toString),
-//      levels = request.levels,
-//      questIds = request.user.history.likedQuestProposalIds.mongoFlatten,
-//      cultureId = request.user.demo.cultureId)))
-//  }
+  def getSolutionsForLikedQuests(request: GetSolutionsForLikedQuestsRequest): ApiResult[GetSolutionsForLikedQuestsResult] = handleDbException {
+
+    val ids = request.user.timeLine
+      .filter(_.objectType == TimeLineType.Quest)
+      .filter(_.ourVote == Some(ContentVote.Cool))
+      .map(_.objectId)
+
+    OkApiResult(GetSolutionsForLikedQuestsResult(db.solution.allWithParams(
+      status = request.status.map(_.toString),
+      levels = request.levels,
+      questIds = ids,
+      cultureId = request.user.demo.cultureId)))
+  }
 
   def getVIPSolutions(request: GetVIPSolutionsRequest): ApiResult[GetVIPSolutionsResult] = handleDbException {
     OkApiResult(GetVIPSolutionsResult(db.solution.allWithParams(
