@@ -168,8 +168,8 @@ trait SolutionSelectUserLogic { this: UserLogic =>
    */
   private def levels: Option[(Int, Int)] = {
     Some((
-      user.profile.publicProfile.level - SolutionLevelDownTolerance,
-      user.profile.publicProfile.level + SolutionLevelUpTolerance))
+      user.profile.publicProfile.level - TimeLineContentLevelSigma,
+      user.profile.publicProfile.level + TimeLineContentLevelSigma))
   }
 
   // FIX: change it to tags.

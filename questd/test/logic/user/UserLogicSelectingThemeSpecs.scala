@@ -31,7 +31,7 @@ class UserLogicSelectingThemeSpecs extends BaseLogicSpecs {
 
   "User Logic" should {
 
-    // TODO: clean me up.
+    // TODO: clean me up with tags.
 //    "Return correct theme from favorite" in {
 //
 //      val themes = createStubThemes
@@ -57,7 +57,6 @@ class UserLogicSelectingThemeSpecs extends BaseLogicSpecs {
 //      ot must beSome.which((t: Theme) => t.id == themes(favTheme).id)
 //    }
 
-    // TODO: clean me up.
 //    "Return correct theme from global" in {
 //
 //      val themes = createStubThemes
@@ -80,7 +79,6 @@ class UserLogicSelectingThemeSpecs extends BaseLogicSpecs {
 //      ot must beSome.which((t: Theme) => t.id == themes(0).id)
 //    }
 
-    // TODO: clean me up.
 //    "Return None if no themes in db" in {
 //      def fillMocks = {
 //        api.getAllThemesForCulture(any) returns OkApiResult(GetAllThemesForCultureResult(List[Theme]().iterator))
