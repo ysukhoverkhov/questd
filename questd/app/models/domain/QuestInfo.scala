@@ -11,7 +11,6 @@ case class QuestInfo(
   level: Int,
   vip: Boolean,
   solveCost: Assets,
-// TODO: remove me default value.
-  solveRewardWon: Assets = Assets(),
-  solveRewardLost: Assets = Assets())
+  solveRewardWon: Assets,
+  solveRewardLost: Assets)
 

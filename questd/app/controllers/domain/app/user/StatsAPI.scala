@@ -34,13 +34,7 @@ private[domain] trait StatsAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     db.user.updateStats (
         user.id,
-        UserStats (
-          lastStatShift = new Date(),
-          proposalsVoted = 0,
-          proposalsVotedPerDay = if (deltaDays == Double.NaN) 0 else user.stats.proposalsVoted / deltaDays,
-          proposalsLiked = 0,
-          proposalsLikedPerDay = if (deltaDays == Double.NaN) 0 else user.stats.proposalsLiked / deltaDays
-        ))
+        user.stats.copy(lastStatShift = new Date()))
 
     OkApiResult(ShiftStatsResult())
   }

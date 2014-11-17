@@ -2,7 +2,6 @@ package logic
 
 import models.domain._
 
-// TODO: check clean up here all constants (most of them are not used now).
 object constants {
 
   val MaxLevel = 20
