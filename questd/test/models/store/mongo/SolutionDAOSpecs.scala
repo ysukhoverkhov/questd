@@ -29,7 +29,7 @@ class SolutionDAOSpecs extends Specification
     db.solution.create(createSolutionStub(
       id = id,
       questId = questId,
-      userId = userId,
+      authorId = userId,
       themeId = themeId,
       level = questLevel,
       vip = vip,

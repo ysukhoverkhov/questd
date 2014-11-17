@@ -137,7 +137,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     try {
       val r = solution.status match {
-          // TODO: implement this part.
+          // FIX: implement this part.
 //        case QuestSolutionStatus.OnVoting =>
 //          Logger.error("We are rewarding player for solution what is on voting.")
 //          InternalErrorApiResult()

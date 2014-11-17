@@ -68,7 +68,7 @@ package object domainstubs {
   def createSolutionStub(
     id: String = "sol id",
     cultureId: String = "cultureId",
-    userId: String = "uid",
+    authorId: String = "uid",
     questId: String = "qid",
     themeId: String = "themeId",
     status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting,
@@ -85,7 +85,7 @@ package object domainstubs {
       info = QuestSolutionInfo(
         content = createSolutionInfoContent,
         vip = vip,
-        authorId = userId,
+        authorId = authorId,
         questId = questId),
       status = status,
       rating = QuestSolutionRating(

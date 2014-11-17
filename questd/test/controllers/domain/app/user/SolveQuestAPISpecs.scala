@@ -106,7 +106,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
     "Do not fight with himself in quest" in context {
 
       val user1 = createUserStub(id = "user1")
-      val mySolution = createSolutionStub(id = "solId1", userId = user1.id, questId = "qid")
+      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = "qid")
 
       solution.allWithParams(
         status = List(QuestSolutionStatus.WaitingForCompetitor.toString),
@@ -124,9 +124,9 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val quest = createQuestStub("qid")
       val user1 = createUserStub(id = "user1")
-      val mySolution = createSolutionStub(id = "solId1", userId = user1.id, questId = quest.id, points = 1, status = QuestSolutionStatus.WaitingForCompetitor)
+      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = quest.id, points = 1, status = QuestSolutionStatus.WaitingForCompetitor)
       val user2 = createUserStub(id = "user2")
-      val rivalSolution = createSolutionStub(id = "solId2", userId = user2.id, questId = quest.id, points = 0, status = QuestSolutionStatus.WaitingForCompetitor)
+      val rivalSolution = createSolutionStub(id = "solId2", authorId = user2.id, questId = quest.id, points = 0, status = QuestSolutionStatus.WaitingForCompetitor)
 
       solution.allWithParams(
         status = List(QuestSolutionStatus.WaitingForCompetitor.toString),
@@ -158,9 +158,9 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val quest = createQuestStub("qid")
       val user1 = createUserStub(id = "user1")
-      val mySolution = createSolutionStub(id = "solId1", userId = user1.id, questId = quest.id, points = 5, status = QuestSolutionStatus.WaitingForCompetitor)
+      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = quest.id, points = 5, status = QuestSolutionStatus.WaitingForCompetitor)
       val user2 = createUserStub(id = "user2")
-      val rivalSolution = createSolutionStub(id = "solId2", userId = user2.id, questId = quest.id, points = 5, status = QuestSolutionStatus.WaitingForCompetitor)
+      val rivalSolution = createSolutionStub(id = "solId2", authorId = user2.id, questId = quest.id, points = 5, status = QuestSolutionStatus.WaitingForCompetitor)
 
       solution.allWithParams(
         status = List(QuestSolutionStatus.WaitingForCompetitor.toString),

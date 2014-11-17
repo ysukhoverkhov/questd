@@ -4,14 +4,13 @@ package controllers.domain.app.user
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain._
-import models.domain.view.{QuestInfoWithID, PublicProfileWithID, QuestSolutionInfoWithID}
+import org.mockito.Matchers
 import testhelpers.domainstubs._
 
 class VoteSolutionAPISpecs extends BaseAPISpecs {
 
   "Vote Solution API" should {
 
-    // TODO: clean me up.
 //    "Remove solution from list of mustVoteSolutions if it's selected" in context {
 //
 //      val sid = "solution id"
@@ -43,5 +42,47 @@ class VoteSolutionAPISpecs extends BaseAPISpecs {
 //      result must beEqualTo(OkApiResult(GetQuestSolutionToVoteResult(ProfileModificationResult.OK, Some(u.profile))))
 //      there was one(user).removeMustVoteSolution(u.id, s.id)
 //    }
+
+    "Voting for friend's solution increase correct stats in solution" in context {
+
+      val sid = "solution id"
+      val friendId = "friendId"
+      val s = createSolutionStub(id = sid, authorId = friendId)
+      val q = createQuestStub()
+      val u = createUserStub(
+        id = "uniqueid",
+        timeLine = List(createTimeLineEntryStub(objectId = s.id)),
+        friends = List(Friendship(friendId, FriendshipStatus.Accepted)))
+
+      solution.readById(s.id) returns Some(s)
+
+      solution.updatePoints(
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any) returns Some(s)
+      user.recordTimeLineVote(u.id, s.id, ContentVote.Cool) returns Some(u)
+
+      val result = api.voteSolution(VoteSolutionRequest(
+        user = u,
+        solutionId = sid,
+        vote = ContentVote.Cool))
+
+      result must beAnInstanceOf[OkApiResult[VoteSolutionResult]]
+      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
+
+      there was one(solution).updatePoints(
+        any,
+        any,
+        any,
+        Matchers.eq(1),
+        any,
+        any,
+        any)
+    }
+
   }
 }

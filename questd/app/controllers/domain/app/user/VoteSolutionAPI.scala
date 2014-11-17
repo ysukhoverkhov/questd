@@ -23,8 +23,6 @@ private[domain] trait VoteSolutionAPI {
     user.canVoteSolution(solutionId) match {
       case OK =>
 
-        // TODO: test me giving friend votes for friends.
-
         db.solution.readById(solutionId) ifSome { s =>
           {
             val isFriend = user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId).contains(s.info.authorId)

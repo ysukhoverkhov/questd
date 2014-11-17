@@ -16,7 +16,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
       val q = createQuestStub(id = "qid")
       val user1 = User(id = "uid")
-      val sol = createSolutionStub(id = "sid", userId = user1.id, questId = q.id)
+      val sol = createSolutionStub(id = "sid", authorId = user1.id, questId = q.id)
 
       val spiedQuestSolutionLogic = spy(new QuestSolutionLogic(sol, api.api))
       when(api.questSolution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
