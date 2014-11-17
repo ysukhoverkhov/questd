@@ -59,60 +59,6 @@ class ContentAPISpecs extends BaseAPISpecs {
 
       result.body must beSome[GetSolutionsForUserResult].which(_.solutions == List())
     }
-
-    // TODO: clean me up.
-    // TODO: check - it looks like this test is already exists somewhere
-//    "getLikedQuests calls db correctly" in context {
-//      db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4")) returns List().iterator
-//
-//      val liked = List(
-//        List("1", "2"),
-//        List("3", "4"))
-//      val u = createUserStub(likedQuestProposalIds = liked)
-//      val result = api.getLikedQuests(GetLikedQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
-//
-//      there was one(quest).allWithParams(
-//        List(QuestStatus.InRotation.toString),
-//        null,
-//        Some(1, 2),
-//        0,
-//        null,
-//        List("1", "2", "3", "4"),
-//        u.demo.cultureId)
-//    }
-
-    "getVIPQuests calls db correctly" in context {
-
-      db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List()) returns List().iterator
-      val u = createUserStub()
-
-      val result = api.getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
-
-      there was one(quest).allWithParams(
-        List(QuestStatus.InRotation.toString),
-        null,
-        Some(1, 2),
-        0,
-        Some(true),
-        null,
-        u.demo.cultureId)
-    }
-
-    "getAllQuests calls db correctly" in context {
-
-      db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, None, List()) returns List().iterator
-
-      val result = api.getAllQuests(GetAllQuestsRequest(createUserStub(cultureId = "cid"), QuestStatus.InRotation, Some(1, 2)))
-
-      there was one(quest).allWithParams(
-        List(QuestStatus.InRotation.toString),
-        null,
-        Some(1, 2),
-        0,
-        null,
-        null,
-        Some("cid"))
-    }
   }
 }
 

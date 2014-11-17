@@ -78,7 +78,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
 
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
-// TODO: save solved quest in stats.
+
     "Do not allow solving of quests already solved" in {
       api.config returns createStubConfig
 

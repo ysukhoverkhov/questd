@@ -80,7 +80,7 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating task for submitting quest.
    */
   private def getSubmitQuestResultTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoResults) {
-    // TODO: clean me up.
+    // FIX: clean me up.
 //    if (canSolveQuestToday)
 //      Some(Task(
 //        taskType = TaskType.SubmitQuestResult,

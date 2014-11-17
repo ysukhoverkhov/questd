@@ -10,13 +10,6 @@ import models.domain._
 trait VotingSolutions { this: UserLogic =>
 
   /**
-   * @return None if no more quests to vote for today.
-   */
-  def getRandomSolutionForTimeLine: Option[QuestSolution] = {
-    getRandomSolution
-  }
-
-  /**
    *
    */
   def canVoteSolution(solutionId: String) = {

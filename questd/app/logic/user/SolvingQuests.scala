@@ -3,8 +3,6 @@ package logic.user
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 import logic._
-import logic.constants._
-import logic.functions._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
 import models.domain.ContentType._
@@ -15,69 +13,11 @@ import models.domain.ContentType._
 trait SolvingQuests { this: UserLogic =>
 
   /**
-   * Check can the user purchase quest.
-   */
-//  def canPurchaseQuest = {
-//    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults))
-//      NotEnoughRights
-//    else if (!(user.profile.assets canAfford costOfPurchasingQuest))
-//      NotEnoughAssets
-//    else if (user.profile.questSolutionContext.questCooldown.after(new Date()))
-//      CoolDown
-//    else if (user.profile.questSolutionContext.takenQuest != None)
-//      InvalidState
-//    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
-//      IncompleteBio
-//    else
-//      OK
-//  }
-
-  /**
    * Checks is user potentially able to solve quests today (disregarding coins and other things).
    */
   def canSolveQuestToday = {
     user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults)
   }
-
-  /**
-   * Tells cost of next quest purchase
-   */
-//  def costOfPurchasingQuest = {
-//    if (user.profile.questSolutionContext.numberOfPurchasedQuests <= NumberOfQuestsSkipsForCoins) {
-//
-//      val questDuration = user.profile.questSolutionContext.purchasedQuest match {
-//        case Some(QuestInfoWithID(_, q)) => q.daysDuration
-//        case _ => 1
-//      }
-//
-//      val c = costToSkipQuest(user.profile.publicProfile.level, user.profile.questSolutionContext.numberOfPurchasedQuests, questDuration)
-//      Assets(coins = c)
-//    } else {
-//      Assets(money = 1)
-//    }
-//  }
-
-  /**
-   * Takes everything into account and returns possible quest to be solved by user.
-   */
-  // TODO: clean me up.
-//  def getRandomQuestForSolution: Option[Quest] = {
-//    getRandomQuest(QuestGetReason.ForSolving)
-//  }
-
-  /**
-   * Check are we able to take quest.
-   */
-//  def canTakeQuest = {
-//    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults))
-//      NotEnoughRights
-//    else if (user.profile.questSolutionContext.purchasedQuest == None)
-//      InvalidState
-//    else if (!(user.profile.assets canAfford costOfTakingQuest))
-//      NotEnoughAssets
-//    else
-//      OK
-//  }
 
   /**
    * Is user can propose quest of given type.
@@ -111,28 +51,8 @@ trait SolvingQuests { this: UserLogic =>
 //    Assets(coins = coinsToInviteFriendForVoteQuestSolution(user.profile.publicProfile.level))
 //  }
 
-//  /**
-//   * Cooldown for taking quest.
-//   */
-//  def getCooldownForTakeQuest(qi: QuestInfo) = {
-//    val daysToSkipt = qi.daysDuration
-//
-//    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-//    (DateTime.now(tz) + daysToSkipt.days).hour(constants.FlipHour).minute(0).second(0) toDate ()
-//  }
-
-//  /**
-//   * Time to solve quest.
-//   */
-//  def getDeadlineForTakeQuest(qi: QuestInfo) = {
-//    val minutesToSolveQuest = qi.minutesDuration
-//
-//    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-//    (DateTime.now(tz) + minutesToSolveQuest.minutes) toDate ()
-//  }
-
   /**
-   * Cooldown for reseting purchases. Purchases should be reset in nearest 5am at user's time.
+   * Cooldown for resetting purchases. Purchases should be reset in nearest 5am at user's time.
    */
   def getResetPurchasesTimeout = getNextFlipHourDate
 

@@ -55,7 +55,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(quest).updatePoints(Matchers.eq(q.id), Matchers.eq(2), anyInt, anyInt, anyInt, anyInt)
     }
 
-    // TODO: clean me up.
+    // FIX: clean me up.
 //    "Report not enough assets for poor user if he wants to invite friends" in context {
 //      val u = createUserStub(assets = Assets(0, 0, 0))
 //      val s = createSolutionInfoContent
@@ -65,7 +65,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 //      result must beEqualTo(OkApiResult(ProposeSolutionResult(ProfileModificationResult.NotEnoughAssets, None)))
 //    }
 
-    // TODO: clean me up.
+    // FIX: clean me up.
 //    "Do not store id of solution for help for not friends" in context {
 //      val friendsIds = List("1", "2", "3")
 //      val requestedFriendsIds = List("4")

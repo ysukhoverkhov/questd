@@ -8,7 +8,6 @@ trait SelectionHelpers { this: UserLogic =>
   /**
    * Select quest what is not or quest and not in given list.
    */
-  // TODO:
   private[user] def selectQuest(
     i: Iterator[Quest],
     usedQuests: List[List[String]]): Option[Quest] = {

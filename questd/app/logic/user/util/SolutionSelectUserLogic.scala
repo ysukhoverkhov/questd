@@ -172,7 +172,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user.profile.publicProfile.level + SolutionLevelUpTolerance))
   }
 
-  // TODO: change it to tags.
+  // FIX: change it to tags.
   private def selectRandomThemes(count: Int): List[String] = {
 //    if (user.history.themesOfSelectedQuests.length > 0) {
 //      for (i <- (1 to count).toList) yield {
