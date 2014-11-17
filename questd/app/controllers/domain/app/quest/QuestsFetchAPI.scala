@@ -39,17 +39,17 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
       cultureId = request.user.demo.cultureId)))
   }
 
-  // TODO: refactor me.
   def getLikedQuests(request: GetLikedQuestsRequest): ApiResult[GetLikedQuestsResult] = handleDbException {
-//    import models.store.mongo.helpers._
 
-//    val ids = request.user.history.likedQuestProposalIds.mongoFlatten
+    val ids = request.user.timeLine
+      .filter(_.objectType == TimeLineType.Quest)
+      .filter(_.ourVote == Some(ContentVote.Cool))
+      .map(_.objectId)
 
     OkApiResult(GetLikedQuestsResult(db.quest.allWithParams(
       status = List(request.status.toString),
       levels = request.levels,
-//      ids = ids,
-      ids = List(),
+      ids = ids,
       cultureId = request.user.demo.cultureId)))
   }
 
