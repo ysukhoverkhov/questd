@@ -76,12 +76,12 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         Some(qs)
     }
 
-    val funcs = List(
+    val functions = List(
       checkWaitCompetitor _,
       checkCheatingSolution _,
       checkAICSolution _)
 
-    val updatedSolution = funcs.foldLeft[Option[QuestSolution]](Some(solution))((r, f) => {
+    val updatedSolution = functions.foldLeft[Option[QuestSolution]](Some(solution))((r, f) => {
       r.flatMap(f)
     })
 

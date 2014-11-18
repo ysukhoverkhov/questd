@@ -130,7 +130,8 @@ package object domainstubs {
         cultureId = Some(cultureId)),
       privateDailyResults = List(DailyResult(
         startOfPeriod = new Date(),
-        dailySalary = Assets())),
+        dailySalary = Assets(),
+        questsIncome = List())),
       profile = Profile(
         assets = assets,
         ratingToNextLevel = 1000000,

@@ -30,12 +30,26 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val dailySalary = user.dailySalary
 
-    db.user.addPrivateDailyResult(
-      user.id,
-      DailyResult(user.getStartOfCurrentDailyResultPeriod, dailySalary)) ifSome { u =>
+    getOwnQuests(GetOwnQuestsRequest(
+      user = user,
+      status = List(QuestStatus.InRotation),
+      pageNumber = 0,
+      pageSize = Int.MaxValue,
+      internalCall = true
+    )) ifOk { r =>
+      val questsIncome = r.quests.map(q => QuestsIncome(q.id, Assets(coins = 10))) // TODO: take correct passive income for quest (from quest logic).
 
-      OkApiResult(ShiftDailyResultResult(u))
+      db.user.addPrivateDailyResult(
+        user.id,
+        DailyResult(
+          user.getStartOfCurrentDailyResultPeriod,
+          dailySalary,
+          questsIncome = questsIncome)) ifSome { u =>
+
+        OkApiResult(ShiftDailyResultResult(u))
+      }
     }
+
   }
 
   /**
@@ -93,7 +107,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val u = ensurePrivateDailyResultExists(user)
 
     val qpr = QuestProposalResult(
-      questProposalId = request.quest.id,
+      questId = request.quest.id,
       reward = request.reward,
       penalty = request.penalty,
       status = request.quest.status)
@@ -112,7 +126,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val u = ensurePrivateDailyResultExists(user)
 
     val qpr = QuestSolutionResult(
-      questSolutionId = request.solution.id,
+      solutionId = request.solution.id,
       reward = request.reward,
       penalty = request.penalty,
       status = request.solution.status)
