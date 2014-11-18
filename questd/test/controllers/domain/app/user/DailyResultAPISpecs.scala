@@ -1,7 +1,5 @@
 package controllers.domain.app.user
 
-import java.util.Date
-
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain._
 import org.mockito.{ArgumentMatcher, Matchers}
@@ -45,7 +43,7 @@ class DailyResultAPISpecs extends BaseAPISpecs {
 
       there was one(user).addPrivateDailyResult(
         Matchers.eq(u.id),
-        Matchers.argThat(QuestIncomeMatcher(List(QuestsIncome(questId = q.id, passiveIncome = Assets(10))))))
+        Matchers.argThat(QuestIncomeMatcher(List(QuestsIncome(questId = q.id, passiveIncome = Assets(50))))))
 
       result must beEqualTo(OkApiResult(ShiftDailyResultResult(user = u)))
     }

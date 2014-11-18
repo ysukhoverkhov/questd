@@ -74,6 +74,16 @@ object functions {
 
   /**
    * *************************
+   * Quests income
+   * *************************
+   */
+  def dailyQuestPassiveIncome: Int = {
+    50
+  }
+
+
+  /**
+   * *************************
    * Daily results
    * *************************
    */
@@ -81,6 +91,7 @@ object functions {
   def dailyCoinsSalary(level: Int): Int = {
     math.round(coinForVoteResult(level)).toInt
   }
+
 
   /**
    * ********************

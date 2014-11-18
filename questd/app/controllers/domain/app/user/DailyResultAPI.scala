@@ -1,5 +1,6 @@
 package controllers.domain.app.user
 
+import logic.QuestLogic
 import models.domain._
 import controllers.domain.DomainAPIComponent
 import components._
@@ -37,7 +38,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       pageSize = Int.MaxValue,
       internalCall = true
     )) ifOk { r =>
-      val questsIncome = r.quests.map(q => QuestsIncome(q.id, Assets(coins = 10))) // TODO: take correct passive income for quest (from quest logic).
+      val questsIncome = r.quests.map(q => QuestsIncome(q.id, QuestLogic.dailyPassiveIncome))
 
       db.user.addPrivateDailyResult(
         user.id,

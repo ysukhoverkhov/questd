@@ -44,6 +44,10 @@ class functionsSpecs extends Specification {
       ratingToWinQuest(20) must beEqualTo(7600)
     }
 
+    "dailyQuestPassiveIncome" in {
+      dailyQuestPassiveIncome must beEqualTo(50)
+    }
+
     "dailySalary" in {
       dailyCoinsSalary(1) must beEqualTo(12)
       dailyCoinsSalary(6) must beEqualTo(331)

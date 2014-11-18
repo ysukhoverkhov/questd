@@ -66,6 +66,14 @@ object QuestLogic {
   }
 
   /**
+   * Passive income a quest generates per day.
+   * @return Passive income.
+   */
+  def dailyPassiveIncome: Assets =  {
+    Assets(coins = dailyQuestPassiveIncome)
+  }
+
+  /**
    * Reward for lost quest.
    */
   def rewardForLosingQuest(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
