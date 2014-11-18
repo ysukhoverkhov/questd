@@ -43,7 +43,11 @@ class DailyResultAPISpecs extends BaseAPISpecs {
 
       there was one(user).addPrivateDailyResult(
         Matchers.eq(u.id),
-        Matchers.argThat(QuestIncomeMatcher(List(QuestsIncome(questId = q.id, passiveIncome = Assets(50))))))
+        Matchers.argThat(QuestIncomeMatcher(List(QuestsIncome(
+          questId = q.id,
+          passiveIncome = Assets(50),
+          timesLiked = 1,
+          likesIncome = Assets(1,1,1))))))
 
       result must beEqualTo(OkApiResult(ShiftDailyResultResult(user = u)))
     }

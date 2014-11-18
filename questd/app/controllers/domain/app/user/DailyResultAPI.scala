@@ -38,7 +38,12 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       pageSize = Int.MaxValue,
       internalCall = true
     )) ifOk { r =>
-      val questsIncome = r.quests.map(q => QuestsIncome(q.id, QuestLogic.dailyPassiveIncome))
+      val questsIncome = r.quests.map(q => QuestsIncome(
+        questId = q.id,
+        passiveIncome = QuestLogic.dailyPassiveIncome,
+        timesLiked = 1, // TODO: get correct values here.
+        likesIncome = Assets(1,1,1)
+        ))
 
       db.user.addPrivateDailyResult(
         user.id,
