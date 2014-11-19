@@ -6,6 +6,9 @@ import controllers.domain.helpers._
 import controllers.domain._
 import play.Logger
 
+case class GetMyQuestsRequest(user: User, status: QuestStatus.Value)
+case class GetMyQuestsResult(quests: Iterator[Quest])
+
 case class GetFriendsQuestsRequest(user: User, status: QuestStatus.Value, levels: Option[(Int, Int)] = None)
 case class GetFriendsQuestsResult(quests: Iterator[Quest])
 
@@ -22,6 +25,12 @@ case class GetAllQuestsRequest(user: User, status: QuestStatus.Value, levels: Op
 case class GetAllQuestsResult(quests: Iterator[Quest])
 
 private[domain] trait QuestsFetchAPI { this: DBAccessor =>
+
+  def getMyQuests(request: GetMyQuestsRequest): ApiResult[GetMyQuestsResult] = handleDbException {
+    OkApiResult(GetMyQuestsResult(db.quest.allWithParams(
+      status = List(request.status),
+      authorIds = List(request.user.id))))
+  }
 
   def getFriendsQuests(request: GetFriendsQuestsRequest): ApiResult[GetFriendsQuestsResult] = handleDbException {
     OkApiResult(GetFriendsQuestsResult(db.quest.allWithParams(
@@ -40,7 +49,6 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
   }
 
   def getLikedQuests(request: GetLikedQuestsRequest): ApiResult[GetLikedQuestsResult] = handleDbException {
-
     val ids = request.user.timeLine
       .filter(_.objectType == TimeLineType.Quest)
       .filter(_.ourVote == Some(ContentVote.Cool))

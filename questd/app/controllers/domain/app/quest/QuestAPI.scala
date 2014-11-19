@@ -102,6 +102,9 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     import request._
 
     {
+      // TODO: reward here quest author for the fact of selecting his quest for a solution.
+
+
       db.quest.updatePoints(quest.id, ratio, 1)
     } ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
@@ -120,12 +123,13 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
     val q = db.quest.updatePoints(
-      quest.id,
-      checkInc(vote, Cool),
-      1,
-      checkInc(vote, Cheating),
-      checkInc(vote, IASpam),
-      checkInc(vote, IAPorn))
+      id = quest.id,
+      pointsChange = checkInc(vote, Cool),
+      likesChange = checkInc(vote, Cool),
+      votersCountChange = 1,
+      cheatingChange = checkInc(vote, Cheating),
+      spamChange = checkInc(vote, IASpam),
+      pornChange = checkInc(vote, IAPorn))
 
     q ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))

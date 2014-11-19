@@ -1,6 +1,6 @@
 package controllers.domain.app.user
 
-import logic.QuestLogic
+import controllers.domain.app.quest.GetMyQuestsRequest
 import models.domain._
 import controllers.domain.DomainAPIComponent
 import components._
@@ -31,19 +31,16 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val dailySalary = user.dailySalary
 
-    getOwnQuests(GetOwnQuestsRequest(
+    getMyQuests(GetMyQuestsRequest(
       user = user,
-      status = List(QuestStatus.InRotation),
-      pageNumber = 0,
-      pageSize = Int.MaxValue,
-      internalCall = true
+      status = QuestStatus.InRotation
     )) ifOk { r =>
       val questsIncome = r.quests.map(q => QuestsIncome(
         questId = q.id,
-        passiveIncome = QuestLogic.dailyPassiveIncome,
-        timesLiked = 1, // TODO: get correct values here.
-        likesIncome = Assets(1,1,1)
-        ))
+        passiveIncome = q.dailyPassiveIncome,
+        timesLiked = q.rating.likesCount,
+        likesIncome = q.dailyIncomeForLikes
+        )).toList
 
       db.user.addPrivateDailyResult(
         user.id,
@@ -55,7 +52,6 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
         OkApiResult(ShiftDailyResultResult(u))
       }
     }
-
   }
 
   /**

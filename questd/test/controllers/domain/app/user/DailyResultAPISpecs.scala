@@ -11,7 +11,7 @@ class DailyResultAPISpecs extends BaseAPISpecs {
 
     "Add questsIncome for each of my quests on shiftDailyResult" in context {
       val u = createUserStub()
-      val q = createQuestStub(authorId = u.id, status = QuestStatus.InRotation)
+      val q = createQuestStub(authorId = u.id, status = QuestStatus.InRotation, likes = 5)
 
       quest.allWithParams(
         status = List(QuestStatus.InRotation),
@@ -43,11 +43,15 @@ class DailyResultAPISpecs extends BaseAPISpecs {
 
       there was one(user).addPrivateDailyResult(
         Matchers.eq(u.id),
-        Matchers.argThat(QuestIncomeMatcher(List(QuestsIncome(
-          questId = q.id,
-          passiveIncome = Assets(50),
-          timesLiked = 1,
-          likesIncome = Assets(1,1,1))))))
+        Matchers.argThat(new ArgumentMatcher[DailyResult] {
+          def matches(result: java.lang.Object): Boolean = {
+            result.asInstanceOf[DailyResult].questsIncome == List(QuestsIncome(
+              questId = q.id,
+              passiveIncome = Assets(50),
+              timesLiked = 5,
+              likesIncome = Assets(3,0,0)))
+          }
+        }))
 
       result must beEqualTo(OkApiResult(ShiftDailyResultResult(user = u)))
     }

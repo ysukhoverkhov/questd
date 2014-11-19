@@ -48,8 +48,7 @@ case class GetOwnQuestsRequest(
   user: User,
   status: List[QuestStatus.Value],
   pageNumber: Int,
-  pageSize: Int,
-  internalCall: Boolean = false)
+  pageSize: Int)
 case class GetOwnQuestsResult(
   allowed: ProfileModificationResult,
   quests: List[QuestInfoWithID],
@@ -177,7 +176,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get own quests.
    */
   def getOwnQuests(request: GetOwnQuestsRequest): ApiResult[GetOwnQuestsResult] = handleDbException {
-    val pageSize = if (request.internalCall) request.pageSize else adjustedPageSize(request.pageSize)
+    val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val questsForUser = db.quest.allWithParams(

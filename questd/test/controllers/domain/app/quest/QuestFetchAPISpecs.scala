@@ -8,6 +8,32 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
 
   "Quest Fetch API" should {
 
+    "getMyQuests calls db correctly" in context {
+
+      val u = createUserStub()
+
+      db.quest.allWithParams(
+        status = List(QuestStatus.InRotation),
+        authorIds = List(u.id),
+        levels = None,
+        skip = 0,
+        vip = Some(false),
+        ids = List(),
+        cultureId = None) returns List().iterator
+
+      val result = api.getMyQuests(GetMyQuestsRequest(u, QuestStatus.InRotation))
+
+      result must beAnInstanceOf[OkApiResult[GetMyQuestsResult]]
+      there was one(quest).allWithParams(
+        status = List(QuestStatus.InRotation),
+        authorIds = List(u.id),
+        levels = null,
+        skip = 0,
+        vip = null,
+        ids = null,
+        cultureId = null)
+    }
+
     "getFriendsQuests return quests for confirmed friends only" in context {
 
       def createUser(friends: List[Friendship]) = {

@@ -17,6 +17,22 @@ class QuestLogic(
   }
 
   /**
+   * Passive income a quest generates per day.
+   * @return Passive income.
+   */
+  def dailyPassiveIncome: Assets = {
+    Assets(coins = dailyQuestPassiveIncome)
+  }
+
+  /**
+   * Calculates income we receive for quest likes.
+   * @return Income for likes.
+   */
+  def dailyIncomeForLikes: Assets = {
+    Assets(coins = dailyQuestIncomeForLikes(quest.rating.likesCount))
+  }
+
+  /**
    * Penalty for cheating solution
    */
   def penaltyForCheatingSolution = {
@@ -63,14 +79,6 @@ object QuestLogic {
    */
   def costOfSolvingQuest(questLevel: Int) = {
     Assets(coins = coinSelectQuest(questLevel))
-  }
-
-  /**
-   * Passive income a quest generates per day.
-   * @return Passive income.
-   */
-  def dailyPassiveIncome: Assets =  {
-    Assets(coins = dailyQuestPassiveIncome)
   }
 
   /**

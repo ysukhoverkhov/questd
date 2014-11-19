@@ -171,15 +171,23 @@ class QuestDAOSpecs extends Specification
 
       db.quest.create(quest)
 
-      db.quest.updatePoints(quest.id, 1, 2, 3, 4, 5)
+      db.quest.updatePoints(
+        id = quest.id,
+        pointsChange = 1,
+        likesChange = 2,
+        votersCountChange = 3,
+        cheatingChange = 4,
+        spamChange = 5,
+        pornChange = 6)
 
       val ou1 = db.quest.readById(quest.id)
       ou1 must beSome.which((q: Quest) => q.id == quest.id)
       ou1 must beSome.which((u: Quest) => u.rating.points == 1)
-      ou1 must beSome.which((u: Quest) => u.rating.votersCount == 2)
-      ou1 must beSome.which((u: Quest) => u.rating.cheating == 3)
-      ou1 must beSome.which((u: Quest) => u.rating.iacpoints.spam == 4)
-      ou1 must beSome.which((u: Quest) => u.rating.iacpoints.porn == 5)
+      ou1 must beSome.which((u: Quest) => u.rating.likesCount == 2)
+      ou1 must beSome.which((u: Quest) => u.rating.votersCount == 3)
+      ou1 must beSome.which((u: Quest) => u.rating.cheating == 4)
+      ou1 must beSome.which((u: Quest) => u.rating.iacpoints.spam == 5)
+      ou1 must beSome.which((u: Quest) => u.rating.iacpoints.porn == 6)
     }
 
   }

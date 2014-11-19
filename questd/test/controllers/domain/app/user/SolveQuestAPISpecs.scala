@@ -27,7 +27,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val s = createSolutionInfoContent
 
       quest.readById(Matchers.eq(q.id)) returns Some(q)
-      quest.updatePoints(Matchers.eq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
+      quest.updatePoints(Matchers.eq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
       user.recordQuestSolving(Matchers.eq(u.id), Matchers.eq(q.id)) returns Some(u)
       user.addEntryToTimeLine(Matchers.eq(u.id), any) returns Some(u)
       user.addToAssets(Matchers.eq(u.id), any) returns Some(u)
@@ -52,7 +52,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(user).addEntryToTimeLine(Matchers.eq(u.id), any)
       there was one(user).addToAssets(Matchers.eq(u.id), any)
       there was one(user).addEntryToTimeLineMulti(Matchers.eq(List("fid1")), any)
-      there was one(quest).updatePoints(Matchers.eq(q.id), Matchers.eq(2), anyInt, anyInt, anyInt, anyInt)
+      there was one(quest).updatePoints(Matchers.eq(q.id), Matchers.eq(2), anyInt, anyInt, anyInt, anyInt, anyInt)
     }
 
     // FIX: clean me up.

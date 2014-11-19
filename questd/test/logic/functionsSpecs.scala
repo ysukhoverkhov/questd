@@ -48,6 +48,13 @@ class functionsSpecs extends Specification {
       dailyQuestPassiveIncome must beEqualTo(50)
     }
 
+    "dailyQuestIncomeForLikes" in {
+      dailyQuestIncomeForLikes(0) must beEqualTo(0)
+      dailyQuestIncomeForLikes(50) must beEqualTo(25)
+      dailyQuestIncomeForLikes(200) must beEqualTo(100)
+      dailyQuestIncomeForLikes(300) must beEqualTo(100)
+    }
+
     "dailySalary" in {
       dailyCoinsSalary(1) must beEqualTo(12)
       dailyCoinsSalary(6) must beEqualTo(331)
