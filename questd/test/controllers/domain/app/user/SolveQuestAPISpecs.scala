@@ -23,7 +23,24 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val t3 = createTimeLineEntryStub(objectType = TimeLineType.Quest)
       val t4 = createTimeLineEntryStub(objectType = TimeLineType.Quest)
       val friends = List(Friendship("fid1", FriendshipStatus.Accepted), Friendship("fid2", FriendshipStatus.Invited))
-      val u = createUserStub(id = uid, cultureId = "cid", vip = true, timeLine = List(tl, t2, t3, t4), friends = friends, questBookmark = Some(q.id))
+      val u = createUserStub(
+        id = uid,
+        cultureId = "cid",
+        vip = true,
+        timeLine = List(tl, t2, t3, t4),
+        friends = friends,
+        questBookmark = Some(q.id),
+        questIncome = QuestIncome(
+          questId = q.id,
+          passiveIncome = Assets(),
+          timesLiked = 0,
+          likesIncome = Assets()))
+      val author = createUserStub(id = q.info.authorId,
+        questIncome = QuestIncome(
+          questId = q.id,
+          passiveIncome = Assets(),
+          timesLiked = 0,
+          likesIncome = Assets()))
       val s = createSolutionInfoContent
 
       quest.readById(Matchers.eq(q.id)) returns Some(q)
@@ -31,10 +48,10 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       user.recordQuestSolving(Matchers.eq(u.id), Matchers.eq(q.id)) returns Some(u)
       user.addEntryToTimeLine(Matchers.eq(u.id), any) returns Some(u)
       user.addToAssets(Matchers.eq(u.id), any) returns Some(u)
+      user.readById(q.info.authorId) returns Some(author)
+      user.storeQuestSolvingInDailyResult(Matchers.eq(q.info.authorId), any, any) returns Some(author)
 
       val result = api.solveQuest(SolveQuestRequest(u, q.id, s))
-
-      result must beEqualTo(OkApiResult(SolveQuestResult(ProfileModificationResult.OK, Some(u.profile))))
 
       there was one(solution).create(
         QuestSolution(
@@ -53,6 +70,9 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(user).addToAssets(Matchers.eq(u.id), any)
       there was one(user).addEntryToTimeLineMulti(Matchers.eq(List("fid1")), any)
       there was one(quest).updatePoints(Matchers.eq(q.id), Matchers.eq(2), anyInt, anyInt, anyInt, anyInt, anyInt)
+      there was one(user).storeQuestSolvingInDailyResult(Matchers.eq(q.info.authorId), any, any)
+
+      result must beEqualTo(OkApiResult(SolveQuestResult(ProfileModificationResult.OK, Some(u.profile))))
     }
 
     // FIX: clean me up.

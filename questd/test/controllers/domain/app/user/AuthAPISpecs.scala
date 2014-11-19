@@ -36,7 +36,7 @@ class AuthAPISpecs extends BaseAPISpecs {
               country = Some(countryName))))))
 
       db.user.readBySNid("FB", userfb.snId) returns None thenReturns u
-      db.user.levelup(anyString, anyInt) returns u
+      db.user.levelUp(anyString, anyInt) returns u
       db.user.setNextLevelRatingAndRights(
         anyString,
         anyInt,

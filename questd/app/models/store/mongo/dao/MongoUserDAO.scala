@@ -174,6 +174,26 @@ private[mongo] class MongoUserDAO
   }
 
   /**
+   * @inheritdoc
+   */
+  def storeQuestSolvingInDailyResult(id: String, questId: String, reward: Assets): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "privateDailyResults.0.questsIncome" -> MongoDBObject(
+          "$elemMatch" -> MongoDBObject(
+            "questId" -> questId
+          )
+        )),
+      MongoDBObject(
+        "$inc" -> MongoDBObject(
+          "privateDailyResults.0.questsIncome.$.timesSolved" -> 1,
+          "privateDailyResults.0.questsIncome.$.solutionsIncome.coins" -> reward.coins,
+          "privateDailyResults.0.questsIncome.$.solutionsIncome.money" -> reward.money,
+          "privateDailyResults.0.questsIncome.$.solutionsIncome.rating" -> reward.rating)))
+  }
+
+  /**
    *
    */
   def storeProposalInDailyResult(id: String, proposal: QuestProposalResult): Option[User] = {
@@ -198,24 +218,24 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def levelup(id: String, ratingToNextlevel: Int): Option[User] = {
+  def levelUp(id: String, ratingToNextLevel: Int): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$inc" -> MongoDBObject(
           "profile.publicProfile.level" -> 1,
-          "profile.assets.rating" -> -ratingToNextlevel)))
+          "profile.assets.rating" -> -ratingToNextLevel)))
   }
 
   /**
    *
    */
-  def setNextLevelRatingAndRights(id: String, newRatingToNextlevel: Int, rights: Rights): Option[User] = {
+  def setNextLevelRatingAndRights(id: String, newRatingToNextLevel: Int, rights: Rights): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
-          "profile.ratingToNextLevel" -> newRatingToNextlevel,
+          "profile.ratingToNextLevel" -> newRatingToNextLevel,
           "profile.rights" -> grater[Rights].asDBObject(rights))))
   }
 

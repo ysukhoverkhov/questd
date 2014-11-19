@@ -1,11 +1,10 @@
 package controllers.domain.app.user
 
-import controllers.domain.app.quest.SolveQuestUpdateRequest
-
 import scala.annotation.tailrec
 import scala.language.postfixOps
 import models.domain._
 import play.Logger
+import controllers.domain.app.quest.SolveQuestUpdateRequest
 import controllers.domain.helpers._
 import controllers.domain._
 import components._

@@ -100,16 +100,18 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
    */
   def solveQuestUpdate(request: SolveQuestUpdateRequest): ApiResult[SolveQuestUpdateResult] = handleDbException {
     import request._
-
     {
-      // TODO: reward here quest author for the fact of selecting his quest for a solution.
-
-
-      db.quest.updatePoints(quest.id, ratio, 1)
-    } ifSome { v =>
-      updateQuestStatus(UpdateQuestStatusRequest(v))
-    } ifOk {
-      OkApiResult(SolveQuestUpdateResult())
+      db.user.readById(quest.info.authorId) ifSome { u =>
+        storeQuestSolvingInDailyResult(StoreQuestSolvingInDailyResultRequest(u, quest))
+      } ifOk {
+        db.quest.updatePoints(
+          id = quest.id,
+          pointsChange = ratio) ifSome { v =>
+          updateQuestStatus(UpdateQuestStatusRequest(v))
+        }
+      } ifOk {
+        OkApiResult(SolveQuestUpdateResult())
+      }
     }
   }
 

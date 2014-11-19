@@ -35,7 +35,7 @@ class DailyResultAPISpecs extends BaseAPISpecs {
         ids = null,
         cultureId = null)
 
-      case class QuestIncomeMatcher(private val incomes: List[QuestsIncome]) extends ArgumentMatcher[DailyResult] {
+      case class QuestIncomeMatcher(private val incomes: List[QuestIncome]) extends ArgumentMatcher[DailyResult] {
         def matches(result: java.lang.Object): Boolean = {
           result.asInstanceOf[DailyResult].questsIncome == incomes
         }
@@ -45,7 +45,7 @@ class DailyResultAPISpecs extends BaseAPISpecs {
         Matchers.eq(u.id),
         Matchers.argThat(new ArgumentMatcher[DailyResult] {
           def matches(result: java.lang.Object): Boolean = {
-            result.asInstanceOf[DailyResult].questsIncome == List(QuestsIncome(
+            result.asInstanceOf[DailyResult].questsIncome == List(QuestIncome(
               questId = q.id,
               passiveIncome = Assets(50),
               timesLiked = 5,

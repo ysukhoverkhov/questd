@@ -33,6 +33,14 @@ class QuestLogic(
   }
 
   /**
+   * Gives reward per quest solving for the quest.
+   * @return Reward for each quest solving
+   */
+  def rewardForSolution: Assets = {
+    Assets(coins = questIncomeForSolving)
+  }
+
+  /**
    * Penalty for cheating solution
    */
   def penaltyForCheatingSolution = {

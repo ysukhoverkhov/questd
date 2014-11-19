@@ -7,12 +7,16 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import play.Logger
+import logic.constants._
 
 case class ShiftDailyResultRequest(user: User)
 case class ShiftDailyResultResult(user: User)
 
 case class GetDailyResultRequest(user: User)
 case class GetDailyResultResult(profile: Profile, hasNewResult: Boolean)
+
+case class StoreQuestSolvingInDailyResultRequest(user: User, quest: Quest)
+case class StoreQuestSolvingInDailyResultResult(user: User)
 
 case class StoreProposalInDailyResultRequest(user: User, quest: Quest, reward: Option[Assets] = None, penalty: Option[Assets] = None)
 case class StoreProposalInDailyResultResult(user: User)
@@ -35,7 +39,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       user = user,
       status = QuestStatus.InRotation
     )) ifOk { r =>
-      val questsIncome = r.quests.map(q => QuestsIncome(
+      val questsIncome = r.quests.map(q => QuestIncome(
         questId = q.id,
         passiveIncome = q.dailyPassiveIncome,
         timesLiked = q.rating.likesCount,
@@ -101,9 +105,36 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   }
 
   /**
+   * Stores information about our solved quest in our daily results. This assumes reward.
+   * @param request Request for the task.
+   * @return Response of the task.
+   */
+  def storeQuestSolvingInDailyResult(request: StoreQuestSolvingInDailyResultRequest): ApiResult[StoreQuestSolvingInDailyResultResult] = handleDbException {
+    import request._
+
+    val u = ensurePrivateDailyResultExists(user)
+
+    u.privateDailyResults.head.questsIncome.find(_.questId == quest.id) ifSome { dailyResultEntry =>
+
+      val reward = if(dailyResultEntry.timesSolved < MaxRewardedQuestSolutionsPerDay)
+        quest.rewardForSolution
+      else
+        Assets()
+
+      db.user.storeQuestSolvingInDailyResult(
+        u.id,
+        quest.id,
+        reward
+      ) ifSome { updatedUser =>
+        OkApiResult(StoreQuestSolvingInDailyResultResult(updatedUser))
+      }
+    }
+  }
+
+  /**
    * Stores result of voting of quest proposal in db
    */
-  def storeProposalInDailyResult(request: StoreProposalInDailyResultRequest): ApiResult[StoreProposalInDailyResultResult] = handleDbException({
+  def storeProposalInDailyResult(request: StoreProposalInDailyResultRequest): ApiResult[StoreProposalInDailyResultResult] = handleDbException {
     import request._
 
     val u = ensurePrivateDailyResultExists(user)
@@ -117,7 +148,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     db.user.storeProposalInDailyResult(user.id, qpr) ifSome { v =>
       OkApiResult(StoreProposalInDailyResultResult(v))
     }
-  })
+  }
 
   /**
    * Stores result of voting of quest solution in db

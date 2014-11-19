@@ -10,7 +10,7 @@ case class DailyResult(
   dailySalary: Assets,
   decidedQuestSolutions: List[QuestSolutionResult] = List(),
   decidedQuestProposals: List[QuestProposalResult] = List(),
-  questsIncome: List[QuestsIncome])
+  questsIncome: List[QuestIncome])
 
 case class QuestSolutionResult(
     solutionId: String,
@@ -33,7 +33,7 @@ case class QuestProposalResult(
  * @param timesSolved Number of times our quest was solved today.
  * @param solutionsIncome Income for solving our quest.
  */
-case class QuestsIncome(
+case class QuestIncome(
   questId: String,
   passiveIncome: Assets,
   timesLiked: Int,

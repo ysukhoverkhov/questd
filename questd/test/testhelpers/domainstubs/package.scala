@@ -123,7 +123,8 @@ package object domainstubs {
     takenTheme: Option[ThemeInfoWithID] = Some(ThemeInfoWithID("theme_id", createThemeStub().info)),
     rights: Rights = Rights.full,
     timeLine: List[TimeLineEntry] = List(),
-    questBookmark: Option[String] = None) = {
+    questBookmark: Option[String] = None,
+    questIncome: QuestIncome = QuestIncome("qid", Assets(), 0, Assets())) = {
 
     User(
       id = id,
@@ -132,7 +133,7 @@ package object domainstubs {
       privateDailyResults = List(DailyResult(
         startOfPeriod = new Date(),
         dailySalary = Assets(),
-        questsIncome = List())),
+        questsIncome = List(questIncome))),
       profile = Profile(
         assets = assets,
         ratingToNextLevel = 1000000,

@@ -474,6 +474,27 @@ class UserDAOSpecs
       ou1.get.stats.solvedQuests must beEqualTo(List(questId))
       ou1.get.profile.questSolutionContext.bookmarkedQuest must beNone
     }
+
+    "storeQuestSolvingInDailyResult do its work" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val quest = createQuestStub()
+      val user = createUserStub(questIncome = QuestIncome(
+        questId = quest.id,
+        passiveIncome = Assets(),
+        timesLiked = 0,
+        likesIncome = Assets()))
+      val reward = Assets(1, 2, 3)
+
+      db.user.create(user)
+      db.user.storeQuestSolvingInDailyResult(user.id, quest.id, reward)
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User]
+      val u = ou1.get
+      u.privateDailyResults.head.questsIncome.head.timesSolved must beEqualTo(1)
+      u.privateDailyResults.head.questsIncome.head.solutionsIncome must beEqualTo(reward)
+    }
   }
 }
 

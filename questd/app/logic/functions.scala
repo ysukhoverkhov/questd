@@ -82,9 +82,7 @@ object functions {
    * Passive income for each of our quests.
    * @return the income.
    */
-  def dailyQuestPassiveIncome: Int = {
-    50
-  }
+  def dailyQuestPassiveIncome: Int = 50
 
   /**
    * Return income for likes of quests.
@@ -95,6 +93,12 @@ object functions {
     import Math._
     min(100, ceil(likesCount * 0.5)).toInt
   }
+
+  /**
+   * Coins income for quest solving.
+   * @return Number of coins as a reward
+   */
+  def questIncomeForSolving: Int = 25
 
   /**
    * *************************

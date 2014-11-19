@@ -37,7 +37,6 @@ class QuestAPISpecs extends BaseAPISpecs {
     }
 
     "Increase likes if quest is liked" in context {
-
       val q = createQuestStub()
 
       quest.updatePoints(
@@ -62,6 +61,7 @@ class QuestAPISpecs extends BaseAPISpecs {
         spamChange = any,
         pornChange = any)
     }
+
   }
 }
 

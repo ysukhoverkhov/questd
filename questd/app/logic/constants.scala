@@ -44,6 +44,8 @@ object constants {
 
   val PremiumIncomeMultiplier = 1.5
 
+  val MaxRewardedQuestSolutionsPerDay = 2
+
   /**
    * Quest proposing.
    */
