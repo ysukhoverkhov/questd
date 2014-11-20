@@ -67,7 +67,9 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
       val deltaAssets = u.profile.dailyResults.foldLeft(Assets()) { (a, dr) =>
 
-        val assetsAfterProposals = dr.decidedQuestProposals.foldLeft(a) { (a, dqp) =>
+        val assetsAfterSalary = a + dr.dailySalary
+
+        val assetsAfterProposals = dr.decidedQuestProposals.foldLeft(assetsAfterSalary) { (a, dqp) =>
           a + dqp.reward.getOrElse(Assets()) - dqp.penalty.getOrElse(Assets())
         }
 
@@ -75,7 +77,9 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
           a + dqs.reward.getOrElse(Assets()) - dqs.penalty.getOrElse(Assets())
         }
 
-        assetsAfterSolutions
+        dr.questsIncome.foldLeft(assetsAfterSolutions) { (a, dqi) =>
+          a + dqi.likesIncome + dqi.passiveIncome + dqi.solutionsIncome
+        }
       }
 
       adjustAssets(AdjustAssetsRequest(user = u, reward = Some(deltaAssets)))

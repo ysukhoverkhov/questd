@@ -30,17 +30,12 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         timeLine = List(tl, t2, t3, t4),
         friends = friends,
         questBookmark = Some(q.id),
-        questIncome = QuestIncome(
-          questId = q.id,
-          passiveIncome = Assets(),
-          timesLiked = 0,
-          likesIncome = Assets()))
-      val author = createUserStub(id = q.info.authorId,
-        questIncome = QuestIncome(
-          questId = q.id,
-          passiveIncome = Assets(),
-          timesLiked = 0,
-          likesIncome = Assets()))
+        privateDailyResults = List(createDailyResultStub(
+          questsIncome = List(createQuestIncomeStub(questId = q.id)))))
+      val author = createUserStub(
+        id = q.info.authorId,
+        privateDailyResults = List(createDailyResultStub(
+          questsIncome = List(createQuestIncomeStub(questId = q.id)))))
       val s = createSolutionInfoContent
 
       quest.readById(Matchers.eq(q.id)) returns Some(q)

@@ -479,11 +479,9 @@ class UserDAOSpecs
       db.user.clear()
 
       val quest = createQuestStub()
-      val user = createUserStub(questIncome = QuestIncome(
-        questId = quest.id,
-        passiveIncome = Assets(),
-        timesLiked = 0,
-        likesIncome = Assets()))
+      val user = createUserStub(
+        privateDailyResults = List(createDailyResultStub(
+          questsIncome = List(createQuestIncomeStub(questId = quest.id)))))
       val reward = Assets(1, 2, 3)
 
       db.user.create(user)

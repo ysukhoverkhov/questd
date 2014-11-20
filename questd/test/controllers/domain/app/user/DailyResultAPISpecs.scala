@@ -55,6 +55,40 @@ class DailyResultAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(ShiftDailyResultResult(user = u)))
     }
+
+    "Apply all income on making private daily results public " in context {
+      val dr = createDailyResultStub(
+        dailySalary = Assets(1, 1, 1),
+        questsIncome = List(
+          createQuestIncomeStub(
+            passiveIncome = Assets(2, 2, 2),
+            likesIncome = Assets(4, 4, 4),
+            solutionsIncome = Assets(8, 8, 8)),
+          createQuestIncomeStub(
+            passiveIncome = Assets(16, 16, 16),
+            likesIncome = Assets(32, 32, 32),
+            solutionsIncome = Assets(64, 64, 64))
+        )
+      )
+
+      val u = createUserStub(privateDailyResults = List(
+        dr,
+        dr
+      ))
+
+      user.movePrivateDailyResultsToPublic(any, any) returns Some(u.copy(
+        privateDailyResults = List(u.privateDailyResults.head),
+        profile = u.profile.copy(
+          dailyResults = u.privateDailyResults.tail
+        )
+      ))
+
+      val result = api.getDailyResult(GetDailyResultRequest(u))
+
+      there was one(user).movePrivateDailyResultsToPublic(u.id, u.privateDailyResults.tail)
+      there was one(user).addToAssets(u.id, Assets(127, 127, 127))
+      result must beAnInstanceOf[OkApiResult[GetDailyResultResult]]
+    }
   }
 }
 

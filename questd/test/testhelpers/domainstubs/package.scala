@@ -110,6 +110,36 @@ package object domainstubs {
     )
   }
 
+  def createQuestIncomeStub(
+    questId: String = "questId",
+    passiveIncome: Assets = Assets(),
+    timesLiked: Int = 0,
+    likesIncome: Assets = Assets(),
+    timesSolved: Int = 0,
+    solutionsIncome: Assets = Assets()
+    ) = {
+    QuestIncome(
+      questId = questId,
+      passiveIncome = passiveIncome,
+      timesLiked = timesLiked,
+      likesIncome = likesIncome,
+      timesSolved = timesSolved,
+      solutionsIncome = solutionsIncome
+    )
+  }
+
+  def createDailyResultStub(
+    startOfPeriod: Date = new Date(),
+    dailySalary: Assets = Assets(),
+    questsIncome: List[QuestIncome] = List(createQuestIncomeStub())
+    ) = {
+    DailyResult(
+      startOfPeriod = startOfPeriod,
+      dailySalary = dailySalary,
+      questsIncome = questsIncome
+    )
+  }
+
   def createUserStub(
     id: String = "uid",
     cultureId: String = "cultureId",
@@ -124,16 +154,13 @@ package object domainstubs {
     rights: Rights = Rights.full,
     timeLine: List[TimeLineEntry] = List(),
     questBookmark: Option[String] = None,
-    questIncome: QuestIncome = QuestIncome("qid", Assets(), 0, Assets())) = {
+    privateDailyResults: List[DailyResult] = List(createDailyResultStub())) = {
 
     User(
       id = id,
       demo = UserDemographics(
         cultureId = Some(cultureId)),
-      privateDailyResults = List(DailyResult(
-        startOfPeriod = new Date(),
-        dailySalary = Assets(),
-        questsIncome = List(questIncome))),
+      privateDailyResults = privateDailyResults,
       profile = Profile(
         assets = assets,
         ratingToNextLevel = 1000000,
