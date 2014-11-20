@@ -17,6 +17,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
 
       user.updateQuestCreationCoolDown(any, any) returns Some(u)
       user.addEntryToTimeLine(any, any) returns Some(u)
+      user.addQuestIncomeToDailyResult(any, any) returns Some(u)
 
       val result = api.createQuest(CreateQuestRequest(u, q.info.content))
 
@@ -24,6 +25,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
 
       there was one(user).addEntryToTimeLine(any, any)
       there was one(user).addEntryToTimeLineMulti(any, any)
+      there was one(user).addQuestIncomeToDailyResult(any, any)
       there was one(quest).create(
         Quest(
           id = anyString,
@@ -44,6 +46,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
 
       user.updateQuestCreationCoolDown(any, any) returns Some(u)
       user.addEntryToTimeLine(any, any) returns Some(u)
+      user.addQuestIncomeToDailyResult(any, any) returns Some(u)
 
       val result = api.createQuest(CreateQuestRequest(u, q.info.content))
 
@@ -51,6 +54,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
 
       there was one(user).addEntryToTimeLine(any, any)
       there was one(user).addEntryToTimeLineMulti(any, any)
+      there was one(user).addQuestIncomeToDailyResult(any, any)
       there was one(quest).create(
         Quest(
           id = anyString,

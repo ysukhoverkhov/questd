@@ -493,6 +493,24 @@ class UserDAOSpecs
       u.privateDailyResults.head.questsIncome.head.timesSolved must beEqualTo(1)
       u.privateDailyResults.head.questsIncome.head.solutionsIncome must beEqualTo(reward)
     }
+
+    "addQuestIncomeToDailyResult do its work" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val quest = createQuestStub()
+      val user = createUserStub(
+        privateDailyResults = List(createDailyResultStub(
+          questsIncome = List(createQuestIncomeStub(questId = quest.id)))))
+      val reward = Assets(1, 2, 3)
+
+      db.user.create(user)
+      db.user.addQuestIncomeToDailyResult(user.id, createQuestIncomeStub())
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User]
+      val u = ou1.get
+      u.privateDailyResults.head.questsIncome.length must beEqualTo(2)
+    }
   }
 }
 

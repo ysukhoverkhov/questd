@@ -176,6 +176,17 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
+  def addQuestIncomeToDailyResult(id: String, questIncome: QuestIncome): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$push" -> MongoDBObject(
+          "privateDailyResults.0.questsIncome" -> grater[QuestIncome].asDBObject(questIncome))))
+  }
+
+  /**
+   * @inheritdoc
+   */
   def storeQuestSolvingInDailyResult(id: String, questId: String, reward: Assets): Option[User] = {
     findAndModify(
       MongoDBObject(

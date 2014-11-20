@@ -38,6 +38,7 @@ trait UserDAO extends BaseDAO[User] {
 
   def addPrivateDailyResult(id: String, dailyResult: DailyResult): Option[User]
   def movePrivateDailyResultsToPublic(id: String, dailyResults: List[DailyResult]): Option[User]
+  def addQuestIncomeToDailyResult(id: String, questIncome: QuestIncome): Option[User]
   def storeQuestSolvingInDailyResult(id: String, questId: String, reward: Assets): Option[User]
   def storeProposalInDailyResult(id: String, proposal: QuestProposalResult): Option[User]
   def storeSolutionInDailyResult(id: String, solution: QuestSolutionResult): Option[User]
