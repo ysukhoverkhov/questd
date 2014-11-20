@@ -21,6 +21,9 @@ case class StoreQuestSolvingInDailyResultResult(user: User)
 case class AddQuestIncomeToDailyResultRequest(user: User, quest: Quest)
 case class AddQuestIncomeToDailyResultResult(user: User)
 
+case class RemoveQuestIncomeFromDailyResultRequest(user: User, questId: String)
+case class RemoveQuestIncomeFromDailyResultResult(user: User)
+
 case class StoreProposalInDailyResultRequest(user: User, quest: Quest, reward: Option[Assets] = None, penalty: Option[Assets] = None)
 case class StoreProposalInDailyResultResult(user: User)
 
@@ -147,6 +150,14 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     db.user.addQuestIncomeToDailyResult(user.id, createQuestIncomeForQuest(quest)) ifSome { u =>
       OkApiResult(AddQuestIncomeToDailyResultResult(u))
+    }
+  }
+
+  def removeQuestIncomeFromDailyResult(request: RemoveQuestIncomeFromDailyResultRequest): ApiResult[RemoveQuestIncomeFromDailyResultResult] = handleDbException {
+    import request._
+
+    db.user.removeQuestIncomeFromDailyResult(user.id, questId) ifSome { u =>
+      OkApiResult(RemoveQuestIncomeFromDailyResultResult(u))
     }
   }
 

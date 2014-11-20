@@ -76,6 +76,8 @@ class DailyResultAPISpecs extends BaseAPISpecs {
         dr
       ))
 
+      user.addToAssets(any, any) returns Some(u)
+
       user.movePrivateDailyResultsToPublic(any, any) returns Some(u.copy(
         privateDailyResults = List(u.privateDailyResults.head),
         profile = u.profile.copy(

@@ -511,6 +511,24 @@ class UserDAOSpecs
       val u = ou1.get
       u.privateDailyResults.head.questsIncome.length must beEqualTo(2)
     }
+
+    "removeQuestIncomeFromDailyResult do its work" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val quest = createQuestStub()
+      val user = createUserStub(
+        privateDailyResults = List(createDailyResultStub(
+          questsIncome = List(createQuestIncomeStub(questId = quest.id)))))
+      val reward = Assets(1, 2, 3)
+
+      db.user.create(user)
+      db.user.removeQuestIncomeFromDailyResult(user.id, quest.id)
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User]
+      val u = ou1.get
+      u.privateDailyResults.head.questsIncome.length must beEqualTo(0)
+    }
   }
 }
 

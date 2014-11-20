@@ -84,7 +84,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     db.user.addToAssets(user.id, del2) ifSome { u =>
       checkIncreaseLevel(CheckIncreaseLevelRequest(u)) ifOk { r => OkApiResult(AdjustAssetsResult(r.user)) }
     }
-
   }
 
   /**

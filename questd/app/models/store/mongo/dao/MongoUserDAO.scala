@@ -187,6 +187,18 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
+  def removeQuestIncomeFromDailyResult(id: String, questId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$pull" -> MongoDBObject(
+          "privateDailyResults.0.questsIncome" -> MongoDBObject(
+            "questId" -> questId))))
+  }
+
+  /**
+   * @inheritdoc
+   */
   def storeQuestSolvingInDailyResult(id: String, questId: String, reward: Assets): Option[User] = {
     findAndModify(
       MongoDBObject(
