@@ -5,7 +5,6 @@ package models.store.mongo
 import org.specs2.mutable._
 import play.api.test._
 import models.domain._
-import java.util.Date
 import testhelpers.domainstubs._
 
 //@RunWith(classOf[JUnitRunner])
@@ -171,20 +170,20 @@ class SolutionDAOSpecs extends Specification
 //      ids.map(_.id) must beEqualTo(List(qs(1).id))
 //    }
 
-//    "updateStatus for solution updates rival correctly" in new WithApplication(appWithTestDatabase) {
-//      clearDB()
-//
-//      val id1 = "id1"
-//      val id2 = "id2"
-//      createSolutionInDB(id1)
-//      createSolutionInDB(id2)
-//
-//      val su1 = db.solution.updateStatus(id1, SolutionStatus.Lost)
-//      val su2 = db.solution.updateStatus(id2, SolutionStatus.Won, Some(id1))
-//
-//      su1 must beSome[Solution].which(s => s.status == SolutionStatus.Lost && s.rivalSolutionId == None)
-//      su2 must beSome[Solution].which(s => s.status == SolutionStatus.Won && s.rivalSolutionId == Some(id1))
-//    }
+    "updateStatus for solution updates rival correctly" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val id1 = "id1"
+      val id2 = "id2"
+      createSolutionInDB(id1)
+      createSolutionInDB(id2)
+
+      val su1 = db.solution.updateStatus(id1, SolutionStatus.Lost)
+      val su2 = db.solution.updateStatus(id2, SolutionStatus.Won, Some(id1))
+
+      su1 must beSome[Solution].which(s => s.status == SolutionStatus.Lost && s.battleIds == List())
+      su2 must beSome[Solution].which(s => s.status == SolutionStatus.Won && s.battleIds == List(id1))
+    }
 
     "Replace cultures" in new WithApplication(appWithTestDatabase) {
       clearDB()

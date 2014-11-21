@@ -21,7 +21,7 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
   /**
    * Updates quest according to vote.
    */
-  def voteQuestSolutionUpdate(request: VoteSolutionUpdateRequest): ApiResult[VoteSolutionUpdateResult] = handleDbException {
+  def voteSolutionUpdate(request: VoteSolutionUpdateRequest): ApiResult[VoteSolutionUpdateResult] = handleDbException {
     import request._
     import ContentVote._
 
@@ -43,6 +43,8 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
     } ifSome { o =>
 
       updateQuestSolutionState(UpdateSolutionStateRequest(o)) ifOk
+      // TODO: update battle state if on voting.
+      // TODO: buttle state update should be in similar API as this one.
         OkApiResult(VoteSolutionUpdateResult())
     }
   }
@@ -54,14 +56,6 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
     import request._
 
     Logger.debug("API - updateQuestSolutionState")
-
-    // TODO: remove me.
-//    def checkWaitCompetitor(qs: Solution) = {
-//      if (qs.shouldStopVoting)
-//        db.solution.updateStatus(solution.id, SolutionStatus.WaitingForCompetitor)
-//      else
-//        Some(qs)
-//    }
 
     def checkCheatingSolution(qs: Solution) = {
       if (qs.shouldBanCheating)
@@ -78,7 +72,6 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
     }
 
     val functions = List(
-//      checkWaitCompetitor _,
       checkCheatingSolution _,
       checkAICSolution _)
 

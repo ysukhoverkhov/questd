@@ -69,7 +69,7 @@ private[mongo] class MongoSolutionDAO
       skip)
   }
 
-  def updateStatus( // TODO: test the function.
+  def updateStatus(
     id: String,
     newStatus: SolutionStatus.Value,
     battleId: Option[String]): Option[Solution] = {
