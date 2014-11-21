@@ -2,10 +2,9 @@ package logic
 
 import models.domain._
 import controllers.domain.DomainAPIComponent
-import java.util.Date
 
-// TODO: rename me to Solutionlogic.
-class QuestSolutionLogic(
+
+class SolutionLogic(
   val qs: Solution,
   val api: DomainAPIComponent#DomainAPI) {
 

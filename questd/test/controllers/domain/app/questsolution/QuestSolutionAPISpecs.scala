@@ -5,7 +5,7 @@ import org.mockito.Matchers
 import controllers.domain._
 import controllers.domain.app.user._
 import models.domain._
-import logic.QuestSolutionLogic
+import logic.SolutionLogic
 import testhelpers.domainstubs._
 
 class QuestSolutionAPISpecs extends BaseAPISpecs {
@@ -18,13 +18,13 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       val user1 = User(id = "uid")
       val sol = createSolutionStub(id = "sid", authorId = user1.id, questId = q.id)
 
-      val spiedQuestSolutionLogic = spy(new QuestSolutionLogic(sol, api.api))
+      val spiedQuestSolutionLogic = spy(new SolutionLogic(sol, api.api))
       when(api.solution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
 
 //      when(spiedQuestSolutionLogic.shouldStopVoting).thenReturn(false)
       when(spiedQuestSolutionLogic.shouldBanCheating).thenReturn(true)
       when(spiedQuestSolutionLogic.shouldBanIAC).thenReturn(false)
-      solution.updateStatus(any, any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))
+      solution.updateStatus(any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))
       user.readById(user1.id) returns Some(user1)
       user.addPrivateDailyResult(any, any) returns Some(user1)
       user.storeSolutionInDailyResult(any, any) returns Some(user1)
@@ -43,7 +43,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
         authorIds = List(user1.id),
         skip = 0)
 
-      there was one(solution).updateStatus(Matchers.eq(sol.id), Matchers.eq(SolutionStatus.CheatingBanned), Matchers.eq(null))
+      there was one(solution).updateStatus(Matchers.eq(sol.id), Matchers.eq(SolutionStatus.CheatingBanned))
       there was one(user).readById(user1.id)
       there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = SolutionStatus.CheatingBanned), user1))
 

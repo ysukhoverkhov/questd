@@ -14,7 +14,6 @@ class BattleLogic(
   /**
    * We check is time come to stop voting for the battle.
    */
-  // TODO: move me to battle logic.
   def shouldStopVoting = {
     new Date().after(battle.voteEndDate)
   }
@@ -22,8 +21,15 @@ class BattleLogic(
   /**
    * Time when to stop fighting battles.
    */
-  def solutionVoteEndDate(qi: QuestInfo) = {
-    val coef = qi.level match {
+  def solutionVoteEndDate(questLevel: Int) = {
+    BattleLogic.voteEndDate(questLevel)
+  }
+}
+
+object BattleLogic {
+
+  def voteEndDate(questLevel: Int) = {
+    val coef = questLevel match {
       case x if 1 to 10 contains x => 1
       case x if 11 to 16 contains x => 2
       case _ => 3

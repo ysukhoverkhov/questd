@@ -14,7 +14,7 @@ trait DatabaseComponent {
     val theme: ThemeDAO
     val config: ConfigDAO
     val quest: QuestDAO
-    val solution: QuestSolutionDAO
+    val solution: SolutionDAO
     val battle: BattleDAO
     val culture: CultureDAO
     val tutorialTask: TutorialTaskDAO

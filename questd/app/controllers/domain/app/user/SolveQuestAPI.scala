@@ -1,8 +1,7 @@
 package controllers.domain.app.user
 
-import java.util.Date
 
-import scala.annotation.tailrec
+import logic.BattleLogic
 import scala.language.postfixOps
 import models.domain._
 import play.Logger
@@ -164,7 +163,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         // FIX: transaction should be here as this operation is atomic.
         val battle = Battle(
           solutionIds = List(solution.id, competitor.id),
-          voteEndDate = new Date() // TODO: select correct date here.
+          voteEndDate = BattleLogic.voteEndDate(solution.questLevel)
         )
 
         // TODO: store battle in solutions

@@ -10,9 +10,9 @@ import java.util.Date
 /**
  * DOA for Quest solution objects
  */
-private[mongo] class MongoQuestSolutionDAO
+private[mongo] class MongoSolutionDAO
   extends BaseMongoDAO[Solution](collectionName = "solutions")
-  with QuestSolutionDAO {
+  with SolutionDAO {
 
   def allWithParams(
     status: List[SolutionStatus.Value] = List(),
@@ -69,22 +69,14 @@ private[mongo] class MongoQuestSolutionDAO
       skip)
   }
 
-  def updateStatus(id: String, newStatus: SolutionStatus.Value, rivalId: Option[String] = None): Option[Solution] = {
+  def updateStatus(id: String, newStatus: SolutionStatus.Value): Option[Solution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (rivalId != None) {
-      queryBuilder +=
-        ("$set" -> MongoDBObject(
-          "status" -> newStatus.toString,
-          "lastModDate" -> new Date(),
-          "rivalSolutionId" -> rivalId.get))
-    } else {
-      queryBuilder +=
-        ("$set" -> MongoDBObject(
-          "status" -> newStatus.toString,
-          "lastModDate" -> new Date()))
-    }
+    queryBuilder +=
+      ("$set" -> MongoDBObject(
+        "status" -> newStatus.toString,
+        "lastModDate" -> new Date()))
 
     findAndModify(
       id,

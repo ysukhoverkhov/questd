@@ -11,7 +11,7 @@ trait LogicBootstrapper { this: APIAccessor with RandomAccessor =>
 
   implicit def quest2Logic(quest: Quest): QuestLogic = new QuestLogic(quest, api)
 
-  implicit def solution2Logic(qs: Solution): QuestSolutionLogic = new QuestSolutionLogic(qs, api)
+  implicit def solution2Logic(qs: Solution): SolutionLogic = new SolutionLogic(qs, api)
 
   implicit def battle2Logic(battle: Battle): BattleLogic = new BattleLogic(battle, api)
 }

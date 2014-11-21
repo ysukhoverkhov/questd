@@ -23,7 +23,7 @@ private[domain] abstract class BaseAPISpecs
   val db = mock[Database]
   val user = mock[UserDAO]
   val quest = mock[QuestDAO]
-  val solution = mock[QuestSolutionDAO]
+  val solution = mock[SolutionDAO]
   val config = mock[ConfigDAO]
   val tutorialTask = mock[TutorialTaskDAO]
   val culture = mock[CultureDAO]
