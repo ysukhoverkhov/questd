@@ -2,13 +2,13 @@ package models.store.dao
 
 import models.domain._
 
-trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
+trait QuestSolutionDAO extends BaseDAO[Solution] {
 
   /**
    * Get solutions what meets following optional parameters.
    */
   def allWithParams(
-    status: List[QuestSolutionStatus.Value] = List(),
+    status: List[SolutionStatus.Value] = List(),
     authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
@@ -16,12 +16,12 @@ trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
     ids: List[String] = List(),
     questIds: List[String] = List(),
     themeIds: List[String] = List(),
-    cultureId: Option[String] = None): Iterator[QuestSolution]
+    cultureId: Option[String] = None): Iterator[Solution]
 
   def updateStatus(
     id: String,
-    newStatus: QuestSolutionStatus.Value,
-    rivalId: Option[String] = None): Option[QuestSolution]
+    newStatus: SolutionStatus.Value,
+    rivalId: Option[String] = None): Option[Solution]
 
   def updatePoints(
     id: String,
@@ -32,7 +32,7 @@ trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
     cheatingChange: Int = 0,
 
     spamChange: Int = 0,
-    pornChange: Int = 0): Option[QuestSolution]
+    pornChange: Int = 0): Option[Solution]
 
   def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit
 

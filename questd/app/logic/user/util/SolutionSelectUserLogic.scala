@@ -8,13 +8,13 @@ import controllers.domain.app.questsolution._
 
 trait SolutionSelectUserLogic { this: UserLogic =>
 
-  def getRandomSolution: Option[QuestSolution] = {
+  def getRandomSolution: Option[Solution] = {
     List(
       () => getSolutionsWithSuperAlgorithm,
       () => getOtherSolutions.getOrElse(List().iterator),
       () => getAnySolutions.getOrElse(List().iterator),
       () => getAnySolutionsIgnoringLevels.getOrElse(List().iterator)).
-      foldLeft[Option[QuestSolution]](None)((run, fun) => {
+      foldLeft[Option[Solution]](None)((run, fun) => {
         if (run == None) {
           selectQuestSolution(fun(), List(solutionIdsToExclude()))
         } else {
@@ -27,7 +27,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     user.timeLine.map(_.objectId)
   }
 
-  private def getSolutionsWithSuperAlgorithm: Iterator[QuestSolution] = {
+  private def getSolutionsWithSuperAlgorithm: Iterator[Solution] = {
     val algorithms = List(
       () => getTutorialSolutions,
       () => getHelpWantedSolutions,
@@ -38,34 +38,34 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       selectFromChain(algorithms, default = List().iterator)
   }
 
-  private[user] def getTutorialSolutions: Option[Iterator[QuestSolution]] = {
+  private[user] def getTutorialSolutions: Option[Iterator[Solution]] = {
     Logger.trace("getTutorialSolutions")
     None
   }
 
-  private[user] def getHelpWantedSolutions: Option[Iterator[QuestSolution]] = {
+  private[user] def getHelpWantedSolutions: Option[Iterator[Solution]] = {
     Logger.trace("getHelpWantedSolutions")
 
     if (user.mustVoteSolutions.nonEmpty) {
       Some(api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(
         user,
-        List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost))).body.get.solutions)
+        List(SolutionStatus.Won, SolutionStatus.Lost))).body.get.solutions)
     } else {
       None
     }
   }
 
-  private[user] def getSolutionsOfOwnQuests: Option[Iterator[QuestSolution]] = {
+  private[user] def getSolutionsOfOwnQuests: Option[Iterator[Solution]] = {
     Logger.trace("getSolutionsOfOwnQuests")
 
     val solutions = api.getSolutionsForOwnQuests(GetSolutionsForOwnQuestsRequest(
       user,
-      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost))).body.get.solutions
+      List(SolutionStatus.Won, SolutionStatus.Lost))).body.get.solutions
 
     if (solutions.isEmpty) None else Some(solutions)
   }
 
-  private[user] def getStartingSolutions: Option[Iterator[QuestSolution]] = {
+  private[user] def getStartingSolutions: Option[Iterator[Solution]] = {
     Logger.trace("getStartingSolutions")
 
     if (user.profile.publicProfile.level > api.config(api.ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions).toInt) {
@@ -81,7 +81,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     }
   }
 
-  private[user] def getDefaultSolutions: Option[Iterator[QuestSolution]] = {
+  private[user] def getDefaultSolutions: Option[Iterator[Solution]] = {
     Logger.trace("getDefaultSolutions")
 
     val algs = List(
@@ -99,7 +99,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning Solutions from friends")
     Some(api.getFriendsSolutions(GetFriendsSolutionsRequest(
       user,
-      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
+      List(SolutionStatus.Won, SolutionStatus.Lost),
       levels)).body.get.solutions)
   }
 
@@ -107,7 +107,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning solutions from Following")
     Some(api.getFollowingSolutions(GetFollowingSolutionsRequest(
       user,
-      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
+      List(SolutionStatus.Won, SolutionStatus.Lost),
       levels)).body.get.solutions)
   }
 
@@ -115,7 +115,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning solutions for quests we liked recently")
     Some(api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
       user,
-      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
+      List(SolutionStatus.Won, SolutionStatus.Lost),
       levels)).body.get.solutions)
   }
 
@@ -127,7 +127,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     Some(api.getVIPSolutions(GetVIPSolutionsRequest(
       user,
-      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
+      List(SolutionStatus.Won, SolutionStatus.Lost),
       levels,
       themeIds)).body.get.solutions)
   }
@@ -140,7 +140,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     Some(api.getAllSolutions(GetAllSolutionsRequest(
       user,
-      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
+      List(SolutionStatus.Won, SolutionStatus.Lost),
       levels,
       themeIds)).body.get.solutions)
   }
@@ -150,7 +150,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     Some(api.getAllSolutions(GetAllSolutionsRequest(
       user,
-      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
+      List(SolutionStatus.Won, SolutionStatus.Lost),
       levels)).body.get.solutions)
   }
 
@@ -159,7 +159,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     Some(api.getAllSolutions(GetAllSolutionsRequest(
       user,
-      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
+      List(SolutionStatus.Won, SolutionStatus.Lost),
       None)).body.get.solutions)
   }
 

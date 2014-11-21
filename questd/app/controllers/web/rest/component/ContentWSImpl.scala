@@ -42,7 +42,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
 
     api.getOwnSolutions(GetOwnSolutionsRequest(
       r.user,
-      v.status.map(QuestSolutionStatus.withName),
+      v.status.map(SolutionStatus.withName),
       v.pageNumber,
       v.pageSize))
   }
@@ -69,7 +69,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getSolutionsForQuest(GetSolutionsForQuestRequest(
       r.user,
       v.id,
-      v.status.map(QuestSolutionStatus.withName),
+      v.status.map(SolutionStatus.withName),
       v.pageNumber,
       v.pageSize))
   }
@@ -83,7 +83,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getSolutionsForUser(GetSolutionsForUserRequest(
       r.user,
       v.id,
-      v.status.map(QuestSolutionStatus.withName),
+      v.status.map(SolutionStatus.withName),
       v.pageNumber,
       v.pageSize))
   }

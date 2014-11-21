@@ -24,7 +24,7 @@ class SolutionDAOSpecs extends Specification
     themeId: String = "theme id",
     questLevel: Int = 5,
     vip: Boolean = false,
-    status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting) = {
+    status: SolutionStatus.Value = SolutionStatus.OnVoting) = {
 
     db.solution.create(createSolutionStub(
       id = id,
@@ -46,7 +46,7 @@ class SolutionDAOSpecs extends Specification
 
       val q = db.solution.readById(id)
 
-      q must beSome[QuestSolution].which(_.id == id)
+      q must beSome[Solution].which(_.id == id)
     }
 
     "Update quest solution" in new WithApplication(appWithTestDatabase) {
@@ -65,7 +65,7 @@ class SolutionDAOSpecs extends Specification
 
       val q2 = db.solution.readById(id)
 
-      q2 must beSome[QuestSolution].which(_.id == id) and beSome[QuestSolution].which(_.info.content.media.reference == "3")
+      q2 must beSome[Solution].which(_.id == id) and beSome[Solution].which(_.info.content.media.reference == "3")
     }
 
     "Delete quest solution" in new WithApplication(appWithTestDatabase) {
@@ -77,7 +77,7 @@ class SolutionDAOSpecs extends Specification
 
       val q = db.solution.readById(id)
 
-      q must beSome[QuestSolution].which(_.id == id)
+      q must beSome[Solution].which(_.id == id)
 
       db.solution.delete(id)
       db.solution.readById(id) must beNone
@@ -179,11 +179,11 @@ class SolutionDAOSpecs extends Specification
       createSolutionInDB(id1)
       createSolutionInDB(id2)
 
-      val su1 = db.solution.updateStatus(id1, QuestSolutionStatus.Lost)
-      val su2 = db.solution.updateStatus(id2, QuestSolutionStatus.Won, Some(id1))
+      val su1 = db.solution.updateStatus(id1, SolutionStatus.Lost)
+      val su2 = db.solution.updateStatus(id2, SolutionStatus.Won, Some(id1))
 
-      su1 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Lost && s.rivalSolutionId == None)
-      su2 must beSome[QuestSolution].which(s => s.status == QuestSolutionStatus.Won && s.rivalSolutionId == Some(id1))
+      su1 must beSome[Solution].which(s => s.status == SolutionStatus.Lost && s.rivalSolutionId == None)
+      su2 must beSome[Solution].which(s => s.status == SolutionStatus.Won && s.rivalSolutionId == Some(id1))
     }
 
     "Replace cultures" in new WithApplication(appWithTestDatabase) {
@@ -200,16 +200,16 @@ class SolutionDAOSpecs extends Specification
       db.solution.replaceCultureIds("rus", "eng")
 
       val ou1 = db.solution.readById(t1.id)
-      ou1 must beSome.which((u: QuestSolution) => u.id == t1.id)
-      ou1 must beSome.which((u: QuestSolution) => u.cultureId == "eng")
+      ou1 must beSome.which((u: Solution) => u.id == t1.id)
+      ou1 must beSome.which((u: Solution) => u.cultureId == "eng")
 
       val ou2 = db.solution.readById(t2.id)
-      ou2 must beSome.which((u: QuestSolution) => u.id == t2.id)
-      ou2 must beSome.which((u: QuestSolution) => u.cultureId == "eng")
+      ou2 must beSome.which((u: Solution) => u.id == t2.id)
+      ou2 must beSome.which((u: Solution) => u.cultureId == "eng")
 
       val ou3 = db.solution.readById(t3.id)
-      ou3 must beSome.which((u: QuestSolution) => u.id == t3.id)
-      ou3 must beSome.which((u: QuestSolution) => u.cultureId == "eng")
+      ou3 must beSome.which((u: Solution) => u.id == t3.id)
+      ou3 must beSome.which((u: Solution) => u.cultureId == "eng")
     }
   }
 }

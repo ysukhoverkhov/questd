@@ -8,47 +8,47 @@ import play.Logger
 
 case class GetFriendsSolutionsRequest(
   user: User,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   levels: Option[(Int, Int)] = None)
-case class GetFriendsSolutionsResult(solutions: Iterator[QuestSolution])
+case class GetFriendsSolutionsResult(solutions: Iterator[Solution])
 
 case class GetFollowingSolutionsRequest(
   user: User,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   levels: Option[(Int, Int)] = None)
-case class GetFollowingSolutionsResult(solutions: Iterator[QuestSolution])
+case class GetFollowingSolutionsResult(solutions: Iterator[Solution])
 
 case class GetSolutionsForLikedQuestsRequest(
   user: User,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   levels: Option[(Int, Int)] = None)
-case class GetSolutionsForLikedQuestsResult(solutions: Iterator[QuestSolution])
+case class GetSolutionsForLikedQuestsResult(solutions: Iterator[Solution])
 
 case class GetVIPSolutionsRequest(
   user: User,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   levels: Option[(Int, Int)] = None,
   themeIds: List[String])
-case class GetVIPSolutionsResult(solutions: Iterator[QuestSolution])
+case class GetVIPSolutionsResult(solutions: Iterator[Solution])
 
 case class GetHelpWantedSolutionsRequest(
   user: User,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   levels: Option[(Int, Int)] = None)
-case class GetHelpWantedSolutionsResult(solutions: Iterator[QuestSolution])
+case class GetHelpWantedSolutionsResult(solutions: Iterator[Solution])
 
 case class GetSolutionsForOwnQuestsRequest(
   user: User,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   levels: Option[(Int, Int)] = None)
-case class GetSolutionsForOwnQuestsResult(solutions: Iterator[QuestSolution])
+case class GetSolutionsForOwnQuestsResult(solutions: Iterator[Solution])
 
 case class GetAllSolutionsRequest(
   user: User,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   levels: Option[(Int, Int)] = None,
   themeIds: List[String] = List())
-case class GetAllSolutionsResult(solutions: Iterator[QuestSolution])
+case class GetAllSolutionsResult(solutions: Iterator[Solution])
 
 
 private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>

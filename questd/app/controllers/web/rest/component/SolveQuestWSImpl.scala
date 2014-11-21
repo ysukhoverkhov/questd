@@ -3,7 +3,7 @@ package controllers.web.rest.component
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
 import controllers.web.rest.protocol._
-import models.domain.{ContentType, ContentReference, QuestSolutionInfoContent}
+import models.domain.{ContentType, ContentReference, SolutionInfoContent}
 
 trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
@@ -19,8 +19,8 @@ trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFu
         reference = v.reference
       )
     }
-    implicit def toQuestInfoContent(v: WSSolveQuestRequest): QuestSolutionInfoContent = {
-      QuestSolutionInfoContent(
+    implicit def toQuestInfoContent(v: WSSolveQuestRequest): SolutionInfoContent = {
+      SolutionInfoContent(
         media = v.media,
         icon = v.icon.map(r => r))
     }

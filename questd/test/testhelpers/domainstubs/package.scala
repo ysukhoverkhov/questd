@@ -60,7 +60,7 @@ package object domainstubs {
   }
 
   def createSolutionInfoContent = {
-    QuestSolutionInfoContent(
+    SolutionInfoContent(
       createContentReferenceStub,
       None)
   }
@@ -72,24 +72,24 @@ package object domainstubs {
     authorId: String = "uid",
     questId: String = "qid",
     themeId: String = "themeId",
-    status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting,
+    status: SolutionStatus.Value = SolutionStatus.OnVoting,
     level: Int = 1,
     points: Int = 0,
     vip: Boolean = false,
     voteEndDate: Date = new Date((new Date).getTime + 100000),
     lastModDate: Date = new Date((new Date).getTime + 100000)) = {
 
-    QuestSolution(
+    Solution(
       id = id,
       cultureId = cultureId,
       questLevel = level,
-      info = QuestSolutionInfo(
+      info = SolutionInfo(
         content = createSolutionInfoContent,
         vip = vip,
         authorId = authorId,
         questId = questId),
       status = status,
-      rating = QuestSolutionRating(
+      rating = SolutionRating(
         pointsRandom = points),
       voteEndDate = voteEndDate,
       lastModDate = lastModDate)

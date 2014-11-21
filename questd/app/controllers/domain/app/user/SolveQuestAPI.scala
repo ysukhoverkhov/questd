@@ -13,13 +13,13 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 case class SolveQuestRequest(
   user: User,
   questId: String,
-  solution: QuestSolutionInfoContent)
+  solution: SolutionInfoContent)
 case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class RewardSolutionAuthorRequest(solution: QuestSolution, author: User)
+case class RewardSolutionAuthorRequest(solution: Solution, author: User)
 case class RewardSolutionAuthorResult()
 
-case class TryFightQuestRequest(solution: QuestSolution)
+case class TryFightQuestRequest(solution: Solution)
 case class TryFightQuestResult()
 
 //case class GetQuestSolutionHelpCostRequest(user: User)
@@ -52,10 +52,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
             user.demo.cultureId ifSome { culture =>
 
-              val solution = QuestSolution(
+              val solution = Solution(
                 cultureId = culture,
                 questLevel = questToSolve.info.level,
-                info = QuestSolutionInfo(
+                info = SolutionInfo(
                   content = content,
                   authorId = user.id,
                   questId = questToSolve.id,
@@ -144,16 +144,16 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 //        case QuestSolutionStatus.WaitingForCompetitor =>
 //          tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
 
-        case QuestSolutionStatus.Won =>
+        case SolutionStatus.Won =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(q.info.solveRewardWon)))
 
-        case QuestSolutionStatus.Lost =>
+        case SolutionStatus.Lost =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(q.info.solveRewardLost)))
 
-        case QuestSolutionStatus.CheatingBanned =>
+        case SolutionStatus.CheatingBanned =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(q.penaltyForCheatingSolution)))
 
-        case QuestSolutionStatus.IACBanned =>
+        case SolutionStatus.IACBanned =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(q.penaltyForIACSolution)))
       }
 
@@ -174,10 +174,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     // 1. find all solutions with the same quest id with status waiting for competitor.
 
     val solutionsForQuest = db.solution.allWithParams(
-      status = List(QuestSolutionStatus.WaitingForCompetitor),
+      status = List(SolutionStatus.WaitingForCompetitor),
       questIds = List(request.solution.info.questId))
 
-    def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {
+    def fight(s1: Solution, s2: Solution): (List[Solution], List[Solution]) = {
       if (s1.calculatePoints == s2.calculatePoints)
         (List(s1, s2), List())
       else if (s1.calculatePoints > s2.calculatePoints)
@@ -187,7 +187,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     }
 
     @tailrec
-    def compete(solutions: Iterator[QuestSolution]): ApiResult[TryFightQuestResult] = {
+    def compete(solutions: Iterator[Solution]): ApiResult[TryFightQuestResult] = {
       if (solutions.hasNext) {
         val other = solutions.next()
 
@@ -208,7 +208,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- winners) {
             Logger.debug("  winner id=" + curSol.id)
 
-            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won, curSol.rivalSolutionId) ifSome { s =>
+            db.solution.updateStatus(curSol.id, SolutionStatus.Won, curSol.rivalSolutionId) ifSome { s =>
               db.user.readById(curSol.info.authorId) ifSome { u =>
                 rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = u))
               }
@@ -220,7 +220,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- losers) {
             Logger.debug("  loser id=" + curSol.id)
 
-            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost, curSol.rivalSolutionId) ifSome { s =>
+            db.solution.updateStatus(curSol.id, SolutionStatus.Lost, curSol.rivalSolutionId) ifSome { s =>
               db.user.readById(curSol.info authorId) ifSome { u =>
                 rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = u))
               }

@@ -24,7 +24,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       when(spiedQuestSolutionLogic.shouldStopVoting).thenReturn(false)
       when(spiedQuestSolutionLogic.shouldBanCheating).thenReturn(true)
       when(spiedQuestSolutionLogic.shouldBanIAC).thenReturn(false)
-      solution.updateStatus(any, any, any) returns Some(sol.copy(status = QuestSolutionStatus.CheatingBanned))
+      solution.updateStatus(any, any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))
       user.readById(user1.id) returns Some(user1)
       user.addPrivateDailyResult(any, any) returns Some(user1)
       user.storeSolutionInDailyResult(any, any) returns Some(user1)
@@ -43,9 +43,9 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
         authorIds = List(user1.id),
         skip = 0)
 
-      there was one(solution).updateStatus(Matchers.eq(sol.id), Matchers.eq(QuestSolutionStatus.CheatingBanned), Matchers.eq(null))
+      there was one(solution).updateStatus(Matchers.eq(sol.id), Matchers.eq(SolutionStatus.CheatingBanned), Matchers.eq(null))
       there was one(user).readById(user1.id)
-      there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = QuestSolutionStatus.CheatingBanned), user1))
+      there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = SolutionStatus.CheatingBanned), user1))
 
       result must beEqualTo(OkApiResult(UpdateQuestSolutionStateResult()))
     }

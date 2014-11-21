@@ -5,14 +5,14 @@ import controllers.domain.DomainAPIComponent
 import java.util.Date
 
 class QuestSolutionLogic(
-  val qs: QuestSolution,
+  val qs: Solution,
   val api: DomainAPIComponent#DomainAPI) {
 
   /**
    * We check is time come to stop voting for the solution.
    */
   def shouldStopVoting = {
-    (qs.status == QuestSolutionStatus.OnVoting) && new Date().after(qs.voteEndDate)
+    (qs.status == SolutionStatus.OnVoting) && new Date().after(qs.voteEndDate)
   }
 
   /**

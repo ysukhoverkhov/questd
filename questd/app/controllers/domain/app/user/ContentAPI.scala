@@ -19,9 +19,9 @@ case class GetSolutionRequest(user: User, solutionId: String)
 case class GetSolutionResult(
   allowed: ProfileModificationResult,
   mySolution: Option[QuestSolutionInfoWithID] = None,
-  myRating: Option[QuestSolutionRating] = None,
+  myRating: Option[SolutionRating] = None,
   rivalSolution: Option[QuestSolutionInfoWithID] = None,
-  rivalRating: Option[QuestSolutionRating] = None,
+  rivalRating: Option[SolutionRating] = None,
   rivalProfile: Option[PublicProfileWithID] = None,
   quest: Option[QuestInfoWithID] = None,
   questAuthor: Option[PublicProfileWithID] = None)
@@ -35,7 +35,7 @@ case class GetPublicProfilesResult(
 
 case class GetOwnSolutionsRequest(
   user: User,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetOwnSolutionsResult(
@@ -58,7 +58,7 @@ case class GetOwnQuestsResult(
 case class GetSolutionsForQuestRequest(
   user: User,
   questId: String,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetSolutionsForQuestResult(
@@ -70,7 +70,7 @@ case class GetSolutionsForQuestResult(
 case class GetSolutionsForUserRequest(
   user: User,
   userId: String,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetSolutionsForUserResult(
@@ -199,7 +199,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForQuest = db.solution.allWithParams(
-      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains),
+      status = request.status.filter(Set(SolutionStatus.Won, SolutionStatus.Lost).contains),
       questIds = List(request.questId),
       skip = pageNumber * pageSize)
 
@@ -225,7 +225,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForUser = db.solution.allWithParams(
-      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains),
+      status = request.status.filter(Set(SolutionStatus.Won, SolutionStatus.Lost).contains),
       authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 

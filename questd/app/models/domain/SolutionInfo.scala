@@ -1,12 +1,12 @@
 package models.domain
 
 
-case class QuestSolutionInfoContent(
+case class SolutionInfoContent(
   media: ContentReference,
   icon: Option[ContentReference] = None)
 
-case class QuestSolutionInfo(
-  content: QuestSolutionInfoContent,
+case class SolutionInfo(
+  content: SolutionInfoContent,
   vip: Boolean,
   authorId: String,
   questId: String)

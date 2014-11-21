@@ -8,12 +8,12 @@ import controllers.domain.app.user._
 import play.Logger
 
 case class VoteQuestSolutionUpdateRequest(
-  solution: QuestSolution,
+  solution: Solution,
   isFriend: Boolean,
   vote: ContentVote.Value)
 case class VoteQuestSolutionUpdateResult()
 
-case class UpdateQuestSolutionStateRequest(solution: QuestSolution)
+case class UpdateQuestSolutionStateRequest(solution: Solution)
 case class UpdateQuestSolutionStateResult()
 
 private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -55,23 +55,23 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
 
     Logger.debug("API - updateQuestSolutionState")
 
-    def checkWaitCompetitor(qs: QuestSolution) = {
+    def checkWaitCompetitor(qs: Solution) = {
       if (qs.shouldStopVoting)
-        db.solution.updateStatus(solution.id, QuestSolutionStatus.WaitingForCompetitor)
+        db.solution.updateStatus(solution.id, SolutionStatus.WaitingForCompetitor)
       else
         Some(qs)
     }
 
-    def checkCheatingSolution(qs: QuestSolution) = {
+    def checkCheatingSolution(qs: Solution) = {
       if (qs.shouldBanCheating)
-        db.solution.updateStatus(solution.id, QuestSolutionStatus.CheatingBanned)
+        db.solution.updateStatus(solution.id, SolutionStatus.CheatingBanned)
       else
         Some(qs)
     }
 
-    def checkAICSolution(qs: QuestSolution) = {
+    def checkAICSolution(qs: Solution) = {
       if (qs.shouldBanIAC)
-        db.solution.updateStatus(solution.id, QuestSolutionStatus.IACBanned)
+        db.solution.updateStatus(solution.id, SolutionStatus.IACBanned)
       else
         Some(qs)
     }
@@ -81,7 +81,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
       checkCheatingSolution _,
       checkAICSolution _)
 
-    val updatedSolution = functions.foldLeft[Option[QuestSolution]](Some(solution))((r, f) => {
+    val updatedSolution = functions.foldLeft[Option[Solution]](Some(solution))((r, f) => {
       r.flatMap(f)
     })
 

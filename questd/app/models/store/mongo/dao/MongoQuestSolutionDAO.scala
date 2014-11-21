@@ -11,11 +11,11 @@ import java.util.Date
  * DOA for Quest solution objects
  */
 private[mongo] class MongoQuestSolutionDAO
-  extends BaseMongoDAO[QuestSolution](collectionName = "solutions")
+  extends BaseMongoDAO[Solution](collectionName = "solutions")
   with QuestSolutionDAO {
 
   def allWithParams(
-    status: List[QuestSolutionStatus.Value] = List(),
+    status: List[SolutionStatus.Value] = List(),
     authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
@@ -23,7 +23,7 @@ private[mongo] class MongoQuestSolutionDAO
     ids: List[String] = List(),
     questIds: List[String] = List(),
     themeIds: List[String] = List(),
-    cultureId: Option[String] = None): Iterator[QuestSolution] = {
+    cultureId: Option[String] = None): Iterator[Solution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -69,7 +69,7 @@ private[mongo] class MongoQuestSolutionDAO
       skip)
   }
 
-  def updateStatus(id: String, newStatus: QuestSolutionStatus.Value, rivalId: Option[String] = None): Option[QuestSolution] = {
+  def updateStatus(id: String, newStatus: SolutionStatus.Value, rivalId: Option[String] = None): Option[Solution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -100,7 +100,7 @@ private[mongo] class MongoQuestSolutionDAO
     cheatingChange: Int = 0,
 
     spamChange: Int = 0,
-    pornChange: Int = 0): Option[QuestSolution] = {
+    pornChange: Int = 0): Option[Solution] = {
 
     findAndModify(
       id,

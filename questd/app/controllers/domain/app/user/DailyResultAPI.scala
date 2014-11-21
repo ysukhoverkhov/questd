@@ -27,7 +27,7 @@ case class RemoveQuestIncomeFromDailyResultResult(user: User)
 case class StoreProposalInDailyResultRequest(user: User, quest: Quest, reward: Option[Assets] = None, penalty: Option[Assets] = None)
 case class StoreProposalInDailyResultResult(user: User)
 
-case class StoreSolutionInDailyResultRequest(user: User, solution: QuestSolution, reward: Option[Assets] = None, penalty: Option[Assets] = None)
+case class StoreSolutionInDailyResultRequest(user: User, solution: Solution, reward: Option[Assets] = None, penalty: Option[Assets] = None)
 case class StoreSolutionInDailyResultResult(user: User)
 
 

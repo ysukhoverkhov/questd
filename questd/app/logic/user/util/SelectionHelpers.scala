@@ -21,10 +21,10 @@ trait SelectionHelpers { this: UserLogic =>
   }
 
   private[user] def selectQuestSolution(
-    i: Iterator[QuestSolution],
-    usedQuests: List[List[String]]): Option[QuestSolution] = {
+    i: Iterator[Solution],
+    usedQuests: List[List[String]]): Option[Solution] = {
 
-    selectObject[QuestSolution, String](
+    selectObject[Solution, String](
       i,
       _.id,
       _.info.authorId,

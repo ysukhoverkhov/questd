@@ -49,11 +49,11 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val result = api.solveQuest(SolveQuestRequest(u, q.id, s))
 
       there was one(solution).create(
-        QuestSolution(
+        Solution(
           id = anyString,
           u.demo.cultureId.get,
           questLevel = q.info.level,
-          info = QuestSolutionInfo(
+          info = SolutionInfo(
             content = s,
             authorId = u.id,
             questId = q.id,
@@ -124,7 +124,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = "qid")
 
       solution.allWithParams(
-        status = List(QuestSolutionStatus.WaitingForCompetitor),
+        status = List(SolutionStatus.WaitingForCompetitor),
         questIds = List(mySolution.info.questId)) returns List(mySolution).iterator
 
       val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
@@ -139,16 +139,16 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val quest = createQuestStub("qid")
       val user1 = createUserStub(id = "user1")
-      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = quest.id, points = 1, status = QuestSolutionStatus.WaitingForCompetitor)
+      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = quest.id, points = 1, status = SolutionStatus.WaitingForCompetitor)
       val user2 = createUserStub(id = "user2")
-      val rivalSolution = createSolutionStub(id = "solId2", authorId = user2.id, questId = quest.id, points = 0, status = QuestSolutionStatus.WaitingForCompetitor)
+      val rivalSolution = createSolutionStub(id = "solId2", authorId = user2.id, questId = quest.id, points = 0, status = SolutionStatus.WaitingForCompetitor)
 
       solution.allWithParams(
-        status = List(QuestSolutionStatus.WaitingForCompetitor),
+        status = List(SolutionStatus.WaitingForCompetitor),
         questIds = List(mySolution.info.questId)) returns List(mySolution, rivalSolution).iterator
 
-      solution.updateStatus(mySolution.id, QuestSolutionStatus.Won, Some(rivalSolution.id)) returns Some(mySolution.copy(status = QuestSolutionStatus.Won))
-      solution.updateStatus(rivalSolution.id, QuestSolutionStatus.Lost, Some(mySolution.id)) returns Some(rivalSolution.copy(status = QuestSolutionStatus.Lost))
+      solution.updateStatus(mySolution.id, SolutionStatus.Won, Some(rivalSolution.id)) returns Some(mySolution.copy(status = SolutionStatus.Won))
+      solution.updateStatus(rivalSolution.id, SolutionStatus.Lost, Some(mySolution.id)) returns Some(rivalSolution.copy(status = SolutionStatus.Lost))
 
       user.readById(mySolution.info.authorId) returns Some(user1)
       user.readById(rivalSolution.info.authorId) returns Some(user2)
@@ -163,8 +163,8 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       result must beEqualTo(OkApiResult(TryFightQuestResult()))
 
       there was
-        one(solution).updateStatus(mySolution.id, QuestSolutionStatus.Won, Some(rivalSolution.id)) andThen
-        one(solution).updateStatus(rivalSolution.id, QuestSolutionStatus.Lost, Some(mySolution.id))
+        one(solution).updateStatus(mySolution.id, SolutionStatus.Won, Some(rivalSolution.id)) andThen
+        one(solution).updateStatus(rivalSolution.id, SolutionStatus.Lost, Some(mySolution.id))
       there were two(user).readById(any)
       there were two(user).storeSolutionInDailyResult(any, any)
     }
@@ -173,16 +173,16 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val quest = createQuestStub("qid")
       val user1 = createUserStub(id = "user1")
-      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = quest.id, points = 5, status = QuestSolutionStatus.WaitingForCompetitor)
+      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = quest.id, points = 5, status = SolutionStatus.WaitingForCompetitor)
       val user2 = createUserStub(id = "user2")
-      val rivalSolution = createSolutionStub(id = "solId2", authorId = user2.id, questId = quest.id, points = 5, status = QuestSolutionStatus.WaitingForCompetitor)
+      val rivalSolution = createSolutionStub(id = "solId2", authorId = user2.id, questId = quest.id, points = 5, status = SolutionStatus.WaitingForCompetitor)
 
       solution.allWithParams(
-        status = List(QuestSolutionStatus.WaitingForCompetitor),
+        status = List(SolutionStatus.WaitingForCompetitor),
         questIds = List(mySolution.info.questId)) returns List(mySolution, rivalSolution).iterator
 
-      solution.updateStatus(mySolution.id, QuestSolutionStatus.Won, Some(rivalSolution.id)) returns Some(mySolution.copy(status = QuestSolutionStatus.Won))
-      solution.updateStatus(rivalSolution.id, QuestSolutionStatus.Won, Some(mySolution.id)) returns Some(rivalSolution.copy(status = QuestSolutionStatus.Won))
+      solution.updateStatus(mySolution.id, SolutionStatus.Won, Some(rivalSolution.id)) returns Some(mySolution.copy(status = SolutionStatus.Won))
+      solution.updateStatus(rivalSolution.id, SolutionStatus.Won, Some(mySolution.id)) returns Some(rivalSolution.copy(status = SolutionStatus.Won))
 
       user.readById(mySolution.info.authorId) returns Some(user1)
       user.readById(rivalSolution.info.authorId) returns Some(user2)
@@ -197,8 +197,8 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       result must beEqualTo(OkApiResult(TryFightQuestResult()))
 
       there was
-        one(solution).updateStatus(mySolution.id, QuestSolutionStatus.Won, Some(rivalSolution.id)) andThen
-        one(solution).updateStatus(rivalSolution.id, QuestSolutionStatus.Won, Some(mySolution.id))
+        one(solution).updateStatus(mySolution.id, SolutionStatus.Won, Some(rivalSolution.id)) andThen
+        one(solution).updateStatus(rivalSolution.id, SolutionStatus.Won, Some(mySolution.id))
       there were two(user).readById(any)
       there were two(user).storeSolutionInDailyResult(any, any)
     }
