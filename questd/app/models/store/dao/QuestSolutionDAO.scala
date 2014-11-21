@@ -1,7 +1,7 @@
 package models.store.dao
 
 import models.domain._
-
+// TODO: rename me to SolutionDAO
 trait QuestSolutionDAO extends BaseDAO[Solution] {
 
   /**
@@ -18,6 +18,7 @@ trait QuestSolutionDAO extends BaseDAO[Solution] {
     themeIds: List[String] = List(),
     cultureId: Option[String] = None): Iterator[Solution]
 
+  // TODO: remove rival id here.
   def updateStatus(
     id: String,
     newStatus: SolutionStatus.Value,

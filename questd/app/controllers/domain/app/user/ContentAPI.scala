@@ -20,9 +20,6 @@ case class GetSolutionResult(
   allowed: ProfileModificationResult,
   mySolution: Option[SolutionInfoWithID] = None,
   myRating: Option[SolutionRating] = None,
-  rivalSolution: Option[SolutionInfoWithID] = None,
-  rivalRating: Option[SolutionRating] = None,
-  rivalProfile: Option[PublicProfileWithID] = None,
   quest: Option[QuestInfoWithID] = None,
   questAuthor: Option[PublicProfileWithID] = None)
 
@@ -118,18 +115,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       val quest = db.quest.readById(s.info.questId)
       val questInfo = quest.map(q => QuestInfoWithID(q.id, q.info))
       val questAuthor = quest.flatMap(q => db.user.readById(q.info.authorId).map (u => PublicProfileWithID(u.id, u.profile.publicProfile)))
-      val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readById(id))
-      val rivalSolutionInfo = rivalSolution.map(rs => SolutionInfoWithID(rs.id, rs.info))
-      val rivalRating = rivalSolution.map(rs => rs.rating)
-      val rivalProfile = rivalSolution.flatMap(rs => db.user.readById(rs.info.authorId)).flatMap(ru => Some(PublicProfileWithID(ru.id, ru.profile.publicProfile)))
 
       OkApiResult(GetSolutionResult(
         allowed = OK,
         mySolution = Some(SolutionInfoWithID(s.id, s.info)),
         myRating = Some(s.rating),
-        rivalSolution = rivalSolutionInfo,
-        rivalRating = rivalRating,
-        rivalProfile = rivalProfile,
         quest = questInfo,
         questAuthor = questAuthor))
     }

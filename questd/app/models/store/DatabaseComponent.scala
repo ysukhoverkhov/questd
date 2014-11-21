@@ -11,10 +11,11 @@ trait DatabaseComponent {
 
   trait Database {
     val user: UserDAO
-    val theme: ThemeDAO 
+    val theme: ThemeDAO
     val config: ConfigDAO
     val quest: QuestDAO
     val solution: QuestSolutionDAO
+    val battle: BattleDAO
     val culture: CultureDAO
     val tutorialTask: TutorialTaskDAO
   }

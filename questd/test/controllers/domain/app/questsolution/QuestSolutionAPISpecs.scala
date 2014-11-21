@@ -19,9 +19,9 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       val sol = createSolutionStub(id = "sid", authorId = user1.id, questId = q.id)
 
       val spiedQuestSolutionLogic = spy(new QuestSolutionLogic(sol, api.api))
-      when(api.questSolution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
+      when(api.solution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
 
-      when(spiedQuestSolutionLogic.shouldStopVoting).thenReturn(false)
+//      when(spiedQuestSolutionLogic.shouldStopVoting).thenReturn(false)
       when(spiedQuestSolutionLogic.shouldBanCheating).thenReturn(true)
       when(spiedQuestSolutionLogic.shouldBanIAC).thenReturn(false)
       solution.updateStatus(any, any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))

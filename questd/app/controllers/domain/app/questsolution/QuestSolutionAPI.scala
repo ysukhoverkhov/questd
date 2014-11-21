@@ -55,12 +55,13 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
 
     Logger.debug("API - updateQuestSolutionState")
 
-    def checkWaitCompetitor(qs: Solution) = {
-      if (qs.shouldStopVoting)
-        db.solution.updateStatus(solution.id, SolutionStatus.WaitingForCompetitor)
-      else
-        Some(qs)
-    }
+    // TODO: remove me.
+//    def checkWaitCompetitor(qs: Solution) = {
+//      if (qs.shouldStopVoting)
+//        db.solution.updateStatus(solution.id, SolutionStatus.WaitingForCompetitor)
+//      else
+//        Some(qs)
+//    }
 
     def checkCheatingSolution(qs: Solution) = {
       if (qs.shouldBanCheating)
@@ -77,7 +78,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
     }
 
     val functions = List(
-      checkWaitCompetitor _,
+//      checkWaitCompetitor _,
       checkCheatingSolution _,
       checkAICSolution _)
 

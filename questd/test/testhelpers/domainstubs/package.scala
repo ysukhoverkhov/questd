@@ -76,7 +76,6 @@ package object domainstubs {
     level: Int = 1,
     points: Int = 0,
     vip: Boolean = false,
-    voteEndDate: Date = new Date((new Date).getTime + 100000),
     lastModDate: Date = new Date((new Date).getTime + 100000)) = {
 
     Solution(
@@ -91,7 +90,6 @@ package object domainstubs {
       status = status,
       rating = SolutionRating(
         pointsRandom = points),
-      voteEndDate = voteEndDate,
       lastModDate = lastModDate)
   }
 

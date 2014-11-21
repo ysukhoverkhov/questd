@@ -4,16 +4,10 @@ import models.domain._
 import controllers.domain.DomainAPIComponent
 import java.util.Date
 
+// TODO: rename me to Solutionlogic.
 class QuestSolutionLogic(
   val qs: Solution,
   val api: DomainAPIComponent#DomainAPI) {
-
-  /**
-   * We check is time come to stop voting for the solution.
-   */
-  def shouldStopVoting = {
-    (qs.status == SolutionStatus.OnVoting) && new Date().after(qs.voteEndDate)
-  }
 
   /**
    * Should we ban quest for cheating and stop displaying it to everyone.
