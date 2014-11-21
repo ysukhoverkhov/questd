@@ -13,7 +13,7 @@ case class TryCreateBattleRequest(solution: Solution)
 case class TryCreateBattleResult()
 
 
-private[domain] trait BattlesAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
+private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Tries to match solution with competitor, leaves it as it is if not found.

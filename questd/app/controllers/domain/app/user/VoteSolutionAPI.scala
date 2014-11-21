@@ -5,7 +5,7 @@ import controllers.domain.helpers._
 import models.domain._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.domain.app.questsolution.VoteQuestSolutionUpdateRequest
+import controllers.domain.app.questsolution.VoteSolutionUpdateRequest
 
 case class VoteSolutionRequest(user: User, solutionId: String, vote: ContentVote.Value)
 
@@ -26,7 +26,7 @@ private[domain] trait VoteSolutionAPI {
         db.solution.readById(solutionId) ifSome { s =>
           {
             val isFriend = user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId).contains(s.info.authorId)
-            voteQuestSolutionUpdate(VoteQuestSolutionUpdateRequest(s, isFriend, request.vote))
+            voteQuestSolutionUpdate(VoteSolutionUpdateRequest(s, isFriend, request.vote))
           } ifOk { r =>
 
             makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuestSolutions)))

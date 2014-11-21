@@ -7,7 +7,7 @@ import controllers.domain.app.user._
 import controllers.domain.app.quest._
 import controllers.domain.app.questsolution._
 import controllers.domain.admin._
-import controllers.domain.app.questsolution.QuestSolutionAPI
+import controllers.domain.app.questsolution.SolutionAPI
 import controllers.domain.config.ApiConfigHolder
 import controllers.domain.app.misc.MiscAPI
 import logic.LogicBootstrapper
@@ -31,7 +31,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     with StatsAPI
     with CreateQuestAPI
     with SolveQuestAPI
-    with BattlesAPI
+    with FightBattleAPI
     with VoteQuestAPI
     with VoteSolutionAPI
     with ContentAPI
@@ -46,8 +46,8 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     with QuestAPI
     with QuestsFetchAPI
     with ThemeFetchAPI
-    with QuestSolutionAPI
-    with QuestsSolutionFetchAPI
+    with SolutionAPI
+    with SolutionFetchAPI
 
     with ThemesAdminAPI
     with UsersAdminAPI

@@ -51,7 +51,7 @@ case class GetAllSolutionsRequest(
 case class GetAllSolutionsResult(solutions: Iterator[Solution])
 
 
-private[domain] trait QuestsSolutionFetchAPI { this: DBAccessor =>
+private[domain] trait SolutionFetchAPI { this: DBAccessor =>
 
   def getFriendsSolutions(request: GetFriendsSolutionsRequest): ApiResult[GetFriendsSolutionsResult] = handleDbException {
     OkApiResult(GetFriendsSolutionsResult(db.solution.allWithParams(

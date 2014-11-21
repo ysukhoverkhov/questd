@@ -7,21 +7,21 @@ import controllers.domain.helpers._
 import controllers.domain.app.user._
 import play.Logger
 
-case class VoteQuestSolutionUpdateRequest(
+case class VoteSolutionUpdateRequest(
   solution: Solution,
   isFriend: Boolean,
   vote: ContentVote.Value)
-case class VoteQuestSolutionUpdateResult()
+case class VoteSolutionUpdateResult()
 
-case class UpdateQuestSolutionStateRequest(solution: Solution)
-case class UpdateQuestSolutionStateResult()
+case class UpdateSolutionStateRequest(solution: Solution)
+case class UpdateSolutionStateResult()
 
-private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
+private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Updates quest according to vote.
    */
-  def voteQuestSolutionUpdate(request: VoteQuestSolutionUpdateRequest): ApiResult[VoteQuestSolutionUpdateResult] = handleDbException {
+  def voteQuestSolutionUpdate(request: VoteSolutionUpdateRequest): ApiResult[VoteSolutionUpdateResult] = handleDbException {
     import request._
     import ContentVote._
 
@@ -42,15 +42,15 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         pornChange = checkInc(vote, IAPorn))
     } ifSome { o =>
 
-      updateQuestSolutionState(UpdateQuestSolutionStateRequest(o)) ifOk
-        OkApiResult(VoteQuestSolutionUpdateResult())
+      updateQuestSolutionState(UpdateSolutionStateRequest(o)) ifOk
+        OkApiResult(VoteSolutionUpdateResult())
     }
   }
 
   /**
    * Update state of quest solution with votes.
    */
-  def updateQuestSolutionState(request: UpdateQuestSolutionStateRequest): ApiResult[UpdateQuestSolutionStateResult] = handleDbException {
+  def updateQuestSolutionState(request: UpdateSolutionStateRequest): ApiResult[UpdateSolutionStateResult] = handleDbException {
     import request._
 
     Logger.debug("API - updateQuestSolutionState")
@@ -102,7 +102,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
           OkApiResult(None)
         }
 
-      authorUpdateResult ifOk OkApiResult(UpdateQuestSolutionStateResult())
+      authorUpdateResult ifOk OkApiResult(UpdateSolutionStateResult())
     }
   }
 }

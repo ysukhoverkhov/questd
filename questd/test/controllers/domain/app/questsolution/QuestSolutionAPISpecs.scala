@@ -36,7 +36,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
         authorIds = List(user1.id),
         skip = 0) returns List().iterator
 
-      val result = api.updateQuestSolutionState(UpdateQuestSolutionStateRequest(sol))
+      val result = api.updateQuestSolutionState(UpdateSolutionStateRequest(sol))
 
       there was two(quest).allWithParams(
         status = List(QuestStatus.InRotation),
@@ -47,7 +47,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       there was one(user).readById(user1.id)
       there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = SolutionStatus.CheatingBanned), user1))
 
-      result must beEqualTo(OkApiResult(UpdateQuestSolutionStateResult()))
+      result must beEqualTo(OkApiResult(UpdateSolutionStateResult()))
     }
   }
 }
