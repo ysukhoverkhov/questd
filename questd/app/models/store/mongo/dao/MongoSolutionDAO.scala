@@ -69,7 +69,10 @@ private[mongo] class MongoSolutionDAO
       skip)
   }
 
-  def updateStatus(id: String, newStatus: SolutionStatus.Value): Option[Solution] = {
+  def updateStatus( // TODO: test the function.
+    id: String,
+    newStatus: SolutionStatus.Value,
+    battleId: Option[String]): Option[Solution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -77,6 +80,14 @@ private[mongo] class MongoSolutionDAO
       ("$set" -> MongoDBObject(
         "status" -> newStatus.toString,
         "lastModDate" -> new Date()))
+
+    battleId match {
+      case None =>
+      case Some(bid) =>
+        queryBuilder +=
+          ("$push" -> MongoDBObject(
+            "battleIds" -> bid))
+    }
 
     findAndModify(
       id,

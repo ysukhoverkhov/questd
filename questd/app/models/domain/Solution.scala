@@ -11,8 +11,8 @@ case class Solution(
   id: String = ID.generateUUID(),
   cultureId: String,
   lastModDate: Date = new Date(),
-  battles: List[Battle] = List(),
-  questLevel: Int, // TODO: check remove me.
+  battleIds: List[String] = List(),
+  questLevel: Int,
   info: SolutionInfo,
   rating: SolutionRating = SolutionRating(),
   status: SolutionStatus.Value = SolutionStatus.WaitingForCompetitor) extends ID

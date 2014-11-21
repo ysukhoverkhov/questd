@@ -20,7 +20,8 @@ trait SolutionDAO extends BaseDAO[Solution] {
 
   def updateStatus(
     id: String,
-    newStatus: SolutionStatus.Value): Option[Solution]
+    newStatus: SolutionStatus.Value,
+    battleId: Option[String] = None): Option[Solution]
 
   def updatePoints(
     id: String,
