@@ -18,9 +18,9 @@ case class GetQuestResult(
 case class GetSolutionRequest(user: User, solutionId: String)
 case class GetSolutionResult(
   allowed: ProfileModificationResult,
-  mySolution: Option[QuestSolutionInfoWithID] = None,
+  mySolution: Option[SolutionInfoWithID] = None,
   myRating: Option[SolutionRating] = None,
-  rivalSolution: Option[QuestSolutionInfoWithID] = None,
+  rivalSolution: Option[SolutionInfoWithID] = None,
   rivalRating: Option[SolutionRating] = None,
   rivalProfile: Option[PublicProfileWithID] = None,
   quest: Option[QuestInfoWithID] = None,
@@ -40,7 +40,7 @@ case class GetOwnSolutionsRequest(
   pageSize: Int)
 case class GetOwnSolutionsResult(
   allowed: ProfileModificationResult,
-  solutions: List[QuestSolutionListInfo],
+  solutions: List[SolutionListInfo],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -63,7 +63,7 @@ case class GetSolutionsForQuestRequest(
   pageSize: Int)
 case class GetSolutionsForQuestResult(
   allowed: ProfileModificationResult,
-  solutions: List[QuestSolutionListInfo],
+  solutions: List[SolutionListInfo],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -75,7 +75,7 @@ case class GetSolutionsForUserRequest(
   pageSize: Int)
 case class GetSolutionsForUserResult(
   allowed: ProfileModificationResult,
-  solutions: List[QuestSolutionListInfo],
+  solutions: List[SolutionListInfo],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -119,13 +119,13 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       val questInfo = quest.map(q => QuestInfoWithID(q.id, q.info))
       val questAuthor = quest.flatMap(q => db.user.readById(q.info.authorId).map (u => PublicProfileWithID(u.id, u.profile.publicProfile)))
       val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readById(id))
-      val rivalSolutionInfo = rivalSolution.map(rs => QuestSolutionInfoWithID(rs.id, rs.info))
+      val rivalSolutionInfo = rivalSolution.map(rs => SolutionInfoWithID(rs.id, rs.info))
       val rivalRating = rivalSolution.map(rs => rs.rating)
       val rivalProfile = rivalSolution.flatMap(rs => db.user.readById(rs.info.authorId)).flatMap(ru => Some(PublicProfileWithID(ru.id, ru.profile.publicProfile)))
 
       OkApiResult(GetSolutionResult(
         allowed = OK,
-        mySolution = Some(QuestSolutionInfoWithID(s.id, s.info)),
+        mySolution = Some(SolutionInfoWithID(s.id, s.info)),
         myRating = Some(s.rating),
         rivalSolution = rivalSolutionInfo,
         rivalRating = rivalRating,
@@ -159,8 +159,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
-      QuestSolutionListInfo(
-        solution = QuestSolutionInfoWithID(s.id, s.info),
+      SolutionListInfo(
+        solution = SolutionInfoWithID(s.id, s.info),
         quest = db.quest.readById(s.info.questId).map(qu => QuestInfoWithID(qu.id, qu.info)),
         author = None)
     })
@@ -204,8 +204,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForQuest.take(pageSize).toList.map(s => {
-      QuestSolutionListInfo(
-        solution = QuestSolutionInfoWithID(s.id, s.info),
+      SolutionListInfo(
+        solution = SolutionInfoWithID(s.id, s.info),
         quest = None,
         author = db.user.readById(s.info.authorId).map(us => PublicProfileWithID(us.id, us.profile.publicProfile)))
     })
@@ -230,8 +230,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
-      QuestSolutionListInfo(
-        solution = QuestSolutionInfoWithID(s.id, s.info),
+      SolutionListInfo(
+        solution = SolutionInfoWithID(s.id, s.info),
         quest = db.quest.readById(s.info.questId).map(qu => QuestInfoWithID(qu.id, qu.info)),
         author = None)
     })
