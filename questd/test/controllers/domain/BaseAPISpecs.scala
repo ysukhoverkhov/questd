@@ -24,6 +24,7 @@ private[domain] abstract class BaseAPISpecs
   val user = mock[UserDAO]
   val quest = mock[QuestDAO]
   val solution = mock[SolutionDAO]
+  val battle = mock[BattleDAO]
   val config = mock[ConfigDAO]
   val tutorialTask = mock[TutorialTaskDAO]
   val culture = mock[CultureDAO]
@@ -43,6 +44,7 @@ private[domain] abstract class BaseAPISpecs
       db.user returns user
       db.quest returns quest
       db.solution returns solution
+      db.battle returns battle
       db.config returns config
       db.tutorialTask returns tutorialTask
       db.culture returns culture
@@ -51,6 +53,5 @@ private[domain] abstract class BaseAPISpecs
       config.readConfig returns mockConfiguration
     }
   }
-
 }
 

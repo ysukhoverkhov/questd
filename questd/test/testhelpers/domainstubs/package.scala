@@ -138,6 +138,17 @@ package object domainstubs {
     )
   }
 
+  def createBattleStub(
+    solutionIds: List[String] = List("1", "2"),
+    status: BattleStatus.Value = BattleStatus.Fighting,
+    voteEndDate: Date = new Date()
+    ) = {
+    Battle(
+      solutionIds = solutionIds,
+      status = status,
+      voteEndDate = voteEndDate)
+  }
+
   def createUserStub(
     id: String = "uid",
     cultureId: String = "cultureId",

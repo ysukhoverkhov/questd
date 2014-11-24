@@ -18,19 +18,17 @@ class BattleDAOSpecs extends Specification
 
   "Mongo Battle DAO" should {
     "Update battle" in new WithApplication(appWithTestDatabase) {
-      // TODO: implement me.
       clearDB()
 
-//      val id = "ididiid"
-//
-//      createSolutionInDB(id)
-//
-//      val q = db.solution.readById(id)
-//
-//      q must beSome[Solution].which(_.id == id)
-      success
-    }
+      val battle = createBattleStub(status = BattleStatus.Fighting)
 
+      db.battle.create(battle)
+      db.battle.updateStatus(battle.id, BattleStatus.Resolved)
+
+      var r = db.battle.readById(battle.id)
+
+      r must beSome.which(_.status == BattleStatus.Resolved)
+    }
   }
 }
 
