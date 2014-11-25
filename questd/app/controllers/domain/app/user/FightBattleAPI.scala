@@ -27,12 +27,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
       if (possibleCompetitors.hasNext) {
         val other = possibleCompetitors.next()
 
-        Logger.error(s"!!!!! other - ${other.info.authorId}")
-        Logger.error(s"!!!!! request - ${request.solution.info.authorId}")
-
-
         if (other.info.authorId != request.solution.info.authorId) {
-          Logger.error(s"???????")
 
           Logger.debug("Found fight pair for quest " + request.solution.info.questId + " :")
           Logger.debug("  s1.id=" + request.solution.id)
@@ -56,7 +51,6 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
 
     selectCompetitor(possibleCompetitors) match {
       case Some(competitor) =>
-        Logger.error(s"1111111")
         // FIX: transaction should be here as this operation is atomic.
         val battle = Battle(
           solutionIds = List(solution.id, competitor.id),
