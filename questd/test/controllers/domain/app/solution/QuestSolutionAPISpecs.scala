@@ -1,4 +1,4 @@
-package controllers.domain.app.questsolution
+package controllers.domain.app.solution
 
 import org.mockito.Mockito._
 import org.mockito.Matchers
@@ -36,7 +36,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
         authorIds = List(user1.id),
         skip = 0) returns List().iterator
 
-      val result = api.updateQuestSolutionState(UpdateSolutionStateRequest(sol))
+      val result = api.updateSolutionState(UpdateSolutionStateRequest(sol))
 
       there was two(quest).allWithParams(
         status = List(QuestStatus.InRotation),

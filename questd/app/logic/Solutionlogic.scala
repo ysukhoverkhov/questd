@@ -37,7 +37,7 @@ class SolutionLogic(
   /**
    * Calculate points for quest solution voting.
    */
-  def calculatePoints = {
+  def votingPoints = {
     List(
       qs.rating.pointsRandom,
       qs.rating.pointsFriends * constants.FriendsVoteMult).sum

@@ -24,6 +24,14 @@ class BattleLogic(
   def solutionVoteEndDate(questLevel: Int) = {
     BattleLogic.voteEndDate(questLevel)
   }
+
+  /**
+   * is the battle is resolved.
+   * @return true if batle should be considered resolved.
+   */
+  def resolved = {
+    shouldStopVoting
+  }
 }
 
 object BattleLogic {

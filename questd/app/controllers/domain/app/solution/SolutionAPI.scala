@@ -1,5 +1,6 @@
-package controllers.domain.app.questsolution
+package controllers.domain.app.solution
 
+import controllers.domain.app.battle.{UpdateBattleStateResult, UpdateBattleStateRequest}
 import models.domain._
 import components._
 import controllers.domain._
@@ -42,17 +43,25 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
         pornChange = checkInc(vote, IAPorn))
     } ifSome { o =>
 
-      updateQuestSolutionState(UpdateSolutionStateRequest(o)) ifOk
-      // TODO: update battle state if on voting.
-      // TODO: buttle state update should be in similar API as this one.
-        OkApiResult(VoteSolutionUpdateResult())
+      updateSolutionState(UpdateSolutionStateRequest(o)) ifOk {
+        (if (o.status == SolutionStatus.OnVoting) {
+          db.battle.readById(o.battleIds.head) ifSome { b =>
+            updateBattleState(UpdateBattleStateRequest(b))
+          }
+        } else {
+          OkApiResult(UpdateBattleStateResult)
+        }) ifOk {
+          //        // TODO: do not forget to update battle state on hourly crawler as well.
+          OkApiResult(VoteSolutionUpdateResult())
+        }
+      }
     }
   }
 
   /**
    * Update state of quest solution with votes.
    */
-  def updateQuestSolutionState(request: UpdateSolutionStateRequest): ApiResult[UpdateSolutionStateResult] = handleDbException {
+  def updateSolutionState(request: UpdateSolutionStateRequest): ApiResult[UpdateSolutionStateResult] = handleDbException {
     import request._
 
     Logger.debug("API - updateQuestSolutionState")

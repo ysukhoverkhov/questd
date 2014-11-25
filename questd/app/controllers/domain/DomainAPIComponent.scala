@@ -1,13 +1,13 @@
 package controllers.domain
 
+import controllers.domain.app.battle.BattleAPI
 import controllers.domain.app.theme.ThemeFetchAPI
 import models.store._
 import components._
 import controllers.domain.app.user._
 import controllers.domain.app.quest._
-import controllers.domain.app.questsolution._
+import controllers.domain.app.solution._
 import controllers.domain.admin._
-import controllers.domain.app.questsolution.SolutionAPI
 import controllers.domain.config.ApiConfigHolder
 import controllers.domain.app.misc.MiscAPI
 import logic.LogicBootstrapper
@@ -48,6 +48,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     with ThemeFetchAPI
     with SolutionAPI
     with SolutionFetchAPI
+    with BattleAPI
 
     with ThemesAdminAPI
     with UsersAdminAPI

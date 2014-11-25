@@ -5,7 +5,7 @@ import controllers.domain.helpers._
 import models.domain._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.domain.app.questsolution.VoteSolutionUpdateRequest
+import controllers.domain.app.solution.VoteSolutionUpdateRequest
 
 case class VoteSolutionRequest(user: User, solutionId: String, vote: ContentVote.Value)
 

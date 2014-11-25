@@ -1,11 +1,11 @@
 package logic.user
 
+import controllers.domain.app.solution._
 import logic.BaseLogicSpecs
 import models.domain._
 import controllers.domain.OkApiResult
 import models.domain.admin.ConfigSection
 import controllers.domain.config._ConfigParams
-import controllers.domain.app.questsolution._
 import testhelpers.domainstubs._
 
 class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {

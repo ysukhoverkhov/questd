@@ -80,6 +80,25 @@ class FightBattleAPISpecs extends BaseAPISpecs {
 
       result must beAnInstanceOf[OkApiResult[TryCreateBattleRequest]]
     }
+
+    // TODO: clean me up.
+    //    "Do not fight with himself in quest" in context {
+    //
+    //      val user1 = createUserStub(id = "user1")
+    //      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = "qid")
+    //
+    //      solution.allWithParams(
+    //        status = List(SolutionStatus.WaitingForCompetitor),
+    //        questIds = List(mySolution.info.questId)) returns List(mySolution).iterator
+    //
+    //      val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
+    //
+    //      result must beEqualTo(OkApiResult(TryFightQuestResult()))
+    //
+    //      there were no(solution).updateStatus(any, any, any)
+    //      there were no(user).storeSolutionInDailyResult(any, any)
+    //    }
+
   }
 }
 

@@ -1,4 +1,4 @@
-package controllers.domain.app.questsolution
+package controllers.domain.app.solution
 
 import controllers.domain._
 import models.domain._

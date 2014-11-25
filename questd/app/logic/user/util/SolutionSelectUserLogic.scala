@@ -4,7 +4,7 @@ import logic.constants._
 import models.domain._
 import logic.UserLogic
 import play.Logger
-import controllers.domain.app.questsolution._
+import controllers.domain.app.solution._
 
 trait SolutionSelectUserLogic { this: UserLogic =>
 
