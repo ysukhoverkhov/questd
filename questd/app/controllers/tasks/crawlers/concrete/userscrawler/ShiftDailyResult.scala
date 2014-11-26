@@ -1,25 +1,26 @@
-package controllers.tasks.crawlers.userscrawler
+package controllers.tasks.crawlers.concrete.userscrawler
 
 import akka.actor.Props
 import controllers.domain._
 import controllers.domain.app.user._
+import controllers.tasks.crawlers.base.BaseCrawler
 import models.domain._
 import java.util.Date
 import com.github.nscala_time.time.Imports._
 import org.joda.time.DateTime
 import components.random.RandomComponent
 
-object CheckShiftDailyResult {
+object ShiftDailyResult {
   def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
-    Props(classOf[CheckShiftDailyResult], api, rand)
+    Props(classOf[ShiftDailyResult], api, rand)
   }
 
-  def name = "CheckShiftDailyResult"
+  def name = "ShiftDailyResult"
 }
 
-class CheckShiftDailyResult(
+class ShiftDailyResult(
     apiPar: DomainAPIComponent#DomainAPI,
-    randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
+    randPar: RandomComponent#Random) extends BaseCrawler[User](apiPar, randPar)  {
 
   protected def check(user: User) = {
     if ((user.privateDailyResults.length == 0)

@@ -148,11 +148,22 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   def addQuestIncomeToDailyResult(request: AddQuestIncomeToDailyResultRequest): ApiResult[AddQuestIncomeToDailyResultResult] = handleDbException {
     import request._
 
-    db.user.addQuestIncomeToDailyResult(user.id, createQuestIncomeForQuest(quest)) ifSome { u =>
+    val u = ensurePrivateDailyResultExists(user)
+
+    if (u.privateDailyResults(0).questsIncome.exists(_.questId == quest.id)) {
       OkApiResult(AddQuestIncomeToDailyResultResult(u))
+    } else {
+      db.user.addQuestIncomeToDailyResult(u.id, createQuestIncomeForQuest(quest)) ifSome { u =>
+        OkApiResult(AddQuestIncomeToDailyResultResult(u))
+      }
     }
   }
 
+  /**
+   * Removes info about quest income from daily results since we do not need it there anymore.
+   * @param request Request with all required information.
+   * @return Response.
+   */
   def removeQuestIncomeFromDailyResult(request: RemoveQuestIncomeFromDailyResultRequest): ApiResult[RemoveQuestIncomeFromDailyResultResult] = handleDbException {
     import request._
 

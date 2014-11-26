@@ -1,3 +1,5 @@
+import play.PlayScala
+
 name := """questd"""
 
 version := "1.0-SNAPSHOT"
@@ -24,4 +26,4 @@ libraryDependencies += "com.restfb" % "restfb" % "1.7.0"
 
 libraryDependencies += "org.mockito" % "mockito-all" % "1.10.10"
 
-libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "1.4.0"
+libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "1.6.0"

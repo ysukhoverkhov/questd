@@ -1,9 +1,10 @@
-package controllers.tasks.crawlers
+package controllers.tasks.crawlers.schedulers
 
 import akka.actor.Props
-import controllers.domain._
-import controllers.tasks.crawlers.userscrawler._
 import components.random.RandomComponent
+import controllers.domain._
+import controllers.tasks.crawlers.base.BaseUsersScheduleCrawler
+import controllers.tasks.crawlers.concrete.userscrawler._
 
 
 object UsersWeeklyCrawler {
@@ -16,7 +17,7 @@ object UsersWeeklyCrawler {
 
 class UsersWeeklyCrawler(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) extends BaseUsersScheduleCrawler(api, rand) {
 
-  protected val userActors = List(
+  protected val actors = List(
       classOf[ShiftUserStats])
 }
 

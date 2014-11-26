@@ -1,9 +1,10 @@
-package controllers.tasks.crawlers.userscrawler
+package controllers.tasks.crawlers.concrete.userscrawler
 
 import akka.actor.Props
 import components.random.RandomComponent
 import controllers.domain._
 import controllers.domain.app.user._
+import controllers.tasks.crawlers.base.BaseCrawler
 import models.domain._
 
 object PopulateTimeLine {
@@ -16,7 +17,7 @@ object PopulateTimeLine {
 
 class PopulateTimeLine(
     apiPar: DomainAPIComponent#DomainAPI,
-    randPar: RandomComponent#Random) extends BaseUserCrawler(apiPar, randPar)  {
+    randPar: RandomComponent#Random) extends BaseCrawler[User](apiPar, randPar)  {
 
   protected def check(user: User) = {
     // TODO: add here a time check for timeline population.

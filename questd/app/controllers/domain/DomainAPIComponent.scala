@@ -1,6 +1,6 @@
 package controllers.domain
 
-import controllers.domain.app.battle.BattleAPI
+import controllers.domain.app.battle.{BattleFetchAPI, BattleAPI}
 import controllers.domain.app.theme.ThemeFetchAPI
 import models.store._
 import components._
@@ -49,6 +49,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     with SolutionAPI
     with SolutionFetchAPI
     with BattleAPI
+    with BattleFetchAPI
 
     with ThemesAdminAPI
     with UsersAdminAPI

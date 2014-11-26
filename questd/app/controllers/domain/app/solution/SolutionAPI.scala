@@ -51,7 +51,6 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
         } else {
           OkApiResult(UpdateBattleStateResult)
         }) ifOk {
-          //        // TODO: do not forget to update battle state on hourly crawler as well.
           OkApiResult(VoteSolutionUpdateResult())
         }
       }
