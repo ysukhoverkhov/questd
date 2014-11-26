@@ -135,13 +135,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     try {
       val r = solution.status match {
-          // FIX: implement this part.
-//        case QuestSolutionStatus.OnVoting =>
-//          Logger.error("We are rewarding player for solution what is on voting.")
-//          InternalErrorApiResult()
-//
-//        case QuestSolutionStatus.WaitingForCompetitor =>
-//          tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
+        case SolutionStatus.WaitingForCompetitor =>
+          Logger.error("We are rewarding player for solution what is waitin for competitor.")
+          InternalErrorApiResult()
+
+        case SolutionStatus.OnVoting =>
+          Logger.error("We are rewarding player for solution what is on voting.")
+          InternalErrorApiResult()
 
         case SolutionStatus.Won =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(q.info.solveRewardWon)))
