@@ -100,8 +100,10 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
     // BATCH
     val questsCount = config(api.ConfigParams.TimeLineRandomQuestsDaily).toInt
     val solutionsCount = config(api.ConfigParams.TimeLineRandomSolutionsDaily).toInt
+    val battlesCount = config(api.ConfigParams.TimeLineRandomBattlesDaily).toInt
     Logger.trace(s"  quests count = $questsCount")
-    Logger.trace(s"  solutions count = $questsCount")
+    Logger.trace(s"  solutions count = $solutionsCount")
+    Logger.trace(s"  battles count = $battlesCount")
 
     def addRandomQuestsToTimeLine(user: Option[User], questsCount: Int): Option[User] = {
       user match {

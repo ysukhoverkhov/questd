@@ -39,6 +39,7 @@ class _ConfigParams {
 
   var TimeLineRandomQuestsDaily = "80 01 TimeLine Random Quests Daily"
   var TimeLineRandomSolutionsDaily = "80 02 TimeLine Random Solutions Daily"
+  var TimeLineRandomBattlesDaily = "80 03 TimeLine Random Battles Daily"
 
   val SolutionProbabilityLevelsToGiveStartingSolutions = "91 01 Level to give starting Solutions"
   val SolutionProbabilityStartingVIPSolutions = "91 02 Probability of selecting VIP Solutions in initial stage"
@@ -93,6 +94,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
 
       ConfigParams.TimeLineRandomQuestsDaily -> "5",
       ConfigParams.TimeLineRandomSolutionsDaily -> "5",
+      ConfigParams.TimeLineRandomBattlesDaily -> "5",
 
       ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions -> "5",
       ConfigParams.SolutionProbabilityStartingVIPSolutions -> "0.5",
