@@ -27,8 +27,8 @@ trait TimeLineLogic { this: UserLogic =>
    * @return None if no more quests to vote for today.
    */
   // TODO: implement me.
-//  def getRandomBattleForTimeLine: Option[Solution] = {
-//    getRandomSolution
-//  }
+  def getRandomBattlesForTimeLine(count: Int): List[Battle] = {
+    List()
+  }
 
 }

@@ -153,10 +153,34 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
       }
     }
 
+    def addRandomBattlesToTimeLine(user: User, battlesCount: Int): ApiResult[PopulateTimeLineWithRandomThingsResult] = {
+      val battles = user.getRandomBattlesForTimeLine(battlesCount)
+
+      battles.foldLeft[ApiResult[PopulateTimeLineWithRandomThingsResult]](OkApiResult(PopulateTimeLineWithRandomThingsResult(user))) { (r, b) =>
+        Logger.trace(s"  random battle selected = ${b.id}")
+
+        r match {
+          case OkApiResult(res) => {
+            addToTimeLine(AddToTimeLineRequest(
+              user = res.user,
+              reason = TimeLineReason.Has,
+              objectType = TimeLineType.Battle,
+              objectId = b.id))
+          } ifOk { res =>
+            OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
+          }
+          case _ =>
+            r
+        }
+      }
+    }
+
     {
       addRandomQuestsToTimeLine(request.user, questsCount)
     } ifOk { r =>
       addRandomSolutionsToTimeLine(r.user, solutionsCount)
+    } ifOk { r =>
+      addRandomBattlesToTimeLine(r.user, battlesCount)
     }
 
     OkApiResult(PopulateTimeLineWithRandomThingsResult(user))
