@@ -2,6 +2,8 @@
 
 package models.store.mongo
 
+import java.util.Date
+
 import org.specs2.mutable._
 import play.api.test._
 import models.domain._
@@ -82,93 +84,97 @@ class SolutionDAOSpecs extends Specification
       db.solution.readById(id) must beNone
     }
 
-    // TODO: clean me up.
-//    "Get all solutions with params" in new WithApplication(appWithTestDatabase) {
-//      clearDB()
-//
-//      // Preparing quests to store in db.
-//      val qs = List(
-//        createSolutionStub(
-//          id = "q1",
-//          questId = "t1",
-//          userId = "q1_author id",
-//          themeId = "q1_theme_id",
-//          level = 3,
-//          vip = false,
-//          status = QuestSolutionStatus.OnVoting,
-//          voteEndDate = new Date(5000),
-//          lastModDate = new Date(5000)),
-//        createSolutionStub(
-//          id = "q2",
-//          questId = "t2",
-//          userId = "q2_author id",
-//          themeId = "q2_theme_id",
-//          level = 13,
-//          vip = true,
-//          status = QuestSolutionStatus.Won,
-//          voteEndDate = new Date(3000),
-//          lastModDate = new Date(3000)),
-//        createSolutionStub(
-//          id = "q3",
-//          questId = "t3",
-//          userId  = "q3_author id",
-//          themeId = "q3_theme_id",
-//          level = 7,
-//          vip = true,
-//          status = QuestSolutionStatus.OnVoting,
-//          voteEndDate = new Date(4000),
-//          lastModDate = new Date(4000)))
-//
-//      qs.foreach(db.solution.create)
-//
-//      val all = db.solution.allWithParams().toList
-//      all.size must beEqualTo(qs.size)
-//      // Checking order with lastModDate
-//      all must beEqualTo(List(qs(1), qs(2), qs(0)))
-//
-//      val status = db.solution.allWithParams(status = List(QuestStatus.OnVoting.toString)).toList
-//      status.map(_.id).size must beEqualTo(2)
-//      status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
-//
-//      val userids = db.solution.allWithParams(authorIds = List("q2_author id")).toList
-//      userids.map(_.id) must beEqualTo(List(qs(1).id))
-//
-//      val levels = db.solution.allWithParams(levels = Some((1, 10))).toList
-//      levels.map(_.id).size must beEqualTo(2)
-//      levels.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
-//
-//      val levelsSkip = db.solution.allWithParams(levels = Some((1, 10)), skip = 1).toList
-//      levelsSkip.map(_.id).size must beEqualTo(1)
-//      levelsSkip.map(_.id) must beEqualTo(List(qs(2).id)) or beEqualTo(List(qs(0).id))
-//
-//      val vip = db.solution.allWithParams(vip = Some(true)).toList
-//      vip.map(_.id).size must beEqualTo(2)
-//      vip.map(_.id) must contain(qs(1).id) and contain(qs(2).id)
-//
-//      val statusVip = db.solution.allWithParams(status = List(QuestStatus.OnVoting.toString), vip = Some(false)).toList
-//      statusVip.map(_.id).size must beEqualTo(1)
-//      statusVip.map(_.id) must beEqualTo(List(qs(0).id))
-//
-//      val ids = db.solution.allWithParams(ids = List("q1", "q2"), vip = Some(true)).toList
-//      ids.map(_.id).size must beEqualTo(1)
-//      ids.map(_.id) must beEqualTo(List(qs(1).id))
-//
-//      val questIds = db.solution.allWithParams(questIds = List("t1", "t3")).toList
-//      questIds.map(_.id).size must beEqualTo(2)
-//      questIds.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
-//
+    "Get all solutions with params" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      // Preparing quests to store in db.
+      val qs = List(
+        createSolutionStub(
+          id = "q1",
+          questId = "t1",
+          authorId = "q1_author id",
+          themeId = "q1_theme_id",
+          level = 3,
+          vip = false,
+          status = SolutionStatus.OnVoting,
+          lastModDate = new Date(5000)),
+        createSolutionStub(
+          id = "q2",
+          questId = "t2",
+          authorId = "q2_author id",
+          themeId = "q2_theme_id",
+          level = 13,
+          vip = true,
+          status = SolutionStatus.Won,
+          lastModDate = new Date(3000)),
+        createSolutionStub(
+          id = "q3",
+          questId = "t3",
+          authorId  = "q3_author id",
+          themeId = "q3_theme_id",
+          level = 7,
+          vip = true,
+          status = SolutionStatus.OnVoting,
+          lastModDate = new Date(4000)))
+
+      qs.foreach(db.solution.create)
+
+      val all = db.solution.allWithParams().toList
+      all.size must beEqualTo(qs.size)
+      // Checking order with lastModDate
+      all must beEqualTo(List(qs(1), qs(2), qs(0)))
+
+      val status = db.solution.allWithParams(status = List(SolutionStatus.OnVoting)).toList
+      status.map(_.id).size must beEqualTo(2)
+      status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
+
+      val userids = db.solution.allWithParams(authorIds = List("q2_author id")).toList
+      userids.map(_.id) must beEqualTo(List(qs(1).id))
+
+      val levels = db.solution.allWithParams(levels = Some((1, 10))).toList
+      levels.map(_.id).size must beEqualTo(2)
+      levels.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
+
+      val levelsSkip = db.solution.allWithParams(levels = Some((1, 10)), skip = 1).toList
+      levelsSkip.map(_.id).size must beEqualTo(1)
+      levelsSkip.map(_.id) must beEqualTo(List(qs(2).id)) or beEqualTo(List(qs(0).id))
+
+      val vip = db.solution.allWithParams(vip = Some(true)).toList
+      vip.map(_.id).size must beEqualTo(2)
+      vip.map(_.id) must contain(qs(1).id) and contain(qs(2).id)
+
+      val statusVip = db.solution.allWithParams(status = List(SolutionStatus.OnVoting), vip = Some(false)).toList
+      statusVip.map(_.id).size must beEqualTo(1)
+      statusVip.map(_.id) must beEqualTo(List(qs(0).id))
+
+      val ids = db.solution.allWithParams(ids = List("q1", "q2"), vip = Some(true)).toList
+      ids.map(_.id).size must beEqualTo(1)
+      ids.map(_.id) must beEqualTo(List(qs(1).id))
+
+      val questIds = db.solution.allWithParams(questIds = List("t1", "t3")).toList
+      questIds.map(_.id).size must beEqualTo(2)
+      questIds.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
+
 //      val themeIds = db.solution.allWithParams(themeIds = List("q1_theme_id", "q2_theme_id")).toList
 //      themeIds.map(_.id).size must beEqualTo(2)
 //      themeIds.map(_.id) must contain(qs(0).id) and contain(qs(1).id)
-//
-//      val themeIdsAndIds = db.solution.allWithParams(ids = List("q1", "q2"), questIds = List("t1", "t3")).toList
-//      themeIdsAndIds.map(_.id).size must beEqualTo(1)
-//      themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))
-//
-//      val statusWithQuestIds = db.solution.allWithParams(ids = List("q1", "q2"), status = List(QuestStatus.OnVoting.toString)).toList
-//      ids.map(_.id).size must beEqualTo(1)
-//      ids.map(_.id) must beEqualTo(List(qs(1).id))
-//    }
+
+      val themeIdsAndIds = db.solution.allWithParams(ids = List("q1", "q2"), questIds = List("t1", "t3")).toList
+      themeIdsAndIds.map(_.id).size must beEqualTo(1)
+      themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))
+
+      val statusWithQuestIds = db.solution.allWithParams(ids = List("q1", "q2"), status = List(SolutionStatus.OnVoting)).toList
+      statusWithQuestIds.map(_.id).size must beEqualTo(1)
+      statusWithQuestIds.map(_.id) must beEqualTo(List(qs(0).id))
+
+      val excludingIds = db.solution.allWithParams(idsExclude = List("q1", "q2")).toList
+      excludingIds.map(_.id).size must beEqualTo(1)
+      excludingIds.map(_.id) must beEqualTo(List(qs(2).id))
+
+      val excludingAuthorIds = db.solution.allWithParams(authorIdsExclude = List("q2_author id")).toList
+      excludingAuthorIds.map(_.id).size must beEqualTo(2)
+      excludingAuthorIds.map(_.id).sorted must beEqualTo(List(qs(0).id, qs(2).id).sorted)
+    }
 
     "updateStatus for solution updates rival correctly" in new WithApplication(appWithTestDatabase) {
       clearDB()

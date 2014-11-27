@@ -1,11 +1,8 @@
 package controllers.domain.app.user
 
-import java.util.Date
-
-import controllers.domain.BaseAPISpecs
+import controllers.domain.{BaseAPISpecs, OkApiResult}
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain._
-import controllers.domain.OkApiResult
 import org.mockito.Matchers
 import testhelpers.domainstubs._
 
@@ -45,7 +42,18 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       user.addToAssets(Matchers.eq(u.id), any) returns Some(u)
       user.readById(q.info.authorId) returns Some(author)
       user.storeQuestSolvingInDailyResult(Matchers.eq(q.info.authorId), any, any) returns Some(author)
-      solution.allWithParams(any, any, any, any, any, any, any, any, any) returns List().iterator
+      solution.allWithParams(
+        status = any,
+        authorIds = any,
+        authorIdsExclude = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        questIds = any,
+        themeIds = any,
+        cultureId = any) returns List().iterator
 
       val result = api.solveQuest(SolveQuestRequest(u, q.id, s))
 

@@ -1,59 +1,8 @@
 package logic.user.util
 
-import models.domain._
 import logic.UserLogic
 
 trait SelectionHelpers { this: UserLogic =>
-
-  /**
-   * Select quest what is not or quest and not in given list.
-   */
-  private[user] def selectQuest(
-    i: Iterator[Quest],
-    usedQuests: List[List[String]]): Option[Quest] = {
-
-    selectObject[Quest, String](
-      i,
-      _.id,
-      _.info.authorId,
-      usedQuests,
-      (x: String) => x)
-  }
-
-  private[user] def selectQuestSolution(
-    i: Iterator[Solution],
-    usedQuests: List[List[String]]): Option[Solution] = {
-
-    selectObject[Solution, String](
-      i,
-      _.id,
-      _.info.authorId,
-      usedQuests,
-      (x: String) => x)
-  }
-
-  /**
-   * Select object what is not our and not in list of lists.
-   */
-  private def selectObject[T, C](
-    i: Iterator[T],
-    getQuestId: (T => String),
-    getQuestAuthorId: (T => String),
-    usedQuests: List[List[C]],
-    getQuestIdInReference: (C => String)): Option[T] = {
-    if (i.hasNext) {
-      val q = i.next()
-
-      if (getQuestAuthorId(q) != user.id
-        && !listOfListsContainsString(usedQuests, getQuestIdInReference, getQuestId(q))) {
-        Some(q)
-      } else {
-        selectObject(i, getQuestId, getQuestAuthorId, usedQuests, getQuestIdInReference)
-      }
-    } else {
-      None
-    }
-  }
 
   /**
    * Check is string in list of dblists of strings.
@@ -66,12 +15,11 @@ trait SelectionHelpers { this: UserLogic =>
   /**
    * Runs algorithms in chain until one of them returns a value
    */
-  private[util] def selectFromChain[T](chain: List[() => Option[T]], default: => T): T = {
+  private[util] def selectFromChain[T](chain: List[() => Option[T]]): Option[T] = {
     chain.
       foldLeft[Option[T]](None)((run, fun) => {
         if (run == None) fun() else run
-      }).
-      getOrElse(default)
+      })
   }
 
   /**

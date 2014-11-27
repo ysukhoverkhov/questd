@@ -1,5 +1,7 @@
 package logic.user
 
+import com.mongodb.BasicDBList
+import com.mongodb.casbah.commons.MongoDBList
 import logic.BaseLogicSpecs
 import models.domain.User
 import com.mongodb.casbah.commons.MongoDBList
@@ -23,7 +25,6 @@ class CommonUtilSpecs extends BaseLogicSpecs {
       u.listOfListsContainsString(test, (x: String) => x, "1") must beFalse
       u.listOfListsContainsString(test, (x: String) => x, "h") must beTrue
     }
-
 
 
     "Find string in list of lists of DBObjects" in {

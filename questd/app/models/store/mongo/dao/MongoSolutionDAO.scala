@@ -17,10 +17,12 @@ private[mongo] class MongoSolutionDAO
   def allWithParams(
     status: List[SolutionStatus.Value] = List(),
     authorIds: List[String] = List(),
+    authorIdsExclude: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
     vip: Option[Boolean] = None,
     ids: List[String] = List(),
+    idsExclude: List[String] = List(),
     questIds: List[String] = List(),
     themeIds: List[String] = List(),
     cultureId: Option[String] = None): Iterator[Solution] = {
@@ -35,6 +37,10 @@ private[mongo] class MongoSolutionDAO
       queryBuilder += ("info.authorId" -> MongoDBObject("$in" -> authorIds))
     }
 
+    if (authorIdsExclude.length > 0) {
+      queryBuilder += ("info.authorId" -> MongoDBObject("$nin" -> authorIdsExclude))
+    }
+
     if (levels != None) {
       queryBuilder += ("$and" -> Array(
         MongoDBObject("questLevel" -> MongoDBObject("$gte" -> levels.get._1)),
@@ -47,6 +53,10 @@ private[mongo] class MongoSolutionDAO
 
     if (ids.length > 0) {
       queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
+    }
+
+    if (idsExclude.length > 0) {
+      queryBuilder += ("id" -> MongoDBObject("$nin" -> idsExclude))
     }
 
     if (questIds.length > 0) {

@@ -11,20 +11,22 @@ class ContentAPISpecs extends BaseAPISpecs {
     "Make correct db call in getSolutionsForQuest" in context {
       val u = createUserStub()
 
-      db.solution.allWithParams(List(SolutionStatus.Won), null, null, 10, null, null, List("qid"), null) returns List[Solution]().iterator
+      db.solution.allWithParams(status = List(SolutionStatus.Won), authorIds = null, levels = null, skip = 10, vip = null, ids = null, questIds = List("qid"), themeIds = null) returns List[Solution]().iterator
 
       val result = api.getSolutionsForQuest(GetSolutionsForQuestRequest(u, "qid", List(SolutionStatus.Won), 2, 5))
 
       there was one(solution).allWithParams(
-        List(SolutionStatus.Won),
-        null,
-        null,
-        10,
-        null,
-        null,
-        List("qid"),
-        null,
-        null)
+        status = List(SolutionStatus.Won),
+        authorIds = null,
+        authorIdsExclude = null,
+        levels = null,
+        skip = 10,
+        vip = null,
+        ids = null,
+        idsExclude = null,
+        questIds = List("qid"),
+        themeIds = null,
+        cultureId = null)
 
       result.body must beSome[GetSolutionsForQuestResult].which(_.solutions == List())
     }
@@ -33,28 +35,30 @@ class ContentAPISpecs extends BaseAPISpecs {
       val u = createUserStub()
 
       db.solution.allWithParams(
-        List(SolutionStatus.Won),
-        List("qid"),
-        null,
-        10,
-        null,
-        null,
-        null,
-        null,
-        null) returns List[Solution]().iterator
+        status = List(SolutionStatus.Won),
+        authorIds = List("qid"),
+        authorIdsExclude = null,
+        levels = null,
+        skip = 10,
+        vip = null,
+        ids = null,
+        idsExclude = null,
+        questIds = null,
+        themeIds = null,
+        cultureId = null) returns List[Solution]().iterator
 
       val result = api.getSolutionsForUser(GetSolutionsForUserRequest(u, "qid", List(SolutionStatus.Won), 2, 5))
 
       there was one(solution).allWithParams(
-        List(SolutionStatus.Won),
-        List("qid"),
-        null,
-        10,
-        null,
-        null,
-        null,
-        null,
-        null)
+        status = List(SolutionStatus.Won),
+        authorIds = List("qid"),
+        levels = null,
+        skip = 10,
+        vip = null,
+        ids = null,
+        questIds = null,
+        themeIds = null,
+        cultureId = null)
 
       result.body must beSome[GetSolutionsForUserResult].which(_.solutions == List())
     }

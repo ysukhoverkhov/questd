@@ -241,8 +241,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val questsForUser = db.quest.allWithParams(
-      request.status.filter(Set(QuestStatus.InRotation).contains),
-      List(request.userId),
+      status = request.status.filter(Set(QuestStatus.InRotation).contains),
+      authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
     OkApiResult(GetQuestsForUserResult(

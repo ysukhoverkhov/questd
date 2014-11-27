@@ -13,26 +13,20 @@ trait QuestSelectUserLogic { this: UserLogic =>
   def getRandomQuest: Option[Quest] = {
     val algorithms = List(
       () => getQuestsWithSuperAlgorithm,
-      () => getQuestsWithMyTags.getOrElse(List().iterator),
-      () => getAnyQuests.getOrElse(List().iterator),
-      () => getAnyQuestsIgnoringLevels.getOrElse(List().iterator))
+      () => getQuestsWithMyTags,
+      () => getAnyQuests,
+      () => getAnyQuestsIgnoringLevels)
 
-    {
-      algorithms.foldLeft[Option[Quest]](None)((run, fun) => {
-        if (run == None) {
-          selectQuest(fun(), List(questIdsToExclude()))
-        } else {
-          run
-        }
-      })
-    }
+    val it = selectFromChain(algorithms).getOrElse(Iterator.empty)
+    if (it.hasNext) Some(it.next()) else None
+
   }
 
   private def questIdsToExclude() = {
     user.timeLine.map(_.objectId)
   }
 
-  private def getQuestsWithSuperAlgorithm = {
+  private def getQuestsWithSuperAlgorithm: Option[Iterator[Quest]] = {
 
     Logger.trace("getQuestsWithSuperAlgorithm")
 
@@ -41,7 +35,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
       () => getStartingQuests,
       () => getDefaultQuests)
 
-    selectFromChain(algorithms, default = List().iterator)
+    selectFromChain(algorithms)
   }
 
   private[user] def getTutorialQuests: Option[Iterator[Quest]] = {

@@ -15,10 +15,12 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       solution.allWithParams(
         status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
         authorIds = any,
+        authorIdsExclude = any,
         levels = any,
         skip = any,
         vip = any,
         ids = any,
+        idsExclude = any,
         questIds = Matchers.eq(List(s.info.questId)),
         themeIds = any,
         cultureId = Matchers.eq(Some(s.cultureId))) returns List(s).iterator
@@ -28,10 +30,12 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       there was one(solution).allWithParams(
         status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
         authorIds = any,
+        authorIdsExclude = any,
         levels = any,
         skip = any,
         vip = any,
         ids = any,
+        idsExclude = any,
         questIds = Matchers.eq(List(s.info.questId)),
         themeIds = any,
         cultureId = Matchers.eq(Some(s.cultureId)))
@@ -54,10 +58,12 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       solution.allWithParams(
         status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
         authorIds = any,
+        authorIdsExclude = any,
         levels = any,
         skip = any,
         vip = any,
         ids = any,
+        idsExclude = any,
         questIds = Matchers.eq(List(ss(0).info.questId)),
         themeIds = any,
         cultureId = Matchers.eq(Some(ss(0).cultureId))) returns ss.iterator
@@ -67,10 +73,12 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       there was one(solution).allWithParams(
         status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
         authorIds = any,
+        authorIdsExclude = any,
         levels = any,
         skip = any,
         vip = any,
         ids = any,
+        idsExclude = any,
         questIds = Matchers.eq(List(ss(0).info.questId)),
         themeIds = any,
         cultureId = Matchers.eq(Some(ss(0).cultureId)))
