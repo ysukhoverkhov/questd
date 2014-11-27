@@ -18,12 +18,14 @@ class BattleAPISpecs extends BaseAPISpecs {
       val b = createBattleStub(
         solutionIds = ss.map(_.id),
         status = BattleStatus.Fighting)
+      val u = createUserStub()
 
       solution.readById(ss(0).id) returns Some(ss(0))
       solution.readById(ss(1).id) returns Some(ss(1))
 
       solution.updateStatus(Matchers.eq(ss(0).id), any, any) returns Some(ss(0).copy(status = SolutionStatus.Won))
       solution.updateStatus(Matchers.eq(ss(1).id), any, any) returns Some(ss(1).copy(status = SolutionStatus.Lost))
+      user.storeSolutionInDailyResult(any, any) returns Some(u)
 
       user.readById(any) returns Some(createUserStub())
       quest.readById(any) returns Some(createQuestStub())
@@ -50,12 +52,14 @@ class BattleAPISpecs extends BaseAPISpecs {
       val b = createBattleStub(
         solutionIds = ss.map(_.id),
         status = BattleStatus.Fighting)
+      val u = createUserStub()
 
       solution.readById(ss(0).id) returns Some(ss(0))
       solution.readById(ss(1).id) returns Some(ss(1))
 
       solution.updateStatus(Matchers.eq(ss(0).id), any, any) returns Some(ss(0).copy(status = SolutionStatus.Won))
       solution.updateStatus(Matchers.eq(ss(1).id), any, any) returns Some(ss(1).copy(status = SolutionStatus.Lost))
+      user.storeSolutionInDailyResult(any, any) returns Some(u)
 
       user.readById(any) returns Some(createUserStub())
       quest.readById(any) returns Some(createQuestStub())
