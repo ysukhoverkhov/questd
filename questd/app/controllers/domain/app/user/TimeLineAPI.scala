@@ -1,11 +1,11 @@
 package controllers.domain.app.user
 
-import controllers.domain.app.quest.SelectQuestToTimeLineRequest
-import models.domain._
 import components._
 import controllers.domain._
-import controllers.domain.helpers._
+import controllers.domain.app.quest.SelectQuestToTimeLineRequest
 import controllers.domain.helpers.PagerHelper._
+import controllers.domain.helpers._
+import models.domain._
 import play.Logger
 
 
@@ -105,75 +105,58 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
     Logger.trace(s"  solutions count = $solutionsCount")
     Logger.trace(s"  battles count = $battlesCount")
 
-    def addRandomQuestsToTimeLine(user: Option[User], questsCount: Int): Option[User] = {
-      user match {
-        case None =>
-          None
-        case Some(u) =>
-          if (questsCount == 0) {
-            user
-          } else {
+    def addRandomQuestsToTimeLine(user: User, questsCount: Int): ApiResult[PopulateTimeLineWithRandomThingsResult] = {
+      val quests = user.getRandomQuestsForTimeLine(questsCount)
 
-            u.getRandomQuestForTimeLine match {
-              case Some(q) =>
-                Logger.trace(s"  random quest selected = ${q.id}")
-                addToTimeLine(AddToTimeLineRequest(
-                  user = u,
-                  reason = TimeLineReason.Has,
-                  objectType = TimeLineType.Quest,
-                  objectId = q.id,
-                  objectAuthorId = Some(q.info.authorId))) match {
+      quests.foldLeft[ApiResult[PopulateTimeLineWithRandomThingsResult]](OkApiResult(PopulateTimeLineWithRandomThingsResult(user))) { (r, q) =>
+        Logger.trace(s"  random quest selected = ${q.id}")
 
-                  case OkApiResult(res) =>
-                    selectQuestToTimeLine(SelectQuestToTimeLineRequest(q))
-                    addRandomQuestsToTimeLine(Some(res.user), questsCount - 1)
-                  case _ =>
-                    None
-                }
-
-              case None =>
-                Logger.trace(s"  no quests found. Giving up")
-                user
+        r match {
+          case OkApiResult(res) => {
+            addToTimeLine(AddToTimeLineRequest(
+              user = res.user,
+              reason = TimeLineReason.Has,
+              objectType = TimeLineType.Quest,
+              objectId = q.id,
+              objectAuthorId = Some(q.info.authorId)))
+            } ifOk { res =>
+              selectQuestToTimeLine(SelectQuestToTimeLineRequest(q))
+            } ifOk {
+              OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
             }
-          }
+          case _ =>
+            r
+        }
       }
     }
 
-    def addRandomSolutionsToTimeLine(user: Option[User], solutionsCount: Int): Option[User] = {
-      user match {
-        case None =>
-          None
-        case Some(u) =>
-          if (solutionsCount == 0) {
-            user
-          } else {
+    def addRandomSolutionsToTimeLine(user: User, solutionsCount: Int): ApiResult[PopulateTimeLineWithRandomThingsResult] = {
+      val solutions = user.getRandomSolutionsForTimeLine(solutionsCount)
 
-            u.getRandomSolutionForTimeLine match {
-              case Some(s) =>
-                Logger.trace(s"  random solution selected = ${s.id}")
-                addToTimeLine(AddToTimeLineRequest(
-                  user = u,
-                  reason = TimeLineReason.Has,
-                  objectType = TimeLineType.Solution,
-                  objectId = s.id,
-                  objectAuthorId = Some(s.info.authorId))) match {
+      solutions.foldLeft[ApiResult[PopulateTimeLineWithRandomThingsResult]](OkApiResult(PopulateTimeLineWithRandomThingsResult(user))) { (r, s) =>
+        Logger.trace(s"  random solution selected = ${s.id}")
 
-                  case OkApiResult(res) =>
-                    addRandomSolutionsToTimeLine(Some(res.user), solutionsCount - 1)
-                  case _ =>
-                    None
-                }
-
-              case None =>
-                Logger.trace(s"  no solutions found. Giving up")
-                user
-            }
+        r match {
+          case OkApiResult(res) => {
+            addToTimeLine(AddToTimeLineRequest(
+              user = res.user,
+              reason = TimeLineReason.Has,
+              objectType = TimeLineType.Solution,
+              objectId = s.id,
+              objectAuthorId = Some(s.info.authorId)))
+          } ifOk { res =>
+            OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
           }
+          case _ =>
+            r
+        }
       }
     }
 
-    addRandomQuestsToTimeLine(Some(request.user), questsCount) ifSome { u =>
-      addRandomSolutionsToTimeLine(Some(u), solutionsCount)
+    {
+      addRandomQuestsToTimeLine(request.user, questsCount)
+    } ifOk { r =>
+      addRandomSolutionsToTimeLine(r.user, solutionsCount)
     }
 
     OkApiResult(PopulateTimeLineWithRandomThingsResult(user))
