@@ -193,20 +193,24 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
       db.quest.allWithParams(
         status = any[List[QuestStatus.Value]],
         authorIds = any[List[String]],
+        authorIdsExclude = any[List[String]],
         levels = any[Option[(Int, Int)]],
         skip = any[Int],
         vip = any[Option[Boolean]],
         ids = any[List[String]],
+        idsExclude = any[List[String]],
         cultureId = any[Option[String]]
       ) returns List(qu).iterator
 
       db.solution.allWithParams(
         status = List(SolutionStatus.OnVoting),
         authorIds = null,
+        authorIdsExclude = null,
         levels = None,
         skip = 0,
         vip = null,
         ids = null,
+        idsExclude = null,
         questIds = List(qu.id),
         themeIds = null,
         cultureId = None) returns List(sol).iterator
@@ -220,12 +224,12 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
       there was one(quest).allWithParams(
         status = any[List[QuestStatus.Value]],
         authorIds = any[List[String]],
-//        authorIdsExclude = any[List[String]],
+        authorIdsExclude = any[List[String]],
         levels = any[Option[(Int, Int)]],
         skip = any[Int],
         vip = any[Option[Boolean]],
         ids = any[List[String]],
-//        idsExclude = any[List[String]],
+        idsExclude = any[List[String]],
         cultureId = any[Option[String]])
 
       there was one(solution).allWithParams(

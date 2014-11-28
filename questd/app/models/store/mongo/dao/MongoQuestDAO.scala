@@ -22,10 +22,12 @@ private[mongo] class MongoQuestDAO
   def allWithParams(
     status: List[QuestStatus.Value] = List(),
     authorIds: List[String] = List(),
+    authorIdsExclude: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
     vip: Option[Boolean] = None,
     ids: List[String] = List(),
+    idsExclude: List[String] = List(),
     cultureId: Option[String] = None): Iterator[Quest] = {
 
     val queryBuilder = MongoDBObject.newBuilder
@@ -36,6 +38,10 @@ private[mongo] class MongoQuestDAO
 
     if (authorIds.length > 0) {
       queryBuilder += ("info.authorId" -> MongoDBObject("$in" -> authorIds))
+    }
+
+    if (authorIdsExclude.length > 0) {
+      queryBuilder += ("info.authorId" -> MongoDBObject("$nin" -> authorIdsExclude))
     }
 
     if (levels != None) {
@@ -50,6 +56,10 @@ private[mongo] class MongoQuestDAO
 
     if (ids.length > 0) {
       queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
+    }
+
+    if (idsExclude.length > 0) {
+      queryBuilder += ("id" -> MongoDBObject("$nin" -> idsExclude))
     }
 
     if (cultureId != None) {
