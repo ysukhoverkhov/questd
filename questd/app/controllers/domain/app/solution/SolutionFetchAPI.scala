@@ -1,51 +1,64 @@
 package controllers.domain.app.solution
 
 import components.DBAccessor
-import models.domain._
-import controllers.domain.helpers._
 import controllers.domain._
-import play.Logger
+import controllers.domain.helpers._
+import models.domain._
 
 case class GetFriendsSolutionsRequest(
   user: User,
   status: List[SolutionStatus.Value],
+  idsExclude: List[String] = List.empty,
+  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetFriendsSolutionsResult(solutions: Iterator[Solution])
 
 case class GetFollowingSolutionsRequest(
   user: User,
   status: List[SolutionStatus.Value],
+  idsExclude: List[String] = List.empty,
+  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetFollowingSolutionsResult(solutions: Iterator[Solution])
 
 case class GetSolutionsForLikedQuestsRequest(
   user: User,
   status: List[SolutionStatus.Value],
+  idsExclude: List[String] = List.empty,
+  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetSolutionsForLikedQuestsResult(solutions: Iterator[Solution])
 
 case class GetVIPSolutionsRequest(
   user: User,
   status: List[SolutionStatus.Value],
+  idsExclude: List[String] = List.empty,
+  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None,
-  themeIds: List[String])
+  themeIds: List[String] = List())
 case class GetVIPSolutionsResult(solutions: Iterator[Solution])
 
 case class GetHelpWantedSolutionsRequest(
   user: User,
   status: List[SolutionStatus.Value],
+  idsExclude: List[String] = List.empty,
+  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetHelpWantedSolutionsResult(solutions: Iterator[Solution])
 
 case class GetSolutionsForOwnQuestsRequest(
   user: User,
   status: List[SolutionStatus.Value],
+  idsExclude: List[String] = List.empty,
+  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetSolutionsForOwnQuestsResult(solutions: Iterator[Solution])
 
 case class GetAllSolutionsRequest(
   user: User,
   status: List[SolutionStatus.Value],
+  idsExclude: List[String] = List.empty,
+  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None,
   themeIds: List[String] = List())
 case class GetAllSolutionsResult(solutions: Iterator[Solution])
@@ -57,6 +70,8 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
     OkApiResult(GetFriendsSolutionsResult(db.solution.allWithParams(
       status = request.status,
       authorIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
+      authorIdsExclude = request.authorsExclude,
+      idsExclude = request.idsExclude,
       levels = request.levels,
       cultureId = request.user.demo.cultureId)))
   }
@@ -65,6 +80,8 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
     OkApiResult(GetFollowingSolutionsResult(db.solution.allWithParams(
       status = request.status,
       authorIds = request.user.following,
+      authorIdsExclude = request.authorsExclude,
+      idsExclude = request.idsExclude,
       levels = request.levels,
       cultureId = request.user.demo.cultureId)))
   }
@@ -78,6 +95,8 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
 
     OkApiResult(GetSolutionsForLikedQuestsResult(db.solution.allWithParams(
       status = request.status,
+      authorIdsExclude = request.authorsExclude,
+      idsExclude = request.idsExclude,
       levels = request.levels,
       questIds = ids,
       cultureId = request.user.demo.cultureId)))
@@ -86,6 +105,8 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
   def getVIPSolutions(request: GetVIPSolutionsRequest): ApiResult[GetVIPSolutionsResult] = handleDbException {
     OkApiResult(GetVIPSolutionsResult(db.solution.allWithParams(
       status = request.status,
+      authorIdsExclude = request.authorsExclude,
+      idsExclude = request.idsExclude,
       levels = request.levels,
       vip = Some(true),
       themeIds = request.themeIds,
@@ -98,6 +119,8 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
     } else {
       OkApiResult(GetHelpWantedSolutionsResult(db.solution.allWithParams(
         status = request.status,
+        authorIdsExclude = request.authorsExclude,
+        idsExclude = request.idsExclude,
         levels = request.levels,
         cultureId = request.user.demo.cultureId,
         ids = request.user.mustVoteSolutions)))
@@ -111,6 +134,8 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
     if (questIds.nonEmpty) {
       OkApiResult(GetSolutionsForOwnQuestsResult(db.solution.allWithParams(
         status = request.status,
+        authorIdsExclude = request.authorsExclude,
+        idsExclude = request.idsExclude,
         levels = request.levels,
         cultureId = request.user.demo.cultureId,
         questIds = questIds)))
@@ -120,10 +145,11 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
   }
 
   def getAllSolutions(request: GetAllSolutionsRequest): ApiResult[GetAllSolutionsResult] = handleDbException {
-    Logger.trace("getAllSolutions - " + request.toString)
 
     OkApiResult(GetAllSolutionsResult(db.solution.allWithParams(
       status = request.status,
+      authorIdsExclude = request.authorsExclude,
+      idsExclude = request.idsExclude,
       levels = request.levels,
       themeIds = request.themeIds,
       cultureId = request.user.demo.cultureId)))

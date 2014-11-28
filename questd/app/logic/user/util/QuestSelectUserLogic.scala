@@ -26,6 +26,10 @@ trait QuestSelectUserLogic { this: UserLogic =>
     user.timeLine.map(_.objectId)
   }
 
+  private def questAuthorIdsToExclude() = {
+    List(user.id)
+  }
+
   private def getQuestsWithSuperAlgorithm: Option[Iterator[Quest]] = {
 
     Logger.trace("getQuestsWithSuperAlgorithm")

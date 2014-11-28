@@ -213,17 +213,21 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
     "All solutions are used if vip and Other solutions are unavailable" in {
       val qid = "qid"
       val u = User()
+      val s = createSolutionStub(id = qid, authorId = "author")
 
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List().iterator))
-      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List().iterator)) thenReturns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
+      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List().iterator)) thenReturns OkApiResult(GetAllSolutionsResult(List(s).iterator))
 
-      u.getRandomSolution
+      val rv = u.getRandomSolution
+
+      rv must beSome
 
       there was one(rand).nextDouble
+      there was one(api).getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest])
       there was one(api).getVIPSolutions(any[GetVIPSolutionsRequest])
       there were two(api).getAllSolutions(any[GetAllSolutionsRequest])
     }

@@ -37,17 +37,20 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         cultureId = u.demo.cultureId) returns List().iterator
       db.solution.allWithParams(status = List(SolutionStatus.OnVoting), authorIds = List(f1.id, f2.id), levels = Some(1, 2), skip = 0, vip = None, ids = List(), questIds = List(), cultureId = u.demo.cultureId) returns List().iterator
 
-      val result = api.getFriendsSolutions(GetFriendsSolutionsRequest(u, List(SolutionStatus.OnVoting), Some(1, 2)))
+      val result = api.getFriendsSolutions(GetFriendsSolutionsRequest(
+        user = u,
+        status = List(SolutionStatus.OnVoting),
+        levels = Some(1, 2)))
 
       there was one(solution).allWithParams(
         status = List(SolutionStatus.OnVoting),
         authorIds = List(f1.id),
-        authorIdsExclude = null,
+        authorIdsExclude = List(),
         levels = Some(1, 2),
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = null,
+        idsExclude = List(),
         questIds = null,
         themeIds = null,
         cultureId = u.demo.cultureId)
@@ -93,7 +96,10 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
       val u = createUserStub(
         timeLine = liked.map(id => createTimeLineEntryStub(objectId = id, objectType = TimeLineType.Quest, ourVote = Some(ContentVote.Cool)))
       )
-      val result = api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(u, List(SolutionStatus.OnVoting), Some(1, 2)))
+      val result = api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
+        user = u,
+        status = List(SolutionStatus.OnVoting),
+        levels = Some(1, 2)))
 
       result must beAnInstanceOf[OkApiResult[GetSolutionsForLikedQuestsResult]]
       there was one(solution).allWithParams(
@@ -120,7 +126,11 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         ids = List(),
         questIds = List("a")) returns List().iterator
 
-      val result = api.getVIPSolutions(GetVIPSolutionsRequest(User(), List(SolutionStatus.OnVoting), Some(1, 2), List("a")))
+      val result = api.getVIPSolutions(GetVIPSolutionsRequest(
+        user = User(),
+        status = List(SolutionStatus.OnVoting),
+        levels = Some(1, 2),
+        themeIds = List("a")))
 
       there was one(solution).allWithParams(
         status = List(SolutionStatus.OnVoting),
@@ -159,10 +169,12 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
       db.solution.allWithParams(
         status = List(SolutionStatus.OnVoting),
         authorIds = null,
+        authorIdsExclude = List(),
         levels = None,
         skip = 0,
         vip = null,
         ids = List("solution_id"),
+        idsExclude = List(),
         questIds = null,
         themeIds = null,
         cultureId = None) returns List(sol).iterator
@@ -174,12 +186,12 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
       there was one(solution).allWithParams(
         status = List(SolutionStatus.OnVoting),
         authorIds = null,
-        authorIdsExclude = null,
+        authorIdsExclude = List(),
         levels = None,
         skip = 0,
         vip = null,
         ids = List("solution_id"),
-        idsExclude = null,
+        idsExclude = List(),
         questIds = null,
         themeIds = null,
         cultureId = None)
@@ -205,12 +217,12 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
       db.solution.allWithParams(
         status = List(SolutionStatus.OnVoting),
         authorIds = null,
-        authorIdsExclude = null,
+        authorIdsExclude = List(),
         levels = None,
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = null,
+        idsExclude = List(),
         questIds = List(qu.id),
         themeIds = null,
         cultureId = None) returns List(sol).iterator
@@ -235,12 +247,12 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
       there was one(solution).allWithParams(
         status = List(SolutionStatus.OnVoting),
         authorIds = null,
-        authorIdsExclude = null,
+        authorIdsExclude = List(),
         levels = None,
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = null,
+        idsExclude = List(),
         questIds = List(qu.id),
         themeIds = null,
         cultureId = None)
@@ -260,17 +272,21 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         themeIds = List("b"),
         cultureId = u.demo.cultureId) returns List().iterator
 
-      val result = api.getAllSolutions(GetAllSolutionsRequest(u, List(SolutionStatus.OnVoting), Some(1, 2), List("b")))
+      val result = api.getAllSolutions(GetAllSolutionsRequest(
+        user = u,
+        status = List(SolutionStatus.OnVoting),
+        levels = Some(1, 2),
+        themeIds = List("b")))
 
       there was one(solution).allWithParams(
         status = List(SolutionStatus.OnVoting),
         authorIds = null,
-        authorIdsExclude = null,
+        authorIdsExclude = List(),
         levels = Some(1, 2),
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = null,
+        idsExclude = List(),
         questIds = null,
         themeIds = List("b"),
         cultureId = u.demo.cultureId)
