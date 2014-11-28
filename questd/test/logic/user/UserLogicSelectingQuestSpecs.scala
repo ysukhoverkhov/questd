@@ -230,7 +230,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
       there were one(rand).nextDouble
       there were atLeast(1)(api).getAllQuests(any[GetAllQuestsRequest])
-      q must beEqualTo(List())
+      q.length must beEqualTo(1)
     }
 
     "Other quests are used if vip quests are unavailable" in {

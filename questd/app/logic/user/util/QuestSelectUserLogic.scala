@@ -31,7 +31,6 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private def getQuestsWithSuperAlgorithm: Option[Iterator[Quest]] = {
-
     Logger.trace("getQuestsWithSuperAlgorithm")
 
     val algorithms = List(
@@ -80,27 +79,27 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
   private[user] def getFriendsQuests = {
     Logger.trace("  Returning quest from friends")
-    Some(api.getFriendsQuests(GetFriendsQuestsRequest(
+    checkNotEmptyIterator(Some(api.getFriendsQuests(GetFriendsQuestsRequest(
       user,
       QuestStatus.InRotation,
-      levels)).body.get.quests)
+      levels)).body.get.quests))
   }
 
   private[user] def getFollowingQuests = {
     Logger.trace("  Returning quest from Following")
-    Some(api.getFollowingQuests(GetFollowingQuestsRequest(
+    checkNotEmptyIterator(Some(api.getFollowingQuests(GetFollowingQuestsRequest(
       user,
       QuestStatus.InRotation,
-      levels)).body.get.quests)
+      levels)).body.get.quests))
   }
 
   private[user] def getLikedQuests = {
     Logger.trace("  Returning quests we liked recently")
 
-    Some(api.getLikedQuests(GetLikedQuestsRequest(
+    checkNotEmptyIterator(Some(api.getLikedQuests(GetLikedQuestsRequest(
       user,
       QuestStatus.InRotation,
-      levels)).body.get.quests)
+      levels)).body.get.quests))
   }
 
   private[user] def getVIPQuests = {
@@ -109,10 +108,10 @@ trait QuestSelectUserLogic { this: UserLogic =>
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPQuests)
     Logger.trace("    Selected themes of vip's quests: " + themeIds.mkString(", "))
 
-    Some(api.getVIPQuests(GetVIPQuestsRequest(
+    checkNotEmptyIterator(Some(api.getVIPQuests(GetVIPQuestsRequest(
       user,
       QuestStatus.InRotation,
-      levels)).body.get.quests)
+      levels)).body.get.quests))
   }
 
   private[user] def getQuestsWithMyTags = {
@@ -121,28 +120,28 @@ trait QuestSelectUserLogic { this: UserLogic =>
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
     Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
 
-    Some(api.getAllQuests(GetAllQuestsRequest(
+    checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
       user,
       QuestStatus.InRotation,
-      levels)).body.get.quests)
+      levels)).body.get.quests))
   }
 
   private[user] def getAnyQuests = {
     Logger.trace("  Returning from any quests (but respecting levels)")
 
-    Some(api.getAllQuests(GetAllQuestsRequest(
+    checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
       user,
       QuestStatus.InRotation,
-      levels)).body.get.quests)
+      levels)).body.get.quests))
   }
 
   private[user] def getAnyQuestsIgnoringLevels = {
     Logger.trace("  Returning from any quests ignoring levels")
 
-    Some(api.getAllQuests(GetAllQuestsRequest(
+    checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
       user,
       QuestStatus.InRotation,
-      None)).body.get.quests)
+      None)).body.get.quests))
   }
 
   /**
