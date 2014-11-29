@@ -58,7 +58,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
   private[user] def getDefaultBattles: Option[Iterator[Battle]] = {
     Logger.trace("getDefaultBattle")
 
-    val algorithms = List(
+    val algorithms = List( // TODO: here and in other places use config params for battles.
       (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsBattles),
       (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingBattles),
       (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedBattles),
@@ -91,7 +91,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
 
   private[user] def getLikedBattles = {
     Logger.trace("  Returning Battle we liked recently")
-
+    // TODO: imeplemnt me.
 //    checkNotEmptyIterator(Some(api.getLikedQuests(GetLikedQuestsRequest(
 //      user,
 //      QuestStatus.InRotation,
@@ -114,7 +114,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
 
   private[user] def getBattlesWithMyTags = {
     Logger.trace("  Returning Battles with my tags")
-// TODO: implement me.
+// TODO: implement me with tags.
 //    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
 //    Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
 //
@@ -127,17 +127,19 @@ trait BattleSelectUserLogic { this: UserLogic =>
 
   private[user] def getAnyBattles = {
     Logger.trace("  Returning from any Battle (but respecting levels)")
-
+// TODO: exclude participants ids here.
     checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
       user = user,
+      excludeIds = battleIdsToExclude,
       levels = levels)).body.get.battles))
   }
 
   private[user] def getAnyBattlesIgnoringLevels = {
     Logger.trace("  Returning from any battles ignoring levels")
-
+    // TODO: exclude participants ids here.
     checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
       user = user,
+      excludeIds = battleIdsToExclude,
       levels = None)).body.get.battles))
   }
 
@@ -150,11 +152,11 @@ trait BattleSelectUserLogic { this: UserLogic =>
       user.profile.publicProfile.level + TimeLineContentLevelSigma))
   }
 
-  private def questIdsToExclude() = {
+  private def battleIdsToExclude = {
     user.timeLine.map(_.objectId)
   }
 
-  private def questAuthorIdsToExclude() = {
+  private def battleParticipantsIdsToExclude = {
     List(user.id)
   }
 

@@ -10,6 +10,7 @@ case class GetAllBattlesInternalResult(battles: Iterator[Battle])
 
 case class GetAllBattlesRequest(
   user: User,
+  excludeIds: List[String] = List(),
   statuses: List[BattleStatus.Value] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetAllBattlesResult(battles: Iterator[Battle])
@@ -35,7 +36,8 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
   def getAllBattles(request: GetAllBattlesRequest): ApiResult[GetAllBattlesResult] = handleDbException {
     OkApiResult(GetAllBattlesResult(db.battle.allWithParams(
       status = request.statuses,
-      levels = request.levels)))
+      levels = request.levels,
+      excludeIds = request.excludeIds)))
   }
 
 }

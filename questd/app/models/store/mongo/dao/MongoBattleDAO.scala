@@ -21,9 +21,10 @@ private[mongo] class MongoBattleDAO
     status: List[BattleStatus.Value] = List(),
 //    authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
-    skip: Int = 0
+    skip: Int = 0,
 //    vip: Option[Boolean] = None,
 //    ids: List[String] = List(),
+      excludeIds: List[String] = List()
 //    questIds: List[String] = List(),
 //    themeIds: List[String] = List(),
 /*    cultureId: Option[String] = None*/): Iterator[Battle] = {
@@ -52,6 +53,10 @@ private[mongo] class MongoBattleDAO
 //      queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
 //    }
 //
+    if (excludeIds.length > 0) {
+      queryBuilder += ("id" -> MongoDBObject("$nin" -> excludeIds))
+    }
+
 //    if (questIds.length > 0) {
 //      queryBuilder += ("info.questId" -> MongoDBObject("$in" -> questIds))
 //    }
