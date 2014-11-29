@@ -22,14 +22,6 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
   }
 
-  private def questIdsToExclude() = {
-    user.timeLine.map(_.objectId)
-  }
-
-  private def questAuthorIdsToExclude() = {
-    List(user.id)
-  }
-
   private def getQuestsWithSuperAlgorithm: Option[Iterator[Quest]] = {
     Logger.trace("getQuestsWithSuperAlgorithm")
 
@@ -80,26 +72,33 @@ trait QuestSelectUserLogic { this: UserLogic =>
   private[user] def getFriendsQuests = {
     Logger.trace("  Returning quest from friends")
     checkNotEmptyIterator(Some(api.getFriendsQuests(GetFriendsQuestsRequest(
-      user,
-      QuestStatus.InRotation,
-      levels)).body.get.quests))
+      user = user,
+      status = QuestStatus.InRotation,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude,
+      levels = levels)).body.get.quests))
   }
 
   private[user] def getFollowingQuests = {
     Logger.trace("  Returning quest from Following")
     checkNotEmptyIterator(Some(api.getFollowingQuests(GetFollowingQuestsRequest(
-      user,
-      QuestStatus.InRotation,
-      levels)).body.get.quests))
+      user = user,
+      status = QuestStatus.InRotation,
+      levels = levels,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude
+    )).body.get.quests))
   }
 
   private[user] def getLikedQuests = {
     Logger.trace("  Returning quests we liked recently")
 
     checkNotEmptyIterator(Some(api.getLikedQuests(GetLikedQuestsRequest(
-      user,
-      QuestStatus.InRotation,
-      levels)).body.get.quests))
+      user = user,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude,
+      status = QuestStatus.InRotation,
+      levels = levels)).body.get.quests))
   }
 
   private[user] def getVIPQuests = {
@@ -109,9 +108,11 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("    Selected themes of vip's quests: " + themeIds.mkString(", "))
 
     checkNotEmptyIterator(Some(api.getVIPQuests(GetVIPQuestsRequest(
-      user,
-      QuestStatus.InRotation,
-      levels)).body.get.quests))
+      user = user,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude,
+      status = QuestStatus.InRotation,
+      levels = levels)).body.get.quests))
   }
 
   private[user] def getQuestsWithMyTags = {
@@ -121,27 +122,33 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
 
     checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
-      user,
-      QuestStatus.InRotation,
-      levels)).body.get.quests))
+      user = user,
+      idsExclude = questIdsToExclude,
+      status = QuestStatus.InRotation,
+      authorsExclude = questAuthorIdsToExclude,
+      levels = levels)).body.get.quests))
   }
 
   private[user] def getAnyQuests = {
     Logger.trace("  Returning from any quests (but respecting levels)")
 
     checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
-      user,
-      QuestStatus.InRotation,
-      levels)).body.get.quests))
+      user = user,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude,
+      status = QuestStatus.InRotation,
+      levels = levels)).body.get.quests))
   }
 
   private[user] def getAnyQuestsIgnoringLevels = {
     Logger.trace("  Returning from any quests ignoring levels")
 
     checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
-      user,
-      QuestStatus.InRotation,
-      None)).body.get.quests))
+      user = user,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude,
+      status = QuestStatus.InRotation,
+      levels = None)).body.get.quests))
   }
 
   /**
@@ -151,6 +158,14 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Some((
       user.profile.publicProfile.level - TimeLineContentLevelSigma,
       user.profile.publicProfile.level + TimeLineContentLevelSigma))
+  }
+
+  private def questIdsToExclude = {
+    user.timeLine.map(_.objectId)
+  }
+
+  private def questAuthorIdsToExclude = {
+    List(user.id)
   }
 
   // FIX: change it to tags when they will be ready.

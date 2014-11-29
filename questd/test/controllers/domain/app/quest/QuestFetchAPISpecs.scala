@@ -73,39 +73,42 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         idsExclude = List()
       ) returns List().iterator
 
-      val result = api.getFriendsQuests(GetFriendsQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
+      val result = api.getFriendsQuests(GetFriendsQuestsRequest(
+        user = u,
+        status = QuestStatus.InRotation,
+        levels = Some(1, 2)))
 
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(f1.id),
-        authorIdsExclude = null,
+        authorIdsExclude = List(),
         levels = Some(1, 2),
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = null,
+        idsExclude = List(),
         cultureId = u.demo.cultureId)
 
       there was no(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(),
-        authorIdsExclude = null,
+        authorIdsExclude = List(),
         levels = Some(1, 2),
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = null,
+        idsExclude = List(),
         cultureId = u.demo.cultureId)
 
       there was no(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(f1.id, f2.id),
-        authorIdsExclude = null,
+        authorIdsExclude = List(),
         levels = Some(1, 2),
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = null,
+        idsExclude = List(),
         cultureId = u.demo.cultureId)
     }
 
@@ -126,18 +129,21 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         timeLine = liked.map(id => createTimeLineEntryStub(objectId = id, objectType = TimeLineType.Quest, ourVote = Some(ContentVote.Cool)))
       )
 
-      val result = api.getLikedQuests(GetLikedQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
+      val result = api.getLikedQuests(GetLikedQuestsRequest(
+        user = u,
+        status = QuestStatus.InRotation,
+        levels = Some(1, 2)))
 
       result must beAnInstanceOf[OkApiResult[GetLikedQuestsResult]]
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = null,
-        authorIdsExclude = null,
+        authorIdsExclude = List(),
         levels = Some(1, 2),
         skip = 0,
         vip = null,
         ids = List("1", "2", "3", "4"),
-        idsExclude = null,
+        idsExclude = List(),
         cultureId = u.demo.cultureId)
     }
 
@@ -155,17 +161,20 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       ) returns List().iterator
 
       val u = createUserStub()
-      val result = api.getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
+      val result = api.getVIPQuests(GetVIPQuestsRequest(
+        user = u,
+        status = QuestStatus.InRotation,
+        levels = Some(1, 2)))
 
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = null,
-        authorIdsExclude = null,
+        authorIdsExclude = List(),
         levels = Some(1, 2),
         skip = 0,
         vip = Some(true),
         ids = null,
-        idsExclude = null,
+        idsExclude = List(),
         cultureId = u.demo.cultureId)
     }
 
@@ -182,17 +191,20 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         idsExclude = List()
       ) returns List().iterator
 
-      val result = api.getAllQuests(GetAllQuestsRequest(createUserStub(cultureId = "cid"), QuestStatus.InRotation, Some(1, 2)))
+      val result = api.getAllQuests(GetAllQuestsRequest(
+        user = createUserStub(cultureId = "cid"),
+        status = QuestStatus.InRotation,
+        levels = Some(1, 2)))
 
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = null,
-        authorIdsExclude = null,
+        authorIdsExclude = List(),
         levels = Some(1, 2),
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = null,
+        idsExclude = List(),
         cultureId = Some("cid"))
     }
   }

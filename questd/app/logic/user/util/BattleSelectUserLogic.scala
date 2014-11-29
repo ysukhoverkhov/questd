@@ -1,5 +1,6 @@
 package logic.user.util
 
+import controllers.domain.app.battle.GetAllBattlesRequest
 import logic.UserLogic
 import logic.constants._
 import models.domain._
@@ -19,14 +20,6 @@ trait BattleSelectUserLogic { this: UserLogic =>
     val it = selectFromChain(algorithms).getOrElse(Iterator.empty)
     if (it.hasNext) Some(it.next()) else None
 
-  }
-
-  private def questIdsToExclude() = {
-    user.timeLine.map(_.objectId)
-  }
-
-  private def questAuthorIdsToExclude() = {
-    List(user.id)
   }
 
   private def getBattlesWithSuperAlgorithm: Option[Iterator[Battle]] = {
@@ -134,23 +127,18 @@ trait BattleSelectUserLogic { this: UserLogic =>
 
   private[user] def getAnyBattles = {
     Logger.trace("  Returning from any Battle (but respecting levels)")
-    // TODO: implement me.
-//    checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
-//      user,
-//      QuestStatus.InRotation,
-//      levels)).body.get.quests))
-    None
+
+    checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
+      user = user,
+      levels = levels)).body.get.battles))
   }
 
   private[user] def getAnyBattlesIgnoringLevels = {
-    // TODO: implement me.
-//    Logger.trace("  Returning from any quests ignoring levels")
-//
-//    checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
-//      user,
-//      QuestStatus.InRotation,
-//      None)).body.get.quests))
-    None
+    Logger.trace("  Returning from any battles ignoring levels")
+
+    checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
+      user = user,
+      levels = None)).body.get.battles))
   }
 
   /**
@@ -160,6 +148,14 @@ trait BattleSelectUserLogic { this: UserLogic =>
     Some((
       user.profile.publicProfile.level - TimeLineContentLevelSigma,
       user.profile.publicProfile.level + TimeLineContentLevelSigma))
+  }
+
+  private def questIdsToExclude() = {
+    user.timeLine.map(_.objectId)
+  }
+
+  private def questAuthorIdsToExclude() = {
+    List(user.id)
   }
 
   // FIX: change it to tags when they will be ready.

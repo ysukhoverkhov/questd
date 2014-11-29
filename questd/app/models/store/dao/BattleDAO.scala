@@ -10,7 +10,7 @@ trait BattleDAO extends BaseDAO[Battle] {
   def allWithParams(
     status: List[BattleStatus.Value] = List(),
 //    authorIds: List[String] = List(),
-//    levels: Option[(Int, Int)] = None,
+    levels: Option[(Int, Int)] = None,
     skip: Int = 0
 //    vip: Option[Boolean] = None,
 //    ids: List[String] = List(),
