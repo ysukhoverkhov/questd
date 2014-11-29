@@ -11,6 +11,9 @@ object BattleStatus extends Enumeration {
  */
 case class Battle(
   id: String = ID.generateUUID(),
-  info: BattleInfo
+  info: BattleInfo,
+  level: Int,
+  vip: Boolean,
+  cultureId: String
   ) extends ID
 

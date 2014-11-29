@@ -56,7 +56,10 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
           info = BattleInfo(
             solutionIds = List(solution.id, competitor.id),
             voteEndDate = BattleLogic.voteEndDate(solution.questLevel)
-          )
+          ),
+          level = competitor.questLevel,
+          vip = competitor.info.vip || solution.info.vip,
+          cultureId = solution.cultureId
         )
         db.battle.create(battle)
 

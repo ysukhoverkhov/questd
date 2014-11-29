@@ -147,7 +147,10 @@ package object domainstubs {
       info = BattleInfo(
         solutionIds = solutionIds,
         status = status,
-        voteEndDate = voteEndDate)
+        voteEndDate = voteEndDate),
+      level = 19,
+      vip = false,
+      cultureId = "cid"
     )
   }
 
