@@ -27,7 +27,7 @@ class BattleDAOSpecs extends Specification
 
       var r = db.battle.readById(battle.id)
 
-      r must beSome.which(_.status == BattleStatus.Resolved)
+      r must beSome.which(_.info.status == BattleStatus.Resolved)
     }
   }
 }

@@ -15,7 +15,7 @@ class BattleLogic(
    * We check is time come to stop voting for the battle.
    */
   def shouldStopVoting = {
-    new Date().after(battle.voteEndDate)
+    new Date().after(battle.info.voteEndDate)
   }
 
   /**

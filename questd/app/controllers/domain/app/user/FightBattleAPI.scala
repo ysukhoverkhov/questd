@@ -53,12 +53,14 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
       case Some(competitor) =>
         // FIX: transaction should be here as this operation is atomic.
         val battle = Battle(
-          solutionIds = List(solution.id, competitor.id),
-          voteEndDate = BattleLogic.voteEndDate(solution.questLevel)
+          info = BattleInfo(
+            solutionIds = List(solution.id, competitor.id),
+            voteEndDate = BattleLogic.voteEndDate(solution.questLevel)
+          )
         )
         db.battle.create(battle)
 
-        battle.solutionIds.foreach {
+        battle.info.solutionIds.foreach {
           db.solution.updateStatus(_, SolutionStatus.OnVoting, Some(battle.id))
         }
 
@@ -68,6 +70,5 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         OkApiResult(TryCreateBattleResult())
     }
   }
-
 }
 

@@ -1,7 +1,5 @@
 package models.domain
 
-import java.util.Date
-
 import models.domain.base.ID
 
 object BattleStatus extends Enumeration {
@@ -13,9 +11,6 @@ object BattleStatus extends Enumeration {
  */
 case class Battle(
   id: String = ID.generateUUID(),
-  status: BattleStatus.Value = BattleStatus.Fighting,
-  solutionIds: List[String],
-  winnerId: Option[String] = None,
-  voteEndDate: Date
+  info: BattleInfo
   ) extends ID
 

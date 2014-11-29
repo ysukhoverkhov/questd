@@ -144,9 +144,11 @@ package object domainstubs {
     voteEndDate: Date = new Date()
     ) = {
     Battle(
-      solutionIds = solutionIds,
-      status = status,
-      voteEndDate = voteEndDate)
+      info = BattleInfo(
+        solutionIds = solutionIds,
+        status = status,
+        voteEndDate = voteEndDate)
+    )
   }
 
   def createUserStub(

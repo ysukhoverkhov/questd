@@ -22,7 +22,7 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
 
     def checkResolved(b: Battle): Option[Battle] = {
       if (b.resolved) {
-        val solutions: List[Solution] = b.solutionIds.map { s =>
+        val solutions: List[Solution] = b.info.solutionIds.map { s =>
           db.solution.readById(s)
         }.flatten
 
@@ -51,9 +51,9 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
     updatedBattle ifSome { b =>
 
       val authorsUpdateResult: OkApiResult[UpdateBattleStateResult] =
-        if (b.status != battle.status) {
+        if (b.info.status != battle.info.status) {
 
-          val solutions: List[Solution] = b.solutionIds.map { s =>
+          val solutions: List[Solution] = b.info.solutionIds.map { s =>
             db.solution.readById(s)
           }.flatten
 

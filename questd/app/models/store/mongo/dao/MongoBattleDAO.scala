@@ -32,7 +32,7 @@ private[mongo] class MongoBattleDAO
     val queryBuilder = MongoDBObject.newBuilder
 
     if (status.length > 0) {
-      queryBuilder += ("status" -> MongoDBObject("$in" -> status.map(_.toString)))
+      queryBuilder += ("info.status" -> MongoDBObject("$in" -> status.map(_.toString)))
     }
 
 //    if (authorIds.length > 0) {
@@ -69,7 +69,7 @@ private[mongo] class MongoBattleDAO
 //      queryBuilder += ("cultureId" -> cultureId.get)
 //    }
 
-    Logger.trace("MongoQuestSolutionDAO - allWithParams - " + queryBuilder.result)
+    Logger.trace("MongoBattleDAO - allWithParams - " + queryBuilder.result)
 
     findByExample(
       example = queryBuilder.result(),
@@ -87,7 +87,7 @@ private[mongo] class MongoBattleDAO
 
       queryBuilder +=
         ("$set" -> MongoDBObject(
-          "status" -> newStatus.toString))
+          "info.status" -> newStatus.toString))
 
     findAndModify(
       id,

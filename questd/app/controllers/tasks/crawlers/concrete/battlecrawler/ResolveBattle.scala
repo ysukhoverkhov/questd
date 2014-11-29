@@ -28,7 +28,7 @@ class ResolveBattle(
     Logger.error("error")
     Logger.debug("debug")
     // it gives us only batles in fighting state so no need in checking the state.
-    if (DateTime.now >= new DateTime(battle.voteEndDate)) {
+    if (DateTime.now >= new DateTime(battle.info.voteEndDate)) {
       api.updateBattleState(UpdateBattleStateRequest(battle))
     }
   }

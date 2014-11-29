@@ -30,7 +30,7 @@ class BattleAPISpecs extends BaseAPISpecs {
       user.readById(any) returns Some(createUserStub())
       quest.readById(any) returns Some(createQuestStub())
 
-      battle.updateStatus(any, Matchers.eq(BattleStatus.Resolved)) returns Some(b.copy(status = BattleStatus.Resolved))
+      battle.updateStatus(any, Matchers.eq(BattleStatus.Resolved)) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
 
       val result = api.updateBattleState(UpdateBattleStateRequest(b))
 
@@ -64,7 +64,7 @@ class BattleAPISpecs extends BaseAPISpecs {
       user.readById(any) returns Some(createUserStub())
       quest.readById(any) returns Some(createQuestStub())
 
-      battle.updateStatus(any, Matchers.eq(BattleStatus.Resolved)) returns Some(b.copy(status = BattleStatus.Resolved))
+      battle.updateStatus(any, Matchers.eq(BattleStatus.Resolved)) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
 
       val result = api.updateBattleState(UpdateBattleStateRequest(b))
 
