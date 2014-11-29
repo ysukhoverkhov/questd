@@ -9,26 +9,29 @@ import models.domain._
 trait TimeLineLogic { this: UserLogic =>
 
   /**
-   * @return None if no more quests to vote for today.
+   * Returns quests for time line.
+   * @param count Number of quests to return. It may return less.
+   * @return List of quests for time line.
    */
-  def getRandomQuestsForTimeLine(count: Int): List[Quest] = {
-    (for (i <- 1 to count) yield getRandomQuest).flatten.toList
-    // TODO: tell what levels to use here.
-  }
+  // TODO: tell what levels to use here.
+  def getRandomQuestsForTimeLine(count: Int): List[Quest] = getRandomItemForTimeLine(count, getRandomQuest)
 
   /**
-   * @return None if no more quests to vote for today.
+   * Returns solutions for time line.
+   * @param count Number of solutions to return. It may return less.
+   * @return List of solutions for time line.
    */
-  def getRandomSolutionsForTimeLine(count: Int): List[Solution] = {
-    (for (i <- 1 to count) yield getRandomSolution).flatten.toList
-  }
+  def getRandomSolutionsForTimeLine(count: Int): List[Solution] = getRandomItemForTimeLine(count, getRandomSolution)
 
   /**
-   * @return None if no more quests to vote for today.
+   * Returns battles for time line.
+   * @param count Number of battles to return. It may return less.
+   * @return List of battles for time line.
    */
-  // TODO: implement me.
-  def getRandomBattlesForTimeLine(count: Int): List[Battle] = {
-    List()
-  }
+  def getRandomBattlesForTimeLine(count: Int): List[Battle] = getRandomItemForTimeLine(count, getRandomBattle)
 
+
+  private def getRandomItemForTimeLine[T](count: Int, fun: => Option[T]): List[T] = {
+    (for (i <- 1 to count) yield fun).flatten.toList
+  }
 }
