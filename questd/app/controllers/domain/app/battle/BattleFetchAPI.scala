@@ -32,12 +32,12 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
    * @param request The request.
    * @return
    */
-  // TODO: take culture into account here.
   def getAllBattles(request: GetAllBattlesRequest): ApiResult[GetAllBattlesResult] = handleDbException {
     OkApiResult(GetAllBattlesResult(db.battle.allWithParams(
       status = request.statuses,
       levels = request.levels,
-      idsExclude = request.excludeIds)))
+      idsExclude = request.excludeIds,
+      cultureId = request.user.demo.cultureId)))
   }
 
 }
