@@ -23,6 +23,11 @@ case class GetSolutionResult(
   quest: Option[QuestInfoWithID] = None,
   questAuthor: Option[PublicProfileWithID] = None)
 
+case class GetBattleRequest(user: User, battleId: String)
+case class GetBattleResult(
+  allowed: ProfileModificationResult,
+  battle: Option[BattleInfoWithID] = None)
+
 case class GetPublicProfilesRequest(
   user: User,
   userIds: List[String])
@@ -122,6 +127,19 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         myRating = Some(s.rating),
         quest = questInfo,
         questAuthor = questAuthor))
+    }
+  }
+
+  /**
+   * Get battle by its id.
+   * @param request The request.
+   * @return
+   */
+  def getBattle(request: GetBattleRequest): ApiResult[GetBattleResult] = handleDbException {
+    import request._
+
+    db.battle.readById(battleId) ifSome { battle =>
+      OkApiResult(GetBattleResult(OK, Some(BattleInfoWithID(battle.id, battle.info))))
     }
   }
 

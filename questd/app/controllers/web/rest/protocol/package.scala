@@ -185,6 +185,11 @@ package object protocol {
 
   type WSGetSolutionResult = GetSolutionResult
 
+  case class WSGetBattleRequest(
+    id: String)
+
+  type WSGetBattleResult = GetBattleResult
+
   case class WSGetPublicProfilesRequest(
     ids: List[String])
 

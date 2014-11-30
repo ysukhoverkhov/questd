@@ -26,6 +26,17 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
   }
 
   /**
+   * Get battle by id
+   * @return requested battle
+   */
+  def getBattle = wrapJsonApiCallReturnBody[WSGetBattleResult] { (js, r) =>
+    // TODO: implement me.
+    val v = Json.read[WSGetBattleRequest](js)
+
+    api.getBattle(GetBattleRequest(r.user, v.id))
+  }
+
+  /**
    * Get profile by id.
    */
   def getPublicProfiles = wrapJsonApiCallReturnBody[WSGetPublicProfileResult] { (js, r) =>
