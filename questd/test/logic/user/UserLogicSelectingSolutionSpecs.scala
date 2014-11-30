@@ -24,7 +24,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
     config.apply(api.ConfigParams.SolutionProbabilityFriends) returns "0.25"
     config.apply(api.ConfigParams.SolutionProbabilityFollowing) returns "0.25"
     config.apply(api.ConfigParams.SolutionProbabilityLiked) returns "0.20"
-    config.apply(api.ConfigParams.SolutionProbabilityStar) returns "0.10"
+    config.apply(api.ConfigParams.SolutionProbabilityVIP) returns "0.10"
 
     config
   }

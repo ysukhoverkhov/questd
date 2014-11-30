@@ -62,7 +62,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
       (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests),
       (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests),
       (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests),
-      (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPQuests),
+      (api.config(api.ConfigParams.QuestProbabilityVIP).toDouble, () => getVIPQuests),
       (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 

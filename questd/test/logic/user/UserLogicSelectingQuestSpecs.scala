@@ -24,7 +24,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
     config.apply(api.ConfigParams.QuestProbabilityFriends) returns "0.25"
     config.apply(api.ConfigParams.QuestProbabilityFollowing) returns "0.25"
     config.apply(api.ConfigParams.QuestProbabilityLiked) returns "0.20"
-    config.apply(api.ConfigParams.QuestProbabilityStar) returns "0.10"
+    config.apply(api.ConfigParams.QuestProbabilityVIP) returns "0.10"
 
     config
   }

@@ -41,13 +41,13 @@ trait BattleSelectUserLogic { this: UserLogic =>
   private[user] def getStartingBattles: Option[Iterator[Battle]] = {
     Logger.trace("getStartingBattles")
 
-    if (user.profile.publicProfile.level > api.config(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
+    if (user.profile.publicProfile.level > api.config(api.ConfigParams.BattleProbabilityLevelsToGiveStartingBattles).toInt) {
       Logger.trace("  returns None because of high level")
       None
     } else {
 
       val algorithms = List(
-        (api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPBattles),
+        (api.config(api.ConfigParams.BattleProbabilityStartingVIPBattles).toDouble, () => getVIPBattles),
         (1.00, () => getBattlesWithMyTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
@@ -58,11 +58,11 @@ trait BattleSelectUserLogic { this: UserLogic =>
   private[user] def getDefaultBattles: Option[Iterator[Battle]] = {
     Logger.trace("getDefaultBattle")
 
-    val algorithms = List( // TODO: here and in other places use config params for battles.
-      (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsBattles),
-      (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingBattles),
-      (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedBattles),
-      (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPBattles),
+    val algorithms = List(
+      (api.config(api.ConfigParams.BattleProbabilityFriends).toDouble, () => getFriendsBattles),
+      (api.config(api.ConfigParams.BattleProbabilityFollowing).toDouble, () => getFollowingBattles),
+      (api.config(api.ConfigParams.BattleProbabilityLiked).toDouble, () => getLikedBattles),
+      (api.config(api.ConfigParams.BattleProbabilityVIP).toDouble, () => getVIPBattles),
       (1.00, () => getBattlesWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 

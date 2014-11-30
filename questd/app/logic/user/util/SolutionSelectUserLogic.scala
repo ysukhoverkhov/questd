@@ -93,7 +93,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       (api.config(api.ConfigParams.SolutionProbabilityFriends).toDouble, () => getFriendsSolutions),
       (api.config(api.ConfigParams.SolutionProbabilityFollowing).toDouble, () => getFollowingSolutions),
       (api.config(api.ConfigParams.SolutionProbabilityLiked).toDouble, () => getSolutionsForLikedQuests),
-      (api.config(api.ConfigParams.SolutionProbabilityStar).toDouble, () => getVIPSolutions),
+      (api.config(api.ConfigParams.SolutionProbabilityVIP).toDouble, () => getVIPSolutions),
       (1.00, () => getOtherSolutions) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
       )
 
