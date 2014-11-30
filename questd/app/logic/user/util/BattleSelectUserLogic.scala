@@ -101,20 +101,22 @@ trait BattleSelectUserLogic { this: UserLogic =>
 
   private[user] def getVIPBattles = {
     Logger.trace("  Returning VIP Battles")
-// TODO: implement me.
+
+    // TODO: TAGS: implement me (perhaps remove tags).
 //    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPQuests)
 //    Logger.trace("    Selected themes of vip's quests: " + themeIds.mkString(", "))
 //
-//    checkNotEmptyIterator(Some(api.getVIPQuests(GetVIPQuestsRequest(
-//      user,
-//      QuestStatus.InRotation,
-//      levels)).body.get.quests))
+//    checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
+//      user = user,
+//      idsExclude = battleIdsToExclude,
+//      authorIdsExclude = battleParticipantsIdsToExclude,
+//      levels = levels)).body.get.battles))
     None
   }
 
   private[user] def getBattlesWithMyTags = {
     Logger.trace("  Returning Battles with my tags")
-// TODO: implement me with tags.
+// TODO: TAGS: implement me with tags.
 //    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
 //    Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
 //
@@ -127,19 +129,21 @@ trait BattleSelectUserLogic { this: UserLogic =>
 
   private[user] def getAnyBattles = {
     Logger.trace("  Returning from any Battle (but respecting levels)")
-// TODO: exclude participants ids here.
+
     checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
       user = user,
-      excludeIds = battleIdsToExclude,
+      idsExclude = battleIdsToExclude,
+      authorIdsExclude = battleParticipantsIdsToExclude,
       levels = levels)).body.get.battles))
   }
 
   private[user] def getAnyBattlesIgnoringLevels = {
     Logger.trace("  Returning from any battles ignoring levels")
-    // TODO: exclude participants ids here.
+
     checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
       user = user,
-      excludeIds = battleIdsToExclude,
+      idsExclude = battleIdsToExclude,
+      authorIdsExclude = battleParticipantsIdsToExclude,
       levels = None)).body.get.battles))
   }
 

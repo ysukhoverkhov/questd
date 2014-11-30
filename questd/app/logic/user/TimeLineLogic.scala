@@ -13,7 +13,6 @@ trait TimeLineLogic { this: UserLogic =>
    * @param count Number of quests to return. It may return less.
    * @return List of quests for time line.
    */
-  // TODO: tell what levels to use here.
   def getRandomQuestsForTimeLine(count: Int): List[Quest] = getRandomItemForTimeLine(count, getRandomQuest)
 
   /**
@@ -28,11 +27,10 @@ trait TimeLineLogic { this: UserLogic =>
    * @param count Number of battles to return. It may return less.
    * @return List of battles for time line.
    */
-  // TODO: make sure battle selected on one iteration will not be included in next iteration
-  // TODO: write a test about it.
   def getRandomBattlesForTimeLine(count: Int): List[Battle] = getRandomItemForTimeLine(count, getRandomBattle)
 
 
+  // TODO: make sure battle selected on one iteration will not be included in next iteration
   private def getRandomItemForTimeLine[T](count: Int, fun: => Option[T]): List[T] = {
     (for (i <- 1 to count) yield fun).flatten.toList
   }

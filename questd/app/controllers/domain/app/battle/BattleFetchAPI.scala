@@ -10,7 +10,8 @@ case class GetAllBattlesInternalResult(battles: Iterator[Battle])
 
 case class GetAllBattlesRequest(
   user: User,
-  excludeIds: List[String] = List(),
+  authorIdsExclude: List[String] = List(),
+  idsExclude: List[String] = List(),
   statuses: List[BattleStatus.Value] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetAllBattlesResult(battles: Iterator[Battle])
@@ -36,7 +37,8 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
     OkApiResult(GetAllBattlesResult(db.battle.allWithParams(
       status = request.statuses,
       levels = request.levels,
-      idsExclude = request.excludeIds,
+      authorIdsExclude = request.authorIdsExclude,
+      idsExclude = request.idsExclude,
       cultureId = request.user.demo.cultureId)))
   }
 }
