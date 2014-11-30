@@ -12,12 +12,12 @@ trait BattleDAO extends BaseDAO[Battle] {
 //    authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
-//    vip: Option[Boolean] = None,
-//    ids: List[String] = List(),
-    excludeIds: List[String] = List()
+    vip: Option[Boolean] = None,
+    ids: List[String] = List(),
+    idsExclude: List[String] = List(),
 //    questIds: List[String] = List(),
 //    themeIds: List[String] = List(),
-/*    cultureId: Option[String] = None*/): Iterator[Battle]
+    cultureId: Option[String] = None): Iterator[Battle]
 
   /**
    * Update status of the battle

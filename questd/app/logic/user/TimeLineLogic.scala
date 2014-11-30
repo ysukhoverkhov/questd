@@ -28,6 +28,8 @@ trait TimeLineLogic { this: UserLogic =>
    * @param count Number of battles to return. It may return less.
    * @return List of battles for time line.
    */
+  // TODO: make sure battle selected on one iteration will not be included in next iteration
+  // TODO: write a test about it.
   def getRandomBattlesForTimeLine(count: Int): List[Battle] = getRandomItemForTimeLine(count, getRandomBattle)
 
 

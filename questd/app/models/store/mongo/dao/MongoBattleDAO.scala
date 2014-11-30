@@ -16,18 +16,17 @@ private[mongo] class MongoBattleDAO
   /**
    * @inheritdoc
    */
-  // TODO: levels should work.
   def allWithParams(
     status: List[BattleStatus.Value] = List(),
 //    authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
-//    vip: Option[Boolean] = None,
-//    ids: List[String] = List(),
-      excludeIds: List[String] = List()
+    vip: Option[Boolean] = None,
+    ids: List[String] = List(),
+    idsExclude: List[String] = List(),
 //    questIds: List[String] = List(),
 //    themeIds: List[String] = List(),
-/*    cultureId: Option[String] = None*/): Iterator[Battle] = {
+    cultureId: Option[String] = None): Iterator[Battle] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -39,22 +38,22 @@ private[mongo] class MongoBattleDAO
 //      queryBuilder += ("info.authorId" -> MongoDBObject("$in" -> authorIds))
 //    }
 //
-//    if (levels != None) {
-//      queryBuilder += ("$and" -> Array(
-//        MongoDBObject("questLevel" -> MongoDBObject("$gte" -> levels.get._1)),
-//        MongoDBObject("questLevel" -> MongoDBObject("$lte" -> levels.get._2))))
-//    }
-//
-//    if (vip != None) {
-//      queryBuilder += ("info.vip" -> vip.get)
-//    }
-//
+    if (levels != None) {
+      queryBuilder += ("$and" -> Array(
+        MongoDBObject("level" -> MongoDBObject("$gte" -> levels.get._1)),
+        MongoDBObject("level" -> MongoDBObject("$lte" -> levels.get._2))))
+    }
+
+    if (vip != None) {
+      queryBuilder += ("vip" -> vip.get)
+    }
+
 //    if (ids.length > 0) {
 //      queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
 //    }
 //
-    if (excludeIds.length > 0) {
-      queryBuilder += ("id" -> MongoDBObject("$nin" -> excludeIds))
+    if (idsExclude.length > 0) {
+      queryBuilder += ("id" -> MongoDBObject("$nin" -> idsExclude))
     }
 
 //    if (questIds.length > 0) {
@@ -64,10 +63,10 @@ private[mongo] class MongoBattleDAO
 //    if (themeIds.length > 0) {
 //      queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
 //    }
-//
-//    if (cultureId != None) {
-//      queryBuilder += ("cultureId" -> cultureId.get)
-//    }
+
+    if (cultureId != None) {
+      queryBuilder += ("cultureId" -> cultureId.get)
+    }
 
     Logger.trace("MongoBattleDAO - allWithParams - " + queryBuilder.result)
 

@@ -37,7 +37,7 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
     OkApiResult(GetAllBattlesResult(db.battle.allWithParams(
       status = request.statuses,
       levels = request.levels,
-      excludeIds = request.excludeIds)))
+      idsExclude = request.excludeIds)))
   }
 
 }
