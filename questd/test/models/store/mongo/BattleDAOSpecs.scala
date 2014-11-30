@@ -28,6 +28,7 @@ class BattleDAOSpecs extends Specification
         createBattleStub(
           id = "b1",
           solutionIds = List("s1_id", "s2_id"),
+          authorIds = List("a1_id", "a2_id"),
           status = BattleStatus.Fighting,
           level = 3,
           vip = false,
@@ -36,6 +37,7 @@ class BattleDAOSpecs extends Specification
         createBattleStub(
           id = "b2",
           solutionIds = List("s1_id", "s3_id"),
+          authorIds = List("a1_id", "a3_id"),
           status = BattleStatus.Resolved,
           level = 7,
           vip = false,
@@ -44,6 +46,7 @@ class BattleDAOSpecs extends Specification
         createBattleStub(
           id = "b3",
           solutionIds = List("s1_id", "s2_id"),
+          authorIds = List("a1_id", "a2_id"),
           status = BattleStatus.Fighting,
           level = 3,
           vip = true,
@@ -59,9 +62,9 @@ class BattleDAOSpecs extends Specification
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(bs(0).id) and contain(bs(2).id)
 
-//      val userids = db.quest.allWithParams(authorIds = List("q2_author id")).toList
-//      userids.map(_.id) must beEqualTo(List(bs(1).id))
-//
+      val userids = db.battle.allWithParams(authorIds = List("a3_id")).toList
+      userids.map(_.id) must beEqualTo(List(bs(1).id))
+
       val levels = db.battle.allWithParams(levels = Some((5, 10))).toList
       levels.map(_.id).size must beEqualTo(1)
       levels.map(_.id) must beEqualTo(List(bs(1).id))
@@ -90,9 +93,9 @@ class BattleDAOSpecs extends Specification
       excludingIds.map(_.id).size must beEqualTo(1)
       excludingIds.map(_.id) must beEqualTo(List(bs(2).id))
 
-//      val excludingAuthorIds = db.quest.allWithParams(authorIdsExclude = List("q2_author id")).toList
-//      excludingAuthorIds.map(_.id).size must beEqualTo(2)
-//      excludingAuthorIds.map(_.id).sorted must beEqualTo(List(bs(0).id, bs(2).id).sorted)
+      val excludingAuthorIds = db.battle.allWithParams(authorIdsExclude = List("a2_id")).toList
+      excludingAuthorIds.map(_.id).size must beEqualTo(1)
+      excludingAuthorIds.map(_.id).sorted must beEqualTo(List(bs(1).id).sorted)
     }
 
 

@@ -8,6 +8,7 @@ import java.util.Date
 case class BattleInfo(
   status: BattleStatus.Value = BattleStatus.Fighting,
   solutionIds: List[String],
+  authorIds: List[String],
   winnerId: Option[String] = None,
   voteEndDate: Date
   )

@@ -141,6 +141,7 @@ package object domainstubs {
   def createBattleStub(
     id: String = ID.generateUUID(),
     solutionIds: List[String] = List("1", "2"),
+    authorIds: List[String] = List("a1", "a2"),
     status: BattleStatus.Value = BattleStatus.Fighting,
     level: Int = 19,
     vip: Boolean = false,
@@ -151,6 +152,7 @@ package object domainstubs {
       id = id,
       info = BattleInfo(
         solutionIds = solutionIds,
+        authorIds = authorIds,
         status = status,
         voteEndDate = voteEndDate),
       level = level,

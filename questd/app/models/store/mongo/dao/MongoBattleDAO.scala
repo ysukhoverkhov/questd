@@ -18,14 +18,13 @@ private[mongo] class MongoBattleDAO
    */
   def allWithParams(
     status: List[BattleStatus.Value] = List(),
-//    authorIds: List[String] = List(),
+    authorIds: List[String] = List(),
+    authorIdsExclude: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
     vip: Option[Boolean] = None,
     ids: List[String] = List(),
     idsExclude: List[String] = List(),
-//    questIds: List[String] = List(),
-//    themeIds: List[String] = List(),
     cultureId: Option[String] = None): Iterator[Battle] = {
 
     val queryBuilder = MongoDBObject.newBuilder
@@ -34,10 +33,14 @@ private[mongo] class MongoBattleDAO
       queryBuilder += ("info.status" -> MongoDBObject("$in" -> status.map(_.toString)))
     }
 
-//    if (authorIds.length > 0) {
-//      queryBuilder += ("info.authorId" -> MongoDBObject("$in" -> authorIds))
-//    }
-//
+    if (authorIds.length > 0) {
+      queryBuilder += ("info.authorIds" -> MongoDBObject("$in" -> authorIds))
+    }
+
+    if (authorIdsExclude.length > 0) {
+      queryBuilder += ("info.authorIds" -> MongoDBObject("$nin" -> authorIdsExclude))
+    }
+
     if (levels != None) {
       queryBuilder += ("$and" -> Array(
         MongoDBObject("level" -> MongoDBObject("$gte" -> levels.get._1)),

@@ -55,6 +55,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         val battle = Battle(
           info = BattleInfo(
             solutionIds = List(solution.id, competitor.id),
+            authorIds = List(solution.info.authorId, competitor.info.authorId),
             voteEndDate = BattleLogic.voteEndDate(solution.questLevel)
           ),
           level = competitor.questLevel,
