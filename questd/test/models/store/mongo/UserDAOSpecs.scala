@@ -4,6 +4,7 @@ package models.store.mongo
 
 import java.util.Date
 
+import com.mongodb.BasicDBList
 import models.domain._
 import models.store._
 import org.specs2.mutable._
@@ -106,32 +107,7 @@ class UserDAOSpecs
       u must beNone
     }
 
-    /// TODO: clean me up.
-//    "recordQuestProposalVote should remember liked proposals" in new WithApplication(appWithTestDatabase) {
-//      val entry1 = createTimeLineEntryStub(objectId = "oid1")
-//      val entry2 = createTimeLineEntryStub(objectId = "oid2")
-//      val user = createUserStub(timeLine = List(entry1, entry2))
-//
-//      db.user.create(user)
-//
-//      db.user.recordTimeLineVote(user.id, entry1.objectId, ContentVote.Cool)
-//      db.user.recordTimeLineVote(user.id, entry2.objectId, ContentVote.Cheating)
-//
-//      val ou = db.user.readById(user.id)
-//      val arr1 = ou.get.history.likedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray.collect { case s: String => s}
-//      arr1.size must beEqualTo(3) // 2 is "", "" stub in list of lists.
-//      arr1(2) must beEqualTo(entry1.objectId)
-//
-//      val arr2 = ou.get.history.votedQuestProposalIds.asInstanceOf[List[BasicDBList]](0).toArray.collect { case s: String => s}
-//      arr2.size must beEqualTo(4) // 2 is "", "" stub in list of lists.
-//      arr2(2) must beEqualTo(entry1.objectId)
-//      arr2(3) must beEqualTo(entry2.objectId)
-//
-//      val tl = ou.get.timeLine
-//      tl.filter(_.ourVote == Some(ContentVote.Cool)).map(_.id) must beEqualTo(List(entry1.id))
-//      tl.filter(_.ourVote == Some(ContentVote.Cheating)).map(_.id) must beEqualTo(List(entry2.id))
-//    }
-
+// TODO: TAGS: clean me up.
 //    "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {
 //      val userId = "takeQuest2"
 //      val themeId = "tid"
@@ -266,7 +242,7 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.questCreationContext.questCreationCoolDown == dateNew)
     }
 
-    // TODO: clean me up.
+    // TODO: TAGS: clean me up.
 //    "resetTodayReviewedThemes do its work" in new WithApplication(appWithTestDatabase) {
 //      val userId = "resetTodayReviewedThemes"
 //      val date = new Date(1000)

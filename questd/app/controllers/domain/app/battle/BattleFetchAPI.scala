@@ -39,5 +39,4 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
       idsExclude = request.excludeIds,
       cultureId = request.user.demo.cultureId)))
   }
-
 }

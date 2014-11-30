@@ -18,9 +18,6 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     val it = selectFromChain(algorithms).getOrElse(Iterator.empty)
     if (it.hasNext) Some(it.next()) else None
-//          // TODO: add "excludeAuthors" and "excludeIds" to getAllSolutions"
-//          // TODO: make similar for quests.
-
   }
 
   private def solutionIdsToExclude = {

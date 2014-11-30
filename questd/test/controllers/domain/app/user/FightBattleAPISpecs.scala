@@ -89,23 +89,48 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       result must beAnInstanceOf[OkApiResult[TryCreateBattleRequest]]
     }
 
-    // TODO: clean me up.
-    //    "Do not fight with himself in quest" in context {
-    //
-    //      val user1 = createUserStub(id = "user1")
-    //      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = "qid")
-    //
-    //      solution.allWithParams(
-    //        status = List(SolutionStatus.WaitingForCompetitor),
-    //        questIds = List(mySolution.info.questId)) returns List(mySolution).iterator
-    //
-    //      val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
-    //
-    //      result must beEqualTo(OkApiResult(TryFightQuestResult()))
-    //
-    //      there were no(solution).updateStatus(any, any, any)
-    //      there were no(user).storeSolutionInDailyResult(any, any)
-    //    }
+    "Do not fight with himself in quest" in context {
+      val ss = List(
+        createSolutionStub(
+          status = SolutionStatus.WaitingForCompetitor,
+          authorId = "aid1"),
+        createSolutionStub(
+          status = SolutionStatus.WaitingForCompetitor,
+          authorId = "aid1"))
+
+      solution.allWithParams(
+        status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
+        authorIds = any,
+        authorIdsExclude = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        questIds = Matchers.eq(List(ss(0).info.questId)),
+        themeIds = any,
+        cultureId = Matchers.eq(Some(ss(0).cultureId))) returns ss.iterator
+
+      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
+
+      there was one(solution).allWithParams(
+        status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
+        authorIds = any,
+        authorIdsExclude = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        questIds = Matchers.eq(List(ss(0).info.questId)),
+        themeIds = any,
+        cultureId = Matchers.eq(Some(ss(0).cultureId)))
+
+      there was no(battle).create(any)
+      there was no(solution).updateStatus(any, any, any)
+
+      result must beAnInstanceOf[OkApiResult[TryCreateBattleRequest]]
+    }
 
   }
 }
