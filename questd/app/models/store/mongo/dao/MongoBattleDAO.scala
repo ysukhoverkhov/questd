@@ -51,21 +51,13 @@ private[mongo] class MongoBattleDAO
       queryBuilder += ("vip" -> vip.get)
     }
 
-//    if (ids.length > 0) {
-//      queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
-//    }
-//
+    if (ids.length > 0) {
+      queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
+    }
+
     if (idsExclude.length > 0) {
       queryBuilder += ("id" -> MongoDBObject("$nin" -> idsExclude))
     }
-
-//    if (questIds.length > 0) {
-//      queryBuilder += ("info.questId" -> MongoDBObject("$in" -> questIds))
-//    }
-//
-//    if (themeIds.length > 0) {
-//      queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
-//    }
 
     if (cultureId != None) {
       queryBuilder += ("cultureId" -> cultureId.get)

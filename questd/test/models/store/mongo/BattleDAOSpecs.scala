@@ -81,7 +81,7 @@ class BattleDAOSpecs extends Specification
       statusVip.map(_.id).size must beEqualTo(1)
       statusVip.map(_.id) must beEqualTo(List(bs(0).id))
 
-      val ids = db.battle.allWithParams(ids = List("b1", "b2"), vip = Some(false)).toList
+      val ids = db.battle.allWithParams(ids = List("b1", "b2")).toList
       ids.map(_.id).size must beEqualTo(2)
       ids.map(_.id).sorted must beEqualTo(List(bs(0).id, bs(1).id).sorted)
 
