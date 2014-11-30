@@ -67,6 +67,8 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         questIds = Matchers.eq(List(ss(0).info.questId)),
         themeIds = any,
         cultureId = Matchers.eq(Some(ss(0).cultureId))) returns ss.iterator
+      user.readById(any) returns Some(createUserStub())
+      user.addEntryToTimeLine(any, any) returns Some(createUserStub())
 
       val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
 
@@ -85,7 +87,8 @@ class FightBattleAPISpecs extends BaseAPISpecs {
 
       there was one(battle).create(any)
       there was two(solution).updateStatus(any, any, any)
-
+      there were two(user).addEntryToTimeLine(any, any)
+      there were two(user).addEntryToTimeLineMulti(any, any)
       result must beAnInstanceOf[OkApiResult[TryCreateBattleRequest]]
     }
 

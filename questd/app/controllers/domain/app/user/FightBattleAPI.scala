@@ -1,12 +1,13 @@
 package controllers.domain.app.user
 
+import components._
+import controllers.domain._
+import controllers.domain.helpers._
 import logic.BattleLogic
-import scala.language.postfixOps
 import models.domain._
 import play.Logger
-import controllers.domain.helpers._
-import controllers.domain._
-import components._
+
+import scala.language.postfixOps
 
 
 case class TryCreateBattleRequest(solution: Solution)
@@ -51,11 +52,14 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
 
     selectCompetitor(possibleCompetitors) match {
       case Some(competitor) =>
+
+        val solutions = List(solution, competitor)
+
         // FIX: transaction should be here as this operation is atomic.
         val battle = Battle(
           info = BattleInfo(
-            solutionIds = List(solution.id, competitor.id),
-            authorIds = List(solution.info.authorId, competitor.info.authorId),
+            solutionIds = solutions.map(_.id),
+            authorIds = solutions.map(_.info.authorId),
             voteEndDate = BattleLogic.voteEndDate(solution.questLevel)
           ),
           level = competitor.questLevel,
@@ -64,8 +68,24 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         )
         db.battle.create(battle)
 
-        battle.info.solutionIds.foreach {
-          db.solution.updateStatus(_, SolutionStatus.OnVoting, Some(battle.id))
+        solutions.foreach { s =>
+          db.solution.updateStatus(s.id, SolutionStatus.OnVoting, Some(battle.id))
+
+          db.user.readById(s.info.authorId) ifSome { u =>
+            {
+              addToTimeLine(AddToTimeLineRequest(
+                user = u,
+                reason = TimeLineReason.Created,
+                objectType = TimeLineType.Battle,
+                objectId = battle.id))
+            } ifOk { r =>
+              addToWatchersTimeLine(AddToWatchersTimeLineRequest(
+                user = u,
+                reason = TimeLineReason.Created,
+                objectType = TimeLineType.Quest,
+                objectId = battle.id))
+            }
+          }
         }
 
         OkApiResult(TryCreateBattleResult())
