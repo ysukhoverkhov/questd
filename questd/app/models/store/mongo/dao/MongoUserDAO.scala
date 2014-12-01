@@ -569,7 +569,6 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  // TODO: test me.
   def setTimeLinePopulationTime(id: String, time: Date): Option[User] = {
     findAndModify(
       id,
