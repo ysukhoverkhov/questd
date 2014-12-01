@@ -8,6 +8,8 @@ import models.domain._
  */
 trait TimeLineLogic { this: UserLogic =>
 
+  def getPupulateTimeLineDate = getNextFlipHourDate
+
   /**
    * Returns quests for time line.
    * @param count Number of quests to return. It may return less.
