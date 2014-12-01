@@ -4,7 +4,6 @@ package models.store.mongo
 
 import java.util.Date
 
-import com.mongodb.BasicDBList
 import models.domain._
 import models.store._
 import org.specs2.mutable._
@@ -504,6 +503,22 @@ class UserDAOSpecs
       ou1 must beSome[User]
       val u = ou1.get
       u.privateDailyResults.head.questsIncome.length must beEqualTo(0)
+    }
+
+    "setTimeLinePopulationTime sets it" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val time = new Date(1000)
+
+      val user = createUserStub()
+
+      db.user.create(user)
+      db.user.setTimeLinePopulationTime(user.id, time)
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User]
+      val u = ou1.get
+      u.schedules.timeLine must beEqualTo(time)
     }
   }
 }
