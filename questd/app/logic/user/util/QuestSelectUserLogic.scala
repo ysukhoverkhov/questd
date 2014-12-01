@@ -8,172 +8,175 @@ import controllers.domain.app.quest._
 
 trait QuestSelectUserLogic { this: UserLogic =>
 
-  import scala.language.implicitConversions
+  def getRandomQuests(count: Int): List[Quest] = getRandomObjects[Quest](count, (a: List[Quest]) => getRandomQuest(a))
 
-  object QuestGetReason extends Enumeration {
-    type QuestGetReason = QuestGetReason.Value
-    val ForVoting, ForSolving = Value
-  }
-  import QuestGetReason._
-
-  def getRandomQuest(reason: QuestGetReason): Option[Quest] = {
+  private def getRandomQuest(implicit selected: List[Quest]): Option[Quest] = {
     val algorithms = List(
-      () => getQuestsWithSuperAlgorithm(reason),
-      () => getOtherQuests(reason).getOrElse(List().iterator),
-      () => getAllQuests(reason).getOrElse(List().iterator))
+      () => getQuestsWithSuperAlgorithm,
+      () => getQuestsWithMyTags,
+      () => getAnyQuests,
+      () => getAnyQuestsIgnoringLevels)
 
-    {
-      algorithms.foldLeft[Option[Quest]](None)((run, fun) => {
-        if (run == None) {
-          selectQuest(fun(), questIdsToExclude(reason))
-        } else {
-          run
-        }
-      })
-    }
+    val it = selectFromChain(algorithms).getOrElse(Iterator.empty)
+    if (it.hasNext) Some(it.next()) else None
+
   }
 
-  private def questIdsToExclude(reason: QuestGetReason) = {
-    reason match {
-      case ForSolving => user.history.solvedQuestIds
-      case ForVoting => user.history.votedQuestProposalIds
-    }
+  private def getQuestsWithSuperAlgorithm(implicit selected: List[Quest]): Option[Iterator[Quest]] = {
+    Logger.trace("getQuestsWithSuperAlgorithm")
+
+    val algorithms = List(
+      () => getTutorialQuests,
+      () => getStartingQuests,
+      () => getDefaultQuests)
+
+    selectFromChain(algorithms)
   }
 
-  def getQuestsWithSuperAlgorithm(reason: QuestGetReason) = {
-    val algs = List(
-      () => getTutorialQuests(reason),
-      () => getStartingQuests(reason),
-      () => getDefaultQuests(reason))
-
-    selectFromChain(algs, default = List().iterator)
-  }
-
-  private[user] def getTutorialQuests(reason: QuestGetReason): Option[Iterator[Quest]] = {
-    Logger.trace("getTutorialQuests")
+  private[user] def getTutorialQuests: Option[Iterator[Quest]] = {
+    Logger.trace("getTutorialQuests returns None since does not implemented")
     None
   }
 
-  private[user] def getStartingQuests(reason: QuestGetReason): Option[Iterator[Quest]] = {
+  private[user] def getStartingQuests(implicit selected: List[Quest]): Option[Iterator[Quest]] = {
     Logger.trace("getStartingQuests")
 
     if (user.profile.publicProfile.level > api.config(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
+      Logger.trace("  returns None because of high level")
       None
     } else {
 
-      val algs = List(
-        (api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests(reason)),
-        (1.00, () => getOtherQuests(reason)) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
+      val algorithms = List(
+        (api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests),
+        (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
-      selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
-
+      selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
     }
   }
 
-  private[user] def getDefaultQuests(reason: QuestGetReason): Option[Iterator[Quest]] = {
+  private[user] def getDefaultQuests(implicit selected: List[Quest]): Option[Iterator[Quest]] = {
     Logger.trace("getDefaultQuests")
 
-    val algs = List(
-      (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests(reason)),
-      (api.config(api.ConfigParams.QuestProbabilityShortlist).toDouble, () => getShortlistQuests(reason)),
-      (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests(reason)),
-      (api.config(api.ConfigParams.QuestProbabilityStar).toDouble, () => getVIPQuests(reason)),
-      (1.00, () => getOtherQuests(reason)) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
+    val algorithms = List(
+      (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests),
+      (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests),
+      (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests),
+      (api.config(api.ConfigParams.QuestProbabilityVIP).toDouble, () => getVIPQuests),
+      (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 
-    selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
+    selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
   }
 
-  private[user] def getFriendsQuests(reason: QuestGetReason) = {
+  private[user] def getFriendsQuests(implicit selected: List[Quest]) = {
     Logger.trace("  Returning quest from friends")
-    Some(api.getFriendsQuests(GetFriendsQuestsRequest(
-      user,
-      reason,
-      levels(reason))).body.get.quests)
+    checkNotEmptyIterator(Some(api.getFriendsQuests(GetFriendsQuestsRequest(
+      user = user,
+      status = QuestStatus.InRotation,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude,
+      levels = levels)).body.get.quests))
   }
 
-  private[user] def getShortlistQuests(reason: QuestGetReason) = {
-    Logger.trace("  Returning quest from shortlist")
-    Some(api.getShortlistQuests(GetShortlistQuestsRequest(
-      user,
-      reason,
-      levels(reason))).body.get.quests)
+  private[user] def getFollowingQuests(implicit selected: List[Quest]) = {
+    Logger.trace("  Returning quest from Following")
+    checkNotEmptyIterator(Some(api.getFollowingQuests(GetFollowingQuestsRequest(
+      user = user,
+      status = QuestStatus.InRotation,
+      levels = levels,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude
+    )).body.get.quests))
   }
 
-  private[user] def getLikedQuests(reason: QuestGetReason) = {
+  private[user] def getLikedQuests(implicit selected: List[Quest]) = {
     Logger.trace("  Returning quests we liked recently")
 
-    // If we already liked the quest we are unable to like it once again anymore.
-    if (reason == QuestGetReason.ForVoting)
-      None
-    else
-      Some(api.getLikedQuests(GetLikedQuestsRequest(
-        user,
-        reason,
-        levels(reason))).body.get.quests)
+    checkNotEmptyIterator(Some(api.getLikedQuests(GetLikedQuestsRequest(
+      user = user,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude,
+      status = QuestStatus.InRotation,
+      levels = levels)).body.get.quests))
   }
 
-  private[user] def getVIPQuests(reason: QuestGetReason) = {
+  private[user] def getVIPQuests(implicit selected: List[Quest]) = {
     Logger.trace("  Returning VIP quests")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPQuests)
     Logger.trace("    Selected themes of vip's quests: " + themeIds.mkString(", "))
 
-    Some(api.getVIPQuests(GetVIPQuestsRequest(
-      user,
-      reason,
-      levels(reason),
-      themeIds)).body.get.quests)
+    checkNotEmptyIterator(Some(api.getVIPQuests(GetVIPQuestsRequest(
+      user = user,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude,
+      status = QuestStatus.InRotation,
+      levels = levels)).body.get.quests))
   }
 
-  private[user] def getOtherQuests(reason: QuestGetReason) = {
-    Logger.trace("  Returning from all quests with favorite themes")
+  private[user] def getQuestsWithMyTags(implicit selected: List[Quest]) = {
+    Logger.trace("  Returning quests with my tags")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
     Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
 
-    Some(api.getAllQuests(GetAllQuestsRequest(
-      user,
-      reason,
-      levels(reason),
-      themeIds)).body.get.quests)
+    checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
+      user = user,
+      idsExclude = questIdsToExclude,
+      status = QuestStatus.InRotation,
+      authorsExclude = questAuthorIdsToExclude,
+      levels = levels)).body.get.quests))
   }
 
-  private[user] def getAllQuests(reason: QuestGetReason) = {
-    Logger.trace("  Returning from all quests")
+  private[user] def getAnyQuests(implicit selected: List[Quest]) = {
+    Logger.trace("  Returning from any quests (but respecting levels)")
 
-    Some(api.getAllQuests(GetAllQuestsRequest(
-      user,
-      reason,
-      levels(reason))).body.get.quests)
+    checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
+      user = user,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude,
+      status = QuestStatus.InRotation,
+      levels = levels)).body.get.quests))
+  }
+
+  private[user] def getAnyQuestsIgnoringLevels(implicit selected: List[Quest]) = {
+    Logger.trace("  Returning from any quests ignoring levels")
+
+    checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
+      user = user,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude,
+      status = QuestStatus.InRotation,
+      levels = None)).body.get.quests))
   }
 
   /**
-   * Tells what level we should give quests based on reason of getting quest.
+   * Tells what level we should give quests.
    */
-  private def levels(reason: QuestGetReason): Option[(Int, Int)] = {
-    reason match {
-      case ForSolving => Some((user.profile.publicProfile.level - QuestForSolveLevelToleranceDown, user.profile.publicProfile.level + QuestForSolveLevelToleranceUp))
-      case ForVoting => None
-    }
+  private def levels: Option[(Int, Int)] = {
+    Some((
+      user.profile.publicProfile.level - TimeLineContentLevelSigma,
+      user.profile.publicProfile.level + TimeLineContentLevelSigma))
   }
 
-  implicit private def reasonToStatus(reason: QuestGetReason): QuestStatus.Value = {
-    reason match {
-      case ForSolving => QuestStatus.InRotation
-      case ForVoting => QuestStatus.OnVoting
-    }
+  private def questIdsToExclude(implicit selected: List[Quest]) = {
+    user.timeLine.map(_.objectId) ::: selected.map(_.id)
   }
 
+  private def questAuthorIdsToExclude = {
+    List(user.id)
+  }
+
+  // FIX: change it to tags when they will be ready.
   private def selectRandomThemes(count: Int): List[String] = {
-    if (user.history.themesOfSelectedQuests.length > 0) {
-      for (i <- (1 to count).toList) yield {
-        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
-      }
-    } else {
+//    if (user.history.themesOfSelectedQuests.length > 0) {
+//      for (i <- (1 to count).toList) yield {
+//        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
+//      }
+//    } else {
       List()
-    }
+//    }
   }
 
 }

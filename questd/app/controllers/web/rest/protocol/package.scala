@@ -1,7 +1,8 @@
 package controllers.web.rest
 
+import scala.language.implicitConversions
 import controllers.domain.app.user._
-import models.domain.Profile
+import models.domain._
 import controllers.domain.app.misc.GetTimeResult
 
 package object protocol {
@@ -73,70 +74,61 @@ package object protocol {
   case class WSSetCountryRequest(country: String)
 
   /**
-   * Get Quest theme cost result
-   */
-  type WSGetQuestThemeCostResult = GetQuestThemeCostResult
-
-  /**
-   * Result for purchase quest.
-   */
-  type WSPurchaseQuestThemeResult = PurchaseQuestThemeResult
-
-  /**
-   * Take theme for inventing quest.
-   */
-  type WSTakeQuestThemeResult = TakeQuestThemeResult
-
-  type WSGetQuestThemeTakeCostResult = GetQuestThemeTakeCostResult
-
-  /**
    *
    */
-  type WSProposeQuestResult = ProposeQuestResult
+  type WSCreateQuestResult = CreateQuestResult
 
   case class WSContentReference(
     contentType: String,
     storage: String,
-    reference: String)
+    reference: String) {
 
-  case class WSProposeQuestRequest(
+  }
+  object WSContentReference {
+    implicit def toContentReference(v: WSContentReference): ContentReference = {
+      ContentReference(
+        contentType = ContentType.withName(v.contentType),
+        storage = v.storage,
+        reference = v.reference
+      )
+    }
+  }
+
+
+  case class WSCreateQuestRequest(
     media: WSContentReference,
     icon: Option[WSContentReference] = None,
     description: String)
+  object WSCreateQuestRequest {
+    implicit def toQuestInfoContent(v: WSCreateQuestRequest): QuestInfoContent = {
+      QuestInfoContent(
+        media = v.media,
+        icon = v.icon.map(r => r),
+        description = v.description)
+    }
+  }
 
-  /**
-   *
-   */
-  type WSGiveUpQuestProposalResult = GiveUpQuestProposalResult
-
-  /**
-   *
-   */
-  type WSGetQuestProposalGiveUpCostResult = GetQuestProposalGiveUpCostResult
-
-  type WSGetQuestProposalHelpCostResult = GetQuestProposalHelpCostResult
 
   /**
    * *******************
    * Solving quests
    * *******************
    */
-  type WSGetQuestCostResult = GetQuestCostResult
 
-  type WSPurchaseQuestResult = PurchaseQuestResult
+  case class WSSolveQuestRequest(
+    questId: String,
+    media: WSContentReference,
+    icon: Option[WSContentReference] = None)
+  object WSSolveQuestRequest {
+    implicit def toSolutionInfoContent(v: WSSolveQuestRequest): SolutionInfoContent = {
+      SolutionInfoContent(
+        media = v.media,
+        icon = v.icon.map(r => r))
+    }
+  }
 
-  type WSGetTakeQuestCostResult = GetTakeQuestCostResult
+  type WSSolveQuestResult = SolveQuestResult
 
-  type WSTakeQuestResult = TakeQuestResult
-
-  type WSProposeSolutionRequest = ProposeSolutionRequest
-  type WSProposeSolutionResult = ProposeSolutionResult
-
-  type WSGetQuestGiveUpCostResult = GetQuestGiveUpCostResult
-
-  type WSGiveUpQuestResult = GiveUpQuestResult
-
-  type WSGetQuestSolutionHelpCostResult = GetQuestSolutionHelpCostResult
 
   /**
    * ********************
@@ -144,25 +136,16 @@ package object protocol {
    * ********************
    */
 
-  case class WSQuestProposalVoteRequest(
+  case class WSVoteQuestRequest(
+
+    questId: String,
+
     /**
      * @see controllers.domain.user.QuestProposalVote
      */
-    vote: String,
+    vote: String)
 
-    /**
-     * @see QuestDuration
-     */
-    duration: String,
-
-    /**
-     * @see QuestDifficulty
-     */
-    difficulty: String)
-
-  type WSGetQuestProposalToVoteResult = GetQuestProposalToVoteResult
-
-  type WSVoteQuestProposalResult = VoteQuestProposalResult
+  type WSVoteQuestResult = VoteQuestByUserResult
 
   /**
    * ********************
@@ -170,15 +153,19 @@ package object protocol {
    * ********************
    */
 
-  case class WSQuestSolutionVoteRequest(
+  case class WSVoteQuestSolutionRequest(
+
+    /**
+     * id of solution we vote for.
+     */
+    solutionId: String,
+
     /**
      * @see controllers.domain.user.QuestSolutionVote
      */
     vote: String)
 
-  type WSGetQuestSolutionToVoteResult = GetQuestSolutionToVoteResult
-
-  type WSVoteQuestSolutionResult = VoteQuestSolutionResult
+  type WSVoteSolutionResult = VoteSolutionResult
 
   /**
    * ********************
@@ -202,6 +189,19 @@ package object protocol {
 
   /**
    * ********************
+   * Time Line
+   * ********************
+   */
+  type WSGetTimeLineResult = GetTimeLineResult
+  case class WSGetTimeLineRequest (
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+
+  /**
+   * ********************
    * Content
    * ********************
    */
@@ -214,6 +214,11 @@ package object protocol {
     id: String)
 
   type WSGetSolutionResult = GetSolutionResult
+
+  case class WSGetBattleRequest(
+    id: String)
+
+  type WSGetBattleResult = GetBattleResult
 
   case class WSGetPublicProfilesRequest(
     ids: List[String])
@@ -285,29 +290,31 @@ package object protocol {
   type WSGetQuestsForUserResult = GetQuestsForUserResult
 
   /**
-   * Shortlist
+   * Following
    */
 
-  type WSGetShortlistResult = GetShortlistResult
+  type WSGetFollowingResult = GetFollowingResult
 
-  type WSCostToShortlistResult = CostToShortlistResult
+  type WSGetFollowersResult = GetFollowersResult
 
-  case class WSAddToShortlistRequest(
+  type WSCostToFollowingResult = CostToFollowingResult
+
+  case class WSAddToFollowingRequest(
     /// Id of a person to add.
     id: String)
 
-  type WSAddToShortlistResult = AddToShortlistResult
+  type WSAddToFollowingResult = AddToFollowingResult
 
-  case class WSRemoveFromShortlistRequest(
+  case class WSRemoveFromFollowingRequest(
     /// Id of a person to remove.
     id: String)
 
-  type WSRemoveFromShortlistResult = RemoveFromShortlistResult
+  type WSRemoveFromFollowingResult = RemoveFromFollowingResult
 
-  case class WSGetSuggestsForShortlistRequest(
+  case class WSGetSuggestsForFollowingRequest(
     tokens: Map[String, String])
 
-  type WSGetSuggestsForShortlistResult = GetSuggestsForShortlistResult
+  type WSGetSuggestsForFollowingResult = GetSuggestsForFollowingResult
 
   /**
    * Friends

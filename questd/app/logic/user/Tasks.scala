@@ -2,7 +2,6 @@ package logic.user
 
 import logic._
 import logic.constants._
-import logic.functions._
 import models.domain._
 
 trait Tasks { this: UserLogic =>
@@ -39,9 +38,9 @@ trait Tasks { this: UserLogic =>
 
     Map(TaskType.VoteQuestSolutions -> getVoteQuestSolutionsTask,
       TaskType.SubmitQuestResult -> getSubmitQuestResultTask,
-      TaskType.AddToShortList -> getAddToShortListTask,
-      TaskType.VoteQuestProposals -> getVoteQuestProposalsTask,
-      TaskType.SubmitQuestProposal -> getSubmitQuestProposalTask,
+      TaskType.AddToFollowing -> getAddToFollowingTask,
+      TaskType.VoteQuests -> getVoteQuestProposalsTask,
+      TaskType.CreateQuest -> getSubmitQuestProposalTask,
       TaskType.VoteReviews -> getVoteReviewsTask,
       TaskType.SubmitReviewsForResults -> getSubmitReviewsForResultsTask,
       TaskType.SubmitReviewsForProposals -> getSubmitReviewsForProposalsTask,
@@ -65,38 +64,40 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating task for voting quests.
    */
   private def getVoteQuestSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
-    def calculateCount = {
-      val share = api.config(api.ConfigParams.SolutionVoteTaskShare).toDouble
-      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
-    }
-
-    Some(Task(
-      taskType = TaskType.VoteQuestSolutions,
-      description = "",
-      requiredCount = calculateCount))
+//    def calculateCount = {
+//      val share = api.config(api.ConfigParams.SolutionVoteTaskShare).toDouble
+//      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
+//    }
+//
+//    Some(Task(
+//      taskType = TaskType.VoteQuestSolutions,
+//      description = "",
+//      requiredCount = calculateCount))
+    None
   }
 
   /**
    * Algorithm for generating task for submitting quest.
    */
   private def getSubmitQuestResultTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoResults) {
-    if (canSolveQuestToday)
-      Some(Task(
-        taskType = TaskType.SubmitQuestResult,
-        description = "",
-        requiredCount = 1))
-    else
+    // FIX: clean me up.
+//    if (canSolveQuestToday)
+//      Some(Task(
+//        taskType = TaskType.SubmitQuestResult,
+//        description = "",
+//        requiredCount = 1))
+//    else
       None
   }
 
   /**
-   * Algorithm for generating tasks for shortlist.
+   * Algorithm for generating tasks for following.
    */
-  private def getAddToShortListTask(user: User) = ifHasRightTo(Functionality.AddToShortList) {
-    val prob = api.config(api.ConfigParams.AddToShortlistTaskProbability).toDouble
+  private def getAddToFollowingTask(user: User) = ifHasRightTo(Functionality.AddToFollowing) {
+    val prob = api.config(api.ConfigParams.AddToFollowingTaskProbability).toDouble
     if (rand.nextDouble < prob)
       Some(Task(
-        taskType = TaskType.AddToShortList,
+        taskType = TaskType.AddToFollowing,
         description = "",
         requiredCount = 1))
     else
@@ -106,16 +107,17 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for creating task for votes for proposals.
    */
-  private def getVoteQuestProposalsTask(user: User) = ifHasRightTo(Functionality.VoteQuestProposals) {
-    def calculateCount = {
-      val share = api.config(api.ConfigParams.QuestVoteTaskShare).toDouble
-      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
-    }
-
-    Some(Task(
-      taskType = TaskType.VoteQuestProposals,
-      description = "",
-      requiredCount = calculateCount))
+  private def getVoteQuestProposalsTask(user: User) = ifHasRightTo(Functionality.VoteQuests) {
+//    def calculateCount = {
+//      val share = api.config(api.ConfigParams.QuestVoteTaskShare).toDouble
+//      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
+//    }
+//
+//    Some(Task(
+//      taskType = TaskType.VoteQuests,
+//      description = "",
+//      requiredCount = calculateCount))
+    None
   }
 
   /**
@@ -124,7 +126,7 @@ trait Tasks { this: UserLogic =>
   private def getSubmitQuestProposalTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
     if (canProposeQuestToday)
       Some(Task(
-        taskType = TaskType.SubmitQuestProposal,
+        taskType = TaskType.CreateQuest,
         description = "",
         requiredCount = 1))
     else

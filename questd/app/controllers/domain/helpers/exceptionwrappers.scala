@@ -25,7 +25,8 @@ object exceptionwrappers {
       f
     } catch {
       case ex: DatabaseException =>
-        Logger.error("DB error during login", ex)
+        if (!ex.silent)
+          Logger.error("DB error during login", ex)
         InternalErrorApiResult()
     }
   }

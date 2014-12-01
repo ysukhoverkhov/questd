@@ -27,7 +27,7 @@ case class AskFriendshipRequest(
   friendId: String)
 case class AskFriendshipResult(
   allowed: ProfileModificationResult,
-  assets: Option[Assets] = None)
+  profile: Option[Profile] = None)
 
 case class RespondFriendshipRequest(
   user: User,
@@ -107,9 +107,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
                   Friendship(request.friendId, FriendshipStatus.Invited),
                   Friendship(r.user.id, FriendshipStatus.Invites))
 
-                // TODO: Send message to person we invites about it.
-
-                OkApiResult(AskFriendshipResult(OK, Some(r.user.profile.assets)))
+                OkApiResult(AskFriendshipResult(OK, Some(r.user.profile)))
               }
             case a => OkApiResult(AskFriendshipResult(a))
           }
@@ -193,7 +191,8 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
    * @return updated user.
    */
   def processFriendshipInvitationsFromSN(request: ProcessFriendshipInvitationsFromSNRequest): ApiResult[ProcessFriendshipInvitationsFromSNResult] = handleDbException {
-    // All exceptions are wrapped and returned as Internal error which is not clean for now but ok since we ignore errors for this call anyways.
+    // All exceptions are wrapped and returned as Internal error which is not good.
+    // Only real internal errors should be reported as internal errors.
 
     val rv = request.snUser.invitations.foldLeft(request.user) { (u, i) =>
       Logger.trace(s"Invitation from ${i.inviterSnId}")
@@ -213,21 +212,13 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
         // Autoaccept for newcomers.
         if (request.user.profile.publicProfile.level <= 1) {
-          // TODO: send messages about accepted friendship.
-          // TODO: Accepted to person who invited,
-          // TODO: Autoaccepted for person who was invited.
-
           becomeFriend(request.user, friend, FriendshipStatus.Accepted)
           becomeFriend(friend, request.user, FriendshipStatus.Accepted)
+          sendMessage(SendMessageRequest(
+            friend, MessageFriendshipAccepted(request.user.id)))
         } else {
-          // TODO: send message to me here.
-
-//          sendMessage(SendMessageRequest(
-//            request.user, ))
-
           becomeFriend(request.user, friend, FriendshipStatus.Invites)
-
-          // TODO: check should we send becomeFriend o friend with status "Invited".
+          becomeFriend(friend, request.user, FriendshipStatus.Invited)
         }
 
       }

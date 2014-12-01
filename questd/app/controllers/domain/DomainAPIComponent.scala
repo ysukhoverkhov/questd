@@ -1,13 +1,13 @@
 package controllers.domain
 
+import controllers.domain.app.battle.{BattleFetchAPI, BattleAPI}
 import controllers.domain.app.theme.ThemeFetchAPI
 import models.store._
 import components._
 import controllers.domain.app.user._
 import controllers.domain.app.quest._
-import controllers.domain.app.questsolution._
+import controllers.domain.app.solution._
 import controllers.domain.admin._
-import controllers.domain.app.questsolution.QuestSolutionAPI
 import controllers.domain.config.ApiConfigHolder
 import controllers.domain.app.misc.MiscAPI
 import logic.LogicBootstrapper
@@ -29,23 +29,27 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     with ProfileAPI
     with DailyResultAPI
     with StatsAPI
-    with ProposeQuestAPI
+    with CreateQuestAPI
     with SolveQuestAPI
-    with VoteQuestProposalAPI
-    with VoteQuestSolutionAPI
+    with FightBattleAPI
+    with VoteQuestAPI
+    with VoteSolutionAPI
     with ContentAPI
-    with ShortlistAPI
+    with FollowingAPI
     with FriendsAPI
     with MessagesAPI
     with MiscAPI
     with TasksAPI
     with TutorialAPI
+    with TimeLineAPI
 
     with QuestAPI
     with QuestsFetchAPI
     with ThemeFetchAPI
-    with QuestSolutionAPI
-    with QuestsSolutionFetchAPI
+    with SolutionAPI
+    with SolutionFetchAPI
+    with BattleAPI
+    with BattleFetchAPI
 
     with ThemesAdminAPI
     with UsersAdminAPI

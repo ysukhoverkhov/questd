@@ -2,7 +2,6 @@ package controllers.domain.app.user
 
 import controllers.domain._
 import models.domain._
-import controllers.domain.app.quest._
 import testhelpers.domainstubs._
 
 class ContentAPISpecs extends BaseAPISpecs {
@@ -12,20 +11,22 @@ class ContentAPISpecs extends BaseAPISpecs {
     "Make correct db call in getSolutionsForQuest" in context {
       val u = createUserStub()
 
-      db.solution.allWithParams(List(QuestSolutionStatus.Won.toString), null, null, 10, null, null, List("qid"), null) returns List[QuestSolution]().iterator
+      db.solution.allWithParams(status = List(SolutionStatus.Won), authorIds = null, levels = null, skip = 10, vip = null, ids = null, questIds = List("qid"), themeIds = null) returns List[Solution]().iterator
 
-      val result = api.getSolutionsForQuest(GetSolutionsForQuestRequest(u, "qid", List(QuestSolutionStatus.Won), 2, 5))
+      val result = api.getSolutionsForQuest(GetSolutionsForQuestRequest(u, "qid", List(SolutionStatus.Won), 2, 5))
 
       there was one(solution).allWithParams(
-        List(QuestSolutionStatus.Won.toString),
-        null,
-        null,
-        10,
-        null,
-        null,
-        List("qid"),
-        null,
-        null)
+        status = List(SolutionStatus.Won),
+        authorIds = null,
+        authorIdsExclude = null,
+        levels = null,
+        skip = 10,
+        vip = null,
+        ids = null,
+        idsExclude = null,
+        questIds = List("qid"),
+        themeIds = null,
+        cultureId = null)
 
       result.body must beSome[GetSolutionsForQuestResult].which(_.solutions == List())
     }
@@ -34,86 +35,32 @@ class ContentAPISpecs extends BaseAPISpecs {
       val u = createUserStub()
 
       db.solution.allWithParams(
-        List(QuestSolutionStatus.Won.toString),
-        List("qid"),
-        null,
-        10,
-        null,
-        null,
-        null,
-        null,
-        null) returns List[QuestSolution]().iterator
+        status = List(SolutionStatus.Won),
+        authorIds = List("qid"),
+        authorIdsExclude = null,
+        levels = null,
+        skip = 10,
+        vip = null,
+        ids = null,
+        idsExclude = null,
+        questIds = null,
+        themeIds = null,
+        cultureId = null) returns List[Solution]().iterator
 
-      val result = api.getSolutionsForUser(GetSolutionsForUserRequest(u, "qid", List(QuestSolutionStatus.Won), 2, 5))
+      val result = api.getSolutionsForUser(GetSolutionsForUserRequest(u, "qid", List(SolutionStatus.Won), 2, 5))
 
       there was one(solution).allWithParams(
-        List(QuestSolutionStatus.Won.toString),
-        List("qid"),
-        null,
-        10,
-        null,
-        null,
-        null,
-        null,
-        null)
+        status = List(SolutionStatus.Won),
+        authorIds = List("qid"),
+        levels = null,
+        skip = 10,
+        vip = null,
+        ids = null,
+        questIds = null,
+        themeIds = null,
+        cultureId = null)
 
       result.body must beSome[GetSolutionsForUserResult].which(_.solutions == List())
-    }
-
-    "getLikedQuests calls db correctly" in context {
-
-      db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4"), List()) returns List().iterator
-
-      val liked = List(
-        List("1", "2"),
-        List("3", "4"))
-      val u = createUserStub(likedQuestProposalIds = liked)
-      val result = api.getLikedQuests(GetLikedQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
-
-      there was one(quest).allWithParams(
-        List(QuestStatus.InRotation.toString),
-        null,
-        Some(1, 2),
-        0,
-        null,
-        List("1", "2", "3", "4"),
-        null,
-        u.demo.cultureId)
-    }
-
-    "getVIPQuests calls db correctly" in context {
-
-      db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, Some(true), List(), List("a")) returns List().iterator
-      val u = createUserStub()
-
-      val result = api.getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, Some(1, 2), List("a")))
-
-      there was one(quest).allWithParams(
-        List(QuestStatus.InRotation.toString),
-        null,
-        Some(1, 2),
-        0,
-        Some(true),
-        null,
-        List("a"),
-        u.demo.cultureId)
-    }
-
-    "getAllQuests calls db correctly" in context {
-
-      db.quest.allWithParams(List(QuestStatus.InRotation.toString), List(), Some(1, 2), 0, None, List(), List("a")) returns List().iterator
-
-      val result = api.getAllQuests(GetAllQuestsRequest(createUserStub(cultureId = "cid"), QuestStatus.InRotation, Some(1, 2), List("a")))
-
-      there was one(quest).allWithParams(
-        List(QuestStatus.InRotation.toString),
-        null,
-        Some(1, 2),
-        0,
-        null,
-        null,
-        List("a"),
-        Some("cid"))
     }
   }
 }

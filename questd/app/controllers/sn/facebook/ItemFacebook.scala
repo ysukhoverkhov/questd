@@ -8,7 +8,7 @@ package controllers.sn.facebook
 abstract class ItemFacebook {
 
   /**
-   * @inheritdoc
+   * Name of social network.
    */
   def snName: String = SocialNetworkClientFacebook.Name
 
