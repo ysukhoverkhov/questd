@@ -1,7 +1,8 @@
 package controllers.web.rest
 
+import scala.language.implicitConversions
 import controllers.domain.app.user._
-import models.domain.Profile
+import models.domain._
 import controllers.domain.app.misc.GetTimeResult
 
 package object protocol {
@@ -80,12 +81,33 @@ package object protocol {
   case class WSContentReference(
     contentType: String,
     storage: String,
-    reference: String)
+    reference: String) {
+
+  }
+  object WSContentReference {
+    implicit def toContentReference(v: WSContentReference): ContentReference = {
+      ContentReference(
+        contentType = ContentType.withName(v.contentType),
+        storage = v.storage,
+        reference = v.reference
+      )
+    }
+  }
+
 
   case class WSCreateQuestRequest(
     media: WSContentReference,
     icon: Option[WSContentReference] = None,
     description: String)
+  object WSCreateQuestRequest {
+    implicit def toQuestInfoContent(v: WSCreateQuestRequest): QuestInfoContent = {
+      QuestInfoContent(
+        media = v.media,
+        icon = v.icon.map(r => r),
+        description = v.description)
+    }
+  }
+
 
   /**
    * *******************
@@ -97,6 +119,14 @@ package object protocol {
     questId: String,
     media: WSContentReference,
     icon: Option[WSContentReference] = None)
+  object WSSolveQuestRequest {
+    implicit def toSolutionInfoContent(v: WSSolveQuestRequest): SolutionInfoContent = {
+      SolutionInfoContent(
+        media = v.media,
+        icon = v.icon.map(r => r))
+    }
+  }
+
   type WSSolveQuestResult = SolveQuestResult
 
 

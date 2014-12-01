@@ -30,7 +30,6 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
    * @return requested battle
    */
   def getBattle = wrapJsonApiCallReturnBody[WSGetBattleResult] { (js, r) =>
-    // TODO: implement me.
     val v = Json.read[WSGetBattleRequest](js)
 
     api.getBattle(GetBattleRequest(r.user, v.id))
