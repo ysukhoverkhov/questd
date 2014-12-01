@@ -1,7 +1,5 @@
 package logic.user
 
-import com.mongodb.BasicDBList
-import com.mongodb.casbah.commons.MongoDBList
 import logic.BaseLogicSpecs
 import models.domain.User
 import com.mongodb.casbah.commons.MongoDBList

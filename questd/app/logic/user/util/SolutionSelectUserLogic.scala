@@ -8,7 +8,9 @@ import controllers.domain.app.solution._
 
 trait SolutionSelectUserLogic { this: UserLogic =>
 
-  def getRandomSolution: Option[Solution] = {
+  def getRandomSolutions(count: Int): List[Solution] = getRandomObjects[Solution](count, (a: List[Solution]) => getRandomSolution(a))
+
+  private[user] def getRandomSolution(implicit selected: List[Solution] = List()): Option[Solution] = {
     val algorithms = List(
       () => getSolutionsWithSuperAlgorithm,
       () => getOtherSolutions,
@@ -20,15 +22,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     if (it.hasNext) Some(it.next()) else None
   }
 
-  private def solutionIdsToExclude = {
-    user.timeLine.map(_.objectId)
-  }
-
-  private def solutionAuthorIdsToExclude = {
-    List(user.id)
-  }
-
-  private def getSolutionsWithSuperAlgorithm: Option[Iterator[Solution]] = {
+  private[user] def getSolutionsWithSuperAlgorithm(implicit selected: List[Solution]): Option[Iterator[Solution]] = {
     val algorithms = List(
       () => getTutorialSolutions,
       () => getHelpWantedSolutions,
@@ -39,12 +33,12 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     selectFromChain(algorithms)
   }
 
-  private[user] def getTutorialSolutions: Option[Iterator[Solution]] = {
+  private[user] def getTutorialSolutions(implicit selected: List[Solution]): Option[Iterator[Solution]] = {
     Logger.trace("getTutorialSolutions")
     None
   }
 
-  private[user] def getHelpWantedSolutions: Option[Iterator[Solution]] = {
+  private[user] def getHelpWantedSolutions(implicit selected: List[Solution]): Option[Iterator[Solution]] = {
     Logger.trace("getHelpWantedSolutions")
 
     if (user.mustVoteSolutions.nonEmpty) {
@@ -58,7 +52,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     }
   }
 
-  private[user] def getSolutionsOfOwnQuests: Option[Iterator[Solution]] = {
+  private[user] def getSolutionsOfOwnQuests(implicit selected: List[Solution]): Option[Iterator[Solution]] = {
     Logger.trace("getSolutionsOfOwnQuests")
 
     val solutions = api.getSolutionsForOwnQuests(GetSolutionsForOwnQuestsRequest(
@@ -70,7 +64,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     if (solutions.isEmpty) None else Some(solutions)
   }
 
-  private[user] def getStartingSolutions: Option[Iterator[Solution]] = {
+  private[user] def getStartingSolutions(implicit selected: List[Solution]): Option[Iterator[Solution]] = {
     Logger.trace("getStartingSolutions")
 
     if (user.profile.publicProfile.level > api.config(api.ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions).toInt) {
@@ -86,7 +80,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     }
   }
 
-  private[user] def getDefaultSolutions: Option[Iterator[Solution]] = {
+  private[user] def getDefaultSolutions(implicit selected: List[Solution]): Option[Iterator[Solution]] = {
     Logger.trace("getDefaultSolutions")
 
     val algorithms = List(
@@ -100,7 +94,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
   }
 
-  private[user] def getFriendsSolutions = {
+  private[user] def getFriendsSolutions(implicit selected: List[Solution]) = {
     Logger.trace("  Returning Solutions from friends")
     checkNotEmptyIterator(Some(api.getFriendsSolutions(GetFriendsSolutionsRequest(
       user = user,
@@ -110,7 +104,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       levels = levels)).body.get.solutions))
   }
 
-  private[user] def getFollowingSolutions = {
+  private[user] def getFollowingSolutions(implicit selected: List[Solution]) = {
     Logger.trace("  Returning solutions from Following")
     checkNotEmptyIterator(Some(api.getFollowingSolutions(GetFollowingSolutionsRequest(
       user = user,
@@ -120,7 +114,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       levels = levels)).body.get.solutions))
   }
 
-  private[user] def getSolutionsForLikedQuests = {
+  private[user] def getSolutionsForLikedQuests(implicit selected: List[Solution]) = {
     Logger.trace("  Returning solutions for quests we liked recently")
     checkNotEmptyIterator(Some(api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
       user = user,
@@ -130,7 +124,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       levels = levels)).body.get.solutions))
   }
 
-  private[user] def getVIPSolutions = {
+  private[user] def getVIPSolutions(implicit selected: List[Solution]) = {
     Logger.trace("  Returning VIP's solutions")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPSolutions)
@@ -145,7 +139,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       themeIds = themeIds)).body.get.solutions))
   }
 
-  private[user] def getOtherSolutions = {
+  private[user] def getOtherSolutions(implicit selected: List[Solution]) = {
     Logger.trace("  Returning from all solutions with favorite themes")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherSolutions)
@@ -160,7 +154,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       themeIds = themeIds)).body.get.solutions))
   }
 
-  private[user] def getAnySolutions = {
+  private[user] def getAnySolutions(implicit selected: List[Solution]) = {
     Logger.trace("  Returning from all solutions (not ignoring levels)")
 
     checkNotEmptyIterator(Some(api.getAllSolutions(GetAllSolutionsRequest(
@@ -171,7 +165,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       levels = levels)).body.get.solutions))
   }
 
-  private[user] def getAnySolutionsIgnoringLevels = {
+  private[user] def getAnySolutionsIgnoringLevels(implicit selected: List[Solution]) = {
     Logger.trace("  Returning from all solutions (ignoring levels)")
 
     checkNotEmptyIterator(Some(api.getAllSolutions(GetAllSolutionsRequest(
@@ -180,6 +174,14 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       authorsExclude = solutionAuthorIdsToExclude,
       status = List(SolutionStatus.Won, SolutionStatus.Lost),
       levels = None)).body.get.solutions))
+  }
+
+  private def solutionIdsToExclude(implicit selected: List[Solution]) = {
+    user.timeLine.map(_.objectId) ::: selected.map(_.id)
+  }
+
+  private def solutionAuthorIdsToExclude = {
+    List(user.id)
   }
 
   /**

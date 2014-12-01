@@ -6,11 +6,12 @@ import logic.constants._
 import models.domain._
 import play.Logger
 
+
 trait BattleSelectUserLogic { this: UserLogic =>
 
-  import scala.language.implicitConversions
+  def getRandomBattles(count: Int): List[Battle] = getRandomObjects[Battle](count, (a: List[Battle]) => getRandomBattle(a))
 
-  def getRandomBattle: Option[Battle] = {
+  private def getRandomBattle(implicit selected: List[Battle]): Option[Battle] = {
     val algorithms = List(
       () => getBattlesWithSuperAlgorithm,
       () => getBattlesWithMyTags,
@@ -127,7 +128,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
     None
   }
 
-  private[user] def getAnyBattles = {
+  private[user] def getAnyBattles(implicit selected: List[Battle]) = {
     Logger.trace("  Returning from any Battle (but respecting levels)")
 
     checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
@@ -137,7 +138,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
       levels = levels)).body.get.battles))
   }
 
-  private[user] def getAnyBattlesIgnoringLevels = {
+  private[user] def getAnyBattlesIgnoringLevels(implicit selected: List[Battle]) = {
     Logger.trace("  Returning from any battles ignoring levels")
 
     checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
@@ -156,8 +157,8 @@ trait BattleSelectUserLogic { this: UserLogic =>
       user.profile.publicProfile.level + TimeLineContentLevelSigma))
   }
 
-  private def battleIdsToExclude = {
-    user.timeLine.map(_.objectId)
+  private def battleIdsToExclude(implicit selected: List[Battle]) = {
+    user.timeLine.map(_.objectId) ::: selected.map(_.id)
   }
 
   private def battleParticipantsIdsToExclude = {

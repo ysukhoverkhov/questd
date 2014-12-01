@@ -1,13 +1,23 @@
 package logic.user.util
 
-import logic.UserLogic
+trait SelectionHelpers {/* this: UserLogic =>*/
 
-trait SelectionHelpers { this: UserLogic =>
+  private [util] def getRandomObjects[T](count: Int, fun: (List[T]) => Option[T]): List[T] = {
+
+    (1 to count).foldLeft[List[T]](List()) { (run, num) =>
+      fun(run) match {
+        case Some(b) =>
+          b :: run
+        case None =>
+          run
+      }
+    }
+  }
 
   /**
    * Check is string in list of dblists of strings.
    */
-  def listOfListsContainsString[C](l: List[List[C]], getQuestIdInReference: (C => String), s: String) = {
+  private [user] def listOfListsContainsString[C](l: List[List[C]], getQuestIdInReference: (C => String), s: String) = {
     import models.store.mongo.helpers._
     l.mongoFlatten.map(getQuestIdInReference).contains(s)
   }

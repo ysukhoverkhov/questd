@@ -182,7 +182,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
     } ifOk { r =>
       addRandomBattlesToTimeLine(r.user, battlesCount)
     } ifOk { r =>
-      db.user.setTimeLinePopulationTime(r.user.id, r.user.getPupulateTimeLineDate) ifSome { u =>
+      db.user.setTimeLinePopulationTime(r.user.id, r.user.getPopulateTimeLineDate) ifSome { u =>
         OkApiResult(PopulateTimeLineWithRandomThingsResult(u))
       }
     }
