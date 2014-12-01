@@ -1,5 +1,7 @@
 package models.store.mongo.dao
 
+import java.util.Date
+
 import com.mongodb.casbah.commons.MongoDBObject
 import models.domain._
 import models.store.dao._
@@ -67,6 +69,8 @@ private[mongo] class MongoBattleDAO
 
     findByExample(
       example = queryBuilder.result(),
+      sort = MongoDBObject(
+        "lastModDate" -> 1),
       skip = skip)
   }
 
@@ -81,12 +85,12 @@ private[mongo] class MongoBattleDAO
 
       queryBuilder +=
         ("$set" -> MongoDBObject(
-          "info.status" -> newStatus.toString))
+          "info.status" -> newStatus.toString,
+          "lastModDate" -> new Date()))
 
     findAndModify(
       id,
       queryBuilder.result())
   }
-
 }
 
