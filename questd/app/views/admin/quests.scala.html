@@ -35,6 +35,7 @@
 			    		<td>level</td>
 			    		<td>difficulty</td>
 			    		<td>duration</td>
+                        <td>cultureId</td>
 			    		<td>content</td>
 			    		<td>action</td>
 			    	</tr>
@@ -50,6 +51,7 @@
 				    		<td>@q.info.level</td>
 				    		<td>@q.info.difficulty</td>
 				    		<td>@q.info.duration</td>
+                            <td>@q.cultureId</td>
 				    		<td><img style="max-width: 204px; height: auto; " src="@q.info.content.media.reference" alt="@q.info.content.media.reference" ></td>
 							<td><a href="@controllers.web.admin.routes.QuestsCRUD.quests(q.id)">edit</a></td>
 
