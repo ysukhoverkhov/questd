@@ -3,328 +3,162 @@ package controllers.domain.app.user
 import scala.annotation.tailrec
 import scala.language.postfixOps
 import models.domain._
-import models.domain.view._
 import play.Logger
+import controllers.domain.app.quest.SolveQuestUpdateRequest
 import controllers.domain.helpers._
 import controllers.domain._
 import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.domain.app.quest._
 
-case class GetQuestCostRequest(user: User)
-case class GetQuestCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
+case class SolveQuestRequest(
+  user: User,
+  questId: String,
+  solution: QuestSolutionInfoContent)
+case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class PurchaseQuestRequest(user: User)
-case class PurchaseQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
-
-case class TakeQuestRequest(user: User)
-case class TakeQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
-
-case class GetTakeQuestCostRequest(user: User)
-case class GetTakeQuestCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
-
-case class AddToMustVoteSolutionsRequest(user: User, friendIds: List[String], solutionId: String)
-case class AddToMustVoteSolutionsResult(user: User)
-
-case class ProposeSolutionRequest(user: User, solution: QuestSolutionInfoContent, friendsToHelp: List[String] = List())
-case class ProposeSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
-
-case class GetQuestGiveUpCostRequest(user: User)
-case class GetQuestGiveUpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
-
-case class GiveUpQuestRequest(user: User)
-case class GiveUpQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
-
-case class GetQuestSolutionHelpCostRequest(user: User)
-case class GetQuestSolutionHelpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
-
-case class DeadlineQuestRequest(user: User)
-case class DeadlineQuestResult(user: Option[User])
-
-case class RewardQuestSolutionAuthorRequest(solution: QuestSolution, author: User)
-case class RewardQuestSolutionAuthorResult()
+case class RewardSolutionAuthorRequest(solution: QuestSolution, author: User)
+case class RewardSolutionAuthorResult()
 
 case class TryFightQuestRequest(solution: QuestSolution)
 case class TryFightQuestResult()
 
+//case class GetQuestSolutionHelpCostRequest(user: User)
+//case class GetQuestSolutionHelpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
+
+//case class AddToMustVoteSolutionsRequest(user: User, friendIds: List[String], solutionId: String)
+//case class AddToMustVoteSolutionsResult(user: User)
+
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
+
+
   /**
-   * Get cost of quest to shuffle.
+   * Solve a quest.
    */
-  def getQuestCost(request: GetQuestCostRequest): ApiResult[GetQuestCostResult] = handleDbException {
+  def solveQuest(request: SolveQuestRequest): ApiResult[SolveQuestResult] = handleDbException {
     import request._
 
-    OkApiResult(GetQuestCostResult(OK, Some(user.costOfPurchasingQuest)))
-  }
+    db.quest.readById(questId) match {
+      case None => OkApiResult(SolveQuestResult(OutOfContent))
+      case Some(questToSolve) =>
+        user.canSolveQuest(contentType = solution.media.contentType, questToSolve = questToSolve) match {
+          case OK =>
 
-  /**
-   * Purchase an option of quest to chose.
-   */
-  def purchaseQuest(request: PurchaseQuestRequest): ApiResult[PurchaseQuestResult] = handleDbException {
-
-    val user = ensureNoDeadlineQuest(request.user)
-
-    user.canPurchaseQuest match {
-      case OK =>
-
-        // Updating quest info.
-        val v = if (user.stats.questsAcceptedPast > 0) {
-
-          user.profile.questSolutionContext.purchasedQuest ifSome { q =>
-            db.quest.readById(q.id) ifSome { q =>
-              skipQuest(SkipQuestRequest(q))
+            def content = if (user.payedAuthor) {
+              solution
+            } else {
+              solution
             }
-          }
-        } else {
-          OkApiResult(SkipQuestResult())
-        }
 
-        v ifOk {
-
-          // Updating user profile.
-          user.getRandomQuestForSolution match {
-            case None => OkApiResult(PurchaseQuestResult(OutOfContent))
-
-            case Some(q) =>
-              val questCost = user.costOfPurchasingQuest
-              db.user.readById(q.info.authorId).map(x => PublicProfileWithID(q.info.authorId, x.profile.publicProfile)) ifSome { author =>
-                adjustAssets(AdjustAssetsRequest(user = user, cost = Some(questCost))) ifOk { r =>
-
-                  val u = db.user.purchaseQuest(
-                    r.user.id,
-                    QuestInfoWithID(q.id, q.info),
-                    author,
-                    r.user.rewardForLosingQuest(q),
-                    r.user.rewardForWinningQuest(q))
-
-                  OkApiResult(PurchaseQuestResult(OK, u.map(_.profile)))
-                }
-              }
-          }
-        }
-
-      case a => OkApiResult(PurchaseQuestResult(a))
-    }
-  }
-
-  /**
-   * Get cost of taking quest to resolve.
-   */
-  def getTakeQuestCost(request: GetTakeQuestCostRequest): ApiResult[GetTakeQuestCostResult] = handleDbException {
-    import request._
-
-    OkApiResult(GetTakeQuestCostResult(OK, Some(user.costOfTakingQuest)))
-  }
-
-  /**
-   * Take quest to deal with.
-   */
-  def takeQuest(request: TakeQuestRequest): ApiResult[TakeQuestResult] = handleDbException {
-    request.user.canTakeQuest match {
-
-      case OK =>
-
-        // Updating quest info.
-        val v = if (request.user.stats.questsAcceptedPast > 0) {
-
-          request.user.profile.questSolutionContext.purchasedQuest ifSome { q =>
-            db.quest.readById(q.id) ifSome { q =>
-              val ratio = Math.round(request.user.stats.questsReviewedPast.toFloat / request.user.stats.questsAcceptedPast) - 1
-              takeQuestUpdate(TakeQuestUpdateRequest(q, ratio))
-            }
-          }
-
-        } else {
-          OkApiResult(TakeQuestUpdateResult)
-        }
-
-        v ifOk {
-          adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfTakingQuest)))
-        } ifOk { r =>
-
-          // Updating user profile.
-          r.user.profile.questSolutionContext.purchasedQuest ifSome { pq =>
-
-            db.user.takeQuest(
-              id = r.user.id,
-              pq,
-              r.user.getCooldownForTakeQuest(pq.obj),
-              r.user.getDeadlineForTakeQuest(pq.obj)) ifSome { usr =>
-
-                OkApiResult(TakeQuestResult(OK, Some(usr.profile)))
-
-              }
-          }
-        }
-
-      case (a: ProfileModificationResult) => OkApiResult(TakeQuestResult(a))
-    }
-  }
-
-  /**
-   * Add a quest to given friends "mustVote" list
-   */
-  def addToMustVoteSolutions(request: AddToMustVoteSolutionsRequest): ApiResult[AddToMustVoteSolutionsResult] = handleDbException {
-    val filteredFriends = request.friendIds.filter( request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId).contains(_) )
-
-    if (request.friendIds.isEmpty) {
-      OkApiResult(AddToMustVoteSolutionsResult(request.user))
-    } else {
-      db.user.populateMustVoteSolutionsList(
-        userIds = filteredFriends,
-        solutionId = request.solutionId)
-
-      {
-        adjustAssets(AdjustAssetsRequest(
-          user = request.user,
-          cost = Some(request.user.costOfAskingForHelpWithSolution * request.friendIds.length)))
-      } ifOk { r =>
-        OkApiResult(AddToMustVoteSolutionsResult(r.user))
-      }
-    }
-  }
-
-  /**
-   * Propose solution for quest.
-   */
-  def proposeSolution(request: ProposeSolutionRequest): ApiResult[ProposeSolutionResult] = handleDbException {
-
-    val user = ensureNoDeadlineQuest(request.user)
-
-    user.canResolveQuest(
-      contentType = request.solution.media.contentType,
-      friendsInvited = request.friendsToHelp.length) match {
-      case OK =>
-
-        def content = if (request.user.payedAuthor) {
-          request.solution
-        } else {
-          request.solution
-        }
-
-        {
-          makeTask(MakeTaskRequest(user, taskType = Some(TaskType.SubmitQuestResult)))
-        } ifOk { r =>
-
-          r.user.profile.questSolutionContext.takenQuest ifSome { takenQuest =>
-            r.user.demo.cultureId ifSome { culture =>
+            user.demo.cultureId ifSome { culture =>
 
               val solution = QuestSolution(
                 cultureId = culture,
-                questLevel = takenQuest.obj.level,
+                questLevel = questToSolve.info.level,
                 info = QuestSolutionInfo(
                   content = content,
-                  authorId = r.user.id,
-                  themeId = takenQuest.obj.themeId,
-                  questId = takenQuest.id,
+                  authorId = user.id,
+                  questId = questToSolve.id,
                   vip = user.profile.publicProfile.vip),
-                voteEndDate = user.solutionVoteEndDate(takenQuest.obj))
+                voteEndDate = user.solutionVoteEndDate(questToSolve.info))
 
-              db.solution.create(solution)
+              {
+                // Adjusting assets for solving quests.
+                adjustAssets(AdjustAssetsRequest(
+                  user = user,
+                  cost = Some(questToSolve.info.solveCost)))
+              } ifOk { r =>
+                makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.SubmitQuestResult)))
+              } ifOk { r =>
 
-              db.user.resetQuestSolution(
-                user.id,
-                config(api.ConfigParams.DebugDisableSolutionCooldown) == "1") ifSome { u =>
+                // Creating solution.
+                db.solution.create(solution)
 
-                addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id)) ifOk { r =>
-                  OkApiResult(ProposeSolutionResult(OK, Some(r.user.profile)))
+                val numberOfReviewedQuests = user.timeLine.count { te =>
+                  ((te.objectType == TimeLineType.Quest)
+                    && (te.objectAuthorId != user.id || te.reason != TimeLineReason.Created))
                 }
+                val numberOfSolvedQuests = user.timeLine.count { te =>
+                  ((te.objectType == TimeLineType.Solution)
+                    && (te.reason == TimeLineReason.Created)
+                    && (te.objectAuthorId == user.id))
+                }
+
+                // Updating quest points.
+                val ratio = if (numberOfSolvedQuests == 0)
+                  1
+                else
+                  Math.round(numberOfReviewedQuests / numberOfSolvedQuests)
+                solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio))
+              } ifOk { sqr =>
+                if (user.profile.questSolutionContext.bookmarkedQuest.map(_.id) == Some(questToSolve.id))
+                  db.user.recordQuestSolving(user.id, questToSolve.id)
+
+                addToTimeLine(AddToTimeLineRequest(
+                  user = user,
+                  reason = TimeLineReason.Created,
+                  objectType = TimeLineType.Solution,
+                  objectId = solution.id))
+              } ifOk { r =>
+                addToWatchersTimeLine(AddToWatchersTimeLineRequest(
+                  user = r.user,
+                  reason = TimeLineReason.Created,
+                  objectType = TimeLineType.Solution,
+                  objectId = solution.id))
+                //                } ifOk { r =>
+                //                  addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id))
+              } ifOk { r =>
+                OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
               }
             }
-          }
+
+          case (a: ProfileModificationResult) => OkApiResult(SolveQuestResult(a))
         }
-
-      case (a: ProfileModificationResult) => OkApiResult(ProposeSolutionResult(a))
-    }
-  }
-
-  /**
-   * How much it'll take to give up quest.
-   */
-  def getQuestGiveUpCost(request: GetQuestGiveUpCostRequest): ApiResult[GetQuestGiveUpCostResult] = handleDbException {
-    import request._
-
-    OkApiResult(GetQuestGiveUpCostResult(OK, Some(user.costOfGivingUpQuest)))
-  }
-
-  /**
-   * Give up quest and do not deal with it anymore.
-   */
-  def giveUpQuest(request: GiveUpQuestRequest): ApiResult[GiveUpQuestResult] = handleDbException {
-    request.user.canGiveUpQuest match {
-      case OK =>
-
-        adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(request.user.costOfGivingUpQuest))) ifOk { r =>
-          val u = db.user.resetQuestSolution(
-            r.user.id,
-            config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
-          OkApiResult(GiveUpQuestResult(OK, u.map(_.profile)))
-        }
-
-      case (a: ProfileModificationResult) => OkApiResult(GiveUpQuestResult(a))
-    }
-  }
-
-  def getQuestSolutionHelpCost(request: GetQuestSolutionHelpCostRequest): ApiResult[GetQuestSolutionHelpCostResult] = handleDbException {
-    import request._
-
-    OkApiResult(GetQuestSolutionHelpCostResult(OK, Some(user.costOfAskingForHelpWithSolution)))
-  }
-
-  /**
-   * Stop from solving quests because its deadline reached.
-   */
-  def deadlineQuest(request: DeadlineQuestRequest): ApiResult[DeadlineQuestResult] = handleDbException {
-    storeSolutionOutOfTimePenalty(StoreSolutionOutOfTimePenaltyReqest(request.user, request.user.costOfGivingUpQuest)) ifOk { r =>
-      val u = db.user.resetQuestSolution(
-        r.user.id,
-        config(api.ConfigParams.DebugDisableSolutionCooldown) == "1")
-      OkApiResult(DeadlineQuestResult(u))
     }
   }
 
   /**
    * Give quest solution author a reward on quest status change
    */
-  def rewardQuestSolutionAuthor(request: RewardQuestSolutionAuthorRequest): ApiResult[RewardQuestSolutionAuthorResult] = handleDbException {
+  def rewardSolutionAuthor(request: RewardSolutionAuthorRequest): ApiResult[RewardSolutionAuthorResult] = handleDbException {
     import request._
 
     Logger.debug("API - rewardQuestSolutionAuthor")
 
-    case class QuestNotFoundException() extends Throwable
+    class QuestNotFoundException() extends Throwable
 
     def q = {
       db.quest.readById(solution.info.questId) match {
         case Some(qu) => qu
-        case None => throw QuestNotFoundException()
+        case None => throw new QuestNotFoundException()
       }
     }
 
     try {
       val r = solution.status match {
-        case QuestSolutionStatus.OnVoting =>
-          Logger.error("We are rewarding player for solution what is on voting.")
-          InternalErrorApiResult()
-
-        case QuestSolutionStatus.WaitingForCompetitor =>
-          tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
+          // FIX: implement this part.
+//        case QuestSolutionStatus.OnVoting =>
+//          Logger.error("We are rewarding player for solution what is on voting.")
+//          InternalErrorApiResult()
+//
+//        case QuestSolutionStatus.WaitingForCompetitor =>
+//          tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
 
         case QuestSolutionStatus.Won =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(author.profile.questSolutionContext.victoryReward)))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(q.info.solveRewardWon)))
 
         case QuestSolutionStatus.Lost =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(author.profile.questSolutionContext.defeatReward)))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(q.info.solveRewardLost)))
 
         case QuestSolutionStatus.CheatingBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(author.penaltyForCheatingSolution(q))))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(q.penaltyForCheatingSolution)))
 
         case QuestSolutionStatus.IACBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(author.penaltyForIACSolution(q))))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(q.penaltyForIACSolution)))
       }
 
       r ifOk {
-        OkApiResult(RewardQuestSolutionAuthorResult())
+        OkApiResult(RewardSolutionAuthorResult())
       }
     } catch {
       case ex: QuestNotFoundException =>
@@ -340,7 +174,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     // 1. find all solutions with the same quest id with status waiting for competitor.
 
     val solutionsForQuest = db.solution.allWithParams(
-      status = List(QuestSolutionStatus.WaitingForCompetitor.toString),
+      status = List(QuestSolutionStatus.WaitingForCompetitor),
       questIds = List(request.solution.info.questId))
 
     def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {
@@ -374,9 +208,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- winners) {
             Logger.debug("  winner id=" + curSol.id)
 
-            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won.toString, curSol.rivalSolutionId) ifSome { s =>
+            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won, curSol.rivalSolutionId) ifSome { s =>
               db.user.readById(curSol.info.authorId) ifSome { u =>
-                rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u))
+                rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = u))
               }
             }
 
@@ -386,9 +220,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           for (curSol <- losers) {
             Logger.debug("  loser id=" + curSol.id)
 
-            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost.toString, curSol.rivalSolutionId) ifSome { s =>
+            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost, curSol.rivalSolutionId) ifSome { s =>
               db.user.readById(curSol.info authorId) ifSome { u =>
-                rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(solution = s, author = u))
+                rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = u))
               }
             }
 
@@ -411,14 +245,36 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     compete(solutionsForQuest)
   }
 
-  // it should return not user but its option.
-  private def ensureNoDeadlineQuest(user: User): User = {
-    if (user.questDeadlineReached) {
-      deadlineQuest(DeadlineQuestRequest(user)).body.get.user.get
-    } else {
-      user
-    }
-  }
+
+  /**
+   * Add a quest to given friends "mustVote" list
+   */
+  //  def addToMustVoteSolutions(request: AddToMustVoteSolutionsRequest): ApiResult[AddToMustVoteSolutionsResult] = handleDbException {
+  //    val filteredFriends = request.friendIds.filter( request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId).contains(_) )
+  //
+  //    if (request.friendIds.isEmpty) {
+  //      OkApiResult(AddToMustVoteSolutionsResult(request.user))
+  //    } else {
+  //      db.user.populateMustVoteSolutionsList(
+  //        userIds = filteredFriends,
+  //        solutionId = request.solutionId)
+  //
+  //      {
+  //        adjustAssets(AdjustAssetsRequest(
+  //          user = request.user,
+  //          cost = Some(request.user.costOfAskingForHelpWithSolution * request.friendIds.length)))
+  //      } ifOk { r =>
+  //        OkApiResult(AddToMustVoteSolutionsResult(r.user))
+  //      }
+  //    }
+  //  }
+
+
+  //  def getQuestSolutionHelpCost(request: GetQuestSolutionHelpCostRequest): ApiResult[GetQuestSolutionHelpCostResult] = handleDbException {
+  //    import request._
+  //
+  //    OkApiResult(GetQuestSolutionHelpCostResult(OK, Some(user.costOfAskingForHelpWithSolution)))
+  //  }
 
 }
 

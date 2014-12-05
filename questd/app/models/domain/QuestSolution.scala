@@ -4,7 +4,7 @@ import models.domain.base.ID
 import java.util.Date
 
 object QuestSolutionStatus extends Enumeration {
-  val OnVoting, WaitingForCompetitor, Won, Lost, CheatingBanned, IACBanned = Value
+  val WaitingForCompetitor, OnVoting, Won, Lost, CheatingBanned, IACBanned = Value
 }
 
 case class QuestSolution(
@@ -15,6 +15,5 @@ case class QuestSolution(
   questLevel: Int,
   info: QuestSolutionInfo,
   rating: QuestSolutionRating = QuestSolutionRating(),
-  // TODO: remove = new Date() in 0.30
-  voteEndDate: Date = new Date(),
+  voteEndDate: Date,
   status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting) extends ID

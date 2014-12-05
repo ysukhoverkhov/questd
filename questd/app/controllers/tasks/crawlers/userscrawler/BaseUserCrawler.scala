@@ -1,12 +1,8 @@
 package controllers.tasks.crawlers.userscrawler
 
-import akka.actor.Actor
-import akka.actor.Props
 import play.Logger
 import helpers.akka.EasyRestartActor
-import controllers.tasks.messages.DoTask
 import controllers.domain._
-import controllers.domain.app.user._
 import models.domain._
 import logic.LogicBootstrapper
 import components._
