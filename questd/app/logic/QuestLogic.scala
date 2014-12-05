@@ -1,5 +1,7 @@
 package logic
 
+import logic.functions._
+import logic.constants._
 import models.domain._
 import controllers.domain.DomainAPIComponent
 
@@ -8,58 +10,48 @@ class QuestLogic(
   val api: DomainAPIComponent#DomainAPI) {
 
   /**
-   * Calculate level of a quest with current votes.
+   * Get cost of solving the quest.
    */
-  def calculateQuestLevel = {
-    val totalVotes = quest.rating.difficultyRating.easy + quest.rating.difficultyRating.normal + quest.rating.difficultyRating.hard + quest.rating.difficultyRating.extreme
-    val l: Int = (quest.rating.difficultyRating.easy * constants.EasyWeight
-        + quest.rating.difficultyRating.normal * constants.NormalWeight
-        + quest.rating.difficultyRating.hard * constants.HardWeight
-        + quest.rating.difficultyRating.extreme * constants.ExtremeWeight) / totalVotes
-
-    math.min(constants.MaxQuestLevel, math.max(constants.MinQuestLevel, l))
+  def costOfSolving: Assets = {
+    QuestLogic.costOfSolvingQuest(quest.info.level)
   }
 
   /**
-   * Calculate difficulty of a quest.
+   * Passive income a quest generates per day.
+   * @return Passive income.
    */
-  def calculateDifficulty: QuestDifficulty.Value = {
-    List(
-      (QuestDifficulty.Easy, quest.rating.difficultyRating.easy),
-      (QuestDifficulty.Normal, quest.rating.difficultyRating.normal),
-      (QuestDifficulty.Hard, quest.rating.difficultyRating.hard),
-      (QuestDifficulty.Extreme, quest.rating.difficultyRating.extreme)).reduce((l, r) => if (l._2 > r._2) l else r)._1
+  def dailyPassiveIncome: Assets = {
+    Assets(coins = dailyQuestPassiveIncome)
   }
 
   /**
-   * Calculate duration of a quest.
+   * Calculates income we receive for quest likes.
+   * @return Income for likes.
    */
-  def calculateDuration: QuestDuration.Value = {
-    List(
-      (QuestDuration.Minutes, quest.rating.durationRating.mins),
-      (QuestDuration.Hour, quest.rating.durationRating.hour),
-      (QuestDuration.Day, quest.rating.durationRating.day),
-      (QuestDuration.Week, quest.rating.durationRating.week)).reduce((l, r) => if (l._2 > r._2) l else r)._1
+  def dailyIncomeForLikes: Assets = {
+    Assets(coins = dailyQuestIncomeForLikes(quest.rating.likesCount))
   }
 
   /**
-   * Are we able to add quest to rotation.
+   * Gives reward per quest solving for the quest.
+   * @return Reward for each quest solving
    */
-  def shouldAddToRotation = {
-    if ((quest.rating.points > api.config(api.ConfigParams.ProposalLikesToEnterRotation).toLong) && (quest.status == QuestStatus.OnVoting))
-      true
-    else
-      false
+  def rewardForSolution: Assets = {
+    Assets(coins = questIncomeForSolving)
   }
 
   /**
-   * Should we remove quest from rotation.
+   * Penalty for cheating solution
    */
-  def shouldRemoveFromRotation = {
-    if ((quest.rating.points < api.config(api.ConfigParams.ProposalLikesToEnterRotation).toLong / 2) && (quest.status == QuestStatus.InRotation))
-      true
-    else
-      false
+  def penaltyForCheatingSolution = {
+    QuestLogic.rewardForLosingQuest(quest.info.level, api) * QuestSolutionCheatingPenalty
+  }
+
+  /**
+   * Penalty for IAC solution
+   */
+  def penaltyForIACSolution = {
+    QuestLogic.rewardForLosingQuest(quest.info.level, api) * QuestSolutionIACPenalty
   }
 
   /**
@@ -80,17 +72,35 @@ class QuestLogic(
    * Should we decide user is a cheater.
    */
   def shouldBanCheating = {
-    val maxCheatingVotes = api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong
-    (quest.rating.cheating > maxCheatingVotes) && (quest.status == QuestStatus.OnVoting)
-  }
 
-  /**
-   * Should we remove it because it's with us for too long without a reason.
-   */
-  def shouldRemoveQuestFromVotingByTime = {
-    (quest.rating.votersCount > api.config(api.ConfigParams.ProposalVotesToLeaveVoting).toLong) &&
-      ((quest.rating.points.toDouble / quest.rating.votersCount.toDouble) < api.config(api.ConfigParams.ProposalRatioToLeaveVoting).toDouble) &&
-      (quest.status == QuestStatus.OnVoting)
+    val maxCheatingVotes = Math.max(
+      api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * quest.rating.votersCount,
+      api.config(api.ConfigParams.ProposalMinCheatingVotes).toLong)
+
+    quest.rating.cheating > maxCheatingVotes
   }
 }
 
+object QuestLogic {
+  /**
+   * Get cost of solving the quest.
+   */
+  def costOfSolvingQuest(questLevel: Int) = {
+    Assets(coins = coinSelectQuest(questLevel))
+  }
+
+  /**
+   * Reward for lost quest.
+   */
+  def rewardForLosingQuest(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
+    Assets(rating = ratingToLoseQuest(questLevel)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+  }
+
+  /**
+   * Reward for won quest.
+   */
+  def rewardForWinningQuest(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
+    Assets(rating = ratingToWinQuest(questLevel)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+  }
+
+}

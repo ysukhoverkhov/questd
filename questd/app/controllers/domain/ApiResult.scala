@@ -28,7 +28,11 @@ sealed abstract class ApiResult[+T] {
 final case class OkApiResult[T](value: T) extends ApiResult[T] {
   val body = Some(value)
 }
+object OkApiResult {
+  def apply() = new OkApiResult[String]("stub")
+}
+
 final case class NotFoundApiResult() extends ApiResult[Nothing] { val body = None }
 final case class NotAuthorisedApiResult() extends ApiResult[Nothing] { val body = None }
-final case class InternalErrorApiResult() extends ApiResult[Nothing] { val body = None }
+final case class InternalErrorApiResult[T]() extends ApiResult[T] { val body = None }
 

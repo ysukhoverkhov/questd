@@ -1,14 +1,10 @@
 package controllers.tasks
 
-import akka.actor.Props
-import play.Logger
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
 import controllers.tasks.crawlers._
 import controllers.domain.DomainAPIComponent
 import components._
-import models.domain._
-import models.domain.admin._
 import controllers.tasks.config.TasksConfigHolder
 import components.random.RandomComponent
 
