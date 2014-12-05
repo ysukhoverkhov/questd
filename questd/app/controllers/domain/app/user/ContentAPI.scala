@@ -18,13 +18,15 @@ case class GetQuestResult(
 case class GetSolutionRequest(user: User, solutionId: String)
 case class GetSolutionResult(
   allowed: ProfileModificationResult,
-  mySolution: Option[QuestSolutionInfoWithID] = None,
-  myRating: Option[QuestSolutionRating] = None,
-  rivalSolution: Option[QuestSolutionInfoWithID] = None,
-  rivalRating: Option[QuestSolutionRating] = None,
-  rivalProfile: Option[PublicProfileWithID] = None,
+  mySolution: Option[SolutionInfoWithID] = None,
+  myRating: Option[SolutionRating] = None,
   quest: Option[QuestInfoWithID] = None,
   questAuthor: Option[PublicProfileWithID] = None)
+
+case class GetBattleRequest(user: User, battleId: String)
+case class GetBattleResult(
+  allowed: ProfileModificationResult,
+  battle: Option[BattleInfoWithID] = None)
 
 case class GetPublicProfilesRequest(
   user: User,
@@ -35,12 +37,12 @@ case class GetPublicProfilesResult(
 
 case class GetOwnSolutionsRequest(
   user: User,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetOwnSolutionsResult(
   allowed: ProfileModificationResult,
-  solutions: List[QuestSolutionListInfo],
+  solutions: List[SolutionListInfo],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -58,24 +60,24 @@ case class GetOwnQuestsResult(
 case class GetSolutionsForQuestRequest(
   user: User,
   questId: String,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetSolutionsForQuestResult(
   allowed: ProfileModificationResult,
-  solutions: List[QuestSolutionListInfo],
+  solutions: List[SolutionListInfo],
   pageSize: Int,
   hasMore: Boolean)
 
 case class GetSolutionsForUserRequest(
   user: User,
   userId: String,
-  status: List[QuestSolutionStatus.Value],
+  status: List[SolutionStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetSolutionsForUserResult(
   allowed: ProfileModificationResult,
-  solutions: List[QuestSolutionListInfo],
+  solutions: List[SolutionListInfo],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -118,20 +120,26 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       val quest = db.quest.readById(s.info.questId)
       val questInfo = quest.map(q => QuestInfoWithID(q.id, q.info))
       val questAuthor = quest.flatMap(q => db.user.readById(q.info.authorId).map (u => PublicProfileWithID(u.id, u.profile.publicProfile)))
-      val rivalSolution = s.rivalSolutionId.flatMap(id => db.solution.readById(id))
-      val rivalSolutionInfo = rivalSolution.map(rs => QuestSolutionInfoWithID(rs.id, rs.info))
-      val rivalRating = rivalSolution.map(rs => rs.rating)
-      val rivalProfile = rivalSolution.flatMap(rs => db.user.readById(rs.info.authorId)).flatMap(ru => Some(PublicProfileWithID(ru.id, ru.profile.publicProfile)))
 
       OkApiResult(GetSolutionResult(
         allowed = OK,
-        mySolution = Some(QuestSolutionInfoWithID(s.id, s.info)),
+        mySolution = Some(SolutionInfoWithID(s.id, s.info)),
         myRating = Some(s.rating),
-        rivalSolution = rivalSolutionInfo,
-        rivalRating = rivalRating,
-        rivalProfile = rivalProfile,
         quest = questInfo,
         questAuthor = questAuthor))
+    }
+  }
+
+  /**
+   * Get battle by its id.
+   * @param request The request.
+   * @return
+   */
+  def getBattle(request: GetBattleRequest): ApiResult[GetBattleResult] = handleDbException {
+    import request._
+
+    db.battle.readById(battleId) ifSome { battle =>
+      OkApiResult(GetBattleResult(OK, Some(BattleInfoWithID(battle.id, battle.info))))
     }
   }
 
@@ -159,8 +167,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
-      QuestSolutionListInfo(
-        solution = QuestSolutionInfoWithID(s.id, s.info),
+      SolutionListInfo(
+        solution = SolutionInfoWithID(s.id, s.info),
         quest = db.quest.readById(s.info.questId).map(qu => QuestInfoWithID(qu.id, qu.info)),
         author = None)
     })
@@ -199,13 +207,13 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForQuest = db.solution.allWithParams(
-      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains),
+      status = request.status.filter(Set(SolutionStatus.Won, SolutionStatus.Lost).contains),
       questIds = List(request.questId),
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForQuest.take(pageSize).toList.map(s => {
-      QuestSolutionListInfo(
-        solution = QuestSolutionInfoWithID(s.id, s.info),
+      SolutionListInfo(
+        solution = SolutionInfoWithID(s.id, s.info),
         quest = None,
         author = db.user.readById(s.info.authorId).map(us => PublicProfileWithID(us.id, us.profile.publicProfile)))
     })
@@ -225,13 +233,13 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForUser = db.solution.allWithParams(
-      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains),
+      status = request.status.filter(Set(SolutionStatus.Won, SolutionStatus.Lost).contains),
       authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
-      QuestSolutionListInfo(
-        solution = QuestSolutionInfoWithID(s.id, s.info),
+      SolutionListInfo(
+        solution = SolutionInfoWithID(s.id, s.info),
         quest = db.quest.readById(s.info.questId).map(qu => QuestInfoWithID(qu.id, qu.info)),
         author = None)
     })
@@ -251,8 +259,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val questsForUser = db.quest.allWithParams(
-      request.status.filter(Set(QuestStatus.InRotation).contains),
-      List(request.userId),
+      status = request.status.filter(Set(QuestStatus.InRotation).contains),
+      authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
     OkApiResult(GetQuestsForUserResult(

@@ -1,11 +1,8 @@
 package controllers.domain.app.user
 
-import java.util.Date
-
-import controllers.domain.BaseAPISpecs
+import controllers.domain.{BaseAPISpecs, OkApiResult}
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain._
-import controllers.domain.OkApiResult
 import org.mockito.Matchers
 import testhelpers.domainstubs._
 
@@ -45,20 +42,31 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       user.addToAssets(Matchers.eq(u.id), any) returns Some(u)
       user.readById(q.info.authorId) returns Some(author)
       user.storeQuestSolvingInDailyResult(Matchers.eq(q.info.authorId), any, any) returns Some(author)
+      solution.allWithParams(
+        status = any,
+        authorIds = any,
+        authorIdsExclude = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        questIds = any,
+        themeIds = any,
+        cultureId = any) returns List().iterator
 
       val result = api.solveQuest(SolveQuestRequest(u, q.id, s))
 
       there was one(solution).create(
-        QuestSolution(
+        Solution(
           id = anyString,
           u.demo.cultureId.get,
           questLevel = q.info.level,
-          info = QuestSolutionInfo(
+          info = SolutionInfo(
             content = s,
             authorId = u.id,
             questId = q.id,
-            vip = true),
-          voteEndDate = new Date()))
+            vip = true)))
       there was one(quest).readById(q.id)
       there was one(user).recordQuestSolving(Matchers.eq(u.id), Matchers.eq(q.id))
       there was one(user).addEntryToTimeLine(Matchers.eq(u.id), any)
@@ -118,89 +126,5 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 //
 //    }
 
-    "Do not fight with himself in quest" in context {
-
-      val user1 = createUserStub(id = "user1")
-      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = "qid")
-
-      solution.allWithParams(
-        status = List(QuestSolutionStatus.WaitingForCompetitor),
-        questIds = List(mySolution.info.questId)) returns List(mySolution).iterator
-
-      val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
-
-      result must beEqualTo(OkApiResult(TryFightQuestResult()))
-
-      there were no(solution).updateStatus(any, any, any)
-      there were no(user).storeSolutionInDailyResult(any, any)
-    }
-
-    "Receive reward for winning quest battle" in context {
-
-      val quest = createQuestStub("qid")
-      val user1 = createUserStub(id = "user1")
-      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = quest.id, points = 1, status = QuestSolutionStatus.WaitingForCompetitor)
-      val user2 = createUserStub(id = "user2")
-      val rivalSolution = createSolutionStub(id = "solId2", authorId = user2.id, questId = quest.id, points = 0, status = QuestSolutionStatus.WaitingForCompetitor)
-
-      solution.allWithParams(
-        status = List(QuestSolutionStatus.WaitingForCompetitor),
-        questIds = List(mySolution.info.questId)) returns List(mySolution, rivalSolution).iterator
-
-      solution.updateStatus(mySolution.id, QuestSolutionStatus.Won, Some(rivalSolution.id)) returns Some(mySolution.copy(status = QuestSolutionStatus.Won))
-      solution.updateStatus(rivalSolution.id, QuestSolutionStatus.Lost, Some(mySolution.id)) returns Some(rivalSolution.copy(status = QuestSolutionStatus.Lost))
-
-      user.readById(mySolution.info.authorId) returns Some(user1)
-      user.readById(rivalSolution.info.authorId) returns Some(user2)
-
-      db.user.storeSolutionInDailyResult(Matchers.eq(user1.id), any) returns Some(user1)
-      db.user.storeSolutionInDailyResult(Matchers.eq(user2.id), any) returns Some(user2)
-
-      db.quest.readById(quest.id) returns Some(quest)
-
-      val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
-
-      result must beEqualTo(OkApiResult(TryFightQuestResult()))
-
-      there was
-        one(solution).updateStatus(mySolution.id, QuestSolutionStatus.Won, Some(rivalSolution.id)) andThen
-        one(solution).updateStatus(rivalSolution.id, QuestSolutionStatus.Lost, Some(mySolution.id))
-      there were two(user).readById(any)
-      there were two(user).storeSolutionInDailyResult(any, any)
-    }
-
-    "Nominate both as winners in case of equal points" in context {
-
-      val quest = createQuestStub("qid")
-      val user1 = createUserStub(id = "user1")
-      val mySolution = createSolutionStub(id = "solId1", authorId = user1.id, questId = quest.id, points = 5, status = QuestSolutionStatus.WaitingForCompetitor)
-      val user2 = createUserStub(id = "user2")
-      val rivalSolution = createSolutionStub(id = "solId2", authorId = user2.id, questId = quest.id, points = 5, status = QuestSolutionStatus.WaitingForCompetitor)
-
-      solution.allWithParams(
-        status = List(QuestSolutionStatus.WaitingForCompetitor),
-        questIds = List(mySolution.info.questId)) returns List(mySolution, rivalSolution).iterator
-
-      solution.updateStatus(mySolution.id, QuestSolutionStatus.Won, Some(rivalSolution.id)) returns Some(mySolution.copy(status = QuestSolutionStatus.Won))
-      solution.updateStatus(rivalSolution.id, QuestSolutionStatus.Won, Some(mySolution.id)) returns Some(rivalSolution.copy(status = QuestSolutionStatus.Won))
-
-      user.readById(mySolution.info.authorId) returns Some(user1)
-      user.readById(rivalSolution.info.authorId) returns Some(user2)
-
-      db.user.storeSolutionInDailyResult(Matchers.eq(user1.id), any) returns Some(user1)
-      db.user.storeSolutionInDailyResult(Matchers.eq(user2.id), any) returns Some(user2)
-
-      db.quest.readById(quest.id) returns Some(quest)
-
-      val result = api.tryFightQuest(TryFightQuestRequest(mySolution))
-
-      result must beEqualTo(OkApiResult(TryFightQuestResult()))
-
-      there was
-        one(solution).updateStatus(mySolution.id, QuestSolutionStatus.Won, Some(rivalSolution.id)) andThen
-        one(solution).updateStatus(rivalSolution.id, QuestSolutionStatus.Won, Some(mySolution.id))
-      there were two(user).readById(any)
-      there were two(user).storeSolutionInDailyResult(any, any)
-    }
   }
 }

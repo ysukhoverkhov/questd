@@ -1,6 +1,5 @@
 package controllers.domain.app.user
 
-import scala.annotation.tailrec
 import scala.language.postfixOps
 import models.domain._
 import play.Logger
@@ -13,14 +12,15 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 case class SolveQuestRequest(
   user: User,
   questId: String,
-  solution: QuestSolutionInfoContent)
+  solution: SolutionInfoContent)
 case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class RewardSolutionAuthorRequest(solution: QuestSolution, author: User)
+case class RewardSolutionAuthorRequest(solution: Solution, author: User)
 case class RewardSolutionAuthorResult()
 
-case class TryFightQuestRequest(solution: QuestSolution)
+case class TryFightQuestRequest(solution: Solution)
 case class TryFightQuestResult()
+
 
 //case class GetQuestSolutionHelpCostRequest(user: User)
 //case class GetQuestSolutionHelpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
@@ -29,8 +29,6 @@ case class TryFightQuestResult()
 //case class AddToMustVoteSolutionsResult(user: User)
 
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
-
-
 
   /**
    * Solve a quest.
@@ -52,15 +50,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
             user.demo.cultureId ifSome { culture =>
 
-              val solution = QuestSolution(
+              val solution = Solution(
                 cultureId = culture,
                 questLevel = questToSolve.info.level,
-                info = QuestSolutionInfo(
+                info = SolutionInfo(
                   content = content,
                   authorId = user.id,
                   questId = questToSolve.id,
-                  vip = user.profile.publicProfile.vip),
-                voteEndDate = user.solutionVoteEndDate(questToSolve.info))
+                  vip = user.profile.publicProfile.vip))
 
               {
                 // Adjusting assets for solving quests.
@@ -108,7 +105,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 //                } ifOk { r =>
                 //                  addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id))
               } ifOk { r =>
-                OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
+                tryCreateBattle(TryCreateBattleRequest(solution)) ifOk {
+                  OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
+                }
               }
             }
 
@@ -136,24 +135,24 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     try {
       val r = solution.status match {
-          // FIX: implement this part.
-//        case QuestSolutionStatus.OnVoting =>
-//          Logger.error("We are rewarding player for solution what is on voting.")
-//          InternalErrorApiResult()
-//
-//        case QuestSolutionStatus.WaitingForCompetitor =>
-//          tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
+        case SolutionStatus.WaitingForCompetitor =>
+          Logger.error("We are rewarding player for solution what is waitin for competitor.")
+          InternalErrorApiResult()
 
-        case QuestSolutionStatus.Won =>
+        case SolutionStatus.OnVoting =>
+          Logger.error("We are rewarding player for solution what is on voting.")
+          InternalErrorApiResult()
+
+        case SolutionStatus.Won =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(q.info.solveRewardWon)))
 
-        case QuestSolutionStatus.Lost =>
+        case SolutionStatus.Lost =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(q.info.solveRewardLost)))
 
-        case QuestSolutionStatus.CheatingBanned =>
+        case SolutionStatus.CheatingBanned =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(q.penaltyForCheatingSolution)))
 
-        case QuestSolutionStatus.IACBanned =>
+        case SolutionStatus.IACBanned =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(q.penaltyForIACSolution)))
       }
 
@@ -166,85 +165,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         InternalErrorApiResult()
     }
   }
-
-  /**
-   * Tries to find competitor to us on quest and resolve our battle. Updates db after that.
-   */
-  def tryFightQuest(request: TryFightQuestRequest): ApiResult[TryFightQuestResult] = handleDbException {
-    // 1. find all solutions with the same quest id with status waiting for competitor.
-
-    val solutionsForQuest = db.solution.allWithParams(
-      status = List(QuestSolutionStatus.WaitingForCompetitor),
-      questIds = List(request.solution.info.questId))
-
-    def fight(s1: QuestSolution, s2: QuestSolution): (List[QuestSolution], List[QuestSolution]) = {
-      if (s1.calculatePoints == s2.calculatePoints)
-        (List(s1, s2), List())
-      else if (s1.calculatePoints > s2.calculatePoints)
-        (List(s1), List(s2))
-      else
-        (List(s2), List(s1))
-    }
-
-    @tailrec
-    def compete(solutions: Iterator[QuestSolution]): ApiResult[TryFightQuestResult] = {
-      if (solutions.hasNext) {
-        val other = solutions.next()
-
-        if (other.info.authorId != request.solution.info.authorId) {
-
-          Logger.debug("Found fight pair for quest " + request.solution + ":")
-          Logger.debug("  s1.id=" + request.solution.id)
-          Logger.debug("  s2.id=" + other.id)
-
-          // Updating solution rivals
-          val ourSol = request.solution.copy(rivalSolutionId = Some(other.id))
-          val otherSol = other.copy(rivalSolutionId = Some(request.solution.id))
-
-          // Compare two solutions.
-          val (winners, losers) = fight(otherSol, ourSol)
-
-          // update solutions, winners
-          for (curSol <- winners) {
-            Logger.debug("  winner id=" + curSol.id)
-
-            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Won, curSol.rivalSolutionId) ifSome { s =>
-              db.user.readById(curSol.info.authorId) ifSome { u =>
-                rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = u))
-              }
-            }
-
-          }
-
-          // and losers
-          for (curSol <- losers) {
-            Logger.debug("  loser id=" + curSol.id)
-
-            db.solution.updateStatus(curSol.id, QuestSolutionStatus.Lost, curSol.rivalSolutionId) ifSome { s =>
-              db.user.readById(curSol.info authorId) ifSome { u =>
-                rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = u))
-              }
-            }
-
-          }
-
-          OkApiResult(TryFightQuestResult())
-
-        } else {
-
-          // Skipping to next if current is we are.
-          compete(solutions)
-        }
-      } else {
-
-        // We didn;t find competitor but this is ok.
-        OkApiResult(TryFightQuestResult())
-      }
-    }
-
-    compete(solutionsForQuest)
-  }
-
 
   /**
    * Add a quest to given friends "mustVote" list

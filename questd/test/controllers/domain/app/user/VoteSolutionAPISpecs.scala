@@ -47,7 +47,7 @@ class VoteSolutionAPISpecs extends BaseAPISpecs {
 
       val sid = "solution id"
       val friendId = "friendId"
-      val s = createSolutionStub(id = sid, authorId = friendId)
+      val s = createSolutionStub(id = sid, authorId = friendId, status = SolutionStatus.Won)
       val q = createQuestStub()
       val u = createUserStub(
         id = "uniqueid",
@@ -71,9 +71,6 @@ class VoteSolutionAPISpecs extends BaseAPISpecs {
         solutionId = sid,
         vote = ContentVote.Cool))
 
-      result must beAnInstanceOf[OkApiResult[VoteSolutionResult]]
-      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
-
       there was one(solution).updatePoints(
         any,
         any,
@@ -82,6 +79,9 @@ class VoteSolutionAPISpecs extends BaseAPISpecs {
         any,
         any,
         any)
+
+      result must beAnInstanceOf[OkApiResult[VoteSolutionResult]]
+      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
     }
 
   }

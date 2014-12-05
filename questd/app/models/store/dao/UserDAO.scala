@@ -78,6 +78,15 @@ trait UserDAO extends BaseDAO[User] {
 
   def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit
 
+
+  /**
+   * Set new time to populate time line at.
+   * @param id id of a user to set time.
+   * @param time New time.
+   * @return Updated user.
+   */
+  def setTimeLinePopulationTime(id: String, time: Date): Option[User]
+
   /**
    * Adds one entry to time line.
    * @param id Id of a user to add to.
