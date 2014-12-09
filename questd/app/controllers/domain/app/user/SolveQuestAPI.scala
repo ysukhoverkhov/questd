@@ -69,7 +69,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       case OK =>
 
         // Updating quest info.
-        val v = if (user.stats.questsAcceptedPast > 0) {
+        // TODO: clean me up.
+        val v = if (user.profile.questSolutionContext.purchasedQuest != None) {
 
           user.profile.questSolutionContext.purchasedQuest ifSome { q =>
             db.quest.readById(q.id) ifSome { q =>
