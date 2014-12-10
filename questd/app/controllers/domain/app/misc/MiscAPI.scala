@@ -20,6 +20,5 @@ private[domain] trait MiscAPI { this: DBAccessor =>
   def getTime(request: GetTimeRequest): ApiResult[GetTimeResult] = handleDbException {
     OkApiResult(GetTimeResult(DateTime.now(DateTimeZone.UTC).toDate()))
   }
-
 }
 
