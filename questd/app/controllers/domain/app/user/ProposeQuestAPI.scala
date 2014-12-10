@@ -1,12 +1,11 @@
 package controllers.domain.app.user
 
+import components._
+import controllers.domain._
+import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.helpers._
 import models.domain._
 import models.domain.view._
-import play.Logger
-import controllers.domain.helpers._
-import controllers.domain._
-import components._
-import controllers.domain.app.protocol.ProfileModificationResult._
 
 case class GetQuestThemeCostRequest(user: User)
 case class GetQuestThemeCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
@@ -251,8 +250,7 @@ private[domain] trait ProposeQuestAPI { this: DomainAPIComponent#DomainAPI with 
 
     val r = quest.status match {
       case QuestStatus.OnVoting =>
-        Logger.error("We are rewarding player for proposal what is on voting.")
-        InternalErrorApiResult()
+        InternalErrorApiResult("We are rewarding player for proposal what is on voting")
       case QuestStatus.InRotation =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, reward = Some(quest.approveReward)))
 

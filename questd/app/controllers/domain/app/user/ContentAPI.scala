@@ -1,13 +1,11 @@
 package controllers.domain.app.user
 
-import models.domain._
-import controllers.domain.DomainAPIComponent
 import components._
-import controllers.domain._
-import controllers.domain.helpers._
-import models.domain.view._
-import play.Logger
+import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.helpers._
+import models.domain._
+import models.domain.view._
 
 case class GetQuestRequest(user: User, questId: String)
 case class GetQuestResult(
@@ -113,8 +111,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     import request._
 
     db.solution.readById(solutionId).fold[ApiResult[GetSolutionResult]] {
-      Logger.error("API - getSolution. Unable to find solution in db with id = " + solutionId)
-      InternalErrorApiResult()
+      InternalErrorApiResult(s"API - getSolution. Unable to find solution in db with id = $solutionId")
     } { s =>
 
       val quest = db.quest.readById(s.info.questId)

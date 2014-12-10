@@ -58,8 +58,7 @@ private[domain] trait VoteQuestProposalAPI { this: DomainAPIComponent#DomainAPI 
 
         db.quest.readById(request.user.profile.questProposalVoteContext.reviewingQuest.get.id) match {
           case None =>
-            Logger.error("Unable to find quest with id for voting " + request.user.profile.questProposalVoteContext.reviewingQuest.get.id)
-            InternalErrorApiResult()
+            InternalErrorApiResult(s"Unable to find quest with id for voting ${request.user.profile.questProposalVoteContext.reviewingQuest.get.id}")
           case Some(q) => {
 
             voteQuest(VoteQuestUpdateRequest(q, request.vote, request.duration, request.difficulty))

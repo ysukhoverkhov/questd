@@ -305,8 +305,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     try {
       val r = solution.status match {
         case QuestSolutionStatus.OnVoting =>
-          Logger.error("We are rewarding player for solution what is on voting.")
-          InternalErrorApiResult()
+          InternalErrorApiResult("We are rewarding player for solution what is on voting")
 
         case QuestSolutionStatus.WaitingForCompetitor =>
           tryFightQuest(TryFightQuestRequest(solution)) ifOk OkApiResult(StoreSolutionInDailyResultResult(author))
@@ -329,8 +328,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       }
     } catch {
       case ex: QuestNotFoundException =>
-        Logger.error("No quest found for updating player assets for changing solution state.")
-        InternalErrorApiResult()
+        InternalErrorApiResult("No quest found for updating player assets for changing solution state")
     }
   }
 

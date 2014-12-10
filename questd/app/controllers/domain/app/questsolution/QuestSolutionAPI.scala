@@ -1,14 +1,11 @@
 package controllers.domain.app.questsolution
 
-import models.domain._
-import models.store._
 import components._
 import controllers.domain._
-import controllers.domain.helpers._
 import controllers.domain.app.user._
-import logic._
+import controllers.domain.helpers._
+import models.domain._
 import play.Logger
-import models.domain.QuestSolutionVote._
 
 case class VoteQuestSolutionUpdateRequest(
   solution: QuestSolution,
@@ -24,8 +21,8 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
    * Updates quest according to vote.
    */
   def voteQuestSolutionUpdate(request: VoteQuestSolutionUpdateRequest): ApiResult[VoteQuestSolutionUpdateResult] = handleDbException {
+    import models.domain.QuestSolutionVote._
     import request._
-    import QuestSolutionVote._
 
     Logger.debug("API - voteQuestSolutionUpdate")
 
@@ -85,7 +82,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
       checkAICSolution _)
 
     val updatedSolution = funcs.foldLeft[Option[QuestSolution]](Some(solution))((r, f) => {
-      r.flatMap(f(_))
+      r.flatMap(f)
     })
 
     updatedSolution ifSome { s =>
@@ -94,13 +91,10 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
           val authorId = solution.info.authorId
 
           db.user.readById(authorId) match {
-            case None => {
-              Logger.error("Unable to find author of quest solution user " + authorId)
-              InternalErrorApiResult()
-            }
-            case Some(author) => {
+            case None =>
+              InternalErrorApiResult(s"Unable to find author of quest solution user $authorId")
+            case Some(author) =>
               rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(s, author))
-            }
           }
         } else {
           OkApiResult(None)

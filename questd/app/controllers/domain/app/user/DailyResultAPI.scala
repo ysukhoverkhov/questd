@@ -40,8 +40,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     u match {
       case Some(u: User) => OkApiResult(ShiftDailyResultResult(u))
       case _ =>
-        Logger.error("API - shiftDailyResult. user is not in db after update.")
-        InternalErrorApiResult()
+        InternalErrorApiResult("API - shiftDailyResult. user is not in db after update.")
     }
   }
 

@@ -92,8 +92,7 @@ private[domain] trait AuthAPI {
         }
 
       case _ =>
-        Logger.error("Wrong request for user.")
-        InternalErrorApiResult()
+        InternalErrorApiResult("Wrong request for user")
     }
   }
 

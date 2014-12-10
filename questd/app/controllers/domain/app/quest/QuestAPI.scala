@@ -115,8 +115,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         val authorId = quest.info.authorId
         db.user.readById(authorId) match {
           case None =>
-            Logger.error("Unable to find author of quest user " + authorId)
-            InternalErrorApiResult()
+            InternalErrorApiResult.apply(s"Unable to find author of quest user $authorId")
           case Some(author) =>
             rewardQuestProposalAuthor(RewardQuestProposalAuthorRequest(q, author))
         }
