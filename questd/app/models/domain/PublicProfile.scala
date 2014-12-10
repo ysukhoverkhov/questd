@@ -1,6 +1,5 @@
 package models.domain
 
-import java.util.Date
 
 import models.domain.base.ID
 

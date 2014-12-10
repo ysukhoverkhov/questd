@@ -23,18 +23,22 @@ private[domain] trait AuthAPI {
    */
   def login(request: LoginRequest): ApiResult[LoginResult] = handleDbException {
 
-    def login(user: User) = {
+    def loginUser(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString
       db.user.updateSessionId(user.id, uuid)
 
       // Update here country from time to time.
       updateUserCulture(UpdateUserCultureRequest(user)) ifOk {
-        api.processFriendshipInvitationsFromSN(ProcessFriendshipInvitationsFromSNRequest(user, request.snuser))
-        OkApiResult(LoginResult(uuid))
+        api.processFriendshipInvitationsFromSN(ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
+          case InternalErrorApiResult() =>
+            InternalErrorApiResult[LoginResult]()
+          case _ =>
+            OkApiResult(LoginResult(uuid))
+        }
       }
     }
 
-    def createUserAndLogin = {
+    def createUserAndLogin() = {
       Logger.debug("No user with FB id found, creating new one " + request.snuser.snId)
 
       val newUser = User(
@@ -56,7 +60,7 @@ private[domain] trait AuthAPI {
 
       db.user.readBySNid(request.snName, request.snuser.snId) ifSome { user =>
           Logger.debug("New user with FB created " + user)
-          login(user)
+          loginUser(user)
       }
     }
 
@@ -65,11 +69,11 @@ private[domain] trait AuthAPI {
     db.user.readBySNid(request.snName, request.snuser.snId) match {
       case None =>
         Logger.debug("New user login with FB")
-        createUserAndLogin
+        createUserAndLogin()
 
       case Some(user) =>
         Logger.debug("Existing user login with FB " + user)
-        login(user)
+        loginUser(user)
     }
   }
 

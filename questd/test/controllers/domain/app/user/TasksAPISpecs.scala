@@ -38,7 +38,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       val u = createUser(DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.AddToShortList,
+            taskType = TaskType.AddToFollowing,
             description = "",
             requiredCount = 10,
             currentCount = 0),
@@ -64,7 +64,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       val u = createUser(DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.AddToShortList,
+            taskType = TaskType.AddToFollowing,
             description = "",
             requiredCount = 10,
             currentCount = 0),
@@ -89,7 +89,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       val u = createUser(DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.AddToShortList,
+            taskType = TaskType.AddToFollowing,
             description = "",
             requiredCount = 10,
             currentCount = 4),
@@ -128,7 +128,7 @@ class TasksAPISpecs extends BaseAPISpecs {
         reward = r,
         tasks = List(
           Task(
-            taskType = TaskType.AddToShortList,
+            taskType = TaskType.AddToFollowing,
             description = "",
             requiredCount = 10,
             currentCount = 10),
@@ -171,7 +171,7 @@ class TasksAPISpecs extends BaseAPISpecs {
         reward = r,
         tasks = List(
           Task(
-            taskType = TaskType.AddToShortList,
+            taskType = TaskType.AddToFollowing,
             description = "",
             requiredCount = 10,
             currentCount = 10),
@@ -214,7 +214,7 @@ class TasksAPISpecs extends BaseAPISpecs {
         reward = r,
         tasks = List(
           Task(
-            taskType = TaskType.AddToShortList,
+            taskType = TaskType.AddToFollowing,
             description = "",
             requiredCount = 10,
             currentCount = 10),
@@ -254,7 +254,7 @@ class TasksAPISpecs extends BaseAPISpecs {
         reward = r,
         tasks = List(
           Task(
-            taskType = TaskType.AddToShortList,
+            taskType = TaskType.AddToFollowing,
             description = "",
             requiredCount = 10,
             currentCount = 10),
@@ -299,7 +299,7 @@ class TasksAPISpecs extends BaseAPISpecs {
         rewardReceived = true,
         tasks = List(
           Task(
-            taskType = TaskType.AddToShortList,
+            taskType = TaskType.AddToFollowing,
             description = "",
             requiredCount = 10,
             currentCount = 10),

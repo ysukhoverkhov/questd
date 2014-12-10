@@ -3,42 +3,31 @@ package controllers.web.rest.component
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
 import controllers.web.rest.protocol._
-import models.domain._
+import models.domain.{ContentType, ContentReference, QuestSolutionInfoContent}
 
 trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
-  def getQuestCost = wrapApiCallReturnBody[WSGetQuestCostResult] { r =>
-    api.getQuestCost(GetQuestCostRequest(r.user))
-  }
+  def solveQuest = wrapJsonApiCallReturnBody[WSSolveQuestResult] { (js, r) =>
+    import scala.language.implicitConversions
 
-  def purchaseQuest = wrapApiCallReturnBody[WSPurchaseQuestResult] { r =>
-    api.purchaseQuest(PurchaseQuestRequest(r.user))
-  }
+    // TODO: find similar function elsewhere and remove code dup. perhaps move it to WSContentReference (move others as well.)
 
-  def getTakeQuestCost = wrapApiCallReturnBody[WSGetTakeQuestCostResult] { r =>
-    api.getTakeQuestCost(GetTakeQuestCostRequest(r.user))
-  }
+    implicit def toContentReference(v: WSContentReference): ContentReference = {
+      ContentReference(
+        contentType = ContentType.withName(v.contentType),
+        storage = v.storage,
+        reference = v.reference
+      )
+    }
+    implicit def toQuestInfoContent(v: WSSolveQuestRequest): QuestSolutionInfoContent = {
+      QuestSolutionInfoContent(
+        media = v.media,
+        icon = v.icon.map(r => r))
+    }
 
-  def takeQuest = wrapApiCallReturnBody[WSTakeQuestResult] { r =>
-    api.takeQuest(TakeQuestRequest(r.user))
-  }
+    val v = Json.read[WSSolveQuestRequest](js.toString)
 
-  def proposeSolution = wrapJsonApiCallReturnBody[WSProposeSolutionResult] { (js, r) =>
-    val v = Json.read[QuestSolutionInfoContent](js.toString)
-
-    api.proposeSolution(ProposeSolutionRequest(r.user, v))
-  }
-
-  def getQuestGiveUpCost = wrapApiCallReturnBody[WSGetQuestGiveUpCostResult] { r =>
-    api.getQuestGiveUpCost(GetQuestGiveUpCostRequest(r.user))
-  }
-
-  def giveUpQuest = wrapApiCallReturnBody[WSGiveUpQuestResult] { r =>
-    api.giveUpQuest(GiveUpQuestRequest(r.user))
-  }
-
-  def getQuestSolutionHelpCost = wrapApiCallReturnBody[WSGetQuestSolutionHelpCostResult] { r =>
-    api.getQuestSolutionHelpCost(GetQuestSolutionHelpCostRequest(r.user))
+    api.solveQuest(SolveQuestRequest(r.user, v.questId, v))
   }
 }
 

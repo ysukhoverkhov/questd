@@ -3,58 +3,21 @@ package logic
 import internal.gainratingfunctions._
 import internal.gaincoinsfunctions._
 import internal.spendcoinsfunctions._
-import internal.spendratingfunctions._
 import logic.internal.basefunctions._
-import models.domain.Functionality._
 import constants._
 
 object functions {
 
   /**
    * ************************
-   * Proposing quests.
+   * Creating quests.
    * ************************
    */
 
   /**
-   * Rating to give user for successful (approved) proposal at a level.
-   */
-  def ratingForProposalAtLevel(level: Int): Int = {
-    val proposalPeriodAtMaxLevel = 2
-
-    (proposalPeriodAtMaxLevel * ratingForSubmitProposal(level) * math.pow(MaxLevel.toDouble / level, 3)).toInt
-  }
-
-  /**
    * Period in days to give players a task to make quest.
    */
-  def questProposalPeriod(level: Int): Int = math.round(ratingForProposalAtLevel(level).toFloat / ratingForSubmitProposal(level).toFloat)
-
-  /**
-   * Cost to skip a single theme for proposal.
-   */
-  def costToSkipTheme(level: Int, skipNumber: Int): Int = {
-    if (skipNumber == 0) {
-      0
-    } else {
-      def costToSkipProposalInt(level: Int, skipNumber: Int, k: Double) = {
-        k * math.pow(40.0 / 32.0, skipNumber)
-      }
-
-      def kf(level: Int) = {
-        coinsShuffleTheme(level) / (1 to NumberOfThemesSkipsForCoins).map(x => costToSkipProposalInt(level, x, 1)).sum
-      }
-
-      math.round(costToSkipProposalInt(level, skipNumber, kf(level)) * questProposalPeriod(level)).toInt
-    }
-  }
-
-  /**
-   * Cost to propose a single quest.
-   */
-  def costToTakeQuestTheme(level: Int): Int = {
-    math.round(coinProposeQuest(level) * questProposalPeriod(level)).toInt
-  }
+  def questProposalPeriod(level: Int): Int = 7
 
   /**
    * Takes proposal period into account.
@@ -66,44 +29,23 @@ object functions {
   }
 
   /**
-   * Cost to give up quest proposal.
-   */
-  def ratingToGiveUpQuestProposal(level: Int): Int = {
-    math.round(ratingForSubmitProposal(level) * questProposalPeriod(level) * QuestProposalGiveUpPenalty).toInt
-  }
-
-  /**
    * *********************
-   * Purchasing of quests.
+   * Solving quests.
    * *********************
    */
 
   /**
-   * Cost to skip a single proposal
+   * How much coins does it takes to solve quest.
    */
-  def costToSkipQuest(level: Int, skipNumber: Int, currentQuestDuration: Int): Int = {
-    assert(skipNumber >= 0)
+  def coinSelectQuest(level: Int): Int = {
 
-    if (skipNumber == 0) {
-      0
-    } else {
-      def costToSkipQuestInt(level: Int, skipNumber: Int, k: Double) = {
-        k * math.pow(4.0 / 3.0, skipNumber)
-      }
+    def coinSelectQuestInt(level: Int, k: Double, d: Double, b: Double) = megaf(level, k, d, b, 0)
 
-      def kf(level: Int) = {
-        coinShuffleQuest(level) / (1 to NumberOfQuestsSkipsForCoins).map(x => costToSkipQuestInt(level, x, 1)).sum
-      }
+    val k = 162.15924
+    val d = 4.593018
+    val b = -150.641173
 
-      math.round(costToSkipQuestInt(level, skipNumber, kf(level)) * currentQuestDuration).toInt
-    }
-  }
-
-  /**
-   * How much coins does it takes to take quest for solving.
-   */
-  def costToTakeQuestToSolve(level: Int, questDuration: Int): Int = {
-    math.round(coinSelectQuest(level) * questDuration).toInt
+    math.round(coinSelectQuestInt(level, k, d, b)).toInt
   }
 
   /**
@@ -114,81 +56,49 @@ object functions {
     4
   }
 
-
   /**
-   * How much in rating we will lose in case of giving quest up.
-   */
-  def ratingToGiveUpQuest(level: Int, questDuration: Int): Int = {
-    math.round(ratingForSubmitResult(level) * questDuration * QuestSolutionGiveUpPenalty).toInt
-  }
-
-  /**
+   * @param level level of the quest.
    * How much rating we will receive for losing quest.
    */
-  def ratingToLoseQuest(level: Int, questDuration: Int): Int = {
-    math.round(ratingForSubmitResult(level) * questDuration * QuestLosingMultiplier).toInt
+  def ratingToLoseQuest(level: Int): Int = {
+    math.round(ratingForSubmitResult(level) * QuestLosingMultiplier).toInt
   }
 
   /**
+   * @param level level of the quest.
    * How much rating we will receive for winning quest.
    */
-  def ratingToWinQuest(level: Int, questDuration: Int): Int = {
-    ratingToLoseQuest(level, questDuration) * QuestVictoryMultiplier
+  def ratingToWinQuest(level: Int): Int = {
+    ratingToLoseQuest(level) * QuestVictoryMultiplier
   }
 
   /**
-   * ***********************
-   * Voting quest proposals.
-   * ***********************
+   * *************************
+   * Quests income
+   * *************************
    */
 
   /**
-   * Number of rewarded proposal votes per level.
+   * Passive income for each of our quests.
+   * @return the income.
    */
-  def rewardedProposalVotesPerLevel(level: Int): Int = {
-    math.floor(4 * math.pow(level + 1 - levelFor(VoteQuestProposals), 0.39)).toInt
+  def dailyQuestPassiveIncome: Int = 50
+
+  /**
+   * Return income for likes of quests.
+   * @param likesCount Number of likes quest received so far.
+   * @return Coins for likes.
+   */
+  def dailyQuestIncomeForLikes(likesCount: Int): Int = {
+    import Math._
+    min(100, ceil(likesCount * 0.5)).toInt
   }
 
   /**
-   * How much rating we will receive for voting quest proposal.
+   * Coins income for quest solving.
+   * @return Number of coins as a reward
    */
-  def rewardForVotingProposal(level: Int, voteNumber: Int): Int = {
-
-    def kf(level: Int): Double = coinForVoteProposal(level) / (1 to rewardedProposalVotesPerLevel(level)).map(x => rewardForVotingProposalInt(level, x, 1)).sum
-
-    def rewardForVotingProposalInt(level: Int, voteNumber: Int, k: Double) = {
-      k * rewardFunction(voteNumber.toDouble / (rewardedProposalVotesPerLevel(level) + 1))
-    }
-
-    math.round(rewardForVotingProposalInt(level, voteNumber, kf(level)).toFloat)
-  }
-
-  /**
-   * ***********************
-   * Voting quest solutions.
-   * ***********************
-   */
-
-  /**
-   * Number of rewarded solution votes per level.
-   */
-  def rewardedSolutionVotesPerLevel(level: Int): Int = {
-    math.floor(10 * math.pow(level + 1 - levelFor(VoteQuestSolutions), 0.3)).toInt
-  }
-
-  /**
-   * How much rating we will receive for voting quest solution.
-   */
-  def rewardForVotingSolution(level: Int, voteNumber: Int): Int = {
-
-    def kf(level: Int): Double = coinForVoteResult(level) / (1 to rewardedSolutionVotesPerLevel(level)).map(x => rewardForVotingSolutionInt(level, x, 1)).sum
-
-    def rewardForVotingSolutionInt(level: Int, voteNumber: Int, k: Double) = {
-      k * rewardFunction(voteNumber.toDouble / (rewardedSolutionVotesPerLevel(level) + 1))
-    }
-
-    math.max(1, math.round(rewardForVotingSolutionInt(level, voteNumber, kf(level)).toFloat))
-  }
+  def questIncomeForSolving: Int = 25
 
   /**
    * *************************
@@ -196,9 +106,10 @@ object functions {
    * *************************
    */
 
-  def dailyRatingDecrease(level: Int): Int = {
-    math.round(ratDecrease(level)).toInt
+  def dailyCoinsSalary(level: Int): Int = {
+    math.round(coinForVoteResult(level)).toInt
   }
+
 
   /**
    * ********************
@@ -224,26 +135,25 @@ object functions {
    */
 
   def maxNumberOfFriendsOnLevel(level: Int): Int = {
-    math.round((NumberOfFreindsOnLastLevel / coinToSpentDailyFriendsOnly(MaxLevel)) * coinToSpentDailyFriendsOnly(level)).toInt
+    math.floor(((NumberOfFriendsOnLastLevel - 1) / coinToSpentDailyFriendsOnly(MaxLevel)) * coinToSpentDailyFriendsOnly(level) + 1).toInt
   }
 
-  def costToInviteFriend(level: Int, levelDifference: Int): Int = {
-
-    def costToInviteFriendCoef(levelDif: Int) = {
-      math.pow(0.78475, levelDif)
-    }
-
-    math.round(costToInviteFriendCoef(levelDifference) * coinAddFriend(level)).toInt
+  /**
+   * Calculates cost to invite a friend to become our friend.
+   * @param level level of a potential friend.
+   * @return cost in coins.
+   */
+  def costToInviteFriend(level: Int): Int = {
+    math.round(coinAddFriend(level)).toInt
   }
 
   /**
    * ********************
-   * Shortlist
+   * Following
    * ********************
    */
-  def costToShortlistPerson(level: Int): Int = {
-    math.round(coinAddShort(level) / 3).toInt
+  def costToFollowPerson(level: Int): Int = {
+    0
   }
-
 }
 

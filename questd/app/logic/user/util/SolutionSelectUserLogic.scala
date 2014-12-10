@@ -12,25 +12,30 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     List(
       () => getSolutionsWithSuperAlgorithm,
       () => getOtherSolutions.getOrElse(List().iterator),
-      () => getAllSolutions.getOrElse(List().iterator)).
+      () => getAnySolutions.getOrElse(List().iterator),
+      () => getAnySolutionsIgnoringLevels.getOrElse(List().iterator)).
       foldLeft[Option[QuestSolution]](None)((run, fun) => {
         if (run == None) {
-          selectQuestSolution(fun(), user.history.votedQuestSolutionIds)
+          selectQuestSolution(fun(), List(solutionIdsToExclude()))
         } else {
           run
         }
       })
   }
 
-  def getSolutionsWithSuperAlgorithm: Iterator[QuestSolution] = {
-    val algs = List(
+  private def solutionIdsToExclude() = {
+    user.timeLine.map(_.objectId)
+  }
+
+  private def getSolutionsWithSuperAlgorithm: Iterator[QuestSolution] = {
+    val algorithms = List(
       () => getTutorialSolutions,
       () => getHelpWantedSolutions,
       () => getSolutionsOfOwnQuests,
       () => getStartingSolutions,
       () => getDefaultSolutions)
 
-      selectFromChain(algs, default = List().iterator)
+      selectFromChain(algorithms, default = List().iterator)
   }
 
   private[user] def getTutorialSolutions: Option[Iterator[QuestSolution]] = {
@@ -44,7 +49,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     if (user.mustVoteSolutions.nonEmpty) {
       Some(api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(
         user,
-        QuestSolutionStatus.OnVoting)).body.get.solutions)
+        List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost))).body.get.solutions)
     } else {
       None
     }
@@ -55,7 +60,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     val solutions = api.getSolutionsForOwnQuests(GetSolutionsForOwnQuestsRequest(
       user,
-      QuestSolutionStatus.OnVoting)).body.get.solutions
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost))).body.get.solutions
 
     if (solutions.isEmpty) None else Some(solutions)
   }
@@ -81,7 +86,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     val algs = List(
       (api.config(api.ConfigParams.SolutionProbabilityFriends).toDouble, () => getFriendsSolutions),
-      (api.config(api.ConfigParams.SolutionProbabilityShortlist).toDouble, () => getShortlistSolutions),
+      (api.config(api.ConfigParams.SolutionProbabilityFollowing).toDouble, () => getFollowingSolutions),
       (api.config(api.ConfigParams.SolutionProbabilityLiked).toDouble, () => getSolutionsForLikedQuests),
       (api.config(api.ConfigParams.SolutionProbabilityStar).toDouble, () => getVIPSolutions),
       (1.00, () => getOtherSolutions) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
@@ -94,15 +99,15 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning Solutions from friends")
     Some(api.getFriendsSolutions(GetFriendsSolutionsRequest(
       user,
-      QuestSolutionStatus.OnVoting,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
       levels)).body.get.solutions)
   }
 
-  private[user] def getShortlistSolutions = {
-    Logger.trace("  Returning solutions from shortlist")
-    Some(api.getShortlistSolutions(GetShortlistSolutionsRequest(
+  private[user] def getFollowingSolutions = {
+    Logger.trace("  Returning solutions from Following")
+    Some(api.getFollowingSolutions(GetFollowingSolutionsRequest(
       user,
-      QuestSolutionStatus.OnVoting,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
       levels)).body.get.solutions)
   }
 
@@ -110,7 +115,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning solutions for quests we liked recently")
     Some(api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
       user,
-      QuestSolutionStatus.OnVoting,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
       levels)).body.get.solutions)
   }
 
@@ -122,7 +127,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     Some(api.getVIPSolutions(GetVIPSolutionsRequest(
       user,
-      QuestSolutionStatus.OnVoting,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
       levels,
       themeIds)).body.get.solutions)
   }
@@ -135,18 +140,27 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     Some(api.getAllSolutions(GetAllSolutionsRequest(
       user,
-      QuestSolutionStatus.OnVoting,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
       levels,
       themeIds)).body.get.solutions)
   }
 
-  private[user] def getAllSolutions = {
-    Logger.trace("  Returning from all solutions")
+  private[user] def getAnySolutions = {
+    Logger.trace("  Returning from all solutions (not ignoring levels)")
 
     Some(api.getAllSolutions(GetAllSolutionsRequest(
       user,
-      QuestSolutionStatus.OnVoting,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
       levels)).body.get.solutions)
+  }
+
+  private[user] def getAnySolutionsIgnoringLevels = {
+    Logger.trace("  Returning from all solutions (not ignoring levels)")
+
+    Some(api.getAllSolutions(GetAllSolutionsRequest(
+      user,
+      List(QuestSolutionStatus.Won, QuestSolutionStatus.Lost),
+      None)).body.get.solutions)
   }
 
   /**
@@ -154,18 +168,19 @@ trait SolutionSelectUserLogic { this: UserLogic =>
    */
   private def levels: Option[(Int, Int)] = {
     Some((
-      user.profile.publicProfile.level - SolutionLevelDownTolerance,
-      user.profile.publicProfile.level + SolutionLevelUpTolerance))
+      user.profile.publicProfile.level - TimeLineContentLevelSigma,
+      user.profile.publicProfile.level + TimeLineContentLevelSigma))
   }
 
+  // FIX: change it to tags.
   private def selectRandomThemes(count: Int): List[String] = {
-    if (user.history.themesOfSelectedQuests.length > 0) {
-      for (i <- (1 to count).toList) yield {
-        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
-      }
-    } else {
+//    if (user.history.themesOfSelectedQuests.length > 0) {
+//      for (i <- (1 to count).toList) yield {
+//        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
+//      }
+//    } else {
       List()
-    }
+//    }
   }
 
 }
