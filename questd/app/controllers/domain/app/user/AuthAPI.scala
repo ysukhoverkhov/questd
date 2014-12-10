@@ -30,8 +30,8 @@ private[domain] trait AuthAPI {
       // Update here country from time to time.
       updateUserCulture(UpdateUserCultureRequest(user)) ifOk {
         api.processFriendshipInvitationsFromSN(ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
-          case InternalErrorApiResult() =>
-            InternalErrorApiResult[LoginResult]()
+          case InternalErrorApiResult(a) =>
+            InternalErrorApiResult[LoginResult](a)
           case _ =>
             OkApiResult(LoginResult(uuid))
         }

@@ -24,9 +24,6 @@ case class TryFightQuestResult()
 
 //case class GetQuestSolutionHelpCostRequest(user: User)
 //case class GetQuestSolutionHelpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
-        val v = if (user.stats.questsAcceptedPast > 0) {
-        // TODO: clean me up.
-        val v = if (user.profile.questSolutionContext.purchasedQuest != None) {
 
 //case class AddToMustVoteSolutionsRequest(user: User, friendIds: List[String], solutionId: String)
 //case class AddToMustVoteSolutionsResult(user: User)

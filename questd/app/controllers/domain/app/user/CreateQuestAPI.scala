@@ -1,13 +1,11 @@
 package controllers.domain.app.user
 
-import logic.QuestLogic
 import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import play.Logger
 import controllers.domain.helpers._
+import logic.QuestLogic
 import models.domain._
-import models.domain.view._
 
 case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List())
 case class CreateQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -92,7 +90,6 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
     import request._
 
     (quest.status match {
-        InternalErrorApiResult("We are rewarding player for proposal what is on voting")
 
       case QuestStatus.CheatingBanned =>
         storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForCheatingQuest)))
@@ -106,8 +103,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
         OkApiResult(StoreProposalInDailyResultResult(author))
 
       case _ =>
-        Logger.error("Rewarding quest author but quest status is Unexpected")
-        InternalErrorApiResult[StoreProposalInDailyResultResult]()
+        InternalErrorApiResult[StoreProposalInDailyResultResult]("Rewarding quest author but quest status is Unexpected")
     }) ifOk {
       OkApiResult(RewardQuestAuthorResult())
     }

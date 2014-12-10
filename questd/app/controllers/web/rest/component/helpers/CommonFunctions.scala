@@ -19,17 +19,21 @@ private[component] trait CommonFunctions { this: QuestController with SecurityWS
           case OkApiResult(r) =>
             body(r)
 
-          case NotAuthorisedApiResult() => Unauthorized(
-            Json.write(WSUnauthorisedResult(UnauthorisedReason.SessionNotFound))).as(JSON)
+          case NotAuthorisedApiResult() =>
+            Unauthorized(
+              Json.write(WSUnauthorisedResult(UnauthorisedReason.SessionNotFound))).as(JSON)
+
+          case InternalErrorApiResult(ex) =>
+            Logger.error("InternalErrorApiResult", ex)
+            ServerError
 
           case a =>
             Logger.error(s"Unexpected result in api call - $a")
             ServerError
         }
       } catch {
-        case ex @ (_: MappingException | _: org.json4s.ParserUtil$ParseException) => {
+        case ex @ (_: MappingException | _: org.json4s.ParserUtil$ParseException) =>
           BadRequest(ex.getMessage)
-        }
         case ex: Throwable =>
           Logger.error("Api calling exception", ex)
           ServerError

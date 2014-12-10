@@ -3,7 +3,6 @@ package controllers.domain.app.questsolution
 import components._
 import controllers.domain._
 import controllers.domain.app.user._
-import logic._
 import controllers.domain.helpers._
 import models.domain._
 import play.Logger
@@ -23,9 +22,8 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
    * Updates quest according to vote.
    */
   def voteQuestSolutionUpdate(request: VoteQuestSolutionUpdateRequest): ApiResult[VoteQuestSolutionUpdateResult] = handleDbException {
-    import models.domain.QuestSolutionVote._
+    import models.domain.ContentVote._
     import request._
-    import ContentVote._
 
     Logger.debug("API - voteQuestSolutionUpdate")
 

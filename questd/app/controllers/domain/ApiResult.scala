@@ -42,6 +42,6 @@ final case class InternalErrorApiResult[T](
     override def toString = s"InternalErrorApiResult\n$error"
   }
 object InternalErrorApiResult {
-  def apply(msg: String): InternalErrorApiResult = new InternalErrorApiResult(msg)
+  def apply[T](msg: String): InternalErrorApiResult[T] = new InternalErrorApiResult(msg)
 }
 

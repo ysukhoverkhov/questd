@@ -2,7 +2,6 @@ package controllers.domain.app.questsolution
 
 import controllers.domain._
 import models.domain._
-import play.Logger
 import testhelpers.domainstubs._
 
 class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
@@ -183,8 +182,6 @@ class QuestSolutionFetchAPISpecs extends BaseAPISpecs {
         None) returns List(sol).iterator
 
       val result = api.getSolutionsForOwnQuests(GetSolutionsForOwnQuestsRequest(User(), List(QuestSolutionStatus.OnVoting)))
-
-      Logger.error(result.toString)
 
       result.body.get.solutions.toList must beEqualTo(List(sol))
 
