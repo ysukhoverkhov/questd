@@ -1,11 +1,11 @@
 package logic.user
 
+import controllers.domain.app.solution._
 import logic.BaseLogicSpecs
 import models.domain._
 import controllers.domain.OkApiResult
 import models.domain.admin.ConfigSection
 import controllers.domain.config._ConfigParams
-import controllers.domain.app.questsolution._
 import testhelpers.domainstubs._
 
 class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
@@ -24,7 +24,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
     config.apply(api.ConfigParams.SolutionProbabilityFriends) returns "0.25"
     config.apply(api.ConfigParams.SolutionProbabilityFollowing) returns "0.25"
     config.apply(api.ConfigParams.SolutionProbabilityLiked) returns "0.20"
-    config.apply(api.ConfigParams.SolutionProbabilityStar) returns "0.10"
+    config.apply(api.ConfigParams.SolutionProbabilityVIP) returns "0.10"
 
     config
   }
@@ -213,17 +213,21 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
     "All solutions are used if vip and Other solutions are unavailable" in {
       val qid = "qid"
       val u = User()
+      val s = createSolutionStub(id = qid, authorId = "author")
 
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
       api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List().iterator))
-      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List().iterator)) thenReturns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
+      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List().iterator)) thenReturns OkApiResult(GetAllSolutionsResult(List(s).iterator))
 
-      u.getRandomSolution
+      val rv = u.getRandomSolution
+
+      rv must beSome
 
       there was one(rand).nextDouble
+      there was one(api).getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest])
       there was one(api).getVIPSolutions(any[GetVIPSolutionsRequest])
       there were two(api).getAllSolutions(any[GetAllSolutionsRequest])
     }

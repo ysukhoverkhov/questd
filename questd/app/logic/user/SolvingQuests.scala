@@ -1,7 +1,5 @@
 package logic.user
 
-import org.joda.time.DateTime
-import com.github.nscala_time.time.Imports._
 import logic._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
@@ -55,18 +53,5 @@ trait SolvingQuests { this: UserLogic =>
    * Cooldown for resetting purchases. Purchases should be reset in nearest 5am at user's time.
    */
   def getResetPurchasesTimeout = getNextFlipHourDate
-
-  /**
-   * Time when to stop voting for solution.
-   */
-  def solutionVoteEndDate(qi: QuestInfo) = {
-    val coef = qi.level match {
-      case x if 1 to 10 contains x => 1
-      case x if 11 to 16 contains x => 2
-      case _ => 3
-    }
-
-    DateTime.now + coef.days toDate ()
-  }
 
 }

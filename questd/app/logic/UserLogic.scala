@@ -24,6 +24,7 @@ class UserLogic(
     with MiscUserLogic
     with QuestSelectUserLogic
     with SolutionSelectUserLogic
+    with BattleSelectUserLogic
 
     with SelectionHelpers {
 }

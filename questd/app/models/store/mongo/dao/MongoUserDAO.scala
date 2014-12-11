@@ -569,6 +569,17 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
+  def setTimeLinePopulationTime(id: String, time: Date): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "schedules.timeLine" -> time)))
+  }
+
+  /**
+   * @inheritdoc
+   */
   def addEntryToTimeLine(id: String, entry: TimeLineEntry): Option[User] = {
     findAndModify(
       id,

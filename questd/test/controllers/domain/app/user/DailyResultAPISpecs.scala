@@ -16,10 +16,12 @@ class DailyResultAPISpecs extends BaseAPISpecs {
       quest.allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(u.id),
+        authorIdsExclude = null,
         levels = null,
         skip = 0,
         vip = null,
         ids = null,
+        idsExclude = null,
         cultureId = null) returns List(q).iterator
       user.addPrivateDailyResult(any, any) returns Some(u)
 
@@ -29,10 +31,12 @@ class DailyResultAPISpecs extends BaseAPISpecs {
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(u.id),
+        authorIdsExclude = null,
         levels = null,
         skip = 0,
         vip = null,
         ids = null,
+        idsExclude = null,
         cultureId = null)
 
       case class QuestIncomeMatcher(private val incomes: List[QuestIncome]) extends ArgumentMatcher[DailyResult] {

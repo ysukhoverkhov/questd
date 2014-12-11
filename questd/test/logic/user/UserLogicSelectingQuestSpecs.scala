@@ -24,7 +24,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
     config.apply(api.ConfigParams.QuestProbabilityFriends) returns "0.25"
     config.apply(api.ConfigParams.QuestProbabilityFollowing) returns "0.25"
     config.apply(api.ConfigParams.QuestProbabilityLiked) returns "0.20"
-    config.apply(api.ConfigParams.QuestProbabilityStar) returns "0.10"
+    config.apply(api.ConfigParams.QuestProbabilityVIP) returns "0.10"
 
     config
   }
@@ -52,12 +52,12 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       api.getFriendsQuests(any[GetFriendsQuestsRequest]) returns OkApiResult(GetFriendsQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       val u = User()
-      val q = u.getRandomQuestForTimeLine
+      val q = u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
       there was one(api).getFriendsQuests(any[GetFriendsQuestsRequest])
 
-      q must beSome.which(q => q.id == qid)
+      q.map(_.id) must beEqualTo(List(qid))
     }
 
     "Return quest from following if dice rolls so" in {
@@ -69,12 +69,12 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       api.getFollowingQuests(any[GetFollowingQuestsRequest]) returns OkApiResult(GetFollowingQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       val u = User()
-      val q = u.getRandomQuestForTimeLine
+      val q = u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
       there was one(api).getFollowingQuests(any[GetFollowingQuestsRequest])
 
-      q must beSome.which(q => q.id == qid)
+      q.map(_.id) must beEqualTo(List(qid))
     }
 
     "Return liked quest if dice rolls so for solving" in {
@@ -86,12 +86,12 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       api.getLikedQuests(any[GetLikedQuestsRequest]) returns OkApiResult(GetLikedQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       val u = User()
-      val q = u.getRandomQuestForTimeLine
+      val q = u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
       there was one(api).getLikedQuests(any[GetLikedQuestsRequest])
 
-      q must beSome.which(q => q.id == qid)
+      q.map(_.id) must beEqualTo(List(qid))
     }
 
     "Do not return liked quest if dice rolls so for voting" in {
@@ -103,13 +103,13 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       val u = User()
-      val q = u.getRandomQuestForTimeLine
+      val q = u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
       there was no(api).getLikedQuests(any[GetLikedQuestsRequest])
       there was one(api).getAllQuests(any[GetAllQuestsRequest])
 
-      q must beSome.which(q => q.id == qid)
+      q.map(_.id) must beEqualTo(List(qid))
     }
 
     "Return VIP quest if dice rolls so" in {
@@ -121,12 +121,12 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       val u = User()
-      val q = u.getRandomQuestForTimeLine
+      val q = u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
       there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
 
-      q must beSome.which(q => q.id == qid)
+      q.map(_.id) must beEqualTo(List(qid))
     }
 
     // TODO: implement me when tags will be impelemented.
@@ -190,7 +190,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
-      u.getRandomQuestForTimeLine
+      u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
       there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
@@ -207,7 +207,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
       api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
-      u.getRandomQuestForTimeLine
+      u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
       there was one(api).getAllQuests(any[GetAllQuestsRequest])
@@ -226,11 +226,11 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
         OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator)) thenReturns
         OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
-      val q = u.getRandomQuestForTimeLine
+      val q = u.getRandomQuestsForTimeLine(1)
 
       there were one(rand).nextDouble
       there were atLeast(1)(api).getAllQuests(any[GetAllQuestsRequest])
-      q must beNone
+      q.length must beEqualTo(1)
     }
 
     "Other quests are used if vip quests are unavailable" in {
@@ -243,7 +243,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List().iterator))
       api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
-      u.getRandomQuestForTimeLine
+      u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
       there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
@@ -260,7 +260,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List().iterator))
       api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List().iterator)) thenReturns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
-      u.getRandomQuestForTimeLine
+      u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
       there was one(api).getVIPQuests(any[GetVIPQuestsRequest])

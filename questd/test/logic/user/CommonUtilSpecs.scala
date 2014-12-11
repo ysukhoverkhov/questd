@@ -25,7 +25,6 @@ class CommonUtilSpecs extends BaseLogicSpecs {
     }
 
 
-
     "Find string in list of lists of DBObjects" in {
       val r1: BasicDBList = MongoDBList("a", "b", "c")
       val r2: BasicDBList = MongoDBList("b", "c", "e")
