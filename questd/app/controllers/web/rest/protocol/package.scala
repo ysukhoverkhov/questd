@@ -409,5 +409,23 @@ package object protocol {
 
   /// OutOfContent if the task is not in active tasks.
   type WSIncTutorialTaskResult = IncTutorialTaskResult
+
+
+  /**
+   * Response on upload request.
+   */
+  case class WSUploadResult(
+    code: UploadCode.Value,
+    url: Option[String])
+
+  /**
+   *  Upload errors.
+   */
+  object UploadCode extends Enumeration {
+    val OK = Value
+    val FileNotFoundInRequest = Value
+    val RequestIsNotMultiPart = Value
+  }
+
 }
 
