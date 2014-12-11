@@ -1,5 +1,5 @@
 @(menuItems: Map[String, String], tasks: List[models.domain.TutorialTask], newTaskForm: Form[controllers.web.admin.component.TutorialTaskForm])
- 
+
 @import helper._
 
 @main("Tutorial Tasks")(menuItems, Map()) {
@@ -8,7 +8,7 @@
     	<tr>
     		<td>
 				<table border="1">
-			
+
 			    	<tr>
 			    		<td>id</td>
 			    		<td>Description</td>
@@ -18,10 +18,10 @@
 			    		<td>Reward Money</td>
 			    		<td>Reward Rating</td>
 			    	</tr>
-			
+
 					@for(t <- tasks) {
 				    	<tr>
-				    	
+
 				    		<td>@t.id</td>
 				    		<td>@t.description</td>
 				    		<td>@t.taskType.toString</td>
@@ -30,7 +30,7 @@
 				    		<td>@t.reward.money</td>
 				    		<td>@t.reward.rating</td>
 							<td><a href="@controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(t.id)">edit</a></td>
-							
+
 	    				</tr>
 	   				}
 				</table>
@@ -39,7 +39,7 @@
 				@form(action = controllers.web.admin.routes.TutorialTasksCRUD.updateTutorialTask()) {
 					@inputText(newTaskForm("id"), 'size -> 18, 'readonly -> "readonly")
 					@inputText(newTaskForm("description"), 'size -> 40)
-					@select(newTaskForm("taskType"), options(List("Client", "VoteQuestSolutions", "SubmitQuestResult", "AddToShortList", "VoteQuestProposals", "SubmitQuestProposal", "VoteReviews", "SubmitReviewsForResults", "SubmitReviewsForProposals", "GiveRewards", "LookThroughWinnersOfMyQuests", "LookThroughFriendshipProposals")))
+					@select(newTaskForm("taskType"), options(List("Client", "VoteQuestSolutions", "SubmitQuestResult", "AddToFollowing", "VoteQuestProposals", "SubmitQuestProposal", "VoteReviews", "SubmitReviewsForResults", "SubmitReviewsForProposals", "GiveRewards", "LookThroughWinnersOfMyQuests", "LookThroughFriendshipProposals")))
 					@inputText(newTaskForm("requiredCount"), 'size -> 5)
 					@inputText(newTaskForm("rewardCoins"), 'size -> 5)
 					@inputText(newTaskForm("rewardMoney"), 'size -> 5)
@@ -53,6 +53,6 @@
     		</td>
     	</tr>
 	</table>
-	
-	
+
+
 }

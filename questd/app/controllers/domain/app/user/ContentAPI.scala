@@ -6,12 +6,12 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import models.domain._
 import models.domain.view._
+import controllers.domain.helpers.PagerHelper._
 
 case class GetQuestRequest(user: User, questId: String)
 case class GetQuestResult(
   allowed: ProfileModificationResult,
-  quest: Option[QuestInfo] = None,
-  theme: Option[ThemeInfo] = None)
+  quest: Option[QuestInfo] = None)
 
 case class GetSolutionRequest(user: User, solutionId: String)
 case class GetSolutionResult(
@@ -98,9 +98,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     import request._
 
     db.quest.readById(questId) ifSome { quest =>
-      db.theme.readById(quest.info.themeId) ifSome { theme =>
-        OkApiResult(GetQuestResult(OK, Some(quest.info), Some(theme.info)))
-      }
+      OkApiResult(GetQuestResult(OK, Some(quest.info)))
     }
   }
 
@@ -153,7 +151,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForUser = db.solution.allWithParams(
-      status = request.status.map(_.toString),
+      status = request.status,
       authorIds = List(request.user.id),
       skip = pageNumber * pageSize)
 
@@ -179,7 +177,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val questsForUser = db.quest.allWithParams(
-      status = request.status.map(_.toString),
+      status = request.status,
       authorIds = List(request.user.id),
       skip = pageNumber * pageSize)
 
@@ -198,7 +196,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForQuest = db.solution.allWithParams(
-      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains).map(_.toString),
+      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains),
       questIds = List(request.questId),
       skip = pageNumber * pageSize)
 
@@ -224,7 +222,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForUser = db.solution.allWithParams(
-      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains).map(_.toString),
+      status = request.status.filter(Set(QuestSolutionStatus.Won, QuestSolutionStatus.Lost).contains),
       authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
@@ -250,7 +248,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val questsForUser = db.quest.allWithParams(
-      request.status.filter(Set(QuestStatus.InRotation).contains).map(_.toString),
+      request.status.filter(Set(QuestStatus.InRotation).contains),
       List(request.userId),
       skip = pageNumber * pageSize)
 
@@ -259,31 +257,6 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       quests = questsForUser.take(pageSize).toList.map(q => QuestInfoWithID(q.id, q.info)),
       pageSize,
       questsForUser.hasNext))
-  }
-
-  /**
-   * Make page of correct size correcting client's request.
-   */
-  private def adjustedPageSize(pageSize: Int): Int = {
-    val maxPageSize = 50
-    val defaultPageSize = 10
-
-    if (pageSize <= 0)
-      defaultPageSize
-    else if (pageSize > maxPageSize)
-      maxPageSize
-    else
-      pageSize
-  }
-
-  /**
-   * Make page number of correct number correcting client's request.
-   */
-  private def adjustedPageNumber(pageNumber: Int): Int = {
-    if (pageNumber < 0)
-      0
-    else
-      pageNumber
   }
 
 }

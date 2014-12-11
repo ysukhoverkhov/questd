@@ -19,28 +19,19 @@ private[mongo] class MongoQuestDAO
       MongoDBObject("status" -> status))
   }
 
-  def allWithStatusAndThemeByPoints(status: String, themeId: String): Iterator[Quest] = {
-    findByExample(
-      MongoDBObject(
-        "status" -> status,
-        "info.themeId" -> themeId),
-      MongoDBObject("rating.points" -> -1))
-  }
-
   def allWithParams(
-    status: List[String] = List(),
+    status: List[QuestStatus.Value] = List(),
     authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
     vip: Option[Boolean] = None,
     ids: List[String] = List(),
-    themeIds: List[String] = List(),
     cultureId: Option[String] = None): Iterator[Quest] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
     if (status.length > 0) {
-      queryBuilder += ("status" -> MongoDBObject("$in" -> status))
+      queryBuilder += ("status" -> MongoDBObject("$in" -> status.map(_.toString)))
     }
 
     if (authorIds.length > 0) {
@@ -61,10 +52,6 @@ private[mongo] class MongoQuestDAO
       queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
     }
 
-    if (themeIds.length > 0) {
-      queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
-    }
-
     if (cultureId != None) {
       queryBuilder += ("cultureId" -> cultureId.get)
     }
@@ -73,49 +60,33 @@ private[mongo] class MongoQuestDAO
 
     findByExample(
       queryBuilder.result(),
-      MongoDBObject("lastModDate" -> 1),
+      MongoDBObject(
+        "rating.points" -> -1,
+        "lastModDate" -> 1),
       skip)
   }
 
   def updatePoints(
     id: String,
     pointsChange: Int,
-    votersCountChange: Int,
+    likesChange: Int,
+    votersCountChange: Int = 0,
     cheatingChange: Int = 0,
 
     spamChange: Int = 0,
-    pornChange: Int = 0,
-
-    easyChange: Int = 0,
-    normalChange: Int = 0,
-    hardChange: Int = 0,
-    extremeChange: Int = 0,
-
-    minsChange: Int = 0,
-    hourChange: Int = 0,
-    dayChange: Int = 0,
-    weekChange: Int = 0): Option[Quest] = {
+    pornChange: Int = 0): Option[Quest] = {
 
     findAndModify(
       id,
       MongoDBObject(
         "$inc" -> MongoDBObject(
           "rating.points" -> pointsChange,
+          "rating.likesCount" -> likesChange,
           "rating.votersCount" -> votersCountChange,
           "rating.cheating" -> cheatingChange,
 
           "rating.iacpoints.spam" -> spamChange,
-          "rating.iacpoints.porn" -> pornChange,
-
-          "rating.difficultyRating.easy" -> easyChange,
-          "rating.difficultyRating.normal" -> normalChange,
-          "rating.difficultyRating.hard" -> hardChange,
-          "rating.difficultyRating.extreme" -> extremeChange,
-
-          "rating.durationRating.mins" -> minsChange,
-          "rating.durationRating.hour" -> hourChange,
-          "rating.durationRating.day" -> dayChange,
-          "rating.durationRating.week" -> weekChange),
+          "rating.iacpoints.porn" -> pornChange),
         "$set" -> MongoDBObject(
           "lastModDate" -> new Date())))
   }
@@ -123,26 +94,24 @@ private[mongo] class MongoQuestDAO
   /**
    *
    */
-  def updateStatus(id: String, newStatus: String): Option[Quest] = {
+  def updateStatus(id: String, newStatus: QuestStatus.Value): Option[Quest] = {
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
-          "status" -> newStatus,
+          "status" -> newStatus.toString,
           "lastModDate" -> new Date())))
   }
 
   /**
    *
    */
-  def updateInfo(id: String, newLevel: Int, duration: String, difficulty: String): Option[Quest] = {
+  def updateInfo(id: String, newLevel: Int): Option[Quest] = {
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
           "info.level" -> newLevel,
-          "info.duration" -> duration,
-          "info.difficulty" -> difficulty,
           "lastModDate" -> new Date())))
   }
 
