@@ -6,7 +6,7 @@ import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
 import controllers.web.rest.protocol._
 import models.domain._
-import play.api._
+import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
 
@@ -26,7 +26,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
   }
 
   // Configure Authorized check
-  class AuthenticatedRequest[A](val user: User, request: Request[A]) extends WrappedRequest[A](request)
+  class AuthenticatedRequest[A](val user: User, val request: Request[A]) extends WrappedRequest[A](request)
 
   object Authenticated extends ActionBuilder[AuthenticatedRequest] {
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
