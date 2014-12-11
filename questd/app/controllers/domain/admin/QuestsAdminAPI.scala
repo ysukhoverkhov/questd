@@ -3,7 +3,6 @@ package controllers.domain.admin
 import play.Logger
 
 import components.DBAccessor
-import models.store._
 import models.domain._
 import controllers.domain.helpers._
 import controllers.domain._
@@ -19,8 +18,6 @@ case class UpdateQuestAdminRequest(
   status: String,
   level: Int,
   description: String,
-  difficulty: String,
-  duration: String,
   points: Int,
   cheating: Int,
   votersCount: Int)
@@ -53,21 +50,18 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
     Logger.debug("Admin request for update a quest " + request.id)
 
     db.quest.readById(request.id) match {
-      case Some(q) => {
+      case Some(q) =>
         db.quest.update(
           q.copy(
             status = QuestStatus.withName(request.status),
             info = q.info.copy(
               level = request.level,
-              difficulty = QuestDifficulty.withName(request.difficulty),
-              duration = QuestDuration.withName(request.duration),
               content = q.info.content.copy(
                 description = request.description)),
             rating = q.rating.copy(
               points = request.points,
               cheating = request.cheating,
               votersCount = request.votersCount)))
-      }
 
       case _ =>
     }

@@ -84,7 +84,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     db.user.addToAssets(user.id, del2) ifSome { u =>
       checkIncreaseLevel(CheckIncreaseLevelRequest(u)) ifOk { r => OkApiResult(AdjustAssetsResult(r.user)) }
     }
-
   }
 
   /**
@@ -92,7 +91,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    */
   def checkIncreaseLevel(request: CheckIncreaseLevelRequest): ApiResult[CheckIncreaseLevelResult] = handleDbException {
     if (request.user.profile.ratingToNextLevel <= request.user.profile.assets.rating) {
-      db.user.levelup(request.user.id, request.user.profile.ratingToNextLevel) ifSome { user =>
+      db.user.levelUp(request.user.id, request.user.profile.ratingToNextLevel) ifSome { user =>
         db.user.setNextLevelRatingAndRights(
           user.id,
           user.ratingToNextLevel,

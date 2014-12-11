@@ -5,6 +5,5 @@ import java.util.Date
 /**
  * All information what is required by analytics.
  */
-case class Analytics(
-  val profileCreationDate: Date = new Date())
-    
+case class Analytics(profileCreationDate: Date = new Date())
+

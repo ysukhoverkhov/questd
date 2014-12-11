@@ -8,7 +8,7 @@ trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
    * Get solutions what meets following optional parameters.
    */
   def allWithParams(
-    status: List[String] = List(),
+    status: List[QuestSolutionStatus.Value] = List(),
     authorIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
@@ -18,7 +18,10 @@ trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
     themeIds: List[String] = List(),
     cultureId: Option[String] = None): Iterator[QuestSolution]
 
-  def updateStatus(id: String, newStatus: String, rivalId: Option[String] = None): Option[QuestSolution]
+  def updateStatus(
+    id: String,
+    newStatus: QuestSolutionStatus.Value,
+    rivalId: Option[String] = None): Option[QuestSolution]
 
   def updatePoints(
     id: String,
@@ -26,7 +29,6 @@ trait QuestSolutionDAO extends BaseDAO[QuestSolution] {
     reviewsCountChange: Int = 0,
     pointsRandomChange: Int = 0,
     pointsFriendsChange: Int = 0,
-    pointsInvitedChange: Int = 0,
     cheatingChange: Int = 0,
 
     spamChange: Int = 0,

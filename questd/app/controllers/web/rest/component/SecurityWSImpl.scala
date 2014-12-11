@@ -43,7 +43,7 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
                   Json.write(WSUnauthorisedResult(UnauthorisedReason.SessionNotFound))).as(JSON)
 
               case InternalErrorApiResult(ex) =>
-                Logger.error(ex.toString)
+                Logger.error("InternalErrorApiResult", ex)
                 ServerError
 
               case a =>
