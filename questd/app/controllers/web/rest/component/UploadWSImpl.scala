@@ -13,8 +13,11 @@ trait UploadWSImpl extends QuestController with SecurityWSImpl { this: WSCompone
         case Some(data) =>
           data.file("content").map { content =>
             import java.io.File
-            val filename = content.filename
-            val contentType = content.contentType
+//            val filename = content.filename
+//            val contentType = content.contentType
+
+            val baseDir = "" // TODO: load from config.
+            val baseURL = "" // TODO: load from config.
             // TODO: invent directory here.
             content.ref.moveTo(new File("d:/picture.jpg"))
             // TODO: tell client url back.
@@ -25,33 +28,7 @@ trait UploadWSImpl extends QuestController with SecurityWSImpl { this: WSCompone
         case          None =>
           BadRequest("MultipartFormData is missing")
       }
-
-//
-//      try {
-//        apiCall(request) match {
-//          case OkApiResult(r) => {
-//            body(r)
-//          }
-//
-//          case NotAuthorisedApiResult() => Unauthorized(
-//            Json.write(WSUnauthorisedResult(UnauthorisedReason.SessionNotFound))).as(JSON)
-//
-//          case a =>
-//            Logger.error(s"Unexpected result in api call - $a")
-//            ServerError
-//        }
-//      } catch {
-//        case ex @ (_: MappingException | _: org.json4s.ParserUtil$ParseException) => {
-//          BadRequest(ex.getMessage())
-//        }
-//        case ex: Throwable => {
-//          Logger.error("Api calling exception", ex)
-//          ServerError
-//        }
-//      }
     }
   }
-
-
 }
 
