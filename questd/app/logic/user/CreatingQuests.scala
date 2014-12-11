@@ -42,7 +42,7 @@ trait CreatingQuests { this: UserLogic =>
   }
 
   /**
-   *
+   * When we will be able to propose new quest.
    */
   def getCoolDownForQuestCreation: Date = {
     import com.github.nscala_time.time.Imports._
@@ -54,16 +54,12 @@ trait CreatingQuests { this: UserLogic =>
     (DateTime.now(tz) + daysToSkip.days).hour(constants.FlipHour).minute(0).second(0) toDate ()
   }
 
-  // TODO: invent me and write in desdoc as well.
   def penaltyForCheatingQuest = {
-    Assets()
-    //(rewardForMakingApprovedQuest * QuestProposalCheatingPenalty) clampTop user.profile.assets
+    Assets(rating = user.profile.assets.rating / 4)
   }
 
-  // TODO: invent me and write in desdoc as well.
   def penaltyForIACQuest = {
-    Assets()
-//    (rewardForMakingApprovedQuest * QuestProposalIACPenalty) clampTop user.profile.assets
+    Assets(rating = user.profile.assets.rating / 2)
   }
 
   /**

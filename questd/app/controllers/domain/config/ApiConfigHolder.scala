@@ -35,10 +35,11 @@ class _ConfigParams {
   val QuestProbabilityFriends = "72 01 Probability of quests from friends"
   val QuestProbabilityFollowing = "72 02 Probability of quests from Following"
   val QuestProbabilityLiked = "72 03 Probability of liked quests"
-  val QuestProbabilityStar = "72 04 Probability of quests from stars"
+  val QuestProbabilityVIP = "72 04 Probability of quests from Vips"
 
   var TimeLineRandomQuestsDaily = "80 01 TimeLine Random Quests Daily"
   var TimeLineRandomSolutionsDaily = "80 02 TimeLine Random Solutions Daily"
+  var TimeLineRandomBattlesDaily = "80 03 TimeLine Random Battles Daily"
 
   val SolutionProbabilityLevelsToGiveStartingSolutions = "91 01 Level to give starting Solutions"
   val SolutionProbabilityStartingVIPSolutions = "91 02 Probability of selecting VIP Solutions in initial stage"
@@ -46,7 +47,15 @@ class _ConfigParams {
   val SolutionProbabilityFriends = "92 01 Probability of Solutions from friends"
   val SolutionProbabilityFollowing = "92 02 Probability of Solutions from Following"
   val SolutionProbabilityLiked = "92 03 Probability of liked Solutions"
-  val SolutionProbabilityStar = "92 04 Probability of quests from Solutions"
+  val SolutionProbabilityVIP = "92 04 Probability of quests from Vips"
+
+  val BattleProbabilityLevelsToGiveStartingBattles = "95 01 Level to give starting Battles"
+  val BattleProbabilityStartingVIPBattles = "95 02 Probability of selecting VIP Battles in initial stage"
+
+  val BattleProbabilityFriends = "96 01 Probability of Battles from friends"
+  val BattleProbabilityFollowing = "96 02 Probability of Battles from Following"
+  val BattleProbabilityLiked = "96 03 Probability of liked Battles"
+  val BattleProbabilityVIP = "96 04 Probability of quests from VIPs"
 }
 
 object _ConfigParams extends _ConfigParams
@@ -89,10 +98,11 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.QuestProbabilityFriends -> "0.25",
       ConfigParams.QuestProbabilityFollowing -> "0.25",
       ConfigParams.QuestProbabilityLiked -> "0.20",
-      ConfigParams.QuestProbabilityStar -> "0.10",
+      ConfigParams.QuestProbabilityVIP -> "0.10",
 
       ConfigParams.TimeLineRandomQuestsDaily -> "5",
       ConfigParams.TimeLineRandomSolutionsDaily -> "5",
+      ConfigParams.TimeLineRandomBattlesDaily -> "5",
 
       ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions -> "5",
       ConfigParams.SolutionProbabilityStartingVIPSolutions -> "0.5",
@@ -100,6 +110,15 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.SolutionProbabilityFriends -> "0.25",
       ConfigParams.SolutionProbabilityFollowing -> "0.25",
       ConfigParams.SolutionProbabilityLiked -> "0.20",
-      ConfigParams.SolutionProbabilityStar -> "0.10"))
+      ConfigParams.SolutionProbabilityVIP -> "0.10",
+
+      ConfigParams.BattleProbabilityLevelsToGiveStartingBattles -> "5",
+      ConfigParams.BattleProbabilityStartingVIPBattles -> "0.5",
+
+      ConfigParams.BattleProbabilityFriends -> "0.25",
+      ConfigParams.BattleProbabilityFollowing -> "0.25",
+      ConfigParams.BattleProbabilityLiked -> "0.20",
+      ConfigParams.BattleProbabilityVIP -> "0.10"
+    ))
 }
 

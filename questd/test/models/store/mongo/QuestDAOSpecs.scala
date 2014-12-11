@@ -136,6 +136,14 @@ class QuestDAOSpecs extends Specification
       val culture = db.quest.allWithParams(cultureId = Some(qs(2).cultureId)).toList
       culture.map(_.id).size must beEqualTo(1)
       culture.map(_.id) must beEqualTo(List(qs(2).id))
+
+      val excludingIds = db.quest.allWithParams(idsExclude = List("q1", "q2")).toList
+      excludingIds.map(_.id).size must beEqualTo(1)
+      excludingIds.map(_.id) must beEqualTo(List(qs(2).id))
+
+      val excludingAuthorIds = db.quest.allWithParams(authorIdsExclude = List("q2_author id")).toList
+      excludingAuthorIds.map(_.id).size must beEqualTo(2)
+      excludingAuthorIds.map(_.id).sorted must beEqualTo(List(qs(0).id, qs(2).id).sorted)
     }
 
     "Replace cultures" in new WithApplication(appWithTestDatabase) {

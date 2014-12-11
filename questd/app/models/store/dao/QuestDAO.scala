@@ -17,10 +17,12 @@ trait QuestDAO extends BaseDAO[Quest] {
   def allWithParams(
     status: List[QuestStatus.Value] = List(),
     authorIds: List[String] = List(),
+    authorIdsExclude: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
     vip: Option[Boolean] = None,
     ids: List[String] = List(),
+    idsExclude: List[String] = List(),
     cultureId: Option[String] = None): Iterator[Quest]
 
   /**

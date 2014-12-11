@@ -60,38 +60,36 @@ package object domainstubs {
   }
 
   def createSolutionInfoContent = {
-    QuestSolutionInfoContent(
+    SolutionInfoContent(
       createContentReferenceStub,
       None)
   }
 
-  // TODO: replace themeId with tags.
+  // TODO: TAGS: replace themeId with tags.
   def createSolutionStub(
     id: String = "sol id",
     cultureId: String = "cultureId",
     authorId: String = "uid",
     questId: String = "qid",
     themeId: String = "themeId",
-    status: QuestSolutionStatus.Value = QuestSolutionStatus.OnVoting,
+    status: SolutionStatus.Value = SolutionStatus.OnVoting,
     level: Int = 1,
     points: Int = 0,
     vip: Boolean = false,
-    voteEndDate: Date = new Date((new Date).getTime + 100000),
     lastModDate: Date = new Date((new Date).getTime + 100000)) = {
 
-    QuestSolution(
+    Solution(
       id = id,
       cultureId = cultureId,
       questLevel = level,
-      info = QuestSolutionInfo(
+      info = SolutionInfo(
         content = createSolutionInfoContent,
         vip = vip,
         authorId = authorId,
         questId = questId),
       status = status,
-      rating = QuestSolutionRating(
+      rating = SolutionRating(
         pointsRandom = points),
-      voteEndDate = voteEndDate,
       lastModDate = lastModDate)
   }
 
@@ -137,6 +135,29 @@ package object domainstubs {
       startOfPeriod = startOfPeriod,
       dailySalary = dailySalary,
       questsIncome = questsIncome
+    )
+  }
+
+  def createBattleStub(
+    id: String = ID.generateUUID(),
+    solutionIds: List[String] = List("1", "2"),
+    authorIds: List[String] = List("a1", "a2"),
+    status: BattleStatus.Value = BattleStatus.Fighting,
+    level: Int = 19,
+    vip: Boolean = false,
+    cultureId: String = "c1",
+    voteEndDate: Date = new Date()
+    ) = {
+    Battle(
+      id = id,
+      info = BattleInfo(
+        solutionIds = solutionIds,
+        authorIds = authorIds,
+        status = status,
+        voteEndDate = voteEndDate),
+      level = level,
+      vip = vip,
+      cultureId = cultureId
     )
   }
 
