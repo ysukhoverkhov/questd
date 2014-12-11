@@ -9,7 +9,8 @@ import play.Logger
 
 case class VoteQuestSolutionUpdateRequest(
   solution: QuestSolution,
-  vote: QuestSolutionVote.Value)
+  isFriend: Boolean,
+  vote: ContentVote.Value)
 case class VoteQuestSolutionUpdateResult()
 
 case class UpdateQuestSolutionStateRequest(solution: QuestSolution)
@@ -21,7 +22,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
    * Updates quest according to vote.
    */
   def voteQuestSolutionUpdate(request: VoteQuestSolutionUpdateRequest): ApiResult[VoteQuestSolutionUpdateResult] = handleDbException {
-    import models.domain.QuestSolutionVote._
+    import models.domain.ContentVote._
     import request._
 
     Logger.debug("API - voteQuestSolutionUpdate")
@@ -33,9 +34,8 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
         solution.id,
 
         reviewsCountChange = 1,
-        pointsRandomChange = checkInc(vote, Cool),
-        pointsFriendsChange = 0,
-        pointsInvitedChange = 0,
+        pointsRandomChange = if (isFriend) 0 else checkInc(vote, Cool),
+        pointsFriendsChange = if (isFriend) checkInc(vote, Cool) else 0,
         cheatingChange = checkInc(vote, Cheating),
 
         spamChange = checkInc(vote, IASpam),
@@ -57,31 +57,31 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
 
     def checkWaitCompetitor(qs: QuestSolution) = {
       if (qs.shouldStopVoting)
-        db.solution.updateStatus(solution.id, QuestSolutionStatus.WaitingForCompetitor.toString)
+        db.solution.updateStatus(solution.id, QuestSolutionStatus.WaitingForCompetitor)
       else
         Some(qs)
     }
 
     def checkCheatingSolution(qs: QuestSolution) = {
       if (qs.shouldBanCheating)
-        db.solution.updateStatus(solution.id, QuestSolutionStatus.CheatingBanned.toString)
+        db.solution.updateStatus(solution.id, QuestSolutionStatus.CheatingBanned)
       else
         Some(qs)
     }
 
     def checkAICSolution(qs: QuestSolution) = {
       if (qs.shouldBanIAC)
-        db.solution.updateStatus(solution.id, QuestSolutionStatus.IACBanned.toString)
+        db.solution.updateStatus(solution.id, QuestSolutionStatus.IACBanned)
       else
         Some(qs)
     }
 
-    val funcs = List(
+    val functions = List(
       checkWaitCompetitor _,
       checkCheatingSolution _,
       checkAICSolution _)
 
-    val updatedSolution = funcs.foldLeft[Option[QuestSolution]](Some(solution))((r, f) => {
+    val updatedSolution = functions.foldLeft[Option[QuestSolution]](Some(solution))((r, f) => {
       r.flatMap(f)
     })
 
@@ -94,7 +94,7 @@ private[domain] trait QuestSolutionAPI { this: DomainAPIComponent#DomainAPI with
             case None =>
               InternalErrorApiResult(s"Unable to find author of quest solution user $authorId")
             case Some(author) =>
-              rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(s, author))
+              rewardSolutionAuthor(RewardSolutionAuthorRequest(s, author))
           }
         } else {
           OkApiResult(None)

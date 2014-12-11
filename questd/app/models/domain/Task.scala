@@ -6,9 +6,9 @@ import java.util.Date
 object TaskType extends Enumeration {
   val VoteQuestSolutions = Value
   val SubmitQuestResult = Value
-  val AddToShortList = Value 
-  val VoteQuestProposals = Value
-  val SubmitQuestProposal = Value
+  val AddToFollowing = Value
+  val VoteQuests = Value
+  val CreateQuest = Value
   val VoteReviews = Value
   val SubmitReviewsForResults = Value
   val SubmitReviewsForProposals = Value

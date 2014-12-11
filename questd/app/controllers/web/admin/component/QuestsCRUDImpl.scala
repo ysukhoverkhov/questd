@@ -12,8 +12,6 @@ case class QuestForm(
   status: String,
   level: Int,
   description: String,
-  difficulty: String,
-  duration: String,
   points: Int,
   cheating: Int,
   votersCount: Int)
@@ -26,8 +24,6 @@ class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller w
       "status" -> nonEmptyText,
       "level" -> number,
       "description" -> nonEmptyText,
-      "difficulty" -> nonEmptyText,
-      "duration" -> nonEmptyText,
       "points" -> number,
       "cheating" -> number,
       "votersCount" -> number)(QuestForm.apply)(QuestForm.unapply))
@@ -48,8 +44,6 @@ class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller w
             status = quest.status.toString,
             level = quest.info.level,
             description = quest.info.content.description,
-            difficulty = quest.info.difficulty.toString,
-            duration = quest.info.duration.toString,
             points = quest.rating.points,
             cheating = quest.rating.cheating,
             votersCount = quest.rating.votersCount))
@@ -97,8 +91,6 @@ class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller w
             questForm.status,
             questForm.level,
             questForm.description,
-            questForm.difficulty,
-            questForm.duration,
             questForm.points,
             questForm.cheating,
             questForm.votersCount))

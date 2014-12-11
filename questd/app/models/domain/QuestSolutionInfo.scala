@@ -1,6 +1,5 @@
 package models.domain
 
-import models.domain.base.ID
 
 case class QuestSolutionInfoContent(
   media: ContentReference,
@@ -10,5 +9,4 @@ case class QuestSolutionInfo(
   content: QuestSolutionInfoContent,
   vip: Boolean,
   authorId: String,
-  themeId: String,
   questId: String)
