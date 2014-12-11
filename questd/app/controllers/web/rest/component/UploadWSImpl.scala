@@ -12,14 +12,13 @@ trait UploadWSImpl extends QuestController with SecurityWSImpl { this: WSCompone
       request.request.body.asMultipartFormData match {
         case Some(data) =>
           data.file("content").map { content =>
-            import java.io.File
 //            val filename = content.filename
 //            val contentType = content.contentType
 
             val baseDir = "" // TODO: load from config.
             val baseURL = "" // TODO: load from config.
             // TODO: invent directory here.
-            content.ref.moveTo(new File("d:/picture.jpg"))
+//            content.ref.moveTo(new File("d:/picture.jpg"))
             // TODO: tell client url back.
             Ok("File uploaded")
           }.getOrElse {
