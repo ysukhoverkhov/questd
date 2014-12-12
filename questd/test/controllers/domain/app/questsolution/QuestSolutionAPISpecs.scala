@@ -16,29 +16,39 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
       val q = createQuestStub(id = "qid")
       val user1 = User(id = "uid")
-      val sol = createSolutionStub(id = "sid", userId = user1.id, questId = q.id)
+      val sol = createSolutionStub(id = "sid", authorId = user1.id, questId = q.id)
 
       val spiedQuestSolutionLogic = spy(new QuestSolutionLogic(sol, api.api))
       when(api.questSolution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
 
-      when(spiedQuestSolutionLogic.shouldStopVoting).thenReturn(true)
-      solution.updateStatus(any, any, any) returns Some(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor))
+      when(spiedQuestSolutionLogic.shouldStopVoting).thenReturn(false)
+      when(spiedQuestSolutionLogic.shouldBanCheating).thenReturn(true)
+      when(spiedQuestSolutionLogic.shouldBanIAC).thenReturn(false)
+      solution.updateStatus(any, any, any) returns Some(sol.copy(status = QuestSolutionStatus.CheatingBanned))
       user.readById(user1.id) returns Some(user1)
+      user.addPrivateDailyResult(any, any) returns Some(user1)
+      user.storeSolutionInDailyResult(any, any) returns Some(user1)
+
       quest.readById(q.id) returns Some(q)
 
-      solution.allWithParams(
-        status = List(QuestSolutionStatus.WaitingForCompetitor.toString),
-        questIds = List(sol.info.questId)) returns List(sol).iterator
+      quest.allWithParams(
+        status = List(QuestStatus.InRotation),
+        authorIds = List(user1.id),
+        skip = 0) returns List().iterator
 
       val result = api.updateQuestSolutionState(UpdateQuestSolutionStateRequest(sol))
 
-      result must beEqualTo(OkApiResult(UpdateQuestSolutionStateResult()))
+      there was two(quest).allWithParams(
+        status = List(QuestStatus.InRotation),
+        authorIds = List(user1.id),
+        skip = 0)
 
-      there was one(solution).updateStatus(Matchers.eq(sol.id), Matchers.eq(QuestSolutionStatus.WaitingForCompetitor.toString), Matchers.eq(null))
+      there was one(solution).updateStatus(Matchers.eq(sol.id), Matchers.eq(QuestSolutionStatus.CheatingBanned), Matchers.eq(null))
       there was one(user).readById(user1.id)
-      there was one(api).rewardQuestSolutionAuthor(RewardQuestSolutionAuthorRequest(sol.copy(status = QuestSolutionStatus.WaitingForCompetitor), user1))
+      there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = QuestSolutionStatus.CheatingBanned), user1))
+
+      result must beEqualTo(OkApiResult(UpdateQuestSolutionStateResult()))
     }
   }
 }
-
 

@@ -75,36 +75,38 @@ class QuestDAOSpecs extends Specification
         createQuestStub(
           id = "q1",
           authorId = "q1_author id",
-          themeId = "t1",
-          status = QuestStatus.OnVoting,
+          status = QuestStatus.CheatingBanned,
           level = 3,
           vip = false,
-          cultureId = "c1"),
+          cultureId = "c1",
+          points = 321),
 
         createQuestStub(
           id = "q2",
           authorId = "q2_author id",
-          themeId = "t2",
           status = QuestStatus.InRotation,
           level = 13,
           vip = true,
-          cultureId = "c2"),
+          cultureId = "c2",
+          points = 21),
 
         createQuestStub(
           id = "q3",
           authorId = "q3_author id",
-          themeId = "t3",
-          status = QuestStatus.OnVoting,
+          status = QuestStatus.CheatingBanned,
           level = 7,
           vip = true,
-          cultureId = "c3"))
+          cultureId = "c3",
+          points = 60))
 
       qs.foreach(db.quest.create)
 
-      val all = db.quest.allWithParams()
+      // Sorted by poins.
+      val all = db.quest.allWithParams().toList
       all.size must beEqualTo(qs.size)
+      all.map(_.id) must beEqualTo(List(qs(0).id, qs(2).id, qs(1).id))
 
-      val status = db.quest.allWithParams(status = List(QuestStatus.OnVoting.toString)).toList
+      val status = db.quest.allWithParams(status = List(QuestStatus.CheatingBanned)).toList
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
 
@@ -123,21 +125,13 @@ class QuestDAOSpecs extends Specification
       vip.map(_.id).size must beEqualTo(2)
       vip.map(_.id) must contain(qs(1).id) and contain(qs(2).id)
 
-      val statusVip = db.quest.allWithParams(status = List(QuestStatus.OnVoting.toString), vip = Some(false)).toList
+      val statusVip = db.quest.allWithParams(status = List(QuestStatus.CheatingBanned), vip = Some(false)).toList
       statusVip.map(_.id).size must beEqualTo(1)
       statusVip.map(_.id) must beEqualTo(List(qs(0).id))
 
       val ids = db.quest.allWithParams(ids = List("q1", "q2"), vip = Some(true)).toList
       ids.map(_.id).size must beEqualTo(1)
       ids.map(_.id) must beEqualTo(List(qs(1).id))
-
-      val themeIds = db.quest.allWithParams(themeIds = List("t1", "t3")).toList
-      themeIds.map(_.id).size must beEqualTo(2)
-      themeIds.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
-
-      val themeIdsAndIds = db.quest.allWithParams(ids = List("q1", "q2"), themeIds = List("t1", "t3")).toList
-      themeIdsAndIds.map(_.id).size must beEqualTo(1)
-      themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))
 
       val culture = db.quest.allWithParams(cultureId = Some(qs(2).cultureId)).toList
       culture.map(_.id).size must beEqualTo(1)
@@ -168,6 +162,32 @@ class QuestDAOSpecs extends Specification
       val ou3 = db.quest.readById(t3.id)
       ou3 must beSome.which((u: Quest) => u.id == t3.id)
       ou3 must beSome.which((u: Quest) => u.cultureId == "eng")
+    }
+
+    "Update quest points"  in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val quest = createQuestStub()
+
+      db.quest.create(quest)
+
+      db.quest.updatePoints(
+        id = quest.id,
+        pointsChange = 1,
+        likesChange = 2,
+        votersCountChange = 3,
+        cheatingChange = 4,
+        spamChange = 5,
+        pornChange = 6)
+
+      val ou1 = db.quest.readById(quest.id)
+      ou1 must beSome.which((q: Quest) => q.id == quest.id)
+      ou1 must beSome.which((u: Quest) => u.rating.points == 1)
+      ou1 must beSome.which((u: Quest) => u.rating.likesCount == 2)
+      ou1 must beSome.which((u: Quest) => u.rating.votersCount == 3)
+      ou1 must beSome.which((u: Quest) => u.rating.cheating == 4)
+      ou1 must beSome.which((u: Quest) => u.rating.iacpoints.spam == 5)
+      ou1 must beSome.which((u: Quest) => u.rating.iacpoints.porn == 6)
     }
 
   }

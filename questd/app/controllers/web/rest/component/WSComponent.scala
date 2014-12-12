@@ -12,13 +12,14 @@ trait WSComponent { component: DomainAPIComponent with SocialNetworkComponent =>
   class WS
     extends LoginWSImpl
     with ProfileWSImpl
-    with ProposeQuestWSImpl
+    with CreateQuestWSImpl
     with SolveQuestWSImpl
-    with VoteQuestProposalWSImpl
+    with VoteQuestWSImpl
     with VoteQuestSolutionWSImpl
     with DailyResultWSImpl
+    with TimeLineWSImpl
     with ContentWSImpl
-    with ShortlistWSImpl
+    with FollowingWSImpl
     with FriendsWSImpl
     with MessagesWSImpl
     with MiscWSImpl

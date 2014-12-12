@@ -29,17 +29,18 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     with ProfileAPI
     with DailyResultAPI
     with StatsAPI
-    with ProposeQuestAPI
+    with CreateQuestAPI
     with SolveQuestAPI
-    with VoteQuestProposalAPI
-    with VoteQuestSolutionAPI
+    with VoteQuestAPI
+    with VoteSolutionAPI
     with ContentAPI
-    with ShortlistAPI
+    with FollowingAPI
     with FriendsAPI
     with MessagesAPI
     with MiscAPI
     with TasksAPI
     with TutorialAPI
+    with TimeLineAPI
 
     with QuestAPI
     with QuestsFetchAPI
