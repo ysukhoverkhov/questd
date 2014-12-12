@@ -1,18 +1,13 @@
 package controllers.tasks
 
-import scala.concurrent.duration._
-import scala.language.postfixOps
 import akka.actor._
-import akka.actor.ActorDSL._
-import akka.actor.ActorSystem
-import us.theatr.akka.quartz._
-import play.Logger
-import play.api.libs.concurrent.Akka
-import play.api.Play.current
-import helpers.akka.EasyRestartActor
 import controllers.tasks.messages.DoTask
-import models.domain._
+import helpers.akka.EasyRestartActor
 import models.domain.admin._
+import play.Logger
+import us.theatr.akka.quartz._
+
+import scala.language.postfixOps
 
 object TasksDispatcher {
   def props(config: ConfigSection) = Props(classOf[TasksDispatcher], config)
@@ -33,35 +28,34 @@ class TasksDispatcher(config: ConfigSection) extends EasyRestartActor {
 
     config.values.foreach(c => schedule(c._1, c._2))
 
-    printScheduledJobs
+    printScheduledJobs()
   }
 
-  def printScheduledJobs = {
+  def printScheduledJobs() = {
     // http://www.mkyong.com/java/how-to-list-all-jobs-in-the-quartz-scheduler/
 
     import org.quartz.impl.StdSchedulerFactory
     import org.quartz.impl.matchers.GroupMatcher
-    import java.util.Date
 
-    import scala.collection.JavaConversions._
+import scala.collection.JavaConversions._
 
     Thread.sleep(1000)
 
-    val all = (new StdSchedulerFactory).getAllSchedulers()
+    val all = (new StdSchedulerFactory).getAllSchedulers
     val scheduler = all.iterator().next()
 
-    for (groupName <- scheduler.getJobGroupNames()) {
+    for (groupName <- scheduler.getJobGroupNames) {
       for (jobKey <- scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
 
-        val jobName = jobKey.getName()
-        val jobGroup = jobKey.getGroup()
+        val jobName = jobKey.getName
+        val jobGroup = jobKey.getGroup
 
         //get job's trigger
-        val triggers = scheduler.getTriggersOfJob(jobKey);
-        val nextFireTime = triggers.get(0).getNextFireTime();
+        val triggers = scheduler.getTriggersOfJob(jobKey)
+        val nextFireTime = triggers.get(0).getNextFireTime
 
         Logger.debug("[jobName] : " + jobName + " [groupName] : "
-          + jobGroup + " - " + nextFireTime);
+          + jobGroup + " - " + nextFireTime)
 
       }
 

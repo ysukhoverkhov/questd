@@ -16,7 +16,7 @@ case class QuestSolutionResult(
     solutionId: String,
     reward: Option[Assets],
     penalty: Option[Assets],
-    status: QuestSolutionStatus.Value)
+    status: SolutionStatus.Value)
 
 case class QuestProposalResult(
     questId: String,

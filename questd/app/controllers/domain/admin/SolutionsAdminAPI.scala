@@ -9,7 +9,7 @@ import controllers.domain.helpers._
 import controllers.domain._
 
 case class AllSolutionsRequest()
-case class AllSolutionsResult(solutions: Iterator[QuestSolution])
+case class AllSolutionsResult(solutions: Iterator[Solution])
 
 private[domain] trait SolutionsAdminAPI { this: DBAccessor =>
 
