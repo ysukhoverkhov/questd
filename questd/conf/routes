@@ -101,7 +101,8 @@ POST	/rest/assignTutorialTask						controllers.web.rest.TutorialWS.assignTutoria
 POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
 
 # Upload
-POST    /upload                                         controllers.web.rest.UploadWS.upload
+POST    /cdn/upload                                     controllers.web.rest.UploadWS.upload
+POST    /cdn/getContentURLById                          controllers.web.rest.UploadWS.getContentURLById
 
 #######################
 # Debug (Should be removed in production)

@@ -416,7 +416,7 @@ package object protocol {
    */
   case class WSUploadResult(
     code: UploadCode.Value,
-    url: Option[String])
+    contentId: Option[String])
 
   /**
    *  Upload errors.
@@ -425,6 +425,17 @@ package object protocol {
     val OK = Value
     val FileNotFoundInRequest = Value
     val RequestIsNotMultiPart = Value
+  }
+
+  case class WSGetContentURLByIdRequest (
+    contentId: String)
+
+  case class WSGetContentURLByIdResult(
+    code: ContentURlRequestCode.Value,
+    url: Option[String])
+  object ContentURlRequestCode extends Enumeration {
+    val OK = Value
+    val ContentNotFount = Value
   }
 
 }

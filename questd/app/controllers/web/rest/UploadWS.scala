@@ -6,5 +6,6 @@ import play.api.mvc._
 object UploadWS extends Controller with AccessToWSInstance {
 
   def upload = ws.upload
+  def getContentURLById = ws.getContentURLById
 }
 

@@ -3,8 +3,9 @@ package controllers.web.rest.component
 
 import java.util.UUID
 
+import controllers.domain.OkApiResult
 import controllers.web.rest.component.helpers._
-import controllers.web.rest.protocol.{UploadCode, WSUploadResult}
+import controllers.web.rest.protocol._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.Future
@@ -21,7 +22,6 @@ trait UploadWSImpl extends QuestController with SecurityWSImpl { this: WSCompone
 //            val contentType = content.contentType
 
             val baseDir = Path(config(ConfigParams.ContentUploadDir))
-            val baseURL = config(ConfigParams.UploadedContentBaseURL)
             val addition = Path(s"${request.user.id}") / UUID.randomUUID().toString
             val file = (baseDir / addition).jfile
 
@@ -29,7 +29,7 @@ trait UploadWSImpl extends QuestController with SecurityWSImpl { this: WSCompone
             content.ref.moveTo(file)
 
             Ok(
-              Json.write(WSUploadResult(UploadCode.OK, Some(baseURL + addition)))).as(JSON)
+              Json.write(WSUploadResult(UploadCode.OK, Some(addition.toString())))).as(JSON)
 
           }.getOrElse {
             BadRequest(
@@ -41,5 +41,14 @@ trait UploadWSImpl extends QuestController with SecurityWSImpl { this: WSCompone
       }
     }
   }
+
+  def getContentURLById = wrapJsonApiCallReturnBody[WSGetContentURLByIdResult] { (js, r) =>
+    val v = Json.read[WSGetContentURLByIdRequest](js)
+
+    val baseURL = config(ConfigParams.UploadedContentBaseURL)
+
+    OkApiResult(WSGetContentURLByIdResult(ContentURlRequestCode.OK, Some(baseURL + v.contentId)))
+  }
+
 }
 
