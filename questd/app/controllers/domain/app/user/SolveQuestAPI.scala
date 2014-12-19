@@ -65,7 +65,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                   user = user,
                   cost = Some(questToSolve.info.solveCost)))
               } ifOk { r =>
-                makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.SubmitQuestResult)))
+                makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.CreateSolution)))
               } ifOk { r =>
 
                 // Creating solution.

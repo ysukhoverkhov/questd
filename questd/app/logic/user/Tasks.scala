@@ -36,8 +36,8 @@ trait Tasks { this: UserLogic =>
    */
   private def getTaskGenerationAlgorithms: Map[TaskType.Value, (User) => Option[Task]] = {
 
-    Map(TaskType.VoteQuestSolutions -> getVoteQuestSolutionsTask,
-      TaskType.SubmitQuestResult -> getSubmitQuestResultTask,
+    Map(TaskType.VoteSolutions -> getVoteQuestSolutionsTask,
+      TaskType.CreateSolution -> getSubmitQuestResultTask,
       TaskType.AddToFollowing -> getAddToFollowingTask,
       TaskType.VoteQuests -> getVoteQuestProposalsTask,
       TaskType.CreateQuest -> getSubmitQuestProposalTask,

@@ -29,7 +29,7 @@ private[domain] trait VoteSolutionAPI {
             voteSolutionUpdate(VoteSolutionUpdateRequest(s, isFriend, request.vote))
           } ifOk { r =>
 
-            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuestSolutions)))
+            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteSolutions)))
 
           } ifOk { r =>
             db.user.recordTimeLineVote(r.user.id, s.id, request.vote) ifSome { u =>

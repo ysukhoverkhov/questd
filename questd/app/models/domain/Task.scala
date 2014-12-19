@@ -1,11 +1,9 @@
 package models.domain
 
-import java.util.Date
-
 
 object TaskType extends Enumeration {
-  val VoteQuestSolutions = Value
-  val SubmitQuestResult = Value
+  val VoteSolutions = Value
+  val CreateSolution = Value
   val AddToFollowing = Value
   val VoteQuests = Value
   val CreateQuest = Value
