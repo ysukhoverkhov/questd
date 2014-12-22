@@ -16,8 +16,8 @@ case class GetQuestResult(
 case class GetSolutionRequest(user: User, solutionId: String)
 case class GetSolutionResult(
   allowed: ProfileModificationResult,
-  mySolution: Option[SolutionInfoWithID] = None,
-  myRating: Option[SolutionRating] = None,
+  solution: Option[SolutionInfoWithID] = None,
+  rating: Option[SolutionRating] = None,
   quest: Option[QuestInfoWithID] = None,
   questAuthor: Option[PublicProfileWithID] = None)
 
@@ -120,8 +120,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
       OkApiResult(GetSolutionResult(
         allowed = OK,
-        mySolution = Some(SolutionInfoWithID(s.id, s.info)),
-        myRating = Some(s.rating),
+        solution = Some(SolutionInfoWithID(s.id, s.info)),
+        rating = Some(s.rating),
         quest = questInfo,
         questAuthor = questAuthor))
     }
