@@ -28,7 +28,7 @@ case class GetLevelsForRightsRequest(user: User, functionality: List[String])
 case class GetLevelsForRightsResult(levels: Map[Functionality.Value, Int])
 
 case class SetDebugRequest(user: User, debug: String)
-case class SetDebugResult(user: User)
+case class SetDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class SetGenderRequest(user: User, gender: Gender.Value)
 case class SetGenderResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -134,7 +134,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     import request._
 
     db.user.setDebug(user.id, debug) ifSome { v =>
-      OkApiResult(SetDebugResult(v))
+      OkApiResult(SetDebugResult(OK, Some(v.profile)))
     }
 
   }
