@@ -1,7 +1,5 @@
 package controllers.web.rest.component
 
-import controllers.domain.OkApiResult
-
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.web.rest.component.helpers._
