@@ -46,7 +46,7 @@ case class GetSuggestsForFollowingRequest(
 
 case class GetSuggestsForFollowingResult(
   allowed: ProfileModificationResult,
-  userIds: List[String] = List())
+  userIds: Option[List[String]] = None)
 
 private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#DomainAPI with SNAccessor =>
 
@@ -152,7 +152,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
           db.user.readBySNid(i.snName, i.snId)
         }).filter(_ != None).map(_.get).map(_.id).filter(!request.user.friends.contains(_)).filter(!request.user.following.contains(_))
 
-        OkApiResult(GetSuggestsForFollowingResult(OK, friends))
+        OkApiResult(GetSuggestsForFollowingResult(OK, Some(friends)))
       case a => OkApiResult(GetSuggestsForFollowingResult(a))
     }
   }
