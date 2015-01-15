@@ -7,7 +7,7 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import logic._
-import play.Logger
+import play.{Play, Logger}
 
 case class GetAllUsersRequest()
 case class GetAllUsersResult(users: Iterator[User])
@@ -184,7 +184,8 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get list of possible countries.
    */
   def getCountryList(request: GetCountryListRequest): ApiResult[GetCountryListResult] = handleDbException {
-    val countries = scala.io.Source.fromFile("conf/countries.txt").getLines().toList
+    val countriesFilePath = Play.application().path().getPath + "/conf/countries.txt"
+    val countries = scala.io.Source.fromFile(countriesFilePath).getLines().toList
 
     OkApiResult(GetCountryListResult(countries))
   }
