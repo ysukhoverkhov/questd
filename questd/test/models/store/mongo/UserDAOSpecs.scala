@@ -396,8 +396,8 @@ class UserDAOSpecs
     "Add entry to time line" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
 
-      val u = User(id = "idid")
-      val tle = TimeLineEntry(
+      val u = User(id = "idid_for_time_line")
+      val tle1 = TimeLineEntry(
         id = "id",
         reason = TimeLineReason.Created,
         objectAuthorId = u.id,
@@ -405,11 +405,11 @@ class UserDAOSpecs
         objectId = "oid")
 
       db.user.create(u)
-      db.user.addEntryToTimeLine(u.id, tle)
+      db.user.addEntryToTimeLine(u.id, tle1)
 
       val ou1 = db.user.readById(u.id)
       ou1 must beSome[User]
-      ou1.get.timeLine must beEqualTo(List(tle))
+      ou1.get.timeLine must beEqualTo(List(tle1))
     }
 
     "Add entry to time line multi" in new WithApplication(appWithTestDatabase) {

@@ -184,8 +184,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get list of possible countries.
    */
   def getCountryList(request: GetCountryListRequest): ApiResult[GetCountryListResult] = handleDbException {
-    val countriesFilePath = Play.application().path().getPath + "/conf/countries.txt"
-    val countries = scala.io.Source.fromFile(countriesFilePath).getLines().toList
+    val countries = scala.io.Source.fromFile(Play.application().getFile("conf/countries.txt")).getLines().toList
 
     OkApiResult(GetCountryListResult(countries))
   }
