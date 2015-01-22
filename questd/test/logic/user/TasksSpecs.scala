@@ -22,6 +22,7 @@ class TasksSpecs extends BaseLogicSpecs {
 
     config.apply(api.ConfigParams.SolutionVoteTaskCountMean) returns "3"
     config.apply(api.ConfigParams.SolutionVoteTaskCountDeviation) returns "1"
+    config.apply(api.ConfigParams.CreateSolutionTaskProbability) returns "0.5"
     config.apply(api.ConfigParams.AddToFollowingTaskProbability) returns "0.3"
     config.apply(api.ConfigParams.QuestVoteTaskShare) returns "0.9"
 
