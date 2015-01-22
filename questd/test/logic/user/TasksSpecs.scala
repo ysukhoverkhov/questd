@@ -52,7 +52,7 @@ class TasksSpecs extends BaseLogicSpecs {
       t.get.requiredCount must be_>=(0)
     }
 
-    "Do not Generate tasks SubmitQuestResult for low level users" in {
+    "Do not Generate tasks CreateSolution for low level users" in {
       api.config returns createStubConfig
 
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 1)))
@@ -62,19 +62,19 @@ class TasksSpecs extends BaseLogicSpecs {
       t must beNone
     }
 
-    // TODO: clean me up.
-//    "Generate tasks SubmitQuestResult" in {
-//      api.config returns createStubConfig
-//
-//      val u = createUser(3)
-//      val dailyResult = u.getTasksForTomorrow
-//
-//      u.canSolveQuestToday must beEqualTo(true)
-//
-//      val t = dailyResult.tasks.find(_.taskType == TaskType.SubmitQuestResult)
-//      t must beSome[Task]
-//      t.get.requiredCount must beEqualTo(1)
-//    }
+    "Generate tasks CreateSolution" in {
+      api.config returns createStubConfig
+      rand.nextDouble() returns 0.1
+
+      val u = createUser(3)
+      val dailyResult = u.getTasksForTomorrow
+
+      u.canSolveQuestToday must beEqualTo(true)
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.CreateSolution)
+      t must beSome[Task]
+      t.get.requiredCount must beEqualTo(1)
+    }
 
     // TODO: clean me up.
 //    "Generate tasks AddToFollowing" in {

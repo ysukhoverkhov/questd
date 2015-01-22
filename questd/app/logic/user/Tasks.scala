@@ -36,18 +36,18 @@ trait Tasks { this: UserLogic =>
    */
   private def getTaskGenerationAlgorithms: Map[TaskType.Value, (User) => Option[Task]] = {
 
-    Map(TaskType.VoteSolutions -> getVoteQuestSolutionsTask,
-      TaskType.CreateSolution -> getSubmitQuestResultTask,
-      TaskType.AddToFollowing -> getAddToFollowingTask,
-      TaskType.VoteQuests -> getVoteQuestProposalsTask,
-      TaskType.CreateQuest -> getSubmitQuestProposalTask,
-      TaskType.VoteReviews -> getVoteReviewsTask,
-      TaskType.SubmitReviewsForResults -> getSubmitReviewsForResultsTask,
-      TaskType.SubmitReviewsForProposals -> getSubmitReviewsForProposalsTask,
-      TaskType.GiveRewards -> getGiveRewardsTask,
-      TaskType.LookThroughWinnersOfMyQuests -> getLookThroughWinnersOfMyQuestsTask,
-      TaskType.LookThroughFriendshipProposals -> getReviewFriendshipRequestsTask,
-      TaskType.Client -> getClientTask)
+    Map(TaskType.VoteSolutions -> createVoteQuestSolutionsTask,
+      TaskType.CreateSolution -> createCreateSolutionTask,
+      TaskType.AddToFollowing -> createAddToFollowingTask,
+      TaskType.VoteQuests -> createVoteQuestProposalsTask,
+      TaskType.CreateQuest -> createSubmitQuestProposalTask,
+      TaskType.VoteReviews -> createVoteReviewsTask,
+      TaskType.SubmitReviewsForResults -> createSubmitReviewsForResultsTask,
+      TaskType.SubmitReviewsForProposals -> createSubmitReviewsForProposalsTask,
+      TaskType.GiveRewards -> createGiveRewardsTask,
+      TaskType.LookThroughWinnersOfMyQuests -> createLookThroughWinnersOfMyQuestsTask,
+      TaskType.LookThroughFriendshipProposals -> createReviewFriendshipRequestsTask,
+      TaskType.Client -> createClientTask)
   }
 
   /**
@@ -63,7 +63,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating task for voting quests.
    */
-  private def getVoteQuestSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
+  private def createVoteQuestSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
     def votesCount = {
       val mean = api.config(api.ConfigParams.SolutionVoteTaskCountMean).toDouble
       val dev = api.config(api.ConfigParams.SolutionVoteTaskCountDeviation).toDouble
@@ -79,21 +79,21 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating task for submitting quest.
    */
-  private def getSubmitQuestResultTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoResults) {
-    // FIX: clean me up.
-//    if (canSolveQuestToday)
-//      Some(Task(
-//        taskType = TaskType.SubmitQuestResult,
-//        description = "",
-//        requiredCount = 1))
-//    else
+  private def createCreateSolutionTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoResults) {
+    val taskProbability = api.config(api.ConfigParams.CreateSolutionTaskProbability).toDouble
+    if (canSolveQuestToday && rand.nextDouble() < taskProbability)
+      Some(Task(
+        taskType = TaskType.CreateSolution,
+        description = "",
+        requiredCount = 1))
+    else
       None
   }
 
   /**
    * Algorithm for generating tasks for following.
    */
-  private def getAddToFollowingTask(user: User) = ifHasRightTo(Functionality.AddToFollowing) {
+  private def createAddToFollowingTask(user: User) = ifHasRightTo(Functionality.AddToFollowing) {
     val prob = api.config(api.ConfigParams.AddToFollowingTaskProbability).toDouble
     if (rand.nextDouble < prob)
       Some(Task(
@@ -107,7 +107,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for creating task for votes for proposals.
    */
-  private def getVoteQuestProposalsTask(user: User) = ifHasRightTo(Functionality.VoteQuests) {
+  private def createVoteQuestProposalsTask(user: User) = ifHasRightTo(Functionality.VoteQuests) {
 //    def calculateCount = {
 //      val share = api.config(api.ConfigParams.QuestVoteTaskShare).toDouble
 //      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
@@ -123,7 +123,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating task for submitting quest proposal.
    */
-  private def getSubmitQuestProposalTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
+  private def createSubmitQuestProposalTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
     if (canProposeQuestToday)
       Some(Task(
         taskType = TaskType.CreateQuest,
@@ -136,7 +136,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for selecting task for voting reviews.
    */
-  private def getVoteReviewsTask(user: User) = ifHasRightTo(Functionality.VoteReviews) {
+  private def createVoteReviewsTask(user: User) = ifHasRightTo(Functionality.VoteReviews) {
     //    Some(Task(
     //      taskType = TaskType.VoteReviews,
     //      description = "",
@@ -147,7 +147,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating tasks for submiting reviews for solutions.
    */
-  private def getSubmitReviewsForResultsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForResults) {
+  private def createSubmitReviewsForResultsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForResults) {
     //    Some(Task(
     //      taskType = TaskType.SubmitReviewsForResults,
     //      description = "",
@@ -158,7 +158,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating tasks for submiting reviews for proposals.
    */
-  private def getSubmitReviewsForProposalsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForProposals) {
+  private def createSubmitReviewsForProposalsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForProposals) {
     //    Some(Task(
     //      taskType = TaskType.SubmitReviewsForProposals,
     //      description = "",
@@ -169,7 +169,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating task about giving reward.
    */
-  private def getGiveRewardsTask(user: User) = ifHasRightTo(Functionality.GiveRewards) {
+  private def createGiveRewardsTask(user: User) = ifHasRightTo(Functionality.GiveRewards) {
     // implement me.  - 20% chance each day.
     //    Some(Task(
     //      taskType = TaskType.GiveRewards,
@@ -178,7 +178,7 @@ trait Tasks { this: UserLogic =>
     None
   }
 
-  private def getLookThroughWinnersOfMyQuestsTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
+  private def createLookThroughWinnersOfMyQuestsTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
     //    Some(Task(
     //      taskType = TaskType.LookThroughWinnersOfMyQuests,
     //      description = "",
@@ -189,7 +189,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating tasks to review friendship request.
    */
-  private def getReviewFriendshipRequestsTask(user: User): Option[Task] = {
+  private def createReviewFriendshipRequestsTask(user: User): Option[Task] = {
     if (user.friends.exists(_.status == FriendshipStatus.Invites))
       Some(Task(
         taskType = TaskType.LookThroughFriendshipProposals,
@@ -202,6 +202,6 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating Client's custom tasks.
    */
-  private def getClientTask(user: User) = None
+  private def createClientTask(user: User) = None
 
 }
