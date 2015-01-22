@@ -89,25 +89,20 @@ class TasksSpecs extends BaseLogicSpecs {
       val t = dailyResult.tasks.find(_.taskType == TaskType.AddToFollowing)
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(1)
-
-      there was one(rand).nextDouble
     }
 
-    // TODO: clean me up.
-//    "Do not generate tasks AddToFollowing" in {
-//      api.config returns createStubConfig
-//      rand.nextDouble returns 0.5
-//
-//      val u = createUser(8)
-//      val dailyResult = u.getTasksForTomorrow
-//
-//      u.canSolveQuestToday must beEqualTo(true)
-//
-//      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToFollowing)
-//      t must beNone
-//
-//      there was one(rand).nextDouble
-//    }
+    "Do not generate tasks AddToFollowing" in {
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.5
+
+      val u = createUser(8)
+      val dailyResult = u.getTasksForTomorrow
+
+      u.canSolveQuestToday must beEqualTo(true)
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToFollowing)
+      t must beNone
+    }
 
 //    "Generate tasks for voting for proposals" in {
 //      api.config returns createStubConfig
