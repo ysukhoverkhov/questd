@@ -24,7 +24,8 @@ class TasksSpecs extends BaseLogicSpecs {
     config.apply(api.ConfigParams.SolutionVoteTaskCountDeviation) returns "1"
     config.apply(api.ConfigParams.CreateSolutionTaskProbability) returns "0.5"
     config.apply(api.ConfigParams.AddToFollowingTaskProbability) returns "0.3"
-    config.apply(api.ConfigParams.QuestVoteTaskShare) returns "0.9"
+    config.apply(api.ConfigParams.QuestVoteTaskCountMean) returns "3"
+    config.apply(api.ConfigParams.QuestVoteTaskCountDeviation) returns "1"
 
     config
   }
@@ -104,16 +105,17 @@ class TasksSpecs extends BaseLogicSpecs {
       t must beNone
     }
 
-//    "Generate tasks for voting for proposals" in {
-//      api.config returns createStubConfig
-//
-//      val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
-//      val dailyResult = u.getTasksForTomorrow
-//
-//      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuests)
-//      t must beSome[Task]
-//      t.get.requiredCount must beEqualTo(3) // 90% from 4
-//    }
+    "Generate tasks for voting for quests" in {
+      api.config returns createStubConfig
+      rand.nextGaussian(any, any) returns 3
+
+      val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
+      val dailyResult = u.getTasksForTomorrow
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuests)
+      t must beSome[Task]
+      t.get.requiredCount must beEqualTo(3)
+    }
 
     // TODO: clean me up.
 //    "Generate tasks for submitting proposals" in {

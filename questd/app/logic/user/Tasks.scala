@@ -108,16 +108,16 @@ trait Tasks { this: UserLogic =>
    * Algorithm for creating task for votes for proposals.
    */
   private def createVoteQuestsTask(user: User) = ifHasRightTo(Functionality.VoteQuests) {
-//    def calculateCount = {
-//      val share = api.config(api.ConfigParams.QuestVoteTaskShare).toDouble
-//      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
-//    }
-//
-//    Some(Task(
-//      taskType = TaskType.VoteQuests,
-//      description = "",
-//      requiredCount = calculateCount))
-    None
+    def votesCount = {
+      val mean = api.config(api.ConfigParams.QuestVoteTaskCountMean).toDouble
+      val dev = api.config(api.ConfigParams.QuestVoteTaskCountDeviation).toDouble
+      math.max(math.round(rand.nextGaussian(mean, dev)), 0).toInt
+    }
+
+    Some(Task(
+      taskType = TaskType.VoteQuests,
+      description = "",
+      requiredCount = votesCount))
   }
 
   /**
