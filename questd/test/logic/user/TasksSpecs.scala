@@ -20,7 +20,8 @@ class TasksSpecs extends BaseLogicSpecs {
 
     val config = mock[ConfigSection]
 
-    config.apply(api.ConfigParams.SolutionVoteTaskShare) returns "0.9"
+    config.apply(api.ConfigParams.SolutionVoteTaskCountMean) returns "3"
+    config.apply(api.ConfigParams.SolutionVoteTaskCountDeviation) returns "1"
     config.apply(api.ConfigParams.AddToFollowingTaskProbability) returns "0.3"
     config.apply(api.ConfigParams.QuestVoteTaskShare) returns "0.9"
 
@@ -38,17 +39,18 @@ class TasksSpecs extends BaseLogicSpecs {
       dailyResult.tasks.length must beGreaterThan(0)
     }
 
-//    "Generate tasks for voting for soluions" in {
-//      api.config returns createStubConfig
-//
-//      val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
-//      val dailyResult = u.getTasksForTomorrow
-//
-//      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuestSolutions)
-//      t must beSome[Task]
-//      t.get.currentCount must beEqualTo(0)
-//      t.get.requiredCount must beEqualTo(17) // 90% from 19
-//    }
+    "Generate tasks for voting for soluions" in {
+      api.config returns createStubConfig
+      rand.nextGaussian(any, any) returns 3
+
+      val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
+      val dailyResult = u.getTasksForTomorrow
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteSolutions)
+      t must beSome[Task]
+      t.get.currentCount must beEqualTo(0)
+      t.get.requiredCount must be_>=(0)
+    }
 
     "Do not Generate tasks SubmitQuestResult for low level users" in {
       api.config returns createStubConfig

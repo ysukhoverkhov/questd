@@ -7,13 +7,14 @@ import models.domain.admin.ConfigSection
 class _ConfigParams {
 
   val DebugExpMultiplier = "01 01 Debug Exp Multiplier"
-  val DebugDisableProposalCooldown = "01 02 Debug Disable Proposal Cooldown"
+  val DebugDisableProposalCoolDown = "01 02 Debug Disable Proposal CoolDown"
 
   val ActiveUserDays = "10 01 Active User Days"
 
-  val SolutionVoteTaskShare = "30 01 Solution Vote Task Share"
-  val AddToFollowingTaskProbability = "30 02 Add To Following Task Probability"
-  val QuestVoteTaskShare = "30 03 Vote Quests task share"
+  val SolutionVoteTaskCountMean = "30 01 Solution Vote Task Count Mean"
+  val SolutionVoteTaskCountDeviation = "30 02 Solution Vote Task Count Deviation"
+  val AddToFollowingTaskProbability = "30 11 Add To Following Task Probability"
+  val QuestVoteTaskShare = "30 21 Vote Quests task share"
 
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
@@ -70,11 +71,12 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     configSectionName,
     Map(
       ConfigParams.DebugExpMultiplier -> "1",
-      ConfigParams.DebugDisableProposalCooldown -> "0",
+      ConfigParams.DebugDisableProposalCoolDown -> "0",
 
       ConfigParams.ActiveUserDays -> "7",
 
-      ConfigParams.SolutionVoteTaskShare -> "0.9",
+      ConfigParams.SolutionVoteTaskCountMean -> "3",
+      ConfigParams.SolutionVoteTaskCountDeviation -> "0.8",
       ConfigParams.AddToFollowingTaskProbability -> "0.3",
       ConfigParams.QuestVoteTaskShare -> "0.9",
 

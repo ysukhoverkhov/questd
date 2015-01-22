@@ -64,16 +64,16 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating task for voting quests.
    */
   private def getVoteQuestSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
-//    def calculateCount = {
-//      val share = api.config(api.ConfigParams.SolutionVoteTaskShare).toDouble
-//      Math.round(Math.floor(rewardedSolutionVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
-//    }
-//
-//    Some(Task(
-//      taskType = TaskType.VoteQuestSolutions,
-//      description = "",
-//      requiredCount = calculateCount))
-    None
+    def votesCount = {
+      val mean = api.config(api.ConfigParams.SolutionVoteTaskCountMean).toDouble
+      val dev = api.config(api.ConfigParams.SolutionVoteTaskCountDeviation).toDouble
+      math.max(math.round(rand.nextGaussian(mean, dev)), 0).toInt
+    }
+
+    Some(Task(
+      taskType = TaskType.VoteSolutions,
+      description = "",
+      requiredCount = votesCount))
   }
 
   /**

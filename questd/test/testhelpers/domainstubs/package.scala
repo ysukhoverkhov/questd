@@ -146,6 +146,7 @@ package object domainstubs {
     level: Int = 19,
     vip: Boolean = false,
     cultureId: String = "c1",
+    winnerId: Option[String] = Some("a1"),
     voteEndDate: Date = new Date()
     ) = {
     Battle(
@@ -154,7 +155,8 @@ package object domainstubs {
         solutionIds = solutionIds,
         authorIds = authorIds,
         status = status,
-        voteEndDate = voteEndDate),
+        voteEndDate = voteEndDate,
+        winnerId = winnerId),
       level = level,
       vip = vip,
       cultureId = cultureId

@@ -52,7 +52,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
         (1.00, () => getBattlesWithMyTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
-      selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
+      selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
     }
   }
 
@@ -67,7 +67,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
       (1.00, () => getBattlesWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 
-    selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
+    selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
   }
 
   private[user] def getFriendsBattles = {

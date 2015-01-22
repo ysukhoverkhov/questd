@@ -4,8 +4,8 @@ package models.domain
 object TaskType extends Enumeration {
   val VoteSolutions = Value
   val CreateSolution = Value
-  val AddToFollowing = Value
   val VoteQuests = Value
+  val AddToFollowing = Value
   val CreateQuest = Value
   val VoteReviews = Value
   val SubmitReviewsForResults = Value
