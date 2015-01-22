@@ -39,7 +39,7 @@ class TasksSpecs extends BaseLogicSpecs {
       dailyResult.tasks.length must beGreaterThan(0)
     }
 
-    "Generate tasks for voting for soluions" in {
+    "Generate tasks for voting for solutions" in {
       api.config returns createStubConfig
       rand.nextGaussian(any, any) returns 3
 

@@ -38,7 +38,7 @@ private[domain] trait VoteSolutionAPI {
                 addToWatchersTimeLine(AddToWatchersTimeLineRequest(
                   user = u,
                   reason = TimeLineReason.Liked,
-                  objectType = TimeLineType.Quest,
+                  objectType = TimeLineType.Solution,
                   objectId = s.id,
                   objectAuthorId = Some(s.info.authorId)
                 ))
