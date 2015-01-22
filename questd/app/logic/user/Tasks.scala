@@ -44,7 +44,6 @@ trait Tasks { this: UserLogic =>
       TaskType.SubmitReviewsForResults -> createSubmitReviewsForResultsTask,
       TaskType.SubmitReviewsForProposals -> createSubmitReviewsForProposalsTask,
       TaskType.GiveRewards -> createGiveRewardsTask,
-      TaskType.LookThroughWinnersOfMyQuests -> createLookThroughWinnersOfMyQuestsTask,
       TaskType.LookThroughFriendshipProposals -> createReviewFriendshipRequestsTask,
       TaskType.Client -> createClientTask)
   }
@@ -173,14 +172,6 @@ trait Tasks { this: UserLogic =>
     // implement me.  - 20% chance each day.
     //    Some(Task(
     //      taskType = TaskType.GiveRewards,
-    //      description = "",
-    //      requiredCount = 10))
-    None
-  }
-
-  private def createLookThroughWinnersOfMyQuestsTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
-    //    Some(Task(
-    //      taskType = TaskType.LookThroughWinnersOfMyQuests,
     //      description = "",
     //      requiredCount = 10))
     None

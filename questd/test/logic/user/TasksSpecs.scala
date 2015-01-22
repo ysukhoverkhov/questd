@@ -132,33 +132,30 @@ class TasksSpecs extends BaseLogicSpecs {
       t.get.requiredCount must beEqualTo(1)
     }
 
-    // TODO: clean me up.
-//    "Generate tasks for reviewing friendship" in {
-//      api.config returns createStubConfig
-//
-//      val u = createUser(12).copy(friends = List(Friendship(friendId = "", status = FriendshipStatus.Invites)))
-//      val dailyResult = u.getTasksForTomorrow
-//
-//      u.canSolveQuestToday must beEqualTo(true)
-//
-//      val t = dailyResult.tasks.find(_.taskType == TaskType.LookThroughFriendshipProposals)
-//      t must beSome[Task]
-//      t.get.requiredCount must beEqualTo(1)
-//    }
+    "Generate tasks for reviewing friendship" in {
+      api.config returns createStubConfig
 
-    // TODO: clean me up.
-//    "Generate tasks for reviewing friendship if there are no requests" in {
-//      api.config returns createStubConfig
-//
-//      val u = createUser(12)
-//      val dailyResult = u.getTasksForTomorrow
-//
-//      u.canSolveQuestToday must beEqualTo(true)
-//
-//      val t = dailyResult.tasks.find(_.taskType == TaskType.LookThroughFriendshipProposals)
-//      t must beNone
-//    }
+      val u = createUser(12).copy(friends = List(Friendship(friendId = "", status = FriendshipStatus.Invites)))
+      val dailyResult = u.getTasksForTomorrow
+
+      u.canSolveQuestToday must beEqualTo(true)
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.LookThroughFriendshipProposals)
+      t must beSome[Task]
+      t.get.requiredCount must beEqualTo(1)
+    }
+
+    "Generate tasks for reviewing friendship if there are no requests" in {
+      api.config returns createStubConfig
+
+      val u = createUser(12)
+      val dailyResult = u.getTasksForTomorrow
+
+      u.canSolveQuestToday must beEqualTo(true)
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.LookThroughFriendshipProposals)
+      t must beNone
+    }
   }
 }
-
 

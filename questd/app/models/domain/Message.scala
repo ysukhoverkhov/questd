@@ -7,6 +7,7 @@ object MessageType extends Enumeration {
   val FriendshipAccepted = Value
   val FriendshipRejected = Value
   val FriendshipRemoved = Value
+  val TasksCompleted = Value
   val Text = Value
 }
 
@@ -17,7 +18,7 @@ object MessageType extends Enumeration {
 case class Message (
   id: String = ID.generateUUID(),
   messageType: MessageType.Value,
-  data: Map[String, String]) extends ID
+  data: Map[String, String] = Map.empty) extends ID
 
 
 /**
@@ -27,7 +28,7 @@ case class Message (
 case class MessageFriendshipAccepted (newFriendId: String)
 
 object MessageFriendshipAccepted {
-  implicit def toMessage(a: MessageFriendshipAccepted) = {
+  implicit def toMessage(a: MessageFriendshipAccepted): Message = {
     Message(
       messageType = MessageType.FriendshipAccepted,
       data = Map("newFriendId" -> a.newFriendId))
@@ -41,7 +42,7 @@ object MessageFriendshipAccepted {
 case class MessageFriendshipRejected (rejecterId: String)
 
 object MessageFriendshipRejected {
-  implicit def toMessage(a: MessageFriendshipRejected) = {
+  implicit def toMessage(a: MessageFriendshipRejected): Message = {
     Message(
       messageType = MessageType.FriendshipRejected,
       data = Map("rejecterId" -> a.rejecterId))
@@ -55,9 +56,21 @@ object MessageFriendshipRejected {
 case class MessageFriendshipRemoved (oldFriendId: String)
 
 object MessageFriendshipRemoved {
-  implicit def toMessage(a: MessageFriendshipRemoved) = {
+  implicit def toMessage(a: MessageFriendshipRemoved): Message = {
     Message(
       messageType = MessageType.FriendshipRemoved,
       data = Map("oldFriendId" -> a.oldFriendId))
+  }
+}
+
+/**
+ * A message about removed friendship connection.
+ */
+case class MessageTasksCompleted ()
+
+object MessageTasksCompleted {
+  implicit def toMessage(a: MessageTasksCompleted): Message = {
+    Message(
+      messageType = MessageType.TasksCompleted)
   }
 }

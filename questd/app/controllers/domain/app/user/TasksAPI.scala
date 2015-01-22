@@ -102,7 +102,9 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       val completed = isCompleted(nt)
 
       val r1 = if (completed) {
-        adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(nt.reward)))
+        adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(nt.reward))) ifOk { r =>
+          sendMessage(SendMessageRequest(r.user, MessageTasksCompleted()))
+        }
       } else {
         OkApiResult(AdjustAssetsResult(user))
       }
