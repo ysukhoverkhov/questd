@@ -15,7 +15,6 @@ trait Tasks { this: UserLogic =>
    * List of tasks to give user for next day.
    */
   def getTasksForTomorrow = {
-    val taskGenerationAlgorithms = getTaskGenerationAlgorithms
     val reward = getTasksReward
 
     val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
@@ -34,13 +33,13 @@ trait Tasks { this: UserLogic =>
   /**
    * Returns list of algorithms for generating all tasks.
    */
-  private def getTaskGenerationAlgorithms: Map[TaskType.Value, (User) => Option[Task]] = {
+  private def taskGenerationAlgorithms: Map[TaskType.Value, (User) => Option[Task]] = {
 
     Map(TaskType.VoteSolutions -> createVoteQuestSolutionsTask,
       TaskType.CreateSolution -> createCreateSolutionTask,
       TaskType.AddToFollowing -> createAddToFollowingTask,
       TaskType.VoteQuests -> createVoteQuestsTask,
-      TaskType.CreateQuest -> createSubmitQuestProposalTask,
+      TaskType.CreateQuest -> createCreateQuestTask,
       TaskType.VoteReviews -> createVoteReviewsTask,
       TaskType.SubmitReviewsForResults -> createSubmitReviewsForResultsTask,
       TaskType.SubmitReviewsForProposals -> createSubmitReviewsForProposalsTask,
@@ -123,8 +122,9 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating task for submitting quest proposal.
    */
-  private def createSubmitQuestProposalTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
-    if (canProposeQuestToday)
+  private def createCreateQuestTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
+    val taskProbability = api.config(api.ConfigParams.CreateQuestTaskProbability).toDouble
+    if (canProposeQuestToday && rand.nextDouble() < taskProbability)
       Some(Task(
         taskType = TaskType.CreateQuest,
         description = "",

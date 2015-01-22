@@ -26,6 +26,7 @@ class TasksSpecs extends BaseLogicSpecs {
     config.apply(api.ConfigParams.AddToFollowingTaskProbability) returns "0.3"
     config.apply(api.ConfigParams.QuestVoteTaskCountMean) returns "3"
     config.apply(api.ConfigParams.QuestVoteTaskCountDeviation) returns "1"
+    config.apply(api.ConfigParams.CreateQuestTaskProbability) returns "0.3"
 
     config
   }
@@ -117,19 +118,19 @@ class TasksSpecs extends BaseLogicSpecs {
       t.get.requiredCount must beEqualTo(3)
     }
 
-    // TODO: clean me up.
-//    "Generate tasks for submitting proposals" in {
-//      api.config returns createStubConfig
-//
-//      val u = createUser(12)
-//      val dailyResult = u.getTasksForTomorrow
-//
-//      u.canSolveQuestToday must beEqualTo(true)
-//
-//      val t = dailyResult.tasks.find(_.taskType == TaskType.SubmitQuestProposal)
-//      t must beSome[Task]
-//      t.get.requiredCount must beEqualTo(1)
-//    }
+    "Generate tasks for creating quests" in {
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.1
+
+      val u = createUser(12)
+      val dailyResult = u.getTasksForTomorrow
+
+      u.canSolveQuestToday must beEqualTo(true)
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.CreateQuest)
+      t must beSome[Task]
+      t.get.requiredCount must beEqualTo(1)
+    }
 
     // TODO: clean me up.
 //    "Generate tasks for reviewing friendship" in {
