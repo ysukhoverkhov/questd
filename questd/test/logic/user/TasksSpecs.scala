@@ -77,22 +77,21 @@ class TasksSpecs extends BaseLogicSpecs {
       t.get.requiredCount must beEqualTo(1)
     }
 
-    // TODO: clean me up.
-//    "Generate tasks AddToFollowing" in {
-//      api.config returns createStubConfig
-//      rand.nextDouble returns 0.2
-//
-//      val u = createUser(8)
-//      val dailyResult = u.getTasksForTomorrow
-//
-//      u.canSolveQuestToday must beEqualTo(true)
-//
-//      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToFollowing)
-//      t must beSome[Task]
-//      t.get.requiredCount must beEqualTo(1)
-//
-//      there was one(rand).nextDouble
-//    }
+    "Generate tasks AddToFollowing" in {
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.2
+
+      val u = createUser(8)
+      val dailyResult = u.getTasksForTomorrow
+
+      u.canSolveQuestToday must beEqualTo(true)
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToFollowing)
+      t must beSome[Task]
+      t.get.requiredCount must beEqualTo(1)
+
+      there was one(rand).nextDouble
+    }
 
     // TODO: clean me up.
 //    "Do not generate tasks AddToFollowing" in {

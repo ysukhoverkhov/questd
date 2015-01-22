@@ -39,7 +39,7 @@ trait Tasks { this: UserLogic =>
     Map(TaskType.VoteSolutions -> createVoteQuestSolutionsTask,
       TaskType.CreateSolution -> createCreateSolutionTask,
       TaskType.AddToFollowing -> createAddToFollowingTask,
-      TaskType.VoteQuests -> createVoteQuestProposalsTask,
+      TaskType.VoteQuests -> createVoteQuestsTask,
       TaskType.CreateQuest -> createSubmitQuestProposalTask,
       TaskType.VoteReviews -> createVoteReviewsTask,
       TaskType.SubmitReviewsForResults -> createSubmitReviewsForResultsTask,
@@ -107,7 +107,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for creating task for votes for proposals.
    */
-  private def createVoteQuestProposalsTask(user: User) = ifHasRightTo(Functionality.VoteQuests) {
+  private def createVoteQuestsTask(user: User) = ifHasRightTo(Functionality.VoteQuests) {
 //    def calculateCount = {
 //      val share = api.config(api.ConfigParams.QuestVoteTaskShare).toDouble
 //      Math.round(Math.floor(rewardedProposalVotesPerLevel(user.profile.publicProfile.level) * share).toFloat)
