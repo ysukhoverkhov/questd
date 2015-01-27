@@ -32,7 +32,7 @@ private[component] trait CommonFunctions { this: QuestController with SecurityWS
             ServerError
         }
       } catch {
-        case ex @ (_: MappingException | _: org.json4s.ParserUtil$ParseException) =>
+        case ex @ (_: MappingException | _: org.json4s.ParserUtil$ParseException | _: java.util.NoSuchElementException) =>
           BadRequest(ex.getMessage)
         case ex: Throwable =>
           Logger.error("Api calling exception", ex)
