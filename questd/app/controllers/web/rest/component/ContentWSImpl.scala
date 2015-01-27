@@ -4,6 +4,7 @@ import controllers.web.rest.component.helpers._
 import controllers.web.rest.protocol._
 import controllers.domain.app.user._
 import models.domain._
+import _root_.helpers.rich._
 
 trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
@@ -52,7 +53,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
 
     api.getOwnSolutions(GetOwnSolutionsRequest(
       r.user,
-      v.status.map(SolutionStatus.withName),
+      v.status.map(SolutionStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }
@@ -65,7 +66,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
 
     api.getOwnQuests(GetOwnQuestsRequest(
       r.user,
-      v.status.map(QuestStatus.withName),
+      v.status.map(QuestStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }
@@ -79,7 +80,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getSolutionsForQuest(GetSolutionsForQuestRequest(
       r.user,
       v.id,
-      v.status.map(SolutionStatus.withName),
+      v.status.map(SolutionStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }
@@ -93,7 +94,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getSolutionsForUser(GetSolutionsForUserRequest(
       r.user,
       v.id,
-      v.status.map(SolutionStatus.withName),
+      v.status.map(SolutionStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }
@@ -107,7 +108,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getQuestsForUser(GetQuestsForUserRequest(
       r.user,
       v.id,
-      v.status.map(QuestStatus.withName),
+      v.status.map(QuestStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }

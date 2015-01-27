@@ -1,12 +1,10 @@
-package controllers.domain.helpers
+package helpers.rich
 
 import org.specs2.mutable._
-import helpers.rich._
 
+class RichBooleanSpecs extends Specification {
 
-class BooleanRichSpecs extends Specification {
-
-  "BooleanRich" should {
+  "RichBoolean" should {
 
     "Perform xoring correctly" in {
 
