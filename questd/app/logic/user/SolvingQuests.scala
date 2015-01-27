@@ -51,7 +51,9 @@ trait SolvingQuests { this: UserLogic =>
 
   /**
    * Cooldown for resetting purchases. Purchases should be reset in nearest 5am at user's time.
+   *
    */
+  // TODO: purchases timeout looks like not used anymore.
   def getResetPurchasesTimeout = getNextFlipHourDate
 
 }
