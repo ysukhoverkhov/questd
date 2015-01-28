@@ -42,19 +42,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         user.canSolveQuest(contentType = solution.media.contentType, questToSolve = questToSolve) match {
           case OK =>
 
-            def content = if (user.payedAuthor) {
-              solution
-            } else {
-              solution
-            }
-
             user.demo.cultureId ifSome { culture =>
 
-              val solution = Solution(
+              val newSolution = Solution(
                 cultureId = culture,
                 questLevel = questToSolve.info.level,
                 info = SolutionInfo(
-                  content = content,
+                  content = solution,
                   authorId = user.id,
                   questId = questToSolve.id,
                   vip = user.profile.publicProfile.vip))
@@ -69,7 +63,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               } ifOk { r =>
 
                 // Creating solution.
-                db.solution.create(solution)
+                db.solution.create(newSolution)
 
                 val numberOfReviewedQuests = user.timeLine.count { te =>
                   ((te.objectType == TimeLineType.Quest)
@@ -95,17 +89,17 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                   user = user,
                   reason = TimeLineReason.Created,
                   objectType = TimeLineType.Solution,
-                  objectId = solution.id))
+                  objectId = newSolution.id))
               } ifOk { r =>
                 addToWatchersTimeLine(AddToWatchersTimeLineRequest(
                   user = r.user,
                   reason = TimeLineReason.Created,
                   objectType = TimeLineType.Solution,
-                  objectId = solution.id))
+                  objectId = newSolution.id))
                 //                } ifOk { r =>
                 //                  addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id))
               } ifOk { r =>
-                tryCreateBattle(TryCreateBattleRequest(solution)) ifOk {
+                tryCreateBattle(TryCreateBattleRequest(newSolution)) ifOk {
                   OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
                 }
               }

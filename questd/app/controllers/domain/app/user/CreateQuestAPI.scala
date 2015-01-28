@@ -23,12 +23,6 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
     request.user.canCreateQuest(request.quest) match {
       case OK =>
 
-        def content = if (request.user.payedAuthor) {
-          request.quest
-        } else {
-          request.quest
-        }
-
         {
           makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.CreateQuest)))
         } ifOk { r =>
@@ -41,7 +35,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
               info = QuestInfo(
                 authorId = r.user.id,
                 level = questLevel,
-                content = content,
+                content = request.quest,
                 vip = r.user.profile.publicProfile.vip,
                 solveCost = QuestLogic.costOfSolvingQuest(questLevel),
                 solveRewardWon = QuestLogic.rewardForWinningQuest(questLevel, this),
