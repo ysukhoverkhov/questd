@@ -69,8 +69,11 @@ private[domain] trait CulturesAdminAPI { this: DBAccessor =>
       getCulture(GetCultureRequest(id = request.idToMergeTo))
     } ifOk { res =>
       // 1. Add all countries from old culture to new culture.
+      val countries = res.culture.countries ::: request.culture.countries
+      Logger.error(s"countries ${res.culture.countries} ::: ${request.culture.countries} = $countries")
+
       updateCulture(UpdateCultureRequest(res.culture.copy(
-        countries = res.culture.countries ::: request.culture.countries)))
+        countries = countries)))
     } ifOk {
 
       // 2. update all themes for new culture id.
@@ -82,10 +85,13 @@ private[domain] trait CulturesAdminAPI { this: DBAccessor =>
       // 4. update all solutions for new culture id.
       db.solution.replaceCultureIds(oldCultureId = request.culture.id, newCultureId = request.idToMergeTo)
 
-      // 5. update all profiles for new culture id.
+      // 5. TODO: update all battles to new culture id.
+
+
+      // 6. update all profiles for new culture id.
       db.user.replaceCultureIds(oldCultureId = request.culture.id, newCultureId = request.idToMergeTo)
 
-      // 6. delete old culture.
+      // 7. delete old culture.
       deleteCulture(DeleteCultureRequest(id = request.culture.id))
     } ifOk {
       OkApiResult(MergeCultureIntoCultureResult())

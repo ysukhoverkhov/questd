@@ -75,22 +75,21 @@ class CulturesCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller
    */
   protected def updateObjectFromForm(form: CultureForm): Unit = {
 
-    val culture = Culture(
-      id = form.id,
-      name = form.name)
-
     val mergeWith = form.cultureToMergeWith
 
-    if (culture.id == "") {
-      api.createCulture(CreateCultureRequest(culture))
+    if (form.id == "") {
+      api.createCulture(CreateCultureRequest(Culture(
+        id = form.id,
+        name = form.name)))
     } else {
+      val culture = api.getCulture(GetCultureRequest(form.id)).body.get.culture
+
       if (mergeWith != "") {
         api.mergeCultureIntoCulture(MergeCultureIntoCultureRequest(culture, mergeWith))
       } else {
-        api.updateCulture(UpdateCultureRequest(culture))
+        api.updateCulture(UpdateCultureRequest(culture.copy(name = form.name)))
       }
     }
-
   }
 }
 
