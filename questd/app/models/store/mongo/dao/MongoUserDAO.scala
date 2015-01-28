@@ -100,12 +100,14 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def recordQuestSolving(id: String, questId: String): Option[User] = {
+  def recordQuestSolving(id: String, questId: String, removeBookmark: Boolean): Option[User] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    queryBuilder += ("$unset" -> MongoDBObject(
-      "profile.questSolutionContext.bookmarkedQuest" -> ""))
+    if (removeBookmark) {
+      queryBuilder += ("$unset" -> MongoDBObject(
+        "profile.questSolutionContext.bookmarkedQuest" -> ""))
+    }
 
     queryBuilder += ("$push" -> MongoDBObject(
       "stats.solvedQuests" -> questId))

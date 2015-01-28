@@ -26,7 +26,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         vip = true,
         timeLine = List(tl, t2, t3, t4),
         friends = friends,
-        questBookmark = Some(q.id),
+        questBookmark = Some(q.id + "this is bookmark not for the quest"),
         privateDailyResults = List(createDailyResultStub(
           questsIncome = List(createQuestIncomeStub(questId = q.id)))))
       val author = createUserStub(
@@ -37,7 +37,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       quest.readById(Matchers.eq(q.id)) returns Some(q)
       quest.updatePoints(Matchers.eq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
-      user.recordQuestSolving(Matchers.eq(u.id), Matchers.eq(q.id)) returns Some(u)
+      user.recordQuestSolving(Matchers.eq(u.id), Matchers.eq(q.id), Matchers.eq(false)) returns Some(u)
       user.addEntryToTimeLine(Matchers.eq(u.id), any) returns Some(u)
       user.addToAssets(Matchers.eq(u.id), any) returns Some(u)
       user.readById(q.info.authorId) returns Some(author)
@@ -68,7 +68,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
             questId = q.id,
             vip = true)))
       there was one(quest).readById(q.id)
-      there was one(user).recordQuestSolving(Matchers.eq(u.id), Matchers.eq(q.id))
+      there was one(user).recordQuestSolving(Matchers.eq(u.id), Matchers.eq(q.id), Matchers.eq(false))
       there was one(user).addEntryToTimeLine(Matchers.eq(u.id), any)
       there was one(user).addToAssets(Matchers.eq(u.id), any)
       there was one(user).addEntryToTimeLineMulti(Matchers.eq(List("fid1")), any)

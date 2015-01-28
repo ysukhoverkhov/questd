@@ -442,7 +442,7 @@ class UserDAOSpecs
       val user = createUserStub(questBookmark = Some(questId))
       db.user.create(user)
 
-      db.user.recordQuestSolving(user.id, questId)
+      db.user.recordQuestSolving(user.id, questId, removeBookmark = true)
 
       val ou1 = db.user.readById(user.id)
       ou1 must beSome[User]
