@@ -6,7 +6,7 @@ version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.5"
 
 libraryDependencies ++= Seq(
   cache,
@@ -22,8 +22,8 @@ libraryDependencies += "se.radley" %% "play-plugins-salat" % "1.5.0"
 
 libraryDependencies += "us.theatr" %% "akka-quartz" % "0.3.0-SNAPSHOT"
 
-libraryDependencies += "com.restfb" % "restfb" % "1.7.0"
+libraryDependencies += "com.restfb" % "restfb" % "1.7.1"
 
-libraryDependencies += "org.mockito" % "mockito-all" % "1.10.10"
+libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19"
 
 libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "1.6.0"

@@ -40,7 +40,7 @@ if "%ACTIVATOR_HOME%"=="" (
 )
 
 set ERROR_CODE=0
-set APP_VERSION=1.2.10
+set APP_VERSION=1.2.12
 set ACTIVATOR_LAUNCH_JAR=activator-launch-%APP_VERSION%.jar
 
 rem Detect if we were double clicked, although theoretically A user could
@@ -132,6 +132,7 @@ for /f "tokens=3" %%g in ('java -version 2^>^&1 ^| findstr /i "version"') do (
 rem Strips away the " characters
 set JAVA_VERSION=%JAVA_VERSION:"=%
 
+rem TODO Check if there are existing mem settings in JAVA_OPTS/CFG_OPTS and use those instead of the below
 for /f "delims=. tokens=1-3" %%v in ("%JAVA_VERSION%") do (
     set MAJOR=%%v
     set MINOR=%%w
