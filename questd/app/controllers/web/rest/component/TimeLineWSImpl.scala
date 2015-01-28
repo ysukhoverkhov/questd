@@ -13,7 +13,8 @@ trait TimeLineWSImpl extends QuestController with SecurityWSImpl with CommonFunc
     api.getTimeLine(GetTimeLineRequest(
       r.user,
       v.pageNumber,
-      v.pageSize))
+      v.pageSize,
+      v.untilEntryId))
   }
 }
 

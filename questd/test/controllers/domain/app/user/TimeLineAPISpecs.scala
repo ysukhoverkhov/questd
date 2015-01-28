@@ -51,6 +51,25 @@ class TimeLineAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(GetTimeLineResult(entries.tail)))
     }
+
+    "getTimeLine should be able to limit result" in context {
+      val entries = List(
+        createTimeLineEntryStub(id = "1", ourVote = Some(ContentVote.Cheating)),
+        createTimeLineEntryStub(id = "2", ourVote = Some(ContentVote.Cool)),
+        createTimeLineEntryStub(id = "3", ourVote = Some(ContentVote.Cool)),
+        createTimeLineEntryStub(id = "4", ourVote = Some(ContentVote.Cool))
+      )
+
+      val u = createUserStub(timeLine = entries)
+
+      val result = api.getTimeLine(GetTimeLineRequest(
+        user = u,
+        pageNumber = 0,
+        pageSize = 20,
+      untilEntryId = Some("3")))
+
+      result must beEqualTo(OkApiResult(GetTimeLineResult(List(entries.tail.head))))
+    }
   }
 }
 

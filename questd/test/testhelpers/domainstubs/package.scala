@@ -94,12 +94,14 @@ package object domainstubs {
   }
 
   def createTimeLineEntryStub(
+    id: String = ID.generateUUID(),
     reason: TimeLineReason.Value = TimeLineReason.Created,
     objectAuthorId: String = "authorId",
     objectType: TimeLineType.Value = TimeLineType.Quest,
     objectId: String = "objectId",
     ourVote: Option[ContentVote.Value] = None) = {
     TimeLineEntry(
+      id = id,
       reason = reason,
       objectAuthorId = objectAuthorId,
       objectType = objectType,

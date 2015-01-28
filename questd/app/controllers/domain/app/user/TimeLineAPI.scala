@@ -28,7 +28,8 @@ case class AddToWatchersTimeLineResult(user: User)
 case class GetTimeLineRequest(
   user: User,
   pageNumber: Int,
-  pageSize: Int)
+  pageSize: Int,
+  untilEntryId: Option[String] = None)
 case class GetTimeLineResult(timeLine: List[TimeLineEntry])
 
 case class PopulateTimeLineWithRandomThingsRequest(user: User)
@@ -75,18 +76,17 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
    * Returns portion of time line.
    */
   def getTimeLine(request: GetTimeLineRequest): ApiResult[GetTimeLineResult] = handleDbException {
-    import request._
 
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
-    OkApiResult(GetTimeLineResult(user.timeLine.filter(
+    OkApiResult(GetTimeLineResult(request.user.timeLine.filter(
       _.ourVote match {
         case None => true
         case Some(ContentVote.Cool) => true
         case _ => false
       }
-    ).iterator.drop(pageSize * pageNumber).take(pageSize).toList))
+    ).iterator.drop(pageSize * pageNumber).take(pageSize).takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
   }
 
   /**

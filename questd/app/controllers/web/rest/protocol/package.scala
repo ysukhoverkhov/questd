@@ -198,7 +198,10 @@ package object protocol {
     pageNumber: Int,
 
     // Number of items on a page.
-    pageSize: Int)
+    pageSize: Int,
+
+    // Id of an item to stop getting results at
+    untilEntryId: Option[String] = None)
 
   /**
    * ********************
