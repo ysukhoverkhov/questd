@@ -6,7 +6,7 @@
 
 	@form(action = controllers.web.admin.routes.QuestsCRUD.updateQuest()) {
 		@inputText(newQuestForm("id"), 'size -> 18, 'readonly -> "readonly") <br />
-		@select(newQuestForm("status"), options(List("OnVoting", "InRotation", "RatingBanned", "CheatingBanned", "IACBanned", "OldBanned"))) <br />
+		@select(newQuestForm("status"), options(List("InRotation", "CheatingBanned", "IACBanned", "OldBanned"))) <br />
 		@inputText(newQuestForm("description"), 'size -> 140) <br />
 		@inputText(newQuestForm("level"), 'size -> 5) <br />
 		@inputText(newQuestForm("points"), 'size -> 5) <br />
