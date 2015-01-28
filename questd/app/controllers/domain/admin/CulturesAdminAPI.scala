@@ -69,11 +69,8 @@ private[domain] trait CulturesAdminAPI { this: DBAccessor =>
       getCulture(GetCultureRequest(id = request.idToMergeTo))
     } ifOk { res =>
       // 1. Add all countries from old culture to new culture.
-      val countries = res.culture.countries ::: request.culture.countries
-      Logger.error(s"countries ${res.culture.countries} ::: ${request.culture.countries} = $countries")
-
       updateCulture(UpdateCultureRequest(res.culture.copy(
-        countries = countries)))
+        countries = res.culture.countries ::: request.culture.countries)))
     } ifOk {
 
       // 2. update all themes for new culture id.
