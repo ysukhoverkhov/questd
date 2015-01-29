@@ -5,6 +5,7 @@ package models.store.mongo
 import java.util.Date
 
 import models.domain._
+import models.domain.view.QuestInfoWithID
 import models.store._
 import org.specs2.mutable._
 import play.api.test._
@@ -448,6 +449,23 @@ class UserDAOSpecs
       ou1 must beSome[User]
       ou1.get.stats.solvedQuests must beEqualTo(List(questId))
       ou1.get.profile.questSolutionContext.bookmarkedQuest must beNone
+    }
+
+    "setQuestBookmark do its work" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val questId = "qiq"
+      val qi = QuestInfoWithID(
+        questId,
+        createQuestStub(id = questId).info)
+      val user = createUserStub(questBookmark = None)
+      db.user.create(user)
+
+      db.user.setQuestBookmark(user.id, qi)
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User]
+      ou1.get.profile.questSolutionContext.bookmarkedQuest must beEqualTo(Some(qi))
     }
 
     "storeQuestSolvingInDailyResult do its work" in new WithApplication(appWithTestDatabase) {

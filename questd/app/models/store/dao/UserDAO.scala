@@ -3,6 +3,8 @@ package models.store.dao
 import models.domain._
 import java.util.Date
 
+import models.domain.view.QuestInfoWithID
+
 trait UserDAO extends BaseDAO[User] {
 
   def updateSessionId(id: String, sessionid: String): Option[User]
@@ -17,13 +19,28 @@ trait UserDAO extends BaseDAO[User] {
 
   /**
    * Records vote for quest proposal.
-   * @param id Id of user maing a vote.
+   * @param id Id of user making a vote.
    * @param questId id of quest we vote for.
    * @param vote our vote.
    * @return Modified user.
    */
   def recordTimeLineVote(id: String, questId: String, vote: ContentVote.Value): Option[User]
 
+  /**
+   * Set quest bookmark for a user.
+   * @param id Id of a user setting a bookmark.
+   * @param questId Id of a quest set bookmark.
+   * @return Modified user.
+   */
+  def setQuestBookmark(id: String, questId: QuestInfoWithID): Option[User]
+
+  /**
+   * Records quest solving and optionally resets bookmark.
+   * @param id Id of user solving a quest.
+   * @param questId If of a quest to solve
+   * @param removeBookmark Should we reset bookmark.
+   * @return Modified user.
+   */
   def recordQuestSolving(id: String, questId: String, removeBookmark: Boolean): Option[User]
 
   /**
