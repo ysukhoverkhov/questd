@@ -20,8 +20,8 @@ case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[
 case class RewardSolutionAuthorRequest(solution: Solution, author: User)
 case class RewardSolutionAuthorResult()
 
-case class SetQuestBookmarkRequest(user: User, questId: String)
-case class SetQuestBookmarkResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class BookmarkQuestRequest(user: User, questId: String)
+case class BookmarkQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 
 //case class GetQuestSolutionHelpCostRequest(user: User)
@@ -164,12 +164,12 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   /**
    * Bookmark a quest to solve it later.
    */
-  def setQuestBookmark(request: SetQuestBookmarkRequest): ApiResult[SetQuestBookmarkResult] = handleDbException {
+  def bookmarkQuest(request: BookmarkQuestRequest): ApiResult[BookmarkQuestResult] = handleDbException {
     import request._
 
     db.quest.readById(questId) ifSome { quest =>
       db.user.setQuestBookmark(user.id, QuestInfoWithID(quest.id, quest.info)) ifSome { updatedUser =>
-        OkApiResult(SetQuestBookmarkResult(OK, Some(updatedUser.profile)))
+        OkApiResult(BookmarkQuestResult(OK, Some(updatedUser.profile)))
       }
     }
   }

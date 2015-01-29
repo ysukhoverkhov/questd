@@ -58,9 +58,9 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       quest.readById(q.id) returns Some(q)
       user.setQuestBookmark(any, any) returns Some(u)
 
-      val result = api.setQuestBookmark(SetQuestBookmarkRequest(u, q.id))
+      val result = api.bookmarkQuest(BookmarkQuestRequest(u, q.id))
 
-      result must beEqualTo(OkApiResult(SetQuestBookmarkResult(ProfileModificationResult.OK, Some(u.profile))))
+      result must beEqualTo(OkApiResult(BookmarkQuestResult(ProfileModificationResult.OK, Some(u.profile))))
       there was one(quest).readById(q.id)
       there was one(user).setQuestBookmark(any, any)
     }

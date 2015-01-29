@@ -24,6 +24,7 @@ POST    /rest/getCountryList                            controllers.web.rest.Pro
 POST	/rest/createQuest								controllers.web.rest.CreateQuestWS.createQuest
 
 # Solve quest
+POST	/rest/bookmarkQuest		    					controllers.web.rest.SolveQuestWS.bookmarkQuest
 POST	/rest/solveQuest		    					controllers.web.rest.SolveQuestWS.solveQuest
 
 # Vote quest

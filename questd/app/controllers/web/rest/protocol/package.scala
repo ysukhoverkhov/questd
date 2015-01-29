@@ -130,6 +130,12 @@ package object protocol {
   type WSSolveQuestResult = SolveQuestResult
 
 
+  case class WSBookmarkQuestRequest(
+    questId: String)
+
+  type WSBookmarkQuestResult = BookmarkQuestResult
+
+
   /**
    * ********************
    * Voting quest proposals

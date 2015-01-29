@@ -11,5 +11,11 @@ trait SolveQuestWSImpl extends QuestController with SecurityWSImpl with CommonFu
 
     api.solveQuest(SolveQuestRequest(r.user, v.questId, v))
   }
+
+  def bookmarkQuest = wrapJsonApiCallReturnBody[WSBookmarkQuestResult] { (js, r) =>
+    val v = Json.read[WSBookmarkQuestRequest](js.toString)
+
+    api.bookmarkQuest(BookmarkQuestRequest(r.user, v.questId))
+  }
 }
 
