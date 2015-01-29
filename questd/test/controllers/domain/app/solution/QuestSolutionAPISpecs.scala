@@ -1,5 +1,6 @@
 package controllers.domain.app.solution
 
+import controllers.domain.app.protocol.ProfileModificationResult
 import org.mockito.Mockito._
 import org.mockito.Matchers
 import controllers.domain._
@@ -49,6 +50,21 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(UpdateSolutionStateResult()))
     }
+
+    "setQuestBookmark does it" in context {
+      val q = createQuestStub(id = "qid")
+      val u = User(id = "uid")
+
+      quest.readById(q.id) returns Some(q)
+      user.setQuestBookmark(any, any) returns Some(u)
+
+      val result = api.setQuestBookmark(SetQuestBookmarkRequest(u, q.id))
+
+      result must beEqualTo(OkApiResult(SetQuestBookmarkResult(ProfileModificationResult.OK, Some(u.profile))))
+      there was one(quest).readById(q.id)
+      there was one(user).setQuestBookmark(any, any)
+    }
+
   }
 }
 

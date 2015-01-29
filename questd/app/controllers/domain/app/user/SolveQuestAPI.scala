@@ -1,5 +1,7 @@
 package controllers.domain.app.user
 
+import models.domain.view.QuestInfoWithID
+
 import scala.language.postfixOps
 import models.domain._
 import play.Logger
@@ -18,8 +20,8 @@ case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[
 case class RewardSolutionAuthorRequest(solution: Solution, author: User)
 case class RewardSolutionAuthorResult()
 
-case class TryFightQuestRequest(solution: Solution)
-case class TryFightQuestResult()
+case class SetQuestBookmarkRequest(user: User, questId: String)
+case class SetQuestBookmarkResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 
 //case class GetQuestSolutionHelpCostRequest(user: User)
@@ -160,6 +162,19 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   }
 
   /**
+   * Bookmark a quest to solve it later.
+   */
+  def setQuestBookmark(request: SetQuestBookmarkRequest): ApiResult[SetQuestBookmarkResult] = handleDbException {
+    import request._
+
+    db.quest.readById(questId) ifSome { quest =>
+      db.user.setQuestBookmark(user.id, QuestInfoWithID(quest.id, quest.info)) ifSome { updatedUser =>
+        OkApiResult(SetQuestBookmarkResult(OK, Some(updatedUser.profile)))
+      }
+    }
+  }
+
+    /**
    * Add a quest to given friends "mustVote" list
    */
   //  def addToMustVoteSolutions(request: AddToMustVoteSolutionsRequest): ApiResult[AddToMustVoteSolutionsResult] = handleDbException {
