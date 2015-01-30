@@ -48,7 +48,8 @@ case class GetAllQuestsRequest(
   idsExclude: List[String] = List.empty,
   authorsExclude: List[String] = List.empty,
   status: QuestStatus.Value,
-  levels: Option[(Int, Int)] = None)
+  levels: Option[(Int, Int)] = None,
+  cultureId: Option[String])
 case class GetAllQuestsResult(quests: Iterator[Quest])
 
 private[domain] trait QuestsFetchAPI { this: DBAccessor =>
@@ -112,6 +113,6 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
       authorIdsExclude = request.authorsExclude,
       levels = request.levels,
       idsExclude = request.idsExclude,
-      cultureId = request.user.demo.cultureId)))
+      cultureId = request.cultureId)))
   }
 }

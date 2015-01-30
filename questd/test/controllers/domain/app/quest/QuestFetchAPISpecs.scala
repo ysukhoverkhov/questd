@@ -194,7 +194,8 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       val result = api.getAllQuests(GetAllQuestsRequest(
         user = createUserStub(cultureId = "cid"),
         status = QuestStatus.InRotation,
-        levels = Some(1, 2)))
+        levels = Some(1, 2),
+        cultureId = Some("cid")))
 
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),

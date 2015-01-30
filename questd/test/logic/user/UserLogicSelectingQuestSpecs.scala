@@ -267,6 +267,22 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       there were two(api).getAllQuests(any[GetAllQuestsRequest])
     }
 
+    "All quests ignoring culture are used if vip and Other quests are unavailable" in {
+      val qid = "qid"
+      val u = User()
+
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.75
+
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List().iterator))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List().iterator)) thenReturns OkApiResult(GetAllQuestsResult(List().iterator)) thenReturns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
+
+      u.getRandomQuestsForTimeLine(1)
+
+      there was one(rand).nextDouble
+      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
+      there were three(api).getAllQuests(any[GetAllQuestsRequest])
+    }
   }
 }
 

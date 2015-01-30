@@ -15,11 +15,11 @@ trait QuestSelectUserLogic { this: UserLogic =>
       () => getQuestsWithSuperAlgorithm,
       () => getQuestsWithMyTags,
       () => getAnyQuests,
-      () => getAnyQuestsIgnoringLevels)
+      () => getAnyQuestsIgnoringLevels,
+      () => getAnyQuestsIgnoringLevelsAndCulture)
 
     val it = selectFromChain(algorithms).getOrElse(Iterator.empty)
     if (it.hasNext) Some(it.next()) else None
-
   }
 
   private def getQuestsWithSuperAlgorithm(implicit selected: List[Quest]): Option[Iterator[Quest]] = {
@@ -51,7 +51,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
         (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
-      selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
+      selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
     }
   }
 
@@ -66,7 +66,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
       (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 
-    selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
+    selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
   }
 
   private[user] def getFriendsQuests(implicit selected: List[Quest]) = {
@@ -126,7 +126,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
       idsExclude = questIdsToExclude,
       status = QuestStatus.InRotation,
       authorsExclude = questAuthorIdsToExclude,
-      levels = levels)).body.get.quests))
+      levels = levels,
+      cultureId = user.demo.cultureId)).body.get.quests))
   }
 
   private[user] def getAnyQuests(implicit selected: List[Quest]) = {
@@ -137,7 +138,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
       idsExclude = questIdsToExclude,
       authorsExclude = questAuthorIdsToExclude,
       status = QuestStatus.InRotation,
-      levels = levels)).body.get.quests))
+      levels = levels,
+      cultureId = user.demo.cultureId)).body.get.quests))
   }
 
   private[user] def getAnyQuestsIgnoringLevels(implicit selected: List[Quest]) = {
@@ -148,7 +150,20 @@ trait QuestSelectUserLogic { this: UserLogic =>
       idsExclude = questIdsToExclude,
       authorsExclude = questAuthorIdsToExclude,
       status = QuestStatus.InRotation,
-      levels = None)).body.get.quests))
+      levels = None,
+      cultureId = user.demo.cultureId)).body.get.quests))
+  }
+
+  private[user] def getAnyQuestsIgnoringLevelsAndCulture(implicit selected: List[Quest]) = {
+    Logger.trace("  Returning from any quests ignoring levels and culture")
+
+    checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
+      user = user,
+      idsExclude = questIdsToExclude,
+      authorsExclude = questAuthorIdsToExclude,
+      status = QuestStatus.InRotation,
+      levels = None,
+      cultureId = None)).body.get.quests))
   }
 
   /**
