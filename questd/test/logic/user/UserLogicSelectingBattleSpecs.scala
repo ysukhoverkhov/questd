@@ -1,7 +1,7 @@
 package logic.user
 
 import controllers.domain.OkApiResult
-import controllers.domain.app.battle.{GetAllBattlesRequest, GetAllBattlesResult}
+import controllers.domain.app.battle._
 import controllers.domain.config._ConfigParams
 import logic.BaseLogicSpecs
 import models.domain._
@@ -31,40 +31,40 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 
   "User Logic" should {
 
-//    "Return quest from friends if dice rolls so" in {
-//
-//      api.config returns createStubConfig
-//      rand.nextDouble returns 0.13
-//
-//      val qid = "qid"
-//
-//      api.getFriendsQuests(any[GetFriendsQuestsRequest]) returns OkApiResult(GetFriendsQuestsResult(List(createQuestStub(qid, "author")).iterator))
-//
-//      val u = User()
-//      val q = u.getRandomQuestsForTimeLine(1)
-//
-//      there was one(rand).nextDouble
-//      there was one(api).getFriendsQuests(any[GetFriendsQuestsRequest])
-//
-//      q.map(_.id) must beEqualTo(List(qid))
-//    }
+    "Return battle from friends if dice rolls so" in {
 
-//    "Return quest from following if dice rolls so" in {
-//      api.config returns createStubConfig
-//      rand.nextDouble returns 0.38
-//
-//      val qid = "qid"
-//
-//      api.getFollowingQuests(any[GetFollowingQuestsRequest]) returns OkApiResult(GetFollowingQuestsResult(List(createQuestStub(qid, "author")).iterator))
-//
-//      val u = User()
-//      val q = u.getRandomQuestsForTimeLine(1)
-//
-//      there was one(rand).nextDouble
-//      there was one(api).getFollowingQuests(any[GetFollowingQuestsRequest])
-//
-//      q.map(_.id) must beEqualTo(List(qid))
-//    }
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.13
+
+      val bid = "qid"
+
+      api.getFriendsBattles(any[GetFriendsBattlesRequest]) returns OkApiResult(GetFriendsBattlesResult(List(createBattleStub(bid)).iterator))
+
+      val u = User()
+      val q = u.getRandomBattlesForTimeLine(1)
+
+      there was one(rand).nextDouble
+      there was one(api).getFriendsBattles(any[GetFriendsBattlesRequest])
+
+      q.map(_.id) must beEqualTo(List(bid))
+    }
+
+    "Return battles from following if dice rolls so" in {
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.38
+
+      val bid = "qid"
+
+      api.getFollowingBattles(any[GetFollowingBattlesRequest]) returns OkApiResult(GetFollowingBattlesResult(List(createBattleStub(bid)).iterator))
+
+      val u = User()
+      val q = u.getRandomBattlesForTimeLine(1)
+
+      there was one(rand).nextDouble
+      there was one(api).getFollowingBattles(any[GetFollowingBattlesRequest])
+
+      q.map(_.id) must beEqualTo(List(bid))
+    }
 
 //    "Return liked quest if dice rolls so for solving" in {
 //      api.config returns createStubConfig
@@ -101,22 +101,22 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //      q.map(_.id) must beEqualTo(List(qid))
 //    }
 
-//    "Return VIP quest if dice rolls so" in {
-//      api.config returns createStubConfig
-//      rand.nextDouble returns 0.75
-//
-//      val qid = "qid"
-//
-//      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List(createQuestStub(qid, "author")).iterator))
-//
-//      val u = User()
-//      val q = u.getRandomQuestsForTimeLine(1)
-//
-//      there was one(rand).nextDouble
-//      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
-//
-//      q.map(_.id) must beEqualTo(List(qid))
-//    }
+    "Return VIP battles if dice rolls so" in {
+      api.config returns createStubConfig
+      rand.nextDouble returns 0.75
+
+      val bid = "qid"
+
+      api.getVIPBattles(any[GetVIPBattlesRequest]) returns OkApiResult(GetVIPBattlesResult(List(createBattleStub(bid)).iterator))
+
+      val u = User()
+      val q = u.getRandomBattlesForTimeLine(1)
+
+      there was one(rand).nextDouble
+      there was one(api).getVIPBattles(any[GetVIPBattlesRequest])
+
+      q.map(_.id) must beEqualTo(List(bid))
+    }
 
     // TODO: implement me when tags will be impelemented.
 //    "Return VIP quest with favorite theme ids if dice rolls so" in {
@@ -246,16 +246,15 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
-//      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List().iterator))
+      api.getVIPBattles(any[GetVIPBattlesRequest]) returns OkApiResult(GetVIPBattlesResult(List().iterator))
       api.getAllBattles(any[GetAllBattlesRequest]) returns OkApiResult(GetAllBattlesResult(List().iterator)) thenReturns OkApiResult(GetAllBattlesResult(List(createBattleStub()).iterator))
 
       u.getRandomBattlesForTimeLine(1)
 
       there was one(rand).nextDouble
-//      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
+      there was one(api).getVIPBattles(any[GetVIPBattlesRequest])
       there were two(api).getAllBattles(any[GetAllBattlesRequest])
     }
-
   }
 }
 
