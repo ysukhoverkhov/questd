@@ -111,6 +111,32 @@ class BattleDAOSpecs extends Specification
 
       r must beSome.which(_.info.status == BattleStatus.Resolved)
     }
+
+    "Replace cultures" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val t1 = createBattleStub(id = "id1", cultureId = "rus")
+      val t2 = createBattleStub(id = "id2", cultureId = "eng")
+      val t3 = createBattleStub(id = "id3", cultureId = "rus")
+
+      db.battle.create(t1)
+      db.battle.create(t2)
+      db.battle.create(t3)
+
+      db.battle.replaceCultureIds("rus", "eng")
+
+      val ou1 = db.battle.readById(t1.id)
+      ou1 must beSome.which((u: Battle) => u.id == t1.id)
+      ou1 must beSome.which((u: Battle) => u.cultureId == "eng")
+
+      val ou2 = db.battle.readById(t2.id)
+      ou2 must beSome.which((u: Battle) => u.id == t2.id)
+      ou2 must beSome.which((u: Battle) => u.cultureId == "eng")
+
+      val ou3 = db.battle.readById(t3.id)
+      ou3 must beSome.which((u: Battle) => u.id == t3.id)
+      ou3 must beSome.which((u: Battle) => u.cultureId == "eng")
+    }
   }
 }
 

@@ -82,8 +82,8 @@ private[domain] trait CulturesAdminAPI { this: DBAccessor =>
       // 4. update all solutions for new culture id.
       db.solution.replaceCultureIds(oldCultureId = request.culture.id, newCultureId = request.idToMergeTo)
 
-      // 5. TODO: update all battles to new culture id.
-
+      // 5. update all battles to new culture id.
+      db.battle.replaceCultureIds(oldCultureId = request.culture.id, newCultureId = request.idToMergeTo)
 
       // 6. update all profiles for new culture id.
       db.user.replaceCultureIds(oldCultureId = request.culture.id, newCultureId = request.idToMergeTo)

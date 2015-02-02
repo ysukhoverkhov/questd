@@ -28,5 +28,12 @@ trait BattleDAO extends BaseDAO[Battle] {
     id: String,
     newStatus: BattleStatus.Value): Option[Battle]
 
+  /**
+   * Replaces culture ids of battles with old one.
+   * @param oldCultureId Replace thi culture id
+   * @param newCultureId With this culture id.
+   */
+  def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit
+
 }
 
