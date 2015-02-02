@@ -1,12 +1,36 @@
 package controllers.domain.app.battle
 
 import components.DBAccessor
-import controllers.domain.{OkApiResult, ApiResult}
 import controllers.domain.helpers._
-import models.domain.{User, BattleStatus, Battle}
+import controllers.domain.{ApiResult, OkApiResult}
+import models.domain._
 
 case class GetAllBattlesInternalRequest()
 case class GetAllBattlesInternalResult(battles: Iterator[Battle])
+
+case class GetFriendsBattlesRequest(
+  user: User,
+  status: List[BattleStatus.Value] = List.empty,
+  idsExclude: List[String] = List.empty,
+  authorsExclude: List[String] = List.empty,
+  levels: Option[(Int, Int)] = None)
+case class GetFriendsBattlesResult(battles: Iterator[Battle])
+
+case class GetFollowingBattlesRequest(
+  user: User,
+  status: List[BattleStatus.Value] = List.empty,
+  idsExclude: List[String] = List.empty,
+  authorsExclude: List[String] = List.empty,
+  levels: Option[(Int, Int)] = None)
+case class GetFollowingBattlesResult(battles: Iterator[Battle])
+
+case class GetVIPBattlesRequest(
+  user: User,
+  status: List[BattleStatus.Value] = List.empty,
+  idsExclude: List[String] = List.empty,
+  authorsExclude: List[String] = List.empty,
+  levels: Option[(Int, Int)] = None)
+case class GetVIPBattlesResult(battles: Iterator[Battle])
 
 case class GetAllBattlesRequest(
   user: User,
@@ -26,6 +50,37 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
   def getAllBattlesInternal(request: GetAllBattlesInternalRequest): ApiResult[GetAllBattlesInternalResult] = handleDbException {
     OkApiResult(GetAllBattlesInternalResult(db.battle.allWithParams(
       status = List(BattleStatus.Fighting))))
+  }
+
+  def getFriendsBattles(request: GetFriendsBattlesRequest): ApiResult[GetFriendsBattlesResult] = handleDbException {
+    OkApiResult(GetFriendsBattlesResult(db.battle.allWithParams(
+      status = request.status,
+      authorIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
+      authorIdsExclude = request.authorsExclude,
+      levels = request.levels,
+      idsExclude = request.idsExclude,
+      cultureId = request.user.demo.cultureId)))
+  }
+
+  def getFollowingBattles(request: GetFollowingBattlesRequest): ApiResult[GetFollowingBattlesResult] = handleDbException {
+    OkApiResult(GetFollowingBattlesResult(db.battle.allWithParams(
+      status = request.status,
+      authorIds = request.user.following,
+      authorIdsExclude = request.authorsExclude,
+      levels = request.levels,
+      idsExclude = request.idsExclude,
+      cultureId = request.user.demo.cultureId)))
+  }
+
+
+  def getVIPBattles(request: GetVIPBattlesRequest): ApiResult[GetVIPBattlesResult] = handleDbException {
+    OkApiResult(GetVIPBattlesResult(db.battle.allWithParams(
+      status = request.status,
+      authorIdsExclude = request.authorsExclude,
+      levels = request.levels,
+      vip = Some(true),
+      idsExclude = request.idsExclude,
+      cultureId = request.user.demo.cultureId)))
   }
 
   /**

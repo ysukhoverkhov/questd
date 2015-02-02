@@ -1,6 +1,6 @@
 package logic.user.util
 
-import controllers.domain.app.battle.GetAllBattlesRequest
+import controllers.domain.app.battle.{GetVIPBattlesRequest, GetAllBattlesRequest, GetFollowingBattlesRequest, GetFriendsBattlesRequest}
 import logic.UserLogic
 import logic.constants._
 import models.domain._
@@ -23,7 +23,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
 
   }
 
-  private def getBattlesWithSuperAlgorithm: Option[Iterator[Battle]] = {
+  private def getBattlesWithSuperAlgorithm(implicit selected: List[Battle]): Option[Iterator[Battle]] = {
     Logger.trace("getBattlesWithSuperAlgorithm")
 
     val algorithms = List(
@@ -34,12 +34,12 @@ trait BattleSelectUserLogic { this: UserLogic =>
     selectFromChain(algorithms)
   }
 
-  private[user] def getTutorialBattles: Option[Iterator[Battle]] = {
+  private[user] def getTutorialBattles(implicit selected: List[Battle]): Option[Iterator[Battle]] = {
     Logger.trace("getTutorialBattles returns None since does not implemented")
     None
   }
 
-  private[user] def getStartingBattles: Option[Iterator[Battle]] = {
+  private[user] def getStartingBattles(implicit selected: List[Battle]): Option[Iterator[Battle]] = {
     Logger.trace("getStartingBattles")
 
     if (user.profile.publicProfile.level > api.config(api.ConfigParams.BattleProbabilityLevelsToGiveStartingBattles).toInt) {
@@ -56,13 +56,13 @@ trait BattleSelectUserLogic { this: UserLogic =>
     }
   }
 
-  private[user] def getDefaultBattles: Option[Iterator[Battle]] = {
+  private[user] def getDefaultBattles(implicit selected: List[Battle]): Option[Iterator[Battle]] = {
     Logger.trace("getDefaultBattle")
 
     val algorithms = List(
       (api.config(api.ConfigParams.BattleProbabilityFriends).toDouble, () => getFriendsBattles),
       (api.config(api.ConfigParams.BattleProbabilityFollowing).toDouble, () => getFollowingBattles),
-      (api.config(api.ConfigParams.BattleProbabilityLiked).toDouble, () => getLikedBattles),
+      (api.config(api.ConfigParams.BattleProbabilityLiked).toDouble, () => getBattlesForLikedQuests),
       (api.config(api.ConfigParams.BattleProbabilityVIP).toDouble, () => getVIPBattles),
       (1.00, () => getBattlesWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
@@ -70,27 +70,27 @@ trait BattleSelectUserLogic { this: UserLogic =>
     selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
   }
 
-  private[user] def getFriendsBattles = {
+  private[user] def getFriendsBattles(implicit selected: List[Battle]) = {
     Logger.trace("  Returning Battle from friends")
-    // TODO: implement me.
-//    checkNotEmptyIterator(Some(api.getFriendsBattles(GetFriendsBattlesRequest(
-//      user,
-//      QuestStatus.InRotation,
-//      levels)).body.get.quests))
-    None
+    checkNotEmptyIterator(Some(api.getFriendsBattles(GetFriendsBattlesRequest(
+      user,
+      List(BattleStatus.Fighting, BattleStatus.Resolved),
+      idsExclude = battleIdsToExclude,
+      authorsExclude = battleParticipantsIdsToExclude,
+      levels)).body.get.battles))
   }
 
-  private[user] def getFollowingBattles = {
+  private[user] def getFollowingBattles(implicit selected: List[Battle]) = {
     Logger.trace("  Returning Battle from Following")
-    // TODO: imeplemnt me.
-//    checkNotEmptyIterator(Some(api.getFollowingQuests(GetFollowingQuestsRequest(
-//      user,
-//      QuestStatus.InRotation,
-//      levels)).body.get.quests))
-    None
+    checkNotEmptyIterator(Some(api.getFollowingBattles(GetFollowingBattlesRequest(
+      user = user,
+      status = List(BattleStatus.Fighting, BattleStatus.Resolved),
+      idsExclude = battleIdsToExclude,
+      authorsExclude = battleParticipantsIdsToExclude,
+      levels)).body.get.battles))
   }
 
-  private[user] def getLikedBattles = {
+  private[user] def getBattlesForLikedQuests(implicit selected: List[Battle]) = {
     Logger.trace("  Returning Battle we liked recently")
     // TODO: imeplemnt me.
 //    checkNotEmptyIterator(Some(api.getLikedQuests(GetLikedQuestsRequest(
@@ -100,22 +100,22 @@ trait BattleSelectUserLogic { this: UserLogic =>
     None
   }
 
-  private[user] def getVIPBattles = {
+  private[user] def getVIPBattles(implicit selected: List[Battle]) = {
     Logger.trace("  Returning VIP Battles")
 
     // TODO: TAGS: implement me (perhaps remove tags).
 //    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPQuests)
 //    Logger.trace("    Selected themes of vip's quests: " + themeIds.mkString(", "))
 //
-//    checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
-//      user = user,
-//      idsExclude = battleIdsToExclude,
-//      authorIdsExclude = battleParticipantsIdsToExclude,
-//      levels = levels)).body.get.battles))
-    None
+    checkNotEmptyIterator(Some(api.getVIPBattles(GetVIPBattlesRequest(
+      user = user,
+      status = List(BattleStatus.Fighting, BattleStatus.Resolved),
+      idsExclude = battleIdsToExclude,
+      authorsExclude = battleParticipantsIdsToExclude,
+      levels = levels)).body.get.battles))
   }
 
-  private[user] def getBattlesWithMyTags = {
+  private[user] def getBattlesWithMyTags(implicit selected: List[Battle]) = {
     Logger.trace("  Returning Battles with my tags")
 // TODO: TAGS: implement me with tags.
 //    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
