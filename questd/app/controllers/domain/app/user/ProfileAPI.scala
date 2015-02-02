@@ -12,9 +12,6 @@ import play.{Play, Logger}
 case class GetAllUsersRequest()
 case class GetAllUsersResult(users: Iterator[User])
 
-case class ResetPurchasesRequest(user: User)
-case class ResetPurchasesResult()
-
 case class AdjustAssetsRequest(user: User, reward: Option[Assets] = None, cost: Option[Assets] = None)
 case class AdjustAssetsResult(user: User)
 
@@ -54,17 +51,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def getAllUsers(request: GetAllUsersRequest): ApiResult[GetAllUsersResult] = handleDbException {
     OkApiResult(GetAllUsersResult(db.user.all))
   }
-
-  /**
-   * Reset all purchases (quests and themes) overnight.
-   */
-  def resetPurchases(request: ResetPurchasesRequest): ApiResult[ResetPurchasesResult] = handleDbException({
-    import request._
-
-    db.user.resetPurchases(user.id, user.getResetPurchasesTimeout)
-
-    OkApiResult(ResetPurchasesResult())
-  })
 
   /**
    * Adjust assets value and performs other modifications on profile because of this.
@@ -122,7 +108,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get level required to get a right.
    */
   def getLevelsForRights(request: GetLevelsForRightsRequest): ApiResult[GetLevelsForRightsResult] = handleDbException {
-    val rv = constants.restrictions.filterKeys(request.functionality.contains(_))
+    val rv = constants.restrictions.filterKeys(f => request.functionality.contains(f.toString))
 
     OkApiResult(GetLevelsForRightsResult(rv))
   }

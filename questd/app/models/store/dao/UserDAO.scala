@@ -51,8 +51,6 @@ trait UserDAO extends BaseDAO[User] {
    */
   def updateQuestCreationCoolDown(id: String, coolDown: Date): Option[User]
 
-  def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User]
-
   def addPrivateDailyResult(id: String, dailyResult: DailyResult): Option[User]
   def movePrivateDailyResultsToPublic(id: String, dailyResults: List[DailyResult]): Option[User]
   def addQuestIncomeToDailyResult(id: String, questIncome: QuestIncome): Option[User]

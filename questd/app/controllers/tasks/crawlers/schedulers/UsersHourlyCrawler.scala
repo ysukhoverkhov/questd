@@ -18,7 +18,6 @@ object UsersHourlyCrawler {
 class UsersHourlyCrawler(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) extends BaseUsersScheduleCrawler(api, rand) {
 
   protected val actors = List(
-      classOf[ResetPurchasesAtNight],
       classOf[ResetTasksAtNight],
       classOf[ShiftDailyResult],
       classOf[PopulateTimeLine])

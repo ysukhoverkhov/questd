@@ -147,17 +147,6 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def resetPurchases(id: String, resetPurchasesTimeout: Date): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$set" -> MongoDBObject(
-          "schedules.purchases" -> resetPurchasesTimeout)))
-  }
-
-  /**
-   *
-   */
   def addPrivateDailyResult(id: String, dailyResult: DailyResult): Option[User] = {
     findAndModify(
       id,
