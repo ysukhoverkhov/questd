@@ -193,11 +193,15 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
   def processFriendshipInvitationsFromSN(request: ProcessFriendshipInvitationsFromSNRequest): ApiResult[ProcessFriendshipInvitationsFromSNResult] = handleDbException {
     // All exceptions are wrapped and returned as Internal error which is not good.
     // Only real internal errors should be reported as internal errors.
+    Logger.trace(s"processFriendshipInvitationsFromSN for ${request.user.id} aka ${request.user.profile.publicProfile.bio.name}")
 
     val rv = request.snUser.invitations.foldLeft(request.user) { (u, i) =>
-      Logger.trace(s"Invitation from ${i.inviterSnId}")
+      Logger.trace(s"Invitation from ${i.inviterSnId} in ${i.snName}")
 
-      db.user.readBySNid(i.snName, i.inviterSnId) foreach { friend =>
+      // Read by snid returns nothing.
+      db.user.readBySNid(i.snName, i.inviterSnId).fold {
+        Logger.trace(s"Unable to find ${i.inviterSnId} in ${i.snName} in db")
+      } { friend =>
         Logger.trace(s"becoming friends with ${friend.profile.publicProfile.bio.name}")
 
         def becomeFriend(me: User, newfriend: User, status: FriendshipStatus.Value): Unit = {
@@ -220,9 +224,9 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
           becomeFriend(request.user, friend, FriendshipStatus.Invites)
           becomeFriend(friend, request.user, FriendshipStatus.Invited)
         }
-
       }
 
+      Logger.trace(s"deleting invitation from ${i.inviterSnId} in ${i.snName}")
       i.delete()
       u
     }
