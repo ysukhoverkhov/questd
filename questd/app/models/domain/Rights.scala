@@ -1,7 +1,12 @@
 package models.domain
 
+import play.api.libs.json.{Format, JsString, JsSuccess, JsValue}
+
 
 object Functionality extends Enumeration {
+
+  type Functionality = Value
+
   val VoteQuestSolutions = Value
   val SubmitPhotoResults = Value
   val SubmitVideoResults = Value
@@ -15,6 +20,11 @@ object Functionality extends Enumeration {
   val SubmitReviewsForResults = Value
   val SubmitReviewsForProposals = Value
   val GiveRewards = Value
+
+  implicit val myEnumFormat = new Format[Functionality] {
+    def reads(json: JsValue) = JsSuccess(Functionality.withName(json.as[String]))
+    def writes(myEnum: Functionality) = JsString(myEnum.toString)
+  }
 }
 
 /**
@@ -26,7 +36,7 @@ case class Rights(
 
 
 object Rights {
-  import Functionality._
+  import models.domain.Functionality._
 
   /**
    * All rights given.

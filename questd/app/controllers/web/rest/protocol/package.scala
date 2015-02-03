@@ -188,7 +188,7 @@ package object protocol {
 
   type WSGetRightsAtLevelsResult = GetRightsAtLevelsResult
 
-  type WSGetLevelsForRightsResult = GetLevelsForRightsResult
+  case class WSGetLevelsForRightsResult (levels: Map[String, Int])
 
   case class WSGetLevelsForRightsRequest(
     functionality: List[String])
