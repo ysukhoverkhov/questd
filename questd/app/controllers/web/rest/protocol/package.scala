@@ -214,20 +214,20 @@ package object protocol {
    * Content
    * ********************
    */
-  case class WSGetQuestRequest(
-    id: String)
+  case class WSGetQuestsRequest(
+    ids: List[String])
 
-  type WSGetQuestResult = GetQuestResult
+  type WSGetQuestsResult = GetQuestsResult
 
-  case class WSGetSolutionRequest(
-    id: String)
+  case class WSGetSolutionsRequest(
+    ids: List[String])
 
-  type WSGetSolutionResult = GetSolutionResult
+  type WSGetSolutionsResult = GetSolutionsResult
 
-  case class WSGetBattleRequest(
-    id: String)
+  case class WSGetBattlesRequest(
+    ids: List[String])
 
-  type WSGetBattleResult = GetBattleResult
+  type WSGetBattlesResult = GetBattlesResult
 
   case class WSGetPublicProfilesRequest(
     ids: List[String])

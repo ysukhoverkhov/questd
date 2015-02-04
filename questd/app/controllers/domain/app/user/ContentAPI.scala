@@ -7,24 +7,25 @@ import controllers.domain.helpers._
 import models.domain._
 import models.domain.view._
 import controllers.domain.helpers.PagerHelper._
+import play.Logger
 
-case class GetQuestRequest(user: User, questId: String)
-case class GetQuestResult(
+case class GetQuestsRequest(user: User, questIds: List[String])
+case class GetQuestsResult(
   allowed: ProfileModificationResult,
-  quest: Option[QuestInfo] = None)
+  quests: List[QuestInfo] = List.empty)
 
-case class GetSolutionRequest(user: User, solutionId: String)
-case class GetSolutionResult(
+case class GetSolutionsRequest(user: User, solutionIds: List[String])
+case class GetSolutionsResult(
   allowed: ProfileModificationResult,
-  solution: Option[SolutionInfoWithID] = None,
-  rating: Option[SolutionRating] = None,
-  quest: Option[QuestInfoWithID] = None,
-  questAuthor: Option[PublicProfileWithID] = None)
+  solutions: List[SolutionInfoWithID] = List.empty,
+  ratings: List[SolutionRating] = List.empty,
+  quests: List[QuestInfoWithID] = List.empty,
+  questAuthors: List[PublicProfileWithID] = List.empty)
 
-case class GetBattleRequest(user: User, battleId: String)
-case class GetBattleResult(
+case class GetBattlesRequest(user: User, battleIds: List[String])
+case class GetBattlesResult(
   allowed: ProfileModificationResult,
-  battle: Option[BattleInfoWithID] = None)
+  battles: List[BattleInfoWithID] = List.empty)
 
 case class GetPublicProfilesRequest(
   user: User,
@@ -96,35 +97,51 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   /**
    * Get quest by its id
    */
-  def getQuest(request: GetQuestRequest): ApiResult[GetQuestResult] = handleDbException {
+  def getQuests(request: GetQuestsRequest): ApiResult[GetQuestsResult] = handleDbException {
     import request._
+    val maxPageSize = adjustedPageSize(questIds.length)
 
-    db.quest.readById(questId) ifSome { quest =>
-      OkApiResult(GetQuestResult(OK, Some(quest.info)))
-    }
+    OkApiResult(GetQuestsResult(
+      OK,
+      db.quest.readManyByIds(questIds.take(maxPageSize)).map(_.info).toList))
   }
 
   /**
    * Get solution by its id
    */
-  def getSolution(request: GetSolutionRequest): ApiResult[GetSolutionResult] = handleDbException {
+  def getSolutions(request: GetSolutionsRequest): ApiResult[GetSolutionsResult] = handleDbException {
     import request._
+    val maxPageSize = adjustedPageSize(solutionIds.length)
 
-    db.solution.readById(solutionId).fold[ApiResult[GetSolutionResult]] {
-      InternalErrorApiResult(s"API - getSolution. Unable to find solution in db with id = $solutionId")
-    } { s =>
-
-      val quest = db.quest.readById(s.info.questId)
-      val questInfo = quest.map(q => QuestInfoWithID(q.id, q.info))
-      val questAuthor = quest.flatMap(q => db.user.readById(q.info.authorId).map (u => PublicProfileWithID(u.id, u.profile.publicProfile)))
-
-      OkApiResult(GetSolutionResult(
-        allowed = OK,
-        solution = Some(SolutionInfoWithID(s.id, s.info)),
-        rating = Some(s.rating),
-        quest = questInfo,
-        questAuthor = questAuthor))
+    val result = db.solution.readManyByIds(solutionIds.take(maxPageSize)).foldLeft[List[(SolutionInfoWithID, SolutionRating, QuestInfoWithID, PublicProfileWithID)]] (List.empty) {
+      case (r, s) =>
+        val quest = db.quest.readById(s.info.questId)
+        quest.map(q => QuestInfoWithID(q.id, q.info)).fold {
+          Logger.error(s"Unable to find quest ${s.info.questId} for solution ${s.id}")
+          r
+        } {
+          case questInfo =>
+            quest.flatMap(q => db.user.readById(q.info.authorId).map(u => PublicProfileWithID(u.id, u.profile.publicProfile))).fold {
+              Logger.error(s"Unable to user ${quest.get.info.authorId} for quest ${quest.get.id}")
+              r
+            } {
+              case questAuthor =>
+                (
+                  SolutionInfoWithID(s.id, s.info),
+                  s.rating,
+                  questInfo,
+                  questAuthor
+                  ) :: r
+            }
+        }
     }
+
+    OkApiResult(GetSolutionsResult(
+      allowed = OK,
+      solutions = result.map(_._1).toList,
+      ratings = result.map(_._2).toList,
+      quests = result.map(_._3).toList,
+      questAuthors = result.map(_._4).toList))
   }
 
   /**
@@ -132,23 +149,24 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * @param request The request.
    * @return
    */
-  def getBattle(request: GetBattleRequest): ApiResult[GetBattleResult] = handleDbException {
+  def getBattles(request: GetBattlesRequest): ApiResult[GetBattlesResult] = handleDbException {
     import request._
+    val maxPageSize = adjustedPageSize(battleIds.length)
 
-    db.battle.readById(battleId) ifSome { battle =>
-      OkApiResult(GetBattleResult(OK, Some(BattleInfoWithID(battle.id, battle.info))))
-    }
+    OkApiResult(GetBattlesResult(
+      OK,
+      db.battle.readManyByIds(battleIds.take(maxPageSize)).map(b => BattleInfoWithID(b.id, b.info)).toList))
   }
 
   /**
    * Get public profile
    */
   def getPublicProfiles(request: GetPublicProfilesRequest): ApiResult[GetPublicProfilesResult] = handleDbException {
-    val maxPageSize = 50
+    val maxPageSize = adjustedPageSize(request.userIds.length)
 
     OkApiResult(GetPublicProfilesResult(
       allowed = OK,
-      publicProfiles = db.user.readSomeByIds(request.userIds.take(maxPageSize)).toList.map(u => PublicProfileWithID(u.id, u.profile.publicProfile))))
+      publicProfiles = db.user.readManyByIds(request.userIds.take(maxPageSize)).toList.map(u => PublicProfileWithID(u.id, u.profile.publicProfile))))
   }
 
   /**

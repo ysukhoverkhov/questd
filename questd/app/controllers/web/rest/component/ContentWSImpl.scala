@@ -11,29 +11,29 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
   /**
    * Get quest by id.
    */
-  def getQuest = wrapJsonApiCallReturnBody[WSGetQuestResult] { (js, r) =>
-    val v = Json.read[WSGetQuestRequest](js)
+  def getQuests = wrapJsonApiCallReturnBody[WSGetQuestsResult] { (js, r) =>
+    val v = Json.read[WSGetQuestsRequest](js)
 
-    api.getQuest(GetQuestRequest(r.user, v.id))
+    api.getQuests(GetQuestsRequest(r.user, v.ids))
   }
 
   /**
    * Get solution by id.
    */
-  def getSolution = wrapJsonApiCallReturnBody[WSGetSolutionResult] { (js, r) =>
-    val v = Json.read[WSGetSolutionRequest](js)
+  def getSolution = wrapJsonApiCallReturnBody[WSGetSolutionsResult] { (js, r) =>
+    val v = Json.read[WSGetSolutionsRequest](js)
 
-    api.getSolution(GetSolutionRequest(r.user, v.id))
+    api.getSolutions(GetSolutionsRequest(r.user, v.ids))
   }
 
   /**
    * Get battle by id
    * @return requested battle
    */
-  def getBattle = wrapJsonApiCallReturnBody[WSGetBattleResult] { (js, r) =>
-    val v = Json.read[WSGetBattleRequest](js)
+  def getBattle = wrapJsonApiCallReturnBody[WSGetBattlesResult] { (js, r) =>
+    val v = Json.read[WSGetBattlesRequest](js)
 
-    api.getBattle(GetBattleRequest(r.user, v.id))
+    api.getBattles(GetBattlesRequest(r.user, v.ids))
   }
 
   /**
