@@ -12,7 +12,7 @@ import play.Logger
 case class GetQuestsRequest(user: User, questIds: List[String])
 case class GetQuestsResult(
   allowed: ProfileModificationResult,
-  quests: List[QuestInfo] = List.empty)
+  quests: List[QuestInfoWithID] = List.empty)
 
 case class GetSolutionsRequest(user: User, solutionIds: List[String])
 case class GetSolutionsResult(
@@ -103,7 +103,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetQuestsResult(
       OK,
-      db.quest.readManyByIds(questIds.take(maxPageSize)).map(_.info).toList))
+      db.quest.readManyByIds(questIds.take(maxPageSize)).map(q => QuestInfoWithID(q.id, q.info)).toList))
   }
 
   /**
@@ -122,7 +122,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         } {
           case questInfo =>
             quest.flatMap(q => db.user.readById(q.info.authorId).map(u => PublicProfileWithID(u.id, u.profile.publicProfile))).fold {
-              Logger.error(s"Unable to user ${quest.get.info.authorId} for quest ${quest.get.id}")
+              Logger.error(s"Unable to find user ${quest.get.info.authorId} for quest ${quest.get.id}")
               r
             } {
               case questAuthor =>
