@@ -1,9 +1,9 @@
 package models.domain
 
-import models.domain.view.QuestInfoWithID
+import models.domain.view.QuestView
 
 
 case class QuestSolutionContext(
-  bookmarkedQuest: Option[QuestInfoWithID] = None
+  bookmarkedQuest: Option[QuestView] = None
   )
 

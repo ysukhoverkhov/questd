@@ -3,7 +3,7 @@ package testhelpers
 import java.util.Date
 import models.domain._
 import models.domain.base.ID
-import models.domain.view.{QuestInfoWithID, ThemeInfoWithID}
+import models.domain.view.{QuestView, ThemeInfoWithID}
 
 
 package object domainstubs {
@@ -190,7 +190,7 @@ package object domainstubs {
         assets = assets,
         ratingToNextLevel = 1000000,
         questSolutionContext = QuestSolutionContext(
-          bookmarkedQuest = questBookmark.map(QuestInfoWithID(_, createQuestStub().info))),
+          bookmarkedQuest = questBookmark.map(QuestView(_, createQuestStub().info))),
         questCreationContext = QuestCreationContext(
           questCreationCoolDown = questCreationCoolDown),
         publicProfile = PublicProfile(

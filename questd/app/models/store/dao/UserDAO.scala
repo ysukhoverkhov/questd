@@ -3,7 +3,7 @@ package models.store.dao
 import models.domain._
 import java.util.Date
 
-import models.domain.view.QuestInfoWithID
+import models.domain.view.QuestView
 
 trait UserDAO extends BaseDAO[User] {
 
@@ -32,7 +32,7 @@ trait UserDAO extends BaseDAO[User] {
    * @param questId Id of a quest set bookmark.
    * @return Modified user.
    */
-  def setQuestBookmark(id: String, questId: QuestInfoWithID): Option[User]
+  def setQuestBookmark(id: String, questId: QuestView): Option[User]
 
   /**
    * Records quest solving and optionally resets bookmark.

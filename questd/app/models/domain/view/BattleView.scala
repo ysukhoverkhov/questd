@@ -2,7 +2,7 @@ package models.domain.view
 
 import models.domain.BattleInfo
 
-case class BattleInfoWithID (
+case class BattleView (
     id: String,
     obj: BattleInfo)
 

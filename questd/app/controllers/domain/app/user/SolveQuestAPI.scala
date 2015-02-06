@@ -1,6 +1,6 @@
 package controllers.domain.app.user
 
-import models.domain.view.QuestInfoWithID
+import models.domain.view.QuestView
 
 import scala.language.postfixOps
 import models.domain._
@@ -168,7 +168,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     import request._
 
     db.quest.readById(questId) ifSome { quest =>
-      db.user.setQuestBookmark(user.id, QuestInfoWithID(quest.id, quest.info)) ifSome { updatedUser =>
+      db.user.setQuestBookmark(user.id, QuestView(quest.id, quest.info)) ifSome { updatedUser =>
         OkApiResult(BookmarkQuestResult(OK, Some(updatedUser.profile)))
       }
     }

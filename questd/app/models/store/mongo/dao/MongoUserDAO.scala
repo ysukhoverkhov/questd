@@ -5,7 +5,7 @@ import java.util.Date
 import com.mongodb.casbah.commons._
 import com.novus.salat._
 import models.domain._
-import models.domain.view.QuestInfoWithID
+import models.domain.view.QuestView
 import models.store.dao._
 import models.store.mongo.helpers._
 import models.store.mongo.SalatContext._
@@ -101,12 +101,12 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def setQuestBookmark(id: String, quest: QuestInfoWithID): Option[User] = {
+  def setQuestBookmark(id: String, quest: QuestView): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
-          "profile.questSolutionContext.bookmarkedQuest" -> grater[QuestInfoWithID].asDBObject(quest))
+          "profile.questSolutionContext.bookmarkedQuest" -> grater[QuestView].asDBObject(quest))
       ))
   }
 

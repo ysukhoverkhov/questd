@@ -5,7 +5,7 @@ package models.store.mongo
 import java.util.Date
 
 import models.domain._
-import models.domain.view.QuestInfoWithID
+import models.domain.view.QuestView
 import models.store._
 import org.specs2.mutable._
 import play.api.test._
@@ -455,7 +455,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val questId = "qiq"
-      val qi = QuestInfoWithID(
+      val qi = QuestView(
         questId,
         createQuestStub(id = questId).info)
       val user = createUserStub(questBookmark = None)

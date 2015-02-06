@@ -1,38 +1,34 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.helpers.PagerHelper._
 import controllers.domain.helpers._
+import controllers.domain.{DomainAPIComponent, _}
 import models.domain._
 import models.domain.view._
-import controllers.domain.helpers.PagerHelper._
-import play.Logger
 
 case class GetQuestsRequest(user: User, questIds: List[String])
 case class GetQuestsResult(
   allowed: ProfileModificationResult,
-  quests: List[QuestInfoWithID] = List.empty)
+  quests: List[QuestView] = List.empty)
 
 case class GetSolutionsRequest(user: User, solutionIds: List[String])
 case class GetSolutionsResult(
   allowed: ProfileModificationResult,
-  solutions: List[SolutionInfoWithID] = List.empty,
-  ratings: List[SolutionRating] = List.empty,
-  quests: List[QuestInfoWithID] = List.empty,
-  questAuthors: List[PublicProfileWithID] = List.empty)
+  solutions: List[SolutionView] = List.empty)
 
 case class GetBattlesRequest(user: User, battleIds: List[String])
 case class GetBattlesResult(
   allowed: ProfileModificationResult,
-  battles: List[BattleInfoWithID] = List.empty)
+  battles: List[BattleView] = List.empty)
 
 case class GetPublicProfilesRequest(
   user: User,
   userIds: List[String])
 case class GetPublicProfilesResult(
   allowed: ProfileModificationResult,
-  publicProfiles: List[PublicProfileWithID])
+  publicProfiles: List[ProfileView])
 
 case class GetOwnSolutionsRequest(
   user: User,
@@ -41,7 +37,7 @@ case class GetOwnSolutionsRequest(
   pageSize: Int)
 case class GetOwnSolutionsResult(
   allowed: ProfileModificationResult,
-  solutions: List[SolutionListInfo],
+  solutions: List[SolutionListInfo], // TODO: replace with view.
   pageSize: Int,
   hasMore: Boolean)
 
@@ -52,7 +48,7 @@ case class GetOwnQuestsRequest(
   pageSize: Int)
 case class GetOwnQuestsResult(
   allowed: ProfileModificationResult,
-  quests: List[QuestInfoWithID],
+  quests: List[QuestView],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -64,7 +60,7 @@ case class GetSolutionsForQuestRequest(
   pageSize: Int)
 case class GetSolutionsForQuestResult(
   allowed: ProfileModificationResult,
-  solutions: List[SolutionListInfo],
+  solutions: List[SolutionListInfo], // TODO: replace with view.
   pageSize: Int,
   hasMore: Boolean)
 
@@ -76,7 +72,7 @@ case class GetSolutionsForUserRequest(
   pageSize: Int)
 case class GetSolutionsForUserResult(
   allowed: ProfileModificationResult,
-  solutions: List[SolutionListInfo],
+  solutions: List[SolutionListInfo],  // TODO: replace with view.
   pageSize: Int,
   hasMore: Boolean)
 
@@ -88,7 +84,7 @@ case class GetQuestsForUserRequest(
   pageSize: Int)
 case class GetQuestsForUserResult(
   allowed: ProfileModificationResult,
-  quests: List[QuestInfoWithID],
+  quests: List[QuestView],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -103,7 +99,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetQuestsResult(
       OK,
-      db.quest.readManyByIds(questIds.take(maxPageSize)).map(q => QuestInfoWithID(q.id, q.info)).toList))
+      db.quest.readManyByIds(questIds.take(maxPageSize)).map(q => QuestView(q.id, q.info, Some(q.rating))).toList))
   }
 
   /**
@@ -113,35 +109,9 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     import request._
     val maxPageSize = adjustedPageSize(solutionIds.length)
 
-    val result = db.solution.readManyByIds(solutionIds.take(maxPageSize)).foldLeft[List[(SolutionInfoWithID, SolutionRating, QuestInfoWithID, PublicProfileWithID)]] (List.empty) {
-      case (r, s) =>
-        val quest = db.quest.readById(s.info.questId)
-        quest.map(q => QuestInfoWithID(q.id, q.info)).fold {
-          Logger.error(s"Unable to find quest ${s.info.questId} for solution ${s.id}")
-          r
-        } {
-          case questInfo =>
-            quest.flatMap(q => db.user.readById(q.info.authorId).map(u => PublicProfileWithID(u.id, u.profile.publicProfile))).fold {
-              Logger.error(s"Unable to find user ${quest.get.info.authorId} for quest ${quest.get.id}")
-              r
-            } {
-              case questAuthor =>
-                (
-                  SolutionInfoWithID(s.id, s.info),
-                  s.rating,
-                  questInfo,
-                  questAuthor
-                  ) :: r
-            }
-        }
-    }
-
     OkApiResult(GetSolutionsResult(
-      allowed = OK,
-      solutions = result.map(_._1).toList,
-      ratings = result.map(_._2).toList,
-      quests = result.map(_._3).toList,
-      questAuthors = result.map(_._4).toList))
+      OK,
+      db.solution.readManyByIds(solutionIds.take(maxPageSize)).map(s => SolutionView(s.id, s.info, Some(s.rating))).toList))
   }
 
   /**
@@ -155,7 +125,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetBattlesResult(
       OK,
-      db.battle.readManyByIds(battleIds.take(maxPageSize)).map(b => BattleInfoWithID(b.id, b.info)).toList))
+      db.battle.readManyByIds(battleIds.take(maxPageSize)).map(b => BattleView(b.id, b.info)).toList))
   }
 
   /**
@@ -166,7 +136,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetPublicProfilesResult(
       allowed = OK,
-      publicProfiles = db.user.readManyByIds(request.userIds.take(maxPageSize)).toList.map(u => PublicProfileWithID(u.id, u.profile.publicProfile))))
+      publicProfiles = db.user.readManyByIds(request.userIds.take(maxPageSize)).toList.map(u => ProfileView(u.id, u.profile.publicProfile))))
   }
 
   /**
@@ -183,8 +153,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
       SolutionListInfo(
-        solution = SolutionInfoWithID(s.id, s.info),
-        quest = db.quest.readById(s.info.questId).map(qu => QuestInfoWithID(qu.id, qu.info)),
+        solution = SolutionView(s.id, s.info),
+        quest = db.quest.readById(s.info.questId).map(qu => QuestView(qu.id, qu.info)),
         author = None)
     })
 
@@ -209,7 +179,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetOwnQuestsResult(
       allowed = OK,
-      quests = questsForUser.take(pageSize).toList.map(q => QuestInfoWithID(q.id, q.info)),
+      quests = questsForUser.take(pageSize).toList.map(q => QuestView(q.id, q.info)),
       pageSize,
       questsForUser.hasNext))
   }
@@ -228,9 +198,9 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     val solutions = solutionsForQuest.take(pageSize).toList.map(s => {
       SolutionListInfo(
-        solution = SolutionInfoWithID(s.id, s.info),
+        solution = SolutionView(s.id, s.info),
         quest = None,
-        author = db.user.readById(s.info.authorId).map(us => PublicProfileWithID(us.id, us.profile.publicProfile)))
+        author = db.user.readById(s.info.authorId).map(us => ProfileView(us.id, us.profile.publicProfile)))
     })
 
     OkApiResult(GetSolutionsForQuestResult(
@@ -254,8 +224,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
       SolutionListInfo(
-        solution = SolutionInfoWithID(s.id, s.info),
-        quest = db.quest.readById(s.info.questId).map(qu => QuestInfoWithID(qu.id, qu.info)),
+        solution = SolutionView(s.id, s.info),
+        quest = db.quest.readById(s.info.questId).map(qu => QuestView(qu.id, qu.info)),
         author = None)
     })
 
@@ -280,7 +250,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetQuestsForUserResult(
       allowed = OK,
-      quests = questsForUser.take(pageSize).toList.map(q => QuestInfoWithID(q.id, q.info)),
+      quests = questsForUser.take(pageSize).toList.map(q => QuestView(q.id, q.info)),
       pageSize,
       questsForUser.hasNext))
   }
