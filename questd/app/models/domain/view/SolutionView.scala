@@ -4,5 +4,5 @@ import models.domain._
 
 case class SolutionView (
     id: String,
-    obj: SolutionInfo,
+    info: SolutionInfo,
     rating: Option[SolutionRating] = None)

@@ -4,5 +4,5 @@ import models.domain.BattleInfo
 
 case class BattleView (
     id: String,
-    obj: BattleInfo)
+    info: BattleInfo)
 

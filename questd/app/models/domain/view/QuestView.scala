@@ -4,5 +4,5 @@ import models.domain._
 
 case class QuestView (
     id: String,
-    obj: QuestInfo,
+    info: QuestInfo,
     rating: Option[QuestRating] = None)

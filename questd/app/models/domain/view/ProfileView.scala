@@ -4,4 +4,4 @@ import models.domain._
 
 case class ProfileView(
     id: String,
-    obj: PublicProfile)
+    info: PublicProfile)
