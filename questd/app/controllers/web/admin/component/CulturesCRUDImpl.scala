@@ -62,7 +62,7 @@ class CulturesCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller
    * Delete object.
    */
   protected def deleteObjectWithId(id: String): Unit = {
-        api.deleteCulture(DeleteCultureRequest(id))
+    api.deleteCulture(DeleteCultureRequest(id))
   }
 
   /**
