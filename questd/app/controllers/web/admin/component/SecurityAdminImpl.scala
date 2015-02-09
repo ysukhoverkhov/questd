@@ -25,7 +25,7 @@ trait SecurityAdminImpl extends InternalErrorLogger {
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
       request.session.get(SecurityAdminImpl.SessionIdKey) match {
 
-        case Some(sessionid: String) if sessionid == SecurityAdminImpl.SessionValue =>
+        case Some(sessionId: String) if sessionId == SecurityAdminImpl.SessionValue =>
           block(new AuthenticatedRequest(request))
 
         case _ =>

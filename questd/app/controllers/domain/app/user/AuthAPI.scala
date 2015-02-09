@@ -9,7 +9,7 @@ import play.Logger
 
 case class LoginRequest(snName: String, snuser: SNUser)
 
-case class LoginResult(session: String)
+case class LoginResult(sessionId: String, userId: String)
 
 case class UserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
 
@@ -33,7 +33,7 @@ private[domain] trait AuthAPI {
           case InternalErrorApiResult(a) =>
             InternalErrorApiResult[LoginResult](a)
           case _ =>
-            OkApiResult(LoginResult(uuid))
+            OkApiResult(LoginResult(uuid, user.id))
         }
       }
     }

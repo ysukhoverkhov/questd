@@ -41,7 +41,7 @@ package object protocol {
   /**
    * Login Result
    */
-  case class WSLoginResult(sessionid: String)
+  case class WSLoginResult(sessionId: String, userId: String)
 
   /**
    * Get profile response
