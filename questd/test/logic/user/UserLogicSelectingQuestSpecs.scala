@@ -11,25 +11,6 @@ import testhelpers.domainstubs._
 class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
   /**
-   * Creates stub config for our tests.
-   */
-  private def createStubConfig = {
-    api.ConfigParams returns _ConfigParams
-
-    val config = mock[ConfigSection]
-
-    config.apply(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests) returns "5"
-    config.apply(api.ConfigParams.QuestProbabilityStartingVIPQuests) returns "0.50"
-
-    config.apply(api.ConfigParams.QuestProbabilityFriends) returns "0.25"
-    config.apply(api.ConfigParams.QuestProbabilityFollowing) returns "0.25"
-    config.apply(api.ConfigParams.QuestProbabilityLiked) returns "0.20"
-    config.apply(api.ConfigParams.QuestProbabilityVIP) returns "0.10"
-
-    config
-  }
-
-  /**
    * Creates user we will test algorithm with
    */
   private def createUser(friends: List[Friendship]) = {
@@ -77,23 +58,6 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       q.map(_.id) must beEqualTo(List(qid))
     }
 
-    "Return liked quest if dice rolls so for solving" in {
-      api.config returns createStubConfig
-      rand.nextDouble returns 0.58
-
-      val qid = "qid"
-
-      api.getLikedQuests(any[GetLikedQuestsRequest]) returns OkApiResult(GetLikedQuestsResult(List(createQuestStub(qid, "author")).iterator))
-
-      val u = User()
-      val q = u.getRandomQuestsForTimeLine(1)
-
-      there was one(rand).nextDouble
-      there was one(api).getLikedQuests(any[GetLikedQuestsRequest])
-
-      q.map(_.id) must beEqualTo(List(qid))
-    }
-
     "Do not return liked quest if dice rolls so for voting" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.98
@@ -106,7 +70,6 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       val q = u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
-      there was no(api).getLikedQuests(any[GetLikedQuestsRequest])
       there was one(api).getAllQuests(any[GetAllQuestsRequest])
 
       q.map(_.id) must beEqualTo(List(qid))

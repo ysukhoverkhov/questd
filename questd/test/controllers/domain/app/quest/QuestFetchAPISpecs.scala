@@ -112,41 +112,6 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         cultureId = u.demo.cultureId)
     }
 
-    "getLikedQuests calls db correctly" in context {
-      db.quest.allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List(),
-        authorIdsExclude = List(),
-        levels = Some(1, 2),
-        skip = 0,
-        vip = Some(false),
-        ids = List("1", "2", "3", "4"),
-        idsExclude = List()
-      ) returns List().iterator
-
-      val liked = List("1", "2", "3", "4")
-      val u = createUserStub(
-        timeLine = liked.map(id => createTimeLineEntryStub(objectId = id, objectType = TimeLineType.Quest, ourVote = Some(ContentVote.Cool)))
-      )
-
-      val result = api.getLikedQuests(GetLikedQuestsRequest(
-        user = u,
-        status = QuestStatus.InRotation,
-        levels = Some(1, 2)))
-
-      result must beAnInstanceOf[OkApiResult[GetLikedQuestsResult]]
-      there was one(quest).allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = null,
-        authorIdsExclude = List(),
-        levels = Some(1, 2),
-        skip = 0,
-        vip = null,
-        ids = List("1", "2", "3", "4"),
-        idsExclude = List(),
-        cultureId = u.demo.cultureId)
-    }
-
     "getVIPQuests calls db correctly" in context {
 
       db.quest.allWithParams(

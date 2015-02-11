@@ -1,34 +1,11 @@
 package logic.user
 
 import controllers.domain.app.protocol.ProfileModificationResult
-import controllers.domain.config._ConfigParams
 import logic.BaseLogicSpecs
-import models.domain.admin.ConfigSection
 import models.domain.{ContentVote, Rights}
 import testhelpers.domainstubs._
 
 class VotingSolutionsSpecs extends BaseLogicSpecs {
-
-  /**
-   * Creates stub config for our tests.
-   */
-  private def createStubConfig = {
-    api.ConfigParams returns _ConfigParams
-
-    val config = mock[ConfigSection]
-
-    config.apply(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests) returns "5"
-    config.apply(api.ConfigParams.QuestProbabilityStartingVIPQuests) returns "0.50"
-
-    config.apply(api.ConfigParams.QuestProbabilityFriends) returns "0.25"
-    config.apply(api.ConfigParams.QuestProbabilityFollowing) returns "0.25"
-    config.apply(api.ConfigParams.QuestProbabilityLiked) returns "0.20"
-    config.apply(api.ConfigParams.QuestProbabilityVIP) returns "0.10"
-
-    config.apply(api.ConfigParams.ProposalMaxDescriptionLength) returns "100"
-
-    config
-  }
 
   "User Logic for voting for solutions" should {
 
@@ -58,7 +35,9 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
 
       val s = createSolutionStub()
-      val user = createUserStub(timeLine = List(createTimeLineEntryStub(objectId = s.id, ourVote = Some(ContentVote.Cool))))
+      val user = createUserStub(
+        timeLine = List(createTimeLineEntryStub(objectId = s.id)),
+        votedSolutions = Map(s.id -> ContentVote.Cool))
 
       val rv = user.canVoteSolution(s.id)
 

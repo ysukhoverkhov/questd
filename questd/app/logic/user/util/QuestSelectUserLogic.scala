@@ -61,7 +61,6 @@ trait QuestSelectUserLogic { this: UserLogic =>
     val algorithms = List(
       (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests),
       (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests),
-      (api.config(api.ConfigParams.QuestProbabilityLiked).toDouble, () => getLikedQuests),
       (api.config(api.ConfigParams.QuestProbabilityVIP).toDouble, () => getVIPQuests),
       (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
@@ -88,17 +87,6 @@ trait QuestSelectUserLogic { this: UserLogic =>
       idsExclude = questIdsToExclude,
       authorsExclude = questAuthorIdsToExclude
     )).body.get.quests))
-  }
-
-  private[user] def getLikedQuests(implicit selected: List[Quest]) = {
-    Logger.trace("  Returning quests we liked recently")
-
-    checkNotEmptyIterator(Some(api.getLikedQuests(GetLikedQuestsRequest(
-      user = user,
-      idsExclude = questIdsToExclude,
-      authorsExclude = questAuthorIdsToExclude,
-      status = QuestStatus.InRotation,
-      levels = levels)).body.get.quests))
   }
 
   private[user] def getVIPQuests(implicit selected: List[Quest]) = {

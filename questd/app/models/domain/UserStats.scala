@@ -15,7 +15,16 @@ case class UserStats (
   /**
    * List of all solved quests.
    */
-  solvedQuests: List[String] = List()
+  solvedQuests: List[String] = List.empty,
 
+  /**
+   * All voted quests.
+   */
+  votedQuests: Map[String, ContentVote.Value] = Map.empty,
+
+  /**
+   * All voted solutions.
+   */
+  votedSolutions: Map[String, ContentVote.Value] = Map.empty
   )
 

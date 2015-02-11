@@ -38,7 +38,6 @@ class _ConfigParams {
 
   val QuestProbabilityFriends = "72 01 Probability of quests from friends"
   val QuestProbabilityFollowing = "72 02 Probability of quests from Following"
-  val QuestProbabilityLiked = "72 03 Probability of liked quests"
   val QuestProbabilityVIP = "72 04 Probability of quests from Vips"
 
   var TimeLineRandomQuestsDaily = "80 01 TimeLine Random Quests Daily"
@@ -103,9 +102,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "5",
       ConfigParams.QuestProbabilityStartingVIPQuests -> "0.5",
 
-      ConfigParams.QuestProbabilityFriends -> "0.25",
-      ConfigParams.QuestProbabilityFollowing -> "0.25",
-      ConfigParams.QuestProbabilityLiked -> "0.20",
+      ConfigParams.QuestProbabilityFriends -> "0.40",
+      ConfigParams.QuestProbabilityFollowing -> "0.30",
       ConfigParams.QuestProbabilityVIP -> "0.10",
 
       ConfigParams.TimeLineRandomQuestsDaily -> "5",

@@ -87,11 +87,9 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
   }
 
   def getSolutionsForLikedQuests(request: GetSolutionsForLikedQuestsRequest): ApiResult[GetSolutionsForLikedQuestsResult] = handleDbException {
-
-    val ids = request.user.timeLine
-      .filter(_.objectType == TimeLineType.Quest)
-      .filter(_.ourVote == Some(ContentVote.Cool))
-      .map(_.objectId)
+    import request._
+// TODO: test the function is really returning solutions for liked quests.
+    val ids = user.stats.votedQuests.filter(_._2 == ContentVote.Cool).keys.toList
 
     OkApiResult(GetSolutionsForLikedQuestsResult(db.solution.allWithParams(
       status = request.status,

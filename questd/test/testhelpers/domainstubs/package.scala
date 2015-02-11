@@ -98,15 +98,13 @@ package object domainstubs {
     reason: TimeLineReason.Value = TimeLineReason.Created,
     actorId: String = "authorId",
     objectType: TimeLineType.Value = TimeLineType.Quest,
-    objectId: String = "objectId",
-    ourVote: Option[ContentVote.Value] = None) = {
+    objectId: String = "objectId") = {
     TimeLineEntry(
       id = id,
       reason = reason,
       actorId = actorId,
       objectType = objectType,
-      objectId = objectId,
-      ourVote = ourVote
+      objectId = objectId
     )
   }
 
@@ -174,7 +172,9 @@ package object domainstubs {
     mustVoteSolutions: List[String] = List(),
     level: Int = 18,
     questCreationCoolDown: Date = new Date(Long.MaxValue),
-    solvedQuests: List[String] = List(),
+    solvedQuests: List[String] = List.empty,
+    votedQuests: Map[String, ContentVote.Value] = Map.empty,
+    votedSolutions: Map[String, ContentVote.Value] = Map.empty,
     takenTheme: Option[ThemeInfoWithID] = Some(ThemeInfoWithID("theme_id", createThemeStub().info)),
     rights: Rights = Rights.full,
     timeLine: List[TimeLineEntry] = List(),
@@ -202,7 +202,9 @@ package object domainstubs {
       friends = friends,
       mustVoteSolutions = mustVoteSolutions,
       timeLine = timeLine,
-      stats = UserStats(solvedQuests = solvedQuests))
+      stats = UserStats(
+        solvedQuests = solvedQuests,
+        votedQuests = votedQuests,
+        votedSolutions = votedSolutions))
   }
-
 }

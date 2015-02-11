@@ -12,25 +12,6 @@ class TasksSpecs extends BaseLogicSpecs {
     User(profile = u.profile.copy(rights = u.calculateRights))
   }
 
-  /**
-   * Creates stub config for our tests.
-   */
-  private def createStubConfig = {
-    api.ConfigParams returns _ConfigParams
-
-    val config = mock[ConfigSection]
-
-    config.apply(api.ConfigParams.SolutionVoteTaskCountMean) returns "3"
-    config.apply(api.ConfigParams.SolutionVoteTaskCountDeviation) returns "1"
-    config.apply(api.ConfigParams.CreateSolutionTaskProbability) returns "0.5"
-    config.apply(api.ConfigParams.AddToFollowingTaskProbability) returns "0.3"
-    config.apply(api.ConfigParams.QuestVoteTaskCountMean) returns "3"
-    config.apply(api.ConfigParams.QuestVoteTaskCountDeviation) returns "1"
-    config.apply(api.ConfigParams.CreateQuestTaskProbability) returns "0.3"
-
-    config
-  }
-
   "Tasks Logic" should {
 
     "Generate DailyTasks on request" in {

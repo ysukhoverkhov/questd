@@ -1,9 +1,7 @@
 package logic.user
 
-import controllers.domain.config._ConfigParams
 import logic.BaseLogicSpecs
 import models.domain._
-import models.domain.admin.ConfigSection
 import testhelpers.domainstubs._
 
 class UserLogicSelectingThemeSpecs extends BaseLogicSpecs {
@@ -15,18 +13,6 @@ class UserLogicSelectingThemeSpecs extends BaseLogicSpecs {
     for (i <- List.range(1, 11)) yield {
       createThemeStub(name = i.toString, desc = i.toString)
     }
-  }
-
-  /**
-   * Creates stub config for our tests.
-   */
-  private def createStubConfig = {
-    api.ConfigParams returns _ConfigParams
-
-    val config = mock[ConfigSection]
-    config.apply(api.ConfigParams.FavoriteThemesShare) returns "0.20"
-    config.apply(api.ConfigParams.FavoriteThemesProbability) returns "0.75"
-    config
   }
 
   "User Logic" should {

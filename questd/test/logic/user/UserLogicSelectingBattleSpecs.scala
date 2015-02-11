@@ -2,32 +2,11 @@ package logic.user
 
 import controllers.domain.OkApiResult
 import controllers.domain.app.battle._
-import controllers.domain.config._ConfigParams
 import logic.BaseLogicSpecs
 import models.domain._
-import models.domain.admin.ConfigSection
 import testhelpers.domainstubs._
 
 class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
-
-  /**
-   * Creates stub config for our tests.
-   */
-  private def createStubConfig = {
-    api.ConfigParams returns _ConfigParams
-
-    val config = mock[ConfigSection]
-
-    config.apply(api.ConfigParams.BattleProbabilityLevelsToGiveStartingBattles) returns "5"
-    config.apply(api.ConfigParams.BattleProbabilityStartingVIPBattles) returns "0.50"
-
-    config.apply(api.ConfigParams.BattleProbabilityFriends) returns "0.25"
-    config.apply(api.ConfigParams.BattleProbabilityFollowing) returns "0.25"
-    config.apply(api.ConfigParams.BattleProbabilityLiked) returns "0.20"
-    config.apply(api.ConfigParams.BattleProbabilityVIP) returns "0.10"
-
-    config
-  }
 
   "User Logic" should {
 

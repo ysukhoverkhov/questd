@@ -27,14 +27,6 @@ case class GetFollowingQuestsRequest(
   levels: Option[(Int, Int)] = None)
 case class GetFollowingQuestsResult(quests: Iterator[Quest])
 
-case class GetLikedQuestsRequest(
-  user: User,
-  idsExclude: List[String] = List.empty,
-  authorsExclude: List[String] = List.empty,
-  status: QuestStatus.Value,
-  levels: Option[(Int, Int)] = None)
-case class GetLikedQuestsResult(quests: Iterator[Quest])
-
 case class GetVIPQuestsRequest(
   user: User,
   idsExclude: List[String] = List.empty,
@@ -76,21 +68,6 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
       authorIds = request.user.following,
       authorIdsExclude = request.authorsExclude,
       levels = request.levels,
-      idsExclude = request.idsExclude,
-      cultureId = request.user.demo.cultureId)))
-  }
-
-  def getLikedQuests(request: GetLikedQuestsRequest): ApiResult[GetLikedQuestsResult] = handleDbException {
-    val ids = request.user.timeLine
-      .filter(_.objectType == TimeLineType.Quest)
-      .filter(_.ourVote == Some(ContentVote.Cool))
-      .map(_.objectId)
-
-    OkApiResult(GetLikedQuestsResult(db.quest.allWithParams(
-      status = List(request.status),
-      authorIdsExclude = request.authorsExclude,
-      levels = request.levels,
-      ids = ids,
       idsExclude = request.idsExclude,
       cultureId = request.user.demo.cultureId)))
   }

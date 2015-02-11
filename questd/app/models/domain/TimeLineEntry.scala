@@ -49,6 +49,5 @@ case class TimeLineEntry  (
   reason: TimeLineReason.Value,
   actorId: String,
   objectType: TimeLineType.Value,
-  objectId: String,
-  ourVote: Option[ContentVote.Value] = None)
+  objectId: String)
 

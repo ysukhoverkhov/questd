@@ -21,7 +21,7 @@ trait VotingSolutions { this: UserLogic =>
       NotEnoughRights
     else if (solutionFromTimeLine == None)
       OutOfContent
-    else if (solutionFromTimeLine.get.ourVote != None)
+    else if (user.stats.votedSolutions.contains(solutionId))
       InvalidState
     else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
       IncompleteBio

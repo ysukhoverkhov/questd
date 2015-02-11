@@ -1,33 +1,12 @@
 package logic.user
 
+import controllers.domain.OkApiResult
 import controllers.domain.app.solution._
 import logic.BaseLogicSpecs
 import models.domain._
-import controllers.domain.OkApiResult
-import models.domain.admin.ConfigSection
-import controllers.domain.config._ConfigParams
 import testhelpers.domainstubs._
 
 class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
-
-  /**
-   * Creates stub config for our tests.
-   */
-  private def createStubConfig = {
-    api.ConfigParams returns _ConfigParams
-
-    val config = mock[ConfigSection]
-
-    config.apply(api.ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions) returns "5"
-    config.apply(api.ConfigParams.SolutionProbabilityStartingVIPSolutions) returns "0.50"
-
-    config.apply(api.ConfigParams.SolutionProbabilityFriends) returns "0.25"
-    config.apply(api.ConfigParams.SolutionProbabilityFollowing) returns "0.25"
-    config.apply(api.ConfigParams.SolutionProbabilityLiked) returns "0.20"
-    config.apply(api.ConfigParams.SolutionProbabilityVIP) returns "0.10"
-
-    config
-  }
 
   private def createFriend(newid: String) = {
     User(id = newid)

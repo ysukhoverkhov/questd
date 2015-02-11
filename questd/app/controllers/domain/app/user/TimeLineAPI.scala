@@ -78,14 +78,11 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
-
-    OkApiResult(GetTimeLineResult(request.user.timeLine.filter(
-      _.ourVote match {
-        case None => true
-        case Some(ContentVote.Cool) => true
-        case _ => false
-      }
-    ).iterator.drop(pageSize * pageNumber).take(pageSize).takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
+// TODO: filter banned.
+    OkApiResult(GetTimeLineResult(request.user.timeLine.iterator
+      .drop(pageSize * pageNumber)
+      .take(pageSize)
+      .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
   }
 
   /**

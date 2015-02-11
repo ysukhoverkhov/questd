@@ -90,10 +90,10 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         vip = Some(false),
         ids = List("1", "2", "3", "4"),
         questIds = List()) returns List().iterator
-
+// TODO: update the test.
       val liked = List("1", "2", "3", "4")
       val u = createUserStub(
-        timeLine = liked.map(id => createTimeLineEntryStub(objectId = id, objectType = TimeLineType.Quest, ourVote = Some(ContentVote.Cool)))
+        timeLine = liked.map(id => createTimeLineEntryStub(objectId = id, objectType = TimeLineType.Quest))
       )
       val result = api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
         user = u,
