@@ -85,17 +85,30 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  // TODO: remove me.
-  def recordTimeLineVote(id: String, objectId: String, vote: ContentVote.Value): Option[User] = {
+  def recordQuestVote(id: String, questId: String, vote: ContentVote.Value): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 
     queryBuilder += ("$set" -> MongoDBObject(
-      "timeLine.$.ourVote" -> vote.toString))
+      s"stats.votedQuests.$questId" -> vote.toString))
 
     findAndModify(
       MongoDBObject(
-        "id" -> id,
-        "timeLine.objectId" -> objectId),
+        "id" -> id),
+      queryBuilder.result())
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def recordSolutionVote(id: String, solutionId: String, vote: ContentVote.Value): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$set" -> MongoDBObject(
+      s"stats.votedSolutions.$solutionId" -> vote.toString))
+
+    findAndModify(
+      MongoDBObject(
+        "id" -> id),
       queryBuilder.result())
   }
 

@@ -24,7 +24,16 @@ trait UserDAO extends BaseDAO[User] {
    * @param vote our vote.
    * @return Modified user.
    */
-  def recordTimeLineVote(id: String, questId: String, vote: ContentVote.Value): Option[User]
+  def recordQuestVote(id: String, questId: String, vote: ContentVote.Value): Option[User]
+
+  /**
+   * Records vote for quest proposal.
+   * @param id Id of user making a vote.
+   * @param solutionId id of solution we vote for.
+   * @param vote our vote.
+   * @return Modified user.
+   */
+  def recordSolutionVote(id: String, solutionId: String, vote: ContentVote.Value): Option[User]
 
   /**
    * Set quest bookmark for a user.

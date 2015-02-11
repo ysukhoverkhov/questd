@@ -65,7 +65,7 @@ class VoteSolutionAPISpecs extends BaseAPISpecs {
         any,
         any,
         any) returns Some(s)
-      user.recordTimeLineVote(u.id, s.id, ContentVote.Cool) returns Some(u)
+      user.recordSolutionVote(u.id, s.id, ContentVote.Cool) returns Some(u)
 
       val result = api.voteSolution(VoteSolutionRequest(
         user = u,
@@ -85,6 +85,5 @@ class VoteSolutionAPISpecs extends BaseAPISpecs {
       result must beAnInstanceOf[OkApiResult[VoteSolutionResult]]
       result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
     }
-
   }
 }

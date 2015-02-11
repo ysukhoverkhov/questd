@@ -32,7 +32,7 @@ private[domain] trait VoteSolutionAPI {
             makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteSolutions)))
 
           } ifOk { r =>
-            db.user.recordTimeLineVote(r.user.id, s.id, request.vote) ifSome { u =>
+            db.user.recordSolutionVote(r.user.id, s.id, request.vote) ifSome { u =>
 
               (if (request.vote == ContentVote.Cool) {
                 addToWatchersTimeLine(AddToWatchersTimeLineRequest(

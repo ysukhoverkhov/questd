@@ -394,6 +394,32 @@ class UserDAOSpecs
       ou1 must beSome//.which((u: User) => u.mustVoteSolutions == List())
     }
 
+    "recordQuestVote works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val u = createUserStub()
+      val q = createQuestStub()
+
+      db.user.create(u)
+      db.user.recordQuestVote(u.id, q.id, ContentVote.Cheating)
+
+      val ou1 = db.user.readById(u.id)
+      ou1 must beSome.which((u: User) => u.stats.votedQuests.get(q.id) == Some(ContentVote.Cheating))
+    }
+
+    "recordSolutionVote works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val u = createUserStub()
+      val s = createSolutionStub()
+
+      db.user.create(u)
+      db.user.recordSolutionVote(u.id, s.id, ContentVote.Cheating)
+
+      val ou1 = db.user.readById(u.id)
+      ou1 must beSome.which((u: User) => u.stats.votedSolutions.get(s.id) == Some(ContentVote.Cheating))
+    }
+
     "Add entry to time line" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
 
