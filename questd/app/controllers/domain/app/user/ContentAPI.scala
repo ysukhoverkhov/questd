@@ -99,7 +99,13 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetQuestsResult(
       OK,
-      db.quest.readManyByIds(questIds.take(maxPageSize)).map(q => QuestView(q.id, q.info, Some(q.rating))).toList))
+      db.quest.readManyByIds(questIds.take(maxPageSize)).map{ q =>
+        QuestView(
+          q.id,
+          q.info,
+          Some(q.rating),
+          myVote = user.stats.votedQuests.get(q.id))
+      }.toList))
   }
 
   /**
@@ -111,7 +117,13 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetSolutionsResult(
       OK,
-      db.solution.readManyByIds(solutionIds.take(maxPageSize)).map(s => SolutionView(s.id, s.info, Some(s.rating))).toList))
+      db.solution.readManyByIds(solutionIds.take(maxPageSize)).map{ s =>
+        SolutionView(
+          id = s.id,
+          info = s.info,
+          rating = Some(s.rating),
+          myVote = user.stats.votedSolutions.get(s.id))
+      }.toList))
   }
 
   /**
