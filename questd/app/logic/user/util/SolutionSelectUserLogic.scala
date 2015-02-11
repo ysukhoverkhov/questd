@@ -76,7 +76,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
         (1.00, () => getOtherSolutions) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
-      selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble)
+      selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble())
     }
   }
 
@@ -91,7 +91,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       (1.00, () => getOtherSolutions) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
       )
 
-    selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble)
+    selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
   }
 
   private[user] def getFriendsSolutions(implicit selected: List[Solution]) = {
@@ -177,7 +177,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   }
 
   private def solutionIdsToExclude(implicit selected: List[Solution]) = {
-    user.timeLine.map(_.objectId) ::: selected.map(_.id)
+    user.timeLine.map(_.objectId)  ::: user.stats.votedSolutions.keys.toList ::: selected.map(_.id)
   }
 
   private def solutionAuthorIdsToExclude = {

@@ -4,8 +4,6 @@ import controllers.domain.OkApiResult
 import controllers.domain.app.quest._
 import logic.BaseLogicSpecs
 import models.domain._
-import models.domain.admin.ConfigSection
-import controllers.domain.config._ConfigParams
 import testhelpers.domainstubs._
 
 class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
@@ -179,6 +177,26 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
     "Starting quests does not return other quests ignoring recent quests list if no quests available otherwise" in {
       val qid = "qid"
       val u = createUserStub(level = 1, timeLine = List(createTimeLineEntryStub(objectId = qid)))
+
+      api.config returns createStubConfig
+      rand.nextDouble returns 1.0 thenReturns 1.0
+
+      api.getAllQuests(any[GetAllQuestsRequest]) returns
+        OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator)) thenReturns
+        OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator)) thenReturns
+        OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator)) thenReturns
+        OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
+
+      val q = u.getRandomQuestsForTimeLine(1)
+
+      there were one(rand).nextDouble
+      there were atLeast(1)(api).getAllQuests(any[GetAllQuestsRequest])
+      q.length must beEqualTo(1)
+    }
+
+    "Starting quests does not return other quests ignoring voted quests quests list if no quests available otherwise" in {
+      val qid = "qid"
+      val u = createUserStub(level = 1, votedQuests = Map(qid -> ContentVote.Cheating))
 
       api.config returns createStubConfig
       rand.nextDouble returns 1.0 thenReturns 1.0

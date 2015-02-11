@@ -164,7 +164,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private def questIdsToExclude(implicit selected: List[Quest]) = {
-    user.timeLine.map(_.objectId) ::: selected.map(_.id)
+    user.timeLine.map(_.objectId) ::: user.stats.votedQuests.keys.toList ::: selected.map(_.id)
   }
 
   private def questAuthorIdsToExclude = {
