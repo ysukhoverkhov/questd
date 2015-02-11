@@ -39,8 +39,7 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
                   user = u,
                   reason = TimeLineReason.Liked,
                   objectType = TimeLineType.Quest,
-                  objectId = q.id,
-                  objectAuthorId = Some(q.info.authorId)
+                  objectId = q.id
                 ))
               } else {
                 OkApiResult(AddToWatchersTimeLineResult(u))

@@ -110,6 +110,7 @@ private[mongo] class MongoSolutionDAO
     reviewsCountChange: Int = 0,
     pointsRandomChange: Int = 0,
     pointsFriendsChange: Int = 0,
+    likesCountChange: Int = 0,
     cheatingChange: Int = 0,
 
     spamChange: Int = 0,
@@ -120,9 +121,11 @@ private[mongo] class MongoSolutionDAO
       MongoDBObject(
         "$inc" -> MongoDBObject(
           "rating.reviewsCount" -> reviewsCountChange,
-          "rating.pointsRandom" -> pointsRandomChange,
 
+          "rating.pointsRandom" -> pointsRandomChange,
           "rating.pointsFriends" -> pointsFriendsChange,
+
+          "rating.likesCount" -> likesCountChange,
 
           "rating.cheating" -> cheatingChange,
 

@@ -14,15 +14,14 @@ case class AddToTimeLineRequest(
   reason: TimeLineReason.Value,
   objectType: TimeLineType.Value,
   objectId: String,
-  objectAuthorId: Option[String] = None)
+  actorId: Option[String] = None)
 case class AddToTimeLineResult(user: User)
 
 case class AddToWatchersTimeLineRequest(
   user: User,
   reason: TimeLineReason.Value,
   objectType: TimeLineType.Value,
-  objectId: String,
-  objectAuthorId: Option[String] = None)
+  objectId: String)
 case class AddToWatchersTimeLineResult(user: User)
 
 case class GetTimeLineRequest(
@@ -48,7 +47,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
       user.id,
       TimeLineEntry(
         reason = reason,
-        objectAuthorId = objectAuthorId.getOrElse(user.id),
+        actorId = actorId.getOrElse(user.id),
         objectType = objectType,
         objectId = objectId)) ifSome { u =>
       OkApiResult(AddToTimeLineResult(u))
@@ -65,7 +64,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
       user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId) ::: user.followers,
       TimeLineEntry(
         reason = reason,
-        objectAuthorId = objectAuthorId.getOrElse(user.id),
+        actorId = user.id,
         objectType = objectType,
         objectId = objectId))
 
@@ -118,7 +117,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
               reason = TimeLineReason.Has,
               objectType = TimeLineType.Quest,
               objectId = q.id,
-              objectAuthorId = Some(q.info.authorId)))
+              actorId = Some(q.info.authorId)))
             } ifOk { res =>
               selectQuestToTimeLine(SelectQuestToTimeLineRequest(q))
             } ifOk {
@@ -143,7 +142,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
               reason = TimeLineReason.Has,
               objectType = TimeLineType.Solution,
               objectId = s.id,
-              objectAuthorId = Some(s.info.authorId)))
+              actorId = Some(s.info.authorId)))
           } ifOk { res =>
             OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
           }

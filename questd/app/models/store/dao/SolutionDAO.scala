@@ -31,6 +31,7 @@ trait SolutionDAO extends BaseDAO[Solution] {
     reviewsCountChange: Int = 0,
     pointsRandomChange: Int = 0,
     pointsFriendsChange: Int = 0,
+    likesCountChange: Int = 0,
     cheatingChange: Int = 0,
 
     spamChange: Int = 0,

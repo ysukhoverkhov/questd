@@ -14,7 +14,7 @@ trait VotingQuests { this: UserLogic =>
    */
   def canVoteQuest(questId: String) = {
     val questFromTimeLine = user.timeLine.find { te =>
-      (te.objectId == questId) && (te.objectAuthorId != user.id)
+      (te.objectId == questId) && (te.actorId != user.id)
     }
 
     if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuests))

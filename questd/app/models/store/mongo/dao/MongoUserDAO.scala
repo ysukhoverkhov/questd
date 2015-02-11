@@ -85,6 +85,7 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
+  // TODO: remove me.
   def recordTimeLineVote(id: String, objectId: String, vote: ContentVote.Value): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 

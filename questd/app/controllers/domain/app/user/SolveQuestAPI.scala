@@ -69,12 +69,12 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
                 val numberOfReviewedQuests = user.timeLine.count { te =>
                   ((te.objectType == TimeLineType.Quest)
-                    && (te.objectAuthorId != user.id || te.reason != TimeLineReason.Created))
+                    && (te.actorId != user.id || te.reason != TimeLineReason.Created))
                 }
                 val numberOfSolvedQuests = user.timeLine.count { te =>
                   ((te.objectType == TimeLineType.Solution)
                     && (te.reason == TimeLineReason.Created)
-                    && (te.objectAuthorId == user.id))
+                    && (te.actorId == user.id))
                 }
 
                 // Updating quest points.

@@ -37,6 +37,8 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
         reviewsCountChange = 1,
         pointsRandomChange = if (isFriend) 0 else checkInc(vote, Cool),
         pointsFriendsChange = if (isFriend) checkInc(vote, Cool) else 0,
+        likesCountChange = checkInc(vote, Cool),
+
         cheatingChange = checkInc(vote, Cheating),
 
         spamChange = checkInc(vote, IASpam),

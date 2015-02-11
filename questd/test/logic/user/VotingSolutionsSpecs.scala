@@ -70,7 +70,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
 
       val uid = "uid"
       val s = createSolutionStub()
-      val user = createUserStub(id = uid, timeLine = List(createTimeLineEntryStub(objectId = s.id, objectAuthorId = uid)))
+      val user = createUserStub(id = uid, timeLine = List(createTimeLineEntryStub(objectId = s.id, actorId = uid)))
 
       val rv = user.canVoteSolution(s.id)
 

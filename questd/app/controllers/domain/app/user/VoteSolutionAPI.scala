@@ -39,8 +39,7 @@ private[domain] trait VoteSolutionAPI {
                   user = u,
                   reason = TimeLineReason.Liked,
                   objectType = TimeLineType.Solution,
-                  objectId = s.id,
-                  objectAuthorId = Some(s.info.authorId)
+                  objectId = s.id
                 ))
               } else {
                 OkApiResult(AddToWatchersTimeLineResult(u))

@@ -401,7 +401,7 @@ class UserDAOSpecs
       val tle1 = TimeLineEntry(
         id = "id",
         reason = TimeLineReason.Created,
-        objectAuthorId = u.id,
+        actorId = u.id,
         TimeLineType.Quest,
         objectId = "oid")
 
@@ -420,7 +420,7 @@ class UserDAOSpecs
       val tle = TimeLineEntry(
         id = "id",
         reason = TimeLineReason.Created,
-        objectAuthorId = u(0).id,
+        actorId = u(0).id,
         TimeLineType.Quest,
         objectId = "oid")
 

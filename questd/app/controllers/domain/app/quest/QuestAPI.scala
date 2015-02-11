@@ -86,7 +86,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     import request._
 
     {
-      db.quest.updatePoints(quest.id, -1)
+      db.quest.updatePoints(quest.id, pointsChange = -1)
     } ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } ifOk {

@@ -63,6 +63,7 @@ class VoteSolutionAPISpecs extends BaseAPISpecs {
         any,
         any,
         any,
+        any,
         any) returns Some(s)
       user.recordTimeLineVote(u.id, s.id, ContentVote.Cool) returns Some(u)
 
@@ -75,6 +76,7 @@ class VoteSolutionAPISpecs extends BaseAPISpecs {
         any,
         any,
         any,
+        Matchers.eq(1),
         Matchers.eq(1),
         any,
         any,

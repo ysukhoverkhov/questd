@@ -72,7 +72,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
       val q = createQuestStub()
       val user = createUserStub(
         id = userId,
-        timeLine = List(createTimeLineEntryStub(objectId = q.id, objectAuthorId = userId)))
+        timeLine = List(createTimeLineEntryStub(objectId = q.id, actorId = userId)))
 
       val rv = user.canVoteQuest(q.id)
 
