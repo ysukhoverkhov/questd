@@ -4,25 +4,36 @@ import controllers.web.rest.component.helpers._
 import controllers.web.rest.protocol._
 import controllers.domain.app.user._
 import models.domain._
+import _root_.helpers.rich._
 
 trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
   /**
    * Get quest by id.
    */
-  def getQuest = wrapJsonApiCallReturnBody[WSGetQuestResult] { (js, r) =>
-    val v = Json.read[WSGetQuestRequest](js)
+  def getQuests = wrapJsonApiCallReturnBody[WSGetQuestsResult] { (js, r) =>
+    val v = Json.read[WSGetQuestsRequest](js)
 
-    api.getQuest(GetQuestRequest(r.user, v.id))
+    api.getQuests(GetQuestsRequest(r.user, v.ids))
   }
 
   /**
    * Get solution by id.
    */
-  def getSolution = wrapJsonApiCallReturnBody[WSGetSolutionResult] { (js, r) =>
-    val v = Json.read[WSGetSolutionRequest](js)
+  def getSolution = wrapJsonApiCallReturnBody[WSGetSolutionsResult] { (js, r) =>
+    val v = Json.read[WSGetSolutionsRequest](js)
 
-    api.getSolution(GetSolutionRequest(r.user, v.id))
+    api.getSolutions(GetSolutionsRequest(r.user, v.ids))
+  }
+
+  /**
+   * Get battle by id
+   * @return requested battle
+   */
+  def getBattle = wrapJsonApiCallReturnBody[WSGetBattlesResult] { (js, r) =>
+    val v = Json.read[WSGetBattlesRequest](js)
+
+    api.getBattles(GetBattlesRequest(r.user, v.ids))
   }
 
   /**
@@ -42,7 +53,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
 
     api.getOwnSolutions(GetOwnSolutionsRequest(
       r.user,
-      v.status.map(QuestSolutionStatus.withName),
+      v.status.map(SolutionStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }
@@ -55,7 +66,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
 
     api.getOwnQuests(GetOwnQuestsRequest(
       r.user,
-      v.status.map(QuestStatus.withName),
+      v.status.map(QuestStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }
@@ -69,7 +80,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getSolutionsForQuest(GetSolutionsForQuestRequest(
       r.user,
       v.id,
-      v.status.map(QuestSolutionStatus.withName),
+      v.status.map(SolutionStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }
@@ -83,7 +94,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getSolutionsForUser(GetSolutionsForUserRequest(
       r.user,
       v.id,
-      v.status.map(QuestSolutionStatus.withName),
+      v.status.map(SolutionStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }
@@ -97,7 +108,7 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getQuestsForUser(GetQuestsForUserRequest(
       r.user,
       v.id,
-      v.status.map(QuestStatus.withName),
+      v.status.map(QuestStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }

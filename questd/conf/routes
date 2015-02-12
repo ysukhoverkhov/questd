@@ -12,7 +12,7 @@ GET     /                           					controllers.web.rest.Application.index
 # Auth
 POST	/rest/login										controllers.web.rest.LoginWS.login
 
-# Requesting profile
+# Profile
 POST	/rest/getProfile								controllers.web.rest.ProfileWS.getProfile
 POST	/rest/setGender									controllers.web.rest.ProfileWS.setGender
 POST	/rest/setDebug									controllers.web.rest.ProfileWS.setDebug
@@ -21,40 +21,20 @@ POST    /rest/setCountry                                controllers.web.rest.Pro
 POST    /rest/getCountryList                            controllers.web.rest.ProfileWS.getCountryList
 
 # Generating quests
-POST	/rest/getQuestThemeCost							controllers.web.rest.ProposeQuestWS.getQuestThemeCost
-POST	/rest/purchaseQuestTheme						controllers.web.rest.ProposeQuestWS.purchaseQuestTheme
-
-POST	/rest/getQuestThemeTakeCost						controllers.web.rest.ProposeQuestWS.getQuestThemeTakeCost
-POST	/rest/takeQuestTheme							controllers.web.rest.ProposeQuestWS.takeQuestTheme
-
-POST	/rest/proposeQuest								controllers.web.rest.ProposeQuestWS.proposeQuest
-
-POST	/rest/giveUpQuestProposal						controllers.web.rest.ProposeQuestWS.giveUpQuestProposal
-POST	/rest/getQuestProposalGiveUpCost				controllers.web.rest.ProposeQuestWS.getQuestProposalGiveUpCost
-
-POST	/rest/getQuestProposalHelpCost				    controllers.web.rest.ProposeQuestWS.getQuestProposalHelpCost
+POST	/rest/createQuest								controllers.web.rest.CreateQuestWS.createQuest
 
 # Solve quest
-POST	/rest/getQuestCost								controllers.web.rest.SolveQuestWS.getQuestCost
-POST	/rest/purchaseQuest								controllers.web.rest.SolveQuestWS.purchaseQuest
+POST	/rest/bookmarkQuest		    					controllers.web.rest.SolveQuestWS.bookmarkQuest
+POST	/rest/solveQuest		    					controllers.web.rest.SolveQuestWS.solveQuest
 
-POST	/rest/getTakeQuestCost							controllers.web.rest.SolveQuestWS.getTakeQuestCost
-POST	/rest/takeQuest									controllers.web.rest.SolveQuestWS.takeQuest
+# Vote quest
+POST	/rest/voteQuest     							controllers.web.rest.VoteQuestWS.voteQuest
 
-POST	/rest/proposeSolution							controllers.web.rest.SolveQuestWS.proposeSolution
+# Vote solution
+POST	/rest/voteSolution						    	controllers.web.rest.VoteQuestSolutionWS.voteSolution
 
-POST	/rest/getQuestGiveUpCost						controllers.web.rest.SolveQuestWS.getQuestGiveUpCost
-POST	/rest/giveUpQuest								controllers.web.rest.SolveQuestWS.giveUpQuest
-
-POST	/rest/getQuestSolutionHelpCost				    controllers.web.rest.SolveQuestWS.getQuestSolutionHelpCost
-
-# Vote quest proposal
-POST	/rest/getQuestProposalToVote					controllers.web.rest.VoteQuestProposalWS.getQuestProposalToVote
-POST	/rest/voteQuestProposal							controllers.web.rest.VoteQuestProposalWS.voteQuestProposal
-
-# Vote quest solution
-POST	/rest/getQuestSolutionToVote					controllers.web.rest.VoteQuestSolutionWS.getQuestSolutionToVote
-POST	/rest/voteQuestSolution							controllers.web.rest.VoteQuestSolutionWS.voteQuestSolution
+# Time line
+POST	/rest/getTimeLine	    						controllers.web.rest.TimeLineWS.getTimeLine
 
 # Daily result
 POST	/rest/getDailyResult							controllers.web.rest.DailyResultWS.getDailyResult
@@ -62,8 +42,10 @@ POST	/rest/getRightsAtLevel							controllers.web.rest.DailyResultWS.getRightsAt
 POST	/rest/getLevelsForRights						controllers.web.rest.DailyResultWS.getLevelsForRights
 
 # Content requests
-POST	/rest/getQuest									controllers.web.rest.ContentWS.getQuest
-POST	/rest/getSolution								controllers.web.rest.ContentWS.getSolution
+POST	/rest/getQuests									controllers.web.rest.ContentWS.getQuests
+POST	/rest/getSolutions								controllers.web.rest.ContentWS.getSolutions
+POST	/rest/getBattles    							controllers.web.rest.ContentWS.getBattles
+
 POST	/rest/getPublicProfiles							controllers.web.rest.ContentWS.getPublicProfiles
 
 POST	/rest/getOwnSolutions				            controllers.web.rest.ContentWS.getOwnSolutions
@@ -73,12 +55,13 @@ POST	/rest/getSolutionsForQuest						controllers.web.rest.ContentWS.getSolutions
 POST	/rest/getSolutionsForUser						controllers.web.rest.ContentWS.getSolutionsForUser
 POST	/rest/getQuestsForUser							controllers.web.rest.ContentWS.getQuestsForUser
 
-# Shortlist requests
-POST	/rest/getShortlist								controllers.web.rest.ShortlistWS.getShortlist
-POST	/rest/costToShortlist							controllers.web.rest.ShortlistWS.costToShortlist
-POST	/rest/addToShortlist							controllers.web.rest.ShortlistWS.addToShortlist
-POST	/rest/removeFromShortlist						controllers.web.rest.ShortlistWS.removeFromShortlist
-POST	/rest/getSuggestsForShortlist					controllers.web.rest.ShortlistWS.getSuggestsForShortlist
+# Following requests
+POST	/rest/getFollowing								controllers.web.rest.FollowingWS.getFollowing
+POST	/rest/getFollowers								controllers.web.rest.FollowingWS.getFollowers
+POST	/rest/costToFollow	    						controllers.web.rest.FollowingWS.costToFollow
+POST	/rest/addToFollowing							controllers.web.rest.FollowingWS.addToFollowing
+POST	/rest/removeFromFollowing						controllers.web.rest.FollowingWS.removeFromFollowing
+POST	/rest/getSuggestsForFollowing					controllers.web.rest.FollowingWS.getSuggestsForFollowing
 
 # Friends requests
 POST	/rest/getFriends								controllers.web.rest.FriendsWS.getFriends

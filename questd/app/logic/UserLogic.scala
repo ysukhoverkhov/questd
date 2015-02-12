@@ -13,16 +13,18 @@ class UserLogic(
     val rand: RandomComponent#Random)
 
     extends CalculatingRights
-    with ProposingQuests
+    with CreatingQuests
     with SolvingQuests
-    with VotingQuestProposals
-    with VotingQuestSolutions
+    with VotingQuests
+    with VotingSolutions
     with DailyResults
     with Friends
     with Tasks
+    with TimeLineLogic
     with MiscUserLogic
     with QuestSelectUserLogic
     with SolutionSelectUserLogic
+    with BattleSelectUserLogic
 
     with SelectionHelpers {
 }

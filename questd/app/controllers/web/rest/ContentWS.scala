@@ -6,8 +6,9 @@ import controllers.web.rest.component.helpers.AccessToWSInstance
 
 object ContentWS extends Controller with AccessToWSInstance {
 
-  def getQuest = ws.getQuest
-  def getSolution = ws.getSolution
+  def getQuests = ws.getQuests
+  def getSolutions = ws.getSolution
+  def getBattles = ws.getBattle
 
   def getOwnSolutions = ws.getOwnSolutions
   def getOwnQuests = ws.getOwnQuests

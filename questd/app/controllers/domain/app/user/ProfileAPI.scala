@@ -1,19 +1,15 @@
 package controllers.domain.app.user
 
-import controllers.domain.app.protocol.ProfileModificationResult._
-import models.domain._
-import controllers.domain.DomainAPIComponent
 import components._
-import controllers.domain._
+import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
-import logic._
-import play.Logger
+import controllers.domain.{DomainAPIComponent, _}
+import logic.constants
+import models.domain._
+import play.{Logger, Play}
 
 case class GetAllUsersRequest()
 case class GetAllUsersResult(users: Iterator[User])
-
-case class ResetPurchasesRequest(user: User)
-case class ResetPurchasesResult()
 
 case class AdjustAssetsRequest(user: User, reward: Option[Assets] = None, cost: Option[Assets] = None)
 case class AdjustAssetsResult(user: User)
@@ -24,11 +20,11 @@ case class CheckIncreaseLevelResult(user: User)
 case class GetRightsAtLevelsRequest(user: User, levelFrom: Int, levelTo: Int)
 case class GetRightsAtLevelsResult(rights: List[Rights])
 
-case class GetLevelsForRightsRequest(user: User, functionality: List[String])
+case class GetLevelsForRightsRequest(user: User, functionality: List[Functionality.Value])
 case class GetLevelsForRightsResult(levels: Map[Functionality.Value, Int])
 
 case class SetDebugRequest(user: User, debug: String)
-case class SetDebugResult(user: User)
+case class SetDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class SetGenderRequest(user: User, gender: Gender.Value)
 case class SetGenderResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -56,17 +52,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   }
 
   /**
-   * Reset all purchases (quests and themes) overnight.
-   */
-  def resetPurchases(request: ResetPurchasesRequest): ApiResult[ResetPurchasesResult] = handleDbException({
-    import request._
-
-    db.user.resetPurchases(user.id, user.getResetPurchasesTimeout)
-
-    OkApiResult(ResetPurchasesResult())
-  })
-
-  /**
    * Adjust assets value and performs other modifications on profile because of this.
    */
   def adjustAssets(request: AdjustAssetsRequest): ApiResult[AdjustAssetsResult] = handleDbException {
@@ -84,7 +69,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     db.user.addToAssets(user.id, del2) ifSome { u =>
       checkIncreaseLevel(CheckIncreaseLevelRequest(u)) ifOk { r => OkApiResult(AdjustAssetsResult(r.user)) }
     }
-
   }
 
   /**
@@ -92,7 +76,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    */
   def checkIncreaseLevel(request: CheckIncreaseLevelRequest): ApiResult[CheckIncreaseLevelResult] = handleDbException {
     if (request.user.profile.ratingToNextLevel <= request.user.profile.assets.rating) {
-      db.user.levelup(request.user.id, request.user.profile.ratingToNextLevel) ifSome { user =>
+      db.user.levelUp(request.user.id, request.user.profile.ratingToNextLevel) ifSome { user =>
         db.user.setNextLevelRatingAndRights(
           user.id,
           user.ratingToNextLevel,
@@ -123,7 +107,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get level required to get a right.
    */
   def getLevelsForRights(request: GetLevelsForRightsRequest): ApiResult[GetLevelsForRightsResult] = handleDbException {
-    val rv = constants.restrictions.filterKeys(request.functionality.contains(_))
+    val rv = constants.restrictions.filterKeys(f => request.functionality.contains(f))
 
     OkApiResult(GetLevelsForRightsResult(rv))
   }
@@ -135,7 +119,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     import request._
 
     db.user.setDebug(user.id, debug) ifSome { v =>
-      OkApiResult(SetDebugResult(v))
+      OkApiResult(SetDebugResult(OK, Some(v.profile)))
     }
 
   }
@@ -185,7 +169,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get list of possible countries.
    */
   def getCountryList(request: GetCountryListRequest): ApiResult[GetCountryListResult] = handleDbException {
-    val countries = scala.io.Source.fromFile("conf/countries.txt").getLines().toList
+    val countries = scala.io.Source.fromFile(Play.application().getFile("conf/countries.txt")).getLines().toList
 
     OkApiResult(GetCountryListResult(countries))
   }

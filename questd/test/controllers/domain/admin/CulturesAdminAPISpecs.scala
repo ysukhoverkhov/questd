@@ -28,6 +28,7 @@ class CulturesAdminAPISpecs extends BaseAPISpecs {
       there was one(quest).replaceCultureIds(oldCultureId = oddCulture.id, newCultureId = coolCulture.id)
       there was one(solution).replaceCultureIds(oldCultureId = oddCulture.id, newCultureId = coolCulture.id)
       there was one(user).replaceCultureIds(oldCultureId = oddCulture.id, newCultureId = coolCulture.id)
+      there was one(battle).replaceCultureIds(oldCultureId = oddCulture.id, newCultureId = coolCulture.id)
       there was one(culture).delete(oddCulture.id)
 
       result must beEqualTo(OkApiResult(MergeCultureIntoCultureResult()))

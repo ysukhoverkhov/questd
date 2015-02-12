@@ -38,12 +38,13 @@ class LoginWSSpecs extends Specification
 
       val facebookToken = "Facebook token"
       val sessid = "sess id"
+      val userId = "user Id"
 
       val user = mock[SNUser]
       val fbsn = mock[SocialNetworkClient]
       sn.clientForName("FB") returns fbsn
       fbsn.fetchUserByToken(facebookToken) returns user
-      api.login(LoginRequest("FB", user)) returns OkApiResult(LoginResult(sessid))
+      api.login(LoginRequest("FB", user)) returns OkApiResult(LoginResult  (sessid, userId))
 
       val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
 

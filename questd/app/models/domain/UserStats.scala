@@ -11,35 +11,20 @@ case class UserStats (
    * When statistics was shifted last.
    */
   lastStatShift: Date = new Date(0),
-  
-  /**
-   * How many quests we were reviewing during selection to take. 
-   */
-  questsReviewed: Int = 0,
-  questsReviewedPast: Int = 0,
-  
-  /**
-   * How many quests we've taken.
-   */
-  questsAccepted: Int = 0,
-  questsAcceptedPast: Int = 0,
 
   /**
-   * How many proposals reviewed since last stats update during voting.
+   * List of all solved quests.
    */
-  proposalsVoted: Int = 0,
+  solvedQuests: List[String] = List.empty,
+
   /**
-   * How many proposals per day reviewed.
+   * All voted quests.
    */
-  proposalsVotedPerDay: Double = 0,
-  
+  votedQuests: Map[String, ContentVote.Value] = Map.empty,
+
   /**
-   * How many reviewed proposals voted up since last stats update.
+   * All voted solutions.
    */
-  proposalsLiked: Int = 0,
-  /**
-   * How many reviewed proposals accepted per day.
-   */
-  proposalsLikedPerDay: Double = 0
+  votedSolutions: Map[String, ContentVote.Value] = Map.empty
   )
 

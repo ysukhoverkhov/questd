@@ -14,10 +14,10 @@ case class Profile(
   rights: Rights = Rights(),
   dailyResults: List[DailyResult] = List(),
   dailyTasks: DailyTasks = DailyTasks(),
-  questProposalContext: QuestProposalConext = QuestProposalConext(),
+  questCreationContext: QuestCreationContext = QuestCreationContext(),
   questSolutionContext: QuestSolutionContext = QuestSolutionContext(),
-  questProposalVoteContext: QuestProposalVoteContext = QuestProposalVoteContext(),
-  questSolutionVoteContext: QuestSolutionVoteContext = QuestSolutionVoteContext(),
+  questProposalVoteContext: QuestVoteContext = QuestVoteContext(),
+  questSolutionVoteContext: SolutionVoteContext = SolutionVoteContext(),
   analytics: Analytics = Analytics(),
   debug: String = "")
 

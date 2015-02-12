@@ -1,29 +1,15 @@
 package logic.user
 
+import logic.BaseLogicSpecs
 import models.domain._
 import controllers.domain.config._ConfigParams
 import models.domain.admin.ConfigSection
 
-class TasksSpecs extends BaseUserLogicSpecs {
+class TasksSpecs extends BaseLogicSpecs {
 
   private def createUser(level: Int) = {
     val u = User(profile = Profile(publicProfile = PublicProfile(level = level)))
     User(profile = u.profile.copy(rights = u.calculateRights))
-  }
-
-  /**
-   * Creates stub config for our tests.
-   */
-  private def createStubConfig = {
-    api.ConfigParams returns _ConfigParams
-
-    val config = mock[ConfigSection]
-
-    config.apply(api.ConfigParams.SolutionVoteTaskShare) returns "0.9"
-    config.apply(api.ConfigParams.AddToShortlistTaskProbability) returns "0.3"
-    config.apply(api.ConfigParams.QuestVoteTaskShare) returns "0.9"
-
-    config
   }
 
   "Tasks Logic" should {
@@ -37,42 +23,44 @@ class TasksSpecs extends BaseUserLogicSpecs {
       dailyResult.tasks.length must beGreaterThan(0)
     }
 
-    "Generate tasks for voting for soluions" in {
+    "Generate tasks for voting for solutions" in {
       api.config returns createStubConfig
+      rand.nextGaussian(any, any) returns 3
 
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
       val dailyResult = u.getTasksForTomorrow
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuestSolutions)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteSolutions)
       t must beSome[Task]
       t.get.currentCount must beEqualTo(0)
-      t.get.requiredCount must beEqualTo(17) // 90% from 19
+      t.get.requiredCount must be_>=(0)
     }
 
-    "Do not Generate tasks SubmitQuestResult for low level users" in {
+    "Do not Generate tasks CreateSolution for low level users" in {
       api.config returns createStubConfig
 
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 1)))
       val dailyResult = u.getTasksForTomorrow
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.SubmitQuestResult)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.CreateSolution)
       t must beNone
     }
 
-    "Generate tasks SubmitQuestResult" in {
+    "Generate tasks CreateSolution" in {
       api.config returns createStubConfig
+      rand.nextDouble() returns 0.1
 
       val u = createUser(3)
       val dailyResult = u.getTasksForTomorrow
 
       u.canSolveQuestToday must beEqualTo(true)
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.SubmitQuestResult)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.CreateSolution)
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(1)
     }
 
-    "Generate tasks AddToShortList" in {
+    "Generate tasks AddToFollowing" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.2
 
@@ -81,14 +69,12 @@ class TasksSpecs extends BaseUserLogicSpecs {
 
       u.canSolveQuestToday must beEqualTo(true)
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToShortList)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToFollowing)
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(1)
-      
-      there was one(rand).nextDouble
     }
 
-    "Do not generate tasks AddToShortList" in {
+    "Do not generate tasks AddToFollowing" in {
       api.config returns createStubConfig
       rand.nextDouble returns 0.5
 
@@ -97,32 +83,32 @@ class TasksSpecs extends BaseUserLogicSpecs {
 
       u.canSolveQuestToday must beEqualTo(true)
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToShortList)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.AddToFollowing)
       t must beNone
-      
-      there was one(rand).nextDouble
     }
 
-    "Generate tasks for voting for proposals" in {
+    "Generate tasks for voting for quests" in {
       api.config returns createStubConfig
+      rand.nextGaussian(any, any) returns 3
 
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
       val dailyResult = u.getTasksForTomorrow
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuestProposals)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuests)
       t must beSome[Task]
-      t.get.requiredCount must beEqualTo(3) // 90% from 4
+      t.get.requiredCount must beEqualTo(3)
     }
 
-    "Generate tasks for submitting proposals" in {
+    "Generate tasks for creating quests" in {
       api.config returns createStubConfig
+      rand.nextDouble returns 0.1
 
       val u = createUser(12)
       val dailyResult = u.getTasksForTomorrow
 
       u.canSolveQuestToday must beEqualTo(true)
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.SubmitQuestProposal)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.CreateQuest)
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(1)
     }
@@ -139,7 +125,7 @@ class TasksSpecs extends BaseUserLogicSpecs {
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(1)
     }
-    
+
     "Generate tasks for reviewing friendship if there are no requests" in {
       api.config returns createStubConfig
 
@@ -153,5 +139,4 @@ class TasksSpecs extends BaseUserLogicSpecs {
     }
   }
 }
-
 

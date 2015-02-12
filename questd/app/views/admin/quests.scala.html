@@ -6,11 +6,9 @@
 
 	@form(action = controllers.web.admin.routes.QuestsCRUD.updateQuest()) {
 		@inputText(newQuestForm("id"), 'size -> 18, 'readonly -> "readonly") <br />
-		@select(newQuestForm("status"), options(List("OnVoting", "InRotation", "RatingBanned", "CheatingBanned", "IACBanned", "OldBanned"))) <br />
+		@select(newQuestForm("status"), options(List("InRotation", "CheatingBanned", "IACBanned", "OldBanned"))) <br />
 		@inputText(newQuestForm("description"), 'size -> 140) <br />
 		@inputText(newQuestForm("level"), 'size -> 5) <br />
-		@select(newQuestForm("difficulty"), options(List("Easy", "Normal", "Hard", "Extreme"))) <br />
-		@select(newQuestForm("duration"), options(List("Minutes", "Hour", "Day", "Week"))) <br />
 		@inputText(newQuestForm("points"), 'size -> 5) <br />
 		@inputText(newQuestForm("cheating"), 'size -> 5) <br />
 		@inputText(newQuestForm("votersCount"), 'size -> 5) <br />
@@ -33,8 +31,6 @@
 			    		<td>cheating</td>
 			    		<td>votersCount</td>
 			    		<td>level</td>
-			    		<td>difficulty</td>
-			    		<td>duration</td>
                         <td>cultureId</td>
 			    		<td>content</td>
 			    		<td>action</td>
@@ -49,8 +45,6 @@
 				    		<td>@q.rating.cheating</td>
 				    		<td>@q.rating.votersCount</td>
 				    		<td>@q.info.level</td>
-				    		<td>@q.info.difficulty</td>
-				    		<td>@q.info.duration</td>
                             <td>@q.cultureId</td>
 				    		<td><img style="max-width: 204px; height: auto; " src="@q.info.content.media.reference" alt="@q.info.content.media.reference" ></td>
 							<td><a href="@controllers.web.admin.routes.QuestsCRUD.quests(q.id)">edit</a></td>
