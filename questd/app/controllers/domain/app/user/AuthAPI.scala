@@ -29,6 +29,11 @@ private[domain] trait AuthAPI {
 
       // Update here country from time to time.
       updateUserCulture(UpdateUserCultureRequest(user)) ifOk {
+        // TODO: remove me in 0.40 as far as we populate time line on creation.
+        if (user.timeLine.length <= 0)
+          populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user))
+        // end of remove
+
         api.processFriendshipInvitationsFromSN(ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
           case InternalErrorApiResult(a) =>
             InternalErrorApiResult[LoginResult](a)
@@ -56,11 +61,13 @@ private[domain] trait AuthAPI {
                 ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = request.snuser.snId))))))
 
       db.user.create(newUser)
-      checkIncreaseLevel(CheckIncreaseLevelRequest(newUser))
+      checkIncreaseLevel(CheckIncreaseLevelRequest(newUser)) // TODO: it looks like it should be removed.
 
       db.user.readBySNid(request.snName, request.snuser.snId) ifSome { user =>
+        populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user)) ifOk { r =>
           Logger.debug("New user with FB created " + user)
           loginUser(user)
+        }
       }
     }
 
