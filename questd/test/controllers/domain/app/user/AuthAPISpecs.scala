@@ -1,11 +1,10 @@
 package controllers.domain.app.user
 
-import controllers.domain.{InternalErrorApiResult, NotAuthorisedApiResult, _}
+import controllers.domain._
 import controllers.sn.client.User
 import models.domain._
-import models.store._
-import org.mockito.Matchers
-
+import models.store
+import org.mockito.Matchers.{eq => mockEq}
 
 class AuthAPISpecs extends BaseAPISpecs {
 
@@ -41,14 +40,21 @@ class AuthAPISpecs extends BaseAPISpecs {
         anyString,
         anyInt,
         any) returns u
+
       db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
+      quest.allWithParams(any, any, any, any, any, any, any, any, any) returns List.empty.iterator
+      solution.allWithParams(any, any, any, any, any, any, any, any, any, any, any) returns List.empty.iterator
+      battle.allWithParams(any, any, any, any, any, any, any, any, any) returns List.empty.iterator
+      user.setTimeLinePopulationTime(any, any) returns u
 
       val rv = api.login(LoginRequest("FB", userfb))
 
+      there were atLeast(1)(quest).allWithParams(any, any, any, any, any, any, any, any, any)
+      there were atLeast(1)(solution).allWithParams(any, any, any, any, any, any, any, any, any, any, any)
+      there were atLeast(1)(battle).allWithParams(any, any, any, any, any, any, any, any, any)
       // Update allowed.
       there were two(user).readBySNid("FB", userfb.snId)
-//      there were one(user).create(any)
-//      there were one(user).update(any)
+      there were one(user).create(any)
 
       rv must beAnInstanceOf[OkApiResult[LoginResult]]
       rv.body must beSome[LoginResult]
@@ -80,7 +86,7 @@ class AuthAPISpecs extends BaseAPISpecs {
     }
 
     "Behaves well with DB exception" in context {
-      db.user.readBySNid(anyString, anyString) throws new DatabaseException(silent = true)
+      db.user.readBySNid(anyString, anyString) throws new store.DatabaseException(silent = true)
 
       val userfb = userFBStub
 
@@ -170,7 +176,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       val rv = api.login(LoginRequest("FB", userfb))
 
       there was one(user).readBySNid("FB", userfb.snId)
-      there was one(user).updateCultureId(Matchers.eq(userid), any)
+      there was one(user).updateCultureId(mockEq(userid), any)
       there was one(culture).create(any)
 
       rv must beAnInstanceOf[OkApiResult[LoginResult]]

@@ -2,8 +2,6 @@ package logic.user
 
 import logic.BaseLogicSpecs
 import models.domain._
-import controllers.domain.config._ConfigParams
-import models.domain.admin.ConfigSection
 
 class TasksSpecs extends BaseLogicSpecs {
 
