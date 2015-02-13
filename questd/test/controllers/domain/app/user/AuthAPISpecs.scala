@@ -4,8 +4,7 @@ import controllers.domain.{InternalErrorApiResult, NotAuthorisedApiResult, _}
 import controllers.sn.client.User
 import models.domain._
 import models.store._
-import org.mockito.Matchers
-
+import org.mockito.Matchers.{eq => mockEq}
 
 class AuthAPISpecs extends BaseAPISpecs {
 
@@ -173,7 +172,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       val rv = api.login(LoginRequest("FB", userfb))
 
       there was one(user).readBySNid("FB", userfb.snId)
-      there was one(user).updateCultureId(Matchers.eq(userid), any)
+      there was one(user).updateCultureId(mockEq(userid), any)
       there was one(culture).create(any)
 
       rv must beAnInstanceOf[OkApiResult[LoginResult]]
