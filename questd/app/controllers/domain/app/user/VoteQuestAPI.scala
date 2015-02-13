@@ -40,9 +40,11 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
                   reason = TimeLineReason.Liked,
                   objectType = TimeLineType.Quest,
                   objectId = q.id
-                ))
+                )) ifOk {r =>
+                  OkApiResult(UserInternalResult(r.user))}
               } else {
-                OkApiResult(AddToWatchersTimeLineResult(u))
+                removeFromTimeLine(RemoveFromTimeLineRequest(user = u, objectId = q.id)) ifOk {r =>
+                  OkApiResult(UserInternalResult(r.user))}
               }) ifOk { r =>
                 OkApiResult(VoteQuestByUserResult(OK, Some(r.user.profile)))
               }
@@ -53,7 +55,5 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
       case notAllowed => OkApiResult(VoteQuestByUserResult(notAllowed))
     }
   }
-
 }
-
 

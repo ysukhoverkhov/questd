@@ -125,4 +125,12 @@ trait UserDAO extends BaseDAO[User] {
    * @param entry Entry to add.
    */
   def addEntryToTimeLineMulti(ids: List[String], entry: TimeLineEntry): Unit
+
+  /**
+   * Removes entry from time line.
+   * @param id Id of a user to add to.
+   * @param entryId Entry to remove.
+   * @return user after modifications.
+   */
+  def removeEntryFromTimeLineByObjectId(id: String, entryId: String): Option[User]
 }
