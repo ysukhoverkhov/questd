@@ -7,6 +7,5 @@ package object helpers {
 
   private [domain] def handleUnknownEx[P, T >: ApiResult[P]] = exceptionwrappers.handleUnknownEx[P, T] _
   private [domain] def handleDbException[P, T >: ApiResult[P]] = exceptionwrappers.handleDbException[P, T] _
-
 }
 

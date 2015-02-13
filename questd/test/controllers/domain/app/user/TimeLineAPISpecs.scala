@@ -3,6 +3,7 @@ package controllers.domain.app.user
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain._
 import testhelpers.domainstubs._
+import org.mockito.Matchers.{eq => mockEq}
 
 class TimeLineAPISpecs extends BaseAPISpecs {
 
@@ -21,6 +22,20 @@ class TimeLineAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(AddToTimeLineResult(user = u)))
       there was one(user).addEntryToTimeLine(any, any)
+    }
+
+    "Removes item from time line when requested" in context {
+      val u = createUserStub()
+      val entryId = "lala"
+
+      user.removeEntryFromTimeLineByObjectId(mockEq(u.id), mockEq(entryId)) returns Some(u)
+
+      val result = api.removeFromTimeLine(RemoveFromTimeLineRequest(
+        user = u,
+        objectId = entryId))
+
+      result must beEqualTo(OkApiResult(RemoveFromTimeLineResult(user = u)))
+      there was one(user).removeEntryFromTimeLineByObjectId(mockEq(u.id), mockEq(entryId))
     }
 
     "Add item to friends' and followers' time line when requested" in context {

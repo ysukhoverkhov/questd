@@ -17,6 +17,11 @@ case class AddToTimeLineRequest(
   actorId: Option[String] = None)
 case class AddToTimeLineResult(user: User)
 
+case class RemoveFromTimeLineRequest(
+  user: User,
+  objectId: String)
+case class RemoveFromTimeLineResult(user: User)
+
 case class AddToWatchersTimeLineRequest(
   user: User,
   reason: TimeLineReason.Value,
@@ -51,6 +56,20 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
         objectType = objectType,
         objectId = objectId)) ifSome { u =>
       OkApiResult(AddToTimeLineResult(u))
+    }
+  }
+
+  /**
+   * Removes entry from time line.
+   *
+   */
+  def removeFromTimeLine(request: RemoveFromTimeLineRequest): ApiResult[RemoveFromTimeLineResult] = handleDbException {
+    import request._
+
+    db.user.removeEntryFromTimeLineByObjectId(
+      user.id,
+      objectId) ifSome { u =>
+      OkApiResult(RemoveFromTimeLineResult(u))
     }
   }
 

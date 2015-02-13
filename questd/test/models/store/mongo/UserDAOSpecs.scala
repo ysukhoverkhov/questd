@@ -462,6 +462,27 @@ class UserDAOSpecs
       ou2.get.timeLine must beEqualTo(List(tle))
     }
 
+    "Remove entry from time line" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val userId = "userId"
+      val tle1 = TimeLineEntry(
+        id = "idqwe",
+        reason = TimeLineReason.Created,
+        actorId = userId,
+        TimeLineType.Quest,
+        objectId = "oid")
+      val u = User(id = userId, timeLine = List(tle1))
+
+      db.user.create(u)
+      db.user.removeEntryFromTimeLineByObjectId(u.id, tle1.objectId)
+
+      val ou1 = db.user.readById(u.id)
+      ou1 must beSome[User]
+      ou1.get.timeLine must beEqualTo(List.empty)
+    }
+
+
     "recordQuestSolving do its work" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
 

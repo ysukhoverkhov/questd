@@ -2,15 +2,10 @@
 
 package models.store.mongo
 
-import org.specs2.mutable._
-import org.specs2.runner._
-import org.junit.runner._
-import play.api.test._
-import play.api.test.Helpers._
-import play.Logger
-import models.store._
-import models.domain.admin._
 import com.mongodb.casbah.commons.MongoDBObject
+import models.domain.admin._
+import org.specs2.mutable._
+import play.api.test._
 
 //@RunWith(classOf[JUnitRunner])
 class ConfigDAOSpecs extends Specification
@@ -25,13 +20,13 @@ class ConfigDAOSpecs extends Specification
 
     "Add config section to configuration" in new WithApplication(appWithTestDatabase) {
 
-      val cs1 = ConfigSection("sec1", Map(("k1" -> "v1"), ("k2" -> "v2")))
-      val cs2 = ConfigSection("sec2", Map(("k3" -> "v3"), ("k4" -> "v4"), ("k5" -> "v5")))
+      val cs1 = ConfigSection("sec1", Map("k1" -> "v1", "k2" -> "v2"))
+      val cs2 = ConfigSection("sec2", Map("k3" -> "v3", "k4" -> "v4", "k5" -> "v5"))
       db.config.upsert(cs1)
       db.config.upsert(cs1)
       db.config.upsert(cs2)
 
-      db.config.dao.collection.ensureIndex(MongoDBObject("id" -> 1), "id_index", true)
+      db.config.dao.collection.ensureIndex(MongoDBObject("id" -> 1), "id_index", unique = true)
 
       val c = db.config.readConfig
       c("sec1") must beSome.which((s: ConfigSection) => s.id == cs1.id)
@@ -45,10 +40,10 @@ class ConfigDAOSpecs extends Specification
 
     "Update config section in configuration" in new WithApplication(appWithTestDatabase) {
 
-      val cs1 = ConfigSection("sec1", Map(("k1" -> "v1"), ("k2" -> "v2")))
-      val cs2 = ConfigSection("sec1", Map(("k3" -> "v3"), ("k4" -> "v4"), ("k5" -> "v5")))
+      val cs1 = ConfigSection("sec1", Map("k1" -> "v1", "k2" -> "v2"))
+      val cs2 = ConfigSection("sec1", Map("k3" -> "v3", "k4" -> "v4", "k5" -> "v5"))
       db.config.upsert(cs1)
-      db.config.dao.collection.ensureIndex(MongoDBObject("id" -> 1), "id_index", true)
+      db.config.dao.collection.ensureIndex(MongoDBObject("id" -> 1), "id_index", unique = true)
 
       val c = db.config.readConfig
       c("sec1") must beSome.which((s: ConfigSection) => s.id == cs1.id)
@@ -64,7 +59,7 @@ class ConfigDAOSpecs extends Specification
     }
 
     "Delete config section from configuration" in new WithApplication(appWithTestDatabase) {
-      val cs1 = ConfigSection("sec1", Map(("k1" -> "v1"), ("k2" -> "v2")))
+      val cs1 = ConfigSection("sec1", Map("k1" -> "v1", "k2" -> "v2"))
       db.config.upsert(cs1)
       db.config.delete("sec1")
       val c = db.config.readConfig

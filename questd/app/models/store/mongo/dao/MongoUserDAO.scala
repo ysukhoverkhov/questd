@@ -625,5 +625,17 @@ private[mongo] class MongoUserDAO
               "$position" -> 0))),
       multi = true)
   }
+
+  /**
+   * @inheritdoc
+   */
+  def removeEntryFromTimeLineByObjectId(id: String, objectId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$pull" -> MongoDBObject(
+          "timeLine" -> MongoDBObject(
+          "objectId" -> objectId))))
+  }
 }
 

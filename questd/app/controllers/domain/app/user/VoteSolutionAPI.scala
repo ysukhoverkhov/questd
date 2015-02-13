@@ -40,9 +40,13 @@ private[domain] trait VoteSolutionAPI {
                   reason = TimeLineReason.Liked,
                   objectType = TimeLineType.Solution,
                   objectId = s.id
-                ))
+                )) ifOk { r =>
+                  OkApiResult(UserInternalResult(r.user))
+                }
               } else {
-                OkApiResult(AddToWatchersTimeLineResult(u))
+                removeFromTimeLine(RemoveFromTimeLineRequest(user = u, objectId = s.id)) ifOk {r =>
+                  OkApiResult(UserInternalResult(r.user))
+                }
               }) ifOk { r =>
                 OkApiResult(VoteSolutionResult(OK, Some(r.user.profile)))
               }
