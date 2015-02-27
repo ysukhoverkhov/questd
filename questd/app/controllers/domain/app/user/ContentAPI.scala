@@ -37,7 +37,7 @@ case class GetOwnSolutionsRequest(
   pageSize: Int)
 case class GetOwnSolutionsResult(
   allowed: ProfileModificationResult,
-  solutions: List[SolutionListInfo], // TODO: replace with view.
+  solutions: List[SolutionView], // TODO: replace with view.
   pageSize: Int,
   hasMore: Boolean)
 
@@ -60,7 +60,7 @@ case class GetSolutionsForQuestRequest(
   pageSize: Int)
 case class GetSolutionsForQuestResult(
   allowed: ProfileModificationResult,
-  solutions: List[SolutionListInfo], // TODO: replace with view.
+  solutions: List[SolutionView],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -72,7 +72,7 @@ case class GetSolutionsForUserRequest(
   pageSize: Int)
 case class GetSolutionsForUserResult(
   allowed: ProfileModificationResult,
-  solutions: List[SolutionListInfo],  // TODO: replace with view.
+  solutions: List[SolutionView],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -164,10 +164,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
-      SolutionListInfo(
-        solution = SolutionView(s.id, s.info),
-        quest = db.quest.readById(s.info.questId).map(qu => QuestView(qu.id, qu.info)),
-        author = None)
+      SolutionView(s.id, s.info)
     })
 
     OkApiResult(GetOwnSolutionsResult(
@@ -209,10 +206,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForQuest.take(pageSize).toList.map(s => {
-      SolutionListInfo(
-        solution = SolutionView(s.id, s.info),
-        quest = None,
-        author = db.user.readById(s.info.authorId).map(us => ProfileView(us.id, us.profile.publicProfile)))
+      SolutionView(s.id, s.info)
     })
 
     OkApiResult(GetSolutionsForQuestResult(
@@ -235,10 +229,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
-      SolutionListInfo(
-        solution = SolutionView(s.id, s.info),
-        quest = db.quest.readById(s.info.questId).map(qu => QuestView(qu.id, qu.info)),
-        author = None)
+      SolutionView(s.id, s.info)
     })
 
     OkApiResult(GetSolutionsForUserResult(
