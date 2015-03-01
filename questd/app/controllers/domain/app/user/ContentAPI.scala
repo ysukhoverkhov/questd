@@ -37,7 +37,7 @@ case class GetOwnSolutionsRequest(
   pageSize: Int)
 case class GetOwnSolutionsResult(
   allowed: ProfileModificationResult,
-  solutions: List[SolutionView], // TODO: replace with view.
+  solutions: List[SolutionView],
   pageSize: Int,
   hasMore: Boolean)
 
