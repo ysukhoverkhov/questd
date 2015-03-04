@@ -102,7 +102,6 @@ class BattleDAOSpecs extends Specification
       solutionIds.map(_.id).sorted must beEqualTo(bs.map(_.id).sorted)
     }
 
-
     "Update battle" in new WithApplication(appWithTestDatabase) {
       clearDB()
 

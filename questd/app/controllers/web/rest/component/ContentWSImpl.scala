@@ -7,16 +7,105 @@ import models.domain._
 import _root_.helpers.rich._
 
 
+private object ContentWSImplTypes
+{
+  case class WSGetOwnQuestsRequest(
+    // see QuestStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetOwnQuestsResult = GetOwnQuestsResult
 
 
+  case class WSGetOwnBattlesRequest(
+    // see BattleStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetOwnBattlesResult = GetOwnBattlesResult
 
 
+  case class WSGetQuestsForUserRequest(
+    id: String,
 
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetQuestsForUserResult = GetQuestsForUserResult
+
+
+  case class WSGetSolutionsForUserRequest(
+    id: String,
+
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetSolutionsForUserResult = GetSolutionsForUserResult
+
+  case class WSGetSolutionsForQuestRequest(
+    id: String,
+
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetSolutionsForQuestResult = GetSolutionsForQuestResult
+
+  case class WSGetBattlesForUserRequest(
+    id: String,
+
+    // see BattleStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetBattlesForUserResult = GetBattlesForUserResult
+
+  case class WSGetBattlesForSolutionRequest(
+    id: String,
+
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetBattlesForSolutionResult = GetBattlesForSolutionResult
+}
 
 
 
 
 trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+
+  import ContentWSImplTypes._
 
   /**
    * Get quest by id.
@@ -55,18 +144,6 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getPublicProfiles(GetPublicProfilesRequest(r.user, v.ids))
   }
 
-  //--------------------------------------------------------------------------------------------------------------------
-  type WSGetOwnQuestsResult = GetOwnQuestsResult
-  case class WSGetOwnQuestsRequest(
-    // see QuestStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-
   /**
    * Get own quests.
    */
@@ -80,7 +157,6 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
       v.pageSize))
   }
 
-  //--------------------------------------------------------------------------------------------------------------------
   /**
    * Get own solutions.
    */
@@ -94,19 +170,6 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
       v.pageSize))
   }
 
-
-  //--------------------------------------------------------------------------------------------------------------------
-  type WSGetOwnBattlesResult = GetOwnBattlesResult
-  case class WSGetOwnBattlesRequest(
-    // see BattleStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-
   /**
    * Get own battles.
    */
@@ -119,21 +182,6 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
       v.pageNumber,
       v.pageSize))
   }
-
-
-  //--------------------------------------------------------------------------------------------------------------------
-  case class WSGetQuestsForUserRequest(
-    id: String,
-
-    // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-  type WSGetQuestsForUserResult = GetQuestsForUserResult
 
   /**
    * Get quests for a given person.
@@ -149,20 +197,6 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
       v.pageSize))
   }
 
-  //--------------------------------------------------------------------------------------------------------------------
-  case class WSGetSolutionsForUserRequest(
-    id: String,
-
-    // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-  type WSGetSolutionsForUserResult = GetSolutionsForUserResult
-
   /**
    * Get solutions for a given person.
    */
@@ -176,20 +210,6 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
       v.pageNumber,
       v.pageSize))
   }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  case class WSGetSolutionsForQuestRequest(
-    id: String,
-
-    // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-  type WSGetSolutionsForQuestResult = GetSolutionsForQuestResult
 
   /**
    * Get solutions for a given quest id.
@@ -205,20 +225,6 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
       v.pageSize))
   }
 
-  //--------------------------------------------------------------------------------------------------------------------
-  case class WSGetBattlesForUserRequest(
-    id: String,
-
-    // see BattleStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-  type WSGetBattlesForUserResult = GetBattlesForUserResult
-
   /**
    * Get battles for a given person.
    */
@@ -232,20 +238,6 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
       v.pageNumber,
       v.pageSize))
   }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  case class WSGetBattlesForSolutionRequest(
-    id: String,
-
-    // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-  type WSGetBattlesForSolutionResult = GetBattlesForSolutionResult
 
   /**
    * Returns battles of a solution.
