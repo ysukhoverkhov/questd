@@ -6,6 +6,16 @@ import controllers.domain.app.user._
 import models.domain._
 import _root_.helpers.rich._
 
+
+
+
+
+
+
+
+
+
+
 trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
   /**
@@ -45,18 +55,17 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     api.getPublicProfiles(GetPublicProfilesRequest(r.user, v.ids))
   }
 
-  /**
-   * Get own solutions.
-   */
-  def getOwnSolutions = wrapJsonApiCallReturnBody[WSGetOwnSolutionsResult] { (js, r) =>
-    val v = Json.read[WSGetOwnSolutionsRequest](js)
+  //--------------------------------------------------------------------------------------------------------------------
+  type WSGetOwnQuestsResult = GetOwnQuestsResult
+  case class WSGetOwnQuestsRequest(
+    // see QuestStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
 
-    api.getOwnSolutions(GetOwnSolutionsRequest(
-      r.user,
-      v.status.map(SolutionStatus.withNameEx),
-      v.pageNumber,
-      v.pageSize))
-  }
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
 
   /**
    * Get own quests.
@@ -71,19 +80,88 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
       v.pageSize))
   }
 
+  //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Get solutions for a given quest id.
+   * Get own solutions.
    */
-  def getSolutionsForQuest = wrapJsonApiCallReturnBody[WSGetSolutionsForQuestResult] { (js, r) =>
-    val v = Json.read[WSGetSolutionsForQuestRequest](js)
+  def getOwnSolutions = wrapJsonApiCallReturnBody[WSGetOwnSolutionsResult] { (js, r) =>
+    val v = Json.read[WSGetOwnSolutionsRequest](js)
 
-    api.getSolutionsForQuest(GetSolutionsForQuestRequest(
+    api.getOwnSolutions(GetOwnSolutionsRequest(
       r.user,
-      v.id,
       v.status.map(SolutionStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  type WSGetOwnBattlesResult = GetOwnBattlesResult
+  case class WSGetOwnBattlesRequest(
+    // see BattleStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+
+  /**
+   * Get own battles.
+   */
+  def getOwnBattles = wrapJsonApiCallReturnBody[WSGetOwnBattlesResult] { (js, r) =>
+    val v = Json.read[WSGetOwnBattlesRequest](js)
+
+    api.getOwnBattles(GetOwnBattlesRequest(
+      r.user,
+      v.status.map(BattleStatus.withNameEx),
+      v.pageNumber,
+      v.pageSize))
+  }
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  case class WSGetQuestsForUserRequest(
+    id: String,
+
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetQuestsForUserResult = GetQuestsForUserResult
+
+  /**
+   * Get quests for a given person.
+   */
+  def getQuestsForUser = wrapJsonApiCallReturnBody[WSGetQuestsForUserResult] { (js, r) =>
+    val v = Json.read[WSGetQuestsForUserRequest](js)
+
+    api.getQuestsForUser(GetQuestsForUserRequest(
+      r.user,
+      v.id,
+      v.status.map(QuestStatus.withNameEx),
+      v.pageNumber,
+      v.pageSize))
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  case class WSGetSolutionsForUserRequest(
+    id: String,
+
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetSolutionsForUserResult = GetSolutionsForUserResult
 
   /**
    * Get solutions for a given person.
@@ -99,16 +177,86 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
       v.pageSize))
   }
 
-  /**
-   * Get quests for a given person.
-   */
-  def getQuestsForUser = wrapJsonApiCallReturnBody[WSGetQuestsForUserResult] { (js, r) =>
-    val v = Json.read[WSGetQuestsForUserRequest](js)
+  //--------------------------------------------------------------------------------------------------------------------
+  case class WSGetSolutionsForQuestRequest(
+    id: String,
 
-    api.getQuestsForUser(GetQuestsForUserRequest(
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetSolutionsForQuestResult = GetSolutionsForQuestResult
+
+  /**
+   * Get solutions for a given quest id.
+   */
+  def getSolutionsForQuest = wrapJsonApiCallReturnBody[WSGetSolutionsForQuestResult] { (js, r) =>
+    val v = Json.read[WSGetSolutionsForQuestRequest](js)
+
+    api.getSolutionsForQuest(GetSolutionsForQuestRequest(
       r.user,
       v.id,
-      v.status.map(QuestStatus.withNameEx),
+      v.status.map(SolutionStatus.withNameEx),
+      v.pageNumber,
+      v.pageSize))
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  case class WSGetBattlesForUserRequest(
+    id: String,
+
+    // see BattleStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetBattlesForUserResult = GetBattlesForUserResult
+
+  /**
+   * Get battles for a given person.
+   */
+  def getBattlesForUser = wrapJsonApiCallReturnBody[WSGetBattlesForUserResult] { (js, r) =>
+    val v = Json.read[WSGetBattlesForUserRequest](js)
+
+    api.getBattlesForUser(GetBattlesForUserRequest(
+      r.user,
+      v.id,
+      v.status.map(BattleStatus.withNameEx),
+      v.pageNumber,
+      v.pageSize))
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  case class WSGetBattlesForSolutionRequest(
+    id: String,
+
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+  type WSGetBattlesForSolutionResult = GetBattlesForSolutionResult
+
+  /**
+   * Returns battles of a solution.
+   */
+  def getBattlesForSolution = wrapJsonApiCallReturnBody[WSGetBattlesForSolutionResult] { (js, r) =>
+    val v = Json.read[WSGetBattlesForSolutionRequest](js)
+
+    api.getBattlesForSolution(GetBattlesForSolutionRequest(
+      r.user,
+      v.id,
+      v.status.map(BattleStatus.withNameEx),
       v.pageNumber,
       v.pageSize))
   }

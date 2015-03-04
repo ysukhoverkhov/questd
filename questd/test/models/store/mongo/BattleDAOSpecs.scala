@@ -62,8 +62,8 @@ class BattleDAOSpecs extends Specification
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(bs(0).id) and contain(bs(2).id)
 
-      val userids = db.battle.allWithParams(authorIds = List("a3_id")).toList
-      userids.map(_.id) must beEqualTo(List(bs(1).id))
+      val userIds = db.battle.allWithParams(authorIds = List("a3_id")).toList
+      userIds.map(_.id) must beEqualTo(List(bs(1).id))
 
       val levels = db.battle.allWithParams(levels = Some((5, 10))).toList
       levels.map(_.id).size must beEqualTo(1)
@@ -96,6 +96,10 @@ class BattleDAOSpecs extends Specification
       val excludingAuthorIds = db.battle.allWithParams(authorIdsExclude = List("a2_id")).toList
       excludingAuthorIds.map(_.id).size must beEqualTo(1)
       excludingAuthorIds.map(_.id).sorted must beEqualTo(List(bs(1).id).sorted)
+
+      val solutionIds = db.battle.allWithParams(solutionIds = List("s1_id")).toList
+      solutionIds.map(_.id).size must beEqualTo(3)
+      solutionIds.map(_.id).sorted must beEqualTo(bs.map(_.id).sorted)
     }
 
 
