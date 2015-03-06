@@ -19,6 +19,17 @@ trait Friends { this: UserLogic =>
       OK
   }
 
+  def canFollowUser(potentialFollowingUserId: String) = {
+    canFollow match {
+      case OK =>
+        if (potentialFollowingUserId == user.id)
+          InvalidState
+        else
+          OK
+      case a => a
+    }
+  }
+
   def costToFollowing = {
     Assets(coins = costToFollowPerson(user.profile.publicProfile.level))
   }
@@ -32,6 +43,8 @@ trait Friends { this: UserLogic =>
       LimitExceeded
     else if (user.profile.publicProfile.level < potentialFriend.profile.publicProfile.level)
       NotEnoughRights
+    else if (potentialFriend.id == user.id)
+      InvalidState
     else
       OK
   }
