@@ -98,7 +98,7 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
             case None =>
               InternalErrorApiResult(s"Unable to find author of quest solution user $authorId")
             case Some(author) =>
-              rewardSolutionAuthor(RewardSolutionAuthorRequest(s, author))
+              rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = author))
           }
         } else {
           OkApiResult(None)

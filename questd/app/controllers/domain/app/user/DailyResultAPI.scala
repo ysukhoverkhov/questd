@@ -27,7 +27,12 @@ case class RemoveQuestIncomeFromDailyResultResult(user: User)
 case class StoreProposalInDailyResultRequest(user: User, quest: Quest, reward: Option[Assets] = None, penalty: Option[Assets] = None)
 case class StoreProposalInDailyResultResult(user: User)
 
-case class StoreSolutionInDailyResultRequest(user: User, solution: Solution, reward: Option[Assets] = None, penalty: Option[Assets] = None)
+case class StoreSolutionInDailyResultRequest(
+  user: User,
+  solution: Solution,
+  battle: Option[Battle] = None,
+  reward: Option[Assets] = None,
+  penalty: Option[Assets] = None)
 case class StoreSolutionInDailyResultResult(user: User)
 
 
@@ -201,6 +206,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val qpr = QuestSolutionResult(
       solutionId = request.solution.id,
+      battleId = request.battle.map(_.id),
       reward = request.reward,
       penalty = request.penalty,
       status = request.solution.status)

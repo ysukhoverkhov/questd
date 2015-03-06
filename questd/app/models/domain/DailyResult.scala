@@ -14,6 +14,7 @@ case class DailyResult(
 
 case class QuestSolutionResult(
     solutionId: String,
+    battleId: Option[String] = None,
     reward: Option[Assets],
     penalty: Option[Assets],
     status: SolutionStatus.Value)

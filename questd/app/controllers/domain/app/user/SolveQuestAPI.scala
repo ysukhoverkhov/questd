@@ -17,7 +17,7 @@ case class SolveQuestRequest(
   solution: SolutionInfoContent)
 case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class RewardSolutionAuthorRequest(solution: Solution, author: User)
+case class RewardSolutionAuthorRequest(solution: Solution, author: User, battle: Option[Battle] = None)
 case class RewardSolutionAuthorResult()
 
 case class BookmarkQuestRequest(user: User, questId: String)
@@ -134,22 +134,36 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     try {
       val r = solution.status match {
         case SolutionStatus.WaitingForCompetitor =>
-          InternalErrorApiResult("We are rewarding player for solution what is waitin for competitor")
+          InternalErrorApiResult("We are rewarding player for solution what is waiting for competitor")
 
         case SolutionStatus.OnVoting =>
           InternalErrorApiResult("We are rewarding player for solution what is on voting.")
 
         case SolutionStatus.Won =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(q.info.solveRewardWon)))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
+              user = author,
+              solution = request.solution,
+              battle = request.battle,
+              reward = Some(q.info.solveRewardWon)))
 
         case SolutionStatus.Lost =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, reward = Some(q.info.solveRewardLost)))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
+              user = author,
+              solution = request.solution,
+              battle = request.battle,
+              reward = Some(q.info.solveRewardLost)))
 
         case SolutionStatus.CheatingBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(q.penaltyForCheatingSolution)))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
+              user = author,
+              solution = request.solution,
+              penalty = Some(q.penaltyForCheatingSolution)))
 
         case SolutionStatus.IACBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(author, request.solution, penalty = Some(q.penaltyForIACSolution)))
+            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
+              user = author,
+              solution = request.solution,
+              penalty = Some(q.penaltyForIACSolution)))
       }
 
       r ifOk {
