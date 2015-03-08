@@ -18,6 +18,8 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
   def updateBattleState(request: UpdateBattleStateRequest): ApiResult[UpdateBattleStateResult] = handleDbException {
     import request._
 
+    require(battle.info.status == BattleStatus.Fighting, "Only battles in Fighting state should be passed here")
+
     Logger.debug("API - updateBattleState")
 
     def checkResolved(b: Battle): Option[Battle] = {
@@ -26,7 +28,7 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
           db.solution.readById(s)
         }.flatten
 
-        val bestSolution = solutions.sortBy(_.votingPoints).head
+        val bestSolution = solutions.sortBy(_.votingPoints)(Ordering[Int].reverse).head
 
         solutions.foreach { s =>
           val status = if (s.votingPoints == bestSolution.votingPoints)
