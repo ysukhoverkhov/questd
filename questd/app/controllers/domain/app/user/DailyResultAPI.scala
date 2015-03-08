@@ -191,7 +191,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       penalty = request.penalty,
       status = request.quest.status)
 
-    db.user.storeProposalInDailyResult(user.id, qpr) ifSome { v =>
+    db.user.storeProposalInDailyResult(u.id, qpr) ifSome { v =>
       OkApiResult(StoreProposalInDailyResultResult(v))
     }
   }
@@ -204,14 +204,14 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val u = ensurePrivateDailyResultExists(user)
 
-    val qpr = QuestSolutionResult(
+    val qsr = QuestSolutionResult(
       solutionId = request.solution.id,
       battleId = request.battle.map(_.id),
       reward = request.reward,
       penalty = request.penalty,
       status = request.solution.status)
 
-    db.user.storeSolutionInDailyResult(user.id, qpr) ifSome { v =>
+    db.user.storeSolutionInDailyResult(u.id, qsr) ifSome { v =>
       OkApiResult(StoreSolutionInDailyResultResult(v))
     }
   }

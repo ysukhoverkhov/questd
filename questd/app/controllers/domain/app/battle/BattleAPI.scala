@@ -62,12 +62,8 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
           solutions.foreach { s =>
             val authorId = s.info.authorId
 
-            db.user.readById(authorId) match {
-              case None =>
-                Logger.error("Unable to find author of quest solution user " + authorId)
-                InternalErrorApiResult()
-              case Some(author) =>
-                rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = author, battle = Some(b)))
+            db.user.readById(authorId) ifSome { author =>
+              rewardSolutionAuthor(RewardSolutionAuthorRequest(solution = s, author = author, battle = Some(b)))
             }
           }
 
