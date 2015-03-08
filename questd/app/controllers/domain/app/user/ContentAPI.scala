@@ -37,7 +37,7 @@ case class GetOwnSolutionsRequest(
   pageSize: Int)
 case class GetOwnSolutionsResult(
   allowed: ProfileModificationResult,
-  solutions: List[SolutionView], // TODO: replace with view.
+  solutions: List[SolutionView],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -49,6 +49,17 @@ case class GetOwnQuestsRequest(
 case class GetOwnQuestsResult(
   allowed: ProfileModificationResult,
   quests: List[QuestView],
+  pageSize: Int,
+  hasMore: Boolean)
+
+case class GetOwnBattlesRequest(
+  user: User,
+  status: List[BattleStatus.Value],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetOwnBattlesResult(
+  allowed: ProfileModificationResult,
+  battles: List[BattleView],
   pageSize: Int,
   hasMore: Boolean)
 
@@ -87,6 +98,31 @@ case class GetQuestsForUserResult(
   quests: List[QuestView],
   pageSize: Int,
   hasMore: Boolean)
+
+case class GetBattlesForUserRequest(
+  user: User,
+  userId: String,
+  status: List[BattleStatus.Value],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetBattlesForUserResult(
+  allowed: ProfileModificationResult,
+  battles: List[BattleView],
+  pageSize: Int,
+  hasMore: Boolean)
+
+case class GetBattlesForSolutionRequest(
+  user: User,
+  solutionId: String,
+  status: List[BattleStatus.Value],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetBattlesForSolutionResult(
+  allowed: ProfileModificationResult,
+  battles: List[BattleView],
+  pageSize: Int,
+  hasMore: Boolean)
+
 
 private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -175,6 +211,31 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   }
 
   /**
+   * Get own battles.
+   * @param request The request.
+   * @return The result.
+   */
+  def getOwnBattles(request: GetOwnBattlesRequest): ApiResult[GetOwnBattlesResult] = handleDbException {
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
+    val battlesForUser = db.battle.allWithParams(
+      status = request.status,
+      authorIds = List(request.user.id),
+      skip = pageNumber * pageSize)
+
+    val battles = battlesForUser.take(pageSize).toList.map(b => {
+      BattleView(b.id, b.info)
+    })
+
+    OkApiResult(GetOwnBattlesResult(
+      allowed = OK,
+      battles = battles,
+      pageSize,
+      battlesForUser.hasNext))
+  }
+
+  /**
    * Get own quests.
    */
   def getOwnQuests(request: GetOwnQuestsRequest): ApiResult[GetOwnQuestsResult] = handleDbException {
@@ -194,26 +255,22 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   }
 
   /**
-   * Get solutions for a quest.
+   * Get all quests for a user.
    */
-  def getSolutionsForQuest(request: GetSolutionsForQuestRequest): ApiResult[GetSolutionsForQuestResult] = handleDbException {
+  def getQuestsForUser(request: GetQuestsForUserRequest): ApiResult[GetQuestsForUserResult] = handleDbException {
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
-    val solutionsForQuest = db.solution.allWithParams(
-      status = request.status.filter(Set(SolutionStatus.Won, SolutionStatus.Lost).contains),
-      questIds = List(request.questId),
+    val questsForUser = db.quest.allWithParams(
+      status = request.status.filter(Set(QuestStatus.InRotation).contains),
+      authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
-    val solutions = solutionsForQuest.take(pageSize).toList.map(s => {
-      SolutionView(s.id, s.info)
-    })
-
-    OkApiResult(GetSolutionsForQuestResult(
+    OkApiResult(GetQuestsForUserResult(
       allowed = OK,
-      solutions = solutions,
+      quests = questsForUser.take(pageSize).toList.map(q => QuestView(q.id, q.info)),
       pageSize,
-      solutionsForQuest.hasNext))
+      questsForUser.hasNext))
   }
 
   /**
@@ -240,22 +297,72 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   }
 
   /**
-   * Get all quests for a user.
+   * Get solutions for a quest.
    */
-  def getQuestsForUser(request: GetQuestsForUserRequest): ApiResult[GetQuestsForUserResult] = handleDbException {
+  def getSolutionsForQuest(request: GetSolutionsForQuestRequest): ApiResult[GetSolutionsForQuestResult] = handleDbException {
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
-    val questsForUser = db.quest.allWithParams(
-      status = request.status.filter(Set(QuestStatus.InRotation).contains),
+    val solutionsForQuest = db.solution.allWithParams(
+      status = request.status.filter(Set(SolutionStatus.Won, SolutionStatus.Lost).contains),
+      questIds = List(request.questId),
+      skip = pageNumber * pageSize)
+
+    val solutions = solutionsForQuest.take(pageSize).toList.map(s => {
+      SolutionView(s.id, s.info)
+    })
+
+    OkApiResult(GetSolutionsForQuestResult(
+      allowed = OK,
+      solutions = solutions,
+      pageSize,
+      solutionsForQuest.hasNext))
+  }
+
+  /**
+   * Get all battle for a user.
+   */
+  def getBattlesForUser(request: GetBattlesForUserRequest): ApiResult[GetBattlesForUserResult] = handleDbException {
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
+    val battlesForUser = db.battle.allWithParams(
+      status = request.status,
       authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
-    OkApiResult(GetQuestsForUserResult(
+    val battles = battlesForUser.take(pageSize).toList.map( b => {
+      BattleView(b.id, b.info)
+    })
+
+    OkApiResult(GetBattlesForUserResult(
       allowed = OK,
-      quests = questsForUser.take(pageSize).toList.map(q => QuestView(q.id, q.info)),
+      battles = battles,
       pageSize,
-      questsForUser.hasNext))
+      battlesForUser.hasNext))
+  }
+
+  /**
+   * Get battles for a solution.
+   */
+  def getBattlesForSolution(request: GetBattlesForSolutionRequest): ApiResult[GetBattlesForSolutionResult] = handleDbException {
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
+    val battlesForSolution = db.battle.allWithParams(
+      status = request.status,
+      solutionIds = List(request.solutionId),
+      skip = pageNumber * pageSize)
+
+    val battles = battlesForSolution.take(pageSize).toList.map(s => {
+      BattleView(s.id, s.info)
+    })
+
+    OkApiResult(GetBattlesForSolutionResult(
+      allowed = OK,
+      battles = battles,
+      pageSize,
+      battlesForSolution.hasNext))
   }
 
 }

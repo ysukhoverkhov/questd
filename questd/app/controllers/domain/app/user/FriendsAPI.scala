@@ -13,7 +13,7 @@ case class GetFriendsRequest(
   user: User)
 case class GetFriendsResult(
   allowed: ProfileModificationResult,
-  userIds: List[Friendship])
+  users: List[Friendship])
 
 case class CostToRequestFriendshipRequest(
   user: User,
@@ -60,7 +60,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
       OkApiResult(GetFriendsResult(
         allowed = OK,
-        userIds = r.user.friends))
+        users = r.user.friends))
 
     }
 

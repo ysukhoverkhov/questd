@@ -1,5 +1,5 @@
 package controllers.web.rest
-
+// TODO: get rid of the file.
 import scala.language.implicitConversions
 import controllers.domain.app.user._
 import models.domain._
@@ -234,17 +234,6 @@ package object protocol {
 
   type WSGetPublicProfileResult = GetPublicProfilesResult
 
-  case class WSGetSolutionsForQuestRequest(
-    id: String,
-
-    // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
 
   type WSGetOwnSolutionsResult = GetOwnSolutionsResult
   case class WSGetOwnSolutionsRequest(
@@ -256,47 +245,6 @@ package object protocol {
 
     // Number of items on a page.
     pageSize: Int)
-
-  type WSGetOwnQuestsResult = GetOwnQuestsResult
-  case class WSGetOwnQuestsRequest(
-    // see QuestStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-
-  type WSGetSolutionsForQuestResult = GetSolutionsForQuestResult
-
-  case class WSGetSolutionsForUserRequest(
-    id: String,
-
-    // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-
-  type WSGetSolutionsForUserResult = GetSolutionsForUserResult
-
-  case class WSGetQuestsForUserRequest(
-    id: String,
-
-    // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-
-  type WSGetQuestsForUserResult = GetQuestsForUserResult
 
   /**
    * Following

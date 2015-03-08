@@ -22,6 +22,7 @@ private[mongo] class MongoBattleDAO
     status: List[BattleStatus.Value] = List(),
     authorIds: List[String] = List(),
     authorIdsExclude: List[String] = List(),
+    solutionIds: List[String] = List(),
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
     vip: Option[Boolean] = None,
@@ -37,6 +38,10 @@ private[mongo] class MongoBattleDAO
 
     if (authorIds.length > 0) {
       queryBuilder += ("info.authorIds" -> MongoDBObject("$in" -> authorIds))
+    }
+
+    if (solutionIds.length > 0) {
+      queryBuilder += ("info.solutionIds" -> MongoDBObject("$in" -> solutionIds))
     }
 
     if (authorIdsExclude.length > 0) {

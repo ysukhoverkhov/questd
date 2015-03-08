@@ -19,6 +19,7 @@ class TasksDispatcher(config: ConfigSection) extends EasyRestartActor {
   case class WakeCrawlerUp(crawler: ActorSelection)
 
   override def preStart(): Unit = {
+    Logger.debug("Starting scheduled tasks")
 
     val quartzActor = context.actorOf(Props[QuartzActor])
 
@@ -26,8 +27,12 @@ class TasksDispatcher(config: ConfigSection) extends EasyRestartActor {
       quartzActor ! AddCronSchedule(self, cron, WakeCrawlerUp(context.actorSelection(path)))
     }
 
-    config.values.foreach(c => schedule(c._1, c._2))
+    config.values.foreach{c =>
+      Logger.debug(s"  Scheduling ${c._1} for ${c._2}")
+      schedule(c._1, c._2)
+    }
 
+    Logger.debug("Scheduled tasks:")
     printScheduledJobs()
   }
 
@@ -36,8 +41,7 @@ class TasksDispatcher(config: ConfigSection) extends EasyRestartActor {
 
     import org.quartz.impl.StdSchedulerFactory
     import org.quartz.impl.matchers.GroupMatcher
-
-import scala.collection.JavaConversions._
+    import scala.collection.JavaConversions._
 
     Thread.sleep(1000)
 
@@ -54,7 +58,7 @@ import scala.collection.JavaConversions._
         val triggers = scheduler.getTriggersOfJob(jobKey)
         val nextFireTime = triggers.get(0).getNextFireTime
 
-        Logger.debug("[jobName] : " + jobName + " [groupName] : "
+        Logger.debug("  [jobName] : " + jobName + " [groupName] : "
           + jobGroup + " - " + nextFireTime)
 
       }

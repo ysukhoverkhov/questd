@@ -3,7 +3,6 @@ package controllers.tasks
 import controllers.tasks.crawlers.schedulers.{BattlesHourlyCrawler, UsersWeeklyCrawler, UsersHourlyCrawler}
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
-import controllers.tasks.crawlers._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.tasks.config.TasksConfigHolder

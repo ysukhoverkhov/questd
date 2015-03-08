@@ -37,7 +37,8 @@ case class RemoveFromFollowingRequest(
   user: User,
   userIdToAdd: String)
 case class RemoveFromFollowingResult(
-  allowed: ProfileModificationResult)
+  allowed: ProfileModificationResult,
+  profile: Option[Profile] = None)
 
 case class GetSuggestsForFollowingRequest(
   user: User,
@@ -54,14 +55,9 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
    * Get ids of users from our following.
    */
   def getFollowing(request: GetFollowingRequest): ApiResult[GetFollowingResult] = handleDbException {
-
-    request.user.canFollow match {
-      case OK =>
-        OkApiResult(GetFollowingResult(
-          allowed = OK,
-          userIds = Some(request.user.following)))
-      case a => OkApiResult(GetFollowingResult(a, None))
-    }
+    OkApiResult(GetFollowingResult(
+      allowed = OK,
+      userIds = Some(request.user.following)))
   }
 
   /**
@@ -92,7 +88,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
     if (request.user.following.length >= maxFollowingSize) {
       OkApiResult(AddToFollowingResult(LimitExceeded))
     } else {
-      request.user.canFollow match {
+      request.user.canFollowUser(request.userIdToAdd) match {
         case OK => {
 
           makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.AddToFollowing)))
@@ -119,13 +115,9 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
    */
   def removeFromFollowing(request: RemoveFromFollowingRequest): ApiResult[RemoveFromFollowingResult] = handleDbException {
 
-    request.user.canFollow match {
-      case OK =>
-        db.user.removeFromFollowing(request.user.id, request.userIdToAdd)
-        OkApiResult(RemoveFromFollowingResult(OK))
-      case a => OkApiResult(RemoveFromFollowingResult(a))
+    db.user.removeFromFollowing(request.user.id, request.userIdToAdd) ifSome { r =>
+      OkApiResult(RemoveFromFollowingResult(OK, Some(r.profile)))
     }
-
   }
 
   /**
@@ -146,11 +138,11 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
 
         val friends = (for (i <- snFriends) yield {
 
-          // optimize it in batch call.
+          // TODO: optimize it in batch call.
           // test batch call
 
           db.user.readBySNid(i.snName, i.snId)
-        }).filter(_ != None).map(_.get).map(_.id).filter(!request.user.friends.contains(_)).filter(!request.user.following.contains(_))
+        }).filter(_ != None).map(_.get).map(_.id).filter(!request.user.friends.map(_.friendId).contains(_)).filter(!request.user.following.contains(_))
 
         OkApiResult(GetSuggestsForFollowingResult(OK, Some(friends)))
       case a => OkApiResult(GetSuggestsForFollowingResult(a))
