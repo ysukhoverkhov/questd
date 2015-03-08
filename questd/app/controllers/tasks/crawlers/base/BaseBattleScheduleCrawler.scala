@@ -17,7 +17,7 @@ abstract class BaseBattleScheduleCrawler(
             r.battles
 
           case _ =>
-            Logger.error(s"Unable to et all users from database")
+            Logger.error(s"Unable to get all battles from database")
             List().iterator
         }
       }
