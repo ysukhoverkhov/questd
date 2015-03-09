@@ -129,12 +129,13 @@ package object domainstubs {
   def createDailyResultStub(
     startOfPeriod: Date = new Date(),
     dailySalary: Assets = Assets(),
-    questsIncome: List[QuestIncome] = List(createQuestIncomeStub())
-    ) = {
+    questsIncome: List[QuestIncome] = List(createQuestIncomeStub()),
+    questSolutionResult: List[QuestSolutionResult] = List.empty) = {
     DailyResult(
       startOfPeriod = startOfPeriod,
       dailySalary = dailySalary,
-      questsIncome = questsIncome
+      questsIncome = questsIncome,
+      decidedQuestSolutions = questSolutionResult
     )
   }
 

@@ -106,7 +106,6 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       there was one(quest).readById(q.id)
       there was one(user).setQuestBookmark(any, any)
     }
-
   }
 }
 

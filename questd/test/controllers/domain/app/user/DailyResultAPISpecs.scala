@@ -2,6 +2,7 @@ package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain._
+import org.mockito.Matchers.{eq => mEq}
 import org.mockito.{ArgumentMatcher, Matchers}
 import testhelpers.domainstubs._
 
@@ -46,7 +47,7 @@ class DailyResultAPISpecs extends BaseAPISpecs {
       }
 
       there was one(user).addPrivateDailyResult(
-        Matchers.eq(u.id),
+        mEq(u.id),
         Matchers.argThat(new ArgumentMatcher[DailyResult] {
           def matches(result: java.lang.Object): Boolean = {
             result.asInstanceOf[DailyResult].questsIncome == List(QuestIncome(
@@ -72,7 +73,8 @@ class DailyResultAPISpecs extends BaseAPISpecs {
             passiveIncome = Assets(16, 16, 16),
             likesIncome = Assets(32, 32, 32),
             solutionsIncome = Assets(64, 64, 64))
-        )
+        ),
+        questSolutionResult = List(QuestSolutionResult("1", None, None, Some(Assets(rating = -128)), SolutionStatus.CheatingBanned))
       )
 
       val u = createUserStub(privateDailyResults = List(
@@ -92,7 +94,7 @@ class DailyResultAPISpecs extends BaseAPISpecs {
       val result = api.getDailyResult(GetDailyResultRequest(u))
 
       there was one(user).movePrivateDailyResultsToPublic(u.id, u.privateDailyResults.tail)
-      there was one(user).addToAssets(u.id, Assets(127, 127, 127))
+      there was one(user).addToAssets(u.id, Assets(127, 127, 255))
       result must beAnInstanceOf[OkApiResult[GetDailyResultResult]]
     }
   }
