@@ -120,7 +120,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
   def rewardSolutionAuthor(request: RewardSolutionAuthorRequest): ApiResult[RewardSolutionAuthorResult] = handleDbException {
     import request._
 
-    Logger.debug("API - rewardQuestSolutionAuthor")
+    Logger.debug("API - rewardSolutionAuthor")
 
     class QuestNotFoundException() extends Throwable
 
