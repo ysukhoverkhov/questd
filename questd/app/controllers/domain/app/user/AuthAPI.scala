@@ -29,12 +29,6 @@ private[domain] trait AuthAPI {
 
       // Update here country from time to time.
       updateUserCulture(UpdateUserCultureRequest(user)) ifOk {
-        // TODO: remove me in 0.40 as far as we populate time line on creation.
-        if (user.timeLine.length <= 0)
-          populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user))
-        // error is not checked here because this will be removed anyways.
-        // end of remove
-
         api.processFriendshipInvitationsFromSN(ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
           case InternalErrorApiResult(a) =>
             InternalErrorApiResult[LoginResult](a)

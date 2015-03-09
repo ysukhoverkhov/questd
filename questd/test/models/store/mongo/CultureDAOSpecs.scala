@@ -8,8 +8,8 @@ import play.api.test._
 
 //@RunWith(classOf[JUnitRunner])
 class CultureDAOSpecs extends Specification
-with MongoDatabaseComponent
-with BaseDAOSpecs {
+  with MongoDatabaseComponent
+  with BaseDAOSpecs {
 
   private[this] def clearDB() = {
     db.culture.clear()
