@@ -155,7 +155,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val u = ensurePrivateDailyResultExists(user)
 
-    if (u.privateDailyResults(0).questsIncome.exists(_.questId == quest.id)) {
+    if (u.privateDailyResults.head.questsIncome.exists(_.questId == quest.id)) {
       OkApiResult(AddQuestIncomeToDailyResultResult(u))
     } else {
       db.user.addQuestIncomeToDailyResult(u.id, createQuestIncomeForQuest(quest)) ifSome { u =>
