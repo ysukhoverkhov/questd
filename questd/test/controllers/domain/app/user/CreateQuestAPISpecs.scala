@@ -69,17 +69,19 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
             solveRewardLost = Assets())))
     }
 
-    "rewardQuestAuthor removes quest from daily income if it's banned" in context {
+    "rewardQuestAuthor removes quest from daily income and timeline if it's banned" in context {
       val u = createUserStub()
       val q = createQuestStub(status = QuestStatus.CheatingBanned)
 
       user.addToAssets(any, any) returns Some(u)
       user.storeProposalInDailyResult(any, any) returns Some(u)
       user.removeQuestIncomeFromDailyResult(any, any) returns Some(u)
+      user.removeEntryFromTimeLineByObjectId(any, any) returns Some(u)
 
       val result = api.rewardQuestAuthor(RewardQuestAuthorRequest(q, u))
 
       there was one(user).removeQuestIncomeFromDailyResult(u.id, q.id)
+      there was one(user).removeEntryFromTimeLineByObjectId(u.id, q.id)
       result must beAnInstanceOf[OkApiResult[RewardQuestAuthorResult]]
     }
   }

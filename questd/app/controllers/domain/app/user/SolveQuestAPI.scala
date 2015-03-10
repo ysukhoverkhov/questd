@@ -158,12 +158,14 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               user = author,
               solution = request.solution,
               penalty = Some(q.penaltyForCheatingSolution)))
+          removeFromTimeLine(RemoveFromTimeLineRequest(author, request.solution.id))
 
         case SolutionStatus.IACBanned =>
             storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
               user = author,
               solution = request.solution,
               penalty = Some(q.penaltyForIACSolution)))
+          removeFromTimeLine(RemoveFromTimeLineRequest(author, request.solution.id))
       }
 
       r ifOk {

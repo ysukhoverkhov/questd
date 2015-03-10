@@ -29,3 +29,6 @@ libraryDependencies += "com.restfb" % "restfb" % "1.8.0"
 libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19"
 
 libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "1.8.0"
+
+
+fork in run := true

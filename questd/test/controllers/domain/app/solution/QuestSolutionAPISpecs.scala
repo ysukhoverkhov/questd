@@ -21,13 +21,13 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       val spiedQuestSolutionLogic = spy(new SolutionLogic(sol, api.api))
       when(api.solution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
 
-//      when(spiedQuestSolutionLogic.shouldStopVoting).thenReturn(false)
       when(spiedQuestSolutionLogic.shouldBanCheating).thenReturn(true)
       when(spiedQuestSolutionLogic.shouldBanIAC).thenReturn(false)
       solution.updateStatus(any, any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))
       user.readById(user1.id) returns Some(user1)
       user.addPrivateDailyResult(any, any) returns Some(user1)
       user.storeSolutionInDailyResult(any, any) returns Some(user1)
+      user.removeEntryFromTimeLineByObjectId(mEq(user1.id), mEq(sol.id)) returns Some(user1)
 
       quest.readById(q.id) returns Some(q)
 
@@ -38,7 +38,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
       val result = api.updateSolutionState(UpdateSolutionStateRequest(sol))
 
-      there was two(quest).allWithParams(
+      there were two(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(user1.id),
         skip = 0)
@@ -58,13 +58,13 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       val spiedQuestSolutionLogic = spy(new SolutionLogic(sol, api.api))
       when(api.solution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
 
-      //      when(spiedQuestSolutionLogic.shouldStopVoting).thenReturn(false)
       when(spiedQuestSolutionLogic.shouldBanCheating).thenReturn(true)
       when(spiedQuestSolutionLogic.shouldBanIAC).thenReturn(false)
       solution.updateStatus(any, any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))
       user.readById(user1.id) returns Some(user1)
       user.addPrivateDailyResult(any, any) returns Some(user1)
       user.storeSolutionInDailyResult(any, any) returns Some(user1)
+      user.removeEntryFromTimeLineByObjectId(mEq(user1.id), mEq(sol.id)) returns Some(user1)
 
       quest.readById(q.id) returns Some(q)
 
@@ -89,6 +89,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
         reward = None,
         penalty = Some(Assets(rating = 4510)),
         status = SolutionStatus.CheatingBanned)))
+      there was one(user).removeEntryFromTimeLineByObjectId(mEq(user1.id), mEq(sol.id))
 
       result must beEqualTo(OkApiResult(UpdateSolutionStateResult()))
     }
