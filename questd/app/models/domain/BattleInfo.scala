@@ -13,7 +13,7 @@ case class BattleInfo(
   status: BattleStatus.Value = BattleStatus.Fighting,
   solutionIds: List[String],
   authorIds: List[String],
-  winnerId: Option[String] = None,
+  winnerIds: List[String] = List.empty,
   voteEndDate: Date
   )
 

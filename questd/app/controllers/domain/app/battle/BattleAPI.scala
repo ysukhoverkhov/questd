@@ -38,7 +38,7 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
           db.solution.updateStatus(s.id, status)
         }
 
-        db.battle.updateStatus(b.id, BattleStatus.Resolved)
+        db.battle.updateStatus(b.id, BattleStatus.Resolved, solutions.filter(_.votingPoints == bestSolution.votingPoints).map(_.info.authorId))
       } else
         Some(b)
     }

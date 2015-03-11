@@ -27,7 +27,8 @@ trait BattleDAO extends BaseDAO[Battle] {
    */
   def updateStatus(
     id: String,
-    newStatus: BattleStatus.Value): Option[Battle]
+    newStatus: BattleStatus.Value,
+    addWinners: List[String] = List.empty): Option[Battle]
 
   /**
    * Replaces culture ids of battles with old one.

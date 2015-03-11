@@ -11,8 +11,8 @@ class BattleAPISpecs extends BaseAPISpecs {
 
     "updateBattleState updates battle and solutions if battle should be resolved" in context {
       val ss = List(
-        createSolutionStub(id = "sid1", status = SolutionStatus.Won),
-        createSolutionStub(id = "sid2", status = SolutionStatus.Lost)
+        createSolutionStub(id = "sid1", status = SolutionStatus.Won, points = 20),
+        createSolutionStub(id = "sid2", status = SolutionStatus.Lost, points = 1)
       )
 
       val b = createBattleStub(
@@ -30,14 +30,14 @@ class BattleAPISpecs extends BaseAPISpecs {
       user.readById(any) returns Some(createUserStub())
       quest.readById(any) returns Some(createQuestStub())
 
-      battle.updateStatus(any, mEq(BattleStatus.Resolved)) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
+      battle.updateStatus(any, mEq(BattleStatus.Resolved), any) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
 
       val result = api.updateBattleState(UpdateBattleStateRequest(b))
 
       there were atLeast(4)(solution).readById(any)
       there were two(solution).updateStatus(any, any, any)
       there were two(user).readById(any)
-      there was one(battle).updateStatus(any, mEq(BattleStatus.Resolved))
+      there was one(battle).updateStatus(any, mEq(BattleStatus.Resolved), mEq(List(ss(0).info.authorId)))
       there were two(user).storeSolutionInDailyResult(any, any)
 
       result must beEqualTo(OkApiResult(UpdateBattleStateResult()))
@@ -64,7 +64,7 @@ class BattleAPISpecs extends BaseAPISpecs {
       user.readById(any) returns Some(createUserStub())
       quest.readById(any) returns Some(createQuestStub())
 
-      battle.updateStatus(any, mEq(BattleStatus.Resolved)) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
+      battle.updateStatus(any, mEq(BattleStatus.Resolved), any) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
 
       val result = api.updateBattleState(UpdateBattleStateRequest(b))
 
@@ -72,7 +72,7 @@ class BattleAPISpecs extends BaseAPISpecs {
       there were one(solution).updateStatus(mEq(ss(0).id), mEq(SolutionStatus.Won), any)
       there were one(solution).updateStatus(mEq(ss(1).id), mEq(SolutionStatus.Lost), any)
       there were two(user).readById(any)
-      there was one(battle).updateStatus(any, mEq(BattleStatus.Resolved))
+      there was one(battle).updateStatus(any, mEq(BattleStatus.Resolved), any)
       there was one(user).storeSolutionInDailyResult(any, mEq(QuestSolutionResult(
         solutionId = ss(0).id,
         battleId = Some(b.id),
@@ -112,19 +112,18 @@ class BattleAPISpecs extends BaseAPISpecs {
       user.readById(any) returns Some(createUserStub())
       quest.readById(any) returns Some(createQuestStub())
 
-      battle.updateStatus(any, mEq(BattleStatus.Resolved)) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
+      battle.updateStatus(any, mEq(BattleStatus.Resolved), mEq(List(ss(0).info.authorId, ss(1).info.authorId))) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
 
       val result = api.updateBattleState(UpdateBattleStateRequest(b))
 
       there were atLeast(4)(solution).readById(any)
       there were two(solution).updateStatus(any, mEq(SolutionStatus.Won), any)
       there were two(user).readById(any)
-      there was one(battle).updateStatus(any, mEq(BattleStatus.Resolved))
+      there was one(battle).updateStatus(any, mEq(BattleStatus.Resolved), mEq(List(ss(0).info.authorId, ss(1).info.authorId)))
       there were two(user).storeSolutionInDailyResult(any, any)
 
       result must beEqualTo(OkApiResult(UpdateBattleStateResult()))
     }
   }
 }
-
 

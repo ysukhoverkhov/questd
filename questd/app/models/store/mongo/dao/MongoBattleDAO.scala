@@ -84,14 +84,22 @@ private[mongo] class MongoBattleDAO
    */
   def updateStatus(
     id: String,
-    newStatus: BattleStatus.Value): Option[Battle] = {
+    newStatus: BattleStatus.Value,
+    addWinners: List[String] = List.empty): Option[Battle] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
+    queryBuilder +=
+      ("$set" -> MongoDBObject(
+        "info.status" -> newStatus.toString,
+        "lastModDate" -> new Date()))
+
+    if (addWinners.length > 0) {
       queryBuilder +=
-        ("$set" -> MongoDBObject(
-          "info.status" -> newStatus.toString,
-          "lastModDate" -> new Date()))
+        ("$push" -> MongoDBObject(
+          "info.winnerIds" -> MongoDBObject(
+            "$each" -> addWinners)))
+    }
 
     findAndModify(
       id,

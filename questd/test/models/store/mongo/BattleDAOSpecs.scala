@@ -112,7 +112,21 @@ class BattleDAOSpecs extends Specification
 
       var r = db.battle.readById(battle.id)
 
-      r must beSome.which(_.info.status == BattleStatus.Resolved)
+      r must beSome.which(b => b.info.status == BattleStatus.Resolved)
+    }
+
+    "Update battle with winners" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val battle = createBattleStub(status = BattleStatus.Fighting, winnerIds = List.empty)
+      val winnerIds = List("1", "2")
+
+      db.battle.create(battle)
+      db.battle.updateStatus(battle.id, BattleStatus.Resolved, winnerIds)
+
+      var r = db.battle.readById(battle.id)
+
+      r must beSome.which(b => b.info.status == BattleStatus.Resolved && b.info.winnerIds == winnerIds)
     }
 
     "Replace cultures" in new WithApplication(appWithTestDatabase) {
