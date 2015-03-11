@@ -8,12 +8,54 @@ import controllers.domain._
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
 import components._
-import controllers.web.rest.protocol._
 import org.json4s.MappingException
 import controllers.web.rest.config.WSConfigHolder
 import controllers.sn.exception._
 
+private [component] object LoginWSImplTypes {
+
+  /**
+   * Payload in case of 401 error.
+   */
+  case class WSUnauthorisedResult(code: UnauthorisedReason.Value)
+
+  /**
+   *  Reasons of Unauthorised results.
+   */
+  object UnauthorisedReason extends Enumeration {
+
+    /**
+     *  FB tells us it doesn't know the token.
+     */
+    val InvalidFBToken = Value
+
+    /**
+     *  Supplied session is not valid on our server.
+     */
+    val SessionNotFound = Value
+
+    /**
+     * Passed version of the application is not supported.
+     */
+    val UnsupportedAppVersion = Value
+  }
+
+  /**
+   * Login Request
+   */
+  case class WSLoginRequest(snName:String, token: String, appVersion: Int)
+
+  /**
+   * Login Result
+   */
+  case class WSLoginResult(sessionId: String, userId: String)
+
+}
+
+
 trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor with APIAccessor with WSConfigHolder =>
+
+  import LoginWSImplTypes._
 
   /**
    * Logins with Facebook or create new user if it not exists

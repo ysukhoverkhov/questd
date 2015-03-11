@@ -1,13 +1,49 @@
 package controllers.web.rest.component
 
-import scala.concurrent.Future
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import controllers.web.rest.component.helpers._
-import controllers.web.rest.protocol._
-import models.domain.Gender
 import controllers.domain.app.user._
+import controllers.web.rest.component.helpers._
+import models.domain.{Gender, Profile}
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
+import scala.concurrent.Future
+
+private object ProfileWSImplTypes {
+
+  /**
+   * Get profile response
+   */
+  type WSProfileResult = Profile
+
+  /**
+   * Set Gender protocol.
+   */
+  type WSSetGenderResult = SetGenderResult
+  case class WSSetGenderRequest(gender: String)
+
+  /**
+   * Set debug protocol.
+   */
+  type WSSetDebugResult = SetDebugResult
+  case class WSSetDebugRequest(debug: String)
+
+  /**
+   * Set city protocol.
+   */
+  type WSSetCityResult = SetCityResult
+  case class WSSetCityRequest(city: String)
+
+  /**
+   * Set country protocol
+   */
+  type WSGetCountryListResult = GetCountryListResult
+  type WSSetCountryResult = SetCountryResult
+  case class WSSetCountryRequest(country: String)
+
+}
 
 trait ProfileWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+
+  import controllers.web.rest.component.ProfileWSImplTypes._
 
   def getProfile = Authenticated.async { implicit request =>
     Future {

@@ -1,14 +1,34 @@
 package controllers.web.rest.component
 
+import _root_.helpers.rich._
 import controllers.domain.OkApiResult
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
-import controllers.web.rest.protocol._
 import models.domain.Functionality
-import _root_.helpers.rich._
+
 import scala.language.existentials
 
+private object DailyResultWSImplTypes {
+
+  type WSGetDailyResultResult = GetDailyResultResult
+
+  type WSShiftDailyResultResult = ShiftDailyResultResult
+
+  case class WSGetRightsAtLevelsRequest(
+    levelFrom: Int,
+    levelTo: Int)
+
+  type WSGetRightsAtLevelsResult = GetRightsAtLevelsResult
+
+  case class WSGetLevelsForRightsResult (levels: Map[String, Int])
+
+  case class WSGetLevelsForRightsRequest(
+    functionality: List[String])
+}
+
 trait DailyResultWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+
+  import controllers.web.rest.component.DailyResultWSImplTypes._
 
   def getDailyResult = wrapApiCallReturnBody[WSGetDailyResultResult] { r =>
     api.getDailyResult(GetDailyResultRequest(r.user))

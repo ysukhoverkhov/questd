@@ -1,11 +1,38 @@
 package controllers.web.rest.component
 
-import controllers.web.rest.component.helpers._
-import controllers.web.rest.protocol._
 import controllers.domain.app.user._
+import controllers.web.rest.component.helpers._
+
+private object FollowingWSImplTypes {
+
+  type WSGetFollowingResult = GetFollowingResult
+
+  type WSGetFollowersResult = GetFollowersResult
+
+  type WSCostToFollowingResult = CostToFollowingResult
+
+  case class WSAddToFollowingRequest(
+    /// Id of a person to add.
+    id: String)
+
+  type WSAddToFollowingResult = AddToFollowingResult
+
+  case class WSRemoveFromFollowingRequest(
+    /// Id of a person to remove.
+    id: String)
+
+  type WSRemoveFromFollowingResult = RemoveFromFollowingResult
+
+  case class WSGetSuggestsForFollowingRequest(
+    tokens: Map[String, String])
+
+  type WSGetSuggestsForFollowingResult = GetSuggestsForFollowingResult
+
+}
 
 trait FollowingWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
 
+  import controllers.web.rest.component.FollowingWSImplTypes._
 
   def getFollowing = wrapApiCallReturnBody[WSGetFollowingResult] { r =>
     api.getFollowing(GetFollowingRequest(r.user))

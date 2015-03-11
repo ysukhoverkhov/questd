@@ -1,14 +1,36 @@
 package controllers.web.rest.component
 
-import controllers.web.rest.component.helpers._
-import controllers.web.rest.protocol._
-import controllers.domain.app.user._
-import models.domain._
 import _root_.helpers.rich._
+import controllers.domain.app.user._
+import controllers.web.rest.component.helpers._
+import models.domain._
 
 
 private object ContentWSImplTypes
 {
+
+  case class WSGetQuestsRequest(
+    ids: List[String])
+
+  type WSGetQuestsResult = GetQuestsResult
+
+  case class WSGetSolutionsRequest(
+    ids: List[String])
+
+  type WSGetSolutionsResult = GetSolutionsResult
+
+  case class WSGetBattlesRequest(
+    ids: List[String])
+
+  type WSGetBattlesResult = GetBattlesResult
+
+
+  case class WSGetPublicProfilesRequest(
+    ids: List[String])
+
+  type WSGetPublicProfileResult = GetPublicProfilesResult
+
+
   case class WSGetOwnQuestsRequest(
     // see QuestStatus enum. if missing all solutions will be returned.
     status: List[String] = List(),
@@ -98,14 +120,25 @@ private object ContentWSImplTypes
     // Number of items on a page.
     pageSize: Int)
   type WSGetBattlesForSolutionResult = GetBattlesForSolutionResult
+
+
+  type WSGetOwnSolutionsResult = GetOwnSolutionsResult
+  case class WSGetOwnSolutionsRequest(
+    // see QuestSolutionStatus enum. if missing all solutions will be returned.
+    status: List[String] = List(),
+
+    // Number of page in result, zero based.
+    pageNumber: Int,
+
+    // Number of items on a page.
+    pageSize: Int)
+
 }
-
-
 
 
 trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
-  import ContentWSImplTypes._
+  import controllers.web.rest.component.ContentWSImplTypes._
 
   /**
    * Get quest by id.

@@ -1,17 +1,46 @@
 package controllers.web.rest.component
 
-
 import java.util.UUID
 
 import controllers.domain.OkApiResult
 import controllers.web.rest.component.helpers._
-import controllers.web.rest.protocol._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.Future
 import scala.reflect.io.Path
 
+private object UploadWSImplTypes {
+  /**
+   * Response on upload request.
+   */
+  case class WSUploadResult(
+    code: UploadCode.Value,
+    contentId: Option[String])
+
+  /**
+   *  Upload errors.
+   */
+  object UploadCode extends Enumeration {
+    val OK = Value
+    val FileNotFoundInRequest = Value
+    val RequestIsNotMultiPart = Value
+  }
+
+  case class WSGetContentURLByIdRequest (
+    contentId: String)
+
+  case class WSGetContentURLByIdResult(
+    code: ContentURlRequestCode.Value,
+    url: Option[String])
+  object ContentURlRequestCode extends Enumeration {
+    val OK = Value
+    val ContentNotFount = Value
+  }
+}
+
 trait UploadWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+
+  import controllers.web.rest.component.UploadWSImplTypes._
 
   def upload = Authenticated.async { implicit request =>
     Future {

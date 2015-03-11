@@ -6,10 +6,11 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import controllers.web.rest.component._
 import controllers.domain._
-import controllers.web.rest.protocol._
 import org.json4s._
 
 private[component] trait CommonFunctions { this: QuestController with SecurityWSImpl =>
+
+  import LoginWSImplTypes._
 
   def wrapApiCall[T <: AnyRef](apiCall: AuthenticatedRequest[AnyContent] => ApiResult[T])(body: T => Result) = Authenticated.async { implicit request =>
     Future {

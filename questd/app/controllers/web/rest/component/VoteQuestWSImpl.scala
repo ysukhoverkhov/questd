@@ -2,10 +2,25 @@ package controllers.web.rest.component
 
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
-import controllers.web.rest.protocol._
 import models.domain._
 
+private object VoteQuestWSImplTypes {
+
+  case class WSVoteQuestRequest(
+
+    questId: String,
+
+    /**
+     * @see controllers.domain.user.QuestProposalVote
+     */
+    vote: String)
+
+  type WSVoteQuestResult = VoteQuestByUserResult
+}
+
 trait VoteQuestWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+
+  import controllers.web.rest.component.VoteQuestWSImplTypes._
 
   def voteQuest = wrapJsonApiCallReturnBody[WSVoteQuestResult] { (js, r) =>
 

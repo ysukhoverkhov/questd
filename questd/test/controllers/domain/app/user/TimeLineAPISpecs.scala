@@ -51,25 +51,6 @@ class TimeLineAPISpecs extends BaseAPISpecs {
       there was one(user).addEntryToTimeLineMulti(any, any)
     }
 
-    "getTimeLine should not return banned entries" in context {
-      // TODO: update the test - test removing of banned things.
-
-//      val entries = List(
-//        createTimeLineEntryStub(objectType = TimeLineType.Quest),
-//        createTimeLineEntryStub(objectType = TimeLineType.Quest)
-//      )
-//
-//      val u = createUserStub(timeLine = entries, votedSolutions = Map(entries.head.id, ContentVote.Cheating))
-//
-//      val result = api.getTimeLine(GetTimeLineRequest(
-//        user = u,
-//        pageNumber = 0,
-//        pageSize = 20))
-//
-//      result must beEqualTo(OkApiResult(GetTimeLineResult(entries.tail)))
-      success
-    }
-
     "getTimeLine should be able to limit result" in context {
       val entries = List(
         createTimeLineEntryStub(id = "1"),

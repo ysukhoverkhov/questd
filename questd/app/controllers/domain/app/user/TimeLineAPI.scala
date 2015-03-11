@@ -97,7 +97,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
-// TODO: filter banned.
+
     OkApiResult(GetTimeLineResult(request.user.timeLine.iterator
       .drop(pageSize * pageNumber)
       .take(pageSize)

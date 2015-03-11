@@ -4,7 +4,6 @@ import components._
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
-import controllers.web.rest.protocol._
 import models.domain._
 import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -19,6 +18,8 @@ object SecurityWSImpl {
 }
 
 trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
+
+  import controllers.web.rest.component.LoginWSImplTypes._
 
   // Store Auth Info
   def storeAuthInfoInResult(result: Result, session: String) = {

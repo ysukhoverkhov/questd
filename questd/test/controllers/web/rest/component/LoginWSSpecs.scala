@@ -1,21 +1,22 @@
 package controllers.web.rest.component
 
-import scala.concurrent.Future
-import org.specs2.mutable._
-import org.specs2.mock.Mockito
-import play.api.test._
-import play.api.test.Helpers._
-import play.api.libs.json._
+import components.random.RandomComponent
 import controllers.domain._
 import controllers.domain.app.user._
-import models.store._
-import models.domain._
-import controllers.web.rest.protocol._
-import play.api.mvc._
-import components.random.RandomComponent
+import controllers.sn.client.{SocialNetworkClient, User => SNUser}
 import controllers.sn.component.SocialNetworkComponent
-import controllers.sn.client.{User => SNUser, SocialNetworkClient}
 import controllers.sn.exception._
+import controllers.web.rest.component.LoginWSImplTypes.WSLoginRequest
+import models.domain._
+import models.store._
+import org.specs2.mock.Mockito
+import org.specs2.mutable._
+import play.api.libs.json._
+import play.api.mvc._
+import play.api.test.Helpers._
+import play.api.test._
+
+import scala.concurrent.Future
 
 class LoginWSSpecs extends Specification
   with RandomComponent

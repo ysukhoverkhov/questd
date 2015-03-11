@@ -56,7 +56,6 @@ private[domain] trait AuthAPI {
                 ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = request.snuser.snId))))))
 
       db.user.create(newUser)
-      checkIncreaseLevel(CheckIncreaseLevelRequest(newUser)) // TODO: it looks like it should be removed.
 
       db.user.readBySNid(request.snName, request.snuser.snId) ifSome { user =>
         populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user)) ifOk { r =>
