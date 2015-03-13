@@ -6,6 +6,8 @@ import models.domain.QuestInfoContent
 
 private object CreateQuestWSImplTypes {
 
+  import scala.language.implicitConversions
+
   type WSCreateQuestResult = CreateQuestResult
 
   case class WSCreateQuestRequest(

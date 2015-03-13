@@ -9,6 +9,9 @@ case class WSContentReference(
 
 }
 object WSContentReference {
+
+  import scala.language.implicitConversions
+
   implicit def toContentReference(v: WSContentReference): ContentReference = {
     ContentReference(
       contentType = ContentType.withName(v.contentType),

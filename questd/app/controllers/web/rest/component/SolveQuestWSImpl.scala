@@ -6,6 +6,8 @@ import models.domain.SolutionInfoContent
 
 private object SolveQuestWSImplTypes {
 
+  import scala.language.implicitConversions
+
   case class WSSolveQuestRequest(
     questId: String,
     media: WSContentReference,
@@ -19,7 +21,6 @@ private object SolveQuestWSImplTypes {
   }
 
   type WSSolveQuestResult = SolveQuestResult
-
 
   case class WSBookmarkQuestRequest(
     questId: String)
