@@ -72,7 +72,7 @@ class BattleAPISpecs extends BaseAPISpecs {
       there were one(solution).updateStatus(mEq(ss(0).id), mEq(SolutionStatus.Won), any)
       there were one(solution).updateStatus(mEq(ss(1).id), mEq(SolutionStatus.Lost), any)
       there were two(user).readById(any)
-      there was one(battle).updateStatus(any, mEq(BattleStatus.Resolved), any)
+      there was one(battle).updateStatus(any, mEq(BattleStatus.Resolved), List(ss(0).info.authorId))
       there was one(user).storeSolutionInDailyResult(any, mEq(QuestSolutionResult(
         solutionId = ss(0).id,
         battleId = Some(b.id),
