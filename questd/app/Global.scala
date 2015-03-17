@@ -6,7 +6,7 @@ object Global extends GlobalSettings {
   override def onStart(app: Application) {
 
     ComponentRegistrySingleton
-    Logger.info("Application has started")
+    Logger.info(s"Starting Application ${misc.BuildInfo}")
   }
 
 }

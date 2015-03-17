@@ -15,3 +15,5 @@ questd/RUNNING_PID
 questd/.idea
 questd/.idea_modules
 questd/project/.sbtserver.lock
+questd/.sbtserver
+questd/project/.sbtserver

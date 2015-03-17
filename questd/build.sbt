@@ -1,8 +1,9 @@
 import play.PlayScala
+import spray.http.DateTime
 
 name := """questd"""
 
-version := "1.0-SNAPSHOT"
+version := "0.30.04-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -32,3 +33,22 @@ libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "1.8.0"
 
 
 fork in run := true
+
+
+buildInfoSettings
+
+sourceGenerators in Compile <+= buildInfo
+
+buildInfoKeys := Seq[BuildInfoKey](
+  name,
+  version,
+  buildInfoBuildNumber,
+  BuildInfoKey.action("buildTime") {
+    DateTime.now
+  },
+  scalaVersion,
+  sbtVersion
+  )
+
+buildInfoPackage := "misc"
+
