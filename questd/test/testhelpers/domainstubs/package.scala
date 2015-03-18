@@ -166,13 +166,15 @@ package object domainstubs {
 
   def createUserStub(
     id: String = "uid",
-    cultureId: String = "cultureId",
+    cultureId: Option[String] = Some("cultureId"),
     vip: Boolean = false,
     friends: List[Friendship] = List(),
     assets: Assets = Assets(100000, 100000, 100000),
     mustVoteSolutions: List[String] = List(),
     level: Int = 18,
     questCreationCoolDown: Date = new Date(Long.MaxValue),
+    createdQuests: List[String] = List.empty,
+    createdSolutions: List[String] = List.empty,
     solvedQuests: List[String] = List.empty,
     votedQuests: Map[String, ContentVote.Value] = Map.empty,
     votedSolutions: Map[String, ContentVote.Value] = Map.empty,
@@ -185,7 +187,7 @@ package object domainstubs {
     User(
       id = id,
       demo = UserDemographics(
-        cultureId = Some(cultureId)),
+        cultureId = cultureId),
       privateDailyResults = privateDailyResults,
       profile = Profile(
         assets = assets,
@@ -204,6 +206,8 @@ package object domainstubs {
       mustVoteSolutions = mustVoteSolutions,
       timeLine = timeLine,
       stats = UserStats(
+        createdQuests = createdQuests,
+        createdSolutions = createdSolutions,
         solvedQuests = solvedQuests,
         votedQuests = votedQuests,
         votedSolutions = votedSolutions))

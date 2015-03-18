@@ -3,7 +3,7 @@ package controllers.domain.helpers
 /**
  * Helps to deal with paging and paging limits.
  */
-private [domain] object PagerHelper {
+private [helpers] object PagerHelper {
 
   /**
    * Make page of correct size correcting client's request.

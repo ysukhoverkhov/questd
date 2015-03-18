@@ -3,7 +3,7 @@ package controllers.domain.app.user
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain._
-import org.mockito.Matchers
+import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
 class SolveQuestAPISpecs extends BaseAPISpecs {
@@ -22,7 +22,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val friends = List(Friendship("fid1", FriendshipStatus.Accepted), Friendship("fid2", FriendshipStatus.Invited))
       val u = createUserStub(
         id = uid,
-        cultureId = "cid",
+        cultureId = Some("cid"),
         vip = true,
         timeLine = List(tl, t2, t3, t4),
         friends = friends,
@@ -35,13 +35,14 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
           questsIncome = List(createQuestIncomeStub(questId = q.id)))))
       val s = createSolutionInfoContent
 
-      quest.readById(Matchers.eq(q.id)) returns Some(q)
-      quest.updatePoints(Matchers.eq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
-      user.recordQuestSolving(Matchers.eq(u.id), Matchers.eq(q.id), Matchers.eq(false)) returns Some(u)
-      user.addEntryToTimeLine(Matchers.eq(u.id), any) returns Some(u)
-      user.addToAssets(Matchers.eq(u.id), any) returns Some(u)
+      quest.readById(mEq(q.id)) returns Some(q)
+      quest.updatePoints(mEq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
+      user.recordQuestSolving(mEq(u.id), mEq(q.id), mEq(false)) returns Some(u)
+      user.recordSolutionCreation(mEq(u.id), any) returns Some(u)
+      user.addEntryToTimeLine(mEq(u.id), any) returns Some(u)
+      user.addToAssets(mEq(u.id), any) returns Some(u)
       user.readById(q.info.authorId) returns Some(author)
-      user.storeQuestSolvingInDailyResult(Matchers.eq(q.info.authorId), any, any) returns Some(author)
+      user.storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any) returns Some(author)
       solution.allWithParams(
         status = any,
         authorIds = any,
@@ -68,12 +69,12 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
             questId = q.id,
             vip = true)))
       there was one(quest).readById(q.id)
-      there was one(user).recordQuestSolving(Matchers.eq(u.id), Matchers.eq(q.id), Matchers.eq(false))
-      there was one(user).addEntryToTimeLine(Matchers.eq(u.id), any)
-      there was one(user).addToAssets(Matchers.eq(u.id), any)
-      there was one(user).addEntryToTimeLineMulti(Matchers.eq(List("fid1")), any)
-      there was one(quest).updatePoints(Matchers.eq(q.id), Matchers.eq(2), anyInt, anyInt, anyInt, anyInt, anyInt)
-      there was one(user).storeQuestSolvingInDailyResult(Matchers.eq(q.info.authorId), any, any)
+      there was one(user).recordQuestSolving(mEq(u.id), mEq(q.id), mEq(false))
+      there was one(user).addEntryToTimeLine(mEq(u.id), any)
+      there was one(user).addToAssets(mEq(u.id), any)
+      there was one(user).addEntryToTimeLineMulti(mEq(List("fid1")), any)
+      there was one(quest).updatePoints(mEq(q.id), mEq(2), anyInt, anyInt, anyInt, anyInt, anyInt)
+      there was one(user).storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any)
 
       result must beEqualTo(OkApiResult(SolveQuestResult(ProfileModificationResult.OK, Some(u.profile))))
     }
@@ -121,7 +122,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 //
 //      there was one(solution).create(any)
 //      there was one(user).resetQuestSolution(any, any)
-//      there was one(user).populateMustVoteSolutionsList(Matchers.eq(friendsIds), any)
+//      there was one(user).populateMustVoteSolutionsList(mEq(friendsIds), any)
 //      there was one(user).addToAssets(any, any)
 //
 //    }

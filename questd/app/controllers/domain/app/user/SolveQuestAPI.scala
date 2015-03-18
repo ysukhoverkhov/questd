@@ -1,15 +1,15 @@
 package controllers.domain.app.user
 
-import models.domain.view.QuestView
-
-import scala.language.postfixOps
-import models.domain._
-import play.Logger
+import components._
+import controllers.domain._
+import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.quest.SolveQuestUpdateRequest
 import controllers.domain.helpers._
-import controllers.domain._
-import components._
-import controllers.domain.app.protocol.ProfileModificationResult._
+import models.domain._
+import models.domain.view.QuestView
+import play.Logger
+
+import scala.language.postfixOps
 
 case class SolveQuestRequest(
   user: User,
@@ -44,37 +44,68 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
         user.canSolveQuest(contentType = solution.media.contentType, questToSolve = questToSolve) match {
           case OK =>
 
-            user.demo.cultureId ifSome { culture =>
+            import request.{user => u}
 
-              val newSolution = Solution(
-                cultureId = culture,
-                questLevel = questToSolve.info.level,
-                info = SolutionInfo(
-                  content = solution,
-                  authorId = user.id,
-                  questId = questToSolve.id,
-                  vip = user.profile.publicProfile.vip))
+            require(u.demo.cultureId != None)
 
+            // creating solution.
+            val culture = u.demo.cultureId.get
+
+            val sol = Solution(
+              cultureId = culture,
+              questLevel = questToSolve.info.level,
+              info = SolutionInfo(
+                content = solution,
+                authorId = user.id,
+                questId = questToSolve.id,
+                vip = user.profile.publicProfile.vip))
+
+            db.solution.create(sol)
+
+            // Running db actions
+            runWhileSome(u)(
+            { u: User =>
+              db.user.recordQuestSolving(
+                u.id,
+                questToSolve.id,
+                u.profile.questSolutionContext.bookmarkedQuest.map(_.id) == Some(questToSolve.id))
+            }, { u: User =>
+              db.user.recordSolutionCreation(
+                u.id,
+                sol.id)
+            }) ifSome { u =>
+
+              // Running API actions
+              // Adjusting assets for solving quests.
+              adjustAssets(AdjustAssetsRequest(
+                user = u,
+                cost = Some(questToSolve.info.solveCost)))
+            } ifOk { r =>
+              makeTask(MakeTaskRequest(r.user, taskType = Some(TaskType.CreateSolution)))
+            } ifOk { r =>
+              addToTimeLine(AddToTimeLineRequest(
+                user = r.user,
+                reason = TimeLineReason.Created,
+                objectType = TimeLineType.Solution,
+                objectId = sol.id))
+            } ifOk { r =>
+              addToWatchersTimeLine(AddToWatchersTimeLineRequest(
+                user = r.user,
+                reason = TimeLineReason.Created,
+                objectType = TimeLineType.Solution,
+                objectId = sol.id))
+              //                } ifOk { r =>
+              //                  addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id))
+            } ifOk { r =>
               {
-                // Adjusting assets for solving quests.
-                adjustAssets(AdjustAssetsRequest(
-                  user = user,
-                  cost = Some(questToSolve.info.solveCost)))
-              } ifOk { r =>
-                makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.CreateSolution)))
-              } ifOk { r =>
-
-                // Creating solution.
-                db.solution.create(newSolution)
-
-                val numberOfReviewedQuests = user.timeLine.count { te =>
+                val numberOfReviewedQuests = u.timeLine.count { te =>
                   ((te.objectType == TimeLineType.Quest)
-                    && (te.actorId != user.id || te.reason != TimeLineReason.Created))
+                    && (te.actorId != u.id || te.reason != TimeLineReason.Created))
                 }
-                val numberOfSolvedQuests = user.timeLine.count { te =>
+                val numberOfSolvedQuests = u.timeLine.count { te =>
                   ((te.objectType == TimeLineType.Solution)
                     && (te.reason == TimeLineReason.Created)
-                    && (te.actorId == user.id))
+                    && (te.actorId == u.id))
                 }
 
                 // Updating quest points.
@@ -83,29 +114,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 else
                   Math.round(numberOfReviewedQuests / numberOfSolvedQuests)
                 solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio))
-              } ifOk { sqr =>
-                db.user.recordQuestSolving(
-                  user.id,
-                  questToSolve.id,
-                  user.profile.questSolutionContext.bookmarkedQuest.map(_.id) == Some(questToSolve.id))
-
-                addToTimeLine(AddToTimeLineRequest(
-                  user = user,
-                  reason = TimeLineReason.Created,
-                  objectType = TimeLineType.Solution,
-                  objectId = newSolution.id))
-              } ifOk { r =>
-                addToWatchersTimeLine(AddToWatchersTimeLineRequest(
-                  user = r.user,
-                  reason = TimeLineReason.Created,
-                  objectType = TimeLineType.Solution,
-                  objectId = newSolution.id))
-                //                } ifOk { r =>
-                //                  addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id))
-              } ifOk { r =>
-                tryCreateBattle(TryCreateBattleRequest(newSolution)) ifOk {
-                  OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
-                }
+              } ifOk {
+                tryCreateBattle(TryCreateBattleRequest(sol))
+              } ifOk {
+                OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
               }
             }
 
@@ -140,31 +152,31 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           InternalErrorApiResult("We are rewarding player for solution what is on voting.")
 
         case SolutionStatus.Won =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
-              user = author,
-              solution = request.solution,
-              battle = request.battle,
-              reward = Some(q.info.solveRewardWon)))
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
+            user = author,
+            solution = request.solution,
+            battle = request.battle,
+            reward = Some(q.info.solveRewardWon)))
 
         case SolutionStatus.Lost =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
-              user = author,
-              solution = request.solution,
-              battle = request.battle,
-              reward = Some(q.info.solveRewardLost)))
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
+            user = author,
+            solution = request.solution,
+            battle = request.battle,
+            reward = Some(q.info.solveRewardLost)))
 
         case SolutionStatus.CheatingBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
-              user = author,
-              solution = request.solution,
-              penalty = Some(q.penaltyForCheatingSolution)))
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
+            user = author,
+            solution = request.solution,
+            penalty = Some(q.penaltyForCheatingSolution)))
           removeFromTimeLine(RemoveFromTimeLineRequest(author, request.solution.id))
 
         case SolutionStatus.IACBanned =>
-            storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
-              user = author,
-              solution = request.solution,
-              penalty = Some(q.penaltyForIACSolution)))
+          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
+            user = author,
+            solution = request.solution,
+            penalty = Some(q.penaltyForIACSolution)))
           removeFromTimeLine(RemoveFromTimeLineRequest(author, request.solution.id))
       }
 
@@ -190,7 +202,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     }
   }
 
-    /**
+  /**
    * Add a quest to given friends "mustVote" list
    */
   //  def addToMustVoteSolutions(request: AddToMustVoteSolutionsRequest): ApiResult[AddToMustVoteSolutionsResult] = handleDbException {

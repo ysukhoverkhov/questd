@@ -22,53 +22,62 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
 
     request.user.canCreateQuest(request.quest) match {
       case OK =>
+        import request.{user => u}
 
-        {
-          makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.CreateQuest)))
-        } ifOk { r =>
-          r.user.demo.cultureId ifSome { culture =>
+        // creating quest
+        require(u.demo.cultureId != None)
 
-            val questLevel = r.user.profile.publicProfile.level
+        val culture = u.demo.cultureId.get
+        val level = u.profile.publicProfile.level
 
-            val quest = Quest(
-              cultureId = culture,
-              info = QuestInfo(
-                authorId = r.user.id,
-                level = questLevel,
-                content = request.quest,
-                vip = r.user.profile.publicProfile.vip,
-                solveCost = QuestLogic.costOfSolvingQuest(questLevel),
-                solveRewardWon = QuestLogic.rewardForWinningQuest(questLevel, this),
-                solveRewardLost = QuestLogic.rewardForLosingQuest(questLevel, this)))
+        val quest = Quest(
+          cultureId = culture,
+          info = QuestInfo(
+            authorId = u.id,
+            level = level,
+            content = request.quest,
+            vip = u.profile.publicProfile.vip,
+            solveCost = QuestLogic.costOfSolvingQuest(level),
+            solveRewardWon = QuestLogic.rewardForWinningQuest(level, this),
+            solveRewardLost = QuestLogic.rewardForLosingQuest(level, this)))
 
-            db.quest.create(quest)
+        db.quest.create(quest)
 
-            (if ((config(api.ConfigParams.DebugDisableProposalCoolDown) == "1") || r.user.profile.publicProfile.vip) {
-              Some(request.user)
-            } else {
-              db.user.updateQuestCreationCoolDown(
-                request.user.id,
-                request.user.getCoolDownForQuestCreation)
-            }) ifSome { u =>
+        // making all db calls
+        runWhileSome(u)(
+        { u: User =>
+          if ((config(api.ConfigParams.DebugDisableProposalCoolDown) == "1") || u.profile.publicProfile.vip) {
+            Some(u)
+          } else {
+            db.user.updateQuestCreationCoolDown(
+              u.id,
+              request.user.getCoolDownForQuestCreation)
+          }
+        }, { u: User =>
+          db.user.recordQuestCreation(
+            u.id,
+            quest.id)
+        }) ifSome { u =>
 
-              {
-                addQuestIncomeToDailyResult(AddQuestIncomeToDailyResultRequest(u, quest))
-              } ifOk { r =>
-                addToTimeLine(AddToTimeLineRequest(
-                  user = r.user,
-                  reason = TimeLineReason.Created,
-                  objectType = TimeLineType.Quest,
-                  objectId = quest.id))
-              } ifOk { r =>
-                addToWatchersTimeLine(AddToWatchersTimeLineRequest(
-                  user = u,
-                  reason = TimeLineReason.Created,
-                  objectType = TimeLineType.Quest,
-                  objectId = quest.id))
-              } ifOk { r =>
-                OkApiResult(CreateQuestResult(OK, Some(r.user.profile)))
-              }
-            }
+          // Making all api calls
+          {
+            makeTask(MakeTaskRequest(u, taskType = Some(TaskType.CreateQuest)))
+          } ifOk { r =>
+            addQuestIncomeToDailyResult(AddQuestIncomeToDailyResultRequest(r.user, quest))
+          } ifOk { r =>
+            addToTimeLine(AddToTimeLineRequest(
+              user = r.user,
+              reason = TimeLineReason.Created,
+              objectType = TimeLineType.Quest,
+              objectId = quest.id))
+          } ifOk { r =>
+            addToWatchersTimeLine(AddToWatchersTimeLineRequest(
+              user = r.user,
+              reason = TimeLineReason.Created,
+              objectType = TimeLineType.Quest,
+              objectId = quest.id))
+          } ifOk { r =>
+            OkApiResult(CreateQuestResult(OK, Some(r.user.profile)))
           }
         }
 

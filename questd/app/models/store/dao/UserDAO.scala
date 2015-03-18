@@ -18,6 +18,22 @@ trait UserDAO extends BaseDAO[User] {
   def removeMustVoteSolution(id: String, solutionId: String): Option[User]
 
   /**
+   * Records quest creation.
+   * @param id Id of user creating a quest.
+   * @param questId Id of a created quest.
+   * @return Modified user.
+   */
+  def recordQuestCreation(id: String, questId: String): Option[User]
+
+  /**
+   * Records solution creation.
+   * @param id Id of user creating a solution.
+   * @param solutionId Id of a created solution.
+   * @return Modified user.
+   */
+  def recordSolutionCreation(id: String, solutionId: String): Option[User]
+
+  /**
    * Records vote for quest proposal.
    * @param id Id of user making a vote.
    * @param questId id of quest we vote for.
@@ -71,6 +87,7 @@ trait UserDAO extends BaseDAO[User] {
   def levelUp(id: String, ratingToNextLevel: Int): Option[User]
   def setNextLevelRatingAndRights(id: String, newRatingToNextLevel: Int, rights: Rights): Option[User]
 
+  // TODO: remove the function since it's wrong.
   def updateStats(id: String, stats: UserStats): Option[User]
 
   def addToFollowing(id: String, idToAdd: String): Option[User]

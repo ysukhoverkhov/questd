@@ -20,7 +20,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.NotEnoughRights)
     }
 
-    "Do not allow voting for solutions not in time line" in {
+    "Do allow voting for solutions not in time line" in {
       api.config returns createStubConfig
 
       val user = createUserStub()
@@ -28,7 +28,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteSolution(s.id)
 
-      rv must beEqualTo(ProfileModificationResult.OutOfContent)
+      rv must beEqualTo(ProfileModificationResult.OK)
     }
 
     "Do not allow voting for solutions in time line but we already voted for" in {
@@ -49,7 +49,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
 
       val uid = "uid"
       val s = createSolutionStub()
-      val user = createUserStub(id = uid, timeLine = List(createTimeLineEntryStub(objectId = s.id, actorId = uid)))
+      val user = createUserStub(id = uid, createdSolutions = List(s.id))
 
       val rv = user.canVoteSolution(s.id)
 
@@ -60,11 +60,11 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
 
       val s = createSolutionStub()
-      val user = createUserStub(cultureId = "")
+      val user = createUserStub(cultureId = None)
 
       val rv = user.canVoteSolution(s.id)
 
-      rv must beEqualTo(ProfileModificationResult.OutOfContent)
+      rv must beEqualTo(ProfileModificationResult.IncompleteBio)
     }
 
     "Allow voting for solutions in normal situations" in {

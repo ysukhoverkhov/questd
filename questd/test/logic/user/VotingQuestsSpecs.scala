@@ -20,7 +20,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.NotEnoughRights)
     }
 
-    "Do not allow voting for quests not in time line" in {
+    "Do allow voting for quests not in time line" in {
       api.config returns createStubConfig
 
       val user = createUserStub()
@@ -28,7 +28,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteQuest(q.id)
 
-      rv must beEqualTo(ProfileModificationResult.OutOfContent)
+      rv must beEqualTo(ProfileModificationResult.OK)
     }
 
     "Do not allow voting for quests in time line but we already voted for" in {
@@ -51,7 +51,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
       val q = createQuestStub()
       val user = createUserStub(
         id = userId,
-        timeLine = List(createTimeLineEntryStub(objectId = q.id, actorId = userId)))
+        createdQuests = List(q.id))
 
       val rv = user.canVoteQuest(q.id)
 

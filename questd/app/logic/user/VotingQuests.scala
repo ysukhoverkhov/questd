@@ -13,16 +13,12 @@ trait VotingQuests { this: UserLogic =>
    * Check is our user can vote for given quest with given vote.
    */
   def canVoteQuest(questId: String) = {
-    val questFromTimeLine = user.timeLine.find { te =>
-      (te.objectId == questId) && (te.actorId != user.id)
-    }
-
     if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteQuests))
       NotEnoughRights
-    else if (questFromTimeLine == None)
-      OutOfContent
     else if (user.stats.votedQuests.contains(questId))
       InvalidState
+    else if (user.stats.createdQuests.contains(questId))
+      OutOfContent
     else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
       IncompleteBio
     else

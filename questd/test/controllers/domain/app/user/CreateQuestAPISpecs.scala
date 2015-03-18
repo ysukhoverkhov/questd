@@ -5,6 +5,7 @@ import java.util.Date
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain._
+import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
 class CreateQuestAPISpecs extends BaseAPISpecs {
@@ -18,6 +19,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
       user.updateQuestCreationCoolDown(any, any) returns Some(u)
       user.addEntryToTimeLine(any, any) returns Some(u)
       user.addQuestIncomeToDailyResult(any, any) returns Some(u)
+      user.recordQuestCreation(mEq(u.id), any) returns Some(u)
 
       val result = api.createQuest(CreateQuestRequest(u, q.info.content))
 
@@ -47,6 +49,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
       user.updateQuestCreationCoolDown(any, any) returns Some(u)
       user.addEntryToTimeLine(any, any) returns Some(u)
       user.addQuestIncomeToDailyResult(any, any) returns Some(u)
+      user.recordQuestCreation(mEq(u.id), any) returns Some(u)
 
       val result = api.createQuest(CreateQuestRequest(u, q.info.content))
 

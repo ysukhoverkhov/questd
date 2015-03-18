@@ -82,6 +82,35 @@ private[mongo] class MongoUserDAO
           "mustVoteSolutions" -> solutionId)))
   }
 
+
+  /**
+   * @inheritdoc
+   */
+  def recordQuestCreation(id: String, questId: String): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$push" -> MongoDBObject(
+      "stats.createdQuests" -> questId))
+
+    findAndModify(
+      id,
+      queryBuilder.result())
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def recordSolutionCreation(id: String, solutionId: String): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$push" -> MongoDBObject(
+      "stats.createdSolutions" -> solutionId))
+
+    findAndModify(
+      id,
+      queryBuilder.result())
+  }
+
   /**
    * @inheritdoc
    */

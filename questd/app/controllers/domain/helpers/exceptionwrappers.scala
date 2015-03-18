@@ -13,7 +13,7 @@ object exceptionwrappers {
     f
   } catch {
     case ex: Throwable =>
-      Logger.error("Exceptionally unexpected exception", ex)
+      Logger.error("Unexpected exception", ex)
       InternalErrorApiResult()
   }
 

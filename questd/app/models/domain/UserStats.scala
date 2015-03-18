@@ -1,16 +1,19 @@
 package models.domain
 
-import java.util.Date
-
 /**
  * Statistics about user used to calculate how he affects shared things.
  */
 case class UserStats (
 
   /**
-   * When statistics was shifted last.
+   * List of all our created quests.
    */
-  lastStatShift: Date = new Date(0),
+  createdQuests: List[String] = List.empty,
+
+  /**
+   * List of all our created solutions.
+   */
+  createdSolutions: List[String] = List.empty,
 
   /**
    * List of all solved quests.
