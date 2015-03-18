@@ -168,9 +168,9 @@ package object domainstubs {
     id: String = "uid",
     cultureId: Option[String] = Some("cultureId"),
     vip: Boolean = false,
-    friends: List[Friendship] = List(),
+    friends: List[Friendship] = List.empty,
     assets: Assets = Assets(100000, 100000, 100000),
-    mustVoteSolutions: List[String] = List(),
+    mustVoteSolutions: List[String] = List.empty,
     level: Int = 18,
     questCreationCoolDown: Date = new Date(Long.MaxValue),
     createdQuests: List[String] = List.empty,
@@ -180,7 +180,7 @@ package object domainstubs {
     votedSolutions: Map[String, ContentVote.Value] = Map.empty,
     takenTheme: Option[ThemeInfoWithID] = Some(ThemeInfoWithID("theme_id", createThemeStub().info)),
     rights: Rights = Rights.full,
-    timeLine: List[TimeLineEntry] = List(),
+    timeLine: List[TimeLineEntry] = List.empty,
     questBookmark: Option[String] = None,
     privateDailyResults: List[DailyResult] = List(createDailyResultStub())) = {
 

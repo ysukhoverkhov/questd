@@ -62,7 +62,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
           if (user.profile.dailyTasks.rewardReceived) {
             db.user.resetTasks(
               user.id,
-              DailyTasks(tasks = List(), reward = Assets()),
+              DailyTasks(tasks = List.empty, reward = Assets()),
               user.getResetTasksTimeout)
           }
 

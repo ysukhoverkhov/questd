@@ -7,7 +7,7 @@ import controllers.domain.helpers._
 import logic.QuestLogic
 import models.domain._
 
-case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List())
+case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List.empty)
 case class CreateQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class RewardQuestAuthorRequest(quest: Quest, author: User)

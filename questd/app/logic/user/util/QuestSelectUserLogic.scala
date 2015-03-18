@@ -178,7 +178,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
 //        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
 //      }
 //    } else {
-      List()
+      List.empty
 //    }
   }
 

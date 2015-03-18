@@ -76,7 +76,7 @@ class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller w
 
         BadRequest(views.html.admin.quests(
           Menu(request),
-          List(),
+          List.empty,
           formWithErrors))
       },
 

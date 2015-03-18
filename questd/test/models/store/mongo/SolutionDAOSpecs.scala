@@ -187,7 +187,7 @@ class SolutionDAOSpecs extends Specification
       val su1 = db.solution.updateStatus(id1, SolutionStatus.Lost)
       val su2 = db.solution.updateStatus(id2, SolutionStatus.Won, Some(id1))
 
-      su1 must beSome[Solution].which(s => s.status == SolutionStatus.Lost && s.battleIds == List())
+      su1 must beSome[Solution].which(s => s.status == SolutionStatus.Lost && s.battleIds == List.empty)
       su2 must beSome[Solution].which(s => s.status == SolutionStatus.Won && s.battleIds == List(id1))
     }
 

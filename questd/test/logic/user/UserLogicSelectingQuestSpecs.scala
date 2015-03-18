@@ -221,7 +221,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List().iterator))
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List.empty.iterator))
       api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       u.getRandomQuestsForTimeLine(1)
@@ -238,8 +238,8 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List().iterator))
-      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List().iterator)) thenReturns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List.empty.iterator))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List.empty.iterator)) thenReturns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       u.getRandomQuestsForTimeLine(1)
 
@@ -255,8 +255,8 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List().iterator))
-      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List().iterator)) thenReturns OkApiResult(GetAllQuestsResult(List().iterator)) thenReturns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List.empty.iterator))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List.empty.iterator)) thenReturns OkApiResult(GetAllQuestsResult(List.empty.iterator)) thenReturns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       u.getRandomQuestsForTimeLine(1)
 

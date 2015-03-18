@@ -12,7 +12,7 @@ case class Profile(
   ratingToNextLevel: Int = 0,
   assets: Assets = Assets(100000, 1000, 0), // Should be (0, 0, 0) here.
   rights: Rights = Rights(),
-  dailyResults: List[DailyResult] = List(),
+  dailyResults: List[DailyResult] = List.empty,
   dailyTasks: DailyTasks = DailyTasks(),
   questCreationContext: QuestCreationContext = QuestCreationContext(),
   questSolutionContext: QuestSolutionContext = QuestSolutionContext(),

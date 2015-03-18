@@ -7,7 +7,7 @@ import controllers.domain.OkApiResult
 
 class TasksAPISpecs extends BaseAPISpecs {
 
-  def createUser(dt: DailyTasks, assignedTutorialTaskIds: List[String] = List()) = {
+  def createUser(dt: DailyTasks, assignedTutorialTaskIds: List[String] = List.empty) = {
     User(
       id = "user_id",
       profile = Profile(
@@ -329,7 +329,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       val u = createUser(DailyTasks(
         reward = Assets(1, 2, 3),
         rewardReceived = true,
-        tasks = List()), List(tutorialTaskId))
+        tasks = List.empty), List(tutorialTaskId))
 
       val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, tutorialTaskId))
 
@@ -340,7 +340,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       val tutorialTaskId = "ttid"
       val u = createUser(DailyTasks(
         reward = Assets(1, 2, 3),
-        tasks = List()), List())
+        tasks = List.empty), List.empty)
 
       db.tutorialTask.readById(s"a$tutorialTaskId") returns None
 
@@ -355,7 +355,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       val u = createUser(DailyTasks(
         reward = Assets(1, 2, 3),
         rewardReceived = true,
-        tasks = List()), List())
+        tasks = List.empty), List.empty)
 
       db.tutorialTask.readById(tutorialTaskId) returns Some(
         TutorialTask(

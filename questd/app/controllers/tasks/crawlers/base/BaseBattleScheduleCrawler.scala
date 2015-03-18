@@ -18,7 +18,7 @@ abstract class BaseBattleScheduleCrawler(
 
           case _ =>
             Logger.error(s"Unable to get all battles from database")
-            List().iterator
+            List.empty.iterator
         }
       }
     }

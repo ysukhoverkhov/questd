@@ -33,7 +33,7 @@ private object ContentWSImplTypes
 
   case class WSGetOwnQuestsRequest(
     // see QuestStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
+    status: List[String] = List.empty,
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -45,7 +45,7 @@ private object ContentWSImplTypes
 
   case class WSGetOwnBattlesRequest(
     // see BattleStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
+    status: List[String] = List.empty,
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -59,7 +59,7 @@ private object ContentWSImplTypes
     id: String,
 
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
+    status: List[String] = List.empty,
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -73,7 +73,7 @@ private object ContentWSImplTypes
     id: String,
 
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
+    status: List[String] = List.empty,
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -86,7 +86,7 @@ private object ContentWSImplTypes
     id: String,
 
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
+    status: List[String] = List.empty,
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -99,7 +99,7 @@ private object ContentWSImplTypes
     id: String,
 
     // see BattleStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
+    status: List[String] = List.empty,
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -112,7 +112,7 @@ private object ContentWSImplTypes
     id: String,
 
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
+    status: List[String] = List.empty,
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -125,7 +125,7 @@ private object ContentWSImplTypes
   type WSGetOwnSolutionsResult = GetOwnSolutionsResult
   case class WSGetOwnSolutionsRequest(
     // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List(),
+    status: List[String] = List.empty,
 
     // Number of page in result, zero based.
     pageNumber: Int,

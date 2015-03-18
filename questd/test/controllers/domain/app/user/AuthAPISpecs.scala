@@ -13,7 +13,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
     val userfb = mock[User]
     userfb.snId returns fbid
-    userfb.invitations returns List()
+    userfb.invitations returns List.empty
 
     userfb
   }

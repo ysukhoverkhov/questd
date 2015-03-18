@@ -16,8 +16,8 @@ class BattleFetchAPISpecs extends BaseAPISpecs {
 //        levels = None,
 //        skip = 0,
 //        vip = Some(false),
-//        ids = List(),
-//        cultureId = None) returns List().iterator
+//        ids = List.empty,
+//        cultureId = None) returns List.empty.iterator
 //
 //      val result = api.getMyQuests(GetMyQuestsRequest(u, QuestStatus.InRotation))
 //
@@ -47,8 +47,8 @@ class BattleFetchAPISpecs extends BaseAPISpecs {
 //
 //      val u = createUser(List(Friendship(f1.id, FriendshipStatus.Accepted), Friendship(f2.id, FriendshipStatus.Invited)))
 //
-//      db.quest.allWithParams(List(QuestStatus.InRotation), List(f1.id), Some(1, 2), 0, None, List()) returns List().iterator
-//      db.quest.allWithParams(List(QuestStatus.InRotation), List(f1.id, f2.id), Some(1, 2), 0, None, List()) returns List().iterator
+//      db.quest.allWithParams(List(QuestStatus.InRotation), List(f1.id), Some(1, 2), 0, None, List.empty) returns List.empty.iterator
+//      db.quest.allWithParams(List(QuestStatus.InRotation), List(f1.id, f2.id), Some(1, 2), 0, None, List.empty) returns List.empty.iterator
 //
 //      val result = api.getFriendsQuests(GetFriendsQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
 //
@@ -63,7 +63,7 @@ class BattleFetchAPISpecs extends BaseAPISpecs {
 //
 //      there was no(quest).allWithParams(
 //        List(QuestStatus.InRotation),
-//        List(),
+//        List.empty,
 //        Some(1, 2),
 //        0,
 //        null,
@@ -81,7 +81,7 @@ class BattleFetchAPISpecs extends BaseAPISpecs {
 //    }
 //
 //    "getLikedQuests calls db correctly" in context {
-//      db.quest.allWithParams(List(QuestStatus.InRotation), List(), Some(1, 2), 0, Some(false), List("1", "2", "3", "4")) returns List().iterator
+//      db.quest.allWithParams(List(QuestStatus.InRotation), List.empty, Some(1, 2), 0, Some(false), List("1", "2", "3", "4")) returns List.empty.iterator
 //
 //      val liked = List("1", "2", "3", "4")
 //      val u = createUserStub(
@@ -103,7 +103,7 @@ class BattleFetchAPISpecs extends BaseAPISpecs {
 //
 //    "getVIPQuests calls db correctly" in context {
 //
-//      db.quest.allWithParams(List(QuestStatus.InRotation), List(), Some(1, 2), 0, Some(true), List()) returns List().iterator
+//      db.quest.allWithParams(List(QuestStatus.InRotation), List.empty, Some(1, 2), 0, Some(true), List.empty) returns List.empty.iterator
 //
 //      val u = createUserStub()
 //      val result = api.getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
@@ -120,7 +120,7 @@ class BattleFetchAPISpecs extends BaseAPISpecs {
 //
 //    "getAllQuests calls db correctly" in context {
 //
-//      db.quest.allWithParams(List(QuestStatus.InRotation), List(), Some(1, 2), 0, None, List()) returns List().iterator
+//      db.quest.allWithParams(List(QuestStatus.InRotation), List.empty, Some(1, 2), 0, None, List.empty) returns List.empty.iterator
 //
 //      val result = api.getAllQuests(GetAllQuestsRequest(createUserStub(cultureId = "cid"), QuestStatus.InRotation, Some(1, 2)))
 //

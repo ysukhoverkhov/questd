@@ -84,7 +84,7 @@ class UserDAOSpecs
       val userid = "id to test all"
 
       db.user.create(User(userid))
-      val all = List() ++ db.user.all
+      val all = List.empty ++ db.user.all
 
       all.map(_.id) must contain(userid)
     }
@@ -92,7 +92,7 @@ class UserDAOSpecs
     "One more check for listing and deleting everything" in new WithApplication(appWithTestDatabase) {
       db.user.all.foreach((u: User) => db.user.delete(u.id))
 
-      val all = List() ++ db.user.all
+      val all = List.empty ++ db.user.all
 
       all must haveSize(0)
     }
@@ -257,7 +257,7 @@ class UserDAOSpecs
 //      val ou = db.user.resetTodayReviewedThemes(userId)
 //
 //      ou must beSome.which((u: User) => u.id.toString == userId)
-//      ou must beSome.which((u: User) => u.profile.questProposalContext.todayReviewedThemeIds == List())
+//      ou must beSome.which((u: User) => u.profile.questProposalContext.todayReviewedThemeIds == List.empty)
 //    }
 
     "addTasks works" in new WithApplication(appWithTestDatabase) {
@@ -295,7 +295,7 @@ class UserDAOSpecs
       db.user.create(User(
         id = userid,
         tutorial = TutorialState(
-          assignedTutorialTaskIds = List())))
+          assignedTutorialTaskIds = List.empty)))
 
       db.user.addTutorialTaskAssigned(userid, "t1")
       db.user.addTutorialTaskAssigned(userid, "t2")
@@ -391,7 +391,7 @@ class UserDAOSpecs
       db.user.removeMustVoteSolution(u.id, sol)
 
       val ou1 = db.user.readById(u.id)
-      ou1 must beSome//.which((u: User) => u.mustVoteSolutions == List())
+      ou1 must beSome//.which((u: User) => u.mustVoteSolutions == List.empty)
     }
 
     "recordQuestVote works" in new WithApplication(appWithTestDatabase) {

@@ -54,7 +54,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         idsExclude = any,
         questIds = any,
         themeIds = any,
-        cultureId = any) returns List().iterator
+        cultureId = any) returns List.empty.iterator
 
       val result = api.solveQuest(SolveQuestRequest(u, q.id, s))
 

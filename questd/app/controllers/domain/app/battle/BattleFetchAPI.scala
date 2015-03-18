@@ -34,8 +34,8 @@ case class GetVIPBattlesResult(battles: Iterator[Battle])
 
 case class GetAllBattlesRequest(
   user: User,
-  authorIdsExclude: List[String] = List(),
-  idsExclude: List[String] = List(),
+  authorIdsExclude: List[String] = List.empty,
+  idsExclude: List[String] = List.empty,
   statuses: List[BattleStatus.Value] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetAllBattlesResult(battles: Iterator[Battle])

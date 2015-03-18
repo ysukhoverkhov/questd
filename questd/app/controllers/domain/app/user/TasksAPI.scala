@@ -26,12 +26,12 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         t,
         (Assets() /: t)((r, c) => r + c.tutorialTask.get.reward))
     } else {
-      (List(), Assets())
+      (List.empty, Assets())
     }
 
     db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout) ifSome { v =>
 
-      (if (tutorialTasksToCarry != List()) {
+      (if (tutorialTasksToCarry != List.empty) {
         db.user.addTasks(user.id, tutorialTasksToCarry, tutorialReward)
       } else {
         Some(user)

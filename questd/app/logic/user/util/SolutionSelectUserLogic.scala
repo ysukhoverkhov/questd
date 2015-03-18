@@ -10,7 +10,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
   def getRandomSolutions(count: Int): List[Solution] = getRandomObjects[Solution](count, (a: List[Solution]) => getRandomSolution(a))
 
-  private[user] def getRandomSolution(implicit selected: List[Solution] = List()): Option[Solution] = {
+  private[user] def getRandomSolution(implicit selected: List[Solution] = List.empty): Option[Solution] = {
     val algorithms = List(
       () => getSolutionsWithSuperAlgorithm,
       () => getOtherSolutions,
@@ -200,7 +200,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 //        user.history.themesOfSelectedQuests(rand.nextInt(user.history.themesOfSelectedQuests.length))
 //      }
 //    } else {
-      List()
+      List.empty
 //    }
   }
 

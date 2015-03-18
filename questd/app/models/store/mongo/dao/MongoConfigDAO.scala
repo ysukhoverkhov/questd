@@ -14,7 +14,7 @@ private[mongo] class MongoConfigDAO
   with ConfigDAO {
 
   def readConfig: Configuration = {
-    val a: List[ConfigSection] = List() ++ all
+    val a: List[ConfigSection] = List.empty ++ all
 
     Configuration(
       a.foldLeft[Map[String, ConfigSection]](Map()) { (m, v) => m + (v.id -> v) })

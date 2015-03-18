@@ -35,7 +35,7 @@ case class GetVIPSolutionsRequest(
   idsExclude: List[String] = List.empty,
   authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None,
-  themeIds: List[String] = List())
+  themeIds: List[String] = List.empty)
 case class GetVIPSolutionsResult(solutions: Iterator[Solution])
 
 case class GetHelpWantedSolutionsRequest(
@@ -60,7 +60,7 @@ case class GetAllSolutionsRequest(
   idsExclude: List[String] = List.empty,
   authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None,
-  themeIds: List[String] = List())
+  themeIds: List[String] = List.empty)
 case class GetAllSolutionsResult(solutions: Iterator[Solution])
 
 
@@ -113,7 +113,7 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
 
   def getHelpWantedSolutions(request: GetHelpWantedSolutionsRequest): ApiResult[GetHelpWantedSolutionsResult] = handleDbException {
     if (request.user.mustVoteSolutions.isEmpty) {
-      OkApiResult(GetHelpWantedSolutionsResult(List().iterator))
+      OkApiResult(GetHelpWantedSolutionsResult(List.empty.iterator))
     } else {
       OkApiResult(GetHelpWantedSolutionsResult(db.solution.allWithParams(
         status = request.status,
@@ -138,7 +138,7 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
         cultureId = request.user.demo.cultureId,
         questIds = questIds)))
     } else {
-      OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+      OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
     }
   }
 

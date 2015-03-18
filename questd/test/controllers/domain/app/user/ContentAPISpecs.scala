@@ -28,7 +28,7 @@ class ContentAPISpecs extends BaseAPISpecs {
         themeIds = null,
         cultureId = null)
 
-      result.body must beSome[GetSolutionsForQuestResult].which(_.solutions == List())
+      result.body must beSome[GetSolutionsForQuestResult].which(_.solutions == List.empty)
     }
 
     "Make correct db call in getSolutionsForUser" in context {
@@ -60,7 +60,7 @@ class ContentAPISpecs extends BaseAPISpecs {
         themeIds = null,
         cultureId = null)
 
-      result.body must beSome[GetSolutionsForUserResult].which(_.solutions == List())
+      result.body must beSome[GetSolutionsForUserResult].which(_.solutions == List.empty)
     }
   }
 }

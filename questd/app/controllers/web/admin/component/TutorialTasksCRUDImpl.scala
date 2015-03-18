@@ -77,7 +77,7 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
 
         BadRequest(views.html.admin.tutorialTasks(
           Menu(request),
-          List(),
+          List.empty,
           formWithErrors))
       },
 

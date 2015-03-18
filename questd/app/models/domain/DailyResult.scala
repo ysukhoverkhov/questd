@@ -8,8 +8,8 @@ import java.util.Date
 case class DailyResult(
   startOfPeriod: Date,
   dailySalary: Assets,
-  decidedQuestSolutions: List[QuestSolutionResult] = List(),
-  decidedQuestProposals: List[QuestProposalResult] = List(),
+  decidedQuestSolutions: List[QuestSolutionResult] = List.empty,
+  decidedQuestProposals: List[QuestProposalResult] = List.empty,
   questsIncome: List[QuestIncome])
 
 case class QuestSolutionResult(

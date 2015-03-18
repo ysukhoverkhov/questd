@@ -15,13 +15,13 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       db.quest.allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(u.id),
-        authorIdsExclude = List(),
+        authorIdsExclude = List.empty,
         levels = None,
         skip = 0,
         vip = Some(false),
-        ids = List(),
-        idsExclude = List(),
-        cultureId = None) returns List().iterator
+        ids = List.empty,
+        idsExclude = List.empty,
+        cultureId = None) returns List.empty.iterator
 
       val result = api.getMyQuests(GetMyQuestsRequest(u, QuestStatus.InRotation))
 
@@ -56,22 +56,22 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       db.quest.allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(f1.id),
-        authorIdsExclude = List(),
+        authorIdsExclude = List.empty,
         levels = Some((1, 2)),
         skip = 0,
         vip = None,
-        ids = List(),
-        idsExclude = List()
-      ) returns List().iterator
+        ids = List.empty,
+        idsExclude = List.empty
+      ) returns List.empty.iterator
       db.quest.allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(f1.id, f2.id),
         levels = Some((1, 2)),
         skip = 0,
         vip = None,
-        ids = List(),
-        idsExclude = List()
-      ) returns List().iterator
+        ids = List.empty,
+        idsExclude = List.empty
+      ) returns List.empty.iterator
 
       val result = api.getFriendsQuests(GetFriendsQuestsRequest(
         user = u,
@@ -81,34 +81,34 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(f1.id),
-        authorIdsExclude = List(),
+        authorIdsExclude = List.empty,
         levels = Some((1, 2)),
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = List(),
+        idsExclude = List.empty,
         cultureId = u.demo.cultureId)
 
       there was no(quest).allWithParams(
         status = List(QuestStatus.InRotation),
-        authorIds = List(),
-        authorIdsExclude = List(),
+        authorIds = List.empty,
+        authorIdsExclude = List.empty,
         levels = Some((1, 2)),
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = List(),
+        idsExclude = List.empty,
         cultureId = u.demo.cultureId)
 
       there was no(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(f1.id, f2.id),
-        authorIdsExclude = List(),
+        authorIdsExclude = List.empty,
         levels = Some((1, 2)),
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = List(),
+        idsExclude = List.empty,
         cultureId = u.demo.cultureId)
     }
 
@@ -116,14 +116,14 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
 
       db.quest.allWithParams(
         status = List(QuestStatus.InRotation),
-        authorIds = List(),
-        authorIdsExclude = List(),
+        authorIds = List.empty,
+        authorIdsExclude = List.empty,
         levels = Some((1, 2)),
         skip = 0,
         vip = Some(true),
-        ids = List(),
-        idsExclude = List()
-      ) returns List().iterator
+        ids = List.empty,
+        idsExclude = List.empty
+      ) returns List.empty.iterator
 
       val u = createUserStub()
       val result = api.getVIPQuests(GetVIPQuestsRequest(
@@ -134,12 +134,12 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = null,
-        authorIdsExclude = List(),
+        authorIdsExclude = List.empty,
         levels = Some((1, 2)),
         skip = 0,
         vip = Some(true),
         ids = null,
-        idsExclude = List(),
+        idsExclude = List.empty,
         cultureId = u.demo.cultureId)
     }
 
@@ -147,14 +147,14 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
 
       db.quest.allWithParams(
         status = List(QuestStatus.InRotation),
-        authorIds = List(),
-        authorIdsExclude = List(),
+        authorIds = List.empty,
+        authorIdsExclude = List.empty,
         levels = Some((1, 2)),
         skip = 0,
         vip = None,
-        ids = List(),
-        idsExclude = List()
-      ) returns List().iterator
+        ids = List.empty,
+        idsExclude = List.empty
+      ) returns List.empty.iterator
 
       val result = api.getAllQuests(GetAllQuestsRequest(
         user = createUserStub(cultureId = Some("cid")),
@@ -165,12 +165,12 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = null,
-        authorIdsExclude = List(),
+        authorIdsExclude = List.empty,
         levels = Some((1, 2)),
         skip = 0,
         vip = null,
         ids = null,
-        idsExclude = List(),
+        idsExclude = List.empty,
         cultureId = Some("cid"))
     }
   }

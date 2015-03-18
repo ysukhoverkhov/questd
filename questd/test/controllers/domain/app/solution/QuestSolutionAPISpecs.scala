@@ -34,7 +34,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       quest.allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(user1.id),
-        skip = 0) returns List().iterator
+        skip = 0) returns List.empty.iterator
 
       val result = api.updateSolutionState(UpdateSolutionStateRequest(sol))
 
@@ -71,7 +71,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       quest.allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(user1.id),
-        skip = 0) returns List().iterator
+        skip = 0) returns List.empty.iterator
 
       val result = api.updateSolutionState(UpdateSolutionStateRequest(sol))
 

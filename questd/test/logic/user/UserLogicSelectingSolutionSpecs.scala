@@ -21,7 +21,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
       val qid = "qid"
 
-      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
       api.getFriendsSolutions(any[GetFriendsSolutionsRequest]) returns OkApiResult(GetFriendsSolutionsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
 
       val u = User()
@@ -39,7 +39,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
       val qid = "qid"
 
-      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
       api.getFollowingSolutions(any[GetFollowingSolutionsRequest]) returns OkApiResult(GetFollowingSolutionsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
 
       val u = User()
@@ -57,7 +57,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
       val qid = "qid"
 
-      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
       api.getSolutionsForLikedQuests(any[GetSolutionsForLikedQuestsRequest]) returns OkApiResult(GetSolutionsForLikedQuestsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
 
       val u = User()
@@ -75,7 +75,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
       val qid = "qid"
 
-      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
       api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
 
       val u = User()
@@ -100,7 +100,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 //      rand.nextDouble returns 0.75
 //      rand.nextInt(4) returns 0 thenReturns 1 thenReturns 2
 //
-//      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+//      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
 //      api.getVIPSolutions(GetVIPSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-20, 12)), List("1", "2", "3"))) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 //
 //      val q = u.getRandomSolution
@@ -123,7 +123,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 //      rand.nextDouble returns 0.95
 //      rand.nextInt(4) returns 1
 //
-//      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+//      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
 //      api.getAllSolutions(GetAllSolutionsRequest(u, QuestSolutionStatus.OnVoting, Some((-12, 20)), List("2"))) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, userId = "author")).iterator))
 //
 //      val q = u.getRandomSolution
@@ -144,7 +144,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.0
 
-      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
       api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
 
       u.getRandomSolution
@@ -162,7 +162,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 1.0
 
-      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
       api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
 
       u.getRandomSolution
@@ -178,8 +178,8 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
-      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
-      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List().iterator))
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
+      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List.empty.iterator))
       api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
 
       u.getRandomSolution
@@ -197,9 +197,9 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
-      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List().iterator))
-      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List().iterator))
-      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List().iterator)) thenReturns OkApiResult(GetAllSolutionsResult(List(s).iterator))
+      api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
+      api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List.empty.iterator))
+      api.getAllSolutions(any[GetAllSolutionsRequest]) returns OkApiResult(GetAllSolutionsResult(List.empty.iterator)) thenReturns OkApiResult(GetAllSolutionsResult(List(s).iterator))
 
       val rv = u.getRandomSolution
 

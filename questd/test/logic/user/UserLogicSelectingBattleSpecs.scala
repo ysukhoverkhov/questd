@@ -208,7 +208,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //      api.config returns createStubConfig
 //      rand.nextDouble returns 0.75
 //
-//      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List().iterator))
+//      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List.empty.iterator))
 //      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 //
 //      u.getRandomQuestsForTimeLine(1)
@@ -225,8 +225,8 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
 
-      api.getVIPBattles(any[GetVIPBattlesRequest]) returns OkApiResult(GetVIPBattlesResult(List().iterator))
-      api.getAllBattles(any[GetAllBattlesRequest]) returns OkApiResult(GetAllBattlesResult(List().iterator)) thenReturns OkApiResult(GetAllBattlesResult(List(createBattleStub()).iterator))
+      api.getVIPBattles(any[GetVIPBattlesRequest]) returns OkApiResult(GetVIPBattlesResult(List.empty.iterator))
+      api.getAllBattles(any[GetAllBattlesRequest]) returns OkApiResult(GetAllBattlesResult(List.empty.iterator)) thenReturns OkApiResult(GetAllBattlesResult(List(createBattleStub()).iterator))
 
       u.getRandomBattlesForTimeLine(1)
 

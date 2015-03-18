@@ -15,14 +15,14 @@ trait QuestDAO extends BaseDAO[Quest] {
    * @param ids list of identifiers chose quest from.
    */
   def allWithParams(
-    status: List[QuestStatus.Value] = List(),
-    authorIds: List[String] = List(),
-    authorIdsExclude: List[String] = List(),
+    status: List[QuestStatus.Value] = List.empty,
+    authorIds: List[String] = List.empty,
+    authorIdsExclude: List[String] = List.empty,
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,
     vip: Option[Boolean] = None,
-    ids: List[String] = List(),
-    idsExclude: List[String] = List(),
+    ids: List[String] = List.empty,
+    idsExclude: List[String] = List.empty,
     cultureId: Option[String] = None): Iterator[Quest]
 
   /**

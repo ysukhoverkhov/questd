@@ -84,7 +84,7 @@ class ThemesCRUDImpl(
     val cultures = api.allCultures(AllCulturesRequest()) match {
       case OkApiResult(a: AllCulturesResult) =>
         a.cultures.toList
-      case _ => List()
+      case _ => List.empty
     }
 
     views.html.admin.themes(

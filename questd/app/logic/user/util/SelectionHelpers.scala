@@ -4,7 +4,7 @@ trait SelectionHelpers {/* this: UserLogic =>*/
 
   private [util] def getRandomObjects[T](count: Int, fun: (List[T]) => Option[T]): List[T] = {
 
-    (1 to count).foldLeft[List[T]](List()) { (run, num) =>
+    (1 to count).foldLeft[List[T]](List.empty) { (run, num) =>
       fun(run) match {
         case Some(b) =>
           b :: run

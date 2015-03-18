@@ -18,7 +18,7 @@ abstract class BaseUsersScheduleCrawler(
 
       case _ =>
         Logger.error(s"Unable to et all users from database")
-        List().iterator
+        List.empty.iterator
     }
   }
 }

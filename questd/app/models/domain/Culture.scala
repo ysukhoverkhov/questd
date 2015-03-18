@@ -9,5 +9,4 @@ import models.domain.base.ID
 case class Culture(
   id: String = ID.generateUUID(),
   name: String,
-  countries: List[String] = List()) extends ID
-    
+  countries: List[String] = List.empty) extends ID
