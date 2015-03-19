@@ -127,6 +127,7 @@ POST	/admin/tutorialTasks/update						controllers.web.admin.TutorialTasksCRUD.up
 
 GET		/admin/users									controllers.web.admin.UsersCRUD.users(id = "")
 GET		/admin/solutions								controllers.web.admin.SolutionsCRUD.solutions(id = "")
+GET		/admin/battles	    							controllers.web.admin.BattlesCRUD.battles(id = "")
 
 GET		/admin/config									controllers.web.admin.Config.config(name = "")
 GET		/admin/config/byname/:name						controllers.web.admin.Config.config(name)

@@ -56,6 +56,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     with QuestsAdminAPI
     with TutorialTasksAdminAPI
     with SolutionsAdminAPI
+    with BattlesAdminAPI
     with CulturesAdminAPI
     with ConfigAdminAPI
 

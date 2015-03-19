@@ -7,10 +7,10 @@ import models.domain.admin._
 
 class ConfigImpl (val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
-  def leftMenu(implicit request: RequestHeader): Map[String, String] = {
+  private def leftMenu(implicit request: RequestHeader): Map[String, String] = {
     api.getConfiguration(GetConfigurationRequest()) match {
       case OkApiResult(GetConfigurationResult(r)) => r.sections.foldLeft[Map[String, String]](Map()) {
-        (c, v) => c + (v.id -> controllers.web.admin.routes.Config.config(v.id).absoluteURL(false))
+        (c, v) => c + (v.id -> controllers.web.admin.routes.Config.config(v.id).absoluteURL(secure = false))
       }
       case _ => Map()
     }
