@@ -59,13 +59,13 @@ private[domain] trait AuthAPI {
 
       db.user.readBySNid(request.snName, request.snuser.snId) ifSome { user =>
         populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user)) ifOk { r =>
-          Logger.debug("New user with FB created " + user)
+          Logger.debug(s"New user created with FB: ${user.id} / ${user.profile.publicProfile.bio.name}")
           loginUser(user)
         }
       }
     }
 
-    Logger.debug("Searching for user in database for login with fbid " + request.snuser.snId)
+    Logger.debug(s"Searching for user in database for login with FBid ${request.snuser.snId}")
 
     db.user.readBySNid(request.snName, request.snuser.snId) match {
       case None =>
@@ -73,7 +73,7 @@ private[domain] trait AuthAPI {
         createUserAndLogin()
 
       case Some(user) =>
-        Logger.debug("Existing user login with FB " + user)
+        Logger.debug(s"Existing user login with FB: ${user.id} / ${user.profile.publicProfile.bio.name}")
         loginUser(user)
     }
   }
