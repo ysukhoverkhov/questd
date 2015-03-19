@@ -8,12 +8,16 @@ import models.domain._
 import play.Logger
 
 case class LoginRequest(snName: String, snuser: SNUser)
-
 case class LoginResult(sessionId: String, userId: String)
+
 
 case class UserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
 
-case class UserResult(user: User)
+object UserResultCode extends Enumeration {
+  val OK, NotFound = Value
+}
+case class UserResult(code: UserResultCode.Value, user: Option[User] = None)
+
 
 private[domain] trait AuthAPI {
   this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -87,21 +91,19 @@ private[domain] trait AuthAPI {
     (params.sessionId, params.userId) match {
       case (Some(sessionId), None) =>
         db.user.readBySessionId(sessionId) match {
-          case None => NotAuthorisedApiResult()
-          case Some(user: User) => OkApiResult(UserResult(user))
+          case None => OkApiResult(UserResult(UserResultCode.NotFound))
+          case Some(user: User) => OkApiResult(UserResult(UserResultCode.OK, Some(user)))
         }
 
       case (None, Some(userId)) =>
         db.user.readById(userId) match {
-          case None => NotFoundApiResult()
-          case Some(user: User) => OkApiResult(UserResult(user))
+          case None => OkApiResult(UserResult(UserResultCode.NotFound))
+          case Some(user: User) => OkApiResult(UserResult(UserResultCode.OK, Some(user)))
         }
 
       case _ =>
         InternalErrorApiResult("Wrong request for user")
     }
   }
-
 }
-
 

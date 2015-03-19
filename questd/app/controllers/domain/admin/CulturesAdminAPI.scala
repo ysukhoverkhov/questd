@@ -101,9 +101,8 @@ private[domain] trait CulturesAdminAPI { this: DBAccessor =>
   def getCulture(request: GetCultureRequest): ApiResult[GetCultureResult] = handleDbException {
     Logger.debug("Admin request for getting Culture by id.")
 
-    db.culture.readById(request.id) match {
-      case Some(r) => OkApiResult(GetCultureResult(r))
-      case None => NotFoundApiResult()
+    db.culture.readById(request.id) ifSome { r =>
+      OkApiResult(GetCultureResult(r))
     }
   }
 

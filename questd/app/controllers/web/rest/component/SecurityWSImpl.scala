@@ -37,9 +37,9 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
           Future {
 
             api.getUser(UserRequest(sessionId = Some(sessionid))) match {
-              case OkApiResult(body) => body.user
+              case OkApiResult(UserResult(UserResultCode.OK, Some(user))) => user
 
-              case NotAuthorisedApiResult() =>
+              case OkApiResult(UserResult(UserResultCode.NotFound, _)) =>
                 Unauthorized(
                   Json.write(WSUnauthorisedResult(UnauthorisedReason.SessionNotFound))).as(JSON)
 

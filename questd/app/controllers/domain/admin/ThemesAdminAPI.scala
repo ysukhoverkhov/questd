@@ -72,9 +72,8 @@ private[domain] trait ThemesAdminAPI {
   def getTheme(request: GetThemeRequest): ApiResult[GetThemeResult] = handleDbException {
     Logger.debug("Admin request for getting theme by id.")
 
-    db.theme.readById(request.id) match {
-      case Some(r) => OkApiResult(GetThemeResult(r))
-      case None => NotFoundApiResult()
+    db.theme.readById(request.id) ifSome { r =>
+      OkApiResult(GetThemeResult(r))
     }
   }
 

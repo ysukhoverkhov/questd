@@ -108,7 +108,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       rv must beAnInstanceOf[OkApiResult[UserResult]]
       rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
-        u.user.auth.session == Some(sesid))
+        u.user.get.auth.session == Some(sesid))
     }
 
     "Do not return none existing user" in context {
@@ -118,8 +118,9 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       val rv = api.getUser(UserRequest(sessionId = Some(sesid)))
 
-      rv must beAnInstanceOf[NotAuthorisedApiResult]
-      rv.body must beNone
+      rv must beAnInstanceOf[OkApiResult[UserResult]]
+      rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
+        u.code == UserResultCode.NotFound)
     }
 
     "Update culture on login" in context {
