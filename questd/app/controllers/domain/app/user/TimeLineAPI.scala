@@ -3,7 +3,6 @@ package controllers.domain.app.user
 import components._
 import controllers.domain._
 import controllers.domain.app.quest.SelectQuestToTimeLineRequest
-import controllers.domain.helpers.PagerHelper._
 import controllers.domain.helpers._
 import models.domain._
 import play.Logger

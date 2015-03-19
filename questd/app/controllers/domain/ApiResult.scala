@@ -31,8 +31,8 @@ object OkApiResult {
   def apply() = new OkApiResult[String]("stub")
 }
 
-final case class NotFoundApiResult() extends ApiResult[Nothing] { val body = None }
-final case class NotAuthorisedApiResult() extends ApiResult[Nothing] { val body = None }
+final case class NotFoundApiResult() extends ApiResult[Nothing] { val body = None } // TODO: remove me since this is logically not here.
+final case class NotAuthorisedApiResult() extends ApiResult[Nothing] { val body = None } //  TODO: remove me since this is logically not here.
 final case class InternalErrorApiResult[T](
   error: Exception = new Exception("Unknown InternalErrorApiResult")
   ) extends ApiResult[T] {

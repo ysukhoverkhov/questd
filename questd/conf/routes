@@ -14,6 +14,7 @@ POST	/rest/login										controllers.web.rest.LoginWS.login
 
 # Profile
 POST	/rest/getProfile								controllers.web.rest.ProfileWS.getProfile
+POST    /rest/getStats                                  controllers.web.rest.ProfileWS.getStats
 POST	/rest/setGender									controllers.web.rest.ProfileWS.setGender
 POST	/rest/setDebug									controllers.web.rest.ProfileWS.setDebug
 POST    /rest/setCity                                   controllers.web.rest.ProfileWS.setCity

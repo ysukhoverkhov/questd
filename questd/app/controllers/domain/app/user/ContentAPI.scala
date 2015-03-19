@@ -2,7 +2,6 @@ package controllers.domain.app.user
 
 import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.domain.helpers.PagerHelper._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import models.domain._

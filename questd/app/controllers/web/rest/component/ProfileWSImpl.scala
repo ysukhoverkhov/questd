@@ -3,9 +3,6 @@ package controllers.web.rest.component
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
 import models.domain.{Gender, Profile}
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
-import scala.concurrent.Future
 
 private object ProfileWSImplTypes {
 
@@ -45,10 +42,12 @@ trait ProfileWSImpl extends QuestController with SecurityWSImpl { this: WSCompon
 
   import controllers.web.rest.component.ProfileWSImplTypes._
 
-  def getProfile = Authenticated.async { implicit request =>
-    Future {
-      Ok(Json.write[WSProfileResult](request.user.profile)).as(JSON)
-    }
+  def getProfile = wrapReturnAny { implicit request =>
+    request.user.profile
+  }
+
+  def getStats = wrapReturnAny { implicit request =>
+    request.user.stats
   }
 
   def setGender() = wrapJsonApiCallReturnBody[WSSetGenderResult] { (js, r) =>

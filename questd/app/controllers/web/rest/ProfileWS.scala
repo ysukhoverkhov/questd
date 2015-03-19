@@ -8,6 +8,8 @@ object ProfileWS extends Controller with AccessToWSInstance {
 
   def getProfile = ws.getProfile
 
+  def getStats = ws.getStats
+
   def setGender() = ws.setGender()
 
   def setDebug() = ws.setDebug()
