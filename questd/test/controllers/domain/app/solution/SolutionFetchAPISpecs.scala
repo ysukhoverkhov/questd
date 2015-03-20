@@ -273,7 +273,10 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         user = u,
         status = List(SolutionStatus.OnVoting),
         levels = Some((1, 2)),
-        themeIds = List("b")))
+        themeIds = List("b"),
+        cultureId = u.demo.cultureId))
+
+      result must beAnInstanceOf[OkApiResult[GetAllSolutionsResult]]
 
       there was one(solution).allWithParams(
         status = List(SolutionStatus.OnVoting),

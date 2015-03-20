@@ -57,7 +57,7 @@ class _ConfigParams {
 
   val BattleProbabilityFriends = "96 01 Probability of Battles from friends"
   val BattleProbabilityFollowing = "96 02 Probability of Battles from Following"
-  val BattleProbabilityLiked = "96 03 Probability of liked Battles"
+  val BattleProbabilityLikedSolutions = "96 03 Probability of Battles for liked Solutions"
   val BattleProbabilityVIP = "96 04 Probability of quests from VIPs"
 }
 
@@ -123,7 +123,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
 
       ConfigParams.BattleProbabilityFriends -> "0.25",
       ConfigParams.BattleProbabilityFollowing -> "0.25",
-      ConfigParams.BattleProbabilityLiked -> "0.20",
+      ConfigParams.BattleProbabilityLikedSolutions -> "0.20",
       ConfigParams.BattleProbabilityVIP -> "0.10"
     ))
 }

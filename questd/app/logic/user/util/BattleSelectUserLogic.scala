@@ -62,7 +62,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
     val algorithms = List(
       (api.config(api.ConfigParams.BattleProbabilityFriends).toDouble, () => getFriendsBattles),
       (api.config(api.ConfigParams.BattleProbabilityFollowing).toDouble, () => getFollowingBattles),
-      (api.config(api.ConfigParams.BattleProbabilityLiked).toDouble, () => getBattlesForLikedQuests),
+      (api.config(api.ConfigParams.BattleProbabilityLikedSolutions).toDouble, () => getBattlesForLikedSolutions),
       (api.config(api.ConfigParams.BattleProbabilityVIP).toDouble, () => getVIPBattles),
       (1.00, () => getBattlesWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
@@ -90,9 +90,8 @@ trait BattleSelectUserLogic { this: UserLogic =>
       levels)).body.get.battles))
   }
 
-  private[user] def getBattlesForLikedQuests(implicit selected: List[Battle]) = {
-    Logger.trace("  Returning Battle we liked recently")
-    // TODO: imeplemnt me.
+  private[user] def getBattlesForLikedSolutions(implicit selected: List[Battle]) = {
+    Logger.trace("  Returning Battles for liked solutions")
 //    checkNotEmptyIterator(Some(api.getLikedQuests(GetLikedQuestsRequest(
 //      user,
 //      QuestStatus.InRotation,

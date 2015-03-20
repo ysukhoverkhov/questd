@@ -60,7 +60,8 @@ case class GetAllSolutionsRequest(
   idsExclude: List[String] = List.empty,
   authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None,
-  themeIds: List[String] = List.empty)
+  themeIds: List[String] = List.empty,
+  cultureId: Option[String])
 case class GetAllSolutionsResult(solutions: Iterator[Solution])
 
 
@@ -150,6 +151,6 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
       idsExclude = request.idsExclude,
       levels = request.levels,
       themeIds = request.themeIds,
-      cultureId = request.user.demo.cultureId)))
+      cultureId = request.cultureId)))
   }
 }

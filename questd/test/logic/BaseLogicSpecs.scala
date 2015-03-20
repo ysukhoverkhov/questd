@@ -53,7 +53,7 @@ private[logic] abstract class BaseLogicSpecs extends Specification
     config.apply(api.ConfigParams.BattleProbabilityStartingVIPBattles) returns "0.50"
     config.apply(api.ConfigParams.BattleProbabilityFriends) returns "0.25"
     config.apply(api.ConfigParams.BattleProbabilityFollowing) returns "0.25"
-    config.apply(api.ConfigParams.BattleProbabilityLiked) returns "0.20"
+    config.apply(api.ConfigParams.BattleProbabilityLikedSolutions) returns "0.20"
     config.apply(api.ConfigParams.BattleProbabilityVIP) returns "0.10"
 
     config.apply(api.ConfigParams.ProposalMaxDescriptionLength) returns "100"

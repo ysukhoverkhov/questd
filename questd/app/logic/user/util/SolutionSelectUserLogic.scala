@@ -13,9 +13,10 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   private[user] def getRandomSolution(implicit selected: List[Solution] = List.empty): Option[Solution] = {
     val algorithms = List(
       () => getSolutionsWithSuperAlgorithm,
-      () => getOtherSolutions,
+      () => getSolutionsWithTags,
       () => getAnySolutions,
-      () => getAnySolutionsIgnoringLevels)
+      () => getAnySolutionsIgnoringLevels,
+      () => getAnySolutionsIgnoringLevelsAndCulture)
 
 
     val it = selectFromChain(algorithms).getOrElse(Iterator.empty)
@@ -71,12 +72,12 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       None
     } else {
 
-      val algs = List(
-        (api.config(api.ConfigParams.SolutionProbabilityStartingVIPSolutions).toDouble, () => getVIPSolutions),
-        (1.00, () => getOtherSolutions) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
+      val algorithms = List(
+        (api.config(api.ConfigParams.SolutionProbabilityStartingVIPSolutions).toDouble, () => getVIPSolutions),// TODO: add probability of friends here too.
+        (1.00, () => getSolutionsWithTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
-      selectNonEmptyIteratorFromRandomAlgorithm(algs, dice = rand.nextDouble())
+      selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
     }
   }
 
@@ -88,7 +89,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       (api.config(api.ConfigParams.SolutionProbabilityFollowing).toDouble, () => getFollowingSolutions),
       (api.config(api.ConfigParams.SolutionProbabilityLiked).toDouble, () => getSolutionsForLikedQuests),
       (api.config(api.ConfigParams.SolutionProbabilityVIP).toDouble, () => getVIPSolutions),
-      (1.00, () => getOtherSolutions) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
+      (1.00, () => getSolutionsWithTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
       )
 
     selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
@@ -139,7 +140,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       themeIds = themeIds)).body.get.solutions))
   }
 
-  private[user] def getOtherSolutions(implicit selected: List[Solution]) = {
+  private[user] def getSolutionsWithTags(implicit selected: List[Solution]) = {
     Logger.trace("  Returning from all solutions with favorite themes")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherSolutions)
@@ -151,7 +152,8 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       levels = levels,
-      themeIds = themeIds)).body.get.solutions))
+      themeIds = themeIds,
+      cultureId = user.demo.cultureId)).body.get.solutions))
   }
 
   private[user] def getAnySolutions(implicit selected: List[Solution]) = {
@@ -162,7 +164,8 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       status = List(SolutionStatus.Won, SolutionStatus.Lost),
-      levels = levels)).body.get.solutions))
+      levels = levels,
+      cultureId = user.demo.cultureId)).body.get.solutions))
   }
 
   private[user] def getAnySolutionsIgnoringLevels(implicit selected: List[Solution]) = {
@@ -173,7 +176,20 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       status = List(SolutionStatus.Won, SolutionStatus.Lost),
-      levels = None)).body.get.solutions))
+      levels = None,
+      cultureId = user.demo.cultureId)).body.get.solutions))
+  }
+
+  private[user] def getAnySolutionsIgnoringLevelsAndCulture(implicit selected: List[Solution]) = {
+    Logger.trace("  Returning from all solutions (ignoring levels and culture)")
+
+    checkNotEmptyIterator(Some(api.getAllSolutions(GetAllSolutionsRequest(
+      user,
+      idsExclude = solutionIdsToExclude,
+      authorsExclude = solutionAuthorIdsToExclude,
+      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      levels = None,
+      cultureId = None)).body.get.solutions))
   }
 
   private def solutionIdsToExclude(implicit selected: List[Solution]) = {
