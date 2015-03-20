@@ -32,6 +32,14 @@ case class GetVIPBattlesRequest(
   levels: Option[(Int, Int)] = None)
 case class GetVIPBattlesResult(battles: Iterator[Battle])
 
+case class GetLikedSolutionBattlesRequest(
+  user: User,
+  status: List[BattleStatus.Value] = List.empty,
+  idsExclude: List[String] = List.empty,
+  authorsExclude: List[String] = List.empty,
+  levels: Option[(Int, Int)] = None)
+case class GetLikedSolutionBattlesResult(battles: Iterator[Battle])
+
 case class GetAllBattlesRequest(
   user: User,
   authorIdsExclude: List[String] = List.empty,
@@ -52,6 +60,7 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
       status = List(BattleStatus.Fighting))))
   }
 
+  // TODO: here and in similar classes merge this two functions into "getbattles for authors"
   def getFriendsBattles(request: GetFriendsBattlesRequest): ApiResult[GetFriendsBattlesResult] = handleDbException {
     OkApiResult(GetFriendsBattlesResult(db.battle.allWithParams(
       status = request.status,
@@ -72,13 +81,22 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
       cultureId = request.user.demo.cultureId)))
   }
 
-
   def getVIPBattles(request: GetVIPBattlesRequest): ApiResult[GetVIPBattlesResult] = handleDbException {
     OkApiResult(GetVIPBattlesResult(db.battle.allWithParams(
       status = request.status,
       authorIdsExclude = request.authorsExclude,
       levels = request.levels,
       vip = Some(true),
+      idsExclude = request.idsExclude,
+      cultureId = request.user.demo.cultureId)))
+  }
+
+  def getLikedSolutionBattles(request: GetLikedSolutionBattlesRequest): ApiResult[GetLikedSolutionBattlesResult] = handleDbException {
+    OkApiResult(GetLikedSolutionBattlesResult(db.battle.allWithParams(
+      status = request.status,
+      authorIdsExclude = request.authorsExclude,
+      solutionIds = request.user.stats.votedSolutions.filter(_._2 == ContentVote.Cool).keys.toList,
+      levels = request.levels,
       idsExclude = request.idsExclude,
       cultureId = request.user.demo.cultureId)))
   }

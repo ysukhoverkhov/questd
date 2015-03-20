@@ -1,6 +1,6 @@
 package logic.user.util
 
-import controllers.domain.app.battle.{GetVIPBattlesRequest, GetAllBattlesRequest, GetFollowingBattlesRequest, GetFriendsBattlesRequest}
+import controllers.domain.app.battle._
 import logic.UserLogic
 import logic.constants._
 import models.domain._
@@ -92,11 +92,12 @@ trait BattleSelectUserLogic { this: UserLogic =>
 
   private[user] def getBattlesForLikedSolutions(implicit selected: List[Battle]) = {
     Logger.trace("  Returning Battles for liked solutions")
-//    checkNotEmptyIterator(Some(api.getLikedQuests(GetLikedQuestsRequest(
-//      user,
-//      QuestStatus.InRotation,
-//      levels)).body.get.quests))
-    None
+    checkNotEmptyIterator(Some(api.getLikedSolutionBattles(GetLikedSolutionBattlesRequest(
+      user,
+      status = List(BattleStatus.Fighting, BattleStatus.Resolved),
+      idsExclude = battleIdsToExclude,
+      authorsExclude = battleParticipantsIdsToExclude,
+      levels = levels)).body.get.battles))
   }
 
   private[user] def getVIPBattles(implicit selected: List[Battle]) = {
@@ -151,9 +152,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
    * Tells what level we should give quests.
    */
   private def levels: Option[(Int, Int)] = {
-    Some((
-      user.profile.publicProfile.level - TimeLineContentLevelSigma,
-      user.profile.publicProfile.level + TimeLineContentLevelSigma))
+    Some(levelsForNextObjectWithSigmaDistribution(user.profile.publicProfile.level, TimeLineContentLevelSigma))
   }
 
   private def battleIdsToExclude(implicit selected: List[Battle]) = {

@@ -158,9 +158,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
    * Tells what level we should give quests.
    */
   private def levels: Option[(Int, Int)] = {
-    Some((
-      user.profile.publicProfile.level - TimeLineContentLevelSigma,
-      user.profile.publicProfile.level + TimeLineContentLevelSigma))
+    Some(levelsForNextObjectWithSigmaDistribution(user.profile.publicProfile.level, TimeLineContentLevelSigma))
   }
 
   private def questIdsToExclude(implicit selected: List[Quest]) = {

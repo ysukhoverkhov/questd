@@ -73,4 +73,9 @@ trait SelectionHelpers {/* this: UserLogic =>*/
       case None => None
     }
   }
+
+  private[util] def levelsForNextObjectWithSigmaDistribution(average: Float, sigma: Float): (Int, Int) = {
+    (Math.round(average - sigma),
+      Math.round(average + sigma))
+  }
 }

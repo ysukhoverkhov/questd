@@ -204,9 +204,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
    * Tells what level we should give quests based on reason of getting quest.
    */
   private def levels: Option[(Int, Int)] = {
-    Some((
-      user.profile.publicProfile.level - TimeLineContentLevelSigma,
-      user.profile.publicProfile.level + TimeLineContentLevelSigma))
+    Some(levelsForNextObjectWithSigmaDistribution(user.profile.publicProfile.level, TimeLineContentLevelSigma))
   }
 
   // FIX: change it to tags.
