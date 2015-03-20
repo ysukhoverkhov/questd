@@ -152,7 +152,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
    * Tells what level we should give quests.
    */
   private def levels: Option[(Int, Int)] = {
-    Some(levelsForNextObjectWithSigmaDistribution(user.profile.publicProfile.level, TimeLineContentLevelSigma))
+    Some(levelsForNextObjectWithSigmaDistribution(user.profile.publicProfile.level, TimeLineContentLevelSigma, rand))
   }
 
   private def battleIdsToExclude(implicit selected: List[Battle]) = {

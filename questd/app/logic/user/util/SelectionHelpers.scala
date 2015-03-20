@@ -1,5 +1,8 @@
 package logic.user.util
 
+import components.random.RandomComponent
+import logic.constants
+
 trait SelectionHelpers {/* this: UserLogic =>*/
 
   private [util] def getRandomObjects[T](count: Int, fun: (List[T]) => Option[T]): List[T] = {
@@ -49,11 +52,11 @@ trait SelectionHelpers {/* this: UserLogic =>*/
     candidates.foldLeft[Either[Double, T]](Left(0))((run, fun) => {
       run match {
         case Left(p) =>
-          val curProbabiliy = p + fun._1
-          if (curProbabiliy > dice) {
+          val curProbability = p + fun._1
+          if (curProbability > dice) {
             Right(fun._2())
           } else {
-            Left(curProbabiliy)
+            Left(curProbability)
           }
         case _ => run
       }
@@ -74,8 +77,13 @@ trait SelectionHelpers {/* this: UserLogic =>*/
     }
   }
 
-  private[util] def levelsForNextObjectWithSigmaDistribution(average: Float, sigma: Float): (Int, Int) = {
-    (Math.round(average - sigma),
-      Math.round(average + sigma))
+  private[util] def levelsForNextObjectWithSigmaDistribution(mean: Float, sigma: Float, rand: RandomComponent#Random): (Int, Int) = {
+
+    val v0 = rand.nextGaussian(mean, sigma)
+    val v1 = Math.round(v0).toInt
+    val v2 = if (v1 < 1) 1 else if (v1 > constants.MaxLevel) constants.MaxLevel else v1
+    (v2, v2)
+//    (Math.round(mean - sigma),
+//      Math.round(mean + sigma))
   }
 }
