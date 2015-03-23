@@ -2,7 +2,7 @@ package controllers.domain.app.quest
 
 import controllers.domain._
 import models.domain.ContentVote
-import org.mockito.Matchers
+import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
 class QuestAPISpecs extends BaseAPISpecs {
@@ -14,8 +14,8 @@ class QuestAPISpecs extends BaseAPISpecs {
       val q = createQuestStub()
 
       quest.updatePoints(
-        id = Matchers.eq(q.id),
-        pointsChange = Matchers.eq(-1),
+        id = mEq(q.id),
+        pointsChange = mEq(-1),
         likesChange = any,
         votersCountChange = any,
         cheatingChange = any,
@@ -27,8 +27,8 @@ class QuestAPISpecs extends BaseAPISpecs {
       result must beEqualTo(OkApiResult(SelectQuestToTimeLineResult()))
 
       there was one(quest).updatePoints(
-        id = Matchers.eq(q.id),
-        pointsChange = Matchers.eq(-1),
+        id = mEq(q.id),
+        pointsChange = mEq(-1),
         likesChange = any,
         votersCountChange = any,
         cheatingChange = any,
@@ -40,9 +40,9 @@ class QuestAPISpecs extends BaseAPISpecs {
       val q = createQuestStub()
 
       quest.updatePoints(
-        id = Matchers.eq(q.id),
-        pointsChange = Matchers.eq(1),
-        likesChange = Matchers.eq(1),
+        id = mEq(q.id),
+        pointsChange = mEq(1),
+        likesChange = mEq(1),
         votersCountChange = any,
         cheatingChange = any,
         spamChange = any,
@@ -53,9 +53,9 @@ class QuestAPISpecs extends BaseAPISpecs {
       result must beEqualTo(OkApiResult(VoteQuestResult()))
 
       there was one(quest).updatePoints(
-        id = Matchers.eq(q.id),
-        pointsChange = Matchers.eq(1),
-        likesChange = Matchers.eq(1),
+        id = mEq(q.id),
+        pointsChange = mEq(1),
+        likesChange = mEq(1),
         votersCountChange = any,
         cheatingChange = any,
         spamChange = any,

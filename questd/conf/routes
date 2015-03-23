@@ -96,8 +96,10 @@ POST    /cdn/getContentURLById                          controllers.web.rest.Upl
 #######################
 # Debug (Should be removed in production)
 #######################
-POST	/rest/debug/shiftDailyResult					controllers.web.rest.DailyResultWS.shiftDailyResult
+POST	/rest/debug/shiftDailyResult					controllers.web.rest.DebugWS.shiftDailyResult
 POST	/rest/debug/test								controllers.web.rest.DebugWS.test
+POST	/rest/debug/voteQuest							controllers.web.rest.DebugWS.voteQuestDebug
+POST	/rest/debug/voteSolution						controllers.web.rest.DebugWS.voteSolutionDebug
 
 
 #######################

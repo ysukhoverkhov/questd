@@ -12,8 +12,6 @@ private object DailyResultWSImplTypes {
 
   type WSGetDailyResultResult = GetDailyResultResult
 
-  type WSShiftDailyResultResult = ShiftDailyResultResult
-
   case class WSGetRightsAtLevelsRequest(
     levelFrom: Int,
     levelTo: Int)
@@ -48,12 +46,6 @@ trait DailyResultWSImpl extends QuestController with SecurityWSImpl with CommonF
       val rv = (apiResult.levels.keys.map(_.toString) zip apiResult.levels.values).toMap
       OkApiResult(WSGetLevelsForRightsResult(rv))
     }
-  }
-
-  def shiftDailyResult = wrapApiCallReturnBody[WSShiftDailyResultResult] { r =>
-    api.resetDailyTasks(ResetDailyTasksRequest(r.user))
-    api.populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(r.user))
-    api.shiftDailyResult(ShiftDailyResultRequest(r.user))
   }
 }
 

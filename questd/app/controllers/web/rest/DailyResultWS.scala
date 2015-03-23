@@ -10,7 +10,5 @@ object DailyResultWS extends Controller with AccessToWSInstance {
   def getRightsAtLevel = ws.getRightsAtLevel
 
   def getLevelsForRights = ws.getLevelsForRights
-
-  def shiftDailyResult = ws.shiftDailyResult
 }
 
