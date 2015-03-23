@@ -100,6 +100,7 @@ POST	/rest/debug/shiftDailyResult					controllers.web.rest.DebugWS.shiftDailyRes
 POST	/rest/debug/test								controllers.web.rest.DebugWS.test
 POST	/rest/debug/voteQuest							controllers.web.rest.DebugWS.voteQuestDebug
 POST	/rest/debug/voteSolution						controllers.web.rest.DebugWS.voteSolutionDebug
+POST	/rest/debug/setFriendship						controllers.web.rest.DebugWS.setFriendshipDebug
 
 
 #######################

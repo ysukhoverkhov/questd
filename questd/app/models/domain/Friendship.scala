@@ -9,6 +9,6 @@ object FriendshipStatus extends Enumeration {
  * Represents friendship status
  */
 case class Friendship(
-  val friendId: String,
-  val status: FriendshipStatus.Value)
-    
+  friendId: String,
+  status: FriendshipStatus.Value)
+

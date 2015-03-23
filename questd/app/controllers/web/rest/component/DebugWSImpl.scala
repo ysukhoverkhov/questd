@@ -1,12 +1,12 @@
 package controllers.web.rest.component
 
 import controllers.domain._
-import controllers.domain.admin.{AllSolutionsRequest, AllQuestsRequest}
+import controllers.domain.admin.{AllUsersRequest, AllSolutionsRequest, AllQuestsRequest}
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionUpdateRequest
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
-import models.domain.ContentVote
+import models.domain.{FriendshipStatus, ContentVote}
 
 import scala.annotation.tailrec
 
@@ -28,6 +28,11 @@ private object DebugWSImplTypes {
     likesCount: Int,
     cheatingCount: Int,
     pornCount: Int
+    )
+
+  case class WSSetFriendshipDebugRequest (
+    peerId: String,
+    myStatus: String
     )
 }
 
@@ -85,6 +90,26 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     v.likesCount times api.voteSolutionUpdate(VoteSolutionUpdateRequest(solution, isFriend = false, ContentVote.Cool))
     v.cheatingCount times api.voteSolutionUpdate(VoteSolutionUpdateRequest(solution, isFriend = false, ContentVote.Cheating))
     v.pornCount times api.voteSolutionUpdate(VoteSolutionUpdateRequest(solution, isFriend = false, ContentVote.IAPorn))
+
+    OkApiResult(WSTestResult("Done"))
+  }
+
+  //noinspection MutatorLikeMethodIsParameterless
+  def setFriendshipDebug = wrapJsonApiCallReturnBody[WSTestResult] { (js, r) =>
+
+    val v = Json.read[WSSetFriendshipDebugRequest](js)
+    val peer = api.allUsers(AllUsersRequest()).body.get.users.filter(_.id == v.peerId).next()
+
+    FriendshipStatus.withName(v.myStatus) match {
+      case FriendshipStatus.Invites =>
+        api.askFriendship(AskFriendshipRequest(r.user, peer.id))
+      case FriendshipStatus.Invited =>
+        api.askFriendship(AskFriendshipRequest(peer, r.user.id))
+      case FriendshipStatus.Accepted =>
+        api.askFriendship(AskFriendshipRequest(r.user, peer.id))
+        val peer2 = api.allUsers(AllUsersRequest()).body.get.users.filter(_.id == v.peerId).next()
+        api.respondFriendship(RespondFriendshipRequest(peer2, r.user.id, accept = true))
+    }
 
     OkApiResult(WSTestResult("Done"))
   }
