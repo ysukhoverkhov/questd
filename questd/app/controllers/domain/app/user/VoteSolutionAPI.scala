@@ -17,6 +17,7 @@ private[domain] trait VoteSolutionAPI {
   /**
    * Vote for a solution.
    */
+  // TODO: rename me to voteSolutionByUser
   def voteSolution(request: VoteSolutionRequest): ApiResult[VoteSolutionResult] = handleDbException {
     import request._
 

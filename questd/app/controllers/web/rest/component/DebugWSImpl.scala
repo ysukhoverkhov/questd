@@ -1,11 +1,14 @@
 package controllers.web.rest.component
 
 import controllers.domain._
-import controllers.domain.admin.AllQuestsRequest
+import controllers.domain.admin.{AllSolutionsRequest, AllQuestsRequest}
 import controllers.domain.app.quest.VoteQuestRequest
+import controllers.domain.app.solution.VoteSolutionUpdateRequest
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
 import models.domain.ContentVote
+
+import scala.annotation.tailrec
 
 private object DebugWSImplTypes {
 
@@ -15,6 +18,13 @@ private object DebugWSImplTypes {
 
   case class WSVoteQuestDebugRequest (
     questId: String,
+    likesCount: Int,
+    cheatingCount: Int,
+    pornCount: Int
+    )
+
+  case class WSVoteSolutionDebugRequest (
+    solutionId: String,
     likesCount: Int,
     cheatingCount: Int,
     pornCount: Int
@@ -41,28 +51,44 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     OkApiResult(WSTestResult("lalai"))
   }
 
+  // TODO: move me to lang extention library
+  class Rep (count: Int) {
+    def times(f: => Unit): Unit = {
+      for (i <- 1 to count) {
+        f
+      }
+    }
+    @tailrec
+    private def loop (f: => Unit, n: Int): Unit = if (n > 0) { f; loop(f, n - 1) }
+  }
+  object Rep {
+    import scala.language.implicitConversions
+    implicit def int2Rep(i: Int): Rep = new Rep(i)
+  }
+
   def voteQuestDebug = wrapJsonApiCallReturnBody[WSTestResult] { (js, r) =>
+    import Rep._
 
     val v = Json.read[WSVoteQuestDebugRequest](js)
-
     val quest = api.allQuests(AllQuestsRequest()).body.get.quests.filter(_.id == v.questId).next()
 
-    (1 to v.likesCount).foreach { i =>
-      api.voteQuest(VoteQuestRequest(quest, ContentVote.Cool))
-    }
-
-    for (i <- 1 to v.cheatingCount) {
-      api.voteQuest(VoteQuestRequest(quest, ContentVote.Cheating))
-    }
-
-    for (i <- 1 to v.pornCount) {
-      api.voteQuest(VoteQuestRequest(quest, ContentVote.IAPorn))
-    }
+    v.likesCount times api.voteQuest(VoteQuestRequest(quest, ContentVote.Cool))
+    v.cheatingCount times api.voteQuest(VoteQuestRequest(quest, ContentVote.Cheating))
+    v.pornCount times api.voteQuest(VoteQuestRequest(quest, ContentVote.IAPorn))
 
     OkApiResult(WSTestResult("Done"))
   }
 
-  def voteSolutionDebug = wrapApiCallReturnBody[WSTestResult] { r =>
+  def voteSolutionDebug = wrapJsonApiCallReturnBody[WSTestResult] { (js, r) =>
+    import Rep._
+
+    val v = Json.read[WSVoteSolutionDebugRequest](js)
+    val solution = api.allSolutions(AllSolutionsRequest()).body.get.solutions.filter(_.id == v.solutionId).next()
+
+    v.likesCount times api.voteSolutionUpdate(VoteSolutionUpdateRequest(solution, isFriend = false, ContentVote.Cool))
+    v.cheatingCount times api.voteSolutionUpdate(VoteSolutionUpdateRequest(solution, isFriend = false, ContentVote.Cheating))
+    v.pornCount times api.voteSolutionUpdate(VoteSolutionUpdateRequest(solution, isFriend = false, ContentVote.IAPorn))
+
     OkApiResult(WSTestResult("Done"))
   }
 }

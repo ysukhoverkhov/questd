@@ -22,6 +22,7 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
   /**
    * Updates quest according to vote.
    */
+  // TODO: rename me to voteSolution
   def voteSolutionUpdate(request: VoteSolutionUpdateRequest): ApiResult[VoteSolutionUpdateResult] = handleDbException {
     import models.domain.ContentVote._
     import request._
