@@ -78,7 +78,7 @@ trait SelectionHelpers {/* this: UserLogic =>*/
   }
 
   private[util] def levelsForNextObjectWithSigmaDistribution(mean: Float, sigma: Float, rand: RandomComponent#Random): (Int, Int) = {
-
+// TODO: test me.
     val v0 = rand.nextGaussian(mean, sigma)
     val v1 = Math.round(v0).toInt
     val v2 = if (v1 < 1) 1 else if (v1 > constants.MaxLevel) constants.MaxLevel else v1
