@@ -54,9 +54,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
   // TODO: move me to lang extention library
   class Rep (count: Int) {
     def times(f: => Unit): Unit = {
-      for (i <- 1 to count) {
-        f
-      }
+      loop(f, count)
     }
     @tailrec
     private def loop (f: => Unit, n: Int): Unit = if (n > 0) { f; loop(f, n - 1) }
