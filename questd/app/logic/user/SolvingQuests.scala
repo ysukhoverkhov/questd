@@ -36,7 +36,7 @@ trait SolvingQuests { this: UserLogic =>
       InvalidState
     else if (user.stats.solvedQuests.contains(questToSolve.id))
       InvalidState
-    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+    else if (!bioComplete)
       IncompleteBio
     else
       OK

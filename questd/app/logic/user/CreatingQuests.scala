@@ -35,7 +35,7 @@ trait CreatingQuests { this: UserLogic =>
       CoolDown
     else if (questContent.description.length > api.config(api.ConfigParams.ProposalMaxDescriptionLength).toInt)
       LimitExceeded
-    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+    else if (!bioComplete)
       IncompleteBio
     else
       OK

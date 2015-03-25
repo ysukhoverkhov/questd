@@ -19,7 +19,7 @@ trait VotingQuests { this: UserLogic =>
       InvalidState
     else if (user.stats.createdQuests.contains(questId))
       OutOfContent
-    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+    else if (!bioComplete)
       IncompleteBio
     else
       OK

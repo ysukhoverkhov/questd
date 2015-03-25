@@ -8,7 +8,7 @@ import models.domain._
  */
 trait TimeLineLogic { this: UserLogic =>
 
-  def getPopulateTimeLineDate = getNextFlipHourDate
+  def getPopulateTimeLineDate = nextFlipHourDate
 
   /**
    * Returns quests for time line.

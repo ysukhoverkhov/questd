@@ -19,7 +19,7 @@ trait VotingSolutions { this: UserLogic =>
       InvalidState
     else if (user.stats.createdSolutions.contains(solutionId))
       OutOfContent
-    else if (user.demo.cultureId == None || user.profile.publicProfile.bio.gender == Gender.Unknown)
+    else if (!bioComplete)
       IncompleteBio
     else
       OK

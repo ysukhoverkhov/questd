@@ -9,7 +9,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Cooldown for reseting tasks. Should be reset in nearest 5am at user's time.
    */
-  def getResetTasksTimeout = getNextFlipHourDate
+  def getResetTasksTimeout = nextFlipHourDate
 
   /**
    * List of tasks to give user for next day.

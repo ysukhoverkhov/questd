@@ -22,6 +22,7 @@ class UserLogic(
     with Tasks
     with TimeLineLogic
     with MiscUserLogic
+    with CommonUserLogic
     with QuestSelectUserLogic
     with SolutionSelectUserLogic
     with BattleSelectUserLogic

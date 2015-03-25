@@ -15,5 +15,6 @@ object DebugWS extends Controller with AccessToWSInstance {
   //noinspection MutatorLikeMethodIsParameterless
   def setFriendshipDebug = ws.setFriendshipDebug
 
+  def makeBattle = ws.makeBattle
 }
 

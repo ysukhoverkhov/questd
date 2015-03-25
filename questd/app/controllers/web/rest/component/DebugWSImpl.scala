@@ -1,12 +1,13 @@
 package controllers.web.rest.component
 
 import controllers.domain._
-import controllers.domain.admin.{AllUsersRequest, AllSolutionsRequest, AllQuestsRequest}
+import controllers.domain.admin.{AllQuestsRequest, AllSolutionsRequest, AllUsersRequest}
+import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionUpdateRequest
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
-import models.domain.{FriendshipStatus, ContentVote}
+import models.domain._
 
 import scala.annotation.tailrec
 
@@ -33,6 +34,10 @@ private object DebugWSImplTypes {
   case class WSSetFriendshipDebugRequest (
     peerId: String,
     myStatus: String
+    )
+
+  case class WSMakeBattleDebugRequest (
+    rivalId: Option[String]
     )
 }
 
@@ -112,6 +117,94 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     }
 
     OkApiResult(WSTestResult("Done"))
+  }
+
+  def makeBattle = wrapJsonApiCallReturnBody[WSTestResult] { (js, r) =>
+
+    val v = Json.read[WSMakeBattleDebugRequest](js)
+
+    def randomUserExcluding(exclude: Seq[String], vip: Boolean = false) =
+      api.allUsers(AllUsersRequest()).body.get.users.filter(u =>
+        !exclude.contains(u.id)
+          && (u.demo.cultureId != None)
+          && (u.profile.publicProfile.bio.gender != Gender.Unknown)
+          && (u.profile.publicProfile.vip == vip)).next()
+
+
+
+    val peer = {
+      v.rivalId.fold[User] {
+        randomUserExcluding(List(r.user.id))
+      } {
+        rivalId => api.allUsers(AllUsersRequest()).body.get.users.filter( u =>
+          u.id == rivalId
+            && (u.demo.cultureId != None)
+            && (u.profile.publicProfile.bio.gender != Gender.Unknown)).next()
+      }
+    }
+    val author = randomUserExcluding(List(r.user.id, peer.id), vip = true)
+
+    {
+      // creating quest.
+      api.createQuest(CreateQuestRequest(
+        user = author,
+        quest = QuestInfoContent(
+          media = ContentReference(
+            contentType = ContentType.Photo,
+            storage = "",
+            reference = ""),
+          icon = None,
+          description = s"Debug quest for battle between ${r.user.id} and ${peer.id}")))
+    } ifOk { rr =>
+      assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
+
+      val questId = api.getUser(UserRequest(userId = Some(author.id))).body.get.user.get.stats.createdQuests.last
+
+      {
+        api.addToTimeLine(AddToTimeLineRequest(
+          user = r.user,
+          reason = TimeLineReason.Created,
+          objectType = TimeLineType.Quest,
+          objectId = questId,
+          actorId = Some(author.id)
+        ))
+      } ifOk { rr =>
+
+        api.solveQuest(SolveQuestRequest(
+          rr.user,
+          questId,
+          SolutionInfoContent(
+            ContentReference(
+              contentType = ContentType.Photo,
+              storage = "",
+              reference = ""))))
+      } ifOk { rr =>
+        assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
+
+        api.addToTimeLine(AddToTimeLineRequest(
+          user = peer,
+          reason = TimeLineReason.Created,
+          objectType = TimeLineType.Quest,
+          objectId = questId,
+          actorId = Some(author.id)
+        ))
+
+      } ifOk { rr =>
+
+        api.solveQuest(SolveQuestRequest(
+          rr.user,
+          questId,
+          SolutionInfoContent(
+            ContentReference(
+              contentType = ContentType.Photo,
+              storage = "",
+              reference = ""))))
+      }
+    } ifOk { rr =>
+      assert(rr.allowed == ProfileModificationResult.CoolDown, rr.allowed)
+
+      OkApiResult(WSTestResult("Done"))
+    }
   }
 }
 
