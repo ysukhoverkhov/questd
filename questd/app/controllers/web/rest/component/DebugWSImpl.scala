@@ -151,8 +151,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
         quest = QuestInfoContent(
           media = ContentReference(
             contentType = ContentType.Photo,
-            storage = "",
-            reference = ""),
+            storage = "url",
+            reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"),
           icon = None,
           description = s"Debug quest for battle between ${r.user.id} and ${peer.id}")))
     } ifOk { rr =>
@@ -176,8 +176,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
           SolutionInfoContent(
             ContentReference(
               contentType = ContentType.Photo,
-              storage = "",
-              reference = ""))))
+              storage = "url",
+              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
       } ifOk { rr =>
         assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
 
@@ -197,8 +197,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
           SolutionInfoContent(
             ContentReference(
               contentType = ContentType.Photo,
-              storage = "",
-              reference = ""))))
+              storage = "url",
+              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
       }
     } ifOk { rr =>
       assert(rr.allowed == ProfileModificationResult.CoolDown, rr.allowed)
