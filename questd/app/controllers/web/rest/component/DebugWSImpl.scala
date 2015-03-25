@@ -201,7 +201,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
       }
     } ifOk { rr =>
-      assert(rr.allowed == ProfileModificationResult.CoolDown, rr.allowed)
+      assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
 
       OkApiResult(WSTestResult("Done"))
     }
