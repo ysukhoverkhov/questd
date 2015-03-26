@@ -15,7 +15,7 @@ private object DebugWSImplTypes {
 
   type WSShiftDailyResultResult = ShiftDailyResultResult
 
-  case class WSTestResult(r: String)
+  case class WSDebugResult(r: String)
 
   case class WSVoteQuestDebugRequest (
     questId: String,
@@ -51,14 +51,14 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     api.shiftDailyResult(ShiftDailyResultRequest(r.user))
   }
 
-  def test = wrapApiCallReturnBody[WSTestResult] { r =>
+  def test = wrapApiCallReturnBody[WSDebugResult] { r =>
 
     //      shiftStats(ShiftStatsRequest(user))
 //import controllers.domain.app.quest._
 //	  calculateProposalThresholds(CalculateProposalThresholdsRequest(10, 3))
 //      shiftHistory(ShiftHistoryRequest(user))
 
-    OkApiResult(WSTestResult("lalai"))
+    OkApiResult(WSDebugResult("lalai"))
   }
 
   // TODO: move me to lang extention library
@@ -73,7 +73,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     implicit def int2Rep(i: Int): Rep = new Rep(i)
   }
 
-  def voteQuestDebug = wrapJsonApiCallReturnBody[WSTestResult] { (js, r) =>
+  def voteQuestDebug = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>
     import Rep._
 
     val v = Json.read[WSVoteQuestDebugRequest](js)
@@ -83,10 +83,10 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     v.cheatingCount times api.voteQuest(VoteQuestRequest(quest, ContentVote.Cheating))
     v.pornCount times api.voteQuest(VoteQuestRequest(quest, ContentVote.IAPorn))
 
-    OkApiResult(WSTestResult("Done"))
+    OkApiResult(WSDebugResult("Done"))
   }
 
-  def voteSolutionDebug = wrapJsonApiCallReturnBody[WSTestResult] { (js, r) =>
+  def voteSolutionDebug = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>
     import Rep._
 
     val v = Json.read[WSVoteSolutionDebugRequest](js)
@@ -96,11 +96,11 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     v.cheatingCount times api.voteSolutionUpdate(VoteSolutionUpdateRequest(solution, isFriend = false, ContentVote.Cheating))
     v.pornCount times api.voteSolutionUpdate(VoteSolutionUpdateRequest(solution, isFriend = false, ContentVote.IAPorn))
 
-    OkApiResult(WSTestResult("Done"))
+    OkApiResult(WSDebugResult("Done"))
   }
 
   //noinspection MutatorLikeMethodIsParameterless
-  def setFriendshipDebug = wrapJsonApiCallReturnBody[WSTestResult] { (js, r) =>
+  def setFriendshipDebug = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>
 
     val v = Json.read[WSSetFriendshipDebugRequest](js)
     val peer = api.allUsers(AllUsersRequest()).body.get.users.filter(_.id == v.peerId).next()
@@ -116,10 +116,10 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
         api.respondFriendship(RespondFriendshipRequest(peer2, r.user.id, accept = true))
     }
 
-    OkApiResult(WSTestResult("Done"))
+    OkApiResult(WSDebugResult("Done"))
   }
 
-  def makeBattle = wrapJsonApiCallReturnBody[WSTestResult] { (js, r) =>
+  def makeBattle = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>
 
     val v = Json.read[WSMakeBattleDebugRequest](js)
 
@@ -203,7 +203,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     } ifOk { rr =>
       assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
 
-      OkApiResult(WSTestResult("Done"))
+      OkApiResult(WSDebugResult("Done"))
     }
   }
 }
