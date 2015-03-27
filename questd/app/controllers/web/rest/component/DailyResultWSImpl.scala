@@ -1,6 +1,6 @@
 package controllers.web.rest.component
 
-import _root_.helpers.rich._
+import com.vita.scala.Extensions._
 import controllers.domain.OkApiResult
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._

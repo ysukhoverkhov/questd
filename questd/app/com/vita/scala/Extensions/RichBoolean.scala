@@ -1,4 +1,4 @@
-package helpers.rich
+package com.vita.scala.Extensions
 
 class RichBoolean (val v: Boolean) {
 

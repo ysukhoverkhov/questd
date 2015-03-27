@@ -1,8 +1,8 @@
 package controllers.tasks.crawlers.base
 
+import com.vita.akka.EasyRestartActor
 import components._
 import components.random.RandomComponent
-import helpers.akka.EasyRestartActor
 import controllers.domain._
 import logic.LogicBootstrapper
 import play.Logger

@@ -1,4 +1,4 @@
-package helpers.rich
+package com.vita.scala.Extensions
 
 import org.specs2.mutable._
 

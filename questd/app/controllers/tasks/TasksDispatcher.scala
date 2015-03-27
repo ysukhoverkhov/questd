@@ -1,8 +1,8 @@
 package controllers.tasks
 
 import akka.actor._
+import com.vita.akka.EasyRestartActor
 import controllers.tasks.messages.DoTask
-import helpers.akka.EasyRestartActor
 import models.domain.admin._
 import play.Logger
 import us.theatr.akka.quartz._
