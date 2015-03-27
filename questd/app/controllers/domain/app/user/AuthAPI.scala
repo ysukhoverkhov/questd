@@ -87,7 +87,6 @@ private[domain] trait AuthAPI {
    */
   def getUser(params: UserRequest): ApiResult[UserResult] = handleDbException {
 
-    // TODO: they should just tell no user with given session id is found and do not try to analyze he reason as NotAuthorized and NotFound.
     (params.sessionId, params.userId) match {
       case (Some(sessionId), None) =>
         db.user.readBySessionId(sessionId) match {
