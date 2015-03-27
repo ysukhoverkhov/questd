@@ -3,7 +3,7 @@ import spray.http.DateTime
 
 name := """questd"""
 
-version := "0.30.05-SNAPSHOT"
+version := "0.30.06-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -30,6 +30,8 @@ libraryDependencies += "com.restfb" % "restfb" % "1.8.0"
 libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19"
 
 libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "1.8.0"
+
+libraryDependencies += "javax.mail" % "mail" % "1.4.7"
 
 
 // fork in run := true
