@@ -28,7 +28,7 @@ class TasksSpecs extends BaseLogicSpecs {
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
       val dailyResult = u.getTasksForTomorrow
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteSolutions)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.LikeSolutions)
       t must beSome[Task]
       t.get.currentCount must beEqualTo(0)
       t.get.requiredCount must be_>=(0)
@@ -92,7 +92,7 @@ class TasksSpecs extends BaseLogicSpecs {
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
       val dailyResult = u.getTasksForTomorrow
 
-      val t = dailyResult.tasks.find(_.taskType == TaskType.VoteQuests)
+      val t = dailyResult.tasks.find(_.taskType == TaskType.LikeQuests)
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(3)
     }

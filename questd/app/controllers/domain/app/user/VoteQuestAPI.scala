@@ -30,7 +30,10 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
           {
             voteQuest(VoteQuestRequest(q, request.vote))
           } ifOk { r =>
-            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteQuests)))
+            if (request.vote == ContentVote.Cool)
+              makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LikeQuests)))
+            else
+              OkApiResult(MakeTaskResult(request.user))
           } ifOk { r =>
             db.user.recordQuestVote(r.user.id, q.id, request.vote) ifSome { u =>
 

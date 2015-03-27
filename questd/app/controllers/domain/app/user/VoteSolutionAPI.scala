@@ -30,7 +30,10 @@ private[domain] trait VoteSolutionAPI {
             voteSolutionUpdate(VoteSolutionUpdateRequest(s, isFriend, request.vote))
           } ifOk { r =>
 
-            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.VoteSolutions)))
+            if (request.vote == ContentVote.Cool)
+              makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LikeSolutions)))
+            else
+              OkApiResult(MakeTaskResult(request.user))
 
           } ifOk { r =>
             db.user.recordSolutionVote(r.user.id, s.id, request.vote) ifSome { u =>
