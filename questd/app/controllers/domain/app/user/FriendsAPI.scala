@@ -143,6 +143,10 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
           sendMessage(SendMessageRequest(f, MessageFriendshipAccepted(request.user.id)))
         }
 
+        // Removing each other from following.
+        db.user.removeFromFollowing(request.user.id, request.friendId)
+        db.user.removeFromFollowing(request.friendId, request.user.id)
+
       } else {
 
         db.user.removeFriendship(request.user.id, request.friendId)

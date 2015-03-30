@@ -165,7 +165,7 @@ package object domainstubs {
   }
 
   def createUserStub(
-    id: String = "uid",
+    id: String = ID.generateUUID(),
     cultureId: Option[String] = Some("cultureId"),
     vip: Boolean = false,
     friends: List[Friendship] = List.empty,

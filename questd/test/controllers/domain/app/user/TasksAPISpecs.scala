@@ -118,6 +118,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       db.user.incTask(u.id, TaskType.LookThroughFriendshipProposals.toString, 0.5f, rewardReceived = false) returns Some(u)
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.LookThroughFriendshipProposals)))
+      result must beEqualTo(OkApiResult(MakeTaskResult(u)))
 
       there was one(db.user).incTask(u.id, TaskType.LookThroughFriendshipProposals.toString, 0.5f, rewardReceived = false)
     }
