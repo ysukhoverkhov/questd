@@ -55,11 +55,6 @@ class DailyResultAPISpecs extends BaseAPISpecs {
             result.asInstanceOf[DailyResult].questsIncome == List.empty
           }
         }))
-//      List(QuestIncome(
-//        questId = q.id,
-//        passiveIncome = Assets(50),
-//        timesLiked = 5,
-//        likesIncome = Assets(3,0,0))
 
       result must beEqualTo(OkApiResult(ShiftDailyResultResult(user = u)))
     }
