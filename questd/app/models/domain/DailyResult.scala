@@ -10,7 +10,7 @@ case class DailyResult(
   dailySalary: Assets,
   decidedQuestSolutions: List[QuestSolutionResult] = List.empty,
   decidedQuestProposals: List[QuestProposalResult] = List.empty,
-  questsIncome: List[QuestIncome])
+  questsIncome: List[QuestIncome] = List.empty)
 
 case class QuestSolutionResult(
     solutionId: String,

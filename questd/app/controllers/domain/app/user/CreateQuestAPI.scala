@@ -63,8 +63,6 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
           {
             makeTask(MakeTaskRequest(u, taskType = Some(TaskType.CreateQuest)))
           } ifOk { r =>
-            addQuestIncomeToDailyResult(AddQuestIncomeToDailyResultRequest(r.user, quest))
-          } ifOk { r =>
             addToTimeLine(AddToTimeLineRequest(
               user = r.user,
               reason = TimeLineReason.Created,

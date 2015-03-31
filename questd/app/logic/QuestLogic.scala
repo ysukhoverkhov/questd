@@ -4,6 +4,7 @@ import logic.functions._
 import logic.constants._
 import models.domain._
 import controllers.domain.DomainAPIComponent
+import play.Logger
 
 class QuestLogic(
   val quest: Quest,
@@ -29,6 +30,8 @@ class QuestLogic(
    * @return Income for likes.
    */
   def dailyIncomeForLikes: Assets = {
+    Logger.trace(s"dailyIncomeForLikes, quest ${quest.id} / likes ${quest.rating.likesCount} / coins = ${dailyQuestIncomeForLikes(quest.rating.likesCount)}")
+
     Assets(coins = dailyQuestIncomeForLikes(quest.rating.likesCount))
   }
 

@@ -27,7 +27,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
 
       there was one(user).addEntryToTimeLine(any, any)
       there was one(user).addEntryToTimeLineMulti(any, any)
-      there was one(user).addQuestIncomeToDailyResult(any, any)
+      there was no(user).addQuestIncomeToDailyResult(any, any)
       there was one(quest).create(
         Quest(
           id = anyString,
@@ -57,7 +57,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
 
       there was one(user).addEntryToTimeLine(any, any)
       there was one(user).addEntryToTimeLineMulti(any, any)
-      there was one(user).addQuestIncomeToDailyResult(any, any)
+      there was no(user).addQuestIncomeToDailyResult(any, any)
       there was one(quest).create(
         Quest(
           id = anyString,

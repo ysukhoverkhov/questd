@@ -40,23 +40,25 @@ class DailyResultAPISpecs extends BaseAPISpecs {
         idsExclude = null,
         cultureId = null)
 
-      case class QuestIncomeMatcher(private val incomes: List[QuestIncome]) extends ArgumentMatcher[DailyResult] {
-        def matches(result: java.lang.Object): Boolean = {
-          result.asInstanceOf[DailyResult].questsIncome == incomes
-        }
-      }
+      there was one(user).addQuestIncomeToDailyResult(
+        mEq(u.id),
+        mEq(QuestIncome(questId = q.id,
+          passiveIncome = Assets(50),
+          timesLiked = 5,
+          likesIncome = Assets(3,0,0))))
 
       there was one(user).addPrivateDailyResult(
         mEq(u.id),
         Matchers.argThat(new ArgumentMatcher[DailyResult] {
           def matches(result: java.lang.Object): Boolean = {
-            result.asInstanceOf[DailyResult].questsIncome == List(QuestIncome(
-              questId = q.id,
-              passiveIncome = Assets(50),
-              timesLiked = 5,
-              likesIncome = Assets(3,0,0)))
+            result.asInstanceOf[DailyResult].questsIncome == List.empty
           }
         }))
+//      List(QuestIncome(
+//        questId = q.id,
+//        passiveIncome = Assets(50),
+//        timesLiked = 5,
+//        likesIncome = Assets(3,0,0))
 
       result must beEqualTo(OkApiResult(ShiftDailyResultResult(user = u)))
     }

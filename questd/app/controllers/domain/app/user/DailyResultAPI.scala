@@ -50,16 +50,20 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       user = user,
       status = QuestStatus.InRotation
     )) ifOk { r =>
-      val questsIncome = r.quests.map(q => createQuestIncomeForQuest(q)).toList
+      r.quests.foldLeft[ApiResult[AddQuestIncomeToDailyResultResult]](OkApiResult(AddQuestIncomeToDailyResultResult(user))) {
+        case (OkApiResult(_), q) =>
+          addQuestIncomeToDailyResult(AddQuestIncomeToDailyResultRequest(user, q))
+        case (badResult, _) =>
+          badResult
+      } ifOk { r =>
+        db.user.addPrivateDailyResult(
+          r.user.id,
+          DailyResult(
+            user.getStartOfCurrentDailyResultPeriod,
+            dailySalary)) ifSome { u =>
 
-      db.user.addPrivateDailyResult(
-        user.id,
-        DailyResult(
-          user.getStartOfCurrentDailyResultPeriod,
-          dailySalary,
-          questsIncome = questsIncome)) ifSome { u =>
-
-        OkApiResult(ShiftDailyResultResult(u))
+          OkApiResult(ShiftDailyResultResult(u))
+        }
       }
     }
   }
