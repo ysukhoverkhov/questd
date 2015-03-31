@@ -25,6 +25,7 @@ class DailyResultAPISpecs extends BaseAPISpecs {
         idsExclude = null,
         cultureId = null) returns List(q).iterator
       user.addPrivateDailyResult(any, any) returns Some(u)
+      user.addQuestIncomeToDailyResult(any, any) returns Some(u)
 
       val result = api.shiftDailyResult(ShiftDailyResultRequest(
         user = u))
