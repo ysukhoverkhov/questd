@@ -197,7 +197,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
   def processFriendshipInvitationsFromSN(request: ProcessFriendshipInvitationsFromSNRequest): ApiResult[ProcessFriendshipInvitationsFromSNResult] = handleDbException {
     // All exceptions are wrapped and returned as Internal error which is not good.
     // Only real internal errors should be reported as internal errors.
-    Logger.trace(s"processFriendshipInvitationsFromSN for ${request.user.id} aka ${request.user.profile.publicProfile.bio.name}")
+    Logger.trace(s"processFriendshipInvitationsFromSN of count ${request.snUser.invitations.length} for ${request.user.id} aka ${request.user.profile.publicProfile.bio.name}")
 
     val rv = request.snUser.invitations.foldLeft(request.user) { (u, i) =>
       Logger.trace(s"Invitation from ${i.inviterSnId} in ${i.snName}")

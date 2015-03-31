@@ -8,6 +8,7 @@ import controllers.domain.app.solution.VoteSolutionUpdateRequest
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
 import models.domain._
+import play.Logger
 
 import scala.annotation.tailrec
 
@@ -123,26 +124,39 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
     val v = Json.read[WSMakeBattleDebugRequest](js)
 
+    def logOrGet[T](log: String)(it: Iterator[T]) = {
+      if (!it.hasNext) {
+        Logger.debug(log)
+      }
+
+      it.next()
+    }
+
     def randomUserExcluding(exclude: Seq[String], vip: Boolean = false) =
-      api.allUsers(AllUsersRequest()).body.get.users.filter(u =>
-        !exclude.contains(u.id)
-          && (u.demo.cultureId != None)
-          && (u.profile.publicProfile.bio.gender != Gender.Unknown)
-          && (u.profile.publicProfile.vip == vip)).next()
-
-
+      logOrGet(s"Unable to find random user with vip = $vip and excluding $exclude"){
+        api.allUsers(AllUsersRequest()).body.get.users.filter(u =>
+          !exclude.contains(u.id)
+            && (u.demo.cultureId != None)
+            && (u.profile.publicProfile.bio.gender != Gender.Unknown)
+            && (u.profile.publicProfile.vip == vip))
+      }
 
     val peer = {
       v.rivalId.fold[User] {
         randomUserExcluding(List(r.user.id))
       } {
-        rivalId => api.allUsers(AllUsersRequest()).body.get.users.filter( u =>
-          u.id == rivalId
-            && (u.demo.cultureId != None)
-            && (u.profile.publicProfile.bio.gender != Gender.Unknown)).next()
+        rivalId =>
+          logOrGet(s"Unable to find user with id = $rivalId"){
+            api.allUsers(AllUsersRequest()).body.get.users.filter( u =>
+              u.id == rivalId
+                && (u.demo.cultureId != None)
+                && (u.profile.publicProfile.bio.gender != Gender.Unknown))}
       }
     }
+    Logger.debug(s"Peer found ${peer.id} / ${peer.profile.publicProfile.bio.name}")
+
     val author = randomUserExcluding(List(r.user.id, peer.id), vip = true)
+    Logger.debug(s"Author found ${author.id} / ${author.profile.publicProfile.bio.name}")
 
     {
       // creating quest.
