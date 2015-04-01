@@ -80,15 +80,15 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               adjustAssets(AdjustAssetsRequest(
                 user = u,
                 cost = Some(questToSolve.info.solveCost)))
-            } ifOk { r =>
+            } map { r =>
               makeTask(MakeTaskRequest(r.user, taskType = Some(TaskType.CreateSolution)))
-            } ifOk { r =>
+            } map { r =>
               addToTimeLine(AddToTimeLineRequest(
                 user = r.user,
                 reason = TimeLineReason.Created,
                 objectType = TimeLineType.Solution,
                 objectId = sol.id))
-            } ifOk { r =>
+            } map { r =>
               addToWatchersTimeLine(AddToWatchersTimeLineRequest(
                 user = r.user,
                 reason = TimeLineReason.Created,
@@ -96,7 +96,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 objectId = sol.id))
               //                } ifOk { r =>
               //                  addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id))
-            } ifOk { r =>
+            } map { r =>
               {
                 val numberOfReviewedQuests = u.timeLine.count { te =>
                   ((te.objectType == TimeLineType.Quest)
@@ -114,9 +114,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 else
                   Math.round(numberOfReviewedQuests / numberOfSolvedQuests)
                 solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio))
-              } ifOk {
+              } map {
                 tryCreateBattle(TryCreateBattleRequest(sol))
-              } ifOk {
+              } map {
                 OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
               }
             }
@@ -180,7 +180,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           removeFromTimeLine(RemoveFromTimeLineRequest(author, request.solution.id))
       }
 
-      r ifOk {
+      r map {
         OkApiResult(RewardSolutionAuthorResult())
       }
     } catch {

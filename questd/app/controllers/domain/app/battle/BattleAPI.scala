@@ -72,7 +72,7 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
           OkApiResult(UpdateBattleStateResult())
         }
 
-      authorsUpdateResult ifOk OkApiResult(UpdateBattleStateResult())
+      authorsUpdateResult map OkApiResult(UpdateBattleStateResult())
     }
   }
 }

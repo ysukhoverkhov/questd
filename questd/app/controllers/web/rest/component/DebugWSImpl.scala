@@ -169,7 +169,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
             reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"),
           icon = None,
           description = s"Debug quest for battle between ${r.user.id} and ${peer.id}")))
-    } ifOk { rr =>
+    } map { rr =>
       assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
 
       val questId = api.getUser(UserRequest(userId = Some(author.id))).body.get.user.get.stats.createdQuests.last
@@ -182,7 +182,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
           objectId = questId,
           actorId = Some(author.id)
         ))
-      } ifOk { rr =>
+      } map { rr =>
 
         api.solveQuest(SolveQuestRequest(
           rr.user,
@@ -192,7 +192,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
               contentType = ContentType.Photo,
               storage = "url",
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
-      } ifOk { rr =>
+      } map { rr =>
         assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
 
         api.addToTimeLine(AddToTimeLineRequest(
@@ -203,7 +203,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
           actorId = Some(author.id)
         ))
 
-      } ifOk { rr =>
+      } map { rr =>
 
         api.solveQuest(SolveQuestRequest(
           rr.user,
@@ -214,7 +214,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
               storage = "url",
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
       }
-    } ifOk { rr =>
+    } map { rr =>
       assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
 
       OkApiResult(WSDebugResult("Done"))

@@ -49,13 +49,13 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     getMyQuests(GetMyQuestsRequest(
       user = user,
       status = QuestStatus.InRotation
-    )) ifOk { r =>
+    )) map { r =>
       r.quests.foldLeft[ApiResult[AddQuestIncomeToDailyResultResult]](OkApiResult(AddQuestIncomeToDailyResultResult(user))) {
         case (OkApiResult(_), q) =>
           addQuestIncomeToDailyResult(AddQuestIncomeToDailyResultRequest(user, q))
         case (badResult, _) =>
           badResult
-      } ifOk { r =>
+      } map { r =>
         db.user.addPrivateDailyResult(
           r.user.id,
           DailyResult(

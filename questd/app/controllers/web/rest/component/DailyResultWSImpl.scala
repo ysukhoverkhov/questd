@@ -42,7 +42,7 @@ trait DailyResultWSImpl extends QuestController with SecurityWSImpl with CommonF
 
     val requestedFunctionality = v.functionality.map(Functionality.withNameEx)
 
-    api.getLevelsForRights(GetLevelsForRightsRequest(r.user, requestedFunctionality)) ifOk { apiResult =>
+    api.getLevelsForRights(GetLevelsForRightsRequest(r.user, requestedFunctionality)) map { apiResult =>
       val rv = (apiResult.levels.keys.map(_.toString) zip apiResult.levels.values).toMap
       OkApiResult(WSGetLevelsForRightsResult(rv))
     }

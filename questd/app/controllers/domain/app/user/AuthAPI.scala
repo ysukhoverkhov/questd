@@ -32,7 +32,7 @@ private[domain] trait AuthAPI {
       db.user.updateSessionId(user.id, uuid)
 
       // Update here country from time to time.
-      updateUserCulture(UpdateUserCultureRequest(user)) ifOk {
+      updateUserCulture(UpdateUserCultureRequest(user)) map {
         api.processFriendshipInvitationsFromSN(ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
           case InternalErrorApiResult(a) =>
             InternalErrorApiResult[LoginResult](a)
@@ -62,7 +62,7 @@ private[domain] trait AuthAPI {
       db.user.create(newUser)
 
       db.user.readBySNid(request.snName, request.snuser.snId) ifSome { user =>
-        populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user)) ifOk { r =>
+        populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user)) map { r =>
           Logger.debug(s"New user created with FB: ${user.id} / ${user.profile.publicProfile.bio.name}")
           loginUser(user)
         }

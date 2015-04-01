@@ -3,8 +3,7 @@ package controllers.domain
 sealed abstract class ApiResult[+T] {
   def body: Option[T]
 
-  // TODO: rename me to "map"
-  def ifOk[T2](f: T => ApiResult[T2]): ApiResult[T2] = {
+  def map[T2](f: T => ApiResult[T2]): ApiResult[T2] = {
     this match {
       case OkApiResult(r) => f(r)
       case InternalErrorApiResult(a) => InternalErrorApiResult(a)
@@ -12,7 +11,7 @@ sealed abstract class ApiResult[+T] {
     }
   }
 
-  def ifOk[T2](f: => ApiResult[T2]): ApiResult[T2] = {
+  def map[T2](f: => ApiResult[T2]): ApiResult[T2] = {
     this match {
       case OkApiResult(_) => f
       case InternalErrorApiResult(a) => InternalErrorApiResult(a)

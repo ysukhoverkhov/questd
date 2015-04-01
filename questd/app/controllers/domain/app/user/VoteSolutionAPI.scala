@@ -28,14 +28,14 @@ private[domain] trait VoteSolutionAPI {
           {
             val isFriend = user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId).contains(s.info.authorId)
             voteSolutionUpdate(VoteSolutionUpdateRequest(s, isFriend, request.vote))
-          } ifOk { r =>
+          } map { r =>
 
             if (request.vote == ContentVote.Cool)
               makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LikeSolutions)))
             else
               OkApiResult(MakeTaskResult(request.user))
 
-          } ifOk { r =>
+          } map { r =>
             db.user.recordSolutionVote(r.user.id, s.id, request.vote) ifSome { u =>
 
               (if (request.vote == ContentVote.Cool) {
@@ -44,14 +44,14 @@ private[domain] trait VoteSolutionAPI {
                   reason = TimeLineReason.Liked,
                   objectType = TimeLineType.Solution,
                   objectId = s.id
-                )) ifOk { r =>
+                )) map { r =>
                   OkApiResult(UserInternalResult(r.user))
                 }
               } else {
-                removeFromTimeLine(RemoveFromTimeLineRequest(user = u, objectId = s.id)) ifOk {r =>
+                removeFromTimeLine(RemoveFromTimeLineRequest(user = u, objectId = s.id)) map {r =>
                   OkApiResult(UserInternalResult(r.user))
                 }
-              }) ifOk { r =>
+              }) map { r =>
                 OkApiResult(VoteSolutionResult(OK, Some(r.user.profile)))
               }
             }

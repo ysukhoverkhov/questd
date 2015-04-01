@@ -89,7 +89,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       db.quest.updatePoints(quest.id, pointsChange = -1)
     } ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
-    } ifOk {
+    } map {
       OkApiResult(SelectQuestToTimeLineResult())
     }
   }
@@ -102,13 +102,13 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     {
       db.user.readById(quest.info.authorId) ifSome { u =>
         storeQuestSolvingInDailyResult(StoreQuestSolvingInDailyResultRequest(u, quest))
-      } ifOk {
+      } map {
         db.quest.updatePoints(
           id = quest.id,
           pointsChange = ratio) ifSome { v =>
           updateQuestStatus(UpdateQuestStatusRequest(v))
         }
-      } ifOk {
+      } map {
         OkApiResult(SolveQuestUpdateResult())
       }
     }
@@ -134,7 +134,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     q ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
-    } ifOk {
+    } map {
       OkApiResult(VoteQuestResult())
     }
   }

@@ -29,12 +29,12 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
         db.quest.readById(request.questId) ifSome { q =>
           {
             voteQuest(VoteQuestRequest(q, request.vote))
-          } ifOk { r =>
+          } map { r =>
             if (request.vote == ContentVote.Cool)
               makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LikeQuests)))
             else
               OkApiResult(MakeTaskResult(request.user))
-          } ifOk { r =>
+          } map { r =>
             db.user.recordQuestVote(r.user.id, q.id, request.vote) ifSome { u =>
 
               (if (request.vote == ContentVote.Cool) {
@@ -43,12 +43,12 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
                   reason = TimeLineReason.Liked,
                   objectType = TimeLineType.Quest,
                   objectId = q.id
-                )) ifOk {r =>
+                )) map {r =>
                   OkApiResult(UserInternalResult(r.user))}
               } else {
-                removeFromTimeLine(RemoveFromTimeLineRequest(user = u, objectId = q.id)) ifOk {r =>
+                removeFromTimeLine(RemoveFromTimeLineRequest(user = u, objectId = q.id)) map {r =>
                   OkApiResult(UserInternalResult(r.user))}
-              }) ifOk { r =>
+              }) map { r =>
                 OkApiResult(VoteQuestByUserResult(OK, Some(r.user.profile)))
               }
             }

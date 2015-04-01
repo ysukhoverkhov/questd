@@ -103,14 +103,14 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       val completed = isCompleted(nt)
 
       val r1 = if (completed) {
-        adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(nt.reward))) ifOk { r =>
+        adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(nt.reward))) map { r =>
           sendMessage(SendMessageRequest(r.user, MessageTasksCompleted()))
         }
       } else {
         OkApiResult(AdjustAssetsResult(user))
       }
 
-      r1 ifOk { r =>
+      r1 map { r =>
         val u = (taskType, tutorialTaskId) match {
           case (Some(tt), None) =>
             db.user.incTask(user.id, tt.toString, newPercent, completed)

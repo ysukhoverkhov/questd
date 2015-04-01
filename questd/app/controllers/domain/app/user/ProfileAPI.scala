@@ -67,7 +67,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       del
 
     db.user.addToAssets(user.id, del2) ifSome { u =>
-      checkIncreaseLevel(CheckIncreaseLevelRequest(u)) ifOk { r => OkApiResult(AdjustAssetsResult(r.user)) }
+      checkIncreaseLevel(CheckIncreaseLevelRequest(u)) map { r => OkApiResult(AdjustAssetsResult(r.user)) }
     }
   }
 
@@ -158,7 +158,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       OkApiResult(SetCountryResult(OutOfContent, None))
     } else {
       db.user.setCountry(user.id, country) ifSome { v =>
-        updateUserCulture(UpdateUserCultureRequest(v)) ifOk { r =>
+        updateUserCulture(UpdateUserCultureRequest(v)) map { r =>
           OkApiResult(SetCountryResult(OK, Some(r.user.profile)))
         }
       }

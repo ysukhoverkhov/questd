@@ -62,19 +62,19 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
           // Making all api calls
           {
             makeTask(MakeTaskRequest(u, taskType = Some(TaskType.CreateQuest)))
-          } ifOk { r =>
+          } map { r =>
             addToTimeLine(AddToTimeLineRequest(
               user = r.user,
               reason = TimeLineReason.Created,
               objectType = TimeLineType.Quest,
               objectId = quest.id))
-          } ifOk { r =>
+          } map { r =>
             addToWatchersTimeLine(AddToWatchersTimeLineRequest(
               user = r.user,
               reason = TimeLineReason.Created,
               objectType = TimeLineType.Quest,
               objectId = quest.id))
-          } ifOk { r =>
+          } map { r =>
             OkApiResult(CreateQuestResult(OK, Some(r.user.profile)))
           }
         }
@@ -107,7 +107,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
 
       case _ =>
         InternalErrorApiResult[StoreProposalInDailyResultResult]("Rewarding quest author but quest status is Unexpected")
-    }) ifOk {
+    }) map {
       OkApiResult(RewardQuestAuthorResult())
     }
   }

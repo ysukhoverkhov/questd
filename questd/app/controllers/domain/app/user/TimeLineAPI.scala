@@ -133,9 +133,9 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
               objectType = TimeLineType.Quest,
               objectId = q.id,
               actorId = Some(q.info.authorId)))
-            } ifOk { res =>
+            } map { res =>
               selectQuestToTimeLine(SelectQuestToTimeLineRequest(q))
-            } ifOk {
+            } map {
               OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
             }
           case _ =>
@@ -158,7 +158,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
               objectType = TimeLineType.Solution,
               objectId = s.id,
               actorId = Some(s.info.authorId)))
-          } ifOk { res =>
+          } map { res =>
             OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
           }
           case _ =>
@@ -180,7 +180,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
               reason = TimeLineReason.Has,
               objectType = TimeLineType.Battle,
               objectId = b.id))
-          } ifOk { res =>
+          } map { res =>
             OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
           }
           case _ =>
@@ -191,11 +191,11 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
     {
       addRandomQuestsToTimeLine(request.user, questsCount)
-    } ifOk { r =>
+    } map { r =>
       addRandomSolutionsToTimeLine(r.user, solutionsCount)
-    } ifOk { r =>
+    } map { r =>
       addRandomBattlesToTimeLine(r.user, battlesCount)
-    } ifOk { r =>
+    } map { r =>
       db.user.setTimeLinePopulationTime(r.user.id, r.user.getPopulateTimeLineDate) ifSome { u =>
         OkApiResult(PopulateTimeLineWithRandomThingsResult(u))
       }

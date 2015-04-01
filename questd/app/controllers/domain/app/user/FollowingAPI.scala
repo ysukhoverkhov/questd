@@ -93,12 +93,12 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
 
           makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.AddToFollowing)))
 
-        } ifOk { r =>
+        } map { r =>
 
           val cost = request.user.costToFollowing
           adjustAssets(AdjustAssetsRequest(user = r.user, cost = Some(cost)))
 
-        } ifOk { r =>
+        } map { r =>
 
           db.user.addToFollowing(r.user.id, request.userIdToAdd)
           OkApiResult(AddToFollowingResult(OK, Some(r.user.profile)))

@@ -46,14 +46,14 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
         pornChange = checkInc(vote, IAPorn))
     } ifSome { o =>
 
-      updateSolutionState(UpdateSolutionStateRequest(o)) ifOk {
+      updateSolutionState(UpdateSolutionStateRequest(o)) map {
         (if (o.status == SolutionStatus.OnVoting) {
           db.battle.readById(o.battleIds.head) ifSome { b =>
             updateBattleState(UpdateBattleStateRequest(b))
           }
         } else {
           OkApiResult(UpdateBattleStateResult)
-        }) ifOk {
+        }) map {
           OkApiResult(VoteSolutionUpdateResult())
         }
       }
@@ -105,7 +105,7 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
           OkApiResult(None)
         }
 
-      authorUpdateResult ifOk OkApiResult(UpdateSolutionStateResult())
+      authorUpdateResult map OkApiResult(UpdateSolutionStateResult())
     }
   }
 }

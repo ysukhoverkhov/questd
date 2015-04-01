@@ -78,7 +78,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
                 reason = TimeLineReason.Created,
                 objectType = TimeLineType.Battle,
                 objectId = battle.id))
-            } ifOk { r =>
+            } map { r =>
               addToWatchersTimeLine(AddToWatchersTimeLineRequest(
                 user = u,
                 reason = TimeLineReason.Created,
