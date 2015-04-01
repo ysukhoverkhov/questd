@@ -74,6 +74,8 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
       val algorithms = List(
         (api.config(api.ConfigParams.SolutionProbabilityStartingVIPSolutions).toDouble, () => getVIPSolutions),// TODO: add probability of friends here too.
+        (api.config(api.ConfigParams.SolutionProbabilityStartingFriendSolutions).toDouble, () => getFriendsSolutions),
+        (api.config(api.ConfigParams.SolutionProbabilityStartingFollowingSolutions).toDouble, () => getFollowingSolutions),
         (1.00, () => getSolutionsWithTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 

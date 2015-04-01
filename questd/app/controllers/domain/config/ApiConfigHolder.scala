@@ -35,7 +35,7 @@ class _ConfigParams {
 
   val QuestProbabilityLevelsToGiveStartingQuests = "71 01 Level to give starting quests"
   val QuestProbabilityStartingVIPQuests = "71 02 Probability of selecting VIP quests in initial stage"
-  val QuestProbabilityStartingFriendQuests = "71 03 Probability of selecting friends quests in initial stage"
+  val QuestProbabilityStartingFriendQuests = "71 03 Probability of selecting friend's quests in initial stage"
   val QuestProbabilityStartingFollowingQuests = "71 04 Probability of selecting following quests in initial stage"
 
   val QuestProbabilityFriends = "72 01 Probability of quests from friends"
@@ -48,6 +48,8 @@ class _ConfigParams {
 
   val SolutionProbabilityLevelsToGiveStartingSolutions = "91 01 Level to give starting Solutions"
   val SolutionProbabilityStartingVIPSolutions = "91 02 Probability of selecting VIP Solutions in initial stage"
+  val SolutionProbabilityStartingFriendSolutions = "91 03 Probability of selecting Friend's Solutions in initial stage"
+  val SolutionProbabilityStartingFollowingSolutions = "91 04 Probability of selecting Following Solutions in initial stage"
 
   val SolutionProbabilityFriends = "92 01 Probability of Solutions from friends"
   val SolutionProbabilityFollowing = "92 02 Probability of Solutions from Following"
@@ -116,6 +118,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
 
       ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions -> "5",
       ConfigParams.SolutionProbabilityStartingVIPSolutions -> "0.5",
+      ConfigParams.SolutionProbabilityStartingFriendSolutions -> "0.2",
+      ConfigParams.SolutionProbabilityStartingFollowingSolutions -> "0.2",
 
       ConfigParams.SolutionProbabilityFriends -> "0.25",
       ConfigParams.SolutionProbabilityFollowing -> "0.25",
