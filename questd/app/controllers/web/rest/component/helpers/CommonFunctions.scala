@@ -1,6 +1,5 @@
 package controllers.web.rest.component.helpers
 
-import controllers.web.rest.component.ProfileWSImplTypes.WSProfileResult
 import play.api._
 import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -16,6 +15,7 @@ private[component] trait CommonFunctions { this: QuestController with SecurityWS
   def wrapJsonApiCallReturnBody[T <: AnyRef](jsonApiCall: (String, AuthenticatedRequest[AnyContent]) => ApiResult[T]) = apiCallToResult { r =>
 
     r.body.asJson.fold {
+      //noinspection Annotator
       throw new org.json4s.ParserUtil$ParseException("Empty request", null)
     } { js =>
       jsonApiCall(js.toString(), r)
@@ -36,18 +36,14 @@ private[component] trait CommonFunctions { this: QuestController with SecurityWS
   }
 
   private def apiCallToResult[T <: AnyRef](apiCall: AuthenticatedRequest[AnyContent] => ApiResult[T])(resultGenerator: T => Result) = composeAsyncResult { implicit request =>
-      try {
+    //noinspection Annotator
+    try {
         apiCall(request) match {
           case OkApiResult(r) =>
             resultGenerator(r)
 
           case InternalErrorApiResult(ex) =>
             Logger.error("InternalErrorApiResult", ex)
-            ServerError
-
-            // TODO: since parent is sealed this can be removed. or not?
-          case a =>
-            Logger.error(s"Unexpected result in api call - $a")
             ServerError
         }
       } catch {
