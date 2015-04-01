@@ -51,11 +51,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
   }
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
-
-    //      shiftStats(ShiftStatsRequest(user))
-//import controllers.domain.app.quest._
-//	  calculateProposalThresholds(CalculateProposalThresholdsRequest(10, 3))
-//      shiftHistory(ShiftHistoryRequest(user))
+    api.populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(r.user))
 
     OkApiResult(WSDebugResult("lalai"))
   }
