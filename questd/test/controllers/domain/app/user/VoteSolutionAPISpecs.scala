@@ -4,7 +4,7 @@ package controllers.domain.app.user
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain._
-import org.mockito.Matchers
+import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
 class VoteSolutionAPISpecs extends BaseAPISpecs {
@@ -48,7 +48,6 @@ class VoteSolutionAPISpecs extends BaseAPISpecs {
       val sid = "solution id"
       val friendId = "friendId"
       val s = createSolutionStub(id = sid, authorId = friendId, status = SolutionStatus.Won)
-      val q = createQuestStub()
       val u = createUserStub(
         id = "uniqueid",
         timeLine = List(createTimeLineEntryStub(objectId = s.id)),
@@ -67,7 +66,7 @@ class VoteSolutionAPISpecs extends BaseAPISpecs {
         any) returns Some(s)
       user.recordSolutionVote(u.id, s.id, ContentVote.Cool) returns Some(u)
 
-      val result = api.voteSolution(VoteSolutionRequest(
+      val result = api.voteSolutionByUser(VoteSolutionByUserRequest(
         user = u,
         solutionId = sid,
         vote = ContentVote.Cool))
@@ -76,13 +75,13 @@ class VoteSolutionAPISpecs extends BaseAPISpecs {
         any,
         any,
         any,
-        Matchers.eq(1),
-        Matchers.eq(1),
+        mEq(1),
+        mEq(1),
         any,
         any,
         any)
 
-      result must beAnInstanceOf[OkApiResult[VoteSolutionResult]]
+      result must beAnInstanceOf[OkApiResult[VoteSolutionByUserResult]]
       result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
     }
   }

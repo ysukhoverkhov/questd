@@ -5,11 +5,11 @@ import controllers.domain.helpers._
 import models.domain._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.domain.app.solution.VoteSolutionUpdateRequest
+import controllers.domain.app.solution.VoteSolutionRequest
 
-case class VoteSolutionRequest(user: User, solutionId: String, vote: ContentVote.Value)
+case class VoteSolutionByUserRequest(user: User, solutionId: String, vote: ContentVote.Value)
 
-case class VoteSolutionResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class VoteSolutionByUserResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 private[domain] trait VoteSolutionAPI {
   this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -17,8 +17,7 @@ private[domain] trait VoteSolutionAPI {
   /**
    * Vote for a solution.
    */
-  // TODO: rename me to voteSolutionByUser
-  def voteSolution(request: VoteSolutionRequest): ApiResult[VoteSolutionResult] = handleDbException {
+  def voteSolutionByUser(request: VoteSolutionByUserRequest): ApiResult[VoteSolutionByUserResult] = handleDbException {
     import request._
 
     user.canVoteSolution(solutionId) match {
@@ -27,7 +26,7 @@ private[domain] trait VoteSolutionAPI {
         db.solution.readById(solutionId) ifSome { s =>
           {
             val isFriend = user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId).contains(s.info.authorId)
-            voteSolutionUpdate(VoteSolutionUpdateRequest(s, isFriend, request.vote))
+            voteSolution(VoteSolutionRequest(s, isFriend, request.vote))
           } map { r =>
 
             if (request.vote == ContentVote.Cool)
@@ -52,13 +51,13 @@ private[domain] trait VoteSolutionAPI {
                   OkApiResult(UserInternalResult(r.user))
                 }
               }) map { r =>
-                OkApiResult(VoteSolutionResult(OK, Some(r.user.profile)))
+                OkApiResult(VoteSolutionByUserResult(OK, Some(r.user.profile)))
               }
             }
           }
         }
 
-      case a => OkApiResult(VoteSolutionResult(a))
+      case a => OkApiResult(VoteSolutionByUserResult(a))
     }
   }
 }

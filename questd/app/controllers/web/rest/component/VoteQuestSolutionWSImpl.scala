@@ -18,7 +18,7 @@ private object VoteQuestSolutionWSImplTypes {
      */
     vote: String)
 
-  type WSVoteSolutionResult = VoteSolutionResult
+  type WSVoteSolutionResult = VoteSolutionByUserResult
 }
 
 trait VoteQuestSolutionWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
@@ -30,7 +30,7 @@ trait VoteQuestSolutionWSImpl extends QuestController with SecurityWSImpl with C
     val v = Json.read[WSVoteQuestSolutionRequest](js)
     val vote = ContentVote.withName(v.vote)
 
-    api.voteSolution(VoteSolutionRequest(r.user, v.solutionId, vote))
+    api.voteSolutionByUser(VoteSolutionByUserRequest(r.user, v.solutionId, vote))
 
   }
 

@@ -4,7 +4,7 @@ import controllers.domain._
 import controllers.domain.admin.{AllQuestsRequest, AllSolutionsRequest, AllUsersRequest}
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
-import controllers.domain.app.solution.VoteSolutionUpdateRequest
+import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
 import models.domain._
@@ -93,9 +93,9 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     val v = Json.read[WSVoteSolutionDebugRequest](js)
     val solution = api.allSolutions(AllSolutionsRequest()).body.get.solutions.filter(_.id == v.solutionId).next()
 
-    v.likesCount times api.voteSolutionUpdate(VoteSolutionUpdateRequest(solution, isFriend = false, ContentVote.Cool))
-    v.cheatingCount times api.voteSolutionUpdate(VoteSolutionUpdateRequest(solution, isFriend = false, ContentVote.Cheating))
-    v.pornCount times api.voteSolutionUpdate(VoteSolutionUpdateRequest(solution, isFriend = false, ContentVote.IAPorn))
+    v.likesCount times api.voteSolution(VoteSolutionRequest(solution, isFriend = false, ContentVote.Cool))
+    v.cheatingCount times api.voteSolution(VoteSolutionRequest(solution, isFriend = false, ContentVote.Cheating))
+    v.pornCount times api.voteSolution(VoteSolutionRequest(solution, isFriend = false, ContentVote.IAPorn))
 
     OkApiResult(WSDebugResult("Done"))
   }

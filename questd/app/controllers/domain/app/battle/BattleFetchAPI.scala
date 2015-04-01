@@ -60,7 +60,6 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
       status = List(BattleStatus.Fighting))))
   }
 
-  // TODO: here and in similar classes merge this two functions into "getbattles for authors"
   def getFriendsBattles(request: GetFriendsBattlesRequest): ApiResult[GetFriendsBattlesResult] = handleDbException {
     OkApiResult(GetFriendsBattlesResult(db.battle.allWithParams(
       status = request.status,

@@ -8,11 +8,11 @@ import controllers.domain.helpers._
 import models.domain._
 import play.Logger
 
-case class VoteSolutionUpdateRequest(
+case class VoteSolutionRequest(
   solution: Solution,
   isFriend: Boolean,
   vote: ContentVote.Value)
-case class VoteSolutionUpdateResult()
+case class VoteSolutionResult()
 
 case class UpdateSolutionStateRequest(solution: Solution)
 case class UpdateSolutionStateResult()
@@ -20,14 +20,13 @@ case class UpdateSolutionStateResult()
 private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
-   * Updates quest according to vote.
+   * Updates solution according to vote.
    */
-  // TODO: rename me to voteSolution
-  def voteSolutionUpdate(request: VoteSolutionUpdateRequest): ApiResult[VoteSolutionUpdateResult] = handleDbException {
+  def voteSolution(request: VoteSolutionRequest): ApiResult[VoteSolutionResult] = handleDbException {
     import models.domain.ContentVote._
     import request._
 
-    Logger.debug("API - voteQuestSolutionUpdate")
+    Logger.debug("API - voteQuestSolution")
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
@@ -54,7 +53,7 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
         } else {
           OkApiResult(UpdateBattleStateResult)
         }) map {
-          OkApiResult(VoteSolutionUpdateResult())
+          OkApiResult(VoteSolutionResult())
         }
       }
     }
