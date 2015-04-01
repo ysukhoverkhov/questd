@@ -87,9 +87,6 @@ trait UserDAO extends BaseDAO[User] {
   def levelUp(id: String, ratingToNextLevel: Int): Option[User]
   def setNextLevelRatingAndRights(id: String, newRatingToNextLevel: Int, rights: Rights): Option[User]
 
-  // TODO: remove the function since it's wrong.
-  def updateStats(id: String, stats: UserStats): Option[User]
-
   def addToFollowing(id: String, idToAdd: String): Option[User]
   def removeFromFollowing(id: String, idToRemove: String): Option[User]
 
