@@ -38,6 +38,9 @@ private[logic] abstract class BaseLogicSpecs extends Specification
 
     config.apply(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests) returns "5"
     config.apply(api.ConfigParams.QuestProbabilityStartingVIPQuests) returns "0.50"
+    config.apply(api.ConfigParams.QuestProbabilityStartingFriendQuests) returns "0.20"
+    config.apply(api.ConfigParams.QuestProbabilityStartingFollowingQuests) returns "0.20"
+
     config.apply(api.ConfigParams.QuestProbabilityFriends) returns "0.25"
     config.apply(api.ConfigParams.QuestProbabilityFollowing) returns "0.45"
     config.apply(api.ConfigParams.QuestProbabilityVIP) returns "0.10"
