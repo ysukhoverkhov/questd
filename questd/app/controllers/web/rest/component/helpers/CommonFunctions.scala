@@ -15,7 +15,6 @@ private[component] trait CommonFunctions { this: QuestController with SecurityWS
   def wrapJsonApiCallReturnBody[T <: AnyRef](jsonApiCall: (String, AuthenticatedRequest[AnyContent]) => ApiResult[T]) = apiCallToResult { r =>
 
     r.body.asJson.fold {
-      //noinspection Annotator
       throw new org.json4s.ParserUtil$ParseException("Empty request", null)
     } { js =>
       jsonApiCall(js.toString(), r)
@@ -36,7 +35,6 @@ private[component] trait CommonFunctions { this: QuestController with SecurityWS
   }
 
   private def apiCallToResult[T <: AnyRef](apiCall: AuthenticatedRequest[AnyContent] => ApiResult[T])(resultGenerator: T => Result) = composeAsyncResult { implicit request =>
-    //noinspection Annotator
     try {
         apiCall(request) match {
           case OkApiResult(r) =>

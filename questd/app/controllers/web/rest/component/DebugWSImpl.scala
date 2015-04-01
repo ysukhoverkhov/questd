@@ -10,8 +10,6 @@ import controllers.web.rest.component.helpers._
 import models.domain._
 import play.Logger
 
-import scala.annotation.tailrec
-
 private object DebugWSImplTypes {
 
   type WSShiftDailyResultResult = ShiftDailyResultResult
@@ -62,20 +60,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     OkApiResult(WSDebugResult("lalai"))
   }
 
-  // TODO: move me to lang extention library
-  class Rep (count: Int) {
-    def times(f: => Unit): Unit = loop(f, count)
-
-    @tailrec
-    private def loop (f: => Unit, n: Int): Unit = if (n > 0) { f; loop(f, n - 1) }
-  }
-  object Rep {
-    import scala.language.implicitConversions
-    implicit def int2Rep(i: Int): Rep = new Rep(i)
-  }
-
   def voteQuestDebug = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>
-    import Rep._
+    import com.vita.utils._
 
     val v = Json.read[WSVoteQuestDebugRequest](js)
     val quest = api.allQuests(AllQuestsRequest()).body.get.quests.filter(_.id == v.questId).next()
@@ -88,7 +74,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
   }
 
   def voteSolutionDebug = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>
-    import Rep._
+    import com.vita.utils._
 
     val v = Json.read[WSVoteSolutionDebugRequest](js)
     val solution = api.allSolutions(AllSolutionsRequest()).body.get.solutions.filter(_.id == v.solutionId).next()
