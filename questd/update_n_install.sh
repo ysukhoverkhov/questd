@@ -1,6 +1,6 @@
 #!/bin/bash
 
 hg pull
-hg up
+hg up $1
 
 ./stage.sh

@@ -47,6 +47,9 @@ private[logic] abstract class BaseLogicSpecs extends Specification
 
     config.apply(api.ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions) returns "5"
     config.apply(api.ConfigParams.SolutionProbabilityStartingVIPSolutions) returns "0.50"
+    config.apply(api.ConfigParams.SolutionProbabilityStartingFriendSolutions) returns "0.20"
+    config.apply(api.ConfigParams.SolutionProbabilityStartingFollowingSolutions) returns "0.20"
+
     config.apply(api.ConfigParams.SolutionProbabilityFriends) returns "0.25"
     config.apply(api.ConfigParams.SolutionProbabilityFollowing) returns "0.25"
     config.apply(api.ConfigParams.SolutionProbabilityLiked) returns "0.20"
