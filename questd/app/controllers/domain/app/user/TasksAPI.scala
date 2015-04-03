@@ -113,10 +113,10 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       r1 map { r =>
         val u = (taskType, tutorialTaskId) match {
           case (Some(tt), None) =>
-            db.user.incTask(user.id, tt.toString, newPercent, completed)
+            db.user.incTask(id = user.id, taskType = tt.toString, completed = newPercent, rewardReceived = completed)
 
           case (None, Some(ti)) =>
-            db.user.incTutorialTask(user.id, ti, newPercent, completed)
+            db.user.incTutorialTask(id = user.id, taskId = ti, completed = newPercent, rewardReceived = completed)
 
           case _ =>
             Logger.error("Incorrect request to makeTest")
