@@ -11,6 +11,7 @@ import org.specs2.mutable._
 import play.api.test._
 import testhelpers.domainstubs._
 
+//noinspection ZeroIndexToHead
 //@RunWith(classOf[JUnitRunner])
 class UserDAOSpecs
   extends Specification
@@ -160,8 +161,8 @@ class UserDAOSpecs
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client)(0).currentCount == 1)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards)(0).currentCount == 2)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client).head.currentCount == 1)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards).head.currentCount == 2)
     }
 
     "incTask should change percentage completed" in new WithApplication(appWithTestDatabase) {
@@ -181,7 +182,7 @@ class UserDAOSpecs
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou.get.profile.dailyTasks.tasks(0).currentCount must beEqualTo(1)
+      ou.get.profile.dailyTasks.tasks.head.currentCount must beEqualTo(1)
       ou.get.profile.dailyTasks.completed must beEqualTo(0.4f)
       ou.get.profile.dailyTasks.rewardReceived must beEqualTo(true)
     }
@@ -218,9 +219,9 @@ class UserDAOSpecs
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client)(0).currentCount == 1)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards)(0).currentCount == 0)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToFollowing)(0).currentCount == 0)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client).head.currentCount == 1)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards).head.currentCount == 0)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToFollowing).head.currentCount == 0)
     }
 
     "updateQuestCreationCoolDown should reset cool down" in new WithApplication(appWithTestDatabase) {
@@ -368,11 +369,11 @@ class UserDAOSpecs
       userids.foreach(v => db.user.create(User(id = v)))
 
 
-      db.user.populateMustVoteSolutionsList(userids, solIds(0))
+      db.user.populateMustVoteSolutionsList(userids, solIds.head)
       db.user.populateMustVoteSolutionsList(userids.tail, solIds(1))
 
-      val ou1 = db.user.readById(userids(0))
-      ou1 must beSome.which((u: User) => u.mustVoteSolutions == List(solIds(0)))
+      val ou1 = db.user.readById(userids.head)
+      ou1 must beSome.which((u: User) => u.mustVoteSolutions == List(solIds.head))
 
       val ou2 = db.user.readById(userids(1))
       ou2 must beSome.which((u: User) => solIds forall u.mustVoteSolutions.contains)
@@ -446,14 +447,14 @@ class UserDAOSpecs
       val tle = TimeLineEntry(
         id = "id",
         reason = TimeLineReason.Created,
-        actorId = u(0).id,
+        actorId = u.head.id,
         TimeLineType.Quest,
         objectId = "oid")
 
       u.foreach(db.user.create)
       db.user.addEntryToTimeLineMulti(u.map(_.id), tle)
 
-      val ou1 = db.user.readById(u(0).id)
+      val ou1 = db.user.readById(u.head.id)
       ou1 must beSome[User]
       ou1.get.timeLine must beEqualTo(List(tle))
 
@@ -504,7 +505,8 @@ class UserDAOSpecs
       val questId = "qiq"
       val qi = QuestView(
         questId,
-        createQuestStub(id = questId).info)
+        createQuestStub(id = questId).info,
+        None)
       val user = createUserStub(questBookmark = None)
       db.user.create(user)
 

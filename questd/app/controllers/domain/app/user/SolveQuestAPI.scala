@@ -196,7 +196,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     import request._
 
     db.quest.readById(questId) ifSome { quest =>
-      db.user.setQuestBookmark(user.id, QuestView(quest.id, quest.info)) ifSome { updatedUser =>
+      db.user.setQuestBookmark(user.id, QuestView(quest.id, quest.info, Some(quest.rating))) ifSome { updatedUser =>
         OkApiResult(BookmarkQuestResult(OK, Some(updatedUser.profile)))
       }
     }

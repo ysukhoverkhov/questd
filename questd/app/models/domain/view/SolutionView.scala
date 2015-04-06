@@ -5,5 +5,5 @@ import models.domain._
 case class SolutionView (
     id: String,
     info: SolutionInfo,
-    rating: Option[SolutionRating] = None,
+    rating: Option[SolutionRating],
     myVote: Option[ContentVote.Value] = None)
