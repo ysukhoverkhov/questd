@@ -84,6 +84,7 @@ POST	/rest/removeMessage								controllers.web.rest.MessagesWS.removeMessage
 POST	/rest/getTime									controllers.web.rest.MiscWS.getTime
 
 # Tutorial
+POST	/rest/getTutorial	    						controllers.web.rest.TutorialWS.getTutorial
 POST	/rest/getTutorialState							controllers.web.rest.TutorialWS.getTutorialState
 POST	/rest/setTutorialState							controllers.web.rest.TutorialWS.setTutorialState
 POST	/rest/assignTutorialTask						controllers.web.rest.TutorialWS.assignTutorialTask

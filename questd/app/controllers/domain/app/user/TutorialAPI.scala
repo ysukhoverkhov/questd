@@ -7,7 +7,10 @@ import controllers.domain._
 import controllers.domain.helpers._
 import controllers.domain.app.protocol.ProfileModificationResult._
 
-case class GetTutorialStateRequest(user: User, platformId: String)
+case class GetTutorialRequest(user: User, platform: TutorialPlatform.Value)
+case class GetTutorialResult(tutorial: List[TutorialElement])
+
+case class GetTutorialStateRequest(user: User, platform: TutorialPlatform.Value)
 case class GetTutorialStateResult(state: Option[String])
 
 case class SetTutorialStateRequest(user: User, platformId: String, state: String)
@@ -22,12 +25,22 @@ case class IncTutorialTaskResult(allowed: ProfileModificationResult, profile: Op
 private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
+   * Get actual for current user tutorial.
+   */
+  def getTutorial(request: GetTutorialRequest): ApiResult[GetTutorialResult] = handleDbException {
+    val commonScenario: List[TutorialElement] =
+      db.tutorial.readById(request.platform.toString) map {_.elements} getOrElse List.empty
+
+    OkApiResult(GetTutorialResult(commonScenario))
+  }
+
+  /**
    * Get state of tutorial for a specified platform.
    */
   def getTutorialState(request: GetTutorialStateRequest): ApiResult[GetTutorialStateResult] = handleDbException {
     import request._
 
-    OkApiResult(GetTutorialStateResult(user.tutorial.clientTutorialState.get(platformId)))
+    OkApiResult(GetTutorialStateResult(user.tutorial.clientTutorialState.get(platform)))
   }
 
   /**

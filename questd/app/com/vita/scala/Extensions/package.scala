@@ -3,7 +3,7 @@ package com.vita.scala
 /**
  * Scala language extensions made by Vita
  */
-package object Extensions {
+package object extensions {
 
   import scala.language.implicitConversions
   implicit def enrichBoolean(v: Boolean): RichBoolean = new RichBoolean(v)

@@ -2,19 +2,29 @@ package controllers.web.rest.component
 
 import controllers.domain.app.user._
 import controllers.web.rest.component.helpers._
+import models.domain.TutorialPlatform
+import com.vita.scala.extensions._
 
 private object TutorialWSImplTypes {
 
+  case class WSGetTutorialRequest(
+    /// Id of a platform to get state for.
+    platform: String)
+
+  /// Get current actual tutorial for the user.
+  type WSGetTutorialResult = GetTutorialResult
+
+
   case class WSGetTutorialStateRequest(
     /// Id of a platform to get state for.
-    platformId: String)
+    platform: String)
 
   /// if no state for platform present empty result will be returned.
   type WSGetTutorialStateResult = GetTutorialStateResult
 
   case class WSSetTutorialStateRequest(
     /// Id of a platform to get state for.
-    platformId: String,
+    platform: String,
     state: String)
 
   /// may return LimitExceeded in "allowed" field if there are too many platforms (logic.constants.NumberOfStoredTutorialPlatforms)
@@ -39,16 +49,22 @@ trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSCompo
 
   import controllers.web.rest.component.TutorialWSImplTypes._
 
+  def getTutorial = wrapJsonApiCallReturnBody[WSGetTutorialResult] { (js, r) =>
+    val v = Json.read[WSGetTutorialRequest](js)
+
+    api.getTutorial(GetTutorialRequest(r.user, TutorialPlatform.withNameEx(v.platform)))
+  }
+
   def getTutorialState = wrapJsonApiCallReturnBody[WSGetTutorialStateResult] { (js, r) =>
     val v = Json.read[WSGetTutorialStateRequest](js)
 
-    api.getTutorialState(GetTutorialStateRequest(r.user, v.platformId))
+    api.getTutorialState(GetTutorialStateRequest(r.user, TutorialPlatform.withNameEx(v.platform)))
   }
 
   def setTutorialState() = wrapJsonApiCallReturnBody[WSSetTutorialStateResult] { (js, r) =>
     val v = Json.read[WSSetTutorialStateRequest](js)
 
-    api.setTutorialState(SetTutorialStateRequest(r.user, v.platformId, v.state))
+    api.setTutorialState(SetTutorialStateRequest(r.user, v.platform, v.state))
   }
 
   def assignTutorialTask = wrapJsonApiCallReturnBody[WSAssignTutorialTaskResult] { (js, r) =>

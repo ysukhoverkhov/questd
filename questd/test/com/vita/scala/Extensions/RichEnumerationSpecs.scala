@@ -1,4 +1,4 @@
-package com.vita.scala.Extensions
+package com.vita.scala.extensions
 
 import org.specs2.mutable.Specification
 
