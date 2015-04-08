@@ -9,6 +9,7 @@ trait MongoDatabaseComponent extends DatabaseComponent {
 
     val theme = new MongoThemeDAO
     val config = new MongoConfigDAO
+    val tutorial = new MongoTutorialDAO
     val tutorialTask = new MongoTutorialTaskDAO
 
     val user = new MongoUserDAO
@@ -17,6 +18,5 @@ trait MongoDatabaseComponent extends DatabaseComponent {
     val battle = new MongoBattleDAO
     val culture = new MongoCultureDAO
   }
-
 }
 

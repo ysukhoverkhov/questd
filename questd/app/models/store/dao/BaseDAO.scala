@@ -1,6 +1,8 @@
 package models.store.dao
 
-private[store] trait BaseDAO[T] {
+import models.domain.base.ID
+
+private[store] trait BaseDAO[T <: ID] {
   def create(u: T): Unit
   def readById(key: String): Option[T]
   def readManyByIds(ids: List[String], skip: Int = 0): Iterator[T]

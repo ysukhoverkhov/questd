@@ -1,11 +1,13 @@
 package models.domain
 
+import models.domain.base.ID
+
 
 /**
  * A tutorial for a platform.
  */
 case class Tutorial (
-  platform: String,
+  id: String,
   elements: List[TutorialElement]
-  )
+  ) extends ID
 
