@@ -49,8 +49,6 @@ POST	/rest/getBattles    							controllers.web.rest.ContentWS.getBattles
 
 POST	/rest/getPublicProfiles							controllers.web.rest.ContentWS.getPublicProfiles
 
-POST	/rest/getOwnSolutions				            controllers.web.rest.ContentWS.getOwnSolutions
-POST	/rest/getOwnQuests					            controllers.web.rest.ContentWS.getOwnQuests
 POST	/rest/getOwnBattles					            controllers.web.rest.ContentWS.getOwnBattles
 
 POST	/rest/getQuestsForUser							controllers.web.rest.ContentWS.getQuestsForUser

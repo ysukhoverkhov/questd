@@ -31,18 +31,6 @@ private object ContentWSImplTypes
   type WSGetPublicProfileResult = GetPublicProfilesResult
 
 
-  case class WSGetOwnQuestsRequest(
-    // see QuestStatus enum. if missing all solutions will be returned.
-    status: List[String] = List.empty,
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-  type WSGetOwnQuestsResult = GetOwnQuestsResult
-
-
   case class WSGetOwnBattlesRequest(
     // see BattleStatus enum. if missing all solutions will be returned.
     status: List[String] = List.empty,
@@ -121,18 +109,6 @@ private object ContentWSImplTypes
     pageSize: Int)
   type WSGetBattlesForSolutionResult = GetBattlesForSolutionResult
 
-
-  type WSGetOwnSolutionsResult = GetOwnSolutionsResult
-  case class WSGetOwnSolutionsRequest(
-    // see QuestSolutionStatus enum. if missing all solutions will be returned.
-    status: List[String] = List.empty,
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-
 }
 
 
@@ -175,32 +151,6 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     val v = Json.read[WSGetPublicProfilesRequest](js)
 
     api.getPublicProfiles(GetPublicProfilesRequest(r.user, v.ids))
-  }
-
-  /**
-   * Get own quests.
-   */
-  def getOwnQuests = wrapJsonApiCallReturnBody[WSGetOwnQuestsResult] { (js, r) =>
-    val v = Json.read[WSGetOwnQuestsRequest](js)
-
-    api.getOwnQuests(GetOwnQuestsRequest(
-      r.user,
-      v.status.map(QuestStatus.withNameEx),
-      v.pageNumber,
-      v.pageSize))
-  }
-
-  /**
-   * Get own solutions.
-   */
-  def getOwnSolutions = wrapJsonApiCallReturnBody[WSGetOwnSolutionsResult] { (js, r) =>
-    val v = Json.read[WSGetOwnSolutionsRequest](js)
-
-    api.getOwnSolutions(GetOwnSolutionsRequest(
-      r.user,
-      v.status.map(SolutionStatus.withNameEx),
-      v.pageNumber,
-      v.pageSize))
   }
 
   /**

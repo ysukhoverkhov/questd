@@ -29,28 +29,6 @@ case class GetPublicProfilesResult(
   allowed: ProfileModificationResult,
   publicProfiles: List[ProfileView])
 
-case class GetOwnSolutionsRequest(
-  user: User,
-  status: List[SolutionStatus.Value],
-  pageNumber: Int,
-  pageSize: Int)
-case class GetOwnSolutionsResult(
-  allowed: ProfileModificationResult,
-  solutions: List[SolutionView],
-  pageSize: Int,
-  hasMore: Boolean)
-
-case class GetOwnQuestsRequest(
-  user: User,
-  status: List[QuestStatus.Value],
-  pageNumber: Int,
-  pageSize: Int)
-case class GetOwnQuestsResult(
-  allowed: ProfileModificationResult,
-  quests: List[QuestView],
-  pageSize: Int,
-  hasMore: Boolean)
-
 case class GetOwnBattlesRequest(
   user: User,
   status: List[BattleStatus.Value],
@@ -187,33 +165,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   }
 
   /**
-   * Get own solutions.
-   */
-  def getOwnSolutions(request: GetOwnSolutionsRequest): ApiResult[GetOwnSolutionsResult] = handleDbException {
-    val pageSize = adjustedPageSize(request.pageSize)
-    val pageNumber = adjustedPageNumber(request.pageNumber)
-
-    val solutionsForUser = db.solution.allWithParams(
-      status = request.status,
-      authorIds = List(request.user.id),
-      skip = pageNumber * pageSize)
-
-    val solutions = solutionsForUser.take(pageSize).toList.map(s => {
-      SolutionView(s.id, s.info, Some(s.rating))
-    })
-
-    OkApiResult(GetOwnSolutionsResult(
-      allowed = OK,
-      solutions = solutions,
-      pageSize,
-      solutionsForUser.hasNext))
-  }
-
-  /**
    * Get own battles.
    * @param request The request.
    * @return The result.
    */
+  // TODO: check it's used in client.
   def getOwnBattles(request: GetOwnBattlesRequest): ApiResult[GetOwnBattlesResult] = handleDbException {
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
@@ -232,25 +188,6 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       battles = battles,
       pageSize,
       battlesForUser.hasNext))
-  }
-
-  /**
-   * Get own quests.
-   */
-  def getOwnQuests(request: GetOwnQuestsRequest): ApiResult[GetOwnQuestsResult] = handleDbException {
-    val pageSize = adjustedPageSize(request.pageSize)
-    val pageNumber = adjustedPageNumber(request.pageNumber)
-
-    val questsForUser = db.quest.allWithParams(
-      status = request.status,
-      authorIds = List(request.user.id),
-      skip = pageNumber * pageSize)
-
-    OkApiResult(GetOwnQuestsResult(
-      allowed = OK,
-      quests = questsForUser.take(pageSize).toList.map(q => QuestView(q.id, q.info, Some(q.rating))),
-      pageSize,
-      questsForUser.hasNext))
   }
 
   /**
