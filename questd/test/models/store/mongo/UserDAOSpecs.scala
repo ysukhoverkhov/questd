@@ -43,7 +43,7 @@ class UserDAOSpecs
       db.user.create(User(testsess, AuthInfo(session = Some(sessid))))
       val u = db.user.readBySessionId(sessid)
       u must beSome.which((u: User) => u.id.toString == testsess) and
-        beSome.which((u: User) => u.auth.snids == Map()) and
+        beSome.which((u: User) => u.auth.snids == Map.empty) and
         beSome.which((u: User) => u.auth.session == Some(sessid))
     }
 
@@ -63,10 +63,10 @@ class UserDAOSpecs
       val u2 = db.user.readById(u1unlifted.id)
 
       u1 must beSome.which((u: User) => u.id.toString == id) and
-        beSome.which((u: User) => u.auth.snids == Map()) and
+        beSome.which((u: User) => u.auth.snids == Map.empty) and
         beSome.which((u: User) => u.auth.session == Some(sessid))
       u2 must beSome.which((u: User) => u.id.toString == id) and
-        beSome.which((u: User) => u.auth.snids == Map()) and
+        beSome.which((u: User) => u.auth.snids == Map.empty) and
         beSome.which((u: User) => u.auth.session == Some(newsessid))
     }
 

@@ -36,7 +36,7 @@ private[domain] abstract class BaseAPISpecs
   // End constructing
 
   def mockConfiguration: Configuration = {
-    Configuration(Map())
+    Configuration(Map.empty)
   }
 
   object context extends org.specs2.mutable.Before {

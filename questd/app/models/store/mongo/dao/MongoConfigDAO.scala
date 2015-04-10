@@ -17,7 +17,7 @@ private[mongo] class MongoConfigDAO
     val a: List[ConfigSection] = List.empty ++ all
 
     Configuration(
-      a.foldLeft[Map[String, ConfigSection]](Map()) { (m, v) => m + (v.id -> v) })
+      a.foldLeft[Map[String, ConfigSection]](Map.empty) { (m, v) => m + (v.id -> v) })
   }
 
 }

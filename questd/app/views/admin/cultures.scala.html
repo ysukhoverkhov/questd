@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main("Cultures")(menuItems, Map()) {
+@main("Cultures")(menuItems, Map.empty) {
 
 	<p>
 		@form(action = controllers.web.admin.routes.CulturesCRUD.createCultureCB()) {

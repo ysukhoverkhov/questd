@@ -9,17 +9,17 @@ class ConfigImpl (val api: DomainAPIComponent#DomainAPI) extends Controller with
 
   private def leftMenu(implicit request: RequestHeader): Map[String, String] = {
     api.getConfiguration(GetConfigurationRequest()) match {
-      case OkApiResult(GetConfigurationResult(r)) => r.sections.foldLeft[Map[String, String]](Map()) {
+      case OkApiResult(GetConfigurationResult(r)) => r.sections.foldLeft[Map[String, String]](Map.empty) {
         (c, v) => c + (v.id -> controllers.web.admin.routes.Config.config(v.id).absoluteURL(secure = false))
       }
-      case _ => Map()
+      case _ => Map.empty
     }
   }
 
   def config(sectionName: String) = Authenticated { implicit request =>
     api.getConfigSection(GetConfigSectionRequest(sectionName)) match {
       case OkApiResult(GetConfigSectionResult(Some(r))) => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, r.values.toSeq.sortBy(_._1)))
-      case _ => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, Map().toSeq))
+      case _ => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, Map.empty.toSeq))
     }
   }
 
@@ -30,7 +30,7 @@ class ConfigImpl (val api: DomainAPIComponent#DomainAPI) extends Controller with
         m.map {
           case (k, v) => k -> v.head
         }
-      case _ => Map()
+      case _ => Map.empty
     }
 
     val sec = ConfigSection(sectionName, values)

@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main("Themes")(menuItems, Map()) {
+@main("Themes")(menuItems, Map.empty) {
 
 	<p>
 		@form(action = controllers.web.admin.routes.ThemesCRUD.createThemeCB()) {

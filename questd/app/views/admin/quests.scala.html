@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main("Quests")(menuItems, Map()) {
+@main("Quests")(menuItems, Map.empty) {
 
 	@form(action = controllers.web.admin.routes.QuestsCRUD.updateQuest()) {
 		@inputText(newQuestForm("id"), 'size -> 18, 'readonly -> "readonly") <br />
