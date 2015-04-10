@@ -14,8 +14,8 @@ class TasksAPISpecs extends BaseAPISpecs {
         dailyTasks = dt,
         ratingToNextLevel = 10000000,
         rights = Rights.full),
-      tutorial = TutorialState(
-        assignedTutorialTaskIds = assignedTutorialTaskIds))
+      tutorialStates = Map(TutorialPlatform.iPhone.toString -> TutorialState(
+        assignedTutorialTaskIds = assignedTutorialTaskIds)))
   }
 
   "Tasks API" should {
@@ -332,7 +332,7 @@ class TasksAPISpecs extends BaseAPISpecs {
         rewardReceived = true,
         tasks = List.empty), List(tutorialTaskId))
 
-      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, tutorialTaskId))
+      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, tutorialTaskId))
 
       result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.LimitExceeded)))
     }
@@ -345,7 +345,7 @@ class TasksAPISpecs extends BaseAPISpecs {
 
       db.tutorialTask.readById(s"a$tutorialTaskId") returns None
 
-      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, s"a$tutorialTaskId"))
+      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, s"a$tutorialTaskId"))
 
       result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.OutOfContent)))
       there was one(db.tutorialTask).readById(any)
@@ -366,15 +366,15 @@ class TasksAPISpecs extends BaseAPISpecs {
           requiredCount = 10,
           reward = Assets()))
       db.user.resetTasks(any, any, any) returns Some(u)
-      db.user.addTutorialTaskAssigned(any, any) returns Some(u)
+      db.user.addTutorialTaskAssigned(any, any, any) returns Some(u)
       db.user.addTasks(any, any, any) returns Some(u)
 
-      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, tutorialTaskId))
+      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, tutorialTaskId))
 
       result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.OK, Some(u.profile))))
       there was one(db.tutorialTask).readById(tutorialTaskId)
       there was one(db.user).resetTasks(any, any, any)
-      there was one(db.user).addTutorialTaskAssigned(any, any)
+      there was one(db.user).addTutorialTaskAssigned(any, any, any)
       there was one(db.user).addTasks(any, any, any)
     }
 

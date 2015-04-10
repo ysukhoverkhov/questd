@@ -10,13 +10,13 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 case class GetTutorialRequest(user: User, platform: TutorialPlatform.Value)
 case class GetTutorialResult(tutorial: List[TutorialElement])
 
-case class GetTutorialStateRequest(user: User, platform: TutorialPlatform.Value)
-case class GetTutorialStateResult(state: Option[String])
+case class GetTutorialElementsStateRequest(user: User, platform: TutorialPlatform.Value)
+case class GetTutorialElementsStateResult(state: TutorialState)
 
-case class SetTutorialStateRequest(user: User, platformId: String, state: String)
-case class SetTutorialStateResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class CloseTutorialElementRequest(user: User, platform: TutorialPlatform.Value, elementId: String)
+case class CloseTutorialElementResult(allowed: ProfileModificationResult, state: Option[TutorialState] = None)
 
-case class AssignTutorialTaskRequest(user: User, taskId: String)
+case class AssignTutorialTaskRequest(user: User, platform: TutorialPlatform.Value, taskId: String)
 case class AssignTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class IncTutorialTaskRequest(user: User, taskId: String)
@@ -37,27 +37,21 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
   /**
    * Get state of tutorial for a specified platform.
    */
-  def getTutorialState(request: GetTutorialStateRequest): ApiResult[GetTutorialStateResult] = handleDbException {
+  def getTutorialElementsState(request: GetTutorialElementsStateRequest): ApiResult[GetTutorialElementsStateResult] = handleDbException {
     import request._
 
-    OkApiResult(GetTutorialStateResult(user.tutorial.clientTutorialState.get(platform)))
+    OkApiResult(GetTutorialElementsStateResult(user.tutorialStates(platform.toString)))
   }
 
   /**
    * Set state of tutorial for a specified platform.
    */
-  def setTutorialState(request: SetTutorialStateRequest): ApiResult[SetTutorialStateResult] = handleDbException {
+  def closeTutorialElement(request: CloseTutorialElementRequest): ApiResult[CloseTutorialElementResult] = handleDbException {
     import request._
 
-    if (user.tutorial.clientTutorialState.size > logic.constants.NumberOfStoredTutorialPlatforms ||
-      state.length > logic.constants.MaxLengthOfTutorialPlatformState) {
-      OkApiResult(SetTutorialStateResult(LimitExceeded))
-    } else {
-      db.user.setTutorialState(user.id, platformId, state) ifSome { v =>
-        OkApiResult(SetTutorialStateResult(OK, Some(v.profile)))
-      }
+    db.user.addClosedTutorialElement(user.id, platform.toString, elementId) ifSome { v =>
+      OkApiResult(CloseTutorialElementResult(OK, Some(v.tutorialStates(platform.toString))))
     }
-
   }
 
   /**
@@ -66,7 +60,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def assignTutorialTask(request: AssignTutorialTaskRequest): ApiResult[AssignTutorialTaskResult] = handleDbException {
     import request._
     // 1. check is the task was already given.
-    if (user.tutorial.assignedTutorialTaskIds.contains(taskId)) {
+    if (user.tutorialStates(platform.toString).assignedTutorialTaskIds.contains(taskId)) {
       OkApiResult(AssignTutorialTaskResult(LimitExceeded))
     } else {
       db.tutorialTask.readById(taskId) match {
@@ -81,7 +75,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
           {
             // 3. Add task to list of assigned tutorial tasks.
-            db.user.addTutorialTaskAssigned(user.id, taskId)
+            db.user.addTutorialTaskAssigned(id = user.id, platform = platform.toString, taskId = taskId)
           } ifSome { v =>
             // 4. Add reward of current task to reward for current daily tasks and increase timeout to infinity.
             val reward = t.reward

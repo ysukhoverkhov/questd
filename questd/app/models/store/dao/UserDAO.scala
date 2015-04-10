@@ -111,8 +111,8 @@ trait UserDAO extends BaseDAO[User] {
   def setCity(id: String, city: String): Option[User]
   def setCountry(id: String, country: String): Option[User]
 
-  def setTutorialState(id: String, platform: String, state: String): Option[User]
-  def addTutorialTaskAssigned(id: String, taskId: String): Option[User]
+  def addClosedTutorialElement(id: String, platform: String, state: String): Option[User]
+  def addTutorialTaskAssigned(id: String, platform: String, taskId: String): Option[User]
 
   def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit
 

@@ -15,23 +15,24 @@ private object TutorialWSImplTypes {
   type WSGetTutorialResult = GetTutorialResult
 
 
-  case class WSGetTutorialStateRequest(
+  case class WSGetTutorialElementsStateRequest(
     /// Id of a platform to get state for.
     platform: String)
 
   /// if no state for platform present empty result will be returned.
-  type WSGetTutorialStateResult = GetTutorialStateResult
+  type WSGetTutorialElementsStateResult = GetTutorialElementsStateResult
 
-  case class WSSetTutorialStateRequest(
+  case class WSCloseTutorialElementRequest(
     /// Id of a platform to get state for.
     platform: String,
-    state: String)
+    elementId: String)
 
   /// may return LimitExceeded in "allowed" field if there are too many platforms (logic.constants.NumberOfStoredTutorialPlatforms)
   /// or state is too long (logic.constants.MaxLengthOfTutorlaPlatformState).
-  type WSSetTutorialStateResult = SetTutorialStateResult
+  type WSCloseTutorialElementResult = CloseTutorialElementResult
 
   case class WSAssignTutorialTaskRequest(
+    platform: String,
     taskId: String)
 
   /// LimitExceeded if task was already requested.
@@ -55,22 +56,25 @@ trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSCompo
     api.getTutorial(GetTutorialRequest(r.user, TutorialPlatform.withNameEx(v.platform)))
   }
 
-  def getTutorialState = wrapJsonApiCallReturnBody[WSGetTutorialStateResult] { (js, r) =>
-    val v = Json.read[WSGetTutorialStateRequest](js)
+  def getTutorialElementsState = wrapJsonApiCallReturnBody[WSGetTutorialElementsStateResult] { (js, r) =>
+    val v = Json.read[WSGetTutorialElementsStateRequest](js)
 
-    api.getTutorialState(GetTutorialStateRequest(r.user, TutorialPlatform.withNameEx(v.platform)))
+    api.getTutorialElementsState(GetTutorialElementsStateRequest(r.user, TutorialPlatform.withNameEx(v.platform)))
   }
 
-  def setTutorialState() = wrapJsonApiCallReturnBody[WSSetTutorialStateResult] { (js, r) =>
-    val v = Json.read[WSSetTutorialStateRequest](js)
+  def closeTutorialElement = wrapJsonApiCallReturnBody[WSCloseTutorialElementResult] { (js, r) =>
+    val v = Json.read[WSCloseTutorialElementRequest](js)
 
-    api.setTutorialState(SetTutorialStateRequest(r.user, v.platform, v.state))
+    api.closeTutorialElement(CloseTutorialElementRequest(
+      user = r.user,
+      platform = TutorialPlatform.withNameEx(v.platform),
+      elementId = v.elementId))
   }
 
   def assignTutorialTask = wrapJsonApiCallReturnBody[WSAssignTutorialTaskResult] { (js, r) =>
     val v = Json.read[WSAssignTutorialTaskRequest](js)
 
-    api.assignTutorialTask(AssignTutorialTaskRequest(r.user, v.taskId))
+    api.assignTutorialTask(AssignTutorialTaskRequest(r.user, TutorialPlatform.withNameEx(v.platform), v.taskId))
   }
 
   def incTutorialTask = wrapJsonApiCallReturnBody[WSIncTutorialTaskResult] { (js, r) =>

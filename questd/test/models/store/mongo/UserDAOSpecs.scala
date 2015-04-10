@@ -284,6 +284,21 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(101, 202, 303))
     }
 
+    "addClosedTutorialElement works" in new WithApplication(appWithTestDatabase) {
+
+      val userid = "addTasksTest"
+      val elementid = "elementid"
+
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid))
+
+      val ou = db.user.addClosedTutorialElement(userid, TutorialPlatform.iPhone.toString, elementid)
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.tutorialStates(TutorialPlatform.iPhone.toString).closedElementIds == List(elementid))
+    }
+
     "addTutorialTaskAssigned works" in new WithApplication(appWithTestDatabase) {
 
       def t = {
@@ -294,17 +309,15 @@ class UserDAOSpecs
 
       db.user.delete(userid)
       db.user.create(User(
-        id = userid,
-        tutorial = TutorialState(
-          assignedTutorialTaskIds = List.empty)))
+        id = userid))
 
-      db.user.addTutorialTaskAssigned(userid, "t1")
-      db.user.addTutorialTaskAssigned(userid, "t2")
-      db.user.addTutorialTaskAssigned(userid, "t3")
-      val ou = db.user.addTutorialTaskAssigned(userid, "t2")
+      db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t1")
+      db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
+      db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t3")
+      val ou = db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.tutorial.assignedTutorialTaskIds.length == 3)
+      ou must beSome.which((u: User) => u.tutorialStates(TutorialPlatform.iPhone.toString).assignedTutorialTaskIds.length == 3)
     }
 
     "updateCultureId works" in new WithApplication(appWithTestDatabase) {

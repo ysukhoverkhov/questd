@@ -1,7 +1,7 @@
 package models.domain
 
 case class TutorialState(
-    clientTutorialState: Map[TutorialPlatform.Value, String] = Map(),
+    closedElementIds: List[String] = List.empty,
     assignedTutorialTaskIds: List[String] = List.empty
 )
 

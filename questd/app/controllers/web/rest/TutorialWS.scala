@@ -6,8 +6,8 @@ import play.api.mvc._
 object TutorialWS extends Controller with AccessToWSInstance {
 
   def getTutorial = ws.getTutorial
-  def getTutorialState = ws.getTutorialState
-  def setTutorialState = ws.setTutorialState
+  def getTutorialElementsState = ws.getTutorialElementsState
+  def closeTutorialElement = ws.closeTutorialElement
   def assignTutorialTask = ws.assignTutorialTask
   def incTutorialTask = ws.incTutorialTask
 }

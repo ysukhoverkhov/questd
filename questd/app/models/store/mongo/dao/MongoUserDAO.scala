@@ -559,23 +559,23 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def setTutorialState(id: String, platform: String, state: String): Option[User] = {
+  def addClosedTutorialElement(id: String, platform: String, elementId: String): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
-        "$set" -> MongoDBObject(
-          s"tutorial.clientTutorialState.$platform" -> state)))
+        "$addToSet" -> MongoDBObject(
+          s"tutorialStates.$platform.closedElementIds" -> elementId)))
   }
 
   /**
    *
    */
-  def addTutorialTaskAssigned(id: String, taskId: String): Option[User] = {
+  def addTutorialTaskAssigned(id: String, platform: String, taskId: String): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$addToSet" -> MongoDBObject(
-          "tutorial.assignedTutorialTaskIds" -> taskId)))
+          s"tutorialStates.$platform.assignedTutorialTaskIds" -> taskId)))
   }
 
   /**
