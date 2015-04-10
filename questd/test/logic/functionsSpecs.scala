@@ -59,13 +59,14 @@ class functionsSpecs extends Specification {
       questIncomeForSolving must beEqualTo(25)
     }
 
-    "dailySalary" in {
-      dailyCoinsSalary(1) must beEqualTo(12)
-      dailyCoinsSalary(6) must beEqualTo(331)
-      dailyCoinsSalary(10) must beEqualTo(398)
-      dailyCoinsSalary(16) must beEqualTo(708)
-      dailyCoinsSalary(20) must beEqualTo(1298)
-    }
+    // TODO: test tasks income functions here.
+//    "dailySalary" in {
+//      dailyCoinsSalary(1) must beEqualTo(12)
+//      dailyCoinsSalary(6) must beEqualTo(331)
+//      dailyCoinsSalary(10) must beEqualTo(398)
+//      dailyCoinsSalary(16) must beEqualTo(708)
+//      dailyCoinsSalary(20) must beEqualTo(1298)
+//    }
 
     "ratToGainLevel" in {
       ratToGainLevel(2) must beEqualTo(246)

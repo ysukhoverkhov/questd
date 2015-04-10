@@ -44,8 +44,6 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   def shiftDailyResult(request: ShiftDailyResultRequest): ApiResult[ShiftDailyResultResult] = handleDbException {
     import request._
 
-    val dailySalary = user.dailySalary
-
     getMyQuests(GetMyQuestsRequest(
       user = user,
       status = QuestStatus.InRotation
@@ -60,7 +58,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
           r.user.id,
           DailyResult(
             user.getStartOfCurrentDailyResultPeriod,
-            dailySalary)) ifSome { u =>
+            dailySalary = Assets())) ifSome { u =>
 
           OkApiResult(ShiftDailyResultResult(u))
         }

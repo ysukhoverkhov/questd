@@ -1,10 +1,9 @@
 package logic
 
-import internal.gainratingfunctions._
-import internal.gaincoinsfunctions._
-import internal.spendcoinsfunctions._
+import logic.constants._
 import logic.internal.basefunctions._
-import constants._
+import logic.internal.gainratingfunctions._
+import logic.internal.spendcoinsfunctions._
 
 object functions {
 
@@ -102,13 +101,16 @@ object functions {
 
   /**
    * *************************
-   * Daily results
+   * Tasks income
    * *************************
    */
 
-  def dailyCoinsSalary(level: Int): Int = {
-    math.round(coinForVoteResult(level)).toInt
-  }
+  // TODO: add here functions to calculate tasks salary.
+
+  // TODO: remove me.
+//  def dailyCoinsSalary(level: Int): Int = {
+//    math.round(coinForVoteResult(level)).toInt
+//  }
 
 
   /**
