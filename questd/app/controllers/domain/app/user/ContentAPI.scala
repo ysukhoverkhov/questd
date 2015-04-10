@@ -29,17 +29,6 @@ case class GetPublicProfilesResult(
   allowed: ProfileModificationResult,
   publicProfiles: List[ProfileView])
 
-case class GetOwnBattlesRequest(
-  user: User,
-  status: List[BattleStatus.Value],
-  pageNumber: Int,
-  pageSize: Int)
-case class GetOwnBattlesResult(
-  allowed: ProfileModificationResult,
-  battles: List[BattleView],
-  pageSize: Int,
-  hasMore: Boolean)
-
 case class GetSolutionsForQuestRequest(
   user: User,
   questId: String,
@@ -162,32 +151,6 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     OkApiResult(GetPublicProfilesResult(
       allowed = OK,
       publicProfiles = db.user.readManyByIds(request.userIds.take(maxPageSize)).toList.map(u => ProfileView(u.id, u.profile.publicProfile))))
-  }
-
-  /**
-   * Get own battles.
-   * @param request The request.
-   * @return The result.
-   */
-  // TODO: check it's used in client.
-  def getOwnBattles(request: GetOwnBattlesRequest): ApiResult[GetOwnBattlesResult] = handleDbException {
-    val pageSize = adjustedPageSize(request.pageSize)
-    val pageNumber = adjustedPageNumber(request.pageNumber)
-
-    val battlesForUser = db.battle.allWithParams(
-      status = request.status,
-      authorIds = List(request.user.id),
-      skip = pageNumber * pageSize)
-
-    val battles = battlesForUser.take(pageSize).toList.map(b => {
-      BattleView(b.id, b.info)
-    })
-
-    OkApiResult(GetOwnBattlesResult(
-      allowed = OK,
-      battles = battles,
-      pageSize,
-      battlesForUser.hasNext))
   }
 
   /**

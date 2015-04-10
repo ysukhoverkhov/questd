@@ -31,18 +31,6 @@ private object ContentWSImplTypes
   type WSGetPublicProfileResult = GetPublicProfilesResult
 
 
-  case class WSGetOwnBattlesRequest(
-    // see BattleStatus enum. if missing all solutions will be returned.
-    status: List[String] = List.empty,
-
-    // Number of page in result, zero based.
-    pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int)
-  type WSGetOwnBattlesResult = GetOwnBattlesResult
-
-
   case class WSGetQuestsForUserRequest(
     id: String,
 
@@ -151,19 +139,6 @@ trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunct
     val v = Json.read[WSGetPublicProfilesRequest](js)
 
     api.getPublicProfiles(GetPublicProfilesRequest(r.user, v.ids))
-  }
-
-  /**
-   * Get own battles.
-   */
-  def getOwnBattles = wrapJsonApiCallReturnBody[WSGetOwnBattlesResult] { (js, r) =>
-    val v = Json.read[WSGetOwnBattlesRequest](js)
-
-    api.getOwnBattles(GetOwnBattlesRequest(
-      r.user,
-      v.status.map(BattleStatus.withNameEx),
-      v.pageNumber,
-      v.pageSize))
   }
 
   /**
