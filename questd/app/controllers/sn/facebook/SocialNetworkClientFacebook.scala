@@ -1,13 +1,12 @@
 package controllers.sn.facebook
 
-import controllers.sn.client.{Invitation, SocialNetworkClient, User}
-import scala.language.implicitConversions
 import com.restfb._
 import com.restfb.exception._
+import controllers.sn.client.{Invitation, SocialNetworkClient, User}
+import controllers.sn.exception.{AuthException, NetworkException}
 import play.Logger
-import controllers.sn.exception.AuthException
-import controllers.sn.exception.NetworkException
-import controllers.sn.exception.LogicException
+
+import scala.language.implicitConversions
 
 private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
 
@@ -63,19 +62,6 @@ private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
       case _ =>
         Logger.error("A try to delete not facebook invitation with facebook client, doing nothing")
     }
-  }
-
-  /// Fetches location of user from FB.
-  private[facebook] def fetchLocationFromFB(token: String): FQLLocation = handleExceptions {
-    val query = "SELECT current_location FROM user WHERE uid=me()"
-
-    val locations = facebookClient(token).executeFqlQuery(query, classOf[FQLLocation])
-
-    if (locations.size < 0 || locations.size > 1) {
-      throw new LogicException()
-    }
-
-    locations.get(0)
   }
 }
 
