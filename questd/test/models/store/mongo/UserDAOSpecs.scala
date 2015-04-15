@@ -155,9 +155,9 @@ class UserDAOSpecs
 
       db.user.resetTasks(userid, tasks, new Date())
 
-      db.user.incTask(userid, TaskType.Client.toString, 0.4f, rewardReceived = true)
-      db.user.incTask(userid, TaskType.GiveRewards.toString, 0.4f, rewardReceived = true)
-      db.user.incTask(userid, TaskType.GiveRewards.toString, 0.4f, rewardReceived = true)
+      db.user.incTask(userid, TaskType.Client.toString)
+      db.user.incTask(userid, TaskType.GiveRewards.toString)
+      db.user.incTask(userid, TaskType.GiveRewards.toString)
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
@@ -178,7 +178,7 @@ class UserDAOSpecs
 
       db.user.resetTasks(userid, tasks, new Date())
 
-      db.user.incTask(userid, TaskType.Client.toString, 0.4f, rewardReceived = true)
+      db.user.incTask(userid, TaskType.Client.toString)
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)

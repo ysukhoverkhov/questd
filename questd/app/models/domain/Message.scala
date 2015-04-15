@@ -65,13 +65,27 @@ object MessageFriendshipRemoved {
 }
 
 /**
- * A message about removed friendship connection.
+ * A message about completing all tasks
  */
-case class MessageTasksCompleted ()
+case class MessageAllTasksCompleted ()
 
-object MessageTasksCompleted {
-  implicit def toMessage(a: MessageTasksCompleted): Message = {
+object MessageAllTasksCompleted {
+  implicit def toMessage(a: MessageAllTasksCompleted): Message = {
     Message(
       messageType = MessageType.AllTasksCompleted)
+  }
+}
+
+
+/**
+ * A message about completing a tasks
+ */
+case class MessageTaskCompleted (taskId: String)
+
+object MessageTaskCompleted {
+  implicit def toMessage(a: MessageTaskCompleted): Message = {
+    Message(
+      messageType = MessageType.TaskCompleted,
+      data = Map("taskId" -> a.taskId))
   }
 }

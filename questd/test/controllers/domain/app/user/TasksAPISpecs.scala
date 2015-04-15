@@ -115,12 +115,12 @@ class TasksAPISpecs extends BaseAPISpecs {
               requiredCount = 10,
               reward = Assets()))))))
 
-      db.user.incTask(u.id, TaskType.LookThroughFriendshipProposals.toString, 0.5f, rewardReceived = false) returns Some(u)
+      db.user.incTask(u.id, TaskType.LookThroughFriendshipProposals.toString) returns Some(u)
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.LookThroughFriendshipProposals)))
       result must beEqualTo(OkApiResult(MakeTaskResult(u)))
 
-      there was one(db.user).incTask(u.id, TaskType.LookThroughFriendshipProposals.toString, 0.5f, rewardReceived = false)
+      there was one(db.user).incTask(u.id, TaskType.LookThroughFriendshipProposals.toString)
     }
 
     "Give reward if everything is completed" in context {
@@ -155,14 +155,14 @@ class TasksAPISpecs extends BaseAPISpecs {
               requiredCount = 10,
               reward = r))))))
 
-      db.user.incTask(u.id, TaskType.LookThroughFriendshipProposals.toString, 1f, rewardReceived = true) returns Some(u)
+      db.user.incTask(u.id, TaskType.LookThroughFriendshipProposals.toString) returns Some(u)
       db.user.addToAssets(u.id, r) returns Some(u)
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.LookThroughFriendshipProposals)))
 
       result must beEqualTo(OkApiResult(MakeTaskResult(u)))
       there was one(db.user).addToAssets(u.id, r)
-      there was one(db.user).incTask(u.id, TaskType.LookThroughFriendshipProposals.toString, 1f, rewardReceived = true)
+      there was one(db.user).incTask(u.id, TaskType.LookThroughFriendshipProposals.toString)
     }
 
     "Give reward if everything is completed including tutorial" in context {

@@ -470,14 +470,10 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def addTasks(id: String, newTasks: List[Task], additionalReward: Assets): Option[User] = {
+  def addTasks(id: String, newTasks: List[Task]): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
-        "$inc" -> MongoDBObject(
-          "profile.dailyTasks.reward.coins" -> additionalReward.coins,
-          "profile.dailyTasks.reward.money" -> additionalReward.money,
-          "profile.dailyTasks.reward.rating" -> additionalReward.rating),
         "$push" -> MongoDBObject(
           "profile.dailyTasks.tasks" -> MongoDBObject(
             "$each" -> newTasks.map(grater[Task].asDBObject)))))
@@ -486,34 +482,37 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def incTask(id: String, taskType: String, completed: Float, rewardReceived: Boolean): Option[User] = {
+  def incTask(id: String, taskId: String): Option[User] = {
     findAndModify(
       MongoDBObject(
         "id" -> id,
-        "profile.dailyTasks.tasks.taskType" -> taskType),
+        "profile.dailyTasks.tasks.id" -> taskId),
       MongoDBObject(
         "$inc" -> MongoDBObject(
-          "profile.dailyTasks.tasks.$.currentCount" -> 1),
-        "$set" -> MongoDBObject(
-          "profile.dailyTasks.completed" -> completed,
-          "profile.dailyTasks.rewardReceived" -> rewardReceived)))
+          "profile.dailyTasks.tasks.$.currentCount" -> 1)))
   }
+
+//  ,
+//  "$set" -> MongoDBObject(
+//    "profile.dailyTasks.completed" -> completed,
+//    "profile.dailyTasks.rewardReceived" -> rewardReceived)
 
   /**
    *
    */
-  def incTutorialTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
-    findAndModify(
-      MongoDBObject(
-        "id" -> id,
-        "profile.dailyTasks.tasks.tutorialTask.id" -> taskId),
-      MongoDBObject(
-        "$inc" -> MongoDBObject(
-          "profile.dailyTasks.tasks.$.currentCount" -> 1),
-        "$set" -> MongoDBObject(
-          "profile.dailyTasks.completed" -> completed,
-          "profile.dailyTasks.rewardReceived" -> rewardReceived)))
-  }
+  // TODO: remove me.
+//  def incTutorialTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
+//    findAndModify(
+//      MongoDBObject(
+//        "id" -> id,
+//        "profile.dailyTasks.tasks.tutorialTask.id" -> taskId),
+//      MongoDBObject(
+//        "$inc" -> MongoDBObject(
+//          "profile.dailyTasks.tasks.$.currentCount" -> 1),
+//        "$set" -> MongoDBObject(
+//          "profile.dailyTasks.completed" -> completed,
+//          "profile.dailyTasks.rewardReceived" -> rewardReceived)))
+//  }
 
   /**
    *

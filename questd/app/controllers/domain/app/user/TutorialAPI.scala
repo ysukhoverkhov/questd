@@ -73,6 +73,8 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
               user.getResetTasksTimeout)
           }
 
+          // TODO: remake points 3 and 4 completelly.
+          // TODO: remove asignTutorialTask from db if it involves tasks
           {
             // 3. Add task to list of assigned tutorial tasks.
             db.user.addTutorialTaskAssigned(id = user.id, platform = platform.toString, taskId = taskId)
@@ -83,8 +85,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
             db.user.addTasks(
               user.id,
-              List(taskToAdd),
-              reward) ifSome { v =>
+              List(taskToAdd)) ifSome { v =>
                 OkApiResult(AssignTutorialTaskResult(OK, Some(v.profile)))
               }
           }
