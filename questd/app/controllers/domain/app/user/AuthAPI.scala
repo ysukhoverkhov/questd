@@ -59,7 +59,7 @@ private[domain] trait AuthAPI {
               avatar = Some(
                 ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = request.snuser.snId))))))
 
-      db.user.create(newUser)
+      db.user.create(newUser.copy(profile = newUser.profile.copy(rights = newUser.calculateRights)))
 
       db.user.readBySNid(request.snName, request.snuser.snId) ifSome { user =>
         populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user)) map { r =>
