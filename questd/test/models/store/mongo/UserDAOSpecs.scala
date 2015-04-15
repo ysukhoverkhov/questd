@@ -264,7 +264,7 @@ class UserDAOSpecs
     "addTasks works" in new WithApplication(appWithTestDatabase) {
 
       def t = {
-        Task(TaskType.GiveRewards, "d", 1)
+        Task(taskType = TaskType.GiveRewards, description = "d", requiredCount = 1)
       }
 
       val userid = "addTasksTest"
@@ -300,10 +300,6 @@ class UserDAOSpecs
     }
 
     "addTutorialTaskAssigned works" in new WithApplication(appWithTestDatabase) {
-
-      def t = {
-        Task(TaskType.GiveRewards, "d", 1)
-      }
 
       val userid = "addTasksTest"
 

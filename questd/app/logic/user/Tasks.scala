@@ -2,6 +2,7 @@ package logic.user
 
 import logic._
 import logic.constants._
+import logic.functions._
 import models.domain._
 
 trait Tasks { this: UserLogic =>
@@ -15,20 +16,33 @@ trait Tasks { this: UserLogic =>
    * List of tasks to give user for next day.
    */
   def getTasksForTomorrow = {
-    val reward = getTasksReward
+    val dailyRatingReward = dailyTasksRatingReward
+    val allTasksCoinsReward = dailyTasksCoinsReward
 
     val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
       case Some(t) => t :: c
       case None => c
     })
 
-    DailyTasks(tasks = tasks, reward = reward)
+    val tasksWithRewards = tasks.map { t =>
+      t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = 0.15)) // TODO: move 15% to config or const.
+    }
+
+    DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
+  }
+
+  /**
+   * Calculates total daily salary in coins for all tasks.
+   * @return
+   */
+  def dailyTasksCoinsReward: Assets = {
+    Assets(coins = dailyTasksCoinsSalary(user.profile.publicProfile.level))
   }
 
   /**
    * Calculates reward for today's tasks.
    */
-  private def getTasksReward = Assets(0, 0, RatingForCompletingDailyTasks)
+  private def dailyTasksRatingReward = Assets(0, 0, RatingForCompletingDailyTasks)
 
   /**
    * Returns list of algorithms for generating all tasks.

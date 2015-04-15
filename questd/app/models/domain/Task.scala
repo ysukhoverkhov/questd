@@ -18,6 +18,7 @@ object TaskType extends Enumeration {
 case class Task(
   taskType: TaskType.Value,
   description: String,
+  reward: Assets = Assets(),
   requiredCount: Int,
   currentCount: Int = 0,
   tutorialTask: Option[TutorialTask] = None)
