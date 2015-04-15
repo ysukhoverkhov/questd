@@ -7,7 +7,8 @@ object MessageType extends Enumeration {
   val FriendshipAccepted = Value
   val FriendshipRejected = Value
   val FriendshipRemoved = Value
-  val TasksCompleted = Value
+  val AllTasksCompleted = Value
+  val TaskCompleted = Value
   val Text = Value
 }
 
@@ -71,6 +72,6 @@ case class MessageTasksCompleted ()
 object MessageTasksCompleted {
   implicit def toMessage(a: MessageTasksCompleted): Message = {
     Message(
-      messageType = MessageType.TasksCompleted)
+      messageType = MessageType.AllTasksCompleted)
   }
 }
