@@ -77,38 +77,81 @@ class TasksAPISpecs extends BaseAPISpecs {
 
     "Calculate completed percent correctly" in context {
       val taskId = "asdasjdkas"
-      val u = createUser(DailyTasks(
-        tasks = List(
-          Task(
-            taskType = TaskType.AddToFollowing,
-            description = "",
-            requiredCount = 10,
-            currentCount = 4),
-          Task(
-            id = taskId,
-            taskType = TaskType.LookThroughFriendshipProposals,
-            description = "",
-            requiredCount = 10,
-            currentCount = 0),
-          Task(
-            taskType = TaskType.GiveRewards,
-            description = "",
-            requiredCount = 5,
-            currentCount = 5),
-          Task(
-            taskType = TaskType.Client,
-            description = "",
-            requiredCount = 10,
-            currentCount = 5,
-            tutorialTaskId = Some("lala")))))
+      def createUserInternal(cc: Int) = {
+        createUser(DailyTasks(
+          tasks = List(
+            Task(
+              taskType = TaskType.AddToFollowing,
+              description = "",
+              requiredCount = 10,
+              currentCount = cc),
+            Task(
+              id = taskId,
+              taskType = TaskType.LookThroughFriendshipProposals,
+              description = "",
+              requiredCount = 10,
+              currentCount = 0),
+            Task(
+              taskType = TaskType.GiveRewards,
+              description = "",
+              requiredCount = 5,
+              currentCount = 5),
+            Task(
+              taskType = TaskType.Client,
+              description = "",
+              requiredCount = 10,
+              currentCount = 5,
+              tutorialTaskId = Some("lala")))))
+      }
 
-      db.user.incTask(u.id, taskId) returns Some(u)
-      db.user.setTasksCompletedFraction(any, any) returns Some(u)
+      val u = createUserInternal(4)
+
+      db.user.incTask(u.id, taskId) returns Some(createUserInternal(5))
+      db.user.setTasksCompletedFraction(any, any) returns Some(createUserInternal(5))
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.LookThroughFriendshipProposals)))
       result must beEqualTo(OkApiResult(MakeTaskResult(u)))
 
       there was one(db.user).incTask(u.id, taskId)
+      there was one(db.user).setTasksCompletedFraction(any, mEq(0.5f))
+    }
+
+    "Inc several tasks at once" in context {
+      def createUserInternal(cc: Int) = {
+        createUser(DailyTasks(
+          tasks = List(
+            Task(
+              taskType = TaskType.AddToFollowing,
+              description = "",
+              requiredCount = 10,
+              currentCount = cc),
+            Task(
+              taskType = TaskType.LookThroughFriendshipProposals,
+              description = "",
+              requiredCount = 10,
+              currentCount = 0),
+            Task(
+              taskType = TaskType.AddToFollowing,
+              description = "",
+              requiredCount = 10,
+              currentCount = cc),
+            Task(
+              taskType = TaskType.Client,
+              description = "",
+              requiredCount = 10,
+              currentCount = 5,
+              tutorialTaskId = Some("lala")))))
+      }
+
+      val u = createUserInternal(4)
+
+      db.user.incTask(any, any) returns Some(createUserInternal(5))
+      db.user.setTasksCompletedFraction(any, any) returns Some(createUserInternal(5))
+
+      val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.AddToFollowing)))
+      result must beEqualTo(OkApiResult(MakeTaskResult(u)))
+
+      there were two(db.user).incTask(any, any)
     }
 
     "Give reward if everything is completed" in context {

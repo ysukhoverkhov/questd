@@ -517,23 +517,6 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   * @inheritdoc
-   */
-  // TODO: remove me.
-//  def incTutorialTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
-//    findAndModify(
-//      MongoDBObject(
-//        "id" -> id,
-//        "profile.dailyTasks.tasks.tutorialTask.id" -> taskId),
-//      MongoDBObject(
-//        "$inc" -> MongoDBObject(
-//          "profile.dailyTasks.tasks.$.currentCount" -> 1),
-//        "$set" -> MongoDBObject(
-//          "profile.dailyTasks.completed" -> completed,
-//          "profile.dailyTasks.rewardReceived" -> rewardReceived)))
-//  }
-
-  /**
    *
    */
   def setGender(id: String, gender: String): Option[User] = {

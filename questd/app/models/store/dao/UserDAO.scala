@@ -105,7 +105,6 @@ trait UserDAO extends BaseDAO[User] {
   def incTask(id: String, taskId: String): Option[User] // TODO: test me.
   def setTasksCompletedFraction(id: String, completedFraction: Float): Option[User] // TODO: test me.
   def setTasksRewardReceived(id: String, rewardReceived: Boolean): Option[User] // TODO: test me.
-//  def incTutorialTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User]
 
   def updateCultureId(id: String, cultureId: String): Option[User]
   def setGender(id: String, gender: String): Option[User]

@@ -41,9 +41,6 @@ private[domain] trait TasksAPI {
     }
   }
 
-
-  // TODO: make client tasks and use them to make tasks from client.
-
   /**
    * Increase by one number of completed tasks for given task. Recalculate percentage and schedule reward if all tasks are completed.
    * Do everything in other words.
@@ -108,7 +105,6 @@ private[domain] trait TasksAPI {
         }) ifSome { u =>
           // Running API calls.
 
-          // TODO: test completing several tasks as once.
           // Give reward for currently completed tasks.
           completedTasks.foldLeft[ApiResult[SendMessageResult]](OkApiResult(SendMessageResult(user))) { (r, t) =>
             r map { r =>
