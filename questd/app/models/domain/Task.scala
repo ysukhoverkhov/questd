@@ -1,5 +1,7 @@
 package models.domain
 
+import models.domain.base.ID
+
 
 object TaskType extends Enumeration {
   val LikeSolutions = Value
@@ -16,10 +18,11 @@ object TaskType extends Enumeration {
 }
 
 case class Task(
+  id: String = ID.generateUUID(),
   taskType: TaskType.Value,
   description: String,
   reward: Assets = Assets(),
   requiredCount: Int,
   currentCount: Int = 0,
-  tutorialTask: Option[TutorialTask] = None)
+  tutorialTaskId: Option[String] = None) extends ID
 

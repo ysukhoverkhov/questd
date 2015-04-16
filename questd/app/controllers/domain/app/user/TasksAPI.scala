@@ -1,42 +1,42 @@
 package controllers.domain.app.user
 
-import models.domain._
-import controllers.domain.DomainAPIComponent
 import components._
-import controllers.domain._
+import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.helpers._
+import models.domain._
 import play.Logger
 
 case class ResetDailyTasksRequest(user: User)
-case class ResetDailyTasksResult()
+case class ResetDailyTasksResult(user: User)
 
-case class MakeTaskRequest(user: User, taskType: Option[TaskType.Value] = None, tutorialTaskId: Option[String] = None)
+case class MakeTaskRequest(
+  user: User,
+  taskType: Option[TaskType.Value] = None,
+  taskId: Option[String] = None)
 case class MakeTaskResult(user: User)
 
-private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
+private[domain] trait TasksAPI {
+  this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Resets daily tasks.
    */
   def resetDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
     import request._
-    val (tutorialTasksToCarry, tutorialReward) = if (!user.profile.dailyTasks.rewardReceived) {
-      val t = user.profile.dailyTasks.tasks.filter(_.tutorialTask != None)
-      (
-        t,
-        (Assets() /: t)((r, c) => r + c.tutorialTask.get.reward))
+    val tutorialTasksToCarry = if (!user.profile.dailyTasks.rewardReceived) {
+      user.profile.dailyTasks.tasks.filter(t => t.tutorialTaskId != None && t.currentCount < t.requiredCount)
     } else {
-      (List.empty, Assets())
+      List.empty
     }
 
     db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout) ifSome { v =>
 
       (if (tutorialTasksToCarry != List.empty) {
-        db.user.addTasks(user.id, tutorialTasksToCarry, tutorialReward)
+        db.user.addTasks(user.id, tutorialTasksToCarry)
       } else {
         Some(user)
-      }) ifSome { v =>
-        OkApiResult(ResetDailyTasksResult())
+      }) ifSome { u =>
+        OkApiResult(ResetDailyTasksResult(u))
       }
     }
   }
@@ -47,84 +47,85 @@ private[domain] trait TasksAPI { this: DomainAPIComponent#DomainAPI with DBAcces
    */
   def makeTask(request: MakeTaskRequest): ApiResult[MakeTaskResult] = handleDbException {
     import request._
-    import com.vita.scala.extensions._
 
-    assert(taskType == None ^^ tutorialTaskId == None, "Both taskType and tutorial task id are None or Some which is wrong.")
+    def completedFraction(dt: DailyTasks): Float = {
+      dt.tasks.map(t => t.currentCount.toFloat / t.requiredCount).sum / dt.tasks.size
+    }
 
-    def taskIsAlreadyCompleted = {
-      (taskType, tutorialTaskId) match {
-        case (Some(tt), None) =>
-          user.profile.dailyTasks.tasks.count(t => t.taskType == tt && t.currentCount < t.requiredCount) <= 0
+    def allTasksCompleted(dt: DailyTasks): Boolean = {
+      dt.tasks.foldLeft(true)((r, v) => if (v.currentCount >= v.requiredCount) r else false)
+    }
 
-        case (None, Some(ti)) =>
-          user.profile.dailyTasks.tasks.count(t => t.tutorialTask != None && t.tutorialTask.get.id == ti && t.currentCount < t.requiredCount) <= 0
+    Logger.trace(s"Making task of type $taskType and/or id $taskId")
 
-        case _ =>
-          Logger.error("Incorrect request to makeTest")
-          true
+    // Running db actions.
+    val tasksToIncrease: List[Task] = {
+      request.taskType.fold[List[Task]](List.empty) { taskType =>
+        user.profile.dailyTasks.tasks.filter { t =>
+          (t.taskType == taskType) && (t.requiredCount > t.currentCount)
+        }
+      }
+    } ::: {
+      request.taskId.fold[List[Task]](List.empty) { taskId =>
+        user.profile.dailyTasks.tasks.filter { t =>
+          t.id == taskId && t.requiredCount > t.currentCount
+        }
       }
     }
 
-    if (taskIsAlreadyCompleted) {
+    Logger.trace(s"  Increasing tasks of count: ${tasksToIncrease.length} and values: ${tasksToIncrease.map(t => t.id + " " + t.taskType).mkString(", ")}")
 
-      // Nothing to do.
+    if (tasksToIncrease.isEmpty) {
       OkApiResult(MakeTaskResult(user))
-
     } else {
-
-      def createUpdatedTasks = {
-        (taskType, tutorialTaskId) match {
-          case (Some(tt), None) =>
-            user.profile.dailyTasks.copy(
-              tasks = user.profile.dailyTasks.tasks.map(t => if (t.taskType == tt) t.copy(currentCount = t.currentCount + 1) else t))
-
-          case (None, Some(ti)) =>
-            user.profile.dailyTasks.copy(
-              tasks = user.profile.dailyTasks.tasks.map(t => if (t.tutorialTask != None && t.tutorialTask.get.id == ti) t.copy(currentCount = t.currentCount + 1) else t))
-
-          case _ =>
-            Logger.error("Incorrect request to makeTest")
-            user.profile.dailyTasks
-        }
+      val (completedTasks, u) = tasksToIncrease.foldLeft[(List[Task], Option[User])](List.empty, Some(user)) {
+        case (run, task) =>
+          val completed = run._1
+          val optUser = run._2
+          optUser.fold(run) { u =>
+            val updatedUser = db.user.incTask(id = u.id, taskId = task.id)
+            if (task.requiredCount - task.currentCount == 1)
+              (task :: completed, updatedUser)
+            else
+              (completed, updatedUser)
+          }
       }
 
-      // Creating copy of our results for future calculations.
-      val nt: DailyTasks = createUpdatedTasks
+      u ifSome { u =>
+        runWhileSome(u)(
+        { u =>
+          db.user.setTasksCompletedFraction(id = u.id, completedFraction = completedFraction(u.profile.dailyTasks))
+        },
+        { u =>
+          if (allTasksCompleted(u.profile.dailyTasks)) {
+            db.user.setTasksRewardReceived(id = u.id, rewardReceived = true)
+          } else {
+            Some(u)
+          }
+        }) ifSome { u =>
+          // Running API calls.
 
-      def calculatePercent(dt: DailyTasks): Float = {
-        dt.tasks.map(t => t.currentCount.toFloat / t.requiredCount).sum / dt.tasks.size
-      }
-
-      def isCompleted(dt: DailyTasks): Boolean = {
-        dt.tasks.foldLeft(true)((r, v) => if (v.currentCount >= v.requiredCount) r else false)
-      }
-
-      val newPercent = calculatePercent(nt)
-      val completed = isCompleted(nt)
-
-      val r1 = if (completed) {
-        adjustAssets(AdjustAssetsRequest(user = request.user, reward = Some(nt.reward))) map { r =>
-          sendMessage(SendMessageRequest(r.user, MessageTasksCompleted()))
-        }
-      } else {
-        OkApiResult(AdjustAssetsResult(user))
-      }
-
-      r1 map { r =>
-        val u = (taskType, tutorialTaskId) match {
-          case (Some(tt), None) =>
-            db.user.incTask(id = user.id, taskType = tt.toString, completed = newPercent, rewardReceived = completed)
-
-          case (None, Some(ti)) =>
-            db.user.incTutorialTask(id = user.id, taskId = ti, completed = newPercent, rewardReceived = completed)
-
-          case _ =>
-            Logger.error("Incorrect request to makeTest")
-            Some(user)
-        }
-
-        u ifSome { v =>
-          OkApiResult(MakeTaskResult(v))
+          // Give reward for currently completed tasks.
+          completedTasks.foldLeft[ApiResult[SendMessageResult]](OkApiResult(SendMessageResult(user))) { (r, t) =>
+            r map { r =>
+              adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(t.reward)))
+            } map { r =>
+              sendMessage(SendMessageRequest(user = r.user, message = MessageTaskCompleted(t.id)))
+            }
+          } map { r =>
+            // give reward for all completed.
+            if (allTasksCompleted(r.user.profile.dailyTasks)) {
+              {
+                adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(r.user.profile.dailyTasks.reward)))
+              } map { r =>
+                sendMessage(SendMessageRequest(r.user, MessageAllTasksCompleted()))
+              }
+            } else {
+              OkApiResult(SendMessageResult(r.user))
+            }
+          } map { r =>
+            OkApiResult(MakeTaskResult(r.user))
+          }
         }
       }
     }

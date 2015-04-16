@@ -155,9 +155,9 @@ class UserDAOSpecs
 
       db.user.resetTasks(userid, tasks, new Date())
 
-      db.user.incTask(userid, TaskType.Client.toString, 0.4f, rewardReceived = true)
-      db.user.incTask(userid, TaskType.GiveRewards.toString, 0.4f, rewardReceived = true)
-      db.user.incTask(userid, TaskType.GiveRewards.toString, 0.4f, rewardReceived = true)
+      db.user.incTask(id = userid, taskId = tasks.tasks.head.id)
+      db.user.incTask(id = userid, taskId = tasks.tasks(1).id)
+      db.user.incTask(id = userid, taskId = tasks.tasks(1).id)
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
@@ -165,64 +165,66 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards).head.currentCount == 2)
     }
 
-    "incTask should change percentage completed" in new WithApplication(appWithTestDatabase) {
-      val userid = "incTasks2"
-      db.user.create(User(userid))
+    // TODO: remove me.
+//    "incTask should change percentage completed" in new WithApplication(appWithTestDatabase) {
+//      val userid = "incTasks2"
+//      db.user.create(User(userid))
+//
+//      val tasks = DailyTasks(
+//        tasks = List(
+//          Task(
+//            taskType = TaskType.Client,
+//            description = "",
+//            requiredCount = 10)))
+//
+//      db.user.resetTasks(userid, tasks, new Date())
+//
+//      db.user.incTask(userid, TaskType.Client.toString)
+//
+//      val ou = db.user.readById(userid)
+//      ou must beSome.which((u: User) => u.id.toString == userid)
+//      ou.get.profile.dailyTasks.tasks.head.currentCount must beEqualTo(1)
+//      ou.get.profile.dailyTasks.completed must beEqualTo(0.4f)
+//      ou.get.profile.dailyTasks.rewardReceived must beEqualTo(true)
+//    }
 
-      val tasks = DailyTasks(
-        tasks = List(
-          Task(
-            taskType = TaskType.Client,
-            description = "",
-            requiredCount = 10)))
-
-      db.user.resetTasks(userid, tasks, new Date())
-
-      db.user.incTask(userid, TaskType.Client.toString, 0.4f, rewardReceived = true)
-
-      val ou = db.user.readById(userid)
-      ou must beSome.which((u: User) => u.id.toString == userid)
-      ou.get.profile.dailyTasks.tasks.head.currentCount must beEqualTo(1)
-      ou.get.profile.dailyTasks.completed must beEqualTo(0.4f)
-      ou.get.profile.dailyTasks.rewardReceived must beEqualTo(true)
-    }
-
-    "incTutorialTask should increase number of times task was completed by one" in new WithApplication(appWithTestDatabase) {
-      val userid = "incTutorialTasks"
-      val taskId = "tid"
-      db.user.create(User(userid))
-
-      val tasks = DailyTasks(
-        tasks = List(
-          Task(
-            taskType = TaskType.AddToFollowing,
-            description = "",
-            requiredCount = 10),
-          Task(
-            taskType = TaskType.GiveRewards,
-            description = "",
-            requiredCount = 10),
-          Task(
-            taskType = TaskType.Client,
-            description = "",
-            requiredCount = 10,
-            tutorialTask = Some(TutorialTask(
-              id = taskId,
-              taskType = TaskType.Client,
-              description = "",
-              requiredCount = 10,
-              reward = Assets())))))
-
-      db.user.resetTasks(userid, tasks, new Date())
-
-      db.user.incTutorialTask(userid, taskId, 0.4f, rewardReceived = true)
-
-      val ou = db.user.readById(userid)
-      ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client).head.currentCount == 1)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards).head.currentCount == 0)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToFollowing).head.currentCount == 0)
-    }
+    // TODO: remove me.
+//    "incTutorialTask should increase number of times task was completed by one" in new WithApplication(appWithTestDatabase) {
+//      val userid = "incTutorialTasks"
+//      val taskId = "tid"
+//      db.user.create(User(userid))
+//
+//      val tasks = DailyTasks(
+//        tasks = List(
+//          Task(
+//            taskType = TaskType.AddToFollowing,
+//            description = "",
+//            requiredCount = 10),
+//          Task(
+//            taskType = TaskType.GiveRewards,
+//            description = "",
+//            requiredCount = 10),
+//          Task(
+//            taskType = TaskType.Client,
+//            description = "",
+//            requiredCount = 10,
+//            tutorialTask = Some(TutorialTask(
+//              id = taskId,
+//              taskType = TaskType.Client,
+//              description = "",
+//              requiredCount = 10,
+//              reward = Assets())))))
+//
+//      db.user.resetTasks(userid, tasks, new Date())
+//
+//      db.user.incTutorialTask(userid, taskId, 0.4f, rewardReceived = true)
+//
+//      val ou = db.user.readById(userid)
+//      ou must beSome.which((u: User) => u.id.toString == userid)
+//      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client).head.currentCount == 1)
+//      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards).head.currentCount == 0)
+//      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToFollowing).head.currentCount == 0)
+//    }
 
     "updateQuestCreationCoolDown should reset cool down" in new WithApplication(appWithTestDatabase) {
       val userId = "resetQuestProposal"
@@ -277,11 +279,11 @@ class UserDAOSpecs
             tasks = List(t, t, t),
             reward = Assets(1, 2, 3)))))
 
-      val ou = db.user.addTasks(userid, List(t, t), Assets(100, 200, 300))
+      val ou = db.user.addTasks(userid, List(t, t))
 
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.length == 5)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(101, 202, 303))
+      ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(1, 2, 3))
     }
 
     "addClosedTutorialElement works" in new WithApplication(appWithTestDatabase) {
