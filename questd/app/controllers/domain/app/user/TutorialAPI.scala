@@ -100,12 +100,16 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
    */
   def incTutorialTask(request: IncTutorialTaskRequest): ApiResult[IncTutorialTaskResult] = handleDbException {
     import request._
-    if (user.profile.dailyTasks.tasks.count(t => t.tutorialTask.map(_.id) == Some(taskId)) > 0) {
-      makeTask(MakeTaskRequest(user = user, tutorialTaskId = Some(taskId))) map { r =>
+
+    user.profile.dailyTasks.tasks.find(t => t.tutorialTaskId == Some(taskId)).fold[ApiResult[IncTutorialTaskResult]] {
+      OkApiResult(IncTutorialTaskResult(OutOfContent))
+    }
+    { t: Task =>
+      {
+        makeTask(MakeTaskRequest(user = user, taskId = Some(t.id)))
+      } map { r =>
         OkApiResult(IncTutorialTaskResult(OK, Some(r.user.profile)))
       }
-    } else {
-      OkApiResult(IncTutorialTaskResult(OutOfContent))
     }
   }
 }

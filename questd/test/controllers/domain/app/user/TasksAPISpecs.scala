@@ -1,9 +1,9 @@
 package controllers.domain.app.user
 
-import controllers.domain.BaseAPISpecs
-import models.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
-import controllers.domain.OkApiResult
+import controllers.domain.{BaseAPISpecs, OkApiResult}
+import models.domain._
+import org.mockito.Matchers.{eq => mEq}
 
 class TasksAPISpecs extends BaseAPISpecs {
 
@@ -31,7 +31,7 @@ class TasksAPISpecs extends BaseAPISpecs {
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.Client)))
 
-      result.body.get.user must beEqualTo(u)
+      result must beEqualTo(OkApiResult(MakeTaskResult(u)))
     }
 
     "Do nothing if regular task should not be completed" in context {
@@ -43,20 +43,15 @@ class TasksAPISpecs extends BaseAPISpecs {
             requiredCount = 10,
             currentCount = 0),
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.CreateQuest,
             description = "",
             requiredCount = 10,
             currentCount = 10,
-            tutorialTask = Some(TutorialTask(
-              id = "taskId",
-              taskType = TaskType.Client,
-              description = "",
-              requiredCount = 10,
-              reward = Assets()))))))
+            tutorialTaskId = None))))
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.GiveRewards)))
 
-      result.body.get.user must beEqualTo(u)
+      result must beEqualTo(OkApiResult(MakeTaskResult(u)))
     }
 
     "Do nothing if tutorial task should not be completed" in context {
@@ -73,12 +68,7 @@ class TasksAPISpecs extends BaseAPISpecs {
             description = "",
             requiredCount = 10,
             currentCount = 10,
-            tutorialTask = Some(TutorialTask(
-              id = taskId,
-              taskType = TaskType.Client,
-              description = "",
-              requiredCount = 10,
-              reward = Assets()))))))
+            tutorialTaskId = Some(taskId)))))
 
       val result = api.incTutorialTask(IncTutorialTaskRequest(u, taskId = taskId))
 
@@ -86,6 +76,7 @@ class TasksAPISpecs extends BaseAPISpecs {
     }
 
     "Calculate completed percent correctly" in context {
+      val taskId = "asdasjdkas"
       val u = createUser(DailyTasks(
         tasks = List(
           Task(
@@ -94,6 +85,7 @@ class TasksAPISpecs extends BaseAPISpecs {
             requiredCount = 10,
             currentCount = 4),
           Task(
+            id = taskId,
             taskType = TaskType.LookThroughFriendshipProposals,
             description = "",
             requiredCount = 10,
@@ -108,25 +100,23 @@ class TasksAPISpecs extends BaseAPISpecs {
             description = "",
             requiredCount = 10,
             currentCount = 5,
-            tutorialTask = Some(TutorialTask(
-              id = "taskId",
-              taskType = TaskType.Client,
-              description = "",
-              requiredCount = 10,
-              reward = Assets()))))))
+            tutorialTaskId = Some("lala")))))
 
-      db.user.incTask(u.id, TaskType.LookThroughFriendshipProposals.toString) returns Some(u)
+      db.user.incTask(u.id, taskId) returns Some(u)
+      db.user.setTasksCompletedFraction(any, any) returns Some(u)
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.LookThroughFriendshipProposals)))
       result must beEqualTo(OkApiResult(MakeTaskResult(u)))
 
-      there was one(db.user).incTask(u.id, TaskType.LookThroughFriendshipProposals.toString)
+      there was one(db.user).incTask(u.id, taskId)
     }
 
     "Give reward if everything is completed" in context {
-      val r = Assets(10, 20, 30)
+      val taskId = "asdasjdkas"
+      val r1 = Assets(10, 20, 30)
+      val r2 = Assets(100, 200, 300)
       val u = createUser(DailyTasks(
-        reward = r,
+        reward = r1,
         tasks = List(
           Task(
             taskType = TaskType.AddToFollowing,
@@ -134,10 +124,12 @@ class TasksAPISpecs extends BaseAPISpecs {
             requiredCount = 10,
             currentCount = 10),
           Task(
+            id = taskId,
             taskType = TaskType.LookThroughFriendshipProposals,
             description = "",
             requiredCount = 10,
-            currentCount = 9),
+            currentCount = 9,
+            reward = r2),
           Task(
             taskType = TaskType.GiveRewards,
             description = "",
@@ -148,28 +140,35 @@ class TasksAPISpecs extends BaseAPISpecs {
             description = "",
             requiredCount = 10,
             currentCount = 10,
-            tutorialTask = Some(TutorialTask(
-              id = "taskId",
-              taskType = TaskType.Client,
-              description = "",
-              requiredCount = 10,
-              reward = r))))))
+            tutorialTaskId = Some("lala")))))
+      val uc = u.copy(profile = u.profile.copy(dailyTasks = u.profile.dailyTasks.copy(tasks =
+        u.profile.dailyTasks.tasks.map(t => t.copy(currentCount = t.requiredCount)))))
 
-      db.user.incTask(u.id, TaskType.LookThroughFriendshipProposals.toString) returns Some(u)
-      db.user.addToAssets(u.id, r) returns Some(u)
+      db.user.incTask(u.id, taskId) returns Some(uc)
+      db.user.addToAssets(u.id, r1) returns Some(uc)
+      db.user.addToAssets(u.id, r2) returns Some(uc)
+      db.user.setTasksCompletedFraction(any, any) returns Some(uc)
+      db.user.setTasksRewardReceived(id = u.id, rewardReceived = true) returns Some(uc)
+      db.user.addMessage(mEq(u.id), any) returns Some(uc)
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.LookThroughFriendshipProposals)))
 
-      result must beEqualTo(OkApiResult(MakeTaskResult(u)))
-      there was one(db.user).addToAssets(u.id, r)
-      there was one(db.user).incTask(u.id, TaskType.LookThroughFriendshipProposals.toString)
+      result must beEqualTo(OkApiResult(MakeTaskResult(uc)))
+      there was one(db.user).incTask(u.id, taskId)
+      there was one(db.user).addToAssets(u.id, r1)
+      there was one(db.user).addToAssets(u.id, r2)
+      there was one(db.user).setTasksRewardReceived(id = u.id, rewardReceived = true)
+      there was one(db.user).setTasksCompletedFraction(any, any)
+      there were two(db.user).addMessage(mEq(u.id), any)
     }
 
     "Give reward if everything is completed including tutorial" in context {
       val taskId = "tid"
-      val r = Assets(10, 20, 30)
+      val tutorialTaskId = "tuttid"
+      val r1 = Assets(10, 20, 30)
+      val r2 = Assets(100, 200, 300)
       val u = createUser(DailyTasks(
-        reward = r,
+        reward = r1,
         tasks = List(
           Task(
             taskType = TaskType.AddToFollowing,
@@ -187,25 +186,33 @@ class TasksAPISpecs extends BaseAPISpecs {
             requiredCount = 5,
             currentCount = 5),
           Task(
+            id = taskId,
+            reward = r2,
             taskType = TaskType.Client,
             description = "",
             requiredCount = 10,
             currentCount = 9,
-            tutorialTask = Some(TutorialTask(
-              id = taskId,
-              taskType = TaskType.Client,
-              description = "",
-              requiredCount = 10,
-              reward = r))))))
+            tutorialTaskId = Some(tutorialTaskId)))))
 
-      db.user.incTutorialTask(u.id, taskId, 1f, rewardReceived = true) returns Some(u)
-      db.user.addToAssets(u.id, r) returns Some(u)
+      val uc = u.copy(profile = u.profile.copy(dailyTasks = u.profile.dailyTasks.copy(tasks =
+        u.profile.dailyTasks.tasks.map(t => t.copy(currentCount = t.requiredCount)))))
 
-      val result = api.incTutorialTask(IncTutorialTaskRequest(u, taskId))
+      db.user.incTask(u.id, taskId) returns Some(uc)
+      db.user.addToAssets(u.id, r1) returns Some(uc)
+      db.user.addToAssets(u.id, r2) returns Some(uc)
+      db.user.setTasksCompletedFraction(any, any) returns Some(uc)
+      db.user.setTasksRewardReceived(id = u.id, rewardReceived = true) returns Some(uc)
+      db.user.addMessage(mEq(u.id), any) returns Some(uc)
 
-      result must beEqualTo(OkApiResult(IncTutorialTaskResult(ProfileModificationResult.OK, Some(u.profile))))
-      there was one(db.user).addToAssets(u.id, r)
-      there was one(db.user).incTutorialTask(u.id, taskId, 1f, rewardReceived = true)
+      val result = api.incTutorialTask(IncTutorialTaskRequest(u, tutorialTaskId))
+
+      result must beEqualTo(OkApiResult(IncTutorialTaskResult(ProfileModificationResult.OK, Some(uc.profile))))
+      there was one(db.user).incTask(u.id, taskId)
+      there was one(db.user).addToAssets(u.id, r1)
+      there was one(db.user).addToAssets(u.id, r2)
+      there was one(db.user).setTasksRewardReceived(id = u.id, rewardReceived = true)
+      there was one(db.user).setTasksCompletedFraction(any, any)
+      there were two(db.user).addMessage(mEq(u.id), any)
     }
 
     "Report missing tutorial task properly" in context {
@@ -233,23 +240,15 @@ class TasksAPISpecs extends BaseAPISpecs {
       val result = api.incTutorialTask(IncTutorialTaskRequest(u, taskId))
 
       result must beEqualTo(OkApiResult(IncTutorialTaskResult(ProfileModificationResult.OutOfContent, None)))
-      there was no(db.user).addToAssets(u.id, r)
-      there was no(db.user).incTutorialTask(u.id, taskId, 1f, rewardReceived = true)
     }
 
     "Carry tutorial tasks to next day if all tasks are not completed" in context {
       val r = Assets(10, 20, 30)
-      val tr = Assets(1, 2, 3)
-      val tutoralTask = Task(
+      val tutorialTask = Task(
         taskType = TaskType.Client,
         description = "",
         requiredCount = 10,
-        tutorialTask = Some(TutorialTask(
-          id = "taskId",
-          taskType = TaskType.Client,
-          description = "",
-          requiredCount = 10,
-          reward = tr)))
+        tutorialTaskId = Some("lala"))
 
       val u = createUser(DailyTasks(
         reward = r,
@@ -269,31 +268,25 @@ class TasksAPISpecs extends BaseAPISpecs {
             description = "",
             requiredCount = 5,
             currentCount = 5),
-          tutoralTask)))
+          tutorialTask)))
 
       user.resetTasks(any, any, any) returns Some(u)
-      user.addTasks(any, any, any) returns Some(u)
+      user.addTasks(any, any) returns Some(u)
 
       val result = api.resetDailyTasks(ResetDailyTasksRequest(u))
 
-      result must beEqualTo(OkApiResult(ResetDailyTasksResult()))
+      result must beEqualTo(OkApiResult(ResetDailyTasksResult(u)))
       there was one(db.user).resetTasks(any, any, any)
-      there was one(db.user).addTasks(u.id, List(tutoralTask), tr)
+      there was one(db.user).addTasks(u.id, List(tutorialTask))
     }
 
     "Do not carry tutorial tasks to next day if all tasks are completed" in context {
       val r = Assets(10, 20, 30)
-      val tr = Assets(1, 2, 3)
-      val tutoralTask = Task(
+      val tutorialTask = Task(
         taskType = TaskType.Client,
         description = "",
         requiredCount = 10,
-        tutorialTask = Some(TutorialTask(
-          id = "taskId",
-          taskType = TaskType.Client,
-          description = "",
-          requiredCount = 10,
-          reward = tr)))
+        tutorialTaskId = Some("lala"))
 
       val u = createUser(DailyTasks(
         reward = r,
@@ -314,15 +307,15 @@ class TasksAPISpecs extends BaseAPISpecs {
             description = "",
             requiredCount = 5,
             currentCount = 5),
-          tutoralTask)))
+          tutorialTask)))
 
       user.resetTasks(any, any, any) returns Some(u)
 
       val result = api.resetDailyTasks(ResetDailyTasksRequest(u))
 
-      result must beEqualTo(OkApiResult(ResetDailyTasksResult()))
+      result must beEqualTo(OkApiResult(ResetDailyTasksResult(u)))
       there was one(db.user).resetTasks(any, any, any)
-      there was no(db.user).addTasks(any, any, any)
+      there was no(db.user).addTasks(any, any)
     }
 
     "Do not assign already assigned tutorial ask" in context {
@@ -367,7 +360,7 @@ class TasksAPISpecs extends BaseAPISpecs {
           reward = Assets()))
       db.user.resetTasks(any, any, any) returns Some(u)
       db.user.addTutorialTaskAssigned(any, any, any) returns Some(u)
-      db.user.addTasks(any, any, any) returns Some(u)
+      db.user.addTasks(any, any) returns Some(u)
 
       val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, tutorialTaskId))
 
@@ -375,7 +368,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       there was one(db.tutorialTask).readById(tutorialTaskId)
       there was one(db.user).resetTasks(any, any, any)
       there was one(db.user).addTutorialTaskAssigned(any, any, any)
-      there was one(db.user).addTasks(any, any, any)
+      there was one(db.user).addTasks(any, any)
     }
 
   }

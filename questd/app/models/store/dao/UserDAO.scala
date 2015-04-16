@@ -103,6 +103,8 @@ trait UserDAO extends BaseDAO[User] {
   def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User]
   def addTasks(id: String, newTasks: List[Task]): Option[User]
   def incTask(id: String, taskId: String): Option[User] // TODO: test me.
+  def setTasksCompletedFraction(id: String, completedFraction: Float): Option[User] // TODO: test me.
+  def setTasksRewardReceived(id: String, rewardReceived: Boolean): Option[User] // TODO: test me.
 //  def incTutorialTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User]
 
   def updateCultureId(id: String, cultureId: String): Option[User]

@@ -480,7 +480,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def incTask(id: String, taskId: String): Option[User] = {
     findAndModify(
@@ -492,13 +492,32 @@ private[mongo] class MongoUserDAO
           "profile.dailyTasks.tasks.$.currentCount" -> 1)))
   }
 
-//  ,
-//  "$set" -> MongoDBObject(
-//    "profile.dailyTasks.completed" -> completed,
-//    "profile.dailyTasks.rewardReceived" -> rewardReceived)
+  /**
+   * @inheritdoc
+   */
+  def setTasksCompletedFraction(id: String, completedFraction: Float): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id),
+      MongoDBObject(
+      "$set" -> MongoDBObject(
+        "profile.dailyTasks.completed" -> completedFraction)))
+  }
 
   /**
-   *
+   * @inheritdoc
+   */
+  def setTasksRewardReceived(id: String, rewardReceived: Boolean): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id),
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "profile.dailyTasks.rewardReceived" -> rewardReceived)))
+  }
+
+  /**
+   * @inheritdoc
    */
   // TODO: remove me.
 //  def incTutorialTask(id: String, taskId: String, completed: Float, rewardReceived: Boolean): Option[User] = {
