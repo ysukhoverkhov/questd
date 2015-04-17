@@ -40,7 +40,6 @@ private[facebook] class FacebookClientRepeater(private val client: FacebookClien
    */
   private def requestSeveralTimes[T](fun: => T): T = {
     val requestResult = List.range(0, 3).foldLeft[(Option[T], Option[FacebookNetworkException])]((None, None)) { (c, i) =>
-      Logger.debug("Making request #" + i + " to FB")
       c match {
         case (Some(r), e) => (Some(r), e)
         case (None, _) =>
