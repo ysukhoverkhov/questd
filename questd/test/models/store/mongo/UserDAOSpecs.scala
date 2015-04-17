@@ -579,6 +579,53 @@ class UserDAOSpecs
       val u = ou1.get
       u.schedules.timeLine must beEqualTo(time)
     }
+
+    "addMessage adds a message" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val m = MessageAllTasksCompleted().toMessage
+
+      db.user.create(user)
+      db.user.addMessage(user.id, m)
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User].which(_.profile.messages == List(m))
+    }
+
+    "removeMessage removes a message" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val m = MessageAllTasksCompleted().toMessage
+
+      db.user.create(user)
+      db.user.addMessage(user.id, m)
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User].which(_.profile.messages == List(m))
+
+      db.user.removeMessage(user.id, m.id)
+
+      val ou2 = db.user.readById(user.id)
+      ou2 must beSome[User].which(_.profile.messages == List.empty)
+    }
+
+    "removeOldestMessage removes a really oldest message" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val ms = (1 to 5).map(n => MessageAllTasksCompleted().toMessage)
+
+      db.user.create(user)
+      ms.foreach(db.user.addMessage(user.id, _))
+
+      db.user.removeOldestMessage(user.id)
+
+      val ou2 = db.user.readById(user.id)
+      ou2 must beSome[User].which(_.profile.messages == ms.tail)
+    }
+
   }
 }
 

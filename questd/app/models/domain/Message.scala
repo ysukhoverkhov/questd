@@ -67,13 +67,15 @@ object MessageFriendshipRemoved {
 /**
  * A message about completing all tasks
  */
-case class MessageAllTasksCompleted ()
-
-object MessageAllTasksCompleted {
-  implicit def toMessage(a: MessageAllTasksCompleted): Message = {
+case class MessageAllTasksCompleted () {
+  def toMessage: Message = {
     Message(
       messageType = MessageType.AllTasksCompleted)
   }
+}
+
+object MessageAllTasksCompleted {
+  implicit def toMessage(a: MessageAllTasksCompleted): Message = a.toMessage
 }
 
 

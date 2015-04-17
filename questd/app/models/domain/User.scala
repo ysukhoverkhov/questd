@@ -18,7 +18,6 @@ case class User(
   followers: List[String] = List.empty,
   friends: List[Friendship] = List.empty,
   mustVoteSolutions: List[String] = List.empty,
-  messages: List[Message] = List.empty,
   tutorialStates: Map[String, TutorialState] =
     TutorialPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
   payedAuthor: Boolean = false) extends ID

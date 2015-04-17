@@ -25,7 +25,7 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
     import request._
 
     def capMessages(u: User): User = {
-      if (u.messages.length >= logic.constants.NumberOfStoredMessages) {
+      if (u.profile.messages.length >= logic.constants.NumberOfStoredMessages) {
         db.user.removeOldestMessage(u.id) match {
           case Some(us) => capMessages(us)
           case None =>
@@ -57,11 +57,11 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
 
   /**
    * Get all messages of a user.
-   */
+   */ // TODO: remove the call.
   def getMessages(request: GetMessagesRequest): ApiResult[GetMessagesResult] = handleDbException {
     import request._
 
-    OkApiResult(GetMessagesResult(OK, user.messages))
+    OkApiResult(GetMessagesResult(OK, user.profile.messages))
   }
 
 }

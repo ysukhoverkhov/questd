@@ -430,7 +430,7 @@ private[mongo] class MongoUserDAO
       id,
       MongoDBObject(
         "$push" -> MongoDBObject(
-          "messages" -> grater[Message].asDBObject(message))))
+          "profile.messages" -> grater[Message].asDBObject(message))))
   }
 
   /**
@@ -441,7 +441,7 @@ private[mongo] class MongoUserDAO
       id,
       MongoDBObject(
         "$pop" -> MongoDBObject(
-          "messages" -> -1)))
+          "profile.messages" -> -1)))
   }
 
   /**
@@ -452,7 +452,7 @@ private[mongo] class MongoUserDAO
       id,
       MongoDBObject(
         "$pull" -> MongoDBObject(
-          "messages" -> MongoDBObject("id" -> messageId))))
+          "profile.messages" -> MongoDBObject("id" -> messageId))))
   }
 
   /**
