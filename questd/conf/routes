@@ -73,7 +73,6 @@ POST	/rest/respondFriendship							controllers.web.rest.FriendsWS.respondFriends
 POST	/rest/removeFromFriends							controllers.web.rest.FriendsWS.removeFromFriends
 
 # Messages
-POST	/rest/getMessages								controllers.web.rest.MessagesWS.getMessages
 POST	/rest/removeMessage								controllers.web.rest.MessagesWS.removeMessage
 
 # Misc

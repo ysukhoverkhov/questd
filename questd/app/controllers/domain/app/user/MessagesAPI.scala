@@ -13,9 +13,6 @@ case class SendMessageResult(user: User)
 case class RemoveMessageRequest(user: User, messageId: String)
 case class RemoveMessageResult(allowed: ProfileModificationResult)
 
-case class GetMessagesRequest(user: User)
-case class GetMessagesResult(allowed: ProfileModificationResult, messages: List[Message])
-
 private[domain] trait MessagesAPI { this: DBAccessor =>
 
   /**
@@ -54,15 +51,5 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
 
     OkApiResult(RemoveMessageResult(OK))
   }
-
-  /**
-   * Get all messages of a user.
-   */ // TODO: remove the call.
-  def getMessages(request: GetMessagesRequest): ApiResult[GetMessagesResult] = handleDbException {
-    import request._
-
-    OkApiResult(GetMessagesResult(OK, user.profile.messages))
-  }
-
 }
 
