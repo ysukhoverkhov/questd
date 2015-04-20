@@ -8,7 +8,7 @@ import controllers.domain.helpers._
 import controllers.domain.app.protocol.ProfileModificationResult._
 
 case class GetTutorialRequest(user: User, platform: TutorialPlatform.Value)
-case class GetTutorialResult(tutorial: List[TutorialElement])
+case class GetTutorialResult(tutorialElements: List[TutorialElement])
 
 case class GetTutorialElementsStateRequest(user: User, platform: TutorialPlatform.Value)
 case class GetTutorialElementsStateResult(state: TutorialState)
