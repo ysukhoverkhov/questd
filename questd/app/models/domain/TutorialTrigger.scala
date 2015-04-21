@@ -6,6 +6,9 @@ package models.domain
 object TutorialTriggerType extends Enumeration {
   val Any = Value
   val TutorialElementClosed = Value
+  val TutorialTaskCompleted = Value
+  val ScreenOpened = Value
+  val ButtonPressed = Value
   val LevelGained = Value
 }
 

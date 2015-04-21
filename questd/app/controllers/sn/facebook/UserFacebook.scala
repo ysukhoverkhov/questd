@@ -34,28 +34,20 @@ private[sn] class UserFacebook(fbUser: com.restfb.types.User,
     fbUser.getTimezone.toInt
   }
 
+  /// Updating location cache
+  private def checkUpdateUserLocation(): Unit = {
+  }
+
   /// Country code of a user.
   def country: Option[String] = {
-    if (location == None) {
-      location = Some(client.fetchLocationFromFB(token))
-    }
-
-    if (location.get.current_location == null)
-      None
-    else
-      Some(location.get.current_location.getCountry)
+    checkUpdateUserLocation()
+    None
   }
 
   /// City of a user.
   def city: Option[String] = {
-    if (location == None) {
-      location = Some(client.fetchLocationFromFB(token))
-    }
-
-    if (location.get.current_location == null)
-      None
-    else
-      Some(location.get.current_location.getCity)
+    checkUpdateUserLocation()
+    None
   }
 
   /**

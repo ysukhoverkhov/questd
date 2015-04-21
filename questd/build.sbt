@@ -3,11 +3,11 @@ import spray.http.DateTime
 
 name := """questd"""
 
-version := "0.30.06-SNAPSHOT"
+version := "0.40.01-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.11.5"
+scalaVersion := "2.11.6"
 
 scalacOptions += "-feature"
 
@@ -25,7 +25,7 @@ libraryDependencies += "se.radley" %% "play-plugins-salat" % "1.5.0"
 
 libraryDependencies += "us.theatr" %% "akka-quartz" % "0.3.0-SNAPSHOT"
 
-libraryDependencies += "com.restfb" % "restfb" % "1.8.0"
+libraryDependencies += "com.restfb" % "restfb" % "1.9.0"
 
 libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19"
 

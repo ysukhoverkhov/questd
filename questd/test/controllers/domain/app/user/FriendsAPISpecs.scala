@@ -16,6 +16,7 @@ class FriendsAPISpecs extends BaseAPISpecs {
       val requester = createUserStub(id = requesterId)
 
       user.readById(requesterId) returns Some(requester)
+      user.addMessage(any, any) returns Some(responder)
 
       val result = api.respondFriendship(RespondFriendshipRequest(responder, requester.id, accept = true))
 

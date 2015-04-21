@@ -57,8 +57,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
         db.user.addPrivateDailyResult(
           r.user.id,
           DailyResult(
-            user.getStartOfCurrentDailyResultPeriod,
-            dailySalary = Assets())) ifSome { u =>
+            user.getStartOfCurrentDailyResultPeriod)) ifSome { u =>
 
           OkApiResult(ShiftDailyResultResult(u))
         }
@@ -75,9 +74,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
       val deltaAssets = u.profile.dailyResults.foldLeft(Assets()) { (a, dr) =>
 
-        val assetsAfterSalary = a + dr.dailySalary
-
-        val assetsAfterProposals = dr.decidedQuestProposals.foldLeft(assetsAfterSalary) { (a, dqp) =>
+        val assetsAfterProposals = dr.decidedQuestProposals.foldLeft(a) { (a, dqp) =>
           a + dqp.reward.getOrElse(Assets()) - dqp.penalty.getOrElse(Assets())
         }
 

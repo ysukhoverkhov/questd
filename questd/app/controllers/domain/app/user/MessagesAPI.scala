@@ -8,13 +8,10 @@ import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
 
 case class SendMessageRequest(user: User, message: Message)
-case class SendMessageResult()
+case class SendMessageResult(user: User)
 
 case class RemoveMessageRequest(user: User, messageId: String)
 case class RemoveMessageResult(allowed: ProfileModificationResult)
-
-case class GetMessagesRequest(user: User)
-case class GetMessagesResult(allowed: ProfileModificationResult, messages: List[Message])
 
 private[domain] trait MessagesAPI { this: DBAccessor =>
 
@@ -25,7 +22,7 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
     import request._
 
     def capMessages(u: User): User = {
-      if (u.messages.length >= logic.constants.NumberOfStoredMessages) {
+      if (u.profile.messages.length >= logic.constants.NumberOfStoredMessages) {
         db.user.removeOldestMessage(u.id) match {
           case Some(us) => capMessages(us)
           case None =>
@@ -39,9 +36,9 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
 
     val u = capMessages(user)
 
-    db.user.addMessage(u.id, message)
-
-    OkApiResult(SendMessageResult())
+    db.user.addMessage(u.id, message) ifSome { u =>
+      OkApiResult(SendMessageResult(user = u))
+    }
   }
 
   /**
@@ -54,15 +51,5 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
 
     OkApiResult(RemoveMessageResult(OK))
   }
-
-  /**
-   * Get all messages of a user.
-   */
-  def getMessages(request: GetMessagesRequest): ApiResult[GetMessagesResult] = handleDbException {
-    import request._
-
-    OkApiResult(GetMessagesResult(OK, user.messages))
-  }
-
 }
 

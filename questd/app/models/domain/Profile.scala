@@ -14,6 +14,7 @@ case class Profile(
   rights: Rights = Rights(),
   dailyResults: List[DailyResult] = List.empty,
   dailyTasks: DailyTasks = DailyTasks(),
+  messages: List[Message] = List.empty,
   questCreationContext: QuestCreationContext = QuestCreationContext(),
   questSolutionContext: QuestSolutionContext = QuestSolutionContext(),
   questProposalVoteContext: QuestVoteContext = QuestVoteContext(),

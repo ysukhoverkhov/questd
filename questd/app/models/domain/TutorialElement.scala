@@ -6,6 +6,6 @@ case class TutorialElement(
   id: String = ID.generateUUID(),
   action: TutorialAction,
   conditions: List[TutorialCondition] = List.empty,
-  triggers: TutorialTrigger
+  triggers: List[TutorialTrigger]
   ) extends ID
 
