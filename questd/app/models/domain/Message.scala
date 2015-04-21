@@ -8,7 +8,7 @@ object MessageType extends Enumeration {
   val FriendshipRejected = Value
   val FriendshipRemoved = Value
   val TasksCompleted = Value
-  val Text = Value
+  val Information = Value
 }
 
 /**
@@ -72,5 +72,18 @@ object MessageTasksCompleted {
   implicit def toMessage(a: MessageTasksCompleted): Message = {
     Message(
       messageType = MessageType.TasksCompleted)
+  }
+}
+
+/**
+ * A message about removed friendship connection.
+ */
+case class MessageInformation (text: String, url: Option[String])
+
+object MessageInformation {
+  implicit def toMessage(a: MessageInformation): Message = {
+    Message(
+      messageType = MessageType.Information,
+      data = a.url.fold[Map[String, String]](Map.empty)(url => Map("url" -> url)) ++ Map("text" -> a.text))
   }
 }
