@@ -133,6 +133,9 @@ GET		/admin/config									controllers.web.admin.Config.config(name = "")
 GET		/admin/config/byname/:name						controllers.web.admin.Config.config(name)
 POST	/admin/config/configUpdate/:name				controllers.web.admin.Config.configUpdate(name)
 
+GET		/admin/messages									controllers.web.admin.Messages.compose(sendResult: String = "")
+GET		/admin/messages/:sendResult						controllers.web.admin.Messages.compose(sendResult: String)
+POST	/admin/messages/send	    					controllers.web.admin.Messages.send
 
 
 # Map static resources from the /public folder to the /assets URL path

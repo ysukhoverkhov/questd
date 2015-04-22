@@ -103,8 +103,8 @@ abstract class BaseMongoDAO[T <: ID : Manifest](collectionName: String)
   /**
    * Update object with new object
    */
-  def update(query: DBObject, u: DBObject, multi: Boolean): Unit =
-    update(query, u, upsert = false, multi = multi)
+  def update(query: DBObject, updateRules: DBObject, multi: Boolean): Unit =
+    update(query, updateRules, upsert = false, multi = multi)
 
   /**
    * Update object with new object
