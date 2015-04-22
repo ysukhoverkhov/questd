@@ -65,7 +65,7 @@ private[mongo] class MongoUserDAO
         "id" -> MongoDBObject(
           "$in" -> userIds
         )),
-      u = MongoDBObject(
+      updateRules = MongoDBObject(
         "$addToSet" -> MongoDBObject(
           "mustVoteSolutions" -> solutionId)),
       multi = true)
@@ -434,6 +434,18 @@ private[mongo] class MongoUserDAO
   }
 
   /**
+   * @inheritdoc
+   */
+  def addMessageToEveryone(message: Message): Unit = {
+    update(
+      query = MongoDBObject(),
+      updateRules = MongoDBObject(
+        "$push" -> MongoDBObject(
+          "messages" -> grater[Message].asDBObject(message))),
+      multi = true)
+  }
+
+  /**
    *
    */
   def removeOldestMessage(id: String): Option[User] = {
@@ -597,7 +609,7 @@ private[mongo] class MongoUserDAO
     update(
       query = MongoDBObject(
         "demo.cultureId" -> oldCultureId),
-      u = MongoDBObject(
+      updateRules = MongoDBObject(
         "$set" -> MongoDBObject(
           "demo.cultureId" -> newCultureId)),
       multi = true)
@@ -636,7 +648,7 @@ private[mongo] class MongoUserDAO
       query = MongoDBObject(
         "id" -> MongoDBObject(
           "$in" -> ids)),
-      u = MongoDBObject(
+      updateRules = MongoDBObject(
         "$push" -> MongoDBObject(
           "timeLine" ->
             MongoDBObject(
