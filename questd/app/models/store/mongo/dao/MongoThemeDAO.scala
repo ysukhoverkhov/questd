@@ -61,7 +61,7 @@ private[mongo] class MongoThemeDAO
     update(
       query = MongoDBObject(
         "cultureId" -> oldCultureId),
-      u = MongoDBObject(
+      updateRules = MongoDBObject(
         "$set" -> MongoDBObject(
           "cultureId" -> newCultureId)),
       multi = true)
