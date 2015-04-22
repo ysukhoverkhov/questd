@@ -16,5 +16,6 @@ trait AdminComponent { component: DomainAPIComponent =>
     val cultures = new CulturesCRUDImpl(component.api)
     val tutorial = new TutorialTasksCRUDImpl(component.api)
     val config = new ConfigImpl(component.api)
+    val messages = new MessagesImpl(component.api)
   }
 }

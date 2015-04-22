@@ -97,6 +97,7 @@ trait UserDAO extends BaseDAO[User] {
   def removeFriendship(id: String, friendId: String): Option[User]
 
   def addMessage(id: String, message: Message): Option[User]
+  def addMessageToEveryone(message: Message): Unit
   def removeOldestMessage(id: String): Option[User]
   def removeMessage(id: String, messageId: String): Option[User]
 

@@ -8,7 +8,10 @@ import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
 
 case class SendMessageRequest(user: User, message: Message)
-case class SendMessageResult()
+case class SendMessageResult(user: User)
+
+case class BroadcastMessageRequest(message: Message)
+case class BroadcastMessageResult()
 
 case class RemoveMessageRequest(user: User, messageId: String)
 case class RemoveMessageResult(allowed: ProfileModificationResult)
@@ -39,9 +42,17 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
 
     val u = capMessages(user)
 
-    db.user.addMessage(u.id, message)
+    db.user.addMessage(u.id, message) ifSome { u =>
+      OkApiResult(SendMessageResult(u))
+    }
+  }
 
-    OkApiResult(SendMessageResult())
+  def broadcastMessage(request: BroadcastMessageRequest): ApiResult[BroadcastMessageResult] =  handleDbException {
+    import request._
+
+    db.user.addMessageToEveryone(message)
+
+    OkApiResult(BroadcastMessageResult())
   }
 
   /**
