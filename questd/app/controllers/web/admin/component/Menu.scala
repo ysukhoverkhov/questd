@@ -12,6 +12,7 @@ private[admin] object Menu {
     "Solutions" -> controllers.web.admin.routes.SolutionsCRUD.solutions().absoluteURL(secure = false),
     "Battles" -> controllers.web.admin.routes.BattlesCRUD.battles().absoluteURL(secure = false),
     "Cultures" -> controllers.web.admin.routes.CulturesCRUD.cultures("").absoluteURL(secure = false),
-    "Tutorial Tasks" -> controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks("").absoluteURL(secure = false)
+    "Tutorial Tasks" -> controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks("").absoluteURL(secure = false),
+    "Messages" -> controllers.web.admin.routes.Messages.compose("").absoluteURL(secure = false)
   )
 }

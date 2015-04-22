@@ -10,6 +10,9 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 case class SendMessageRequest(user: User, message: Message)
 case class SendMessageResult(user: User)
 
+case class BroadcastMessageRequest(message: Message)
+case class BroadcastMessageResult()
+
 case class RemoveMessageRequest(user: User, messageId: String)
 case class RemoveMessageResult(allowed: ProfileModificationResult)
 
@@ -39,6 +42,13 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
     db.user.addMessage(u.id, message) ifSome { u =>
       OkApiResult(SendMessageResult(user = u))
     }
+  }
+  def broadcastMessage(request: BroadcastMessageRequest): ApiResult[BroadcastMessageResult] =  handleDbException {
+    import request._
+
+    db.user.addMessageToEveryone(message)
+
+    OkApiResult(BroadcastMessageResult())
   }
 
   /**
