@@ -441,7 +441,7 @@ private[mongo] class MongoUserDAO
       query = MongoDBObject(),
       updateRules = MongoDBObject(
         "$push" -> MongoDBObject(
-          "messages" -> grater[Message].asDBObject(message))),
+          "profile.messages" -> grater[Message].asDBObject(message))),
       multi = true)
   }
 

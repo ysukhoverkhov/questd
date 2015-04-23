@@ -581,7 +581,6 @@ class UserDAOSpecs
     }
 
     "addMessage adds a message" in new WithApplication(appWithTestDatabase) {
-    "addMessageToEveryone does its work" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
 
       val user = createUserStub()
@@ -594,9 +593,7 @@ class UserDAOSpecs
       ou1 must beSome[User].which(_.profile.messages == List(m))
     }
 
-    "removeMessage removes a message" in new WithApplication(appWithTestDatabase) {
-      db.user.clear()
-
+    "addMessageToEveryone does its work" in new WithApplication(appWithTestDatabase) {
       val users = (1 to 5).map(i => createUserStub())
 
       users.foreach(db.user.create)
@@ -604,12 +601,16 @@ class UserDAOSpecs
 
       val u: Iterator[User] = db.user.all
       val u2 = u.toList
-      u2(0).messages.length must beEqualTo(1)
-      u2(1).messages.length must beEqualTo(1)
-      u2(2).messages.length must beEqualTo(1)
-      u2(3).messages.length must beEqualTo(1)
-      u2(4).messages.length must beEqualTo(1)
+      u2(0).profile.messages.length must beEqualTo(1)
+      u2(1).profile.messages.length must beEqualTo(1)
+      u2(2).profile.messages.length must beEqualTo(1)
+      u2(3).profile.messages.length must beEqualTo(1)
+      u2(4).profile.messages.length must beEqualTo(1)
     }
+
+    "removeMessage removes a message" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
       val user = createUserStub()
       val m = MessageAllTasksCompleted().toMessage
 
@@ -639,7 +640,6 @@ class UserDAOSpecs
       val ou2 = db.user.readById(user.id)
       ou2 must beSome[User].which(_.profile.messages == ms.tail)
     }
-
   }
 }
 
