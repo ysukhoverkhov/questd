@@ -121,10 +121,6 @@ GET		/admin/quests									controllers.web.admin.QuestsCRUD.quests(id = "")
 GET		/admin/quests/byid/:id							controllers.web.admin.QuestsCRUD.quests(id)
 POST	/admin/quests/update							controllers.web.admin.QuestsCRUD.updateQuest
 
-GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")
-GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)
-POST	/admin/tutorialTasks/update						controllers.web.admin.TutorialTasksCRUD.updateTutorialTask
-
 GET		/admin/users									controllers.web.admin.UsersCRUD.users(id = "")
 GET		/admin/solutions								controllers.web.admin.SolutionsCRUD.solutions(id = "")
 GET		/admin/battles	    							controllers.web.admin.BattlesCRUD.battles(id = "")
@@ -133,9 +129,14 @@ GET		/admin/config									controllers.web.admin.Config.config(name = "")
 GET		/admin/config/byname/:name						controllers.web.admin.Config.config(name)
 POST	/admin/config/configUpdate/:name				controllers.web.admin.Config.configUpdate(name)
 
-GET		/admin/messages									controllers.web.admin.Messages.compose(sendResult: String = "")
-GET		/admin/messages/:sendResult						controllers.web.admin.Messages.compose(sendResult: String)
+GET		/admin/messages         						controllers.web.admin.Messages.compose(sendResult: String)
 POST	/admin/messages/send	    					controllers.web.admin.Messages.send
+
+GET     /admin/tutorial                                 controllers.web.admin.TutorialScriptsCRUD.tutorial(platform: String)
+
+GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")
+GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)
+POST	/admin/tutorialTasks/update						controllers.web.admin.TutorialTasksCRUD.updateTutorialTask
 
 
 # Map static resources from the /public folder to the /assets URL path
