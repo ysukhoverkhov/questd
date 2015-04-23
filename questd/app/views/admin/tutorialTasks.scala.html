@@ -1,0 +1,58 @@
+@(menuItems: Map[String, String], tasks: List[models.domain.TutorialTask], newTaskForm: Form[controllers.web.admin.component.TutorialTaskForm])
+
+@import helper._
+
+@main("Tutorial Tasks")(menuItems, Map.empty) {
+
+	<table border="0">
+    	<tr>
+    		<td>
+				<table border="1">
+
+			    	<tr>
+			    		<td>id</td>
+			    		<td>Description</td>
+			    		<td>Task type</td>
+			    		<td>Required count</td>
+			    		<td>Reward Coins</td>
+			    		<td>Reward Money</td>
+			    		<td>Reward Rating</td>
+			    	</tr>
+
+					@for(t <- tasks) {
+				    	<tr>
+
+				    		<td>@t.id</td>
+				    		<td>@t.description</td>
+				    		<td>@t.taskType.toString</td>
+				    		<td>@t.requiredCount</td>
+				    		<td>@t.reward.coins</td>
+				    		<td>@t.reward.money</td>
+				    		<td>@t.reward.rating</td>
+							<td><a href="@controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(t.id)">edit</a></td>
+
+	    				</tr>
+	   				}
+				</table>
+    		</td>
+    		<td>
+				@form(action = controllers.web.admin.routes.TutorialTasksCRUD.updateTutorialTask()) {
+					@inputText(newTaskForm("id"), 'size -> 18, 'readonly -> "readonly")
+					@inputText(newTaskForm("description"), 'size -> 40)
+					@select(newTaskForm("taskType"), options(List("Client", "VoteQuestSolutions", "SubmitQuestResult", "AddToFollowing", "VoteQuestProposals", "SubmitQuestProposal", "VoteReviews", "SubmitReviewsForResults", "SubmitReviewsForProposals", "GiveRewards", "LookThroughWinnersOfMyQuests", "LookThroughFriendshipProposals")))
+					@inputText(newTaskForm("requiredCount"), 'size -> 5)
+					@inputText(newTaskForm("rewardCoins"), 'size -> 5)
+					@inputText(newTaskForm("rewardMoney"), 'size -> 5)
+					@inputText(newTaskForm("rewardRating"), 'size -> 5)
+					@if(newTaskForm("id").value == None) {
+			 			<input type="submit" value="Create">
+					} else {
+						<input type="submit" value="Update">
+					}
+		   		}
+    		</td>
+    	</tr>
+	</table>
+
+
+}
