@@ -61,7 +61,6 @@ class DailyResultAPISpecs extends BaseAPISpecs {
 
     "Apply all income on making private daily results public " in context {
       val dr = createDailyResultStub(
-        dailySalary = Assets(1, 1, 1),
         questsIncome = List(
           createQuestIncomeStub(
             passiveIncome = Assets(2, 2, 2),
@@ -92,7 +91,7 @@ class DailyResultAPISpecs extends BaseAPISpecs {
       val result = api.getDailyResult(GetDailyResultRequest(u))
 
       there was one(user).movePrivateDailyResultsToPublic(u.id, u.privateDailyResults.tail)
-      there was one(user).addToAssets(u.id, Assets(127, 127, 255))
+      there was one(user).addToAssets(u.id, Assets(126, 126, 254))
       result must beAnInstanceOf[OkApiResult[GetDailyResultResult]]
     }
   }

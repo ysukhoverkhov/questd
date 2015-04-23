@@ -103,7 +103,8 @@ object constants {
   /**
    * Tasks
    */
-  val RatingForCompletingDailyTasks = 250
+  val DailyTasksRatingForCompleting = 250
+  val DailyTasksRatingDeviation = 0.15
 
 }
 

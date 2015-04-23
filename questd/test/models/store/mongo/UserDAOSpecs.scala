@@ -155,9 +155,9 @@ class UserDAOSpecs
 
       db.user.resetTasks(userid, tasks, new Date())
 
-      db.user.incTask(userid, TaskType.Client.toString, 0.4f, rewardReceived = true)
-      db.user.incTask(userid, TaskType.GiveRewards.toString, 0.4f, rewardReceived = true)
-      db.user.incTask(userid, TaskType.GiveRewards.toString, 0.4f, rewardReceived = true)
+      db.user.incTask(id = userid, taskId = tasks.tasks.head.id)
+      db.user.incTask(id = userid, taskId = tasks.tasks(1).id)
+      db.user.incTask(id = userid, taskId = tasks.tasks(1).id)
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
@@ -165,7 +165,29 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards).head.currentCount == 2)
     }
 
-    "incTask should change percentage completed" in new WithApplication(appWithTestDatabase) {
+    "setTasksCompletedFraction should change percentage completed" in new WithApplication(appWithTestDatabase) {
+      val userid = "incTasks2"
+      val fraction = 0.3f
+      db.user.create(User(userid))
+
+      val tasks = DailyTasks(
+        tasks = List(
+          Task(
+            taskType = TaskType.Client,
+            description = "",
+            requiredCount = 10)))
+
+      db.user.resetTasks(userid, tasks, new Date())
+
+      db.user.setTasksCompletedFraction(userid, fraction)
+
+      val ou = db.user.readById(userid)
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou.get.profile.dailyTasks.completed must beEqualTo(fraction)
+      ou.get.profile.dailyTasks.rewardReceived must beEqualTo(false)
+    }
+
+    "setTasksRewardReceived should change the flag" in new WithApplication(appWithTestDatabase) {
       val userid = "incTasks2"
       db.user.create(User(userid))
 
@@ -178,50 +200,11 @@ class UserDAOSpecs
 
       db.user.resetTasks(userid, tasks, new Date())
 
-      db.user.incTask(userid, TaskType.Client.toString, 0.4f, rewardReceived = true)
+      db.user.setTasksRewardReceived(id = userid, rewardReceived = true)
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou.get.profile.dailyTasks.tasks.head.currentCount must beEqualTo(1)
-      ou.get.profile.dailyTasks.completed must beEqualTo(0.4f)
       ou.get.profile.dailyTasks.rewardReceived must beEqualTo(true)
-    }
-
-    "incTutorialTask should increase number of times task was completed by one" in new WithApplication(appWithTestDatabase) {
-      val userid = "incTutorialTasks"
-      val taskId = "tid"
-      db.user.create(User(userid))
-
-      val tasks = DailyTasks(
-        tasks = List(
-          Task(
-            taskType = TaskType.AddToFollowing,
-            description = "",
-            requiredCount = 10),
-          Task(
-            taskType = TaskType.GiveRewards,
-            description = "",
-            requiredCount = 10),
-          Task(
-            taskType = TaskType.Client,
-            description = "",
-            requiredCount = 10,
-            tutorialTask = Some(TutorialTask(
-              id = taskId,
-              taskType = TaskType.Client,
-              description = "",
-              requiredCount = 10,
-              reward = Assets())))))
-
-      db.user.resetTasks(userid, tasks, new Date())
-
-      db.user.incTutorialTask(userid, taskId, 0.4f, rewardReceived = true)
-
-      val ou = db.user.readById(userid)
-      ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client).head.currentCount == 1)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards).head.currentCount == 0)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.AddToFollowing).head.currentCount == 0)
     }
 
     "updateQuestCreationCoolDown should reset cool down" in new WithApplication(appWithTestDatabase) {
@@ -277,11 +260,11 @@ class UserDAOSpecs
             tasks = List(t, t, t),
             reward = Assets(1, 2, 3)))))
 
-      val ou = db.user.addTasks(userid, List(t, t), Assets(100, 200, 300))
+      val ou = db.user.addTasks(userid, List(t, t))
 
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.length == 5)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(101, 202, 303))
+      ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(1, 2, 3))
     }
 
     "addClosedTutorialElement works" in new WithApplication(appWithTestDatabase) {
@@ -597,7 +580,21 @@ class UserDAOSpecs
       u.schedules.timeLine must beEqualTo(time)
     }
 
+    "addMessage adds a message" in new WithApplication(appWithTestDatabase) {
     "addMessageToEveryone does its work" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val m = MessageAllTasksCompleted().toMessage
+
+      db.user.create(user)
+      db.user.addMessage(user.id, m)
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User].which(_.profile.messages == List(m))
+    }
+
+    "removeMessage removes a message" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
 
       val users = (1 to 5).map(i => createUserStub())
@@ -613,6 +610,36 @@ class UserDAOSpecs
       u2(3).messages.length must beEqualTo(1)
       u2(4).messages.length must beEqualTo(1)
     }
+      val user = createUserStub()
+      val m = MessageAllTasksCompleted().toMessage
+
+      db.user.create(user)
+      db.user.addMessage(user.id, m)
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User].which(_.profile.messages == List(m))
+
+      db.user.removeMessage(user.id, m.id)
+
+      val ou2 = db.user.readById(user.id)
+      ou2 must beSome[User].which(_.profile.messages == List.empty)
+    }
+
+    "removeOldestMessage removes a really oldest message" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val ms = (1 to 5).map(n => MessageAllTasksCompleted().toMessage)
+
+      db.user.create(user)
+      ms.foreach(db.user.addMessage(user.id, _))
+
+      db.user.removeOldestMessage(user.id)
+
+      val ou2 = db.user.readById(user.id)
+      ou2 must beSome[User].which(_.profile.messages == ms.tail)
+    }
+
   }
 }
 

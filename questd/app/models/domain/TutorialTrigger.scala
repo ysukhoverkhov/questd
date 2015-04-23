@@ -6,6 +6,9 @@ package models.domain
 object TutorialTriggerType extends Enumeration {
   val Any = Value
   val TutorialElementClosed = Value
+  val TutorialTaskCompleted = Value
+  val ScreenOpened = Value
+  val ButtonPressed = Value
   val LevelGained = Value
 }
 
@@ -13,6 +16,7 @@ object TutorialTriggerType extends Enumeration {
  * Describes an action client application should take during the tutorial.
  */
 case class TutorialTrigger (
-  `type`: TutorialTriggerType.Value
+  `type`: TutorialTriggerType.Value,
+   params: Map[String, String] = Map.empty
   )
 

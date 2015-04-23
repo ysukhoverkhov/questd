@@ -7,7 +7,8 @@ object MessageType extends Enumeration {
   val FriendshipAccepted = Value
   val FriendshipRejected = Value
   val FriendshipRemoved = Value
-  val TasksCompleted = Value
+  val AllTasksCompleted = Value
+  val TaskCompleted = Value
   val Information = Value
 }
 
@@ -64,14 +65,30 @@ object MessageFriendshipRemoved {
 }
 
 /**
- * A message about removed friendship connection.
+ * A message about completing all tasks
  */
-case class MessageTasksCompleted ()
-
-object MessageTasksCompleted {
-  implicit def toMessage(a: MessageTasksCompleted): Message = {
+case class MessageAllTasksCompleted () {
+  def toMessage: Message = {
     Message(
-      messageType = MessageType.TasksCompleted)
+      messageType = MessageType.AllTasksCompleted)
+  }
+}
+
+object MessageAllTasksCompleted {
+  implicit def toMessage(a: MessageAllTasksCompleted): Message = a.toMessage
+}
+
+
+/**
+ * A message about completing a tasks
+ */
+case class MessageTaskCompleted (taskId: String)
+
+object MessageTaskCompleted {
+  implicit def toMessage(a: MessageTaskCompleted): Message = {
+    Message(
+      messageType = MessageType.TaskCompleted,
+      data = Map("taskId" -> a.taskId))
   }
 }
 

@@ -13,6 +13,7 @@ case class TutorialTask(
     taskType = taskType,
     description = description,
     requiredCount = requiredCount,
-    tutorialTask = Some(this))
+    reward = reward,
+    tutorialTaskId = Some(this.id))
 }
 
