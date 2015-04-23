@@ -5,7 +5,7 @@ package models.domain
  */
 object TutorialConditionType extends Enumeration {
   val TutorialElementClosed = Value
-  val HasLevel = Value
+  val ProfileVariableState = Value
 }
 
 /**

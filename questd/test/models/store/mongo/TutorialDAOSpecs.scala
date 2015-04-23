@@ -21,7 +21,7 @@ class TutorialDAOSpecs extends Specification
 
       clearDB()
 
-      val tc = TutorialCondition(TutorialConditionType.HasLevel, params = Map("param" -> "value"))
+      val tc = TutorialCondition(TutorialConditionType.ProfileVariableState, params = Map("param" -> "value"))
       val tt = TutorialTrigger(TutorialTriggerType.Any)
       val te = TutorialElement(
         action = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg")),
