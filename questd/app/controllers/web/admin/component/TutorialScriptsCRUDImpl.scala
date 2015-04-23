@@ -1,7 +1,8 @@
 package controllers.web.admin.component
 
-import controllers.domain.DomainAPIComponent
-import models.domain.TutorialPlatform
+import controllers.domain.app.user.{GetCommonTutorialRequest, GetCommonTutorialResult}
+import controllers.domain.{DomainAPIComponent, OkApiResult}
+import models.domain._
 import play.api.mvc._
 
 class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
@@ -13,11 +14,13 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
   }
 
   def tutorial(platform: String) = Authenticated { implicit request =>
-//    api.getConfigSection(GetConfigSectionRequest(sectionName)) match {
-//      case OkApiResult(GetConfigSectionResult(Some(r))) => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, r.values.toSeq.sortBy(_._1)))
-//      case _ => Ok(views.html.admin.config(Menu(request), leftMenu, sectionName, Map.empty.toSeq))
-//    }
-    Ok(views.html.admin.tutorialScripts(Menu(request), leftMenu, platform))
+
+    api.getCommonTutorial(GetCommonTutorialRequest(TutorialPlatform.withName(platform))) match {
+      case OkApiResult(GetCommonTutorialResult(elements)) =>
+        Ok(views.html.admin.tutorialScripts(Menu(request), leftMenu, platform, elements))
+      case _ =>
+        Ok(views.html.admin.tutorialScripts(Menu(request), leftMenu, platform, List.empty))
+    }
   }
 
 //  def configUpdate(sectionName: String) = Authenticated { implicit request =>

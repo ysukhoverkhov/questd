@@ -7,6 +7,9 @@ import controllers.domain._
 import controllers.domain.helpers._
 import controllers.domain.app.protocol.ProfileModificationResult._
 
+case class GetCommonTutorialRequest(platform: TutorialPlatform.Value)
+case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])
+
 case class GetTutorialRequest(user: User, platform: TutorialPlatform.Value)
 case class GetTutorialResult(tutorialElements: List[TutorialElement])
 
@@ -23,6 +26,16 @@ case class IncTutorialTaskRequest(user: User, taskId: String)
 case class IncTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
+
+  /**
+   * Get common for all users tutorial for the platform.
+   */
+  def getCommonTutorial(request: GetCommonTutorialRequest): ApiResult[GetCommonTutorialResult] = handleDbException {
+    val commonScenario: List[TutorialElement] =
+      db.tutorial.readById(request.platform.toString) map {_.elements} getOrElse List.empty
+
+    OkApiResult(GetCommonTutorialResult(commonScenario))
+  }
 
   /**
    * Get actual for current user tutorial.
@@ -78,7 +91,6 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
             db.user.addTutorialTaskAssigned(id = user.id, platform = platform.toString, taskId = taskId)
           } ifSome { v =>
             // 4. Add reward of current task to reward for current daily tasks and increase timeout to infinity.
-            val reward = t.reward
             val taskToAdd = t.task
 
             db.user.addTasks(

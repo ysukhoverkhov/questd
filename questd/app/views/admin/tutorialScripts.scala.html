@@ -1,6 +1,34 @@
-@(menuItems: Map[String, String], leftMenuItems: Map[String, String], currentPlatform: String)
+@(menuItems: Map[String, String], leftMenuItems: Map[String, String], currentPlatform: String, elements: List[models.domain.TutorialElement])
 
 @main(s"Tutorial sctipt for: $currentPlatform")(menuItems, leftMenuItems) {
 
-adasdasdasd
+@*
+@if(values.size > 0) {
+@helper.form(action=controllers.web.admin.routes.Config.configUpdate(sectionName)) {
+*@
+
+<table border="1">
+    <tr>
+        <td>id</td>
+        <td>action</td>
+        <td>conditions</td>
+        <td>triggers</td>
+    </tr>
+
+    @for(element <- elements) {
+    <tr>
+        <td>@element.id</td>
+        <td>@element.action</td>
+        <td>@element.conditions</td>
+        <td>@element.triggers</td>
+    </tr>
+    }
+</table>
+
+@*
+<input type='submit' value='Update' />
+}
+}
+*@
+
 }
