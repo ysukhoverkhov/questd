@@ -7,7 +7,7 @@ import java.util.Date
  */
 case class DailyResult(
   startOfPeriod: Date,
-  dailySalary: Assets, // TODO: remove me in 0.40
+  dailySalary: Assets = Assets(), // TODO: remove me in 0.40
   decidedQuestSolutions: List[QuestSolutionResult] = List.empty,
   decidedQuestProposals: List[QuestProposalResult] = List.empty,
   questsIncome: List[QuestIncome] = List.empty)

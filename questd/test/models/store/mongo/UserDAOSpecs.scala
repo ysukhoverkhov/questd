@@ -596,6 +596,23 @@ class UserDAOSpecs
       val u = ou1.get
       u.schedules.timeLine must beEqualTo(time)
     }
+
+    "addMessageToEveryone does its work" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val users = (1 to 5).map(i => createUserStub())
+
+      users.foreach(db.user.create)
+      db.user.addMessageToEveryone(MessageInformation("", Some("")))
+
+      val u: Iterator[User] = db.user.all
+      val u2 = u.toList
+      u2(0).messages.length must beEqualTo(1)
+      u2(1).messages.length must beEqualTo(1)
+      u2(2).messages.length must beEqualTo(1)
+      u2(3).messages.length must beEqualTo(1)
+      u2(4).messages.length must beEqualTo(1)
+    }
   }
 }
 
