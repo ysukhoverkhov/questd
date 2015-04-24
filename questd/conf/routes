@@ -133,6 +133,9 @@ GET		/admin/messages         						controllers.web.admin.Messages.compose(sendRe
 POST	/admin/messages/send	    					controllers.web.admin.Messages.send
 
 GET     /admin/tutorial                                 controllers.web.admin.TutorialScriptsCRUD.tutorial(platform: String)
+POST    /admin/tutorial/updateAction                    controllers.web.admin.TutorialScriptsCRUD.updateAction(platform: String, elementId: String)
+POST    /admin/tutorial/addElement                      controllers.web.admin.TutorialScriptsCRUD.addElement(platform: String)
+POST    /admin/tutorial/deleteElement                   controllers.web.admin.TutorialScriptsCRUD.deleteElement(platform: String, elementId: String)
 
 GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")
 GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)

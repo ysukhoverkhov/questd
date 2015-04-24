@@ -457,7 +457,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def removeMessage(id: String, messageId: String): Option[User] = {
     findAndModify(

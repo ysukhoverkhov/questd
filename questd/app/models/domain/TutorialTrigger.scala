@@ -16,7 +16,7 @@ object TutorialTriggerType extends Enumeration {
  * Describes an action client application should take during the tutorial.
  */
 case class TutorialTrigger (
-  `type`: TutorialTriggerType.Value,
+  triggerType: TutorialTriggerType.Value,
    params: Map[String, String] = Map.empty
   )
 

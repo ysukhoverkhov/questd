@@ -1,11 +1,13 @@
-@(menuItems: Map[String, String], leftMenuItems: Map[String, String], currentPlatform: String, elements: List[models.domain.TutorialElement])
+@(
+menuItems: Map[String, String],
+leftMenuItems: Map[String, String],
+currentPlatform: String,
+elements: List[models.domain.TutorialElement],
+possibleActions: List[String])
+
+@import helper._
 
 @main(s"Tutorial sctipt for: $currentPlatform")(menuItems, leftMenuItems) {
-
-@*
-@if(values.size > 0) {
-@helper.form(action=controllers.web.admin.routes.Config.configUpdate(sectionName)) {
-*@
 
 <table border="1">
     <tr>
@@ -13,22 +15,46 @@
         <td>action</td>
         <td>conditions</td>
         <td>triggers</td>
+        <td>Action!</td>
     </tr>
 
     @for(element <- elements) {
     <tr>
         <td>@element.id</td>
-        <td>@element.action</td>
+        <td>
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateAction(currentPlatform, element.id)) {
+            <select id="actionType" name="actionType">
+                @for(action <- possibleActions) {
+                    @if(action == element.action.actionType.toString) {
+                        <option value="@action" selected="selected">@action</option>
+                    } else {
+                        <option value="@action">@action</option>
+                    }
+                }
+            </select>
+            <input type='submit' value='Save' />
+            }
+        </td>
         <td>@element.conditions</td>
         <td>@element.triggers</td>
+        <td>
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteElement(currentPlatform, element.id)) {
+            <input type='submit' value='DELETE' />
+            }
+        </td>
     </tr>
     }
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addElement(currentPlatform)) {
+            <input type='submit' value='ADD' />
+            }
+        </td>
+    </tr>
 </table>
-
-@*
-<input type='submit' value='Update' />
-}
-}
-*@
 
 }

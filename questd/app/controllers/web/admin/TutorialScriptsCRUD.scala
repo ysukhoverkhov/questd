@@ -10,6 +10,8 @@ object TutorialScriptsCRUD extends Controller {
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
   def tutorial(platform: String) = admin.tutorialScripts.tutorial(platform)
-
+  def updateAction(platform: String, elementId: String) = admin.tutorialScripts.updateAction(platform, elementId)
+  def addElement(platform: String) = admin.tutorialScripts.addElement(platform)
+  def deleteElement(platform: String, elementId: String) = admin.tutorialScripts.deleteElement(platform, elementId)
 }
 

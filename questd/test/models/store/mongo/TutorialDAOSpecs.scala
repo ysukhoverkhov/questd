@@ -17,7 +17,7 @@ class TutorialDAOSpecs extends Specification
 
   "Mongo Tutorial DAO" should {
 
-    "Create and read tuorials" in new WithApplication(appWithTestDatabase) {
+    "Create and read tutorials" in new WithApplication(appWithTestDatabase) {
 
       clearDB()
 
@@ -36,6 +36,44 @@ class TutorialDAOSpecs extends Specification
       val ot = db.tutorial.readById(t.id)
 
       ot must beSome.which(_.id == t.id)
+    }
+
+    "Add element to tutorial" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val tc = TutorialCondition(TutorialConditionType.ProfileVariableState, params = Map("param" -> "value"))
+      val tt = TutorialTrigger(TutorialTriggerType.Any)
+      val te = TutorialElement(
+        action = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg")),
+        conditions = List(tc, tc),
+        triggers = List(tt, tt))
+
+      private val platform = TutorialPlatform.iPhone.toString
+      val t = Tutorial(platform, List.empty)
+      db.tutorial.create(t)
+
+      val ot = db.tutorial.addElement(platform, te)
+      ot must beSome.which(_.id == t.id)
+      ot must beSome.which(_.elements.length == 1)
+    }
+
+    "Remove element to tutorial" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val tc = TutorialCondition(TutorialConditionType.ProfileVariableState, params = Map("param" -> "value"))
+      val tt = TutorialTrigger(TutorialTriggerType.Any)
+      val te = TutorialElement(
+        action = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg")),
+        conditions = List(tc, tc),
+        triggers = List(tt, tt))
+
+      private val platform = TutorialPlatform.iPhone.toString
+      val t = Tutorial(platform, List(te))
+      db.tutorial.create(t)
+
+      val ot = db.tutorial.deleteElement(platform, te.id)
+      ot must beSome.which(_.id == t.id)
+      ot must beSome.which(_.elements.length == 0)
     }
   }
 }
