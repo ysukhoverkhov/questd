@@ -21,5 +21,15 @@ trait TutorialDAO extends BaseDAO[Tutorial] {
    * @return Uprated tutorial.
    */
   def deleteElement(id: String, tutorialElementId: String): Option[Tutorial]
+
+  /**
+   * Updates existing element in tutorial script.
+   *
+   * @param id Platform id.
+   * @param tutorialElement Element to update.
+   * @return Updated tutorial.
+   */
+  def updateElement(id: String, tutorialElement: TutorialElement): Option[Tutorial]
+
 }
 

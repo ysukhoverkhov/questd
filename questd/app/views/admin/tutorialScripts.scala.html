@@ -7,11 +7,16 @@ possibleActions: List[String])
 
 @import helper._
 
+<style>
+    form { display: inline; }
+</style>
+
+
 @main(s"Tutorial sctipt for: $currentPlatform")(menuItems, leftMenuItems) {
 
 <table border="1">
     <tr>
-        <td>id</td>
+        <td width="10%">id</td>
         <td>action</td>
         <td>conditions</td>
         <td>triggers</td>
@@ -21,7 +26,7 @@ possibleActions: List[String])
     @for(element <- elements) {
     <tr>
         <td>@element.id</td>
-        <td>
+        <td nowrap="nowrap">
             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateAction(currentPlatform, element.id)) {
             <select id="actionType" name="actionType">
                 @for(action <- possibleActions) {
@@ -34,12 +39,34 @@ possibleActions: List[String])
             </select>
             <input type='submit' value='Save' />
             }
+
+            @for((key, value) <- element.action.params) {
+                <p>
+                    @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementAction(currentPlatform, element.id, key)) {
+                        <input type="text" id="key" name="key" value='@key' size="5">
+                        <input type="text" id="value" name="value" value='@value' size="5">
+                        <input type='submit' value='Save' />
+                    }
+                    @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteParamFromElementAction(currentPlatform, element.id, key)) {
+                        <input type='submit' value='Del' />
+                    }
+                </p>
+            }
+
+            <p>
+                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addParamToElementAction(currentPlatform, element.id)) {
+                    <input type='submit' value='Add Param' />
+                }
+            </p>
         </td>
+
         <td>@element.conditions</td>
+
         <td>@element.triggers</td>
+
         <td>
             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteElement(currentPlatform, element.id)) {
-            <input type='submit' value='DELETE' />
+                <input type='submit' value='DELETE' />
             }
         </td>
     </tr>

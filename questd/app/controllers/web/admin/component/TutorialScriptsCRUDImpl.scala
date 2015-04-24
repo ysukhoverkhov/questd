@@ -3,7 +3,18 @@ package controllers.web.admin.component
 import controllers.domain.app.user.{GetCommonTutorialRequest, GetCommonTutorialResult}
 import controllers.domain.{DomainAPIComponent, OkApiResult}
 import models.domain._
+import play.api.Logger
+import play.api.data.Form
+import play.api.data.Forms._
 import play.api.mvc._
+
+case class TutorialActionForm(
+  elementId: String,
+  actionType: String)
+
+case class KeyValueForm(
+  key: String,
+  value: String)
 
 class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
@@ -12,6 +23,33 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       (c, v) => c + (v.toString -> controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(v.toString).absoluteURL(secure = false))
     }
   }
+
+  private def findTutorialElement(platform: String, elementId: String): Option[TutorialElement] = {
+    api.db.tutorial.readById(platform).flatMap(_.elements.find(_.id == elementId))
+  }
+
+  private def deleteParamFromActionImpl(platform: String, elementId: String, paramKey: String): Unit = {
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedElement = e.copy(action = e.action.copy(params = e.action.params - paramKey))
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+  }
+
+  private def addParamToElementActionImpl(platform: String, elementId: String, key: String, value: String): Unit = {
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedElement = e.copy(action = e.action.copy(params = e.action.params + (key -> value)))
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+  }
+
 
   def tutorial(platform: String) = Authenticated { implicit request =>
 
@@ -32,17 +70,26 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
   def updateAction(platform: String, elementId: String) = Authenticated { implicit request =>
 
-    // TODO: update action type here.
-//    val values: Map[String, String] = request.body.asFormUrlEncoded match {
-//      case Some(m) =>
-//        m.map {
-//          case (k, v) => k -> v.head
-//        }
-//      case _ => Map.empty
-//    }
-//
-//    val sec = ConfigSection(sectionName, values)
-//    api.setConfigSection(SetConfigSectionRequest(sec))
+    val form = Form(
+    mapping(
+      "elementId" -> nonEmptyText,
+      "actionType" -> nonEmptyText)(TutorialActionForm.apply)(TutorialActionForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"$formWithErrors.errors")
+      },
+
+      actionForm => {
+        findTutorialElement(platform, actionForm.elementId) match {
+          case Some(e) =>
+            val updatedElement = e.copy(action = e.action.copy(actionType = TutorialActionType.withName(actionForm.actionType)))
+            api.db.tutorial.updateElement(platform, updatedElement)
+
+          case None =>
+            Logger.error(s"Tutorial script or element not found")
+        }
+      })
 
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }
@@ -66,9 +113,70 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }
 
-  def deleteElement(platform: String, elementId: String) = Authenticated { implicit request =>
 
+  /**
+   * Deletes element from tutorial script.
+   *
+   * @param platform Platform of the script.
+   * @param elementId Id if element to delete.
+   * @return Content to display.
+   */
+  def deleteElement(platform: String, elementId: String) = Authenticated { implicit request =>
     api.db.tutorial.deleteElement(platform, elementId)
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Adds empty param to element's action.
+   *
+   * @param platform Platform of the script.
+   * @param elementId Id if element to delete.
+   * @return Content to display.
+   */
+  def addParamToElementAction(platform: String, elementId: String) = Authenticated { implicit request =>
+
+    addParamToElementActionImpl(platform, elementId, "", "")
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Remove parameter from action by its key.
+   *
+   * @param platform Platform of tutorial element.
+   * @param elementId Id of the element.
+   * @param paramKey Key of param we should remove.
+   * @return Updated content.
+   */
+  def deleteParamFromElementAction(platform: String, elementId: String, paramKey: String) = Authenticated { implicit request =>
+    deleteParamFromActionImpl(platform, elementId, paramKey)
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Saves param in action.
+   *
+   * @param platform Platform of element with action.
+   * @param elementId Id of element to save param in.
+   * @param paramKey Key of the parameter to save.
+   * @return Content.
+   */
+  def saveParamInElementAction(platform: String, elementId: String, paramKey: String) = Authenticated { implicit request =>
+
+    val form = Form(
+      mapping(
+        "key" -> nonEmptyText,
+        "value" -> nonEmptyText)(KeyValueForm.apply)(KeyValueForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+      },
+
+      keyValueForm => {
+        deleteParamFromActionImpl(platform, elementId, paramKey)
+        addParamToElementActionImpl(platform, elementId, keyValueForm.key, keyValueForm.value)
+      })
 
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }

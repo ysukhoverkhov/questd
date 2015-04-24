@@ -35,4 +35,17 @@ private[mongo] class MongoTutorialDAO
         "$pull" -> MongoDBObject(
           "elements" -> MongoDBObject("id" -> tutorialElementId))))
   }
+
+  /**
+   * @inheritdoc
+   */
+  def updateElement(id: String, tutorialElement: TutorialElement): Option[Tutorial] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "elements.id" -> tutorialElement.id),
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "elements.$" -> grater[TutorialElement].asDBObject(tutorialElement))))
+  }
 }

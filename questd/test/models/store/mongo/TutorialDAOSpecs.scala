@@ -75,6 +75,28 @@ class TutorialDAOSpecs extends Specification
       ot must beSome.which(_.id == t.id)
       ot must beSome.which(_.elements.length == 0)
     }
+
+    "Update element to tutorial" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val tc = TutorialCondition(TutorialConditionType.ProfileVariableState, params = Map("param" -> "value"))
+      val tt = TutorialTrigger(TutorialTriggerType.Any)
+      val te = TutorialElement(
+        action = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg")),
+        conditions = List(tc, tc),
+        triggers = List(tt, tt))
+
+      val updatedElement = te.copy(action = te.action.copy(actionType = TutorialActionType.Message))
+
+      private val platform = TutorialPlatform.iPhone.toString
+      val t = Tutorial(platform, List(te))
+      db.tutorial.create(t)
+
+      val ot = db.tutorial.updateElement(platform, updatedElement)
+      ot must beSome.which(_.id == t.id)
+      ot must beSome.which(_.elements.length == 1)
+      ot must beSome.which(_.elements.head.action.actionType == TutorialActionType.Message)
+    }
   }
 }
 
