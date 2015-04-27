@@ -18,6 +18,7 @@ object TutorialScriptsCRUD extends Controller {
   def saveParamInElementAction(platform: String, elementId: String, paramKey: String) = admin.tutorialScripts.saveParamInElementAction(platform, elementId, paramKey)
 
   def addConditionToElement(platform: String, elementId: String) = admin.tutorialScripts.addConditionToElement(platform, elementId)
-
+  def deleteConditionFromElement(platform: String, elementId: String, conditionIndex: Int) = admin.tutorialScripts.deleteConditionFromElement(platform, elementId, conditionIndex)
+  def updateCondition(platform: String, elementId: String, conditionIndex: Int) = admin.tutorialScripts.updateCondition(platform, elementId, conditionIndex)
 }
 

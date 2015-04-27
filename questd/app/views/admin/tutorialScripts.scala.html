@@ -3,7 +3,8 @@ menuItems: Map[String, String],
 leftMenuItems: Map[String, String],
 currentPlatform: String,
 elements: List[models.domain.TutorialElement],
-possibleActions: List[String])
+possibleActions: List[String],
+possibleConditions: List[String])
 
 @import helper._
 
@@ -29,7 +30,7 @@ possibleActions: List[String])
         <td>@element.id</td>
         <td nowrap="nowrap">
             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateAction(currentPlatform, element.id)) {
-            <select id="actionType" name="actionType">
+            <select id="entityType" name="entityType">
                 @for(action <- possibleActions) {
                     @if(action == element.action.actionType.toString) {
                         <option value="@action" selected="selected">@action</option>
@@ -63,10 +64,49 @@ possibleActions: List[String])
 
         <td>
             <table border="1">
-                @for(condition <- element.conditions) {
-                    <tr><td>
-                        @condition
-                    </td></tr>
+                @for((condition, index) <- element.conditions.zipWithIndex) {
+                    <tr>
+                        <td nowrap="nowrap">
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateCondition(currentPlatform, element.id, index)) {
+                                <select id="entityType" name="entityType">
+                                    @for(ct <- possibleConditions) {
+                                        @if(ct == condition.conditionType.toString) {
+                                            <option value="@ct" selected="selected">@ct</option>
+                                        } else {
+                                            <option value="@ct">@ct</option>
+                                        }
+                                    }
+                                </select>
+                                <input type='submit' value='Save' />
+                            }
+
+                            @*
+                            @for((key, value) <- element.action.params) {
+                            <p>
+                                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementAction(currentPlatform, element.id, key)) {
+                                <input type="text" id="key" name="key" value='@key' size="5">
+                                <input type="text" id="value" name="value" value='@value' size="5">
+                                <input type='submit' value='Save' />
+                                }
+                                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteParamFromElementAction(currentPlatform, element.id, key)) {
+                                    <input type='submit' value='Del' />
+                                }
+                            </p>
+                            }
+
+                            <p>
+                                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addParamToElementAction(currentPlatform, element.id)) {
+                                    <input type='submit' value='Add Param' />
+                                }
+                            </p>
+                            *@
+                        </td>
+                        <td>
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteConditionFromElement(currentPlatform, element.id, index)) {
+                                <input type='submit' value='Del' />
+                            }
+                        </td>
+                    </tr>
                 }
 
                 <tr><td>
@@ -76,10 +116,6 @@ possibleActions: List[String])
                 </td></tr>
             </table>
         </td>
-
-
-
-
 
         <td>@element.triggers</td>
 

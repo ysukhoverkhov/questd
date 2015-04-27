@@ -8,9 +8,8 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc._
 
-case class TutorialActionForm(
-  elementId: String,
-  actionType: String)
+case class TutorialEntityTypeForm(
+  entityType: String)
 
 case class KeyValueForm(
   key: String,
@@ -65,15 +64,15 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       leftMenuItems = leftMenu,
       currentPlatform = platform,
       elements = els,
-      possibleActions = TutorialActionType.values.map(_.toString).toList))
+      possibleActions = TutorialActionType.values.map(_.toString).toList,
+      possibleConditions = TutorialConditionType.values.map(_.toString).toList))
   }
 
   def updateAction(platform: String, elementId: String) = Authenticated { implicit request =>
 
     val form = Form(
     mapping(
-      "elementId" -> nonEmptyText,
-      "actionType" -> nonEmptyText)(TutorialActionForm.apply)(TutorialActionForm.unapply))
+      "entityType" -> nonEmptyText)(TutorialEntityTypeForm.apply)(TutorialEntityTypeForm.unapply))
 
     form.bindFromRequest.fold(
       formWithErrors => {
@@ -81,9 +80,9 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       },
 
       actionForm => {
-        findTutorialElement(platform, actionForm.elementId) match {
+        findTutorialElement(platform, elementId) match {
           case Some(e) =>
-            val updatedElement = e.copy(action = e.action.copy(actionType = TutorialActionType.withName(actionForm.actionType)))
+            val updatedElement = e.copy(action = e.action.copy(actionType = TutorialActionType.withName(actionForm.entityType)))
             api.db.tutorial.updateElement(platform, updatedElement)
 
           case None =>
@@ -205,5 +204,62 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
   }
 
 
+  /**
+   * Deletes condition from element.
+   *
+   * @param platform Platform element in.
+   * @param elementId Id of element.
+   * @param conditionIndex Index of condition to delete.
+   * @return Content.
+   */
+  def deleteConditionFromElement(platform: String, elementId: String, conditionIndex: Int) = Authenticated { implicit request =>
+
+    val tc = TutorialCondition(TutorialConditionType.TutorialElementClosed)
+
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedElement = e.copy(conditions = e.conditions.take(conditionIndex) ++ e.conditions.drop(conditionIndex + 1))
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Updates type of condition with form.
+   *
+   * @param platform Platform element in.
+   * @param elementId Id of element.
+   * @param conditionIndex Index of condition to delete.
+   * @return Content.
+   */
+  def updateCondition(platform: String, elementId: String, conditionIndex: Int) = Authenticated { implicit request =>
+
+    val form = Form(
+      mapping(
+        "entityType" -> nonEmptyText)(TutorialEntityTypeForm.apply)(TutorialEntityTypeForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+      },
+
+      entityTypeForm => {
+        findTutorialElement(platform, elementId) match {
+          case Some(e) =>
+            val updatedCondition = e.conditions(conditionIndex).copy(conditionType = TutorialConditionType.withName(entityTypeForm.entityType))
+            val updatedElement = e.copy(conditions = e.conditions.take(conditionIndex) ++ List(updatedCondition) ++ e.conditions.drop(conditionIndex + 1))
+            api.db.tutorial.updateElement(platform, updatedElement)
+
+          case None =>
+            Logger.error(s"Tutorial script or element not found")
+        }
+      })
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
 }
 
