@@ -145,6 +145,9 @@ POST    /admin/tutorial/addConditionToElement           controllers.web.admin.Tu
 POST    /admin/tutorial/deleteConditionFromElement      controllers.web.admin.TutorialScriptsCRUD.deleteConditionFromElement(platform: String, elementId: String, conditionIndex: Int)
 POST    /admin/tutorial/updateCondition                 controllers.web.admin.TutorialScriptsCRUD.updateCondition(platform: String, elementId: String, conditionIndex: Int)
 POST    /admin/tutorial/addParamToElementCondition      controllers.web.admin.TutorialScriptsCRUD.addParamToElementCondition(platform: String, elementId: String, conditionIndex: Int)
+POST    /admin/tutorial/deleteParamFromElemCondition    controllers.web.admin.TutorialScriptsCRUD.deleteParamFromElemCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String)
+POST    /admin/tutorial/saveParamInElementCondition     controllers.web.admin.TutorialScriptsCRUD.saveParamInElementCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String)
+
 
 GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")
 GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)

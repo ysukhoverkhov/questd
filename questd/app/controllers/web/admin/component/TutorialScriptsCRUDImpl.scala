@@ -49,7 +49,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
   }
 
-  private def addParamToElementConditionImpl(platform: String, elementId: String, conditionIndex:Int, key: String, value: String): Unit = {
+  private def addParamToElementConditionImpl(platform: String, elementId: String, conditionIndex: Int, key: String, value: String): Unit = {
     findTutorialElement(platform, elementId) match {
       case Some(e) =>
         val updatedCondition = e.conditions(conditionIndex).copy(params = e.conditions(conditionIndex).params + (key -> value))
@@ -61,7 +61,25 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
   }
 
+  private def deleteParamToElementConditionImpl(platform: String, elementId: String, conditionIndex: Int, paramKey: String): Unit = {
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedCondition = e.conditions(conditionIndex).copy(params = e.conditions(conditionIndex).params - paramKey)
+        val updatedElement = e.copy(conditions = e.conditions.take(conditionIndex) ++ List(updatedCondition) ++ e.conditions.drop(conditionIndex + 1))
+        api.db.tutorial.updateElement(platform, updatedElement)
 
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+  }
+
+
+  /**
+   * Tutorial index page.
+   *
+   * @param platform Platform to display tutorial for.
+   * @return Content of html.
+   */
   def tutorial(platform: String) = Authenticated { implicit request =>
 
     val els = api.getCommonTutorial(GetCommonTutorialRequest(TutorialPlatform.withName(platform))) match {
@@ -286,5 +304,51 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }
+
+  /**
+   * Deletes param from condition.
+   *
+   * @param platform Platform element in.
+   * @param elementId Id of element.
+   * @param conditionIndex Index of condition to delete.
+   * @param paramKey key of param to delete.
+   * @return Content.
+   */
+  def deleteParamFromElemCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String) = Authenticated { implicit request =>
+
+    deleteParamToElementConditionImpl(platform, elementId, conditionIndex, paramKey)
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Updates param from condition.
+   *
+   * @param platform Platform element in.
+   * @param elementId Id of element.
+   * @param conditionIndex Index of condition to update.
+   * @param paramKey key of param to update.
+   * @return Content.
+   */
+  def saveParamInElementCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String) = Authenticated { implicit request =>
+
+    val form = Form(
+      mapping(
+        "key" -> nonEmptyText,
+        "value" -> nonEmptyText)(KeyValueForm.apply)(KeyValueForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+      },
+
+      keyValueForm => {
+        deleteParamToElementConditionImpl(platform, elementId, conditionIndex, paramKey)
+        addParamToElementConditionImpl(platform, elementId, conditionIndex, keyValueForm.key, keyValueForm.value)
+      })
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
 }
 
