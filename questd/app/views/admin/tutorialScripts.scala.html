@@ -4,14 +4,12 @@ leftMenuItems: Map[String, String],
 currentPlatform: String,
 elements: List[models.domain.TutorialElement],
 possibleActions: List[String],
-possibleConditions: List[String])
+possibleConditions: List[String],
+possibleTriggers: List[String])
 
 @import helper._
 
 @* TODO: move me to a file with custom styles  *@
-<style>
-    form { display: inline; }
-</style>
 
 
 @main(s"Tutorial sctipt for: $currentPlatform")(menuItems, leftMenuItems) {
@@ -28,6 +26,8 @@ possibleConditions: List[String])
     @for(element <- elements) {
     <tr>
         <td>@element.id</td>
+
+        <!-- Action -->
         <td nowrap="nowrap">
             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateAction(currentPlatform, element.id)) {
             <select id="entityType" name="entityType">
@@ -62,6 +62,7 @@ possibleConditions: List[String])
             </p>
         </td>
 
+        <!-- Conditions -->
         <td>
             <table border="1">
                 @for((condition, index) <- element.conditions.zipWithIndex) {
@@ -117,7 +118,62 @@ possibleConditions: List[String])
             </table>
         </td>
 
-        <td>@element.triggers</td>
+        <!-- Triggers -->
+        <td>
+            <table border="1">
+                @for((trigger, index) <- element.triggers.zipWithIndex) {
+                <tr>
+                    <td nowrap="nowrap">
+                        @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateTrigger(currentPlatform, element.id, index)) {
+                            <select id="entityType" name="entityType">
+                                @for(tt <- possibleTriggers) {
+                                    @if(tt == trigger.triggerType.toString) {
+                                        <option value="@tt" selected="selected">@tt</option>
+                                    } else {
+                                        <option value="@tt">@tt</option>
+                                    }
+                                }
+                            </select>
+                            <input type='submit' value='Save' />
+                        }
+
+                        @for((key, value) <- trigger.params) {
+                        <p>
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementTrigger(currentPlatform, element.id, index, key)) {
+                                <input type="text" id="key" name="key" value='@key' size="5">
+                                <input type="text" id="value" name="value" value='@value' size="5">
+                                <input type='submit' value='Save' />
+                            }
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteParamFromElemTrigger(currentPlatform, element.id, index, key)) {
+                                <input type='submit' value='Del' />
+                            }
+                        </p>
+                        }
+
+                        <p>
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addParamToElementTrigger(currentPlatform, element.id, index)) {
+                                <input type='submit' value='Add Param' />
+                            }
+                        </p>
+
+                    </td>
+
+                    <td>
+                        @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteTriggerFromElement(currentPlatform, element.id, index)) {
+                            <input type='submit' value='Del' />
+                        }
+                    </td>
+                </tr>
+                }
+
+                <tr><td>
+                    @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addTriggerToElement(currentPlatform, element.id)) {
+                        <input type='submit' value='Add Trigger' />
+                    }
+                </td></tr>
+            </table>
+
+        </td>
 
         <td>
             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteElement(currentPlatform, element.id)) {
@@ -127,13 +183,9 @@ possibleConditions: List[String])
     </tr>
     }
     <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td>
+        <td colspan="5">
             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addElement(currentPlatform)) {
-            <input type='submit' value='ADD' />
+            <input type='submit' value='Add Element' />
             }
         </td>
     </tr>

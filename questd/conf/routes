@@ -141,12 +141,19 @@ POST    /admin/tutorial/addParamToElementAction         controllers.web.admin.Tu
 POST    /admin/tutorial/deleteParamFromElementAction    controllers.web.admin.TutorialScriptsCRUD.deleteParamFromElementAction(platform: String, elementId: String, paramKey: String)
 POST    /admin/tutorial/saveParamInElementAction        controllers.web.admin.TutorialScriptsCRUD.saveParamInElementAction(platform: String, elementId: String, paramKey: String)
 
+POST    /admin/tutorial/updateCondition                 controllers.web.admin.TutorialScriptsCRUD.updateCondition(platform: String, elementId: String, conditionIndex: Int)
 POST    /admin/tutorial/addConditionToElement           controllers.web.admin.TutorialScriptsCRUD.addConditionToElement(platform: String, elementId: String)
 POST    /admin/tutorial/deleteConditionFromElement      controllers.web.admin.TutorialScriptsCRUD.deleteConditionFromElement(platform: String, elementId: String, conditionIndex: Int)
-POST    /admin/tutorial/updateCondition                 controllers.web.admin.TutorialScriptsCRUD.updateCondition(platform: String, elementId: String, conditionIndex: Int)
 POST    /admin/tutorial/addParamToElementCondition      controllers.web.admin.TutorialScriptsCRUD.addParamToElementCondition(platform: String, elementId: String, conditionIndex: Int)
 POST    /admin/tutorial/deleteParamFromElemCondition    controllers.web.admin.TutorialScriptsCRUD.deleteParamFromElemCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String)
 POST    /admin/tutorial/saveParamInElementCondition     controllers.web.admin.TutorialScriptsCRUD.saveParamInElementCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String)
+
+POST    /admin/tutorial/updateTrigger                   controllers.web.admin.TutorialScriptsCRUD.updateTrigger(platform: String, elementId: String, index: Int)
+POST    /admin/tutorial/addTriggerToElement             controllers.web.admin.TutorialScriptsCRUD.addTriggerToElement(platform: String, elementId: String)
+POST    /admin/tutorial/deleteTriggerFromElement        controllers.web.admin.TutorialScriptsCRUD.deleteTriggerFromElement(platform: String, elementId: String, index: Int)
+POST    /admin/tutorial/addParamToElementTrigger        controllers.web.admin.TutorialScriptsCRUD.addParamToElementTrigger(platform: String, elementId: String, index: Int)
+POST    /admin/tutorial/deleteParamFromElemTrigger      controllers.web.admin.TutorialScriptsCRUD.deleteParamFromElemTrigger(platform: String, elementId: String, index: Int, paramKey: String)
+POST    /admin/tutorial/saveParamInElementTrigger       controllers.web.admin.TutorialScriptsCRUD.saveParamInElementTrigger(platform: String, elementId: String, index: Int, paramKey: String)
 
 
 GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")

@@ -17,12 +17,19 @@ object TutorialScriptsCRUD extends Controller {
   def deleteParamFromElementAction(platform: String, elementId: String, paramKey: String) = admin.tutorialScripts.deleteParamFromElementAction(platform, elementId, paramKey)
   def saveParamInElementAction(platform: String, elementId: String, paramKey: String) = admin.tutorialScripts.saveParamInElementAction(platform, elementId, paramKey)
 
+  def updateCondition(platform: String, elementId: String, conditionIndex: Int) = admin.tutorialScripts.updateCondition(platform, elementId, conditionIndex)
   def addConditionToElement(platform: String, elementId: String) = admin.tutorialScripts.addConditionToElement(platform, elementId)
   def deleteConditionFromElement(platform: String, elementId: String, conditionIndex: Int) = admin.tutorialScripts.deleteConditionFromElement(platform, elementId, conditionIndex)
-  def updateCondition(platform: String, elementId: String, conditionIndex: Int) = admin.tutorialScripts.updateCondition(platform, elementId, conditionIndex)
   def addParamToElementCondition(platform: String, elementId: String, conditionIndex: Int) = admin.tutorialScripts.addParamToElementCondition(platform, elementId, conditionIndex)
   def deleteParamFromElemCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String) = admin.tutorialScripts.deleteParamFromElemCondition(platform, elementId, conditionIndex, paramKey)
   def saveParamInElementCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String) = admin.tutorialScripts.saveParamInElementCondition(platform, elementId, conditionIndex, paramKey)
+
+  def updateTrigger(platform: String, elementId: String, index: Int) = admin.tutorialScripts.updateTrigger(platform, elementId, index)
+  def addTriggerToElement(platform: String, elementId: String) = admin.tutorialScripts.addTriggerToElement(platform, elementId)
+  def deleteTriggerFromElement(platform: String, elementId: String, index: Int) = admin.tutorialScripts.deleteTriggerFromElement(platform, elementId, index)
+  def addParamToElementTrigger(platform: String, elementId: String, index: Int) = admin.tutorialScripts.addParamToElementTrigger(platform, elementId, index)
+  def deleteParamFromElemTrigger(platform: String, elementId: String, index: Int, paramKey: String) = admin.tutorialScripts.deleteParamFromElemTrigger(platform, elementId, index, paramKey)
+  def saveParamInElementTrigger(platform: String, elementId: String, index: Int, paramKey: String) = admin.tutorialScripts.saveParamInElementTrigger(platform, elementId, index, paramKey)
 
 }
 

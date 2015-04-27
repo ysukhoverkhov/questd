@@ -73,6 +73,30 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
   }
 
+  private def addParamToElementTriggerImpl(platform: String, elementId: String, index: Int, key: String, value: String): Unit = {
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedTrigger = e.triggers(index).copy(params = e.triggers(index).params + (key -> value))
+        val updatedElement = e.copy(triggers = e.triggers.take(index) ++ List(updatedTrigger) ++ e.triggers.drop(index + 1))
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+  }
+
+  private def deleteParamToElementTriggerImpl(platform: String, elementId: String, index: Int, paramKey: String): Unit = {
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedTrigger = e.triggers(index).copy(params = e.triggers(index).params - paramKey)
+        val updatedElement = e.copy(triggers = e.triggers.take(index) ++ List(updatedTrigger) ++ e.triggers.drop(index + 1))
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+  }
+
 
   /**
    * Tutorial index page.
@@ -95,7 +119,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       currentPlatform = platform,
       elements = els,
       possibleActions = TutorialActionType.values.map(_.toString).toList,
-      possibleConditions = TutorialConditionType.values.map(_.toString).toList))
+      possibleConditions = TutorialConditionType.values.map(_.toString).toList,
+      possibleTriggers = TutorialTriggerType.values.map(_.toString).toList))
   }
 
   def updateAction(platform: String, elementId: String) = Authenticated { implicit request =>
@@ -299,9 +324,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @return Content.
    */
   def addParamToElementCondition(platform: String, elementId: String, conditionIndex: Int) = Authenticated { implicit request =>
-
     addParamToElementConditionImpl(platform, elementId, conditionIndex, "", "")
-
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }
 
@@ -315,9 +338,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @return Content.
    */
   def deleteParamFromElemCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String) = Authenticated { implicit request =>
-
     deleteParamToElementConditionImpl(platform, elementId, conditionIndex, paramKey)
-
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }
 
@@ -345,6 +366,143 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       keyValueForm => {
         deleteParamToElementConditionImpl(platform, elementId, conditionIndex, paramKey)
         addParamToElementConditionImpl(platform, elementId, conditionIndex, keyValueForm.key, keyValueForm.value)
+      })
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+
+  /**
+   * Updates trigger's type.
+   *
+   * @param platform Platform element in.
+   * @param elementId Id of element.
+   * @param index Index of trigger
+   * @return Content.
+   */
+  def updateTrigger(platform: String, elementId: String, index: Int) = Authenticated { implicit request =>
+
+    val form = Form(
+      mapping(
+        "entityType" -> nonEmptyText)(TutorialEntityTypeForm.apply)(TutorialEntityTypeForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+      },
+
+      entityTypeForm => {
+        findTutorialElement(platform, elementId) match {
+          case Some(e) =>
+            val updatedTrigger = e.triggers(index).copy(triggerType = TutorialTriggerType.withName(entityTypeForm.entityType))
+            val updatedElement = e.copy(triggers = e.triggers.take(index) ++ List(updatedTrigger) ++ e.triggers.drop(index + 1))
+            api.db.tutorial.updateElement(platform, updatedElement)
+
+          case None =>
+            Logger.error(s"Tutorial script or element not found")
+        }
+      })
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Adds new trigger to element.
+   *
+   * @param platform Platform element in.
+   * @param elementId Id of element.
+   * @return Content.
+   */
+  def addTriggerToElement(platform: String, elementId: String) = Authenticated { implicit request =>
+
+    val tc = TutorialTrigger(TutorialTriggerType.Any)
+
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedElement = e.copy(triggers = tc :: e.triggers)
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+
+  /**
+   * Deletes specified trigger in element.
+   *
+   * @param platform Platform element in.
+   * @param elementId Id of element.
+   * @param index Index of trigger
+   * @return Content.
+   */
+  def deleteTriggerFromElement(platform: String, elementId: String, index: Int) = Authenticated { implicit request =>
+
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedElement = e.copy(triggers = e.triggers.take(index) ++ e.triggers.drop(index + 1))
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Adds param to trigger in element.
+   *
+   * @param platform Platform element in.
+   * @param elementId Id of element.
+   * @param index Index of trigger
+   * @return Content.
+   */
+  def addParamToElementTrigger(platform: String, elementId: String, index: Int) = Authenticated { implicit request =>
+    addParamToElementTriggerImpl(platform, elementId, index, "", "")
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Deletes param in trigger.
+   *
+   * @param platform Platform element in.
+   * @param elementId Id of element.
+   * @param index Index of trigger
+   * @param paramKey Key of param to delete.
+   * @return Content.
+   */
+  def deleteParamFromElemTrigger(platform: String, elementId: String, index: Int, paramKey: String) = Authenticated { implicit request =>
+    deleteParamToElementTriggerImpl(platform, elementId, index, paramKey)
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Saves new param value.
+   *
+   * @param platform Platform element in.
+   * @param elementId Id of element.
+   * @param index Index of trigger
+   * @param paramKey Key of param to delete.
+   * @return Content.
+   */
+  def saveParamInElementTrigger(platform: String, elementId: String, index: Int, paramKey: String) = Authenticated { implicit request =>
+
+    val form = Form(
+      mapping(
+        "key" -> nonEmptyText,
+        "value" -> nonEmptyText)(KeyValueForm.apply)(KeyValueForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+      },
+
+      keyValueForm => {
+        deleteParamToElementTriggerImpl(platform, elementId, index, paramKey)
+        addParamToElementTriggerImpl(platform, elementId, index, keyValueForm.key, keyValueForm.value)
       })
 
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
