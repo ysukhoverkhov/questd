@@ -80,8 +80,8 @@ possibleConditions: List[String])
                                 <input type='submit' value='Save' />
                             }
 
-                            @*
-                            @for((key, value) <- element.action.params) {
+
+                            @for((key, value) <- condition.params) {
                             <p>
                                 @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementAction(currentPlatform, element.id, key)) {
                                 <input type="text" id="key" name="key" value='@key' size="5">
@@ -95,11 +95,11 @@ possibleConditions: List[String])
                             }
 
                             <p>
-                                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addParamToElementAction(currentPlatform, element.id)) {
+                                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addParamToElementCondition(currentPlatform, element.id, index)) {
                                     <input type='submit' value='Add Param' />
                                 }
                             </p>
-                            *@
+
                         </td>
                         <td>
                             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteConditionFromElement(currentPlatform, element.id, index)) {

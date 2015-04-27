@@ -49,6 +49,18 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
   }
 
+  private def addParamToElementConditionImpl(platform: String, elementId: String, conditionIndex:Int, key: String, value: String): Unit = {
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedCondition = e.conditions(conditionIndex).copy(params = e.conditions(conditionIndex).params + (key -> value))
+        val updatedElement = e.copy(conditions = e.conditions.take(conditionIndex) ++ List(updatedCondition) ++ e.conditions.drop(conditionIndex + 1))
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+  }
+
 
   def tutorial(platform: String) = Authenticated { implicit request =>
 
@@ -214,8 +226,6 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def deleteConditionFromElement(platform: String, elementId: String, conditionIndex: Int) = Authenticated { implicit request =>
 
-    val tc = TutorialCondition(TutorialConditionType.TutorialElementClosed)
-
     findTutorialElement(platform, elementId) match {
       case Some(e) =>
         val updatedElement = e.copy(conditions = e.conditions.take(conditionIndex) ++ e.conditions.drop(conditionIndex + 1))
@@ -258,6 +268,21 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
             Logger.error(s"Tutorial script or element not found")
         }
       })
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Adds param to specific condition.
+   *
+   * @param platform Platform element in.
+   * @param elementId Id of element.
+   * @param conditionIndex Index of condition to delete.
+   * @return Content.
+   */
+  def addParamToElementCondition(platform: String, elementId: String, conditionIndex: Int) = Authenticated { implicit request =>
+
+    addParamToElementConditionImpl(platform, elementId, conditionIndex, "", "")
 
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }
