@@ -132,6 +132,7 @@ POST	/admin/config/configUpdate/:name				controllers.web.admin.Config.configUpda
 GET		/admin/messages         						controllers.web.admin.Messages.compose(sendResult: String)
 POST	/admin/messages/send	    					controllers.web.admin.Messages.send
 
+
 GET     /admin/tutorial                                 controllers.web.admin.TutorialScriptsCRUD.tutorial(platform: String)
 POST    /admin/tutorial/updateAction                    controllers.web.admin.TutorialScriptsCRUD.updateAction(platform: String, elementId: String)
 POST    /admin/tutorial/addElement                      controllers.web.admin.TutorialScriptsCRUD.addElement(platform: String)
@@ -139,6 +140,9 @@ POST    /admin/tutorial/deleteElement                   controllers.web.admin.Tu
 POST    /admin/tutorial/addParamToElementAction         controllers.web.admin.TutorialScriptsCRUD.addParamToElementAction(platform: String, elementId: String)
 POST    /admin/tutorial/deleteParamFromElementAction    controllers.web.admin.TutorialScriptsCRUD.deleteParamFromElementAction(platform: String, elementId: String, paramKey: String)
 POST    /admin/tutorial/saveParamInElementAction        controllers.web.admin.TutorialScriptsCRUD.saveParamInElementAction(platform: String, elementId: String, paramKey: String)
+
+POST    /admin/tutorial/addConditionToElement           controllers.web.admin.TutorialScriptsCRUD.addConditionToElement(platform: String, elementId: String)
+
 
 GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")
 GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)

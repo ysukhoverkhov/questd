@@ -7,6 +7,7 @@ possibleActions: List[String])
 
 @import helper._
 
+@* TODO: move me to a file with custom styles  *@
 <style>
     form { display: inline; }
 </style>
@@ -60,7 +61,25 @@ possibleActions: List[String])
             </p>
         </td>
 
-        <td>@element.conditions</td>
+        <td>
+            <table border="1">
+                @for(condition <- element.conditions) {
+                    <tr><td>
+                        @condition
+                    </td></tr>
+                }
+
+                <tr><td>
+                    @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addConditionToElement(currentPlatform, element.id)) {
+                        <input type='submit' value='Add Condition' />
+                    }
+                </td></tr>
+            </table>
+        </td>
+
+
+
+
 
         <td>@element.triggers</td>
 

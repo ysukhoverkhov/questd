@@ -113,7 +113,6 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }
 
-
   /**
    * Deletes element from tutorial script.
    *
@@ -180,6 +179,31 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }
+
+
+  /**
+   * Adds new condition to element.
+   *
+   * @param platform Platform of the element.
+   * @param elementId Id of element to add condition to.
+   * @return Content.
+   */
+  def addConditionToElement(platform: String, elementId: String) = Authenticated { implicit request =>
+
+    val tc = TutorialCondition(TutorialConditionType.TutorialElementClosed)
+
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedElement = e.copy(conditions = tc :: e.conditions)
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
 
 }
 
