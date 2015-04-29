@@ -231,8 +231,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       db.user.addPrivateDailyResult(
         user.id,
         DailyResult(
-          user.getStartOfCurrentDailyResultPeriod,
-          dailySalary = Assets()))
+          user.getStartOfCurrentDailyResultPeriod))
     } else {
       Some(user)
     }
