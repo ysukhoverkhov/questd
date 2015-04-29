@@ -121,26 +121,24 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   def storeQuestSolvingInDailyResult(request: StoreQuestSolvingInDailyResultRequest): ApiResult[StoreQuestSolvingInDailyResultResult] = handleDbException {
     import request._
 
-    ensurePrivateDailyResultExists(user) ifSome { u =>
-      u.privateDailyResults.head.questsIncome.find(_.questId == quest.id) match {
+    user.privateDailyResults.head.questsIncome.find(_.questId == quest.id) match {
 
-        case Some(dailyResultEntry) =>
-          val reward = if (dailyResultEntry.timesSolved < MaxRewardedQuestSolutionsPerDay)
-            quest.rewardForSolution
-          else
-            Assets()
+      case Some(dailyResultEntry) =>
+        val reward = if (dailyResultEntry.timesSolved < MaxRewardedQuestSolutionsPerDay)
+          quest.rewardForSolution
+        else
+          Assets()
 
-          db.user.storeQuestSolvingInDailyResult(
-            u.id,
-            quest.id,
-            reward
-          ) ifSome { updatedUser =>
-            OkApiResult(StoreQuestSolvingInDailyResultResult(updatedUser))
-          }
+        db.user.storeQuestSolvingInDailyResult(
+          user.id,
+          quest.id,
+          reward
+        ) ifSome { updatedUser =>
+          OkApiResult(StoreQuestSolvingInDailyResultResult(updatedUser))
+        }
 
-        case None =>
-          OkApiResult(StoreQuestSolvingInDailyResultResult(u))
-      }
+      case None =>
+        OkApiResult(StoreQuestSolvingInDailyResultResult(user))
     }
   }
 
@@ -152,13 +150,11 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   def addQuestIncomeToDailyResult(request: AddQuestIncomeToDailyResultRequest): ApiResult[AddQuestIncomeToDailyResultResult] = handleDbException {
     import request._
 
-    ensurePrivateDailyResultExists(user) ifSome { u =>
-      if (u.privateDailyResults.head.questsIncome.exists(_.questId == quest.id)) {
+    if (user.privateDailyResults.head.questsIncome.exists(_.questId == quest.id)) {
+      OkApiResult(AddQuestIncomeToDailyResultResult(user))
+    } else {
+      db.user.addQuestIncomeToDailyResult(user.id, createQuestIncomeForQuest(quest)) ifSome { u =>
         OkApiResult(AddQuestIncomeToDailyResultResult(u))
-      } else {
-        db.user.addQuestIncomeToDailyResult(u.id, createQuestIncomeForQuest(quest)) ifSome { u =>
-          OkApiResult(AddQuestIncomeToDailyResultResult(u))
-        }
       }
     }
   }
@@ -182,16 +178,14 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   def storeProposalInDailyResult(request: StoreProposalInDailyResultRequest): ApiResult[StoreProposalInDailyResultResult] = handleDbException {
     import request._
 
-    ensurePrivateDailyResultExists(user) ifSome { u =>
-      val qpr = QuestProposalResult(
-        questId = request.quest.id,
-        reward = request.reward,
-        penalty = request.penalty,
-        status = request.quest.status)
+    val qpr = QuestProposalResult(
+      questId = request.quest.id,
+      reward = request.reward,
+      penalty = request.penalty,
+      status = request.quest.status)
 
-      db.user.storeProposalInDailyResult(u.id, qpr) ifSome { v =>
-        OkApiResult(StoreProposalInDailyResultResult(v))
-      }
+    db.user.storeProposalInDailyResult(user.id, qpr) ifSome { v =>
+      OkApiResult(StoreProposalInDailyResultResult(v))
     }
   }
 
@@ -201,17 +195,15 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   def storeSolutionInDailyResult(request: StoreSolutionInDailyResultRequest): ApiResult[StoreSolutionInDailyResultResult] = handleDbException {
     import request._
 
-    ensurePrivateDailyResultExists(user) ifSome { u =>
-      val qsr = QuestSolutionResult(
-        solutionId = request.solution.id,
-        battleId = request.battle.map(_.id),
-        reward = request.reward,
-        penalty = request.penalty,
-        status = request.solution.status)
+    val qsr = QuestSolutionResult(
+      solutionId = request.solution.id,
+      battleId = request.battle.map(_.id),
+      reward = request.reward,
+      penalty = request.penalty,
+      status = request.solution.status)
 
-      db.user.storeSolutionInDailyResult(u.id, qsr) ifSome { v =>
-        OkApiResult(StoreSolutionInDailyResultResult(v))
-      }
+    db.user.storeSolutionInDailyResult(user.id, qsr) ifSome { v =>
+      OkApiResult(StoreSolutionInDailyResultResult(v))
     }
   }
 
@@ -223,20 +215,5 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       likesIncome = quest.dailyIncomeForLikes
     )
   }
-
-
-  // TODO: remove the function completelly in 0.40 and create first private daily result at creation of user.
-  private def ensurePrivateDailyResultExists(user: User): Option[User] = {
-    if (user.privateDailyResults.length == 0) {
-      db.user.addPrivateDailyResult(
-        user.id,
-        DailyResult(
-          user.getStartOfCurrentDailyResultPeriod))
-    } else {
-      Some(user)
-    }
-  }
-
 }
-
 
