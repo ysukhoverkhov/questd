@@ -38,7 +38,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
       val result = api.updateSolutionState(UpdateSolutionStateRequest(sol))
 
-      there were two(quest).allWithParams(
+      there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(user1.id),
         skip = 0)
@@ -75,7 +75,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
 
       val result = api.updateSolutionState(UpdateSolutionStateRequest(sol))
 
-      there was two(quest).allWithParams(
+      there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(user1.id),
         skip = 0)
