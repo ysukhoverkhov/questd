@@ -9,7 +9,7 @@ import models.domain.base.ID
 case class PublicProfile(
   publicProfileId: String = ID.generateUUID(), // Not used on server.
   publicProfileVersion: Int = 1,
-  level: Int = 10, // Should be 1 here.
+  level: Int = 1,
   bio: Bio = Bio(),
   vip: Boolean = false)
 
