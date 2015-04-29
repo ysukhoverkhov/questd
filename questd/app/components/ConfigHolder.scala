@@ -21,18 +21,16 @@ trait ConfigHolder { this: APIAccessor =>
    */
   def config: ConfigSection = {
     api.getConfigSection(GetConfigSectionRequest(configSectionName)) match {
-      case OkApiResult(GetConfigSectionResult(Some(c: ConfigSection))) => {
+      case OkApiResult(GetConfigSectionResult(Some(c: ConfigSection))) =>
         if (c.values.keySet == defaultConfiguration.values.keySet)
           c
         else {
           resetConfig()
           defaultConfiguration
         }
-      }
-      case _ => {
+      case _ =>
         resetConfig()
         defaultConfiguration
-      }
     }
   }
 
@@ -49,10 +47,5 @@ trait ConfigHolder { this: APIAccessor =>
   def resetConfig(): Unit = {
     api.setConfigSection(SetConfigSectionRequest(defaultConfiguration))
   }
-
-  /**
-   * Check if config section is not initialized and initialize it.
-   */
-  private def initConfiguration(): Unit = config
 }
 

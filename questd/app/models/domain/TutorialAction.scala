@@ -17,7 +17,7 @@ object TutorialActionType extends Enumeration {
  * Describes an action client application should take during the tutorial.
  */
 case class TutorialAction (
-  `type`: TutorialActionType.Value,
+  actionType: TutorialActionType.Value,
   params: Map[String, String] = Map.empty
   )
 

@@ -8,7 +8,7 @@ import com.vita.scala.extensions._
 private object TutorialWSImplTypes {
 
   case class WSGetTutorialRequest(
-    /// Id of a platform to get state for.
+    /// Platform to get state for.
     platform: String)
 
   /// Get current actual tutorial for the user.
@@ -16,14 +16,14 @@ private object TutorialWSImplTypes {
 
 
   case class WSGetTutorialElementsStateRequest(
-    /// Id of a platform to get state for.
+    /// Platform to get state for.
     platform: String)
 
   /// if no state for platform present empty result will be returned.
   type WSGetTutorialElementsStateResult = GetTutorialElementsStateResult
 
   case class WSCloseTutorialElementRequest(
-    /// Id of a platform to get state for.
+    /// Platform to get state for.
     platform: String,
     elementId: String)
 

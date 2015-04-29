@@ -7,6 +7,7 @@ import models.domain.base.ID
  */
 object TutorialPlatform extends Enumeration {
   val iPhone = Value
+  val Facebook = Value
 }
 
 /**

@@ -8,8 +8,8 @@ object TutorialTasksCRUD extends Controller {
 
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
-  def tutorialTasks(id: String) = admin.tutorial.tutorialTasks(id)
+  def tutorialTasks(id: String) = admin.tutorialTasks.tutorialTasks(id)
 
-  def updateTutorialTask() = admin.tutorial.updateTutorialTask()
+  def updateTutorialTask() = admin.tutorialTasks.updateTutorialTask()
 }
 

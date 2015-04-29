@@ -7,8 +7,11 @@ import controllers.domain._
 import controllers.domain.helpers._
 import controllers.domain.app.protocol.ProfileModificationResult._
 
+case class GetCommonTutorialRequest(platform: TutorialPlatform.Value)
+case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])
+
 case class GetTutorialRequest(user: User, platform: TutorialPlatform.Value)
-case class GetTutorialResult(tutorial: List[TutorialElement])
+case class GetTutorialResult(tutorialElements: List[TutorialElement])
 
 case class GetTutorialElementsStateRequest(user: User, platform: TutorialPlatform.Value)
 case class GetTutorialElementsStateResult(state: TutorialState)
@@ -23,6 +26,16 @@ case class IncTutorialTaskRequest(user: User, taskId: String)
 case class IncTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
+
+  /**
+   * Get common for all users tutorial for the platform.
+   */
+  def getCommonTutorial(request: GetCommonTutorialRequest): ApiResult[GetCommonTutorialResult] = handleDbException {
+    val commonScenario: List[TutorialElement] =
+      db.tutorial.readById(request.platform.toString) map {_.elements} getOrElse List.empty
+
+    OkApiResult(GetCommonTutorialResult(commonScenario))
+  }
 
   /**
    * Get actual for current user tutorial.
@@ -78,13 +91,11 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
             db.user.addTutorialTaskAssigned(id = user.id, platform = platform.toString, taskId = taskId)
           } ifSome { v =>
             // 4. Add reward of current task to reward for current daily tasks and increase timeout to infinity.
-            val reward = t.reward
             val taskToAdd = t.task
 
             db.user.addTasks(
               user.id,
-              List(taskToAdd),
-              reward) ifSome { v =>
+              List(taskToAdd)) ifSome { v =>
                 OkApiResult(AssignTutorialTaskResult(OK, Some(v.profile)))
               }
           }
@@ -99,12 +110,16 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
    */
   def incTutorialTask(request: IncTutorialTaskRequest): ApiResult[IncTutorialTaskResult] = handleDbException {
     import request._
-    if (user.profile.dailyTasks.tasks.count(t => t.tutorialTask.map(_.id) == Some(taskId)) > 0) {
-      makeTask(MakeTaskRequest(user = user, tutorialTaskId = Some(taskId))) map { r =>
+
+    user.profile.dailyTasks.tasks.find(t => t.tutorialTaskId == Some(taskId)).fold[ApiResult[IncTutorialTaskResult]] {
+      OkApiResult(IncTutorialTaskResult(OutOfContent))
+    }
+    { t: Task =>
+      {
+        makeTask(MakeTaskRequest(user = user, taskId = Some(t.id)))
+      } map { r =>
         OkApiResult(IncTutorialTaskResult(OK, Some(r.user.profile)))
       }
-    } else {
-      OkApiResult(IncTutorialTaskResult(OutOfContent))
     }
   }
 }

@@ -25,7 +25,7 @@ trait Tasks { this: UserLogic =>
     })
 
     val tasksWithRewards = tasks.map { t =>
-      t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = 0.15)) // TODO: move 15% to config or const.
+      t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = DailyTasksRatingDeviation))
     }
 
     DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
@@ -42,7 +42,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Calculates reward for today's tasks.
    */
-  private def dailyTasksRatingReward = Assets(0, 0, RatingForCompletingDailyTasks)
+  private def dailyTasksRatingReward = Assets(0, 0, DailyTasksRatingForCompleting)
 
   /**
    * Returns list of algorithms for generating all tasks.
