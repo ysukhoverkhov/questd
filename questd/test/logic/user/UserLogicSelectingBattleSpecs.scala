@@ -3,7 +3,6 @@ package logic.user
 import controllers.domain.OkApiResult
 import controllers.domain.app.battle._
 import logic.BaseLogicSpecs
-import models.domain._
 import testhelpers.domainstubs._
 
 class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
@@ -19,7 +18,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 
       api.getFriendsBattles(any[GetFriendsBattlesRequest]) returns OkApiResult(GetFriendsBattlesResult(List(createBattleStub(bid)).iterator))
 
-      val u = User()
+      val u = createUserStub()
       val q = u.getRandomBattlesForTimeLine(1)
 
       there was one(rand).nextDouble
@@ -36,7 +35,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 
       api.getFollowingBattles(any[GetFollowingBattlesRequest]) returns OkApiResult(GetFollowingBattlesResult(List(createBattleStub(bid)).iterator))
 
-      val u = User()
+      val u = createUserStub()
       val q = u.getRandomBattlesForTimeLine(1)
 
       there was one(rand).nextDouble
@@ -88,7 +87,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 
       api.getVIPBattles(any[GetVIPBattlesRequest]) returns OkApiResult(GetVIPBattlesResult(List(createBattleStub(bid)).iterator))
 
-      val u = User()
+      val u = createUserStub()
       val q = u.getRandomBattlesForTimeLine(1)
 
       there was one(rand).nextDouble
@@ -220,7 +219,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 
     "All battles are used if vip and Other battles are unavailable" in {
       val qid = "qid"
-      val u = User()
+      val u = createUserStub()
 
       api.config returns createStubConfig
       rand.nextDouble returns 0.75

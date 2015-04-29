@@ -24,7 +24,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
       api.getFriendsSolutions(any[GetFriendsSolutionsRequest]) returns OkApiResult(GetFriendsSolutionsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
 
-      val u = User()
+      val u = createUserStub()
       val q = u.getRandomSolution
 
       there was one(rand).nextDouble
@@ -42,7 +42,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
       api.getFollowingSolutions(any[GetFollowingSolutionsRequest]) returns OkApiResult(GetFollowingSolutionsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
 
-      val u = User()
+      val u = createUserStub()
       val q = u.getRandomSolution
 
       there was one(rand).nextDouble
@@ -60,7 +60,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
       api.getSolutionsForLikedQuests(any[GetSolutionsForLikedQuestsRequest]) returns OkApiResult(GetSolutionsForLikedQuestsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
 
-      val u = User()
+      val u = createUserStub()
       val q = u.getRandomSolution
 
       there was one(rand).nextDouble
@@ -78,7 +78,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
       api.getVIPSolutions(any[GetVIPSolutionsRequest]) returns OkApiResult(GetVIPSolutionsResult(List(createSolutionStub(id = qid, authorId = "author")).iterator))
 
-      val u = User()
+      val u = createUserStub()
       val q = u.getRandomSolution
 
       there was one(rand).nextDouble
@@ -173,7 +173,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
     "Other quests are used if vip quests are unavailable" in {
       val qid = "qid"
-      val u = User()
+      val u = createUserStub()
 
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
@@ -191,7 +191,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
     "All solutions are used if vip and Other solutions are unavailable" in {
       val qid = "qid"
-      val u = User()
+      val u = createUserStub()
       val s = createSolutionStub(id = qid, authorId = "author")
 
       api.config returns createStubConfig

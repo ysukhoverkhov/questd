@@ -30,7 +30,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
       api.getFriendsQuests(any[GetFriendsQuestsRequest]) returns OkApiResult(GetFriendsQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
-      val u = User()
+      val u = createUserStub()
       val q = u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
@@ -47,7 +47,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
       api.getFollowingQuests(any[GetFollowingQuestsRequest]) returns OkApiResult(GetFollowingQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
-      val u = User()
+      val u = createUserStub()
       val q = u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
@@ -81,7 +81,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
-      val u = User()
+      val u = createUserStub()
       val q = u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
@@ -216,7 +216,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
     "Other quests are used if vip quests are unavailable" in {
       val qid = "qid"
-      val u = User()
+      val u = createUserStub()
 
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
@@ -233,7 +233,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
     "All quests are used if vip and Other quests are unavailable" in {
       val qid = "qid"
-      val u = User()
+      val u = createUserStub()
 
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
@@ -250,7 +250,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
     "All quests ignoring culture are used if vip and Other quests are unavailable" in {
       val qid = "qid"
-      val u = User()
+      val u = createUserStub()
 
       api.config returns createStubConfig
       rand.nextDouble returns 0.75
