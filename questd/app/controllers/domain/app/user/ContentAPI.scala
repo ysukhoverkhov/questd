@@ -103,9 +103,9 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       OK,
       db.quest.readManyByIds(questIds.take(maxPageSize)).map{ q =>
         QuestView(
-          q.id,
-          q.info,
-          Some(q.rating),
+          id = q.id,
+          info = q.info,
+          rating = Some(q.rating),
           myVote = user.stats.votedQuests.get(q.id))
       }.toList))
   }
@@ -167,7 +167,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetQuestsForUserResult(
       allowed = OK,
-      quests = questsForUser.take(pageSize).toList.map(q => QuestView(q.id, q.info, Some(q.rating))),
+      quests = questsForUser.take(pageSize).toList.map(q => QuestView(
+        id = q.id,
+        info = q.info,
+        rating = Some(q.rating),
+        myVote = request.user.stats.votedQuests.get(q.id))),
       pageSize,
       questsForUser.hasNext))
   }
@@ -185,7 +189,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForUser.take(pageSize).toList.map(s => {
-      SolutionView(s.id, s.info, Some(s.rating))
+      SolutionView(
+        id = s.id,
+        info = s.info,
+        rating = Some(s.rating),
+        myVote = request.user.stats.votedSolutions.get(s.id))
     })
 
     OkApiResult(GetSolutionsForUserResult(
@@ -208,7 +216,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForQuest.take(pageSize).toList.map(s => {
-      SolutionView(s.id, s.info, Some(s.rating))
+      SolutionView(
+        id = s.id,
+        info = s.info,
+        rating = Some(s.rating),
+        myVote = request.user.stats.votedSolutions.get(s.id))
     })
 
     OkApiResult(GetSolutionsForQuestResult(
