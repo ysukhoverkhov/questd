@@ -6,4 +6,4 @@ case class QuestView (
     id: String,
     info: QuestInfo,
     rating: Option[QuestRating],
-    myVote: Option[ContentVote.Value] = None)
+    myVote: Option[ContentVote.Value])

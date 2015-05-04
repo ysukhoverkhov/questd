@@ -191,7 +191,7 @@ package object domainstubs {
         assets = assets,
         ratingToNextLevel = 1000000,
         questSolutionContext = QuestSolutionContext(
-          bookmarkedQuest = questBookmark.map(QuestView(_, createQuestStub().info, None))),
+          bookmarkedQuest = questBookmark.map(QuestView(_, createQuestStub().info, None, None))),
         questCreationContext = QuestCreationContext(
           questCreationCoolDown = questCreationCoolDown),
         publicProfile = PublicProfile(

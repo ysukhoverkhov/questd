@@ -28,8 +28,6 @@ trait SolvingQuests { this: UserLogic =>
 
     if (!content)
       NotEnoughRights
-    else if (!user.timeLine.map(_.objectId).contains(questToSolve.id))
-      OutOfContent
     else if (!(user.profile.assets canAfford questToSolve.info.solveCost))
       NotEnoughAssets
     else if (questToSolve.info.authorId == user.id)

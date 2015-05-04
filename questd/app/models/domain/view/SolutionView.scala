@@ -6,4 +6,4 @@ case class SolutionView (
     id: String,
     info: SolutionInfo,
     rating: Option[SolutionRating],
-    myVote: Option[ContentVote.Value] = None)
+    myVote: Option[ContentVote.Value])
