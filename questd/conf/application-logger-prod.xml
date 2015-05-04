@@ -22,6 +22,23 @@
         </encoder>
     </appender>
 
+    <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+        <smtpHost>vitasw.com</smtpHost>
+        <username>questd_log@questmeapp.com</username>
+        <password>AFAhTx3P74z4hndeX8T6</password>
+
+        <to>questd_log@questmeapp.com</to>
+        <from>questd_log@questmeapp.com</from>
+
+        <subject>questd: %logger{20} - %m</subject>
+        <layout class="ch.qos.logback.classic.html.HTMLLayout">
+            <pattern>%relative%level%logger%msg</pattern>
+        </layout>
+        <cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTracker">
+            <bufferSize>100</bufferSize>
+        </cyclicBufferTracker>
+    </appender>
+
     <logger name="play" level="INFO" />
     <logger name="akka" level="INFO" />
     <logger name="application" level="DEBUG" />
@@ -29,6 +46,7 @@
     <root level="ERROR">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
+        <appender-ref ref="EMAIL" />
     </root>
 
 </configuration>
