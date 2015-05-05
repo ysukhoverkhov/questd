@@ -24,8 +24,8 @@ case class AddQuestIncomeToDailyResultResult(user: User)
 case class RemoveQuestIncomeFromDailyResultRequest(user: User, questId: String)
 case class RemoveQuestIncomeFromDailyResultResult(user: User)
 
-case class StoreProposalInDailyResultRequest(user: User, quest: Quest, reward: Option[Assets] = None, penalty: Option[Assets] = None)
-case class StoreProposalInDailyResultResult(user: User)
+case class StoreQuestInDailyResultRequest(user: User, quest: Quest, reward: Option[Assets] = None, penalty: Option[Assets] = None)
+case class StoreQuestInDailyResultResult(user: User)
 
 case class StoreSolutionInDailyResultRequest(
   user: User,
@@ -74,11 +74,11 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
       val deltaAssets = u.profile.dailyResults.foldLeft(Assets()) { (a, dr) =>
 
-        val assetsAfterProposals = dr.decidedQuestProposals.foldLeft(a) { (a, dqp) =>
+        val assetsAfterQuests = dr.decidedQuests.foldLeft(a) { (a, dqp) =>
           a + dqp.reward.getOrElse(Assets()) - dqp.penalty.getOrElse(Assets())
         }
 
-        val assetsAfterSolutions = dr.decidedQuestSolutions.foldLeft(assetsAfterProposals) { (a, dqs) =>
+        val assetsAfterSolutions = dr.decidedSolutions.foldLeft(assetsAfterQuests) { (a, dqs) =>
           a + dqs.reward.getOrElse(Assets()) - dqs.penalty.getOrElse(Assets())
         }
 
@@ -175,17 +175,17 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   /**
    * Stores result of voting of quest proposal in db
    */
-  def storeProposalInDailyResult(request: StoreProposalInDailyResultRequest): ApiResult[StoreProposalInDailyResultResult] = handleDbException {
+  def storeQuestInDailyResult(request: StoreQuestInDailyResultRequest): ApiResult[StoreQuestInDailyResultResult] = handleDbException {
     import request._
 
-    val qpr = QuestProposalResult(
+    val qpr = QuestResult(
       questId = request.quest.id,
       reward = request.reward,
       penalty = request.penalty,
       status = request.quest.status)
 
-    db.user.storeProposalInDailyResult(user.id, qpr) ifSome { v =>
-      OkApiResult(StoreProposalInDailyResultResult(v))
+    db.user.storeQuestInDailyResult(user.id, qpr) ifSome { v =>
+      OkApiResult(StoreQuestInDailyResultResult(v))
     }
   }
 
@@ -195,7 +195,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   def storeSolutionInDailyResult(request: StoreSolutionInDailyResultRequest): ApiResult[StoreSolutionInDailyResultResult] = handleDbException {
     import request._
 
-    val qsr = QuestSolutionResult(
+    val qsr = SolutionResult(
       solutionId = request.solution.id,
       battleId = request.battle.map(_.id),
       reward = request.reward,

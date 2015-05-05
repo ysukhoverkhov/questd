@@ -77,7 +77,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
       val q = createQuestStub(status = QuestStatus.CheatingBanned)
 
       user.addToAssets(any, any) returns Some(u)
-      user.storeProposalInDailyResult(any, any) returns Some(u)
+      user.storeQuestInDailyResult(any, any) returns Some(u)
       user.removeQuestIncomeFromDailyResult(any, any) returns Some(u)
       user.removeEntryFromTimeLineByObjectId(any, any) returns Some(u)
 

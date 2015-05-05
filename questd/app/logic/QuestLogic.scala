@@ -62,8 +62,8 @@ class QuestLogic(
    */
   def shouldBanIAC = {
     val votesToBan = Math.max(
-        api.config(api.ConfigParams.ProposalIACRatio).toDouble * quest.rating.votersCount,
-        api.config(api.ConfigParams.ProposalMinIACVotes).toLong)
+        api.config(api.ConfigParams.QuestIACRatio).toDouble * quest.rating.votersCount,
+        api.config(api.ConfigParams.QuestMinIACVotes).toLong)
 
     val maxVotes = List(
         quest.rating.iacpoints.porn,
@@ -77,8 +77,8 @@ class QuestLogic(
   def shouldBanCheating = {
 
     val maxCheatingVotes = Math.max(
-      api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * quest.rating.votersCount,
-      api.config(api.ConfigParams.ProposalMinCheatingVotes).toLong)
+      api.config(api.ConfigParams.QuestCheatingRatio).toDouble * quest.rating.votersCount,
+      api.config(api.ConfigParams.QuestMinCheatingVotes).toLong)
 
     quest.rating.cheating > maxCheatingVotes
   }

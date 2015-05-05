@@ -18,7 +18,7 @@ object Functionality extends Enumeration {
   val SubmitVideoQuests = Value
   val VoteReviews = Value
   val SubmitReviewsForResults = Value
-  val SubmitReviewsForProposals = Value
+  val SubmitReviewsForQuests = Value
   val GiveRewards = Value
 
   implicit val myEnumFormat = new Format[Functionality] {
@@ -53,7 +53,7 @@ object Rights {
     SubmitVideoQuests,
     VoteReviews,
     SubmitReviewsForResults,
-    SubmitReviewsForProposals,
+    SubmitReviewsForQuests,
     GiveRewards))
 
   val none: Rights = Rights(Set())

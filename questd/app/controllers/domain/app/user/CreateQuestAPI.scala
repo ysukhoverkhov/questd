@@ -46,7 +46,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
         // making all db calls
         runWhileSome(u)(
         { u: User =>
-          if ((config(api.ConfigParams.DebugDisableProposalCoolDown) == "1") || u.profile.publicProfile.vip) {
+          if ((config(api.ConfigParams.DebugDisableQuestCreationCoolDown) == "1") || u.profile.publicProfile.vip) {
             Some(u)
           } else {
             db.user.updateQuestCreationCoolDown(
@@ -93,20 +93,20 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
     (quest.status match {
 
       case QuestStatus.CheatingBanned =>
-        storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForCheatingQuest)))
+        storeQuestInDailyResult(StoreQuestInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForCheatingQuest)))
         removeQuestIncomeFromDailyResult(RemoveQuestIncomeFromDailyResultRequest(author, request.quest.id))
         removeFromTimeLine(RemoveFromTimeLineRequest(author, request.quest.id))
 
       case QuestStatus.IACBanned =>
-        storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForIACQuest)))
+        storeQuestInDailyResult(StoreQuestInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForIACQuest)))
         removeQuestIncomeFromDailyResult(RemoveQuestIncomeFromDailyResultRequest(author, request.quest.id))
         removeFromTimeLine(RemoveFromTimeLineRequest(author, request.quest.id))
 
       case QuestStatus.OldBanned =>
-        OkApiResult(StoreProposalInDailyResultResult(author))
+        OkApiResult(StoreQuestInDailyResultResult(author))
 
       case _ =>
-        InternalErrorApiResult[StoreProposalInDailyResultResult]("Rewarding quest author but quest status is Unexpected")
+        InternalErrorApiResult[StoreQuestInDailyResultResult]("Rewarding quest author but quest status is Unexpected")
     }) map {
       OkApiResult(RewardQuestAuthorResult())
     }

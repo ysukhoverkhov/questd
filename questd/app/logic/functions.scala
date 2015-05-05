@@ -17,13 +17,13 @@ object functions {
   /**
    * Period in days to give players a task to make quest.
    */
-  def questProposalPeriod(level: Int): Int = 7
+  def questCreationPeriod(level: Int): Int = 7
 
   /**
    * Takes proposal period into account.
-   * @return Cost for inviting one friend to help with proposal.
+   * @return Cost for inviting one friend to help with quest.
    */
-  def coinsToInviteFriendForVoteQuestProposal(level: Int): Int = {
+  def coinsToInviteFriendForVoteQuest(level: Int): Int = {
     // THis will be redone anyways.
     4
   }

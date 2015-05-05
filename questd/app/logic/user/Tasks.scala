@@ -56,7 +56,7 @@ trait Tasks { this: UserLogic =>
       TaskType.CreateQuest -> createCreateQuestTask,
       TaskType.VoteReviews -> createVoteReviewsTask,
       TaskType.SubmitReviewsForResults -> createSubmitReviewsForResultsTask,
-      TaskType.SubmitReviewsForProposals -> createSubmitReviewsForProposalsTask,
+      TaskType.SubmitReviewsForQuests -> createSubmitReviewsForQuestsTask,
       TaskType.GiveRewards -> createGiveRewardsTask,
       TaskType.LookThroughFriendshipProposals -> createReviewFriendshipRequestsTask,
       TaskType.Client -> createClientTask)
@@ -171,7 +171,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating tasks for submiting reviews for proposals.
    */
-  private def createSubmitReviewsForProposalsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForProposals) {
+  private def createSubmitReviewsForQuestsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForQuests) {
     //    Some(Task(
     //      taskType = TaskType.SubmitReviewsForProposals,
     //      description = "",

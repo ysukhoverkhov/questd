@@ -266,23 +266,23 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def storeProposalInDailyResult(id: String, proposal: QuestProposalResult): Option[User] = {
+  def storeQuestInDailyResult(id: String, proposal: QuestResult): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$push" -> MongoDBObject(
-          "privateDailyResults.0.decidedQuestProposals" -> grater[QuestProposalResult].asDBObject(proposal))))
+          "privateDailyResults.0.decidedQuests" -> grater[QuestResult].asDBObject(proposal))))
   }
 
   /**
    *
    */
-  def storeSolutionInDailyResult(id: String, solution: QuestSolutionResult): Option[User] = {
+  def storeSolutionInDailyResult(id: String, solution: SolutionResult): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$push" -> MongoDBObject(
-          "privateDailyResults.0.decidedQuestSolutions" -> grater[QuestSolutionResult].asDBObject(solution))))
+          "privateDailyResults.0.decidedSolutions" -> grater[SolutionResult].asDBObject(solution))))
   }
 
   /**

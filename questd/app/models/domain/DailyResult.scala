@@ -7,18 +7,18 @@ import java.util.Date
  */
 case class DailyResult(
   startOfPeriod: Date,
-  decidedQuestSolutions: List[QuestSolutionResult] = List.empty,
-  decidedQuestProposals: List[QuestProposalResult] = List.empty,
+  decidedSolutions: List[SolutionResult] = List.empty,
+  decidedQuests: List[QuestResult] = List.empty,
   questsIncome: List[QuestIncome] = List.empty)
 
-case class QuestSolutionResult(
+case class SolutionResult(
     solutionId: String,
     battleId: Option[String] = None,
     reward: Option[Assets],
     penalty: Option[Assets],
     status: SolutionStatus.Value)
 
-case class QuestProposalResult(
+case class QuestResult(
     questId: String,
     reward: Option[Assets],
     penalty: Option[Assets],

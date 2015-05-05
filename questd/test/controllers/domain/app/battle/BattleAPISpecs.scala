@@ -1,7 +1,7 @@
 package controllers.domain.app.battle
 
 import controllers.domain._
-import models.domain.{Assets, QuestSolutionResult, BattleStatus, SolutionStatus}
+import models.domain.{Assets, SolutionResult, BattleStatus, SolutionStatus}
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
@@ -74,14 +74,14 @@ class BattleAPISpecs extends BaseAPISpecs {
       there were one(solution).updateStatus(mEq(ss(1).id), mEq(SolutionStatus.Lost), any)
       there were two(user).readById(any)
       there was one(battle).updateStatus(any, mEq(BattleStatus.Resolved), mEq(List(ss(0).info.authorId)))
-      there was one(user).storeSolutionInDailyResult(any, mEq(QuestSolutionResult(
+      there was one(user).storeSolutionInDailyResult(any, mEq(SolutionResult(
         solutionId = ss(0).id,
         battleId = Some(b.id),
         reward = Some(Assets(0,0,0)),
         penalty = None,
         status = SolutionStatus.Won
       )))
-      there was one(user).storeSolutionInDailyResult(any, mEq(QuestSolutionResult(
+      there was one(user).storeSolutionInDailyResult(any, mEq(SolutionResult(
         solutionId = ss(1).id,
         battleId = Some(b.id),
         reward = Some(Assets(0,0,0)),

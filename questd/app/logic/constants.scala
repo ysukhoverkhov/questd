@@ -19,7 +19,7 @@ object constants {
     Functionality.VoteQuests -> 10,
     Functionality.VoteReviews -> 14,
     Functionality.SubmitReviewsForResults -> 16,
-    Functionality.SubmitReviewsForProposals -> 18,
+    Functionality.SubmitReviewsForQuests -> 18,
     Functionality.GiveRewards -> 20)
 
   def levelFor(f: Functionality.Value): Int = {
@@ -48,10 +48,10 @@ object constants {
 
   /**
    * Quest proposing.
-   */
-  val QuestProposalCheatingPenalty = 10
+   */ // TODO: find out why this is not used and what is used instead of this.
+  val QuestCheatingPenalty = 10
 
-  val QuestProposalIACPenalty = 10
+  val QuestIACPenalty = 10
 
 
   /**

@@ -7,7 +7,7 @@ import models.domain.admin.ConfigSection
 class _ConfigParams {
 
   val DebugExpMultiplier = "01 01 Debug Exp Multiplier"
-  val DebugDisableProposalCoolDown = "01 02 Debug Disable Proposal CoolDown"
+  val DebugDisableQuestCreationCoolDown = "01 02 Debug Disable Quest Creation CoolDown"
 
   val ActiveUserDays = "10 01 Active User Days"
 
@@ -22,11 +22,11 @@ class _ConfigParams {
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
 
-  val ProposalCheatingRatio = "50 12 Proposal Cheating to Votes Ratio"
-  val ProposalMinCheatingVotes = "50 13 Proposal Min Cheating Votes"
-  val ProposalIACRatio = "50 13 Proposal IAC to Total Votes Ratio"
-  val ProposalMinIACVotes = "50 14 Proposal min IAC Votes"
-  val ProposalMaxDescriptionLength = "50 30 Proposal Max Description Length"
+  val QuestCheatingRatio = "50 12 Quest Cheating to Votes Ratio"
+  val QuestMinCheatingVotes = "50 13 Quest Min Cheating Votes"
+  val QuestIACRatio = "50 13 Quest IAC to Total Votes Ratio"
+  val QuestMinIACVotes = "50 14 Quest min IAC Votes"
+  val QuestMaxDescriptionLength = "50 30 Quest Max Description Length"
 
   val SolutionCheatingRatio = "60 10 Solution Cheating to Votes Ratio"
   val SolutionMinCheatingVotes = "60 11 Solution minimum votes to thing it's a cheating"
@@ -77,7 +77,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     configSectionName,
     Map(
       ConfigParams.DebugExpMultiplier -> "1",
-      ConfigParams.DebugDisableProposalCoolDown -> "0",
+      ConfigParams.DebugDisableQuestCreationCoolDown -> "0",
 
       ConfigParams.ActiveUserDays -> "7",
 
@@ -92,11 +92,11 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.FavoriteThemesShare -> "0.2",
       ConfigParams.FavoriteThemesProbability -> "0.75",
 
-      ConfigParams.ProposalCheatingRatio -> "0.1",
-      ConfigParams.ProposalMinCheatingVotes -> "10",
-      ConfigParams.ProposalIACRatio -> "0.03",
-      ConfigParams.ProposalMinIACVotes -> "10",
-      ConfigParams.ProposalMaxDescriptionLength -> "140",
+      ConfigParams.QuestCheatingRatio -> "0.1",
+      ConfigParams.QuestMinCheatingVotes -> "10",
+      ConfigParams.QuestIACRatio -> "0.03",
+      ConfigParams.QuestMinIACVotes -> "10",
+      ConfigParams.QuestMaxDescriptionLength -> "140",
 
       ConfigParams.SolutionCheatingRatio -> "0.1",
       ConfigParams.SolutionMinCheatingVotes -> "5",

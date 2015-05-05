@@ -7,15 +7,15 @@ class functionsSpecs extends Specification {
 
   "Functions should" should {
 
-    "questProposalPeriod" in {
-      questProposalPeriod(12) must beEqualTo(7)
-      questProposalPeriod(13) must beEqualTo(7)
-      questProposalPeriod(20) must beEqualTo(7)
+    "questCreationPeriod" in {
+      questCreationPeriod(12) must beEqualTo(7)
+      questCreationPeriod(13) must beEqualTo(7)
+      questCreationPeriod(20) must beEqualTo(7)
     }
 
-    "coinsToInviteFriendForVoteQuestProposal" in {
-      coinsToInviteFriendForVoteQuestProposal(1) must beEqualTo(4)
-      coinsToInviteFriendForVoteQuestProposal(20) must beEqualTo(4)
+    "coinsToInviteFriendForVoteQuest" in {
+      coinsToInviteFriendForVoteQuest(1) must beEqualTo(4)
+      coinsToInviteFriendForVoteQuest(20) must beEqualTo(4)
     }
 
     "coinSelectQuest" in {

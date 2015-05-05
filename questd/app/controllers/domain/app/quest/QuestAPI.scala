@@ -22,9 +22,6 @@ case class VoteQuestRequest(
   vote: ContentVote.Value)
 case class VoteQuestResult()
 
-case class CalculateProposalThresholdsRequest(proposalsVoted: Double, proposalsLiked: Double)
-case class CalculateProposalThresholdsResult()
-
 private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**

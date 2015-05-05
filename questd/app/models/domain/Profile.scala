@@ -17,8 +17,8 @@ case class Profile(
   messages: List[Message] = List.empty,
   questCreationContext: QuestCreationContext = QuestCreationContext(),
   questSolutionContext: QuestSolutionContext = QuestSolutionContext(),
-  questProposalVoteContext: QuestVoteContext = QuestVoteContext(),
-  questSolutionVoteContext: SolutionVoteContext = SolutionVoteContext(),
+  questVoteContext: QuestVoteContext = QuestVoteContext(),
+  solutionVoteContext: SolutionVoteContext = SolutionVoteContext(),
   analytics: Analytics = Analytics(),
   debug: String = "")
 

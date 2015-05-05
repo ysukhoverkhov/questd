@@ -71,7 +71,7 @@ class DailyResultAPISpecs extends BaseAPISpecs {
             likesIncome = Assets(32, 32, 32),
             solutionsIncome = Assets(64, 64, 64))
         ),
-        questSolutionResult = List(QuestSolutionResult("1", None, None, Some(Assets(rating = -128)), SolutionStatus.CheatingBanned))
+        questSolutionResult = List(SolutionResult("1", None, None, Some(Assets(rating = -128)), SolutionStatus.CheatingBanned))
       )
 
       val u = createUserStub(privateDailyResults = List(

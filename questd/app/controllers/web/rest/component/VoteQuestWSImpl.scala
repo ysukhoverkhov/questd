@@ -7,12 +7,7 @@ import models.domain._
 private object VoteQuestWSImplTypes {
 
   case class WSVoteQuestRequest(
-
     questId: String,
-
-    /**
-     * @see controllers.domain.user.QuestProposalVote
-     */
     vote: String)
 
   type WSVoteQuestResult = VoteQuestByUserResult
