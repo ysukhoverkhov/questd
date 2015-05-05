@@ -6,6 +6,7 @@ package models.domain
 object TutorialConditionType extends Enumeration {
   val TutorialElementClosed = Value
   val ProfileVariableState = Value
+  val ScreenOpened = Value
 }
 
 /**
