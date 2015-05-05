@@ -14,7 +14,7 @@ trait SolvingQuests { this: UserLogic =>
    * Checks is user potentially able to solve quests today (disregarding coins and other things).
    */
   def canSolveQuestToday = {
-    user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults)
+    user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoSolutions)
   }
 
   /**
@@ -22,8 +22,8 @@ trait SolvingQuests { this: UserLogic =>
    */
   def canSolveQuest(contentType: ContentType, questToSolve: Quest) = {
     val content = contentType match {
-      case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoResults)
-      case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoResults)
+      case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoSolutions)
+      case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoSolutions)
     }
 
     if (!content)

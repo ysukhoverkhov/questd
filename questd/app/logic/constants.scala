@@ -10,15 +10,15 @@ object constants {
   val restrictions: Map[Functionality.Value, Int] = Map(
     Functionality.VoteQuestSolutions -> 1,
     Functionality.AddToFollowing -> 2,
-    Functionality.SubmitPhotoResults -> 3,
-    Functionality.SubmitVideoResults -> 4,
+    Functionality.SubmitPhotoSolutions -> 3,
+    Functionality.SubmitVideoSolutions -> 4,
     Functionality.Report -> 5,
     Functionality.InviteFriends -> 6,
     Functionality.SubmitPhotoQuests -> 7,
     Functionality.SubmitVideoQuests -> 8,
     Functionality.VoteQuests -> 10,
     Functionality.VoteReviews -> 14,
-    Functionality.SubmitReviewsForResults -> 16,
+    Functionality.SubmitReviewsForSolutions -> 16,
     Functionality.SubmitReviewsForQuests -> 18,
     Functionality.GiveRewards -> 20)
 

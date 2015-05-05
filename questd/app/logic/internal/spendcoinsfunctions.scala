@@ -39,8 +39,8 @@ object spendcoinsfunctions {
 
     def coinSelectQuestInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
       level match {
-        case _ if level < levelFor(SubmitPhotoResults) => 0
-        case _ if (level < levelFor(SubmitPhotoQuests)) && (level >= levelFor(SubmitPhotoResults)) => megaf(level, k, d, b, y)
+        case _ if level < levelFor(SubmitPhotoSolutions) => 0
+        case _ if (level < levelFor(SubmitPhotoQuests)) && (level >= levelFor(SubmitPhotoSolutions)) => megaf(level, k, d, b, y)
         case _ => coinSelectQuestInt(levelFor(SubmitPhotoQuests) - 1, k, d, b, y) * 0.63 + megaf(level, k, d, b, y) * 0.37
       }
     }
@@ -67,8 +67,8 @@ object spendcoinsfunctions {
     def coinAddShortInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
       level match {
         case _ if level < levelFor(AddToFollowing) => 0
-        case _ if (level < levelFor(SubmitPhotoResults)) && (level >= levelFor(AddToFollowing)) => megaf(level, k, d, b, y)
-        case _ => coinAddShortInt(levelFor(SubmitPhotoResults) - 1, k, d, b, y)
+        case _ if (level < levelFor(SubmitPhotoSolutions)) && (level >= levelFor(AddToFollowing)) => megaf(level, k, d, b, y)
+        case _ => coinAddShortInt(levelFor(SubmitPhotoSolutions) - 1, k, d, b, y)
       }
     }
 

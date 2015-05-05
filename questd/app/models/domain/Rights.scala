@@ -8,8 +8,8 @@ object Functionality extends Enumeration {
   type Functionality = Value
 
   val VoteQuestSolutions = Value
-  val SubmitPhotoResults = Value
-  val SubmitVideoResults = Value
+  val SubmitPhotoSolutions = Value
+  val SubmitVideoSolutions = Value
   val Report = Value
   val InviteFriends = Value
   val AddToFollowing = Value
@@ -17,7 +17,7 @@ object Functionality extends Enumeration {
   val SubmitPhotoQuests = Value
   val SubmitVideoQuests = Value
   val VoteReviews = Value
-  val SubmitReviewsForResults = Value
+  val SubmitReviewsForSolutions = Value
   val SubmitReviewsForQuests = Value
   val GiveRewards = Value
 
@@ -43,8 +43,8 @@ object Rights {
    */
   val full: Rights = Rights(Set(
     VoteQuestSolutions,
-    SubmitPhotoResults,
-    SubmitVideoResults,
+    SubmitPhotoSolutions,
+    SubmitVideoSolutions,
     Report,
     InviteFriends,
     AddToFollowing,
@@ -52,7 +52,7 @@ object Rights {
     SubmitPhotoQuests,
     SubmitVideoQuests,
     VoteReviews,
-    SubmitReviewsForResults,
+    SubmitReviewsForSolutions,
     SubmitReviewsForQuests,
     GiveRewards))
 

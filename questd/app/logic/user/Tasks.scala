@@ -91,7 +91,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating task for submitting quest.
    */
-  private def createCreateSolutionTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoResults) {
+  private def createCreateSolutionTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoSolutions) {
     val taskProbability = api.config(api.ConfigParams.CreateSolutionTaskProbability).toDouble
     if (canSolveQuestToday && rand.nextDouble() < taskProbability)
       Some(Task(
@@ -160,7 +160,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating tasks for submiting reviews for solutions.
    */
-  private def createSubmitReviewsForResultsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForResults) {
+  private def createSubmitReviewsForResultsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForSolutions) {
     //    Some(Task(
     //      taskType = TaskType.SubmitReviewsForResults,
     //      description = "",
