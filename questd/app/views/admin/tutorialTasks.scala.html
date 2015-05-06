@@ -1,6 +1,7 @@
 @(menuItems: Map[String, String], tasks: List[models.domain.TutorialTask], newTaskForm: Form[controllers.web.admin.component.TutorialTaskForm])
 
 @import helper._
+@import models.domain.TaskType
 
 @main("Tutorial Tasks")(menuItems, Map.empty) {
 
@@ -39,7 +40,7 @@
 				@form(action = controllers.web.admin.routes.TutorialTasksCRUD.updateTutorialTask()) {
 					@inputText(newTaskForm("id"), 'size -> 18, 'readonly -> "readonly")
 					@inputText(newTaskForm("description"), 'size -> 40)
-					@select(newTaskForm("taskType"), options(List("Client", "VoteQuestSolutions", "SubmitQuestResult", "AddToFollowing", "VoteQuestProposals", "SubmitQuestProposal", "VoteReviews", "SubmitReviewsForResults", "SubmitReviewsForProposals", "GiveRewards", "LookThroughWinnersOfMyQuests", "LookThroughFriendshipProposals")))
+					@select(newTaskForm("taskType"), options(TaskType.values.map(_.toString).toList.sorted))
 					@inputText(newTaskForm("requiredCount"), 'size -> 5)
 					@inputText(newTaskForm("rewardCoins"), 'size -> 5)
 					@inputText(newTaskForm("rewardMoney"), 'size -> 5)
