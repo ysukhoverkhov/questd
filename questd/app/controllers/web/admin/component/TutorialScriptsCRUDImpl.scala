@@ -505,5 +505,21 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }
 
+  /**
+   * Exports the whole tutorial script for given platform.
+   *
+   * @param platform Platform to export script for.
+   * @return The script.
+   */
+  def exportTutorialScript(platform: String) = Authenticated { implicit request =>
+
+    api.db.tutorial.readById(platform) match {
+      case Some(t) =>
+        // TODO: translate it here to json and pass to Ok's apply.
+        Ok("lalala").withHeaders(CACHE_CONTROL -> "max-age=0", CONTENT_DISPOSITION -> s"attachment; filename=$platform.js", CONTENT_TYPE -> "application/x-download")
+      case None =>
+        InternalServerError
+    }
+  }
 }
 
