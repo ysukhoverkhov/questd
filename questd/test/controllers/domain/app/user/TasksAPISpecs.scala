@@ -329,6 +329,7 @@ class TasksAPISpecs extends BaseAPISpecs {
         taskType = TaskType.Client,
         description = "",
         requiredCount = 10,
+        currentCount = 10,
         tutorialTaskId = Some("lala"))
 
       val u = createUser(DailyTasks(

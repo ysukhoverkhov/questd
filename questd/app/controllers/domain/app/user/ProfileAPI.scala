@@ -11,6 +11,7 @@ import play.{Logger, Play}
 case class GetAllUsersRequest()
 case class GetAllUsersResult(users: Iterator[User])
 
+// TODO: get rid of reward and cost here.
 case class AdjustAssetsRequest(user: User, reward: Option[Assets] = None, cost: Option[Assets] = None)
 case class AdjustAssetsResult(user: User)
 

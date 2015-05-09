@@ -10,7 +10,7 @@ case class Profile(
   profileVersion: Int = 1,
   publicProfile: PublicProfile = PublicProfile(),
   ratingToNextLevel: Int = 0,
-  assets: Assets = Assets(100000, 1000, 0), // Should be (0, 0, 0) here.
+  assets: Assets = Assets(100000, 0, 0), // Should be (0, 0, 0) here.
   rights: Rights = Rights(),
   dailyResults: List[DailyResult] = List.empty,
   dailyTasks: DailyTasks = DailyTasks(),

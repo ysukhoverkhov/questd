@@ -42,9 +42,13 @@ private[domain] trait AuthAPI {
       }
     }
 
+    // This should be moved to seporate API call like "createUser" what should be called from "login".
     def initializeUser(user: User): User = {
       user.copy(
-        profile = user.profile.copy(rights = user.calculateRights),
+        profile = user.profile.copy(
+          rights = user.calculateRights,
+          ratingToNextLevel = user.ratingToNextLevel
+        ),
         privateDailyResults = List(DailyResult(
           user.getStartOfCurrentDailyResultPeriod)
         ))
