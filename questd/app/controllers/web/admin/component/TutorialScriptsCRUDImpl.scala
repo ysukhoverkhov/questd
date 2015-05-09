@@ -117,10 +117,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       menuItems = Menu(request),
       leftMenuItems = leftMenu,
       currentPlatform = platform,
-      elements = els,
-      possibleActions = TutorialActionType.values.map(_.toString).toList,
-      possibleConditions = TutorialConditionType.values.map(_.toString).toList,
-      possibleTriggers = TutorialTriggerType.values.map(_.toString).toList))
+      elements = els))
   }
 
   def updateAction(platform: String, elementId: String) = Authenticated { implicit request =>
