@@ -32,41 +32,41 @@ private[mongo] class MongoBattleDAO
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (status.length > 0) {
+    if (status.nonEmpty) {
       queryBuilder += ("info.status" -> MongoDBObject("$in" -> status.map(_.toString)))
     }
 
-    if (authorIds.length > 0) {
+    if (authorIds.nonEmpty) {
       queryBuilder += ("info.authorIds" -> MongoDBObject("$in" -> authorIds))
     }
 
-    if (solutionIds.length > 0) {
+    if (solutionIds.nonEmpty) {
       queryBuilder += ("info.solutionIds" -> MongoDBObject("$in" -> solutionIds))
     }
 
-    if (authorIdsExclude.length > 0) {
+    if (authorIdsExclude.nonEmpty) {
       queryBuilder += ("info.authorIds" -> MongoDBObject("$nin" -> authorIdsExclude))
     }
 
-    if (levels != None) {
+    if (levels.isDefined) {
       queryBuilder += ("$and" -> Array(
         MongoDBObject("level" -> MongoDBObject("$gte" -> levels.get._1)),
         MongoDBObject("level" -> MongoDBObject("$lte" -> levels.get._2))))
     }
 
-    if (vip != None) {
+    if (vip.isDefined) {
       queryBuilder += ("vip" -> vip.get)
     }
 
-    if (ids.length > 0) {
+    if (ids.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
     }
 
-    if (idsExclude.length > 0) {
+    if (idsExclude.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$nin" -> idsExclude))
     }
 
-    if (cultureId != None) {
+    if (cultureId.isDefined) {
       queryBuilder += ("cultureId" -> cultureId.get)
     }
 
@@ -94,7 +94,7 @@ private[mongo] class MongoBattleDAO
         "info.status" -> newStatus.toString,
         "lastModDate" -> new Date()))
 
-    if (addWinners.length > 0) {
+    if (addWinners.nonEmpty) {
       queryBuilder +=
         ("$push" -> MongoDBObject(
           "info.winnerIds" -> MongoDBObject(
