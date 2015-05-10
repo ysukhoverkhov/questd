@@ -3,6 +3,7 @@ package controllers.web.admin.component
 import controllers.domain.admin._
 import controllers.domain.{DomainAPIComponent, OkApiResult}
 import models.domain._
+import org.json4s.ext.EnumNameSerializer
 import play.api._
 import play.api.data.Forms._
 import play.api.data._
@@ -121,8 +122,22 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
    *
    * @return Redirect
    */
-  def importTutorialTasks = Authenticated { implicit request =>
-    Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
+  def importTutorialTasks = Authenticated(parse.multipartFormData) { request =>
+    import controllers.web.helpers._
+    request.body.file("tutorialTasks").map { tutorialTasks =>
+
+      val serializers = List(new EnumNameSerializer(TaskType))
+
+      val tasks = Json.read[List[TutorialTask]](scala.io.Source.fromFile(tutorialTasks.ref.file).mkString, serializers)
+
+      api.db.tutorialTask.clear()
+      tasks.foreach(api.db.tutorialTask.create)
+
+      Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
+    }.getOrElse {
+      Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks("")).flashing(
+        "error" -> "Missing file")
+    }
   }
 
 }

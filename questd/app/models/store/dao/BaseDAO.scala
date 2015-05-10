@@ -10,5 +10,6 @@ private[store] trait BaseDAO[T <: ID] {
   def upsert(o: T): Unit
   def delete(id: String): Unit
   def all: Iterator[T]
+  def clear(): Unit
 }
 
