@@ -525,6 +525,12 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
   }
 
+  /**
+   * Imports tutorial script from file.
+   *
+   * @param platform Platfor to import script for.
+   * @return Redirects somewhere.
+   */
   def importTutorialScript(platform: String) = Authenticated(parse.multipartFormData) { request =>
     import controllers.web.helpers._
     request.body.file("tutorialScript").map { tutorialScript =>
@@ -536,7 +542,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       )
 
       val tutorial = Json.read[Tutorial](scala.io.Source.fromFile(tutorialScript.ref.file).mkString, serializers)
-      Logger.error(tutorial.toString)
+      api.db.tutorial.update(tutorial.copy(id = platform))
 
       Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
     }.getOrElse {

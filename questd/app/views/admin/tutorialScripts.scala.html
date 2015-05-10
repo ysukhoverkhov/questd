@@ -29,7 +29,7 @@ elements: List[models.domain.TutorialElement])
 
 @helper.form(action = controllers.web.admin.routes.TutorialScriptsCRUD.importTutorialScript(currentPlatform), 'enctype -> "multipart/form-data") {
     <input type="file" name="tutorialScript">
-    <input type="submit">
+    <input type="submit" value="Export">
 }
 
 <table border="1">
