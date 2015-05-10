@@ -26,10 +26,9 @@ elements: List[models.domain.TutorialElement])
 @main(s"Tutorial script for: $currentPlatform")(menuItems, leftMenuItems) {
 
 <a href="@controllers.web.admin.routes.TutorialScriptsCRUD.exportTutorialScript(currentPlatform)">Export</a>
-
 @helper.form(action = controllers.web.admin.routes.TutorialScriptsCRUD.importTutorialScript(currentPlatform), 'enctype -> "multipart/form-data") {
     <input type="file" name="tutorialScript">
-    <input type="submit" value="Export">
+    <input type="submit" value="Import">
 }
 
 <table border="1">

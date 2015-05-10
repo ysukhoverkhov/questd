@@ -162,6 +162,9 @@ GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorial
 GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)
 POST	/admin/tutorialTasks/update						controllers.web.admin.TutorialTasksCRUD.updateTutorialTask
 
+GET     /admin/tutorial/exportTutorialTasks             controllers.web.admin.TutorialTasksCRUD.exportTutorialTasks
+POST    /admin/tutorial/importTutorialTasks             controllers.web.admin.TutorialTasksCRUD.importTutorialTasks
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               					controllers.Assets.at(path="/public", file)

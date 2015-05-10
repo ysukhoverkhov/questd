@@ -5,6 +5,12 @@
 
 @main("Tutorial Tasks")(menuItems, Map.empty) {
 
+    <a href="@controllers.web.admin.routes.TutorialTasksCRUD.exportTutorialTasks">Export</a>
+    @helper.form(action = controllers.web.admin.routes.TutorialTasksCRUD.importTutorialTasks, 'enctype -> "multipart/form-data") {
+        <input type="file" name="tutorialTasks">
+        <input type="submit" value="Import">
+    }
+
 	<table border="0">
     	<tr>
     		<td>

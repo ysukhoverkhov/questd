@@ -103,6 +103,28 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
       })
   }
 
+
+  /**
+   * Exports tutorial tasks to file.
+   *
+   * @return Redirect
+   */
+  def exportTutorialTasks = Authenticated { implicit request =>
+    import controllers.web.helpers._
+
+    val tasks = api.db.tutorialTask.all.toList
+    Ok(Json.write(tasks)).withHeaders(CACHE_CONTROL -> "max-age=0", CONTENT_DISPOSITION -> s"attachment; filename=tutorialTasks.js", CONTENT_TYPE -> "application/x-download")
+  }
+
+  /**
+   * Imports Tutorial tasks from file.
+   *
+   * @return Redirect
+   */
+  def importTutorialTasks = Authenticated { implicit request =>
+    Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
+  }
+
 }
 
 
