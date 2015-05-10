@@ -1,6 +1,6 @@
-package controllers.web.rest.component.helpers
+package controllers.web.helpers
 
-object _Json {
+object JsonHelper {
 
   import scala.reflect.ClassTag
 
@@ -14,7 +14,7 @@ object _Json {
 
     // Can take deserialization from here: https://github.com/json4s/json4s/blob/master/ext/src/main/scala/org/json4s/ext/EnumSerializer.scala
     def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), E#Value] = {
-      case x if false => throw new MappingException("Enums deserializaion is not implemented") 
+      case x if false => throw new MappingException("Enums deserializaion is not implemented")
     }
 
     def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
@@ -24,11 +24,10 @@ object _Json {
 
   implicit val formats = org.json4s.native.Serialization.formats(NoTypeHints) + new EnumNameSerializer
 
-  
+
   def write[A <: AnyRef](a: A): String = swrite(a)
-  
+
   def read[A <: AnyRef : Manifest](json: String): A = {
     parse(json).extract[A]
   }
-  
 }

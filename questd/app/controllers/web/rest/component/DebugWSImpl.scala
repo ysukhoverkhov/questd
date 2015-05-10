@@ -6,7 +6,7 @@ import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
-import controllers.web.rest.component.helpers._
+import controllers.web.helpers._
 import models.domain._
 import play.Logger
 
@@ -118,7 +118,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
       logOrGet(s"Unable to find random user with vip = $vip and excluding $exclude"){
         api.allUsers(AllUsersRequest()).body.get.users.filter(u =>
           !exclude.contains(u.id)
-            && (u.demo.cultureId != None)
+            && u.demo.cultureId.isDefined
             && (u.profile.publicProfile.bio.gender != Gender.Unknown)
             && (u.profile.publicProfile.vip == vip))
       }
@@ -131,7 +131,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
           logOrGet(s"Unable to find user with id = $rivalId"){
             api.allUsers(AllUsersRequest()).body.get.users.filter( u =>
               u.id == rivalId
-                && (u.demo.cultureId != None)
+                && u.demo.cultureId.isDefined
                 && (u.profile.publicProfile.bio.gender != Gender.Unknown))}
       }
     }

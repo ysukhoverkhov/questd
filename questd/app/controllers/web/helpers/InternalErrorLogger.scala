@@ -1,4 +1,4 @@
-package controllers.web.rest.component.helpers
+package controllers.web.helpers
 
 import play.api._
 import play.api.mvc._

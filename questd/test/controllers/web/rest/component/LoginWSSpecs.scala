@@ -47,7 +47,7 @@ class LoginWSSpecs extends Specification
       fbsn.fetchUserByToken(facebookToken) returns user
       api.login(LoginRequest("FB", user)) returns OkApiResult(LoginResult  (sessid, userId))
 
-      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
+      val data = AnyContentAsJson(Json.parse(controllers.web.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,
@@ -73,7 +73,7 @@ class LoginWSSpecs extends Specification
       fbsn.fetchUserByToken(facebookToken) throws new AuthException()
 
 
-      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
+      val data = AnyContentAsJson(Json.parse(controllers.web.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,
@@ -95,7 +95,7 @@ class LoginWSSpecs extends Specification
       sn.clientForName("FB") returns fbsn
       fbsn.fetchUserByToken(facebookToken) throws new NetworkException()
 
-      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
+      val data = AnyContentAsJson(Json.parse(controllers.web.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,
@@ -117,7 +117,7 @@ class LoginWSSpecs extends Specification
       sn.clientForName("FB") returns fbsn
       fbsn.fetchUserByToken(facebookToken) throws new SocialNetworkClientNotFound()
 
-      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
+      val data = AnyContentAsJson(Json.parse(controllers.web.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,

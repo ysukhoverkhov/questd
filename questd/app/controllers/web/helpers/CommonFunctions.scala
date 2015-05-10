@@ -1,4 +1,4 @@
-package controllers.web.rest.component.helpers
+package controllers.web.helpers
 
 import play.api._
 import play.api.mvc._
@@ -8,7 +8,7 @@ import controllers.web.rest.component._
 import controllers.domain._
 import org.json4s._
 
-private[component] trait CommonFunctions { this: QuestController with SecurityWSImpl =>
+private[web] trait CommonFunctions { this: QuestController with SecurityWSImpl =>
 
   def wrapApiCallReturnBody[T <: AnyRef](apiCall: AuthenticatedRequest[AnyContent] => ApiResult[T]) = apiCallToResult(apiCall)(writeAnyInResponse)
 

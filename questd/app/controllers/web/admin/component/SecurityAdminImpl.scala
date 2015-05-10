@@ -3,7 +3,7 @@ package controllers.web.admin.component
 import scala.language.postfixOps
 import scala.concurrent._
 import play.api.mvc._
-import controllers.web.rest.component.helpers._
+import controllers.web.helpers._
 
 object SecurityAdminImpl {
   // Constant for session name in cookie

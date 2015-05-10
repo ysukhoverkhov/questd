@@ -1,7 +1,7 @@
-package controllers.web.rest.component.helpers
+package controllers.web.rest.helpers
 
-import controllers.web.rest.component.WSComponent
 import components.componentregistry.ComponentRegistrySingleton
+import controllers.web.rest.component.WSComponent
 
 trait AccessToWSInstance {
   val ws: WSComponent#WS = ComponentRegistrySingleton.ws

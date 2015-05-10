@@ -6,7 +6,7 @@ import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import controllers.domain._
 import controllers.domain.app.user._
-import controllers.web.rest.component.helpers._
+import controllers.web.helpers._
 import components._
 import org.json4s.MappingException
 import controllers.web.rest.config.WSConfigHolder

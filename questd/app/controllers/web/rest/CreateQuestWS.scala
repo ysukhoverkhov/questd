@@ -1,11 +1,11 @@
 package controllers.web.rest
 
+import controllers.web.rest.helpers.AccessToWSInstance
 import play.api.mvc._
-import controllers.web.rest.component.helpers.AccessToWSInstance
 
 object CreateQuestWS extends Controller with AccessToWSInstance {
 
-  def createQuest = ws.proposeQuest
+  def createQuest = ws.createQuest
 
 }
 
