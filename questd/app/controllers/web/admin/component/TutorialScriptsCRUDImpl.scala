@@ -3,6 +3,7 @@ package controllers.web.admin.component
 import controllers.domain.app.user.{GetCommonTutorialRequest, GetCommonTutorialResult}
 import controllers.domain.{DomainAPIComponent, OkApiResult}
 import models.domain._
+import org.json4s.ext.EnumNameSerializer
 import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
@@ -513,13 +514,34 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def exportTutorialScript(platform: String) = Authenticated { implicit request =>
 
+    import controllers.web.helpers._
+
     api.db.tutorial.readById(platform) match {
       case Some(t) =>
-        
-        // TODO: translate it here to json and pass to Ok's apply.
-        Ok("lalala").withHeaders(CACHE_CONTROL -> "max-age=0", CONTENT_DISPOSITION -> s"attachment; filename=$platform.js", CONTENT_TYPE -> "application/x-download")
+
+        Ok(Json.write(t)).withHeaders(CACHE_CONTROL -> "max-age=0", CONTENT_DISPOSITION -> s"attachment; filename=$platform.js", CONTENT_TYPE -> "application/x-download")
       case None =>
         InternalServerError
+    }
+  }
+
+  def importTutorialScript(platform: String) = Authenticated(parse.multipartFormData) { request =>
+    import controllers.web.helpers._
+    request.body.file("tutorialScript").map { tutorialScript =>
+
+      val serializers = List(
+        new EnumNameSerializer(TutorialActionType),
+        new EnumNameSerializer(TutorialTriggerType),
+        new EnumNameSerializer(TutorialConditionType)
+      )
+
+      val tutorial = Json.read[Tutorial](scala.io.Source.fromFile(tutorialScript.ref.file).mkString, serializers)
+      Logger.error(tutorial.toString)
+
+      Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+    }.getOrElse {
+      Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform)).flashing(
+        "error" -> "Missing file")
     }
   }
 }

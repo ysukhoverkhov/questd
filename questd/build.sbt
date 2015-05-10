@@ -19,6 +19,8 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
 
+libraryDependencies += "org.json4s" %% "json4s-ext" % "3.2.11"
+
 libraryDependencies += "se.radley" %% "play-plugins-salat" % "1.5.0"
 
 // resolvers += "theatr.us" at "http://repo.theatr.us"

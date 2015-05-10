@@ -3,7 +3,6 @@ package controllers.web.admin
 import components.componentregistry.ComponentRegistrySingleton
 import controllers.web.admin.component.AdminComponent
 import play.api.mvc._
-import views.html.admin.index
 
 
 object TutorialScriptsCRUD extends Controller {
@@ -33,5 +32,6 @@ object TutorialScriptsCRUD extends Controller {
   def saveParamInElementTrigger(platform: String, elementId: String, index: Int, paramKey: String) = admin.tutorialScripts.saveParamInElementTrigger(platform, elementId, index, paramKey)
 
   def exportTutorialScript(platform: String) = admin.tutorialScripts.exportTutorialScript(platform)
+  def importTutorialScript(platform: String) = admin.tutorialScripts.importTutorialScript(platform)
 }
 

@@ -156,6 +156,7 @@ POST    /admin/tutorial/deleteParamFromElemTrigger      controllers.web.admin.Tu
 POST    /admin/tutorial/saveParamInElementTrigger       controllers.web.admin.TutorialScriptsCRUD.saveParamInElementTrigger(platform: String, elementId: String, index: Int, paramKey: String)
 
 GET     /admin/tutorial/exportTutorialScript            controllers.web.admin.TutorialScriptsCRUD.exportTutorialScript(platform: String)
+POST    /admin/tutorial/importTutorialScript            controllers.web.admin.TutorialScriptsCRUD.importTutorialScript(platform: String)
 
 GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")
 GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)
