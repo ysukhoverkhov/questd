@@ -22,7 +22,7 @@ case class GetRightsAtLevelsRequest(user: User, levelFrom: Int, levelTo: Int)
 case class GetRightsAtLevelsResult(rights: List[Rights])
 
 case class GetLevelsForRightsRequest(user: User, functionality: List[Functionality.Value])
-case class GetLevelsForRightsResult(levels: Map[Functionality.Value, Int])
+case class GetLevelsForRightsResult(levels: Map[String, Int])
 
 case class SetDebugRequest(user: User, debug: String)
 case class SetDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -109,8 +109,10 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    */
   def getLevelsForRights(request: GetLevelsForRightsRequest): ApiResult[GetLevelsForRightsResult] = handleDbException {
     val rv = constants.restrictions.filterKeys(f => request.functionality.contains(f))
-
-    OkApiResult(GetLevelsForRightsResult(rv))
+    Logger.error(rv.toString())
+    val rv2 = rv.map(r => r._1.toString -> r._2)
+    Logger.error(rv2.toString())
+    OkApiResult(GetLevelsForRightsResult(rv2))
   }
 
   /**
