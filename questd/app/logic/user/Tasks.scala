@@ -76,16 +76,18 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating task for voting quests.
    */
   private def createLikeSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
-    def likesCount = {
+    {
       val mean = api.config(api.ConfigParams.SolutionVoteTaskCountMean).toDouble
       val dev = api.config(api.ConfigParams.SolutionVoteTaskCountDeviation).toDouble
-      math.max(math.round(rand.nextGaussian(mean, dev)), 0).toInt
+      math.round(rand.nextGaussian(mean, dev)).toInt
+    } match {
+      case likesCount if likesCount > 0 =>
+        Some(Task(
+          taskType = TaskType.LikeSolutions,
+          description = "",
+          requiredCount = likesCount))
+      case _ => None
     }
-
-    Some(Task(
-      taskType = TaskType.LikeSolutions,
-      description = "",
-      requiredCount = likesCount))
   }
 
   /**
@@ -120,16 +122,18 @@ trait Tasks { this: UserLogic =>
    * Algorithm for creating task for votes for proposals.
    */
   private def createLikeQuestsTask(user: User) = ifHasRightTo(Functionality.VoteQuests) {
-    def likesCount = {
+    {
       val mean = api.config(api.ConfigParams.QuestVoteTaskCountMean).toDouble
       val dev = api.config(api.ConfigParams.QuestVoteTaskCountDeviation).toDouble
-      math.max(math.round(rand.nextGaussian(mean, dev)), 0).toInt
+      math.round(rand.nextGaussian(mean, dev)).toInt
+    } match {
+      case likesCount if likesCount > 0 =>
+        Some(Task(
+          taskType = TaskType.LikeQuests,
+          description = "",
+          requiredCount = likesCount))
+      case _ => None
     }
-
-    Some(Task(
-      taskType = TaskType.LikeQuests,
-      description = "",
-      requiredCount = likesCount))
   }
 
   /**

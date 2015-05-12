@@ -14,6 +14,7 @@ class TasksSpecs extends BaseLogicSpecs {
 
     "Generate DailyTasks on request" in {
       api.config returns createStubConfig
+      rand.nextGaussian(any, any) returns 1
 
       val u = User()
       val dailyResult = u.getTasksForTomorrow
