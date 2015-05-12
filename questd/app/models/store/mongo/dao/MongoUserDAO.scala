@@ -482,13 +482,25 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def addTasks(id: String, newTasks: List[Task]): Option[User] = {
+  def addTasks(id: String, newTasks: List[Task], addReward: Option[Assets] = None): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$push" -> MongoDBObject(
+      "profile.dailyTasks.tasks" -> MongoDBObject(
+        "$each" -> newTasks.map(grater[Task].asDBObject))))
+
+    addReward match {
+      case Some(assets) =>
+        queryBuilder += ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.reward.coins" -> assets.coins,
+          "profile.dailyTasks.reward.money" -> assets.money,
+          "profile.dailyTasks.reward.rating" -> assets.rating))
+      case _ =>
+    }
+
     findAndModify(
       id,
-      MongoDBObject(
-        "$push" -> MongoDBObject(
-          "profile.dailyTasks.tasks" -> MongoDBObject(
-            "$each" -> newTasks.map(grater[Task].asDBObject)))))
+      queryBuilder.result())
   }
 
   /**
