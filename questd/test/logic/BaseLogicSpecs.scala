@@ -71,6 +71,7 @@ private[logic] abstract class BaseLogicSpecs extends Specification
     config.apply(api.ConfigParams.QuestVoteTaskCountMean) returns "3"
     config.apply(api.ConfigParams.QuestVoteTaskCountDeviation) returns "1"
     config.apply(api.ConfigParams.CreateQuestTaskProbability) returns "0.3"
+    config.apply(api.ConfigParams.DailyTasksStartsFromLevel) returns "2"
 
     config.apply(api.ConfigParams.FavoriteThemesShare) returns "0.20"
     config.apply(api.ConfigParams.FavoriteThemesProbability) returns "0.75"

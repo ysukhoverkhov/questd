@@ -2,6 +2,7 @@ package logic.user
 
 import logic.BaseLogicSpecs
 import models.domain._
+import testhelpers.domainstubs._
 
 class TasksSpecs extends BaseLogicSpecs {
 
@@ -16,10 +17,20 @@ class TasksSpecs extends BaseLogicSpecs {
       api.config returns createStubConfig
       rand.nextGaussian(any, any) returns 1
 
-      val u = User()
+      val u = createUserStub(level = 20)
       val dailyResult = u.getTasksForTomorrow
 
       dailyResult.tasks.length must beGreaterThan(0)
+    }
+
+    "Do not generate DailyTasks for 1st level users" in {
+      api.config returns createStubConfig
+      rand.nextGaussian(any, any) returns 1
+
+      val u = createUserStub(level = 1)
+      val dailyResult = u.getTasksForTomorrow
+
+      dailyResult.tasks.length must beEqualTo(0)
     }
 
     "Generate tasks for voting for solutions" in {

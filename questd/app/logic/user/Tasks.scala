@@ -16,19 +16,23 @@ trait Tasks { this: UserLogic =>
    * List of tasks to give user for next day.
    */
   def getTasksForTomorrow = {
-    val dailyRatingReward = dailyTasksRatingReward
-    val allTasksCoinsReward = dailyTasksCoinsReward
+    if (user.profile.publicProfile.level < api.config(api.ConfigParams.DailyTasksStartsFromLevel).toInt) {
+      DailyTasks(tasks = List.empty, reward = Assets())
+    } else {
+      val dailyRatingReward = dailyTasksRatingReward
+      val allTasksCoinsReward = dailyTasksCoinsReward
 
-    val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
-      case Some(t) => t :: c
-      case None => c
-    })
+      val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
+        case Some(t) => t :: c
+        case None => c
+      })
 
-    val tasksWithRewards = tasks.map { t =>
-      t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = DailyTasksRatingDeviation))
+      val tasksWithRewards = tasks.map { t =>
+        t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = DailyTasksCoinsDeviation))
+      }
+
+      DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
     }
-
-    DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
   }
 
   /**
