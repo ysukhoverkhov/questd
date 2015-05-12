@@ -2,6 +2,7 @@ package controllers.domain.app.user
 
 import controllers.domain._
 import models.domain._
+import models.domain.solution.{Solution, SolutionStatus}
 import testhelpers.domainstubs._
 
 class ContentAPISpecs extends BaseAPISpecs {

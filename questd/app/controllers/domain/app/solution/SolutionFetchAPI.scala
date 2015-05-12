@@ -3,7 +3,9 @@ package controllers.domain.app.solution
 import components.DBAccessor
 import controllers.domain._
 import controllers.domain.helpers._
-import models.domain._
+import models.domain.common.ContentVote
+import models.domain.solution.{Solution, SolutionStatus}
+import models.domain.user.{FriendshipStatus, User}
 
 case class GetFriendsSolutionsRequest(
   user: User,

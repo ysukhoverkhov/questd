@@ -1,7 +1,7 @@
 package models.store.mongo.dao
 
 import com.mongodb.casbah.MongoClient
-import models.domain.User
+import models.domain.user.User
 import models.store.mongo.helpers.QSalatDAO
 import org.bson.types.ObjectId
 import models.store.mongo.SalatContext._

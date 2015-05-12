@@ -1,7 +1,10 @@
 package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
-import models.domain._
+import models.domain.common.Assets
+import models.domain.quest.QuestStatus
+import models.domain.solution.SolutionStatus
+import models.domain.user.{SolutionResult, DailyResult, QuestIncome}
 import org.mockito.Matchers.{eq => mEq}
 import org.mockito.{ArgumentMatcher, Matchers}
 import testhelpers.domainstubs._

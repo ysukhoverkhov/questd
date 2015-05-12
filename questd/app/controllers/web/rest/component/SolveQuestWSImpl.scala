@@ -2,7 +2,7 @@ package controllers.web.rest.component
 
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import models.domain.SolutionInfoContent
+import models.domain.solution.SolutionInfoContent
 
 private object SolveQuestWSImplTypes {
 

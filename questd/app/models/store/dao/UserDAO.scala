@@ -1,9 +1,11 @@
 package models.store.dao
 
-import models.domain._
 import java.util.Date
 
-import models.domain.view.QuestView
+import models.domain.common.{Assets, ContentVote}
+import models.domain.user._
+import models.domain.user.message.Message
+import models.view.QuestView
 
 trait UserDAO extends BaseDAO[User] {
 

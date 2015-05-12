@@ -4,7 +4,7 @@ import java.util.Date
 
 import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
-import models.domain.Rights
+import models.domain.user.Rights
 import testhelpers.domainstubs._
 
 class CreatingQuestSpecs extends BaseLogicSpecs {

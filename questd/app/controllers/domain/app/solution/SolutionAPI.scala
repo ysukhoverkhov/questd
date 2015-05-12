@@ -6,6 +6,8 @@ import controllers.domain._
 import controllers.domain.app.user._
 import controllers.domain.helpers._
 import models.domain._
+import models.domain.common.ContentVote
+import models.domain.solution.{SolutionStatus, Solution}
 import play.Logger
 
 case class VoteSolutionRequest(
@@ -23,7 +25,7 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
    * Updates solution according to vote.
    */
   def voteSolution(request: VoteSolutionRequest): ApiResult[VoteSolutionResult] = handleDbException {
-    import models.domain.ContentVote._
+    import ContentVote._
     import request._
 
     Logger.debug("API - voteQuestSolution")

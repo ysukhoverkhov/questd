@@ -2,7 +2,8 @@ package logic.internal
 
 import logic.constants._
 import basefunctions._
-import models.domain.Functionality._
+import models.domain.user.Functionality
+import Functionality._
 
 object spendratingfunctions {
 

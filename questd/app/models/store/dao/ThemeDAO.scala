@@ -1,6 +1,7 @@
 package models.store.dao
 
 import models.domain._
+import models.domain.tag.Theme
 
 trait ThemeDAO extends BaseDAO[Theme] {
   def count: Long

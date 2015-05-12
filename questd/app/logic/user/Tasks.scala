@@ -3,7 +3,8 @@ package logic.user
 import logic._
 import logic.constants._
 import logic.functions._
-import models.domain._
+import models.domain.common.Assets
+import models.domain.user._
 
 trait Tasks { this: UserLogic =>
 

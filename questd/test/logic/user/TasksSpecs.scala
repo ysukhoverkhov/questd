@@ -2,6 +2,7 @@ package logic.user
 
 import logic.BaseLogicSpecs
 import models.domain._
+import models.domain.user._
 import testhelpers.domainstubs._
 
 class TasksSpecs extends BaseLogicSpecs {

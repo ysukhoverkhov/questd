@@ -1,6 +1,6 @@
 package logic
 
-import models.domain.Assets
+import models.domain.common.Assets
 
 class QuestLogicSpecs extends BaseLogicSpecs {
 

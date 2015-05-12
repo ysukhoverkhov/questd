@@ -2,6 +2,7 @@ package logic
 
 import models.domain._
 import controllers.domain.DomainAPIComponent
+import models.domain.solution.Solution
 
 
 class SolutionLogic(

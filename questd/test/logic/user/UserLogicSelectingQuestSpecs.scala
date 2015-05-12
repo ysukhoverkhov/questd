@@ -3,7 +3,8 @@ package logic.user
 import controllers.domain.OkApiResult
 import controllers.domain.app.quest._
 import logic.BaseLogicSpecs
-import models.domain._
+import models.domain.common.ContentVote
+import models.domain.user.{Friendship, PublicProfile, Profile, User}
 import testhelpers.domainstubs._
 
 class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {

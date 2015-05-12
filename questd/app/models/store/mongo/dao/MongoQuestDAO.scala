@@ -1,11 +1,12 @@
 package models.store.mongo.dao
 
-import play.Logger
-import models.store.mongo.helpers._
-import models.store.dao._
-import models.domain._
-import com.mongodb.casbah.commons.MongoDBObject
 import java.util.Date
+
+import com.mongodb.casbah.commons.MongoDBObject
+import models.domain.quest.{Quest, QuestStatus}
+import models.store.dao._
+import models.store.mongo.helpers._
+import play.Logger
 
 /**
  * DOA for Quest objects
@@ -32,37 +33,37 @@ private[mongo] class MongoQuestDAO
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (status.length > 0) {
+    if (status.nonEmpty) {
       queryBuilder += ("status" -> MongoDBObject("$in" -> status.map(_.toString)))
     }
 
-    if (authorIds.length > 0) {
+    if (authorIds.nonEmpty) {
       queryBuilder += ("info.authorId" -> MongoDBObject("$in" -> authorIds))
     }
 
-    if (authorIdsExclude.length > 0) {
+    if (authorIdsExclude.nonEmpty) {
       queryBuilder += ("info.authorId" -> MongoDBObject("$nin" -> authorIdsExclude))
     }
 
-    if (levels != None) {
+    if (levels.isDefined) {
       queryBuilder += ("$and" -> Array(
         MongoDBObject("info.level" -> MongoDBObject("$gte" -> levels.get._1)),
         MongoDBObject("info.level" -> MongoDBObject("$lte" -> levels.get._2))))
     }
 
-    if (vip != None) {
+    if (vip.isDefined) {
       queryBuilder += ("info.vip" -> vip.get)
     }
 
-    if (ids.length > 0) {
+    if (ids.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
     }
 
-    if (idsExclude.length > 0) {
+    if (idsExclude.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$nin" -> idsExclude))
     }
 
-    if (cultureId != None) {
+    if (cultureId.isDefined) {
       queryBuilder += ("cultureId" -> cultureId.get)
     }
 

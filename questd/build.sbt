@@ -3,7 +3,7 @@ import spray.http.DateTime
 
 name := """questd"""
 
-version := "0.40.02-SNAPSHOT"
+version := "0.40.03-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -56,3 +56,6 @@ buildInfoKeys := Seq[BuildInfoKey](
 
 buildInfoPackage := "misc"
 
+
+
+fork in run := true

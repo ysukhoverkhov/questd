@@ -4,6 +4,7 @@ import java.util.Date
 
 import controllers.domain.DomainAPIComponent
 import models.domain._
+import models.domain.battle.Battle
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 

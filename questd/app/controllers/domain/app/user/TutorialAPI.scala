@@ -1,11 +1,12 @@
 package controllers.domain.app.user
 
-import models.domain._
-import controllers.domain.DomainAPIComponent
 import components._
-import controllers.domain._
-import controllers.domain.helpers._
+import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.helpers._
+import models.domain.common.Assets
+import models.domain.tutorial.{TutorialElement, TutorialPlatform}
+import models.domain.user._
 
 case class GetCommonTutorialRequest(platform: TutorialPlatform.Value)
 case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])

@@ -1,6 +1,6 @@
 package models.store.mongo
 
-import models.domain.Theme
+import models.domain.tag.Theme
 import org.specs2.mutable._
 import play.api.test.WithApplication
 import testhelpers.domainstubs._

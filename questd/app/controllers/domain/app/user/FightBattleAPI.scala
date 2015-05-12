@@ -5,6 +5,9 @@ import controllers.domain._
 import controllers.domain.helpers._
 import logic.BattleLogic
 import models.domain._
+import models.domain.battle.{BattleInfo, Battle}
+import models.domain.solution.{Solution, SolutionStatus}
+import models.domain.user.{TimeLineType, TimeLineReason}
 import play.Logger
 
 import scala.language.postfixOps

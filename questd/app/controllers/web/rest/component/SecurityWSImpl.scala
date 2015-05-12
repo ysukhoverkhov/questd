@@ -6,6 +6,7 @@ import controllers.domain.app.user._
 import controllers.web.helpers.InternalErrorLogger
 import controllers.web.helpers._
 import models.domain._
+import models.domain.user.User
 import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._

@@ -4,7 +4,10 @@ import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.user._
 import logic.SolutionLogic
-import models.domain._
+import models.domain.common.Assets
+import models.domain.quest.QuestStatus
+import models.domain.solution.SolutionStatus
+import models.domain.user.{SolutionResult, User}
 import org.mockito.Matchers.{eq => mEq}
 import org.mockito.Mockito._
 import testhelpers.domainstubs._

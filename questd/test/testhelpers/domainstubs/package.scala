@@ -3,7 +3,13 @@ package testhelpers
 import java.util.Date
 import models.domain._
 import models.domain.base.ID
-import models.domain.view.{QuestView, ThemeInfoWithID}
+import models.domain.battle.{BattleInfo, Battle, BattleStatus}
+import models.domain.common.{Assets, ContentVote, ContentType, ContentReference}
+import models.domain.quest._
+import models.domain.solution._
+import models.domain.tag.{ThemeInfo, Theme}
+import models.domain.user._
+import models.view.{QuestView, ThemeInfoWithID}
 
 
 package object domainstubs {

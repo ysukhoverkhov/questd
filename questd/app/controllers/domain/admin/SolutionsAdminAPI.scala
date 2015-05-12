@@ -1,5 +1,6 @@
 package controllers.domain.admin
 
+import models.domain.solution.Solution
 import play.Logger
 
 import components.DBAccessor

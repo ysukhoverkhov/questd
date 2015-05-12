@@ -8,6 +8,7 @@ import controllers.domain._
 import controllers.domain.app.user._
 import controllers.tasks.crawlers.base.BaseCrawler
 import models.domain._
+import models.domain.user.User
 
 object PopulateTimeLine {
   def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {

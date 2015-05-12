@@ -3,6 +3,7 @@ package controllers.web.rest.component
 import controllers.domain.app.user._
 import controllers.web.helpers._
 import models.domain._
+import models.domain.common.ContentVote
 
 private object VoteQuestWSImplTypes {
 

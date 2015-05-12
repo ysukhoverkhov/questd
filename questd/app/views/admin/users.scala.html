@@ -1,10 +1,9 @@
-@(menuItems: Map[String, String], users: List[models.domain.User])
+@(menuItems: Map[String, String], users: List[models.domain.user.User])
 
 @import helper._
 
 @main("Users")(menuItems, Map.empty) {
 
-	<p>
 	<table border="1">
 	    	<tr>
 	    		<td>id</td>
@@ -25,7 +24,6 @@
 	    	</tr>
 	    }
 	</table>
-	</p>
 
 }
 

@@ -2,22 +2,22 @@
 menuItems: Map[String, String],
 leftMenuItems: Map[String, String],
 currentPlatform: String,
-elements: List[models.domain.TutorialElement])
+elements: List[models.domain.tutorial.TutorialElement])
 
 @import helper._
 
 @possibleActions = @{
-    import models.domain._
+    import models.domain.tutorial._
     TutorialActionType.values.map(_.toString).toList
 }
 
 @possibleConditions = @{
-    import models.domain._
+    import models.domain.tutorial._
     TutorialConditionType.values.map(_.toString).toList
 }
 
 @possibleTriggers = @{
-    import models.domain._
+    import models.domain.tutorial._
     TutorialTriggerType.values.map(_.toString).toList
 }
 

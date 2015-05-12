@@ -1,5 +1,6 @@
 package controllers.domain.admin
 
+import models.domain.tutorialtask.TutorialTask
 import play.Logger
 
 import components.DBAccessor
@@ -60,7 +61,7 @@ private[domain] trait TutorialTasksAdminAPI { this: DBAccessor =>
     Logger.debug("Admin request for update a tutorial task" + request.task.id)
 
     db.tutorialTask.update(request.task)
-    
+
     OkApiResult(UpdateTutorialTaskAdminResult())
   }
 

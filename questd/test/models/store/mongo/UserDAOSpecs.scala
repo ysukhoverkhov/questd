@@ -4,9 +4,12 @@ package models.store.mongo
 
 import java.util.Date
 
-import models.domain._
-import models.domain.view.QuestView
+import models.domain.common.{Assets, ContentVote}
+import models.domain.tutorial.TutorialPlatform
+import models.domain.user._
+import models.domain.user.message.MessageInformation
 import models.store._
+import models.view.QuestView
 import org.specs2.mutable._
 import play.api.test._
 import testhelpers.domainstubs._
@@ -585,7 +588,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val m = MessageAllTasksCompleted().toMessage
+      val m = message.MessageAllTasksCompleted().toMessage
 
       db.user.create(user)
       db.user.addMessage(user.id, m)
@@ -613,7 +616,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val m = MessageAllTasksCompleted().toMessage
+      val m = message.MessageAllTasksCompleted().toMessage
 
       db.user.create(user)
       db.user.addMessage(user.id, m)
@@ -631,7 +634,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val ms = (1 to 5).map(n => MessageAllTasksCompleted().toMessage)
+      val ms = (1 to 5).map(n => message.MessageAllTasksCompleted().toMessage)
 
       db.user.create(user)
       ms.foreach(db.user.addMessage(user.id, _))

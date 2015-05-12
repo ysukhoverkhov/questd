@@ -5,7 +5,9 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import logic.constants
-import models.domain._
+import models.domain.common.Assets
+import models.domain.culture.Culture
+import models.domain.user._
 import play.{Logger, Play}
 
 case class GetAllUsersRequest()

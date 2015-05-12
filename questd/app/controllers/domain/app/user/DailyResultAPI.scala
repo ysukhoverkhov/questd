@@ -1,11 +1,15 @@
 package controllers.domain.app.user
 
 import controllers.domain.app.quest.GetMyQuestsRequest
-import models.domain._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
+import models.domain.battle.Battle
+import models.domain.common.Assets
+import models.domain.quest.{QuestStatus, Quest}
+import models.domain.solution.Solution
+import models.domain.user._
 import play.Logger
 import logic.constants._
 

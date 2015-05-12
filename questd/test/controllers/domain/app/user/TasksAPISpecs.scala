@@ -3,6 +3,10 @@ package controllers.domain.app.user
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain._
+import models.domain.common.Assets
+import models.domain.tutorial.TutorialPlatform
+import models.domain.tutorialtask.TutorialTask
+import models.domain.user._
 import org.mockito.Matchers.{eq => mEq}
 
 class TasksAPISpecs extends BaseAPISpecs {

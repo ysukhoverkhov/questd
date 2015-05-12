@@ -2,8 +2,8 @@ package controllers.web.rest.component
 
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import models.domain.TutorialPlatform
 import com.vita.scala.extensions._
+import models.domain.tutorial.TutorialPlatform
 
 private object TutorialWSImplTypes {
 

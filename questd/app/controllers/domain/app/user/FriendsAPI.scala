@@ -1,12 +1,13 @@
 package controllers.domain.app.user
 
-import controllers.sn.client.{User => SNUser}
-import models.domain._
-import controllers.domain.DomainAPIComponent
 import components._
-import controllers.domain._
-import controllers.domain.helpers._
+import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.helpers._
+import controllers.sn.client.{User => SNUser}
+import models.domain.common.Assets
+import models.domain.user._
+import models.domain.user.message.{MessageFriendshipAccepted, MessageFriendshipRemoved}
 import play.Logger
 
 case class GetFriendsRequest(
@@ -126,9 +127,9 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
   def respondFriendship(request: RespondFriendshipRequest): ApiResult[RespondFriendshipResult] = handleDbException {
 
     if (request.friendId == request.user.id ||
-      request.user.friends.find {
+      !request.user.friends.exists {
         x => (x.friendId == request.friendId) && (x.status == FriendshipStatus.Invites)
-      } == None) {
+      }) {
       OkApiResult(RespondFriendshipResult(allowed = OutOfContent))
     } else {
       if (request.accept) {
@@ -153,7 +154,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
         // sending message for rejected response.
         db.user.readById(request.friendId) ifSome { f =>
-          sendMessage(SendMessageRequest(f, MessageFriendshipRejected(request.user.id)))
+          sendMessage(SendMessageRequest(f, message.MessageFriendshipRejected(request.user.id)))
         }
       }
 
@@ -166,9 +167,10 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
    */
   def removeFromFriends(request: RemoveFromFriendsRequest): ApiResult[RemoveFromFriendsResult] = handleDbException {
     if (request.friendId == request.user.id
-      || request.user.friends.find {
-        x => (x.friendId == request.friendId) && (x.status == FriendshipStatus.Accepted || x.status == FriendshipStatus.Invited)
-      } == None) {
+      || !request.user.friends.exists {
+      x => (x.friendId == request.friendId) && (x.status == FriendshipStatus.Accepted || x.status == FriendshipStatus
+        .Invited)
+    }) {
       OkApiResult(RemoveFromFriendsResult(
         allowed = OutOfContent))
     } else {

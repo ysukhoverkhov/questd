@@ -5,7 +5,11 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import models.domain._
-import models.domain.view._
+import models.domain.battle.BattleStatus
+import models.domain.quest.QuestStatus
+import models.domain.solution.SolutionStatus
+import models.domain.user.User
+import models.view.{BattleView, QuestView, ProfileView, SolutionView}
 
 case class GetQuestsRequest(user: User, questIds: List[String])
 case class GetQuestsResult(

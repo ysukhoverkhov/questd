@@ -2,6 +2,9 @@ package logic.user
 
 import logic._
 import models.domain._
+import models.domain.battle.Battle
+import models.domain.quest.Quest
+import models.domain.solution.Solution
 
 /**
  * All logic about voting quests is here.

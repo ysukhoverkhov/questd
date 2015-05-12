@@ -4,11 +4,13 @@ import java.util.Date
 
 import com.mongodb.casbah.commons._
 import com.novus.salat._
-import models.domain._
-import models.domain.view.QuestView
+import models.domain.common.{Assets, ContentVote}
+import models.domain.user._
+import models.domain.user.message.Message
 import models.store.dao._
-import models.store.mongo.helpers._
 import models.store.mongo.SalatContext._
+import models.store.mongo.helpers._
+import models.view.QuestView
 
 /**
  * DOA for User objects

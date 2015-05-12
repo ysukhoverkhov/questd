@@ -2,7 +2,7 @@
 
 package models.store.mongo
 
-import models.domain.Culture
+import models.domain.culture.Culture
 import org.specs2.mutable._
 import play.api.test._
 

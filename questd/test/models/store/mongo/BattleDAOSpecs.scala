@@ -2,11 +2,12 @@
 
 package models.store.mongo
 
-import models.domain._
+import models.domain.battle.{Battle, BattleStatus}
 import org.specs2.mutable._
 import play.api.test.WithApplication
 import testhelpers.domainstubs._
 
+//noinspection ZeroIndexToHead
 //@RunWith(classOf[JUnitRunner])
 class BattleDAOSpecs extends Specification
   with MongoDatabaseComponent

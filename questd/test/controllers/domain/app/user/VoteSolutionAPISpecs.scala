@@ -1,9 +1,11 @@
 package controllers.domain.app.user
 
 
-import controllers.domain.{BaseAPISpecs, OkApiResult}
 import controllers.domain.app.protocol.ProfileModificationResult
-import models.domain._
+import controllers.domain.{BaseAPISpecs, OkApiResult}
+import models.domain.common.ContentVote
+import models.domain.solution.SolutionStatus
+import models.domain.user.{Friendship, FriendshipStatus}
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 

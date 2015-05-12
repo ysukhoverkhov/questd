@@ -2,6 +2,7 @@ package logic.user
 
 import logic.BaseLogicSpecs
 import models.domain._
+import models.domain.tag.Theme
 import testhelpers.domainstubs._
 
 class UserLogicSelectingThemeSpecs extends BaseLogicSpecs {

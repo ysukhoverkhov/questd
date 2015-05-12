@@ -5,6 +5,8 @@ import java.util.Date
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain._
+import models.domain.common.Assets
+import models.domain.quest.{QuestStatus, Quest, QuestInfo}
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
