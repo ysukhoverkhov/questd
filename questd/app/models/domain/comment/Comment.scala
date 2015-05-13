@@ -7,7 +7,5 @@ import models.domain.base.ID
  */
 case class Comment (
   id: String = ID.generateUUID(),
-  objectId: String,
-  authorId: String,
-  respondToCommentId: Option[String]
+  info: CommentInfo
   ) extends ID

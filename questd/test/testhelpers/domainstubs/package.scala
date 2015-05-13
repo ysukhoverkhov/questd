@@ -1,13 +1,14 @@
 package testhelpers
 
 import java.util.Date
-import models.domain._
+
 import models.domain.base.ID
-import models.domain.battle.{BattleInfo, Battle, BattleStatus}
-import models.domain.common.{Assets, ContentVote, ContentType, ContentReference}
+import models.domain.battle.{Battle, BattleInfo, BattleStatus}
+import models.domain.comment.{CommentInfo, Comment}
+import models.domain.common.{Assets, ContentReference, ContentType, ContentVote}
 import models.domain.quest._
 import models.domain.solution._
-import models.domain.tag.{ThemeInfo, Theme}
+import models.domain.tag.{Theme, ThemeInfo}
 import models.domain.user._
 import models.view.{QuestView, ThemeInfoWithID}
 
@@ -141,6 +142,18 @@ package object domainstubs {
       questsIncome = questsIncome,
       decidedSolutions = questSolutionResult
     )
+  }
+
+  def createCommentStub(id: String = ID.generateUUID()) = {
+    Comment(
+      id = id,
+      info = CommentInfo(
+        commentedObjectId = "objectId",
+        authorId = "authorId",
+        respondedCommentId = None,
+        postingDate = new Date(),
+        message = "stub message"
+      ))
   }
 
   def createBattleStub(
