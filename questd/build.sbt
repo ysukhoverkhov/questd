@@ -56,6 +56,3 @@ buildInfoKeys := Seq[BuildInfoKey](
 
 buildInfoPackage := "misc"
 
-
-
-fork in run := true

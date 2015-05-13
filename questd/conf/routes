@@ -85,6 +85,9 @@ POST	/rest/closeTutorialElement						controllers.web.rest.TutorialWS.closeTutori
 POST	/rest/assignTutorialTask						controllers.web.rest.TutorialWS.assignTutorialTask
 POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
 
+# Comments
+POST	/rest/postComment	    						controllers.web.rest.CommentsWS.postComment
+
 # Upload
 POST    /cdn/upload                                     controllers.web.rest.UploadWS.upload
 POST    /cdn/getContentURLById                          controllers.web.rest.UploadWS.getContentURLById
