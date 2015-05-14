@@ -63,6 +63,7 @@ private[logic] abstract class BaseLogicSpecs extends Specification
     config.apply(api.ConfigParams.BattleProbabilityVIP) returns "0.10"
 
     config.apply(api.ConfigParams.QuestMaxDescriptionLength) returns "100"
+    config.apply(api.ConfigParams.CommentsMaxLength) returns "420"
 
     config.apply(api.ConfigParams.SolutionVoteTaskCountMean) returns "3"
     config.apply(api.ConfigParams.SolutionVoteTaskCountDeviation) returns "1"

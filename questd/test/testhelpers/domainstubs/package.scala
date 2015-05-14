@@ -144,15 +144,17 @@ package object domainstubs {
     )
   }
 
-  def createCommentStub(id: String = ID.generateUUID()) = {
+  def createCommentStub(
+    id: String = ID.generateUUID(),
+    message: String = "the message") = {
     Comment(
       id = id,
       info = CommentInfo(
         commentedObjectId = "objectId",
         authorId = "authorId",
-        respondedCommentId = None,
+        respondedCommentId = Some("respond_id"),
         postingDate = new Date(),
-        message = "stub message"
+        message = message
       ))
   }
 

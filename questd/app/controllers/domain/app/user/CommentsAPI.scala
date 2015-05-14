@@ -25,11 +25,11 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
    */
   def postComment(request: PostCommentRequest): ApiResult[PostCommentResult] = handleDbException {
 
-    val charLimitExceeded = request.message.length > config(api.ConfigParams.CommentsMaxLength).toInt
+    lazy val charLimitExceeded = request.message.length > config(api.ConfigParams.CommentsMaxLength).toInt
 
-    val respondToExists = request.respondedCommentId.fold(true)(db.comment.readById(_).isDefined)
+    lazy val respondNotFound = !request.respondedCommentId.fold(true)(db.comment.readById(_).isDefined)
 
-    val objectExists = List(
+    lazy val objectNotFound = !List(
       db.quest.readById(_: String).isDefined,
       db.solution.readById(_: String).isDefined,
       db.battle.readById(_: String).isDefined
@@ -38,26 +38,21 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
       case (false, block) => block(request.commentedObjectId)
     }
 
-    (!respondToExists || !objectExists, charLimitExceeded) match {
-      case (true, _) =>
-        OkApiResult(PostCommentResult(OutOfContent))
-      case (_, true) =>
-        OkApiResult(PostCommentResult(LimitExceeded))
-      case _ =>
-        db.comment.create(Comment(info = CommentInfo(
-          commentedObjectId = request.commentedObjectId,
-          authorId = request.user.id,
-          respondedCommentId = request.respondedCommentId,
-          postingDate = new Date(),
-          message = request.message
-        )))
+    if (charLimitExceeded)
+      OkApiResult(PostCommentResult(LimitExceeded))
+    else if (respondNotFound || objectNotFound)
+      OkApiResult(PostCommentResult(OutOfContent))
+    else {
+      db.comment.create(Comment(info = CommentInfo(
+        commentedObjectId = request.commentedObjectId,
+        authorId = request.user.id,
+        respondedCommentId = request.respondedCommentId,
+        postingDate = new Date(),
+        message = request.message
+      )))
 
-        OkApiResult(PostCommentResult(OK, Some(request.user.profile)))
+      OkApiResult(PostCommentResult(OK, Some(request.user.profile)))
     }
-    // TODO: test normal.
-    // TODO: test limit.
-    // TODO: test no parent.
-    // TODO: test no content.
   }
 }
 
