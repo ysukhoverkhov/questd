@@ -6,7 +6,7 @@ import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
-import models.domain.comment.{CommentInfo, Comment}
+import models.domain.comment.{Comment, CommentInfo}
 import models.domain.user.{Profile, User}
 
 case class PostCommentRequest(
@@ -18,15 +18,14 @@ case class PostCommentResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None)
 
-private[domain] trait CommentsAPI { this: DBAccessor =>
+private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Post a comment to an object.
    */
   def postComment(request: PostCommentRequest): ApiResult[PostCommentResult] = handleDbException {
 
-    // TODO: get limit from config.
-    val charLimitExceeded = request.message.length > 5
+    val charLimitExceeded = request.message.length > config(api.ConfigParams.CommentsMaxLength).toInt
 
     val respondToExists = request.respondedCommentId.fold(true)(db.comment.readById(_).isDefined)
 

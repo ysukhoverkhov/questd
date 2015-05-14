@@ -23,6 +23,8 @@ class _ConfigParams {
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
 
+  val CommentsMaxLength = "45 01 Comments Max Length"
+
   val QuestCheatingRatio = "50 12 Quest Cheating to Votes Ratio"
   val QuestMinCheatingVotes = "50 13 Quest Min Cheating Votes"
   val QuestIACRatio = "50 13 Quest IAC to Total Votes Ratio"
@@ -93,6 +95,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
 
       ConfigParams.FavoriteThemesShare -> "0.2",
       ConfigParams.FavoriteThemesProbability -> "0.75",
+
+      ConfigParams.CommentsMaxLength -> "420",
 
       ConfigParams.QuestCheatingRatio -> "0.1",
       ConfigParams.QuestMinCheatingVotes -> "10",
