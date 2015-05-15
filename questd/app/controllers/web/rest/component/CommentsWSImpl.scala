@@ -20,7 +20,7 @@ private object CommentsWSImpl {
 
   case class WSGetCommentsForObjectRequest(
     // Id of object o get comments for.
-    id: String,
+    commentedObjectId: String,
 
     // Number of page in result, zero based.
     pageNumber: Int,
@@ -29,7 +29,6 @@ private object CommentsWSImpl {
     pageSize: Int
     )
   type WSGetCommentsForObjectResult = GetCommentsForObjectResult
-
 }
 
 trait CommentsWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
@@ -55,7 +54,7 @@ trait CommentsWSImpl extends QuestController with SecurityWSImpl { this: WSCompo
   def getCommentsForObject = wrapJsonApiCallReturnBody[WSGetCommentsForObjectResult] { (js, r) =>
     val v = Json.read[WSGetCommentsForObjectRequest](js.toString)
 
-    api.getCommentsForObject(GetCommentsForObjectRequest(r.user, v.id, v.pageNumber, v.pageSize))
+    api.getCommentsForObject(GetCommentsForObjectRequest(r.user, v.commentedObjectId, v.pageNumber, v.pageSize))
   }
 }
 

@@ -23,7 +23,7 @@ case class PostCommentResult(
 
 case class GetCommentsForObjectRequest(
   user: User,
-  objectId: String,
+  commentedObjectId: String,
   pageNumber: Int,
   pageSize: Int)
 case class GetCommentsForObjectResult(
@@ -70,16 +70,15 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
     }
   }
 
-
   /**
    * Get comments for objects.
-   */// TODO: test me.
+   */
   def getCommentsForObject(request: GetCommentsForObjectRequest): ApiResult[GetCommentsForObjectResult] = handleDbException {
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val commentsForObject = db.comment.allWithParams(
-      objectIds = List(request.objectId),
+      commentedObjectId = List(request.commentedObjectId),
       skip = pageNumber * pageSize)
 
     val comments = commentsForObject.take(pageSize).toList.map(c => {

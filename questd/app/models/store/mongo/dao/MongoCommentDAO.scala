@@ -17,14 +17,14 @@ private[mongo] class MongoCommentDAO
    * @inheritdoc
    */
   def allWithParams(
-    objectIds: List[String] = List.empty,
+    commentedObjectId: List[String] = List.empty,
     skip: Int = 0
     ): Iterator[Comment] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (objectIds.nonEmpty) {
-      queryBuilder += ("info.commentedObjectId" -> MongoDBObject("$in" -> objectIds))
+    if (commentedObjectId.nonEmpty) {
+      queryBuilder += ("info.commentedObjectId" -> MongoDBObject("$in" -> commentedObjectId))
     }
 
     Logger.trace("MongoCommentDAO - allWithParams - " + queryBuilder.result)

@@ -2,7 +2,8 @@ package controllers.domain.app.comment
 
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
-import controllers.domain.app.user.{PostCommentRequest, PostCommentResult}
+import controllers.domain.app.user.{GetCommentsForObjectResult, GetCommentsForObjectRequest, PostCommentRequest, PostCommentResult}
+import models.view.CommentView
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
@@ -88,6 +89,27 @@ class CommentAPISpecs extends BaseAPISpecs {
       there was one(battle).readById(any)
 
       result must beEqualTo(OkApiResult(PostCommentResult(ProfileModificationResult.OutOfContent, None)))
+    }
+
+    "Comments fetching works" in context {
+      val cs = List(createCommentStub())
+      val u = createUserStub()
+
+      comment.allWithParams(any, any) returns cs.iterator
+
+      val result = api.getCommentsForObject(GetCommentsForObjectRequest(
+        user = u,
+        commentedObjectId = cs.head.info.commentedObjectId,
+        pageNumber = 0,
+        pageSize = 10))
+
+      there was one(comment).allWithParams(any, any)
+
+      result must beEqualTo(OkApiResult(GetCommentsForObjectResult(
+        allowed = ProfileModificationResult.OK,
+        comments = cs.map(c => CommentView(c.id, c.info)),
+        pageSize = 10,
+        hasMore = false)))
     }
   }
 }
