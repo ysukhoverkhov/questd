@@ -8,5 +8,6 @@ import play.api.mvc._
 object CommentsWS extends Controller with AccessToWSInstance {
 
   def postComment = ws.postComment
+  def getCommentsForObject = ws.getCommentsForObject
 }
 

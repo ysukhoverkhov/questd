@@ -150,9 +150,9 @@ package object domainstubs {
     Comment(
       id = id,
       info = CommentInfo(
-        commentedObjectId = "objectId",
-        authorId = "authorId",
-        respondedCommentId = Some("respond_id"),
+        commentedObjectId = ID.generateUUID(),
+        authorId = ID.generateUUID(),
+        respondedCommentId = Some(ID.generateUUID()),
         postingDate = new Date(),
         message = message
       ))

@@ -8,6 +8,8 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import models.domain.comment.{Comment, CommentInfo}
 import models.domain.user.{Profile, User}
+import models.view.CommentView
+
 
 case class PostCommentRequest(
   user: User,
@@ -17,6 +19,19 @@ case class PostCommentRequest(
 case class PostCommentResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None)
+
+
+case class GetCommentsForObjectRequest(
+  user: User,
+  objectId: String,
+  pageNumber: Int,
+  pageSize: Int)
+case class GetCommentsForObjectResult(
+  allowed: ProfileModificationResult,
+  comments: List[CommentView],
+  pageSize: Int,
+  hasMore: Boolean)
+
 
 private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -54,5 +69,29 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
       OkApiResult(PostCommentResult(OK, Some(request.user.profile)))
     }
   }
+
+
+  /**
+   * Get comments for objects.
+   */// TODO: test me.
+  def getCommentsForObject(request: GetCommentsForObjectRequest): ApiResult[GetCommentsForObjectResult] = handleDbException {
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
+    val commentsForObject = db.comment.allWithParams(
+      objectIds = List(request.objectId),
+      skip = pageNumber * pageSize)
+
+    val comments = commentsForObject.take(pageSize).toList.map(c => {
+      CommentView(c.id, c.info)
+    })
+
+    OkApiResult(GetCommentsForObjectResult(
+      allowed = OK,
+      comments = comments,
+      pageSize,
+      commentsForObject.hasNext))
+  }
+
 }
 

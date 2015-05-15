@@ -87,6 +87,7 @@ POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
 
 # Comments
 POST	/rest/postComment	    						controllers.web.rest.CommentsWS.postComment
+POST	/rest/getCommentsForObject 						controllers.web.rest.CommentsWS.getCommentsForObject
 
 # Upload
 POST    /cdn/upload                                     controllers.web.rest.UploadWS.upload

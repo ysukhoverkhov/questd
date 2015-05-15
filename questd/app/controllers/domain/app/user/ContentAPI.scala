@@ -4,7 +4,6 @@ import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
-import models.domain._
 import models.domain.battle.BattleStatus
 import models.domain.quest.QuestStatus
 import models.domain.solution.SolutionStatus
