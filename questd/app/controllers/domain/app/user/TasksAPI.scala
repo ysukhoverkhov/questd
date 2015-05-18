@@ -3,7 +3,8 @@ package controllers.domain.app.user
 import components._
 import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.helpers._
-import models.domain._
+import models.domain.user._
+import models.domain.user.message.MessageTaskCompleted
 import play.Logger
 
 case class ResetDailyTasksRequest(user: User)
@@ -115,7 +116,7 @@ private[domain] trait TasksAPI {
               {
                 adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(r.user.profile.dailyTasks.reward)))
               } map { r =>
-                sendMessage(SendMessageRequest(r.user, MessageAllTasksCompleted()))
+                sendMessage(SendMessageRequest(r.user, message.MessageAllTasksCompleted()))
               }
             } else {
               OkApiResult(SendMessageResult(r.user))

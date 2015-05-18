@@ -12,14 +12,12 @@ private object MessagesWSImpl {
 }
 
 trait MessagesWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
-
-  import MessagesWSImpl._
+  import MessagesWSImpl.{WSRemoveMessageRequest, WSRemoveMessageResult}
 
   def removeMessage() = wrapJsonApiCallReturnBody[WSRemoveMessageResult] { (js, r) =>
     val v = Json.read[WSRemoveMessageRequest](js.toString)
 
     api.removeMessage(RemoveMessageRequest(r.user, v.id))
   }
-
 }
 

@@ -7,7 +7,10 @@ import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import models.domain._
+import models.domain.common.{ContentVote, ContentType, ContentReference}
+import models.domain.quest.QuestInfoContent
+import models.domain.solution.SolutionInfoContent
+import models.domain.user._
 import play.Logger
 
 private object DebugWSImplTypes {

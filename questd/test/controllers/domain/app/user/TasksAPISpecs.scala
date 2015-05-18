@@ -3,6 +3,10 @@ package controllers.domain.app.user
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain._
+import models.domain.common.Assets
+import models.domain.tutorial.TutorialPlatform
+import models.domain.tutorialtask.TutorialTask
+import models.domain.user._
 import org.mockito.Matchers.{eq => mEq}
 
 class TasksAPISpecs extends BaseAPISpecs {
@@ -314,13 +318,13 @@ class TasksAPISpecs extends BaseAPISpecs {
           tutorialTask)))
 
       user.resetTasks(any, any, any) returns Some(u)
-      user.addTasks(any, any) returns Some(u)
+      user.addTasks(any, any, any) returns Some(u)
 
       val result = api.resetDailyTasks(ResetDailyTasksRequest(u))
 
       result must beEqualTo(OkApiResult(ResetDailyTasksResult(u)))
       there was one(db.user).resetTasks(any, any, any)
-      there was one(db.user).addTasks(u.id, List(tutorialTask))
+      there was one(db.user).addTasks(u.id, List(tutorialTask), null)
     }
 
     "Do not carry tutorial tasks to next day if all tasks are completed" in context {
@@ -359,7 +363,7 @@ class TasksAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(ResetDailyTasksResult(u)))
       there was one(db.user).resetTasks(any, any, any)
-      there was no(db.user).addTasks(any, any)
+      there was no(db.user).addTasks(any, any, any)
     }
 
     "Do not assign already assigned tutorial ask" in context {
@@ -401,10 +405,10 @@ class TasksAPISpecs extends BaseAPISpecs {
           taskType = TaskType.Client,
           description = "",
           requiredCount = 10,
-          reward = Assets()))
+          reward = Assets(rating = 10)))
       db.user.resetTasks(any, any, any) returns Some(u)
       db.user.addTutorialTaskAssigned(any, any, any) returns Some(u)
-      db.user.addTasks(any, any) returns Some(u)
+      db.user.addTasks(any, any, any) returns Some(u)
 
       val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, tutorialTaskId))
 
@@ -412,9 +416,8 @@ class TasksAPISpecs extends BaseAPISpecs {
       there was one(db.tutorialTask).readById(tutorialTaskId)
       there was one(db.user).resetTasks(any, any, any)
       there was one(db.user).addTutorialTaskAssigned(any, any, any)
-      there was one(db.user).addTasks(any, any)
+      there was one(db.user).addTasks(any, any, mEq(Some(Assets(rating = 10))))
     }
-
   }
 }
 

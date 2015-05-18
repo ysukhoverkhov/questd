@@ -3,7 +3,7 @@ package controllers.tasks.crawlers.base
 import components.random.RandomComponent
 import controllers.domain._
 import controllers.domain.app.battle.{GetAllBattlesInternalRequest, GetAllBattlesInternalResult}
-import models.domain.Battle
+import models.domain.battle.Battle
 import play.Logger
 
 

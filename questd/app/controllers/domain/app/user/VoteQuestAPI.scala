@@ -6,6 +6,8 @@ import controllers.domain.helpers._
 import models.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain._
+import models.domain.common.ContentVote
+import models.domain.user._
 
 case class VoteQuestByUserRequest(
   user: User,

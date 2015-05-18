@@ -1,10 +1,11 @@
 package controllers.domain.app.user
 
 import controllers.domain.{OkApiResult, BaseAPISpecs}
-import models.domain.SolutionStatus
-import org.mockito.Matchers
+import models.domain.solution.SolutionStatus
+import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
+//noinspection ZeroIndexToHead
 class FightBattleAPISpecs extends BaseAPISpecs {
 
   "FightBattle API" should {
@@ -13,7 +14,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       val s = createSolutionStub()
 
       solution.allWithParams(
-        status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
+        status = mEq(List(SolutionStatus.WaitingForCompetitor)),
         authorIds = any,
         authorIdsExclude = any,
         levels = any,
@@ -21,14 +22,14 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         vip = any,
         ids = any,
         idsExclude = any,
-        questIds = Matchers.eq(List(s.info.questId)),
+        questIds = mEq(List(s.info.questId)),
         themeIds = any,
-        cultureId = Matchers.eq(Some(s.cultureId))) returns List(s).iterator
+        cultureId = mEq(Some(s.cultureId))) returns List(s).iterator
 
       val result = api.tryCreateBattle(TryCreateBattleRequest(s))
 
       there was one(solution).allWithParams(
-        status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
+        status = mEq(List(SolutionStatus.WaitingForCompetitor)),
         authorIds = any,
         authorIdsExclude = any,
         levels = any,
@@ -36,9 +37,9 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         vip = any,
         ids = any,
         idsExclude = any,
-        questIds = Matchers.eq(List(s.info.questId)),
+        questIds = mEq(List(s.info.questId)),
         themeIds = any,
-        cultureId = Matchers.eq(Some(s.cultureId)))
+        cultureId = mEq(Some(s.cultureId)))
 
       there was no(battle).create(any)
       there was no(solution).update(any)
@@ -56,7 +57,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
           authorId = "aid2"))
 
       solution.allWithParams(
-        status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
+        status = mEq(List(SolutionStatus.WaitingForCompetitor)),
         authorIds = any,
         authorIdsExclude = any,
         levels = any,
@@ -64,16 +65,16 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         vip = any,
         ids = any,
         idsExclude = any,
-        questIds = Matchers.eq(List(ss(0).info.questId)),
+        questIds = mEq(List(ss(0).info.questId)),
         themeIds = any,
-        cultureId = Matchers.eq(Some(ss(0).cultureId))) returns ss.iterator
+        cultureId = mEq(Some(ss(0).cultureId))) returns ss.iterator
       user.readById(any) returns Some(createUserStub())
       user.addEntryToTimeLine(any, any) returns Some(createUserStub())
 
       val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
 
       there was one(solution).allWithParams(
-        status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
+        status = mEq(List(SolutionStatus.WaitingForCompetitor)),
         authorIds = any,
         authorIdsExclude = any,
         levels = any,
@@ -81,9 +82,9 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         vip = any,
         ids = any,
         idsExclude = any,
-        questIds = Matchers.eq(List(ss(0).info.questId)),
+        questIds = mEq(List(ss(0).info.questId)),
         themeIds = any,
-        cultureId = Matchers.eq(Some(ss(0).cultureId)))
+        cultureId = mEq(Some(ss(0).cultureId)))
 
       there was one(battle).create(any)
       there was two(solution).updateStatus(any, any, any)
@@ -102,7 +103,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
           authorId = "aid1"))
 
       solution.allWithParams(
-        status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
+        status = mEq(List(SolutionStatus.WaitingForCompetitor)),
         authorIds = any,
         authorIdsExclude = any,
         levels = any,
@@ -110,14 +111,14 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         vip = any,
         ids = any,
         idsExclude = any,
-        questIds = Matchers.eq(List(ss(0).info.questId)),
+        questIds = mEq(List(ss(0).info.questId)),
         themeIds = any,
-        cultureId = Matchers.eq(Some(ss(0).cultureId))) returns ss.iterator
+        cultureId = mEq(Some(ss(0).cultureId))) returns ss.iterator
 
       val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
 
       there was one(solution).allWithParams(
-        status = Matchers.eq(List(SolutionStatus.WaitingForCompetitor)),
+        status = mEq(List(SolutionStatus.WaitingForCompetitor)),
         authorIds = any,
         authorIdsExclude = any,
         levels = any,
@@ -125,9 +126,9 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         vip = any,
         ids = any,
         idsExclude = any,
-        questIds = Matchers.eq(List(ss(0).info.questId)),
+        questIds = mEq(List(ss(0).info.questId)),
         themeIds = any,
-        cultureId = Matchers.eq(Some(ss(0).cultureId)))
+        cultureId = mEq(Some(ss(0).cultureId)))
 
       there was no(battle).create(any)
       there was no(solution).updateStatus(any, any, any)

@@ -1,7 +1,7 @@
 package controllers.domain.app.quest
 
 import controllers.domain._
-import models.domain.ContentVote
+import models.domain.common.ContentVote
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 

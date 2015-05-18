@@ -2,7 +2,8 @@ package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import controllers.domain.app.protocol.ProfileModificationResult
-import models.domain._
+import models.domain.solution.{Solution, SolutionInfo}
+import models.domain.user.{FriendshipStatus, Friendship, TimeLineType, TimeLineReason}
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 

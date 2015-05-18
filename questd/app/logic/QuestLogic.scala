@@ -4,6 +4,8 @@ import logic.functions._
 import logic.constants._
 import models.domain._
 import controllers.domain.DomainAPIComponent
+import models.domain.common.Assets
+import models.domain.quest.Quest
 import play.Logger
 
 class QuestLogic(

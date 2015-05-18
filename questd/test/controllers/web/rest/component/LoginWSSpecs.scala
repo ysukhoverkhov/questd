@@ -7,7 +7,7 @@ import controllers.sn.client.{SocialNetworkClient, User => SNUser}
 import controllers.sn.component.SocialNetworkComponent
 import controllers.sn.exception._
 import controllers.web.rest.component.LoginWSImplTypes.WSLoginRequest
-import models.domain._
+import models.domain.user.User
 import models.store._
 import org.specs2.mock.Mockito
 import org.specs2.mutable._

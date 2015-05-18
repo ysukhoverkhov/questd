@@ -3,6 +3,9 @@ package controllers.web.admin.component
 import controllers.domain.admin._
 import controllers.domain.{DomainAPIComponent, OkApiResult}
 import models.domain._
+import models.domain.common.Assets
+import models.domain.tutorialtask.TutorialTask
+import models.domain.user.TaskType
 import org.json4s.ext.EnumNameSerializer
 import play.api._
 import play.api.data.Forms._

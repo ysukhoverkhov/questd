@@ -4,7 +4,7 @@ import components._
 import controllers.domain._
 import controllers.domain.app.quest.SelectQuestToTimeLineRequest
 import controllers.domain.helpers._
-import models.domain._
+import models.domain.user._
 import play.Logger
 
 
@@ -98,8 +98,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     OkApiResult(GetTimeLineResult(request.user.timeLine.iterator
-      .drop(pageSize * pageNumber)
-      .take(pageSize)
+      .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
       .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
   }
 

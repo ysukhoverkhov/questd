@@ -1,10 +1,11 @@
 package controllers.domain.app.battle
 
-import models.domain._
 import components._
 import controllers.domain._
-import controllers.domain.helpers._
 import controllers.domain.app.user._
+import controllers.domain.helpers._
+import models.domain.battle.{Battle, BattleStatus}
+import models.domain.solution.{Solution, SolutionStatus}
 import play.Logger
 
 case class UpdateBattleStateRequest(battle: Battle)
@@ -24,9 +25,9 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
 
     def checkResolved(b: Battle): Option[Battle] = {
       if (b.resolved) {
-        val solutions: List[Solution] = b.info.solutionIds.map { s =>
+        val solutions: List[Solution] = b.info.solutionIds.flatMap { s =>
           db.solution.readById(s)
-        }.flatten
+        }
 
         val bestSolution = solutions.sortBy(_.votingPoints)(Ordering[Int].reverse).head
 
@@ -55,9 +56,9 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
       val authorsUpdateResult: OkApiResult[UpdateBattleStateResult] =
         if (b.info.status != battle.info.status) {
 
-          val solutions: List[Solution] = b.info.solutionIds.map { s =>
+          val solutions: List[Solution] = b.info.solutionIds.flatMap { s =>
             db.solution.readById(s)
-          }.flatten
+          }
 
           solutions.foreach { s =>
             val authorId = s.info.authorId

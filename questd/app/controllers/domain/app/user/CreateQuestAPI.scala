@@ -5,7 +5,8 @@ import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import logic.QuestLogic
-import models.domain._
+import models.domain.quest.{Quest, QuestInfo, QuestInfoContent, QuestStatus}
+import models.domain.user._
 
 case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List.empty)
 case class CreateQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -25,7 +26,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
         import request.{user => u}
 
         // creating quest
-        require(u.demo.cultureId != None)
+        require(u.demo.cultureId.isDefined)
 
         val culture = u.demo.cultureId.get
         val level = u.profile.publicProfile.level

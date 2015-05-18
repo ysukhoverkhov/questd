@@ -1,9 +1,11 @@
 package models.store.dao
 
-import models.domain._
 import java.util.Date
 
-import models.domain.view.QuestView
+import models.domain.common.{Assets, ContentVote}
+import models.domain.user._
+import models.domain.user.message.Message
+import models.view.QuestView
 
 trait UserDAO extends BaseDAO[User] {
 
@@ -102,7 +104,7 @@ trait UserDAO extends BaseDAO[User] {
   def removeMessage(id: String, messageId: String): Option[User]
 
   def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User]
-  def addTasks(id: String, newTasks: List[Task]): Option[User]
+  def addTasks(id: String, newTasks: List[Task], addReward: Option[Assets] = None): Option[User]
   def incTask(id: String, taskId: String): Option[User]
   def setTasksCompletedFraction(id: String, completedFraction: Float): Option[User]
   def setTasksRewardReceived(id: String, rewardReceived: Boolean): Option[User]

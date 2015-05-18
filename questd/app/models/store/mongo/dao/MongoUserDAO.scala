@@ -4,11 +4,13 @@ import java.util.Date
 
 import com.mongodb.casbah.commons._
 import com.novus.salat._
-import models.domain._
-import models.domain.view.QuestView
+import models.domain.common.{Assets, ContentVote}
+import models.domain.user._
+import models.domain.user.message.Message
 import models.store.dao._
-import models.store.mongo.helpers._
 import models.store.mongo.SalatContext._
+import models.store.mongo.helpers._
+import models.view.QuestView
 
 /**
  * DOA for User objects
@@ -482,13 +484,25 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def addTasks(id: String, newTasks: List[Task]): Option[User] = {
+  def addTasks(id: String, newTasks: List[Task], addReward: Option[Assets] = None): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$push" -> MongoDBObject(
+      "profile.dailyTasks.tasks" -> MongoDBObject(
+        "$each" -> newTasks.map(grater[Task].asDBObject))))
+
+    addReward match {
+      case Some(assets) =>
+        queryBuilder += ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.reward.coins" -> assets.coins,
+          "profile.dailyTasks.reward.money" -> assets.money,
+          "profile.dailyTasks.reward.rating" -> assets.rating))
+      case _ =>
+    }
+
     findAndModify(
       id,
-      MongoDBObject(
-        "$push" -> MongoDBObject(
-          "profile.dailyTasks.tasks" -> MongoDBObject(
-            "$each" -> newTasks.map(grater[Task].asDBObject)))))
+      queryBuilder.result())
   }
 
   /**

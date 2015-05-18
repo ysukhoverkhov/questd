@@ -1,9 +1,10 @@
 package controllers.domain.app.user
 
-import models.domain._
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
+import models.domain.user.User
+import models.domain.user.message.Message
 import play.Logger
 import controllers.domain.app.protocol.ProfileModificationResult._
 

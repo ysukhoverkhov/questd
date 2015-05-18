@@ -5,7 +5,10 @@ import logic._
 import logic.functions._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
-import models.domain.ContentType._
+import models.domain.common.{Assets, ContentType}
+import ContentType._
+import models.domain.quest.QuestInfoContent
+import models.domain.user.Functionality
 
 /**
  * All logic related to proposing quests.

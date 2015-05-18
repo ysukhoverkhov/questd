@@ -7,6 +7,7 @@ import controllers.domain.app.battle.UpdateBattleStateRequest
 import controllers.tasks.crawlers.base.BaseCrawler
 import controllers.tasks.crawlers.concrete.userscrawler.ShiftDailyResult
 import models.domain._
+import models.domain.battle.Battle
 
 //import org.joda.time.DateTime
 

@@ -6,7 +6,7 @@ import components.random.RandomComponent
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.tasks.crawlers.base.BaseCrawler
-import models.domain._
+import models.domain.user.User
 import org.joda.time.DateTime
 
 object ShiftDailyResult {
@@ -22,7 +22,7 @@ class ShiftDailyResult(
     randPar: RandomComponent#Random) extends BaseCrawler[User](apiPar, randPar)  {
 
   protected def check(user: User) = {
-    if ((user.privateDailyResults.length == 0)
+    if (user.privateDailyResults.isEmpty
       || ((new DateTime(user.privateDailyResults.head.startOfPeriod) + 1.day) < DateTime.now())
         && user.isActive){
       api.shiftDailyResult(ShiftDailyResultRequest(user))

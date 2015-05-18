@@ -2,6 +2,7 @@ package controllers.domain.admin
 
 import controllers.domain._
 import models.domain._
+import models.domain.culture.Culture
 
 class CulturesAdminAPISpecs extends BaseAPISpecs {
 

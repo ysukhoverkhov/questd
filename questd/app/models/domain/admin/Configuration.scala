@@ -17,9 +17,9 @@ case class Configuration(
 }
 
 case class ConfigSection(
-  val id: String,
-  val values: Map[String, String]) extends ID {
-  
+  id: String,
+  values: Map[String, String]) extends ID {
+
   def apply(key: String): String = {
     values.getOrElse(key, "")
   }

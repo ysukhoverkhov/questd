@@ -3,13 +3,13 @@ package models.store.mongo.dao
 import java.util.Date
 
 import com.mongodb.casbah.commons.MongoDBObject
-import models.domain._
+import models.domain.battle.{Battle, BattleStatus}
 import models.store.dao._
 import models.store.mongo.helpers._
 import play.Logger
 
 /**
- * DOA for Quest solution objects
+ * DOA for Battles
  */
 private[mongo] class MongoBattleDAO
   extends BaseMongoDAO[Battle](collectionName = "battles")

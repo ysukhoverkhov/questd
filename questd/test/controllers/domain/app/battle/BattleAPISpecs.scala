@@ -1,7 +1,10 @@
 package controllers.domain.app.battle
 
 import controllers.domain._
-import models.domain.{Assets, SolutionResult, BattleStatus, SolutionStatus}
+import models.domain.battle.BattleStatus
+import models.domain.common.Assets
+import models.domain.solution.SolutionStatus
+import models.domain.user.SolutionResult
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 

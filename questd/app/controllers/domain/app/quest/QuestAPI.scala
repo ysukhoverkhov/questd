@@ -6,6 +6,8 @@ import components._
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.domain.helpers._
+import models.domain.common.ContentVote
+import models.domain.quest.{QuestStatus, Quest}
 import play.Logger
 
 case class UpdateQuestStatusRequest(quest: Quest)
@@ -116,7 +118,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
    */
   def voteQuest(request: VoteQuestRequest): ApiResult[VoteQuestResult] = handleDbException {
     import request._
-    import models.domain.ContentVote._
+    import ContentVote._
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 

@@ -4,6 +4,7 @@ import controllers.domain.OkApiResult
 import controllers.domain.app.solution._
 import logic.BaseLogicSpecs
 import models.domain._
+import models.domain.user.{Profile, PublicProfile, User}
 import testhelpers.domainstubs._
 
 class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {

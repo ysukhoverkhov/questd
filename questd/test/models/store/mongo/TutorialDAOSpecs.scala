@@ -2,7 +2,7 @@
 
 package models.store.mongo
 
-import models.domain._
+import models.domain.tutorial._
 import org.specs2.mutable._
 import play.api.test.WithApplication
 
@@ -73,7 +73,7 @@ class TutorialDAOSpecs extends Specification
 
       val ot = db.tutorial.deleteElement(platform, te.id)
       ot must beSome.which(_.id == t.id)
-      ot must beSome.which(_.elements.length == 0)
+      ot must beSome.which(_.elements.isEmpty)
     }
 
     "Update element to tutorial" in new WithApplication(appWithTestDatabase) {

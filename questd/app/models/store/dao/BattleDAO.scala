@@ -1,6 +1,6 @@
 package models.store.dao
 
-import models.domain._
+import models.domain.battle.{BattleStatus, Battle}
 
 trait BattleDAO extends BaseDAO[Battle] {
 

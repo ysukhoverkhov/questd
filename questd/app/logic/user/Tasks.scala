@@ -3,7 +3,8 @@ package logic.user
 import logic._
 import logic.constants._
 import logic.functions._
-import models.domain._
+import models.domain.common.Assets
+import models.domain.user._
 
 trait Tasks { this: UserLogic =>
 
@@ -16,19 +17,23 @@ trait Tasks { this: UserLogic =>
    * List of tasks to give user for next day.
    */
   def getTasksForTomorrow = {
-    val dailyRatingReward = dailyTasksRatingReward
-    val allTasksCoinsReward = dailyTasksCoinsReward
+    if (user.profile.publicProfile.level < api.config(api.ConfigParams.DailyTasksStartsFromLevel).toInt) {
+      DailyTasks(tasks = List.empty, reward = Assets())
+    } else {
+      val dailyRatingReward = dailyTasksRatingReward
+      val allTasksCoinsReward = dailyTasksCoinsReward
 
-    val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
-      case Some(t) => t :: c
-      case None => c
-    })
+      val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
+        case Some(t) => t :: c
+        case None => c
+      })
 
-    val tasksWithRewards = tasks.map { t =>
-      t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = DailyTasksRatingDeviation))
+      val tasksWithRewards = tasks.map { t =>
+        t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = DailyTasksCoinsDeviation))
+      }
+
+      DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
     }
-
-    DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
   }
 
   /**
@@ -76,16 +81,18 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating task for voting quests.
    */
   private def createLikeSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
-    def likesCount = {
+    {
       val mean = api.config(api.ConfigParams.SolutionVoteTaskCountMean).toDouble
       val dev = api.config(api.ConfigParams.SolutionVoteTaskCountDeviation).toDouble
-      math.max(math.round(rand.nextGaussian(mean, dev)), 0).toInt
+      math.round(rand.nextGaussian(mean, dev)).toInt
+    } match {
+      case likesCount if likesCount > 0 =>
+        Some(Task(
+          taskType = TaskType.LikeSolutions,
+          description = "",
+          requiredCount = likesCount))
+      case _ => None
     }
-
-    Some(Task(
-      taskType = TaskType.LikeSolutions,
-      description = "",
-      requiredCount = likesCount))
   }
 
   /**
@@ -120,16 +127,18 @@ trait Tasks { this: UserLogic =>
    * Algorithm for creating task for votes for proposals.
    */
   private def createLikeQuestsTask(user: User) = ifHasRightTo(Functionality.VoteQuests) {
-    def likesCount = {
+    {
       val mean = api.config(api.ConfigParams.QuestVoteTaskCountMean).toDouble
       val dev = api.config(api.ConfigParams.QuestVoteTaskCountDeviation).toDouble
-      math.max(math.round(rand.nextGaussian(mean, dev)), 0).toInt
+      math.round(rand.nextGaussian(mean, dev)).toInt
+    } match {
+      case likesCount if likesCount > 0 =>
+        Some(Task(
+          taskType = TaskType.LikeQuests,
+          description = "",
+          requiredCount = likesCount))
+      case _ => None
     }
-
-    Some(Task(
-      taskType = TaskType.LikeQuests,
-      description = "",
-      requiredCount = likesCount))
   }
 
   /**

@@ -3,6 +3,7 @@ package logic.user.util
 import logic.constants._
 import models.domain._
 import logic.UserLogic
+import models.domain.solution.{SolutionStatus, Solution}
 import play.Logger
 import controllers.domain.app.solution._
 

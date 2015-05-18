@@ -3,7 +3,10 @@ package logic.user
 import logic._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
-import models.domain.ContentType._
+import models.domain.common.ContentType
+import ContentType._
+import models.domain.quest.Quest
+import models.domain.user.Functionality
 
 /**
  * All logic related to solving quests.

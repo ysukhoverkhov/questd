@@ -1,11 +1,12 @@
 package controllers.domain.app.user
 
-import models.domain._
-import controllers.domain.DomainAPIComponent
 import components._
-import controllers.domain._
-import controllers.domain.helpers._
+import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.helpers._
+import models.domain.common.Assets
+import models.domain.tutorial.{TutorialElement, TutorialPlatform}
+import models.domain.user._
 
 case class GetCommonTutorialRequest(platform: TutorialPlatform.Value)
 case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])
@@ -93,9 +94,16 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
             // 4. Add reward of current task to reward for current daily tasks and increase timeout to infinity.
             val taskToAdd = t.task
 
+            val ratingReward = taskToAdd.reward.rating match {
+              case r if r != 0 =>
+                Some(Assets(rating = r))
+              case _ => None
+            }
+
             db.user.addTasks(
               user.id,
-              List(taskToAdd)) ifSome { v =>
+              List(taskToAdd.copy(reward = Assets(coins = taskToAdd.reward.coins, money = taskToAdd.reward.money))),
+              ratingReward) ifSome { v =>
                 OkApiResult(AssignTutorialTaskResult(OK, Some(v.profile)))
               }
           }
@@ -111,7 +119,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def incTutorialTask(request: IncTutorialTaskRequest): ApiResult[IncTutorialTaskResult] = handleDbException {
     import request._
 
-    user.profile.dailyTasks.tasks.find(t => t.tutorialTaskId == Some(taskId)).fold[ApiResult[IncTutorialTaskResult]] {
+    user.profile.dailyTasks.tasks.find(t => t.tutorialTaskId.contains(taskId)).fold[ApiResult[IncTutorialTaskResult]] {
       OkApiResult(IncTutorialTaskResult(OutOfContent))
     }
     { t: Task =>

@@ -5,8 +5,10 @@ import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.quest.SolveQuestUpdateRequest
 import controllers.domain.helpers._
-import models.domain._
-import models.domain.view.QuestView
+import models.domain.battle.Battle
+import models.domain.solution.{Solution, SolutionInfo, SolutionInfoContent, SolutionStatus}
+import models.domain.user._
+import models.view.QuestView
 import play.Logger
 
 import scala.language.postfixOps
@@ -46,7 +48,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
             import request.{user => u}
 
-            require(u.demo.cultureId != None)
+            require(u.demo.cultureId.isDefined)
 
             // creating solution.
             val culture = u.demo.cultureId.get
@@ -68,7 +70,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               db.user.recordQuestSolving(
                 u.id,
                 questToSolve.id,
-                u.profile.questSolutionContext.bookmarkedQuest.map(_.id) == Some(questToSolve.id))
+                u.profile.questSolutionContext.bookmarkedQuest.map(_.id).contains(questToSolve.id))
             }, { u: User =>
               db.user.recordSolutionCreation(
                 u.id,

@@ -2,7 +2,8 @@ package controllers.domain.app.user
 
 import controllers.domain._
 import controllers.sn.client.User
-import models.domain._
+import models.domain.culture.Culture
+import models.domain.user._
 import models.store
 import org.mockito.Matchers.{eq => mockEq}
 
@@ -108,7 +109,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       rv must beAnInstanceOf[OkApiResult[UserResult]]
       rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
-        u.user.get.auth.session == Some(sesid))
+        u.user.get.auth.session.contains(sesid))
     }
 
     "Do not return none existing user" in context {

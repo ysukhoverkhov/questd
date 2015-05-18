@@ -1,6 +1,7 @@
 package logic
 
 import models.domain._
+import models.domain.user.Functionality
 
 object constants {
 
@@ -104,7 +105,7 @@ object constants {
    * Tasks
    */
   val DailyTasksRatingForCompleting = 250
-  val DailyTasksRatingDeviation = 0.15
+  val DailyTasksCoinsDeviation = 0.15
 
 }
 

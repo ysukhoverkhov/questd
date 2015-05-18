@@ -1,7 +1,7 @@
-@(menuItems: Map[String, String], tasks: List[models.domain.TutorialTask], newTaskForm: Form[controllers.web.admin.component.TutorialTaskForm])
+@(menuItems: Map[String, String], tasks: List[models.domain.tutorialtask.TutorialTask], newTaskForm: Form[controllers.web.admin.component.TutorialTaskForm])
 
 @import helper._
-@import models.domain.TaskType
+@import models.domain.user.TaskType
 
 @main("Tutorial Tasks")(menuItems, Map.empty) {
 

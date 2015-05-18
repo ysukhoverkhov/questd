@@ -1,7 +1,8 @@
 package logic.user
 
 import logic.BaseLogicSpecs
-import models.domain._
+import models.domain.common.Assets
+import models.domain.user._
 
 class UserLogicSpecs extends BaseLogicSpecs {
 

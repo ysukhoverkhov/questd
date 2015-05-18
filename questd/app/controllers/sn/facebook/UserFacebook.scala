@@ -1,7 +1,7 @@
 package controllers.sn.facebook
 
 import controllers.sn.client.{Invitation, User}
-import models.domain.Gender
+import models.domain.user.Gender
 
 private[sn] class UserFacebook(fbUser: com.restfb.types.User,
                                client: SocialNetworkClientFacebook,

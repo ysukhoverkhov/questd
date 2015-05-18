@@ -3,6 +3,7 @@ package controllers.web.admin.component
 import controllers.domain.app.user.{GetCommonTutorialRequest, GetCommonTutorialResult}
 import controllers.domain.{DomainAPIComponent, OkApiResult}
 import models.domain._
+import models.domain.tutorial._
 import org.json4s.ext.EnumNameSerializer
 import play.api.Logger
 import play.api.data.Form

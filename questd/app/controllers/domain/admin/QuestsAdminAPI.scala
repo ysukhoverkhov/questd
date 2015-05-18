@@ -1,5 +1,6 @@
 package controllers.domain.admin
 
+import models.domain.quest.{QuestStatus, Quest}
 import play.Logger
 
 import components.DBAccessor

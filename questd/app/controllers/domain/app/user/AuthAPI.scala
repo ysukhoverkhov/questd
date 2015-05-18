@@ -4,7 +4,8 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import controllers.sn.client.{User => SNUser}
-import models.domain._
+import models.domain.common.{ContentType, ContentReference}
+import models.domain.user._
 import play.Logger
 
 case class LoginRequest(snName: String, snuser: SNUser)

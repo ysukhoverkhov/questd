@@ -4,9 +4,12 @@ package models.store.mongo
 
 import java.util.Date
 
-import models.domain._
-import models.domain.view.QuestView
+import models.domain.common.{Assets, ContentVote}
+import models.domain.tutorial.TutorialPlatform
+import models.domain.user._
+import models.domain.user.message.MessageInformation
 import models.store._
+import models.view.QuestView
 import org.specs2.mutable._
 import play.api.test._
 import testhelpers.domainstubs._
@@ -44,7 +47,7 @@ class UserDAOSpecs
       val u = db.user.readBySessionId(sessid)
       u must beSome.which((u: User) => u.id.toString == testsess) and
         beSome.which((u: User) => u.auth.snids == Map.empty) and
-        beSome.which((u: User) => u.auth.session == Some(sessid))
+        beSome.which((u: User) => u.auth.session.contains(sessid))
     }
 
     "Update user in DB" in new WithApplication(appWithTestDatabase) {
@@ -64,10 +67,10 @@ class UserDAOSpecs
 
       u1 must beSome.which((u: User) => u.id.toString == id) and
         beSome.which((u: User) => u.auth.snids == Map.empty) and
-        beSome.which((u: User) => u.auth.session == Some(sessid))
+        beSome.which((u: User) => u.auth.session.contains(sessid))
       u2 must beSome.which((u: User) => u.id.toString == id) and
         beSome.which((u: User) => u.auth.snids == Map.empty) and
-        beSome.which((u: User) => u.auth.session == Some(newsessid))
+        beSome.which((u: User) => u.auth.session.contains(newsessid))
     }
 
     "Delete user in DB" in new WithApplication(appWithTestDatabase) {
@@ -260,11 +263,11 @@ class UserDAOSpecs
             tasks = List(t, t, t),
             reward = Assets(1, 2, 3)))))
 
-      val ou = db.user.addTasks(userid, List(t, t))
+      val ou = db.user.addTasks(userid, List(t, t), Some(Assets(rating = 10)))
 
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.length == 5)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(1, 2, 3))
+      ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(1, 2, 13))
     }
 
     "addClosedTutorialElement works" in new WithApplication(appWithTestDatabase) {
@@ -312,7 +315,7 @@ class UserDAOSpecs
       val ou = db.user.updateCultureId(userid, cultureId)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.demo.cultureId == Some(cultureId))
+      ou must beSome.which((u: User) => u.demo.cultureId.contains(cultureId))
     }
 
     "replaceCultureIds works" in new WithApplication(appWithTestDatabase) {
@@ -341,15 +344,15 @@ class UserDAOSpecs
 
       val ou1 = db.user.readById(userid1)
       ou1 must beSome.which((u: User) => u.id.toString == userid1)
-      ou1 must beSome.which((u: User) => u.demo.cultureId == Some(newC))
+      ou1 must beSome.which((u: User) => u.demo.cultureId.contains(newC))
 
       val ou2 = db.user.readById(userid2)
       ou2 must beSome.which((u: User) => u.id.toString == userid2)
-      ou2 must beSome.which((u: User) => u.demo.cultureId == Some(newC))
+      ou2 must beSome.which((u: User) => u.demo.cultureId.contains(newC))
 
       val ou3 = db.user.readById(userid3)
       ou3 must beSome.which((u: User) => u.id.toString == userid3)
-      ou3 must beSome.which((u: User) => u.demo.cultureId == Some(oldC + "1"))
+      ou3 must beSome.which((u: User) => u.demo.cultureId.contains(oldC + "1"))
     }
 
     "populate mustVoteSolutions list" in new WithApplication(appWithTestDatabase) {
@@ -397,7 +400,7 @@ class UserDAOSpecs
       db.user.recordQuestVote(u.id, q.id, ContentVote.Cheating)
 
       val ou1 = db.user.readById(u.id)
-      ou1 must beSome.which((u: User) => u.stats.votedQuests.get(q.id) == Some(ContentVote.Cheating))
+      ou1 must beSome.which((u: User) => u.stats.votedQuests.get(q.id).contains(ContentVote.Cheating))
     }
 
     "recordSolutionVote works" in new WithApplication(appWithTestDatabase) {
@@ -410,7 +413,7 @@ class UserDAOSpecs
       db.user.recordSolutionVote(u.id, s.id, ContentVote.Cheating)
 
       val ou1 = db.user.readById(u.id)
-      ou1 must beSome.which((u: User) => u.stats.votedSolutions.get(s.id) == Some(ContentVote.Cheating))
+      ou1 must beSome.which((u: User) => u.stats.votedSolutions.get(s.id).contains(ContentVote.Cheating))
     }
 
     "Add entry to time line" in new WithApplication(appWithTestDatabase) {
@@ -585,7 +588,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val m = MessageAllTasksCompleted().toMessage
+      val m = message.MessageAllTasksCompleted().toMessage
 
       db.user.create(user)
       db.user.addMessage(user.id, m)
@@ -613,7 +616,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val m = MessageAllTasksCompleted().toMessage
+      val m = message.MessageAllTasksCompleted().toMessage
 
       db.user.create(user)
       db.user.addMessage(user.id, m)
@@ -631,7 +634,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val ms = (1 to 5).map(n => MessageAllTasksCompleted().toMessage)
+      val ms = (1 to 5).map(n => message.MessageAllTasksCompleted().toMessage)
 
       db.user.create(user)
       ms.foreach(db.user.addMessage(user.id, _))

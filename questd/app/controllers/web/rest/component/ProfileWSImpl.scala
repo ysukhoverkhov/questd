@@ -2,7 +2,8 @@ package controllers.web.rest.component
 
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import models.domain.{Gender, Profile}
+import models.domain.user.{Gender, Profile}
+
 
 private object ProfileWSImplTypes {
 

@@ -1,6 +1,6 @@
 package controllers.web.helpers
 
-import models.domain.{ContentType, ContentReference}
+import models.domain.common.{ContentType, ContentReference}
 
 case class WSContentReference(
   contentType: String,

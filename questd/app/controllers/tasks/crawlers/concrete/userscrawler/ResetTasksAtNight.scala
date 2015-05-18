@@ -7,6 +7,7 @@ import controllers.tasks.crawlers.base.BaseCrawler
 import models.domain._
 import java.util.Date
 import components.random.RandomComponent
+import models.domain.user.User
 
 object ResetTasksAtNight {
   def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
