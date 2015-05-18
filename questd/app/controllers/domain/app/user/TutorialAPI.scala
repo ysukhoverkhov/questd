@@ -26,6 +26,9 @@ case class AssignTutorialTaskResult(allowed: ProfileModificationResult, profile:
 case class IncTutorialTaskRequest(user: User, taskId: String)
 case class IncTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
+case class ResetTutorialRequest(user: User)
+case class ResetTutorialResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+
 private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -129,6 +132,19 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
         OkApiResult(IncTutorialTaskResult(OK, Some(r.user.profile)))
       }
     }
+  }
+
+  /**
+   * Reset tutorial script anc completed tutorial tasks.
+   */
+  def resetTutorial(request: ResetTutorialRequest): ApiResult[ResetTutorialResult] = handleDbException {
+    import request._
+
+    db.user.update(
+      user.copy(tutorialStates = TutorialPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())})
+    )
+
+    OkApiResult(ResetTutorialResult(OK, Some(user.profile)))
   }
 }
 

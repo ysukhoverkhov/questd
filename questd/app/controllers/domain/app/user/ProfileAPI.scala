@@ -44,6 +44,8 @@ case class GetCountryListResult(countries: List[String])
 case class UpdateUserCultureRequest(user: User)
 case class UpdateUserCultureResult(user: User)
 
+case class SetLevelDebugRequest(user: User, level: Int)
+case class SetLevelDebugResult(user: User)
 
 private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -210,6 +212,34 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     }
 
     OkApiResult(UpdateUserCultureResult(request.user))
+  }
+
+
+  /**
+   * Debug api for setting level of user.
+   */
+  def setLevelDebug(request: SetLevelDebugRequest): ApiResult[SetLevelDebugResult] = handleDbException {
+    import request._
+
+    val newLevel = user.copy(
+      profile = user.profile.copy(
+        publicProfile = user.profile.publicProfile.copy(
+          level = level
+        )
+      ))
+
+    val userWithNewRights = newLevel.copy(
+      profile = user.profile.copy(
+        rights = user.calculateRights,
+        ratingToNextLevel = user.ratingToNextLevel
+      ),
+      privateDailyResults = List(
+        DailyResult(
+          user.getStartOfCurrentDailyResultPeriod)
+      ))
+    db.user.update(userWithNewRights)
+
+    OkApiResult(SetLevelDebugResult(userWithNewRights))
   }
 }
 

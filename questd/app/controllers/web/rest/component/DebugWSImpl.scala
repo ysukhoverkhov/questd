@@ -41,6 +41,10 @@ private object DebugWSImplTypes {
   case class WSMakeBattleDebugRequest (
     rivalId: Option[String]
     )
+
+  case class WSSetLevelRequest (
+    level: Int
+    )
 }
 
 trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
@@ -204,6 +208,22 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
       OkApiResult(WSDebugResult("Done"))
     }
+  }
+
+  // TODO: add to postman
+  def resetTutorial = wrapJsonApiCallReturnBody[ResetTutorialResult] { (js, r) =>
+    api.resetTutorial(ResetTutorialRequest(r.user))
+  }
+
+  //noinspection MutatorLikeMethodIsParameterless
+  // TODO: add to postman
+  //noinspection MutatorLikeMethodIsParameterless
+  def setLevel = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>
+    val v = Json.read[WSSetLevelRequest](js)
+
+    api.setLevelDebug(SetLevelDebugRequest(r.user, v.level))
+
+    OkApiResult(WSDebugResult("Done"))
   }
 }
 

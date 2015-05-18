@@ -102,6 +102,10 @@ POST	/rest/debug/voteQuest							controllers.web.rest.DebugWS.voteQuestDebug
 POST	/rest/debug/voteSolution						controllers.web.rest.DebugWS.voteSolutionDebug
 POST	/rest/debug/setFriendship						controllers.web.rest.DebugWS.setFriendshipDebug
 POST	/rest/debug/makeBattle						    controllers.web.rest.DebugWS.makeBattle
+POST	/rest/debug/resetTutorial					    controllers.web.rest.DebugWS.resetTutorial
+POST	/rest/debug/setLevel					        controllers.web.rest.DebugWS.setLevel
+
+
 
 
 #######################
