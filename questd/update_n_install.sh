@@ -1,7 +1,7 @@
 #!/bin/bash
 
 hg pull
-hg up -r "0.40.03"
+hg up -r "0.40.04"
 
 ./stage.sh
 
