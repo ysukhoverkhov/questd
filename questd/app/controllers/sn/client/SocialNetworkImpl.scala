@@ -1,10 +1,9 @@
 package controllers.sn.client
 
-import controllers.sn.facebook.SocialNetworkClientFacebook
 import controllers.sn.exception.SocialNetworkClientNotFound
-import play.Logger
+import controllers.sn.facebook.SocialNetworkClientFacebook
 
-abstract class SocialNetoworkImpl {
+abstract class SocialNetworkImpl {
 
   val clients = Map(
     SocialNetworkClientFacebook.Name -> SocialNetworkClientFacebook())
@@ -13,9 +12,8 @@ abstract class SocialNetoworkImpl {
     try {
       clients(name)
     } catch {
-      case ex: NoSuchElementException => {
+      case ex: NoSuchElementException =>
         throw new SocialNetworkClientNotFound
-      }
     }
   }
 }

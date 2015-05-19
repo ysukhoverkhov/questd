@@ -6,6 +6,7 @@ import com.mongodb.casbah.commons._
 import com.novus.salat._
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
+import models.domain.user.auth.CrossPromotedApp
 import models.domain.user.message.Message
 import models.store.dao._
 import models.store.mongo.SalatContext._
@@ -63,7 +64,21 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
+   */
+  def addCrossPromotions(id: String, snName: String, apps: List[CrossPromotedApp]): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "auth.loginMethods.methodName" -> snName),
+      MongoDBObject(
+        "$addToSet" -> MongoDBObject(
+          "auth.loginMethods.$.crossPromotion.apps" -> MongoDBObject(
+            "$each" -> apps.map(grater[CrossPromotedApp].asDBObject)))))
+  }
+
+  /**
+   * @inheritdoc
    */
   def populateMustVoteSolutionsList(userIds: List[String], solutionId: String): Unit = {
     update(

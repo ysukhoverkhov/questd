@@ -7,7 +7,7 @@ import java.util.Date
 import models.domain.common.{Assets, ContentVote}
 import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
-import models.domain.user.auth.{LoginMethod, AuthInfo}
+import models.domain.user.auth.{CrossPromotedApp, LoginMethod, AuthInfo}
 import models.domain.user.message.MessageInformation
 import models.store._
 import models.view.QuestView
@@ -112,7 +112,20 @@ class UserDAOSpecs
       u must beNone
     }
 
-// TODO: TAGS: clean me up.
+    "Add cross promotions" in new WithApplication(appWithTestDatabase) {
+      val user: User = createUserStub()
+      db.user.create(user)
+
+      val u = db.user.addCrossPromotions(user.id, "FB", List(CrossPromotedApp("appName", "userId"), CrossPromotedApp("appName2", "userId2")))
+
+      u must beSome
+      val u2 = u.get
+      u2.auth.loginMethods.find(_.methodName == "FB").get.crossPromotion.apps.length must beEqualTo(2)
+      u2.auth.loginMethods.find(_.methodName == "FB").get.crossPromotion.apps.find(_.appName == "appName") must beSome
+    }
+
+
+    // TODO: TAGS: clean me up.
 //    "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {
 //      val userId = "takeQuest2"
 //      val themeId = "tid"

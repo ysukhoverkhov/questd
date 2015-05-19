@@ -1,6 +1,6 @@
 package controllers.sn.facebook
 
-import controllers.sn.client.{Invitation, User}
+import controllers.sn.client.{UserIdInApplication, Invitation, User}
 import models.domain.user.Gender
 
 private[sn] class UserFacebook(fbUser: com.restfb.types.User,
@@ -56,6 +56,14 @@ private[sn] class UserFacebook(fbUser: com.restfb.types.User,
   def invitations: List[Invitation] = {
     client.fetchInvitations(token)
   }
+
+  /**
+   * @inheritdoc
+   */
+  def idsInOtherApps: List[UserIdInApplication] = {
+    client.fetchIdsInOtherApps(token)
+  }
+
 }
 
 private[sn] object UserFacebook {

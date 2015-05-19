@@ -1,10 +1,10 @@
 package controllers.domain.app.user
 
 import controllers.domain._
-import controllers.sn.client.User
+import controllers.sn.client.{UserIdInApplication, User}
 import models.domain.culture.Culture
 import models.domain.user._
-import models.domain.user.auth.{LoginMethod, AuthInfo}
+import models.domain.user.auth.{AuthInfo, LoginMethod}
 import models.store
 import org.mockito.Matchers.{eq => mockEq}
 
@@ -16,6 +16,7 @@ class AuthAPISpecs extends BaseAPISpecs {
     val userfb = mock[User]
     userfb.snId returns fbid
     userfb.invitations returns List.empty
+    userfb.idsInOtherApps returns List.empty
 
     userfb
   }
@@ -36,6 +37,7 @@ class AuthAPISpecs extends BaseAPISpecs {
             bio = Bio(
               country = Some(countryName))))))
 
+      db.user.updateSessionId(any, any) returns u
       db.user.readBySNid("FB", userfb.snId) returns None thenReturns u
       db.user.levelUp(anyString, anyInt) returns u
       db.user.setNextLevelRatingAndRights(
@@ -76,6 +78,7 @@ class AuthAPISpecs extends BaseAPISpecs {
             bio = Bio(
               country = Some(countryName))))))
 
+      db.user.updateSessionId(any, any) returns u
       db.user.readBySNid("FB", userfb.snId) returns u
       db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
 
@@ -141,6 +144,7 @@ class AuthAPISpecs extends BaseAPISpecs {
             bio = Bio(
               country = Some(currentCulture))))))
 
+      db.user.updateSessionId(any, any) returns u
       db.user.readBySNid("FB", userfb.snId) returns u
       db.culture.findByCountry(currentCulture) returns Some(Culture(id = actualCulture, name = actualCulture))
       db.user.updateCultureId(userid, actualCulture) returns u
@@ -171,6 +175,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
 
       userfb.snId returns userfb.snId
+      db.user.updateSessionId(any, any) returns u
       db.user.readBySNid("FB", userfb.snId) returns u
       db.culture.findByCountry(currentCulture) returns None
 

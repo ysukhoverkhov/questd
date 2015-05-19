@@ -4,10 +4,12 @@ import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
+import controllers.sn.client.{User => SNUser}
 import logic.constants
 import models.domain.common.Assets
 import models.domain.culture.Culture
 import models.domain.user._
+import models.domain.user.auth.CrossPromotedApp
 import play.{Logger, Play}
 
 case class GetAllUsersRequest()
@@ -40,6 +42,11 @@ case class SetCountryResult(allowed: ProfileModificationResult, profile: Option[
 
 case class GetCountryListRequest(user: User)
 case class GetCountryListResult(countries: List[String])
+
+case class UpdateCrossPromotionRequest(
+  user: User,
+  snUser: SNUser)
+case class UpdateCrossPromotionResult(user: User)
 
 case class UpdateUserCultureRequest(user: User)
 case class UpdateUserCultureResult(user: User)
@@ -177,6 +184,35 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val countries = scala.io.Source.fromFile(Play.application().getFile("conf/countries.txt")).getLines().toList
 
     OkApiResult(GetCountryListResult(countries))
+  }
+
+  /**
+   * Updates cross promotion info of current user.
+   */
+  def updateCrossPromotion(request: UpdateCrossPromotionRequest): ApiResult[UpdateCrossPromotionResult] = handleDbException {
+    import request._
+
+    val appsToAdd = request.snUser.idsInOtherApps.filter{ a =>
+      request.user.auth.loginMethods.find(lp => lp.methodName == request.snUser.snName) match {
+        case None =>
+          Logger.error(s"LOgin method is not present in profile but we've just logged in with it: ${request.snUser.snName}")
+          false
+        case Some(lm) =>
+          !lm.crossPromotion.apps.exists(storedApp => storedApp.appName == a.appName)
+      }
+    }.map{ a =>
+      CrossPromotedApp(appName = a.appName, userId = a.snId)
+    }
+
+    (if (appsToAdd.nonEmpty)
+      db.user.addCrossPromotions(
+        id = user.id,
+        snName = request.snUser.snName,
+        apps = appsToAdd)
+    else
+      Some(user)) ifSome { u =>
+        OkApiResult(UpdateCrossPromotionResult(u))
+    }
   }
 
   /**

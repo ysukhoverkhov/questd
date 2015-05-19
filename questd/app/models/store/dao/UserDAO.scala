@@ -4,12 +4,21 @@ import java.util.Date
 
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
+import models.domain.user.auth.CrossPromotedApp
 import models.domain.user.message.Message
 import models.view.QuestView
 
 trait UserDAO extends BaseDAO[User] {
 
-  def updateSessionId(id: String, sessionid: String): Option[User]
+  def updateSessionId(id: String, sessionId: String): Option[User]
+
+  /**
+   * Adds one or some cross promoted apps info.
+   * @param id Id of a user to modify
+   * @param snName name of network to modify.
+   * @param apps List of apps to add.
+   */
+  def addCrossPromotions(id: String, snName: String, apps: List[CrossPromotedApp]): Option[User]
 
   def readBySessionId(sessionid: String): Option[User]
   def readBySNid(snName:String, snid: String): Option[User]

@@ -31,15 +31,20 @@ private[domain] trait AuthAPI {
 
     def loginUser(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString
-      db.user.updateSessionId(user.id, uuid)
 
-      // Update here country from time to time.
-      updateUserCulture(UpdateUserCultureRequest(user)) map {
-        api.processFriendshipInvitationsFromSN(ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
-          case InternalErrorApiResult(a) =>
-            InternalErrorApiResult[LoginResult](a)
-          case _ =>
-            OkApiResult(LoginResult(uuid, user.id))
+      db.user.updateSessionId(user.id, uuid) ifSome { u =>
+        {
+          updateCrossPromotion(UpdateCrossPromotionRequest(user, request.snuser))
+        } map {
+          updateUserCulture(UpdateUserCultureRequest(user))
+        } map {
+          api
+            .processFriendshipInvitationsFromSN(ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
+            case InternalErrorApiResult(a) =>
+              InternalErrorApiResult[LoginResult](a)
+            case _ =>
+              OkApiResult(LoginResult(uuid, user.id))
+          }
         }
       }
     }

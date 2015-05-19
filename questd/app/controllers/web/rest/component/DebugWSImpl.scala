@@ -210,13 +210,10 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     }
   }
 
-  // TODO: add to postman
   def resetTutorial = wrapJsonApiCallReturnBody[ResetTutorialResult] { (js, r) =>
     api.resetTutorial(ResetTutorialRequest(r.user))
   }
 
-  //noinspection MutatorLikeMethodIsParameterless
-  // TODO: add to postman
   //noinspection MutatorLikeMethodIsParameterless
   def setLevel = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>
     val v = Json.read[WSSetLevelRequest](js)

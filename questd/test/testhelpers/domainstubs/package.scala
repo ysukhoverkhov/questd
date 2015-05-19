@@ -10,6 +10,7 @@ import models.domain.quest._
 import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
 import models.domain.user._
+import models.domain.user.auth.{LoginMethod, AuthInfo}
 import models.view.{QuestView, ThemeInfoWithID}
 
 
@@ -205,6 +206,11 @@ package object domainstubs {
 
     User(
       id = id,
+      auth = AuthInfo(
+        loginMethods = List(LoginMethod(
+          methodName = "FB",
+          userId = "adasd"
+        ))),
       demo = UserDemographics(
         cultureId = cultureId),
       privateDailyResults = privateDailyResults,

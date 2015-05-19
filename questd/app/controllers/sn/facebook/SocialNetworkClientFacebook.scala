@@ -2,11 +2,13 @@ package controllers.sn.facebook
 
 import com.restfb._
 import com.restfb.exception._
-import controllers.sn.client.{Invitation, SocialNetworkClient, User}
+import controllers.sn.client._
 import controllers.sn.exception.{AuthException, NetworkException}
+import controllers.sn.facebook.types.UserIdWithApp
 import play.Logger
 
 import scala.language.implicitConversions
+
 
 private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
 
@@ -63,7 +65,18 @@ private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
         Logger.error("A try to delete not facebook invitation with facebook client, doing nothing")
     }
   }
+
+  /**
+   * @inheritdoc
+   */
+  def fetchIdsInOtherApps(token: String): List[UserIdInApplication] = {
+    import collection.JavaConversions._
+
+    facebookClient(token).fetchConnection(
+      "me/ids_for_business", classOf[UserIdWithApp]).getData.toList.map(UserIdInApplicationFacebook(_))
+  }
 }
+
 
 private[sn] object SocialNetworkClientFacebook {
   val Name = "FB"
