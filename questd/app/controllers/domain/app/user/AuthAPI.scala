@@ -4,8 +4,9 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import controllers.sn.client.{User => SNUser}
-import models.domain.common.{ContentType, ContentReference}
+import models.domain.common.{ContentReference, ContentType}
 import models.domain.user._
+import models.domain.user.auth.{AuthInfo, LoginMethod}
 import play.Logger
 
 case class LoginRequest(snName: String, snuser: SNUser)
@@ -60,7 +61,9 @@ private[domain] trait AuthAPI {
 
       val newUser = User(
         auth = AuthInfo(
-          snids = Map(request.snName -> request.snuser.snId)),
+          loginMethods = List(LoginMethod(
+            methodName = request.snName,
+            userId = request.snuser.snId))),
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(

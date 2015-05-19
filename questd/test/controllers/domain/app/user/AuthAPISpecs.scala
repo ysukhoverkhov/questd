@@ -4,6 +4,7 @@ import controllers.domain._
 import controllers.sn.client.User
 import models.domain.culture.Culture
 import models.domain.user._
+import models.domain.user.auth.{LoginMethod, AuthInfo}
 import models.store
 import org.mockito.Matchers.{eq => mockEq}
 
@@ -28,7 +29,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       val u = Some(User(
         id = "userid",
-        auth = AuthInfo(snids = Map("FB" -> userfb.snId)),
+        auth = AuthInfo(loginMethods = List(LoginMethod("FB", userfb.snId))),
         demo = UserDemographics(cultureId = Some(countryName)),
         profile = Profile(
           publicProfile = PublicProfile(
@@ -68,7 +69,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       val u = Some(User(
         id = "userid",
-        auth = AuthInfo(snids = Map("FB" -> userfb.snId)),
+        auth = AuthInfo(loginMethods = List(LoginMethod("FB", userfb.snId))),
         demo = UserDemographics(cultureId = Some(countryName)),
         profile = Profile(
           publicProfile = PublicProfile(
@@ -133,7 +134,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       val u = Some(User(
         id = userid,
-        auth = AuthInfo(snids = Map("FB" -> userfb.snId)),
+        auth = AuthInfo(loginMethods = List(LoginMethod("FB", userfb.snId))),
         demo = UserDemographics(cultureId = Some(currentCulture)),
         profile = Profile(
           publicProfile = PublicProfile(
@@ -161,7 +162,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       val u = Some(User(
         id = userid,
-        auth = AuthInfo(snids = Map("FB" -> userfb.snId)),
+        auth = AuthInfo(loginMethods = List(LoginMethod("FB", userfb.snId))),
         demo = UserDemographics(cultureId = Some(currentCulture)),
         profile = Profile(
           publicProfile = PublicProfile(

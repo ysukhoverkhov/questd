@@ -22,15 +22,19 @@ private[mongo] class MongoUserDAO
   /**
    * Read by session id
    */
-  def readBySessionId(sessid: String): Option[User] = {
-    readByExample("auth.session", sessid)
+  def readBySessionId(sessionId: String): Option[User] = {
+    readByExample("auth.session", sessionId)
   }
 
   /**
    * Read by fb id
    */
-  def readBySNid(snName: String, snid: String): Option[User] = {
-    readByExample(s"auth.snids.$snName", snid)
+  def readBySNid(snName: String, userId: String): Option[User] = {
+    readByExample(
+      MongoDBObject(
+        "auth.loginMethods.methodName" -> snName,
+        "auth.loginMethods.userId" -> userId
+      ))
   }
 
   /**

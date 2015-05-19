@@ -2,6 +2,7 @@ package models.domain.user
 
 import models.domain.base.ID
 import models.domain.tutorial.TutorialPlatform
+import models.domain.user.auth.AuthInfo
 
 /**
  * Structure representing beloved user.

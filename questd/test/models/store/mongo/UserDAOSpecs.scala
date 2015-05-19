@@ -7,6 +7,7 @@ import java.util.Date
 import models.domain.common.{Assets, ContentVote}
 import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
+import models.domain.user.auth.{LoginMethod, AuthInfo}
 import models.domain.user.message.MessageInformation
 import models.store._
 import models.view.QuestView
@@ -33,7 +34,7 @@ class UserDAOSpecs
     "Find user by FB id" in new WithApplication(appWithTestDatabase) {
       val fbid = "idid_fbid"
       val user_id = "session name"
-      db.user.create(User(user_id, AuthInfo(snids = Map("FB" -> fbid))))
+      db.user.create(User(user_id, AuthInfo(loginMethods = List(LoginMethod("FB", fbid)))))
       val u = db.user.readBySNid("FB", fbid)
 
       u must beSome
@@ -46,7 +47,7 @@ class UserDAOSpecs
       db.user.create(User(testsess, AuthInfo(session = Some(sessid))))
       val u = db.user.readBySessionId(sessid)
       u must beSome.which((u: User) => u.id.toString == testsess) and
-        beSome.which((u: User) => u.auth.snids == Map.empty) and
+        beSome.which((u: User) => u.auth.loginMethods == List.empty) and
         beSome.which((u: User) => u.auth.session.contains(sessid))
     }
 
@@ -66,10 +67,10 @@ class UserDAOSpecs
       val u2 = db.user.readById(u1unlifted.id)
 
       u1 must beSome.which((u: User) => u.id.toString == id) and
-        beSome.which((u: User) => u.auth.snids == Map.empty) and
+        beSome.which((u: User) => u.auth.loginMethods == List.empty) and
         beSome.which((u: User) => u.auth.session.contains(sessid))
       u2 must beSome.which((u: User) => u.id.toString == id) and
-        beSome.which((u: User) => u.auth.snids == Map.empty) and
+        beSome.which((u: User) => u.auth.loginMethods == List.empty) and
         beSome.which((u: User) => u.auth.session.contains(newsessid))
     }
 
