@@ -106,7 +106,7 @@ private[domain] trait TasksAPI {
           // Give reward for currently completed tasks.
           completedTasks.foldLeft[ApiResult[SendMessageResult]](OkApiResult(SendMessageResult(user))) { (r, t) =>
             r map { r =>
-              adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(t.reward)))
+              adjustAssets(AdjustAssetsRequest(user = r.user, change = t.reward))
             } map { r =>
               sendMessage(SendMessageRequest(user = r.user, message = MessageTaskCompleted(t.id)))
             }
@@ -114,7 +114,7 @@ private[domain] trait TasksAPI {
             // give reward for all completed.
             if (allTasksCompleted(r.user.profile.dailyTasks)) {
               {
-                adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(r.user.profile.dailyTasks.reward)))
+                adjustAssets(AdjustAssetsRequest(user = r.user, change = r.user.profile.dailyTasks.reward))
               } map { r =>
                 sendMessage(SendMessageRequest(r.user, message.MessageAllTasksCompleted()))
               }

@@ -81,7 +81,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               // Adjusting assets for solving quests.
               adjustAssets(AdjustAssetsRequest(
                 user = u,
-                cost = Some(questToSolve.info.solveCost)))
+                change = -questToSolve.info.solveCost))
             } map { r =>
               makeTask(MakeTaskRequest(r.user, taskType = Some(TaskType.CreateSolution)))
             } map { r =>

@@ -97,7 +97,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
         } map { r =>
 
           val cost = request.user.costToFollowing
-          adjustAssets(AdjustAssetsRequest(user = r.user, cost = Some(cost)))
+          adjustAssets(AdjustAssetsRequest(user = r.user, change = -cost))
 
         } map { r =>
 

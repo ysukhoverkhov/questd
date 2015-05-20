@@ -13,6 +13,8 @@ case class Assets(
       this.money - o.money,
       this.rating - o.rating)
 
+  def unary_- = Assets() - this
+
   def +(o: Assets): Assets =
     Assets(this.coins + o.coins,
       this.money + o.money,

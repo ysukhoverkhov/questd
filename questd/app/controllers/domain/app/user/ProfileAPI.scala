@@ -10,8 +10,7 @@ import models.domain.culture.Culture
 import models.domain.user._
 import play.{Logger, Play}
 
-// TODO: get rid of reward and cost here.
-case class AdjustAssetsRequest(user: User, reward: Option[Assets] = None, cost: Option[Assets] = None)
+case class AdjustAssetsRequest(user: User, change: Assets)
 case class AdjustAssetsResult(user: User)
 
 case class CheckIncreaseLevelRequest(user: User)
@@ -45,14 +44,12 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     Logger.debug("API - adjustAssets for user " + user.id)
 
-    val del = reward.getOrElse(Assets()) - cost.getOrElse(Assets())
-
-    val del2 = if ((del + user.profile.assets).rating < 0)
-      Assets(del.coins, del.money, -user.profile.assets.rating)
+    val delta = if ((change + user.profile.assets).rating < 0)
+      Assets(change.coins, change.money, -user.profile.assets.rating)
     else
-      del
+      change
 
-    db.user.addToAssets(user.id, del2) ifSome { u =>
+    db.user.addToAssets(user.id, delta) ifSome { u =>
       checkIncreaseLevel(CheckIncreaseLevelRequest(u)) map { r => OkApiResult(AdjustAssetsResult(r.user)) }
     }
   }
@@ -67,6 +64,19 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
           user.id,
           user.ratingToNextLevel,
           user.calculateRights) ifSome { user =>
+
+          def userFishingId(user: User): String = {
+            user.auth.loginMethods.find(_.methodName == "FB")
+              .fold("missing")(_.crossPromotion.apps.find(_.appName == "fishing_paradise").fold("missing")(_.userId))
+          }
+
+          val myIdInFishing = userFishingId(user)
+          val referrerIdInFishing = user.friends.find(_.referralStatus == ReferralStatus.ReferredBy).fold("missing")(f => db.user.readById(f.friendId).fold("missing")(userFishingId))
+
+          Logger.error(s"User ${user.id} leveled up to level ${user.profile.publicProfile.level}. " +
+            s"His fishing id is $myIdInFishing. " +
+            s"His referrer fishing id is $referrerIdInFishing.")
+
           OkApiResult(CheckIncreaseLevelResult(user))
         }
       }

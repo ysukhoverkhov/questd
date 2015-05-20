@@ -100,7 +100,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
             case OK =>
 
               val cost = request.user.costToAddFriend(u)
-              adjustAssets(AdjustAssetsRequest(user = request.user, cost = Some(cost))) map { r =>
+              adjustAssets(AdjustAssetsRequest(user = request.user, change = -cost)) map { r =>
 
                 db.user.askFriendship(
                   r.user.id,

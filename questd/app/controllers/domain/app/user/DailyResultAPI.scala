@@ -91,7 +91,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
         }
       }
 
-      adjustAssets(AdjustAssetsRequest(user = u, reward = Some(deltaAssets)))
+      adjustAssets(AdjustAssetsRequest(user = u, change = deltaAssets))
     }
 
     // Check replace old public daily results with new daily results.

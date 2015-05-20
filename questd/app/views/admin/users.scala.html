@@ -7,7 +7,6 @@
 	<table border="1">
 	    	<tr>
 	    		<td>id</td>
-	    		<td>FBID</td>
 	    		<td>lastLogin</td>
 	    		<td>name</td>
 	    		<td>level</td>
@@ -16,7 +15,6 @@
 		@for(u <- users) {
 	    	<tr>
 	    		<td>@u.id.toString</td>
-	    		<td>@u.auth.snids("FB").toString</td>
 	    		<td>@u.auth.lastLogin</td>
 	    		<td>@u.profile.publicProfile.bio.name</td>
 	    		<td>@u.profile.publicProfile.level.toString</td>
