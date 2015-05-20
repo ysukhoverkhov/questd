@@ -384,14 +384,24 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def updateFriendship(id: String, friendId: String, status: String): Option[User] = {
+  def updateFriendship(id: String, friendId: String, status: Option[String], referralStatus: Option[String]): Option[User] = {
+
+    val queryBuilder = MongoDBObject.newBuilder
+
+    status.foreach { status =>
+      queryBuilder += "friends.$.status" -> status
+    }
+
+    referralStatus.foreach { referralStatus =>
+      queryBuilder += "friends.$.referralStatus" -> referralStatus
+    }
+
     findAndModify(
       MongoDBObject(
         "id" -> id,
         "friends.friendId" -> friendId),
       MongoDBObject(
-        "$set" -> MongoDBObject(
-          "friends.$.status" -> status)))
+        "$set" -> queryBuilder.result()))
   }
 
   /**

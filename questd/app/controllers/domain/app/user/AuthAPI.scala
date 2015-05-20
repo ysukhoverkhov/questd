@@ -29,8 +29,8 @@ private[domain] trait AuthAPI {
         } map {
           updateUserCulture(UpdateUserCultureRequest(user))
         } map {
-          api
-            .processFriendshipInvitationsFromSN(ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
+          api.processFriendshipInvitationsFromSN(
+            ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
             case InternalErrorApiResult(a) =>
               InternalErrorApiResult[LoginResult](a)
             case _ =>

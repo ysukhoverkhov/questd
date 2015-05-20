@@ -210,20 +210,20 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
       } { friend =>
         Logger.trace(s"becoming friends with ${friend.profile.publicProfile.bio.name}")
 
-        def becomeFriend(me: User, newfriend: User, status: FriendshipStatus.Value): Unit = {
-          if (me.friends.map(_.friendId).contains(newfriend.id)) {
+        def becomeFriend(me: User, newFriend: User, status: FriendshipStatus.Value, referralStatus: Option[ReferralStatus.Value] = None): Unit = {
+          if (me.friends.map(_.friendId).contains(newFriend.id)) {
             Logger.trace(s"updating friendship")
-            db.user.updateFriendship(me.id, newfriend.id, status.toString)
+            db.user.updateFriendship(me.id, newFriend.id, Some(status.toString), referralStatus.map(_.toString))
           } else {
             Logger.trace(s"creating friendship")
-            db.user.addFriendship(me.id, Friendship(newfriend.id, status))
+            db.user.addFriendship(me.id, Friendship(newFriend.id, status, referralStatus.getOrElse(ReferralStatus.None)))
           }
         }
 
-        // Autoaccept for newcomers.
+        // Auto accept for newcomers.
         if (request.user.profile.publicProfile.level <= 1) {
-          becomeFriend(request.user, friend, FriendshipStatus.Accepted)
-          becomeFriend(friend, request.user, FriendshipStatus.Accepted)
+          becomeFriend(request.user, friend, FriendshipStatus.Accepted, Some(ReferralStatus.ReferredBy))
+          becomeFriend(friend, request.user, FriendshipStatus.Accepted, Some(ReferralStatus.Refers))
           sendMessage(SendMessageRequest(
             friend, MessageFriendshipAccepted(request.user.id)))
         } else {
