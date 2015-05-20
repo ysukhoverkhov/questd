@@ -161,7 +161,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     } map { rr =>
       assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
 
-      val questId = api.getUser(UserRequest(userId = Some(author.id))).body.get.user.get.stats.createdQuests.last
+      val questId = api.getUser(GetUserRequest(userId = Some(author.id))).body.get.user.get.stats.createdQuests.last
 
       {
         api.addToTimeLine(AddToTimeLineRequest(

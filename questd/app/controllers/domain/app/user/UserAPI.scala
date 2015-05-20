@@ -8,15 +8,48 @@ import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
 import play.Logger
 
+case class GetUserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
+object UserResultCode extends Enumeration {
+  val OK, NotFound = Value
+}
+case class GetUserResult(code: UserResultCode.Value, user: Option[User] = None)
+
+
 case class GetAllUsersRequest()
 case class GetAllUsersResult(users: Iterator[User])
+
 
 case class UpdateCrossPromotionRequest(
   user: User,
   snUser: SNUser)
 case class UpdateCrossPromotionResult(user: User)
 
+
 private[domain] trait UserAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
+
+  /**
+   * User by session or id.
+   */
+  def getUser(params: GetUserRequest): ApiResult[GetUserResult] = handleDbException {
+
+    (params.sessionId, params.userId) match {
+      case (Some(sessionId), None) =>
+        db.user.readBySessionId(sessionId) match {
+          case None => OkApiResult(GetUserResult(UserResultCode.NotFound))
+          case Some(user: User) => OkApiResult(GetUserResult(UserResultCode.OK, Some(user)))
+        }
+
+      case (None, Some(userId)) =>
+        db.user.readById(userId) match {
+          case None => OkApiResult(GetUserResult(UserResultCode.NotFound))
+          case Some(user: User) => OkApiResult(GetUserResult(UserResultCode.OK, Some(user)))
+        }
+
+      case _ =>
+        InternalErrorApiResult("Wrong request for user")
+    }
+  }
+
 
   /**
    * Get iterator for all users.

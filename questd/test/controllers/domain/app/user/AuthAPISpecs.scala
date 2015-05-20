@@ -109,10 +109,10 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       db.user.readBySessionId(sesid) returns Some(User("", AuthInfo(session = Some(sesid))))
 
-      val rv = api.getUser(UserRequest(sessionId = Some(sesid)))
+      val rv = api.getUser(GetUserRequest(sessionId = Some(sesid)))
 
-      rv must beAnInstanceOf[OkApiResult[UserResult]]
-      rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
+      rv must beAnInstanceOf[OkApiResult[GetUserResult]]
+      rv.body must beSome[GetUserResult] and beSome.which((u: GetUserResult) =>
         u.user.get.auth.session.contains(sesid))
     }
 
@@ -121,10 +121,10 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       db.user.readBySessionId(sesid) returns None
 
-      val rv = api.getUser(UserRequest(sessionId = Some(sesid)))
+      val rv = api.getUser(GetUserRequest(sessionId = Some(sesid)))
 
-      rv must beAnInstanceOf[OkApiResult[UserResult]]
-      rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
+      rv must beAnInstanceOf[OkApiResult[GetUserResult]]
+      rv.body must beSome[GetUserResult] and beSome.which((u: GetUserResult) =>
         u.code == UserResultCode.NotFound)
     }
 
