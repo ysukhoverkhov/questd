@@ -40,18 +40,6 @@ private[domain] trait AuthAPI {
       }
     }
 
-    // TODO: This should be moved to UserAPI call like "createUser" what should be called from "login".
-    def initializeUser(user: User): User = {
-      user.copy(
-        profile = user.profile.copy(
-          rights = user.calculateRights,
-          ratingToNextLevel = user.ratingToNextLevel
-        ),
-        privateDailyResults = List(DailyResult(
-          user.getStartOfCurrentDailyResultPeriod)
-        ))
-    }
-
     def createUserAndLogin() = {
       Logger.debug("No user with FB id found, creating new one " + request.snuser.snId)
 
@@ -71,13 +59,13 @@ private[domain] trait AuthAPI {
               avatar = Some(
                 ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = request.snuser.snId))))))
 
-      db.user.create(initializeUser(newUser))
-
-      db.user.readBySNid(request.snName, request.snuser.snId) ifSome { user =>
-        populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user)) map { r =>
-          Logger.debug(s"New user created with FB: ${user.id} / ${user.profile.publicProfile.bio.name}")
-          loginUser(user)
-        }
+      {
+        createUser(CreateUserRequest(newUser))
+      } map { r =>
+        populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(r.user))
+      } map { r =>
+        Logger.debug(s"New user created with FB: ${r.user.id} / ${r.user.profile.publicProfile.bio.name}")
+        loginUser(r.user)
       }
     }
 
@@ -85,7 +73,6 @@ private[domain] trait AuthAPI {
 
     db.user.readBySNid(request.snName, request.snuser.snId) match {
       case None =>
-        Logger.debug("New user login with FB")
         createUserAndLogin()
 
       case Some(user) =>

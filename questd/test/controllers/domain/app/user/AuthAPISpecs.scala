@@ -1,7 +1,7 @@
 package controllers.domain.app.user
 
 import controllers.domain._
-import controllers.sn.client.{UserIdInApplication, User}
+import controllers.sn.client.User
 import models.domain.culture.Culture
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, LoginMethod}
@@ -57,8 +57,8 @@ class AuthAPISpecs extends BaseAPISpecs {
       there were atLeast(1)(solution).allWithParams(any, any, any, any, any, any, any, any, any, any, any)
       there were atLeast(1)(battle).allWithParams(any, any, any, any, any, any, any, any, any, any)
       // Update allowed.
-      there were two(user).readBySNid("FB", userfb.snId)
-      there were one(user).create(any)
+      there was one(user).readBySNid("FB", userfb.snId)
+      there was one(user).create(any)
 
       rv must beAnInstanceOf[OkApiResult[LoginResult]]
       rv.body must beSome[LoginResult]

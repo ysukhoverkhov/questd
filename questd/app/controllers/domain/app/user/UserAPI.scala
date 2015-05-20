@@ -14,16 +14,16 @@ object UserResultCode extends Enumeration {
 }
 case class GetUserResult(code: UserResultCode.Value, user: Option[User] = None)
 
-
 case class GetAllUsersRequest()
 case class GetAllUsersResult(users: Iterator[User])
-
 
 case class UpdateCrossPromotionRequest(
   user: User,
   snUser: SNUser)
 case class UpdateCrossPromotionResult(user: User)
 
+case class CreateUserRequest(user: User)
+case class CreateUserResult(user: User)
 
 private[domain] trait UserAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -85,6 +85,27 @@ private[domain] trait UserAPI { this: DomainAPIComponent#DomainAPI with DBAccess
       Some(user)) ifSome { u =>
         OkApiResult(UpdateCrossPromotionResult(u))
     }
+  }
+
+  /**
+   * Updates cross promotion info of current user.
+   */
+  def createUser(request: CreateUserRequest): ApiResult[CreateUserResult] = handleDbException {
+    def initializeUser(user: User): User = {
+      user.copy(
+        profile = user.profile.copy(
+          rights = user.calculateRights,
+          ratingToNextLevel = user.ratingToNextLevel
+        ),
+        privateDailyResults = List(DailyResult(
+          user.getStartOfCurrentDailyResultPeriod)
+        ))
+    }
+
+    val user = initializeUser(request.user)
+    db.user.create(user)
+
+    OkApiResult(CreateUserResult(user))
   }
 }
 
