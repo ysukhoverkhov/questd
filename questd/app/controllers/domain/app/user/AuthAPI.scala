@@ -49,7 +49,7 @@ private[domain] trait AuthAPI {
       }
     }
 
-    // This should be moved to seporate API call like "createUser" what should be called from "login".
+    // TODO: This should be moved to UserAPI call like "createUser" what should be called from "login".
     def initializeUser(user: User): User = {
       user.copy(
         profile = user.profile.copy(

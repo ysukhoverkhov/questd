@@ -4,16 +4,11 @@ import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
-import controllers.sn.client.{User => SNUser}
 import logic.constants
 import models.domain.common.Assets
 import models.domain.culture.Culture
 import models.domain.user._
-import models.domain.user.auth.CrossPromotedApp
 import play.{Logger, Play}
-
-case class GetAllUsersRequest()
-case class GetAllUsersResult(users: Iterator[User])
 
 // TODO: get rid of reward and cost here.
 case class AdjustAssetsRequest(user: User, reward: Option[Assets] = None, cost: Option[Assets] = None)
@@ -28,9 +23,6 @@ case class GetRightsAtLevelsResult(rights: List[Rights])
 case class GetLevelsForRightsRequest(user: User, functionality: List[Functionality.Value])
 case class GetLevelsForRightsResult(levels: Map[String, Int])
 
-case class SetDebugRequest(user: User, debug: String)
-case class SetDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
-
 case class SetGenderRequest(user: User, gender: Gender.Value)
 case class SetGenderResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
@@ -40,28 +32,10 @@ case class SetCityResult(allowed: ProfileModificationResult, profile: Option[Pro
 case class SetCountryRequest(user: User, country: String)
 case class SetCountryResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class GetCountryListRequest(user: User)
-case class GetCountryListResult(countries: List[String])
-
-case class UpdateCrossPromotionRequest(
-  user: User,
-  snUser: SNUser)
-case class UpdateCrossPromotionResult(user: User)
-
 case class UpdateUserCultureRequest(user: User)
 case class UpdateUserCultureResult(user: User)
 
-case class SetLevelDebugRequest(user: User, level: Int)
-case class SetLevelDebugResult(user: User)
-
 private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
-
-  /**
-   * Get iterator for all users.
-   */
-  def getAllUsers(request: GetAllUsersRequest): ApiResult[GetAllUsersResult] = handleDbException {
-    OkApiResult(GetAllUsersResult(db.user.all))
-  }
 
   /**
    * Adjust assets value and performs other modifications on profile because of this.
@@ -125,18 +99,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   }
 
   /**
-   * Updates debug string in user profile.
-   */
-  def setDebug(request: SetDebugRequest): ApiResult[SetDebugResult] = handleDbException {
-    import request._
-
-    db.user.setDebug(user.id, debug) ifSome { v =>
-      OkApiResult(SetDebugResult(OK, Some(v.profile)))
-    }
-
-  }
-
-  /**
    * Updates user gender.
    */
   def setGender(request: SetGenderRequest): ApiResult[SetGenderResult] = handleDbException {
@@ -178,44 +140,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   }
 
   /**
-   * Get list of possible countries.
-   */
-  def getCountryList(request: GetCountryListRequest): ApiResult[GetCountryListResult] = handleDbException {
-    val countries = scala.io.Source.fromFile(Play.application().getFile("conf/countries.txt")).getLines().toList
-
-    OkApiResult(GetCountryListResult(countries))
-  }
-
-  /**
-   * Updates cross promotion info of current user.
-   */
-  def updateCrossPromotion(request: UpdateCrossPromotionRequest): ApiResult[UpdateCrossPromotionResult] = handleDbException {
-    import request._
-
-    val appsToAdd = request.snUser.idsInOtherApps.filter{ a =>
-      request.user.auth.loginMethods.find(lp => lp.methodName == request.snUser.snName) match {
-        case None =>
-          Logger.error(s"LOgin method is not present in profile but we've just logged in with it: ${request.snUser.snName}")
-          false
-        case Some(lm) =>
-          !lm.crossPromotion.apps.exists(storedApp => storedApp.appName == a.appName)
-      }
-    }.map{ a =>
-      CrossPromotedApp(appName = a.appName, userId = a.snId)
-    }
-
-    (if (appsToAdd.nonEmpty)
-      db.user.addCrossPromotions(
-        id = user.id,
-        snName = request.snUser.snName,
-        apps = appsToAdd)
-    else
-      Some(user)) ifSome { u =>
-        OkApiResult(UpdateCrossPromotionResult(u))
-    }
-  }
-
-  /**
    * Update culture if country changed.
    */
   def updateUserCulture(request: UpdateUserCultureRequest): ApiResult[UpdateUserCultureResult] = handleDbException {
@@ -248,34 +172,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     }
 
     OkApiResult(UpdateUserCultureResult(request.user))
-  }
-
-
-  /**
-   * Debug api for setting level of user.
-   */
-  def setLevelDebug(request: SetLevelDebugRequest): ApiResult[SetLevelDebugResult] = handleDbException {
-    import request._
-
-    val newLevel = user.copy(
-      profile = user.profile.copy(
-        publicProfile = user.profile.publicProfile.copy(
-          level = level
-        )
-      ))
-
-    val userWithNewRights = newLevel.copy(
-      profile = user.profile.copy(
-        rights = user.calculateRights,
-        ratingToNextLevel = user.ratingToNextLevel
-      ),
-      privateDailyResults = List(
-        DailyResult(
-          user.getStartOfCurrentDailyResultPeriod)
-      ))
-    db.user.update(userWithNewRights)
-
-    OkApiResult(SetLevelDebugResult(userWithNewRights))
   }
 }
 
