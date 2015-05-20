@@ -32,7 +32,7 @@ private[mongo] class MongoCommentDAO
     findByExample(
       example = queryBuilder.result(),
       sort = MongoDBObject(
-        "info.postingDate" -> 1),
+        "info.postingDate" -> -1),
       skip = skip)
   }
 }
