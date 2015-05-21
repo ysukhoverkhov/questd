@@ -1,11 +1,10 @@
 package logic.user.util
 
-import logic.constants._
-import models.domain._
-import logic.UserLogic
-import models.domain.quest.{QuestStatus, Quest}
-import play.Logger
 import controllers.domain.app.quest._
+import logic.UserLogic
+import logic.constants._
+import models.domain.quest.{Quest, QuestStatus}
+import play.Logger
 
 trait QuestSelectUserLogic { this: UserLogic =>
 
@@ -17,7 +16,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
       () => getQuestsWithMyTags,
       () => getAnyQuests,
       () => getAnyQuestsIgnoringLevels,
-      () => getAnyQuestsIgnoringLevelsAndCulture)
+      () => getAnyQuestsDefaultCultureIgnoringLevels)
 
     val it = selectFromChain(algorithms).getOrElse(Iterator.empty)
     if (it.hasNext) Some(it.next()) else None
@@ -145,8 +144,10 @@ trait QuestSelectUserLogic { this: UserLogic =>
       cultureId = user.demo.cultureId)).body.get.quests))
   }
 
-  private[user] def getAnyQuestsIgnoringLevelsAndCulture(implicit selected: List[Quest]) = {
-    Logger.trace("  Returning from any quests ignoring levels and culture")
+  private[user] def getAnyQuestsDefaultCultureIgnoringLevels(implicit selected: List[Quest]) = {
+    Logger.trace("  Returning from any quests ignoring levels and for default culture")
+
+    val defaultCultureId = api.config(api.ConfigParams.DefaultCultureId)
 
     checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
       user = user,
@@ -154,7 +155,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
       authorsExclude = questAuthorIdsToExclude,
       status = QuestStatus.InRotation,
       levels = None,
-      cultureId = None)).body.get.quests))
+      cultureId = Some(defaultCultureId))).body.get.quests))
   }
 
   /**

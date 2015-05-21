@@ -3,7 +3,6 @@ package logic.user.util
 import controllers.domain.app.battle._
 import logic.UserLogic
 import logic.constants._
-import models.domain._
 import models.domain.battle.{BattleStatus, Battle}
 import play.Logger
 

@@ -1,11 +1,10 @@
 package logic.user.util
 
-import logic.constants._
-import models.domain._
-import logic.UserLogic
-import models.domain.solution.{SolutionStatus, Solution}
-import play.Logger
 import controllers.domain.app.solution._
+import logic.UserLogic
+import logic.constants._
+import models.domain.solution.{Solution, SolutionStatus}
+import play.Logger
 
 trait SolutionSelectUserLogic { this: UserLogic =>
 
@@ -17,7 +16,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       () => getSolutionsWithTags,
       () => getAnySolutions,
       () => getAnySolutionsIgnoringLevels,
-      () => getAnySolutionsIgnoringLevelsAndCulture)
+      () => getAnySolutionsDefaultCultureIgnoringLevels)
 
 
     val it = selectFromChain(algorithms).getOrElse(Iterator.empty)
@@ -183,8 +182,10 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       cultureId = user.demo.cultureId)).body.get.solutions))
   }
 
-  private[user] def getAnySolutionsIgnoringLevelsAndCulture(implicit selected: List[Solution]) = {
-    Logger.trace("  Returning from all solutions (ignoring levels and culture)")
+  private[user] def getAnySolutionsDefaultCultureIgnoringLevels(implicit selected: List[Solution]) = {
+    Logger.trace("  Returning from all solutions (ignoring levels and for default culture)")
+
+    val defaultCultureId = api.config(api.ConfigParams.DefaultCultureId)
 
     checkNotEmptyIterator(Some(api.getAllSolutions(GetAllSolutionsRequest(
       user,
@@ -192,7 +193,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       authorsExclude = solutionAuthorIdsToExclude,
       status = List(SolutionStatus.Won, SolutionStatus.Lost),
       levels = None,
-      cultureId = None)).body.get.solutions))
+      cultureId = Some(defaultCultureId))).body.get.solutions))
   }
 
   private def solutionIdsToExclude(implicit selected: List[Solution]) = {

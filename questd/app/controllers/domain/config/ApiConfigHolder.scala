@@ -10,6 +10,7 @@ class _ConfigParams {
   val DebugDisableQuestCreationCoolDown = "01 02 Debug Disable Quest Creation CoolDown"
 
   val ActiveUserDays = "10 01 Active User Days"
+  val DefaultCultureId = "68349b7a-20ee-4f6e-8406-f468b30be783"
 
   val SolutionVoteTaskCountMean = "30 01 Solution Vote Task Count Mean"
   val SolutionVoteTaskCountDeviation = "30 02 Solution Vote Task Count Deviation"
