@@ -1,6 +1,5 @@
 package controllers.domain.app.quest
 
-import models.domain._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._

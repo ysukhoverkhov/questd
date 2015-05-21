@@ -5,7 +5,6 @@ import components._
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.domain.helpers._
-import models.domain._
 import models.domain.common.ContentVote
 import models.domain.solution.{SolutionStatus, Solution}
 import play.Logger

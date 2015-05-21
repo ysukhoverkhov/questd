@@ -1,6 +1,5 @@
 package models.store.dao
 
-import models.domain._
 import models.domain.solution.{Solution, SolutionStatus}
 
 trait SolutionDAO extends BaseDAO[Solution] {
