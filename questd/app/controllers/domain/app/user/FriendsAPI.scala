@@ -212,16 +212,16 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
         def becomeFriend(me: User, newFriend: User, status: FriendshipStatus.Value, referralStatus: Option[ReferralStatus.Value] = None): Unit = {
           if (me.friends.map(_.friendId).contains(newFriend.id)) {
-            Logger.trace(s"updating friendship")
+            Logger.trace(s"updating friendship with referral status $referralStatus")
             db.user.updateFriendship(me.id, newFriend.id, Some(status.toString), referralStatus.map(_.toString))
           } else {
-            Logger.trace(s"creating friendship")
+            Logger.trace(s"creating friendship with referral status $referralStatus")
             db.user.addFriendship(me.id, Friendship(newFriend.id, status, referralStatus.getOrElse(ReferralStatus.None)))
           }
         }
 
-        // Auto accept for newcomers.
-        if (request.user.profile.publicProfile.level <= 1) {
+        // Auto accept first social network invitation for newcomers.
+        if (!request.user.friends.exists(_.status == FriendshipStatus.Accepted)) {
           becomeFriend(request.user, friend, FriendshipStatus.Accepted, Some(ReferralStatus.ReferredBy))
           becomeFriend(friend, request.user, FriendshipStatus.Accepted, Some(ReferralStatus.Refers))
           sendMessage(SendMessageRequest(
