@@ -18,6 +18,7 @@ class _ConfigParams {
   val QuestVoteTaskCountMean = "30 31 Quest Vote Task Count Mean"
   val QuestVoteTaskCountDeviation = "30 32 Quest Vote Task Count Deviation"
   val CreateQuestTaskProbability = "30 41 Create Quest Task Probability"
+  val WriteCommentTaskProbability = "30 42 Write Comment Task Probability"
   val DailyTasksStartsFromLevel = "35 01 Daily Tasks Starts From Level"
 
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
@@ -91,6 +92,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       ConfigParams.QuestVoteTaskCountMean -> "2",
       ConfigParams.QuestVoteTaskCountDeviation -> "0.5",
       ConfigParams.CreateQuestTaskProbability -> "0.3",
+      ConfigParams.WriteCommentTaskProbability -> "0.3",
       ConfigParams.DailyTasksStartsFromLevel -> "2",
 
       ConfigParams.FavoriteThemesShare -> "0.2",

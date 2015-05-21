@@ -54,7 +54,8 @@ trait Tasks { this: UserLogic =>
    */
   private def taskGenerationAlgorithms: Map[TaskType.Value, (User) => Option[Task]] = {
 
-    Map(TaskType.LikeSolutions -> createLikeSolutionsTask,
+    Map(
+      TaskType.LikeSolutions -> createLikeSolutionsTask,
       TaskType.CreateSolution -> createCreateSolutionTask,
       TaskType.AddToFollowing -> createAddToFollowingTask,
       TaskType.LikeQuests -> createLikeQuestsTask,
@@ -181,11 +182,14 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating tasks for submiting reviews for proposals.
    */
   private def createSubmitReviewsForQuestsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForQuests) {
-    //    Some(Task(
-    //      taskType = TaskType.SubmitReviewsForProposals,
-    //      description = "",
-    //      requiredCount = 10))
-    None
+    val taskProbability = api.config(api.ConfigParams.WriteCommentTaskProbability).toDouble
+    if (rand.nextDouble() < taskProbability)
+      Some(Task(
+        taskType = TaskType.SubmitReviewsForQuests,
+        description = "",
+        requiredCount = 1))
+    else
+      None
   }
 
   /**

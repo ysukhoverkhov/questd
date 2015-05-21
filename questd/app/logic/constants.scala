@@ -1,6 +1,5 @@
 package logic
 
-import models.domain._
 import models.domain.user.Functionality
 
 object constants {
@@ -17,10 +16,10 @@ object constants {
     Functionality.InviteFriends -> 6,
     Functionality.SubmitPhotoQuests -> 7,
     Functionality.SubmitVideoQuests -> 8,
-    Functionality.VoteQuests -> 10,
-    Functionality.VoteReviews -> 14,
-    Functionality.SubmitReviewsForSolutions -> 16,
-    Functionality.SubmitReviewsForQuests -> 18,
+    Functionality.VoteQuests -> 1, // TODO: tweak it.
+    Functionality.VoteReviews -> 1,
+    Functionality.SubmitReviewsForSolutions -> 1,
+    Functionality.SubmitReviewsForQuests -> 1,
     Functionality.GiveRewards -> 20)
 
   def levelFor(f: Functionality.Value): Int = {

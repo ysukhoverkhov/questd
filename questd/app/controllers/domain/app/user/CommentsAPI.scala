@@ -7,7 +7,7 @@ import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import models.domain.comment.{Comment, CommentInfo}
-import models.domain.user.{Profile, User}
+import models.domain.user.{TaskType, Profile, User}
 import models.view.CommentView
 
 
@@ -65,6 +65,8 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
         postingDate = new Date(),
         message = request.message
       )))
+
+      makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.SubmitReviewsForQuests)))
 
       OkApiResult(PostCommentResult(OK, Some(request.user.profile)))
     }
