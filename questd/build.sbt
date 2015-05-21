@@ -16,6 +16,12 @@ libraryDependencies ++= Seq(
   ws
 )
 
+sources in (Compile,doc) := Seq.empty
+
+publishArtifact in (Compile, packageDoc) := false
+
+publishArtifact in (Compile, packageSrc) := false
+
 
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
 
