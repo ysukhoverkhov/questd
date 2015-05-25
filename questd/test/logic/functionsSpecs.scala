@@ -74,11 +74,10 @@ class functionsSpecs extends Specification {
     }
 
     "maxNumberOfFriendsOnLevel" in {
-      maxNumberOfFriendsOnLevel(1) must beEqualTo(1)
-      maxNumberOfFriendsOnLevel(2) must beEqualTo(1)
       maxNumberOfFriendsOnLevel(6) must beEqualTo(4)
       maxNumberOfFriendsOnLevel(10) must beEqualTo(10)
-      maxNumberOfFriendsOnLevel(15) must beEqualTo(33)
+      maxNumberOfFriendsOnLevel(13) must beEqualTo(21)
+      maxNumberOfFriendsOnLevel(17) must beEqualTo(51)
       maxNumberOfFriendsOnLevel(20) must beEqualTo(100)
     }
 
@@ -92,14 +91,12 @@ class functionsSpecs extends Specification {
     }
 
     "costToInviteFriend" in {
-      costToInviteFriend(1) must beEqualTo(6)
-      costToInviteFriend(5) must beEqualTo(118)
-      costToInviteFriend(6) must beEqualTo(165)
-      costToInviteFriend(13) must beEqualTo(1030)
+      costToInviteFriend(6) must beEqualTo(181)
+      costToInviteFriend(10) must beEqualTo(500)
+      costToInviteFriend(13) must beEqualTo(1016)
+      costToInviteFriend(17) must beEqualTo(2539)
       costToInviteFriend(20) must beEqualTo(5000)
     }
   }
-
 }
-
 
