@@ -37,15 +37,15 @@ private[mongo] class MongoBattleDAO
     }
 
     if (authorIds.nonEmpty) {
-      queryBuilder += ("info.authorIds" -> MongoDBObject("$in" -> authorIds))
+      queryBuilder += ("info.battleSides.authorId" -> MongoDBObject("$in" -> authorIds))
     }
 
     if (solutionIds.nonEmpty) {
-      queryBuilder += ("info.solutionIds" -> MongoDBObject("$in" -> solutionIds))
+      queryBuilder += ("info.battleSides.solutionId" -> MongoDBObject("$in" -> solutionIds))
     }
 
     if (authorIdsExclude.nonEmpty) {
-      queryBuilder += ("info.authorIds" -> MongoDBObject("$nin" -> authorIdsExclude))
+      queryBuilder += ("info.battleSides.authorId" -> MongoDBObject("$nin" -> authorIdsExclude))
     }
 
     if (levels.isDefined) {
@@ -85,25 +85,41 @@ private[mongo] class MongoBattleDAO
   def updateStatus(
     id: String,
     newStatus: BattleStatus.Value,
-    addWinners: List[String] = List.empty): Option[Battle] = {
+    setWinnerSolutions: List[String] = List.empty): Option[Battle] = {
 
-    val queryBuilder = MongoDBObject.newBuilder
+    // REFACTOR: remove "for" here and make atomic call when this will be implemented.  https://jira.mongodb.org/browse/SERVER-1243
 
-    queryBuilder +=
-      ("$set" -> MongoDBObject(
-        "info.status" -> newStatus.toString,
-        "lastModDate" -> new Date()))
-
-    if (addWinners.nonEmpty) {
-      queryBuilder +=
-        ("$push" -> MongoDBObject(
-          "info.winnerIds" -> MongoDBObject(
-            "$each" -> addWinners)))
+    val winnersUpdated = setWinnerSolutions.foldLeft(true) {
+      case (true, winnerSolutionId) =>
+        findAndModify(
+          MongoDBObject(
+            "id" -> id,
+            "info.battleSides" -> MongoDBObject("$elemMatch" -> MongoDBObject("solutionId" -> winnerSolutionId))
+          ),
+          MongoDBObject(
+           "$set" -> MongoDBObject(
+             "info.battleSides.$.isWinner" -> true
+           )
+          )
+        ).isDefined
+      case (false, _) =>
+        false
     }
 
-    findAndModify(
-      id,
-      queryBuilder.result())
+    if (winnersUpdated) {
+      val queryBuilder = MongoDBObject.newBuilder
+
+      queryBuilder +=
+        ("$set" -> MongoDBObject(
+          "info.status" -> newStatus.toString,
+          "lastModDate" -> new Date()))
+
+      findAndModify(
+        id,
+        queryBuilder.result())
+    } else {
+      None
+    }
   }
 
   /**

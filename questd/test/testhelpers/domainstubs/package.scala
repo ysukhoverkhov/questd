@@ -3,7 +3,7 @@ package testhelpers
 import java.util.Date
 
 import models.domain.base.ID
-import models.domain.battle.{Battle, BattleInfo, BattleStatus}
+import models.domain.battle.{BattleSide, Battle, BattleInfo, BattleStatus}
 import models.domain.comment.{CommentInfo, Comment}
 import models.domain.common.{Assets, ContentReference, ContentType, ContentVote}
 import models.domain.quest._
@@ -173,11 +173,16 @@ package object domainstubs {
     Battle(
       id = id,
       info = BattleInfo(
-        solutionIds = solutionIds,
-        authorIds = authorIds,
+        battleSides = (solutionIds, authorIds).zipped.map {
+          case (s, a) =>
+            BattleSide(
+              solutionId = s,
+              authorId = a,
+              isWinner = winnerIds.contains(a)
+            )
+        },
         status = status,
-        voteEndDate = voteEndDate,
-        winnerIds = winnerIds),
+        voteEndDate = voteEndDate),
       level = level,
       vip = vip,
       cultureId = cultureId

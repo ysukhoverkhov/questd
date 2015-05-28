@@ -23,11 +23,15 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
 
     Logger.debug("API - updateBattleState")
 
+    def solutionsOfBattle(b: Battle): List[Solution] = {
+      b.info.battleSides.flatMap { s =>
+        db.solution.readById(s.solutionId)
+      }
+    }
+
     def checkResolved(b: Battle): Option[Battle] = {
       if (b.resolved) {
-        val solutions: List[Solution] = b.info.solutionIds.flatMap { s =>
-          db.solution.readById(s)
-        }
+        val solutions = solutionsOfBattle(b)
 
         val bestSolution = solutions.sortBy(_.votingPoints)(Ordering[Int].reverse).head
 
@@ -56,9 +60,7 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
       val authorsUpdateResult: OkApiResult[UpdateBattleStateResult] =
         if (b.info.status != battle.info.status) {
 
-          val solutions: List[Solution] = b.info.solutionIds.flatMap { s =>
-            db.solution.readById(s)
-          }
+          val solutions = solutionsOfBattle(b)
 
           solutions.foreach { s =>
             val authorId = s.info.authorId

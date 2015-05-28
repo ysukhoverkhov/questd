@@ -4,10 +4,9 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import logic.BattleLogic
-import models.domain._
-import models.domain.battle.{BattleInfo, Battle}
+import models.domain.battle.{Battle, BattleInfo, BattleSide}
 import models.domain.solution.{Solution, SolutionStatus}
-import models.domain.user.{TimeLineType, TimeLineReason}
+import models.domain.user.{TimeLineReason, TimeLineType}
 import play.Logger
 
 import scala.language.postfixOps
@@ -61,8 +60,12 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         // FIX: transaction should be here as this operation is atomic.
         val battle = Battle(
           info = BattleInfo(
-            solutionIds = solutions.map(_.id),
-            authorIds = solutions.map(_.info.authorId),
+            battleSides = solutions.map { s =>
+              BattleSide(
+                solutionId = s.id,
+                authorId = s.info.authorId
+              )
+            },
             voteEndDate = BattleLogic.voteEndDate(solution.questLevel)
           ),
           level = competitor.questLevel,

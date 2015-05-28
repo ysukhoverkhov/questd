@@ -19,6 +19,26 @@ class BattleDAOSpecs extends Specification
 
   "Mongo Battle DAO" should {
 
+    "Create battle" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val b = createBattleStub(
+        id = "b1",
+        solutionIds = List("s1_id", "s2_id"),
+        authorIds = List("a1_id", "a2_id"),
+        status = BattleStatus.Fighting,
+        level = 3,
+        vip = false,
+        cultureId = "c1")
+
+      db.battle.create(b)
+
+      val ob = db.battle.readById(b.id)
+
+      ob must beSome
+      ob.get must beEqualTo(b)
+    }
+
     "Get all battles" in new WithApplication(appWithTestDatabase) {
 
       clearDB()
@@ -53,7 +73,12 @@ class BattleDAOSpecs extends Specification
           vip = true,
           cultureId = "c2"))
 
+      bs.head.info.battleSides.map(_.solutionId).sorted must beEqualTo(List("s1_id", "s2_id").sorted)
+      bs.head.info.battleSides.map(_.authorId).sorted must beEqualTo(List("a1_id", "a2_id").sorted)
+
       bs.foreach(db.battle.create)
+
+      db.battle.all.toList.sortBy(_.id) must beEqualTo(bs.sortBy(_.id))
 
       val all = db.battle.allWithParams().toList
       all.size must beEqualTo(bs.size)
@@ -127,7 +152,8 @@ class BattleDAOSpecs extends Specification
 
       var r = db.battle.readById(battle.id)
 
-      r must beSome.which(b => b.info.status == BattleStatus.Resolved && b.info.winnerIds == winnerIds)
+      r must beSome.which(b => b.info.status == BattleStatus.Resolved && b.info.battleSides.filter(s => winnerIds.contains(s.solutionId)).filter(
+        s => s.isWinner).map(_.solutionId).sorted == winnerIds.sorted)
     }
 
     "Replace cultures" in new WithApplication(appWithTestDatabase) {
