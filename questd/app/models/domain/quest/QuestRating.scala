@@ -7,8 +7,9 @@ import models.domain.common.IAContentRating
  */
 case class QuestRating(
     // The filed is by group.
-  points: Int = 0, // TODO: rename me to timelinePoints
+  votersCount: Int = 0,
+  timelinePoints: Int = 0,
   likesCount: Int = 0,
   cheating: Int = 0,
-  iacpoints: IAContentRating = IAContentRating(),
-  votersCount: Int = 0)
+  iacpoints: IAContentRating = IAContentRating()
+  )

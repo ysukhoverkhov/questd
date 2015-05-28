@@ -27,7 +27,7 @@ class SolutionDAOSpecs extends Specification
     themeId: String = "theme id",
     questLevel: Int = 5,
     vip: Boolean = false,
-    status: SolutionStatus.Value = SolutionStatus.OnVoting) = {
+    status: SolutionStatus.Value = SolutionStatus.InRotation) = {
 
     db.solution.create(createSolutionStub(
       id = id,
@@ -98,7 +98,7 @@ class SolutionDAOSpecs extends Specification
           themeId = "q1_theme_id",
           level = 3,
           vip = false,
-          status = SolutionStatus.OnVoting,
+          status = SolutionStatus.InRotation,
           lastModDate = new Date(5000)),
         createSolutionStub(
           id = "q2",
@@ -107,7 +107,7 @@ class SolutionDAOSpecs extends Specification
           themeId = "q2_theme_id",
           level = 13,
           vip = true,
-          status = SolutionStatus.Won,
+          status = SolutionStatus.OldBanned,
           lastModDate = new Date(3000)),
         createSolutionStub(
           id = "q3",
@@ -116,7 +116,7 @@ class SolutionDAOSpecs extends Specification
           themeId = "q3_theme_id",
           level = 7,
           vip = true,
-          status = SolutionStatus.OnVoting,
+          status = SolutionStatus.InRotation,
           lastModDate = new Date(4000)))
 
       qs.foreach(db.solution.create)
@@ -126,7 +126,7 @@ class SolutionDAOSpecs extends Specification
       // Checking order with lastModDate
       all must beEqualTo(List(qs(1), qs(2), qs(0)))
 
-      val status = db.solution.allWithParams(status = List(SolutionStatus.OnVoting)).toList
+      val status = db.solution.allWithParams(status = List(SolutionStatus.InRotation)).toList
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
 
@@ -145,7 +145,7 @@ class SolutionDAOSpecs extends Specification
       vip.map(_.id).size must beEqualTo(2)
       vip.map(_.id) must contain(qs(1).id) and contain(qs(2).id)
 
-      val statusVip = db.solution.allWithParams(status = List(SolutionStatus.OnVoting), vip = Some(false)).toList
+      val statusVip = db.solution.allWithParams(status = List(SolutionStatus.InRotation), vip = Some(false)).toList
       statusVip.map(_.id).size must beEqualTo(1)
       statusVip.map(_.id) must beEqualTo(List(qs(0).id))
 
@@ -165,7 +165,7 @@ class SolutionDAOSpecs extends Specification
       themeIdsAndIds.map(_.id).size must beEqualTo(1)
       themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))
 
-      val statusWithQuestIds = db.solution.allWithParams(ids = List("q1", "q2"), status = List(SolutionStatus.OnVoting)).toList
+      val statusWithQuestIds = db.solution.allWithParams(ids = List("q1", "q2"), status = List(SolutionStatus.InRotation)).toList
       statusWithQuestIds.map(_.id).size must beEqualTo(1)
       statusWithQuestIds.map(_.id) must beEqualTo(List(qs(0).id))
 
@@ -186,11 +186,11 @@ class SolutionDAOSpecs extends Specification
       createSolutionInDB(id1)
       createSolutionInDB(id2)
 
-      val su1 = db.solution.updateStatus(id1, SolutionStatus.Lost)
-      val su2 = db.solution.updateStatus(id2, SolutionStatus.Won, Some(id1))
+      val su1 = db.solution.updateStatus(id1, SolutionStatus.CheatingBanned)
+      val su2 = db.solution.updateStatus(id2, SolutionStatus.OldBanned, Some(id1))
 
-      su1 must beSome[Solution].which(s => s.status == SolutionStatus.Lost && s.battleIds == List.empty)
-      su2 must beSome[Solution].which(s => s.status == SolutionStatus.Won && s.battleIds == List(id1))
+      su1 must beSome[Solution].which(s => s.status == SolutionStatus.CheatingBanned && s.battleIds == List.empty)
+      su2 must beSome[Solution].which(s => s.status == SolutionStatus.OldBanned && s.battleIds == List(id1))
     }
 
     "Replace cultures" in new WithApplication(appWithTestDatabase) {

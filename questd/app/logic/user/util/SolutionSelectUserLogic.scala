@@ -47,7 +47,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
         user = user,
         idsExclude = solutionIdsToExclude,
         authorsExclude = solutionAuthorIdsToExclude,
-        status = List(SolutionStatus.Won, SolutionStatus.Lost))).body.get.solutions)
+        status = List(SolutionStatus.InRotation))).body.get.solutions)
     } else {
       None
     }
@@ -60,7 +60,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user = user,
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost))).body.get.solutions
+      status = List(SolutionStatus.InRotation))).body.get.solutions
 
     if (solutions.isEmpty) None else Some(solutions)
   }
@@ -101,7 +101,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning Solutions from friends")
     checkNotEmptyIterator(Some(api.getFriendsSolutions(GetFriendsSolutionsRequest(
       user = user,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       levels = levels)).body.get.solutions))
@@ -111,7 +111,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning solutions from Following")
     checkNotEmptyIterator(Some(api.getFollowingSolutions(GetFollowingSolutionsRequest(
       user = user,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       levels = levels)).body.get.solutions))
@@ -121,7 +121,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning solutions for quests we liked recently")
     checkNotEmptyIterator(Some(api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
       user = user,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       levels = levels)).body.get.solutions))
@@ -135,7 +135,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     checkNotEmptyIterator(Some(api.getVIPSolutions(GetVIPSolutionsRequest(
       user = user,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       levels = levels,
@@ -150,7 +150,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     checkNotEmptyIterator(Some(api.getAllSolutions(GetAllSolutionsRequest(
       user = user,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       levels = levels,
@@ -165,7 +165,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user = user,
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       levels = levels,
       cultureId = user.demo.cultureId)).body.get.solutions))
   }
@@ -177,7 +177,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user,
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       levels = None,
       cultureId = user.demo.cultureId)).body.get.solutions))
   }
@@ -191,7 +191,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user,
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       levels = None,
       cultureId = Some(defaultCultureId))).body.get.solutions))
   }

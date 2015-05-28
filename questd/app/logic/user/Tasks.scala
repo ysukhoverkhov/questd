@@ -81,7 +81,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating task for voting quests.
    */
-  private def createLikeSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
+  private def createLikeSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteSolutions) {
     {
       val mean = api.config(api.ConfigParams.SolutionVoteTaskCountMean).toDouble
       val dev = api.config(api.ConfigParams.SolutionVoteTaskCountDeviation).toDouble

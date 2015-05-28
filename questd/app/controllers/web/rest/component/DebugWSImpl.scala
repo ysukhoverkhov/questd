@@ -163,6 +163,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
       val questId = api.getUser(GetUserRequest(userId = Some(author.id))).body.get.user.get.stats.createdQuests.last
 
+      Logger.debug(s"Quest for debug battle created id = $questId")
+
       {
         api.addToTimeLine(AddToTimeLineRequest(
           user = r.user,
@@ -172,6 +174,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
           actorId = Some(author.id)
         ))
       } map { rr =>
+
+        Logger.debug(s"Quest added to timeline")
 
         api.solveQuest(SolveQuestRequest(
           rr.user,
@@ -184,6 +188,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
       } map { rr =>
         assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
 
+        Logger.debug(s"Quest solved")
+
         api.addToTimeLine(AddToTimeLineRequest(
           user = peer,
           reason = TimeLineReason.Created,
@@ -193,6 +199,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
         ))
 
       } map { rr =>
+
+        Logger.debug(s"Quest added to timeline")
 
         api.solveQuest(SolveQuestRequest(
           rr.user,
@@ -205,6 +213,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
       }
     } map { rr =>
       assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
+
+      Logger.debug(s"Quest solved")
 
       OkApiResult(WSDebugResult("Done"))
     }

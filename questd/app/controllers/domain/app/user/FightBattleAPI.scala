@@ -26,9 +26,13 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
   def tryCreateBattle(request: TryCreateBattleRequest): ApiResult[TryCreateBattleResult] = handleDbException {
     import request._
 
+    Logger.trace(s"Trying to create battle")
+
     def selectCompetitor(possibleCompetitors: Iterator[Solution]): Option[Solution] = {
       if (possibleCompetitors.hasNext) {
         val other = possibleCompetitors.next()
+
+        Logger.trace(s"    Analysing competitor $other")
 
         if (other.info.authorId != request.solution.info.authorId) {
 
@@ -47,14 +51,18 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
       }
     }
 
+    // TODO: filter out here somehow solutions with battles.
     val possibleCompetitors = db.solution.allWithParams(
-      status = List(SolutionStatus.WaitingForCompetitor),
+      status = List(SolutionStatus.InRotation),
       questIds = List(solution.info.questId),
       cultureId = Some(solution.cultureId))
+
+//    Logger.trace(s"  Possible competitors count [${possibleCompetitors.length}}]")
 
     selectCompetitor(possibleCompetitors) match {
       case Some(competitor) =>
 
+        Logger.trace(s"  Selected competitor solution $competitor}")
         val solutions = List(solution, competitor)
 
         // FIX: transaction should be here as this operation is atomic.
@@ -74,9 +82,9 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         )
         db.battle.create(battle)
 
-        solutions.foreach { s =>
-          db.solution.updateStatus(s.id, SolutionStatus.OnVoting, Some(battle.id))
+        Logger.trace(s"  Battle created")
 
+        solutions.foreach { s =>
           db.user.readById(s.info.authorId) ifSome { u =>
             {
               addToTimeLine(AddToTimeLineRequest(
@@ -97,6 +105,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         OkApiResult(TryCreateBattleResult())
 
       case None =>
+        Logger.trace(s"  Competitor not selected")
         OkApiResult(TryCreateBattleResult())
     }
   }

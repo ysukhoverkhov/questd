@@ -13,9 +13,9 @@ case class UserStats (
   createdQuests: List[String] = List.empty,
 
   /**
-   * List of all our created solutions.
+   * All voted quests.
    */
-  createdSolutions: List[String] = List.empty,
+  votedQuests: Map[String, ContentVote.Value] = Map.empty,
 
   /**
    * List of all solved quests.
@@ -23,12 +23,26 @@ case class UserStats (
   solvedQuests: List[String] = List.empty,
 
   /**
-   * All voted quests.
+   * List of all our created solutions.
    */
-  votedQuests: Map[String, ContentVote.Value] = Map.empty,
+  createdSolutions: List[String] = List.empty,
 
   /**
    * All voted solutions.
    */
-  votedSolutions: Map[String, ContentVote.Value] = Map.empty
+  votedSolutions: Map[String, ContentVote.Value] = Map.empty,
+
+  // TODO: test it's filled
+  // TODO: test it's used for voting.
+  /**
+   * Battles we took part in.
+   */
+  participatedBattles: List[String] = List.empty,
+
+  // TODO: test it's filled
+  // TODO: test it's used for voting.
+  /**
+   * All voted battles. Value is id of solution in battle we voted for.
+   */
+  votedBattles: Map[String, String] = Map.empty
   )

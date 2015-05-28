@@ -2,12 +2,11 @@ package controllers.web.rest.component
 
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import models.domain._
 import models.domain.common.ContentVote
 
-private object VoteQuestSolutionWSImplTypes {
+private object VoteSolutionWSImplTypes {
 
-  case class WSVoteQuestSolutionRequest(
+  case class WSVoteSolutionRequest(
 
     /**
      * id of solution we vote for.
@@ -22,18 +21,16 @@ private object VoteQuestSolutionWSImplTypes {
   type WSVoteSolutionResult = VoteSolutionByUserResult
 }
 
-trait VoteQuestSolutionWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+trait VoteSolutionWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
-  import controllers.web.rest.component.VoteQuestSolutionWSImplTypes._
+  import controllers.web.rest.component.VoteSolutionWSImplTypes._
 
   def voteSolution = wrapJsonApiCallReturnBody[WSVoteSolutionResult] { (js, r) =>
 
-    val v = Json.read[WSVoteQuestSolutionRequest](js)
+    val v = Json.read[WSVoteSolutionRequest](js)
     val vote = ContentVote.withName(v.vote)
 
     api.voteSolutionByUser(VoteSolutionByUserRequest(r.user, v.solutionId, vote))
-
   }
-
 }
 

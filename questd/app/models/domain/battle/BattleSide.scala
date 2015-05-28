@@ -7,5 +7,6 @@ case class BattleSide(
   solutionId: String,
   authorId: String,
   isWinner: Boolean = false,
-  points: Int = 0
+  pointsRandom: Int = 0,
+  pointsFriends: Int = 0
   )

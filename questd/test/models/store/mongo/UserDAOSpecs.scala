@@ -22,6 +22,10 @@ class UserDAOSpecs
   with MongoDatabaseComponent
   with BaseDAOSpecs {
 
+  private[this] def clearDB() = {
+    db.user.clear()
+  }
+
   "Mongo User DAO" should {
     "Create new User in DB and find it by userId" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
@@ -75,6 +79,8 @@ class UserDAOSpecs
     }
 
     "Delete user in DB" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
       val userid = "id to test delete"
 
       db.user.create(User(userid))
@@ -108,7 +114,7 @@ class UserDAOSpecs
     }
 
     """Return "None" in search for not existing user""" in new WithApplication(appWithTestDatabase) {
-      val u = db.user.readBySessionId("Another id of another never existign user")
+      val u = db.user.readBySessionId("Another id of another never existing user")
       u must beNone
     }
 

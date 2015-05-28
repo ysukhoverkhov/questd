@@ -3,9 +3,9 @@ package controllers.web.rest
 import controllers.web.rest.helpers.AccessToWSInstance
 import play.api.mvc._
 
-object VoteQuestSolutionWS extends Controller with AccessToWSInstance {
+object VoteBattleWS extends Controller with AccessToWSInstance {
 
-  def voteSolution = ws.voteSolution
+  def voteBattle= ws.voteBattle
 
 }
 

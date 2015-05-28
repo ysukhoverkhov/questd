@@ -60,7 +60,7 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
               content = q.info.content.copy(
                 description = request.description)),
             rating = q.rating.copy(
-              points = request.points,
+              timelinePoints = request.points,
               cheating = request.cheating,
               votersCount = request.votersCount)))
 

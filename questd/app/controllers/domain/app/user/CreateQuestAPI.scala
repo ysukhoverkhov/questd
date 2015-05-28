@@ -104,7 +104,8 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
         removeFromTimeLine(RemoveFromTimeLineRequest(author, request.quest.id))
 
       case QuestStatus.OldBanned =>
-        OkApiResult(StoreQuestInDailyResultResult(author))
+        // We do nothing here.
+        OkApiResult(RewardQuestAuthorResult())
 
       case _ =>
         InternalErrorApiResult[StoreQuestInDailyResultResult]("Rewarding quest author but quest status is Unexpected")

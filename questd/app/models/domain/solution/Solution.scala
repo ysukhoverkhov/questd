@@ -15,4 +15,4 @@ case class Solution(
   questLevel: Int,
   info: SolutionInfo,
   rating: SolutionRating = SolutionRating(),
-  status: SolutionStatus.Value = SolutionStatus.WaitingForCompetitor) extends ID
+  status: SolutionStatus.Value = SolutionStatus.InRotation) extends ID

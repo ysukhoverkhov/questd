@@ -125,6 +125,30 @@ private[mongo] class MongoBattleDAO
   /**
    * @inheritdoc
    */
+  def updatePoints(
+    id: String,
+    solutionId: String,
+    randomPointsChange: Int,
+    friendsPointsChange: Int): Option[Battle] = {
+// TODO: test me.
+// TODO: test last mod date updated.
+
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "info.battleSides" -> MongoDBObject("$elemMatch" -> MongoDBObject("solutionId" -> solutionId))
+      ),
+      MongoDBObject(
+        "$inc" -> MongoDBObject(
+          "info.battleSides.$.pointsRandom" -> randomPointsChange,
+          "info.battleSides.$.pointsFriends" -> friendsPointsChange),
+        "$set" -> MongoDBObject(
+          "lastModDate" -> new Date())))
+  }
+
+  /**
+   * @inheritdoc
+   */
   def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit = {
     update(
       query = MongoDBObject(

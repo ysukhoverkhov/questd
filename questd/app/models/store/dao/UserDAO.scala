@@ -63,6 +63,16 @@ trait UserDAO extends BaseDAO[User] {
   def recordSolutionVote(id: String, solutionId: String, vote: ContentVote.Value): Option[User]
 
   /**
+   * Record vote of battle.
+   *
+   * @param id Id of user to record vote.
+   * @param battleId Battle id we voted.
+   * @param solutionId Solution we voted for.
+   * @return Updated user.
+   */
+  def recordBattleVote(id: String, battleId: String, solutionId: String): Option[User]
+
+  /**
    * Set quest bookmark for a user.
    * @param id Id of a user setting a bookmark.
    * @param questId Id of a quest set bookmark.

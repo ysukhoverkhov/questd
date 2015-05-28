@@ -79,7 +79,7 @@ private[mongo] class MongoQuestDAO
 
   def updatePoints(
     id: String,
-    pointsChange: Int,
+    timelinePointsChange: Int,
     likesChange: Int,
     votersCountChange: Int = 0,
     cheatingChange: Int = 0,
@@ -91,7 +91,7 @@ private[mongo] class MongoQuestDAO
       id,
       MongoDBObject(
         "$inc" -> MongoDBObject(
-          "rating.points" -> pointsChange,
+          "rating.timelinePoints" -> timelinePointsChange,
           "rating.likesCount" -> likesChange,
           "rating.votersCount" -> votersCountChange,
           "rating.cheating" -> cheatingChange,

@@ -2,11 +2,10 @@ package logic
 
 import java.util.Date
 
+import com.github.nscala_time.time.Imports._
 import controllers.domain.DomainAPIComponent
-import models.domain._
 import models.domain.battle.Battle
 import org.joda.time.DateTime
-import com.github.nscala_time.time.Imports._
 
 class BattleLogic(
   val battle: Battle,
@@ -27,12 +26,14 @@ class BattleLogic(
   }
 
   /**
-   * is the battle is resolved.
-   * @return true if batle should be considered resolved.
+   * Calculate points for quest solution voting.
    */
-  def resolved = {
-    shouldStopVoting
-  }
+//  def votingPoints = {
+//    List(
+//      qs.rating.pointsRandom,
+//      qs.rating.pointsFriends * constants.FriendsVoteMult).sum
+//  }
+
 }
 
 object BattleLogic {

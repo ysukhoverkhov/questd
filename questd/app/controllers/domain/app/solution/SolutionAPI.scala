@@ -1,12 +1,11 @@
 package controllers.domain.app.solution
 
-import controllers.domain.app.battle.{UpdateBattleStateResult, UpdateBattleStateRequest}
 import components._
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.domain.helpers._
 import models.domain.common.ContentVote
-import models.domain.solution.{SolutionStatus, Solution}
+import models.domain.solution.{Solution, SolutionStatus}
 import play.Logger
 
 case class VoteSolutionRequest(
@@ -27,7 +26,7 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
     import ContentVote._
     import request._
 
-    Logger.debug("API - voteQuestSolution")
+    Logger.debug("API - voteSolution")
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
@@ -35,27 +34,17 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
       db.solution.updatePoints(
         solution.id,
 
-        reviewsCountChange = 1,
-        pointsRandomChange = if (isFriend) 0 else checkInc(vote, Cool),
-        pointsFriendsChange = if (isFriend) checkInc(vote, Cool) else 0,
-        likesCountChange = checkInc(vote, Cool),
+        votersCountChange = 1,
+        timelinePointsChange = checkInc(vote, Cool),
+        likesChange = checkInc(vote, Cool),
 
         cheatingChange = checkInc(vote, Cheating),
-
         spamChange = checkInc(vote, IASpam),
         pornChange = checkInc(vote, IAPorn))
     } ifSome { o =>
 
       updateSolutionState(UpdateSolutionStateRequest(o)) map {
-        (if (o.status == SolutionStatus.OnVoting) {
-          db.battle.readById(o.battleIds.head) ifSome { b =>
-            updateBattleState(UpdateBattleStateRequest(b))
-          }
-        } else {
-          OkApiResult(UpdateBattleStateResult)
-        }) map {
-          OkApiResult(VoteSolutionResult())
-        }
+        OkApiResult(VoteSolutionResult())
       }
     }
   }

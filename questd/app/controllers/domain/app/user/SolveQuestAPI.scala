@@ -147,25 +147,27 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     try {
       val r = solution.status match {
-        case SolutionStatus.WaitingForCompetitor =>
-          InternalErrorApiResult("We are rewarding player for solution what is waiting for competitor")
+        case SolutionStatus.InRotation =>
+          InternalErrorApiResult("We are rewarding player for solution what is in rotation")
 
-        case SolutionStatus.OnVoting =>
-          InternalErrorApiResult("We are rewarding player for solution what is on voting.")
+        case SolutionStatus.OldBanned =>
+          // We do nothing here.
+          OkApiResult(RewardSolutionAuthorResult())
 
-        case SolutionStatus.Won =>
-          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
-            user = author,
-            solution = request.solution,
-            battle = request.battle,
-            reward = Some(q.info.solveRewardWon)))
-
-        case SolutionStatus.Lost =>
-          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
-            user = author,
-            solution = request.solution,
-            battle = request.battle,
-            reward = Some(q.info.solveRewardLost)))
+          // TODO: move it to rewarting battle participiant.
+//        case SolutionStatus.Won =>
+//          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
+//            user = author,
+//            solution = request.solution,
+//            battle = request.battle,
+//            reward = Some(q.info.solveRewardWon)))
+//
+//        case SolutionStatus.Lost =>
+//          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
+//            user = author,
+//            solution = request.solution,
+//            battle = request.battle,
+//            reward = Some(q.info.solveRewardLost)))
 
         case SolutionStatus.CheatingBanned =>
           storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(

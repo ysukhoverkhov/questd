@@ -63,7 +63,7 @@ package object domainstubs {
           solveCost = solveCost,
           solveRewardWon = Assets(),
           solveRewardLost = Assets()),
-      rating = QuestRating(points = points, likesCount = likes),
+      rating = QuestRating(timelinePoints = points, likesCount = likes),
       status = status)
   }
 
@@ -80,7 +80,7 @@ package object domainstubs {
     authorId: String = "uid",
     questId: String = "qid",
     themeId: String = "themeId",
-    status: SolutionStatus.Value = SolutionStatus.OnVoting,
+    status: SolutionStatus.Value = SolutionStatus.InRotation,
     level: Int = 1,
     points: Int = 0,
     vip: Boolean = false,
@@ -97,7 +97,7 @@ package object domainstubs {
         questId = questId),
       status = status,
       rating = SolutionRating(
-        pointsRandom = points),
+        timelinePoints = points),
       lastModDate = lastModDate)
   }
 
