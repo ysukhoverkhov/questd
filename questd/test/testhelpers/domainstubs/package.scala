@@ -11,7 +11,7 @@ import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
 import models.domain.user._
 import models.domain.user.auth.{LoginMethod, AuthInfo}
-import models.domain.user.dailyresults.{SolutionResult, QuestIncome, DailyResult}
+import models.domain.user.dailyresults._
 import models.view.{QuestView, ThemeInfoWithID}
 
 
@@ -137,11 +137,15 @@ package object domainstubs {
   def createDailyResultStub(
     startOfPeriod: Date = new Date(),
     questsIncome: List[QuestIncome] = List(createQuestIncomeStub()),
-    questSolutionResult: List[SolutionResult] = List.empty) = {
+    questResult: List[QuestResult] = List.empty,
+    solutionResult: List[SolutionResult] = List.empty,
+    battleResult: List[BattleResult] = List.empty) = {
     DailyResult(
       startOfPeriod = startOfPeriod,
       questsIncome = questsIncome,
-      decidedSolutions = questSolutionResult
+      decidedQuests = questResult,
+      decidedSolutions = solutionResult,
+      decidedBattles = battleResult
     )
   }
 

@@ -35,8 +35,10 @@ case class StoreQuestInDailyResultRequest(
   reward: Assets)
 case class StoreQuestInDailyResultResult(user: User)
 
-// TODO: apply daily results for battles
-case class StoreBattleInDailyResultRequest(user: User, battle: Battle, reward: Assets)
+case class StoreBattleInDailyResultRequest(
+  user: User,
+  battle: Battle,
+  reward: Assets)
 case class StoreBattleInDailyResultResult(user: User)
 
 case class StoreSolutionInDailyResultRequest(
@@ -84,24 +86,22 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
       val deltaAssets = u.profile.dailyResults.foldLeft(Assets()) { (a, dailyResult) =>
 
-        // TODO: fold three functions here (use inheritance of common result).
-        val assetsAfterQuests = dailyResult.decidedQuests.foldLeft(a) { (a, result) =>
-          a + result.reward
+        a + List[Assets](
+          dailyResult.decidedQuests.foldLeft(Assets()) { (a, result) =>
+            a + result.reward
+          },
+          dailyResult.decidedSolutions.foldLeft(Assets()) { (a, result) =>
+            a + result.reward
+          },
+          dailyResult.decidedBattles.foldLeft(Assets()) { (a, result) =>
+            a + result.reward
+          },
+          dailyResult.questsIncome.foldLeft(Assets()) { (a, questIncome) =>
+            a + questIncome.likesIncome + questIncome.passiveIncome + questIncome.solutionsIncome
+          }
+        ).foldLeft(Assets()) { (r, assets) =>
+          r + assets
         }
-
-        val assetsAfterSolutions = dailyResult.decidedSolutions.foldLeft(assetsAfterQuests) { (a, result) =>
-          a + result.reward
-        }
-
-        val assetsAfterBattles = dailyResult.decidedBattles.foldLeft(assetsAfterSolutions) { (a, result) =>
-          a + result.reward
-        }
-
-        dailyResult.questsIncome.foldLeft(assetsAfterBattles) { (a, questIncome) =>
-          a + questIncome.likesIncome + questIncome.passiveIncome + questIncome.solutionsIncome
-        }
-        // end of todo.
-
       }
 
       adjustAssets(AdjustAssetsRequest(user = u, change = deltaAssets))
