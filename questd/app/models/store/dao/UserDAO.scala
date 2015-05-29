@@ -5,7 +5,7 @@ import java.util.Date
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
-import models.domain.user.dailyresults.{SolutionResult, QuestIncome, QuestResult, DailyResult}
+import models.domain.user.dailyresults._
 import models.domain.user.message.Message
 import models.view.QuestView
 
@@ -105,6 +105,7 @@ trait UserDAO extends BaseDAO[User] {
   def storeQuestSolvingInDailyResult(id: String, questId: String, reward: Assets): Option[User]
   def storeQuestInDailyResult(id: String, proposal: QuestResult): Option[User]
   def storeSolutionInDailyResult(id: String, solution: SolutionResult): Option[User]
+  def storeBattleInDailyResult(id: String, battle: BattleResult): Option[User]
 
   def levelUp(id: String, ratingToNextLevel: Int): Option[User]
   def setNextLevelRatingAndRights(id: String, newRatingToNextLevel: Int, rights: Rights): Option[User]

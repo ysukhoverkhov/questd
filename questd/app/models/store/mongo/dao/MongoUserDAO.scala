@@ -7,7 +7,7 @@ import com.novus.salat._
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
-import models.domain.user.dailyresults.{SolutionResult, QuestIncome, QuestResult, DailyResult}
+import models.domain.user.dailyresults._
 import models.domain.user.message.Message
 import models.store.dao._
 import models.store.mongo.SalatContext._
@@ -312,7 +312,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def storeSolutionInDailyResult(id: String, solution: SolutionResult): Option[User] = {
     findAndModify(
@@ -323,7 +323,18 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
+   */
+  def storeBattleInDailyResult(id: String, battle: BattleResult): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$push" -> MongoDBObject(
+          "privateDailyResults.0.decidedBattles" -> grater[BattleResult].asDBObject(battle))))
+  }
+
+  /**
+   * @inheritdoc
    */
   def levelUp(id: String, ratingToNextLevel: Int): Option[User] = {
     findAndModify(

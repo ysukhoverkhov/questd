@@ -10,7 +10,7 @@ import models.domain.common.Assets
 import models.domain.quest.{QuestStatus, Quest}
 import models.domain.solution.Solution
 import models.domain.user._
-import models.domain.user.dailyresults.{SolutionResult, QuestIncome, QuestResult, DailyResult}
+import models.domain.user.dailyresults._
 import play.Logger
 import logic.constants._
 
@@ -224,10 +224,18 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   /**
    * Stores battle in daily result.
    */
-  // TODO: implement me.
   // TODO: test me.
   def storeBattleInDailyResult(request: StoreBattleInDailyResultRequest): ApiResult[StoreBattleInDailyResultResult] = handleDbException {
-    OkApiResult(StoreBattleInDailyResultResult(request.user))
+    import request._
+
+    val battleResult = BattleResult(
+      battleId = battle.id,
+      reward = reward,
+      isVictory = battle.info.battleSides.find(_.authorId == user.id).fold(false)(_.isWinner))
+
+    db.user.storeBattleInDailyResult(user.id, battleResult) ifSome { u =>
+      OkApiResult(StoreBattleInDailyResultResult(u))
+    }
   }
 
   private def createQuestIncomeForQuest(quest: Quest): QuestIncome = {

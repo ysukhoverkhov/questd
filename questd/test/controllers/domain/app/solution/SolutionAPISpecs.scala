@@ -13,9 +13,9 @@ import org.mockito.Matchers.{eq => mEq}
 import org.mockito.Mockito._
 import testhelpers.domainstubs._
 
-class QuestSolutionAPISpecs extends BaseAPISpecs {
+class SolutionAPISpecs extends BaseAPISpecs {
 
-  "Quest solution API" should {
+  "Solution API" should {
 
     "updateQuestSolutionState calls rewardQuestSolutionAuthor if solution state is changed" in context {
       val q = createQuestStub(id = "qid")

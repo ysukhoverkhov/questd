@@ -8,6 +8,7 @@ import models.domain.common.{Assets, ContentVote}
 import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
 import models.domain.user.auth.{CrossPromotedApp, LoginMethod, AuthInfo}
+import models.domain.user.dailyresults.BattleResult
 import models.domain.user.message.MessageInformation
 import models.store._
 import models.view.QuestView
@@ -21,10 +22,6 @@ class UserDAOSpecs
   extends Specification
   with MongoDatabaseComponent
   with BaseDAOSpecs {
-
-  private[this] def clearDB() = {
-    db.user.clear()
-  }
 
   "Mongo User DAO" should {
     "Create new User in DB and find it by userId" in new WithApplication(appWithTestDatabase) {
@@ -79,7 +76,7 @@ class UserDAOSpecs
     }
 
     "Delete user in DB" in new WithApplication(appWithTestDatabase) {
-      clearDB()
+      db.user.clear()
 
       val userid = "id to test delete"
 
@@ -695,6 +692,21 @@ class UserDAOSpecs
       val u = ou2.get
       u.friends.head.status must beEqualTo(FriendshipStatus.Accepted)
       u.friends.head.referralStatus must beEqualTo(ReferralStatus.ReferredBy)
+    }
+
+    "storeBattleInDailyResult works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val br = BattleResult("1", Assets(1, 2, 3), isVictory = true)
+
+      db.user.create(user)
+      db.user.storeBattleInDailyResult(user.id, br)
+
+      val ou = db.user.readById(user.id)
+
+      ou must beSome
+      ou.get.privateDailyResults.head.decidedBattles.head must beEqualTo(br)
     }
   }
 }
