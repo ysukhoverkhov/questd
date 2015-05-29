@@ -62,8 +62,7 @@ package object domainstubs {
           icon = None,
           description = "desc"),
           solveCost = solveCost,
-          solveRewardWon = Assets(),
-          solveRewardLost = Assets()),
+          solveReward = Assets()),
       rating = QuestRating(timelinePoints = points, likesCount = likes),
       status = status)
   }
@@ -183,7 +182,9 @@ package object domainstubs {
             )
         },
         status = status,
-        voteEndDate = voteEndDate),
+        voteEndDate = voteEndDate,
+        victoryReward = Assets(),
+        defeatReward = Assets()),
       level = level,
       vip = vip,
       cultureId = cultureId

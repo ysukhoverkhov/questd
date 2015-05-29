@@ -60,6 +60,14 @@ object functions {
    * @param level level of the quest.
    * How much rating we will receive for losing quest.
    */
+  def ratingToSolveQuest(level: Int): Int = {
+    math.round(ratingForSubmitResult(level) * QuestLosingMultiplier).toInt
+  }
+
+  /**
+   * @param level level of the quest.
+   * How much rating we will receive for losing quest.
+   */
   def ratingToLoseQuest(level: Int): Int = {
     math.round(ratingForSubmitResult(level) * QuestLosingMultiplier).toInt
   }

@@ -5,6 +5,7 @@ import controllers.domain._
 import controllers.domain.helpers._
 import logic.BattleLogic
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
+import models.domain.common.Assets
 import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.{TimeLineReason, TimeLineType}
 import play.Logger
@@ -74,7 +75,9 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
                 authorId = s.info.authorId
               )
             },
-            voteEndDate = BattleLogic.voteEndDate(solution.questLevel)
+            voteEndDate = BattleLogic.voteEndDate(solution.questLevel),
+            victoryReward = Assets(), // TODO: calculate it.
+            defeatReward = Assets()
           ),
           level = competitor.questLevel,
           vip = competitor.info.vip || solution.info.vip,

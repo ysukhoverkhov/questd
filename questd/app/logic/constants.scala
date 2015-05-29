@@ -50,12 +50,6 @@ object constants {
 
   val MaxRewardedQuestSolutionsPerDay = 2
 
-  /**
-   * Quest proposing.
-   */ // TODO: find out why this is not used and what is used instead of this.
-  val QuestCheatingPenalty = 10
-
-  val QuestIACPenalty = 10
 
 
   /**

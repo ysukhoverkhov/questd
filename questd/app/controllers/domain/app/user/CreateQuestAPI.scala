@@ -39,8 +39,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
             content = request.quest,
             vip = u.profile.publicProfile.vip,
             solveCost = QuestLogic.costOfSolvingQuest(level),
-            solveRewardWon = QuestLogic.rewardForWinningQuest(level, this),
-            solveRewardLost = QuestLogic.rewardForLosingQuest(level, this)))
+            solveReward = QuestLogic.rewardForSolvingQuest(level, this)))
 
         db.quest.create(quest)
 

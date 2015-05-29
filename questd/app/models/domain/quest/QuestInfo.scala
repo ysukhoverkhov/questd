@@ -8,6 +8,5 @@ case class QuestInfo(
   level: Int,
   vip: Boolean,
   solveCost: Assets,
-  solveRewardWon: Assets,
-  solveRewardLost: Assets)
+  solveReward: Assets)
 

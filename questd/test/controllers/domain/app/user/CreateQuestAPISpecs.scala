@@ -4,9 +4,8 @@ import java.util.Date
 
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
-import models.domain._
 import models.domain.common.Assets
-import models.domain.quest.{QuestStatus, Quest, QuestInfo}
+import models.domain.quest.{Quest, QuestInfo, QuestStatus}
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
@@ -40,8 +39,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
             content = q.info.content,
             vip = false,
             solveCost = Assets(),
-            solveRewardWon = Assets(),
-            solveRewardLost = Assets())))
+            solveReward = Assets())))
     }
 
     "Create VIP quests for VIP users" in context {
@@ -70,8 +68,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
             content = q.info.content,
             vip = true,
             solveCost = Assets(),
-            solveRewardWon = Assets(),
-            solveRewardLost = Assets())))
+            solveReward = Assets())))
     }
 
     "rewardQuestAuthor removes quest from daily income and timeline if it's banned" in context {
