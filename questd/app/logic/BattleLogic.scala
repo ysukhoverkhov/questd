@@ -4,7 +4,7 @@ import java.util.Date
 
 import com.github.nscala_time.time.Imports._
 import controllers.domain.DomainAPIComponent
-import models.domain.battle.Battle
+import models.domain.battle.{BattleSide, Battle}
 import org.joda.time.DateTime
 
 class BattleLogic(
@@ -26,13 +26,13 @@ class BattleLogic(
   }
 
   /**
-   * Calculate points for quest solution voting.
+   * Calculate points for battle.
    */
-//  def votingPoints = {
-//    List(
-//      qs.rating.pointsRandom,
-//      qs.rating.pointsFriends * constants.FriendsVoteMult).sum
-//  }
+  def votingPoints(battleSide: BattleSide) = {
+    List(
+      battleSide.pointsRandom,
+      battleSide.pointsFriends * constants.FriendsVoteMult).sum
+  }
 
 }
 

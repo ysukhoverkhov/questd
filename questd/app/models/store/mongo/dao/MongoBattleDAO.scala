@@ -130,8 +130,6 @@ private[mongo] class MongoBattleDAO
     solutionId: String,
     randomPointsChange: Int,
     friendsPointsChange: Int): Option[Battle] = {
-// TODO: test me.
-// TODO: test last mod date updated.
 
     findAndModify(
       MongoDBObject(

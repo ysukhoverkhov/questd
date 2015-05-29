@@ -4,7 +4,7 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import logic.BattleLogic
-import models.domain.battle.{Battle, BattleInfo, BattleSide}
+import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
 import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.{TimeLineReason, TimeLineType}
 import play.Logger
@@ -15,6 +15,8 @@ import scala.language.postfixOps
 case class TryCreateBattleRequest(solution: Solution)
 case class TryCreateBattleResult()
 
+case class RewardBattleParticipantsRequest(battle: Battle)
+case class RewardBattleParticipantsResult()
 
 private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -56,8 +58,6 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
       status = List(SolutionStatus.InRotation),
       questIds = List(solution.info.questId),
       cultureId = Some(solution.cultureId))
-
-//    Logger.trace(s"  Possible competitors count [${possibleCompetitors.length}}]")
 
     selectCompetitor(possibleCompetitors) match {
       case Some(competitor) =>
@@ -108,6 +108,31 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         Logger.trace(s"  Competitor not selected")
         OkApiResult(TryCreateBattleResult())
     }
+  }
+
+  /**
+   * Rewards all battle participants.
+   * @param request Request with battle.
+   * @return Result.
+   */
+  // TODO: test me.
+  def rewardBattleParticipants(request: RewardBattleParticipantsRequest): ApiResult[RewardBattleParticipantsResult] = handleDbException {
+    import request._
+
+    require(battle.info.status == BattleStatus.Resolved, "Only battles in Resolved state should be passed here")
+
+    battle.info.battleSides.foldLeft[ApiResult[_]](OkApiResult()) {
+      case (OkApiResult(_), bs) =>
+        db.user.readById(bs.authorId) ifSome { user =>
+
+          storeBattleInDailyResult(StoreBattleInDailyResultRequest(
+            user = user,
+            battle = battle,
+            reward = if (bs.isWinner) battle.info.victoryReward else battle.info.defeatReward))
+        }
+
+      case (_ @ result, _) => result
+    } map OkApiResult(RewardBattleParticipantsResult())
   }
 }
 

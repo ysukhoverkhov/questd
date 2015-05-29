@@ -5,7 +5,6 @@ import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.quest.SolveQuestUpdateRequest
 import controllers.domain.helpers._
-import models.domain.battle.Battle
 import models.domain.solution.{Solution, SolutionInfo, SolutionInfoContent, SolutionStatus}
 import models.domain.user._
 import models.view.QuestView
@@ -19,7 +18,7 @@ case class SolveQuestRequest(
   solution: SolutionInfoContent)
 case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class RewardSolutionAuthorRequest(solution: Solution, author: User, battle: Option[Battle] = None)
+case class RewardSolutionAuthorRequest(solution: Solution, author: User)
 case class RewardSolutionAuthorResult()
 
 case class BookmarkQuestRequest(user: User, questId: String)
@@ -154,33 +153,18 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
           // We do nothing here.
           OkApiResult(RewardSolutionAuthorResult())
 
-          // TODO: move it to rewarting battle participiant.
-//        case SolutionStatus.Won =>
-//          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
-//            user = author,
-//            solution = request.solution,
-//            battle = request.battle,
-//            reward = Some(q.info.solveRewardWon)))
-//
-//        case SolutionStatus.Lost =>
-//          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
-//            user = author,
-//            solution = request.solution,
-//            battle = request.battle,
-//            reward = Some(q.info.solveRewardLost)))
-
         case SolutionStatus.CheatingBanned =>
           storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
             user = author,
             solution = request.solution,
-            penalty = Some(q.penaltyForCheatingSolution)))
+            reward = -q.penaltyForCheatingSolution))
           removeFromTimeLine(RemoveFromTimeLineRequest(author, request.solution.id))
 
         case SolutionStatus.IACBanned =>
           storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
             user = author,
             solution = request.solution,
-            penalty = Some(q.penaltyForIACSolution)))
+            reward = -q.penaltyForIACSolution))
           removeFromTimeLine(RemoveFromTimeLineRequest(author, request.solution.id))
       }
 

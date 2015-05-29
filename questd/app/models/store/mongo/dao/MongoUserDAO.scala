@@ -7,6 +7,7 @@ import com.novus.salat._
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
+import models.domain.user.dailyresults.{SolutionResult, QuestIncome, QuestResult, DailyResult}
 import models.domain.user.message.Message
 import models.store.dao._
 import models.store.mongo.SalatContext._
@@ -165,7 +166,6 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  // TODO: test me.
   def recordBattleVote(id: String, battleId: String, solutionId: String): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 

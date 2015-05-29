@@ -3,6 +3,7 @@ package models.domain.user
 import models.domain.base.ID
 import models.domain.tutorial.TutorialPlatform
 import models.domain.user.auth.AuthInfo
+import models.domain.user.dailyresults.DailyResult
 
 /**
  * Structure representing beloved user.

@@ -156,6 +156,23 @@ class BattleDAOSpecs extends Specification
         s => s.isWinner).map(_.solutionId).sorted == winnerIds.sorted)
     }
 
+    "Update battle points" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val battle = createBattleStub(status = BattleStatus.Fighting)
+      db.battle.create(battle)
+      val ob = db.battle.updatePoints(
+        id = battle.id,
+        solutionId = battle.info.battleSides.head.solutionId,
+        randomPointsChange = 1,
+        friendsPointsChange = 2)
+
+      ob must beSome
+
+      ob.get.info.battleSides.head.pointsFriends must beEqualTo(2)
+      ob.get.info.battleSides.head.pointsRandom must beEqualTo(1)
+    }
+
     "Replace cultures" in new WithApplication(appWithTestDatabase) {
       clearDB()
 

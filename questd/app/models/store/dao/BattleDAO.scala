@@ -28,7 +28,7 @@ trait BattleDAO extends BaseDAO[Battle] {
   def updateStatus(
     id: String,
     newStatus: BattleStatus.Value,
-    setWinnerSolutions: List[String] = List.empty): Option[Battle]
+    setWinnerSolutionIds: List[String] = List.empty): Option[Battle]
 
   /**
    * Updates voting points of battle.

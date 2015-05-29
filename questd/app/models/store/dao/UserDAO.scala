@@ -5,6 +5,7 @@ import java.util.Date
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
+import models.domain.user.dailyresults.{SolutionResult, QuestIncome, QuestResult, DailyResult}
 import models.domain.user.message.Message
 import models.view.QuestView
 

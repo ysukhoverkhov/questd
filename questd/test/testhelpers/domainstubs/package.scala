@@ -11,6 +11,7 @@ import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
 import models.domain.user._
 import models.domain.user.auth.{LoginMethod, AuthInfo}
+import models.domain.user.dailyresults.{SolutionResult, QuestIncome, DailyResult}
 import models.view.{QuestView, ThemeInfoWithID}
 
 

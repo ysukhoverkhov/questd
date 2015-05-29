@@ -1,4 +1,4 @@
-package models.domain.user
+package models.domain.user.dailyresults
 
 import models.domain.common.Assets
 

@@ -3,6 +3,7 @@ package models.domain.user
 import models.domain.base.ID
 import models.domain.common.Assets
 import models.domain.quest.QuestSolutionContext
+import models.domain.user.dailyresults.DailyResult
 import models.domain.user.message.Message
 
 /**

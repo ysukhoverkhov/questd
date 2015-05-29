@@ -436,6 +436,20 @@ class UserDAOSpecs
       ou1 must beSome.which((u: User) => u.stats.votedSolutions.get(s.id).contains(ContentVote.Cheating))
     }
 
+    "recordBattleVote works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val u = createUserStub()
+      val s = createSolutionStub()
+      val b = createBattleStub()
+
+      db.user.create(u)
+      db.user.recordBattleVote(u.id, b.id, s.id)
+
+      val ou1 = db.user.readById(u.id)
+      ou1 must beSome.which((u: User) => u.stats.votedBattles.get(b.id).contains(s.id))
+    }
+
     "Add entry to time line" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
 

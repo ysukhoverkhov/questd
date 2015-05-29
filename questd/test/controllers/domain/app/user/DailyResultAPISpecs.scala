@@ -4,7 +4,7 @@ import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain.common.Assets
 import models.domain.quest.QuestStatus
 import models.domain.solution.SolutionStatus
-import models.domain.user.{SolutionResult, DailyResult, QuestIncome}
+import models.domain.user.dailyresults.{SolutionResult, QuestIncome, DailyResult}
 import org.mockito.Matchers.{eq => mEq}
 import org.mockito.{ArgumentMatcher, Matchers}
 import testhelpers.domainstubs._
@@ -74,7 +74,10 @@ class DailyResultAPISpecs extends BaseAPISpecs {
             likesIncome = Assets(32, 32, 32),
             solutionsIncome = Assets(64, 64, 64))
         ),
-        questSolutionResult = List(SolutionResult("1", None, None, Some(Assets(rating = -128)), SolutionStatus.CheatingBanned))
+        questSolutionResult = List(SolutionResult(
+          solutionId = "1",
+          reward = -Assets(rating = -128),
+          status = SolutionStatus.CheatingBanned))
       )
 
       val u = createUserStub(privateDailyResults = List(

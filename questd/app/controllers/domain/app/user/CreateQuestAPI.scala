@@ -94,12 +94,18 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
     (quest.status match {
 
       case QuestStatus.CheatingBanned =>
-        storeQuestInDailyResult(StoreQuestInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForCheatingQuest)))
+        storeQuestInDailyResult(StoreQuestInDailyResultRequest(
+          user = author,
+          quest = request.quest,
+          reward = -author.penaltyForCheatingQuest))
         removeQuestIncomeFromDailyResult(RemoveQuestIncomeFromDailyResultRequest(author, request.quest.id))
         removeFromTimeLine(RemoveFromTimeLineRequest(author, request.quest.id))
 
       case QuestStatus.IACBanned =>
-        storeQuestInDailyResult(StoreQuestInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForIACQuest)))
+        storeQuestInDailyResult(StoreQuestInDailyResultRequest(
+          user = author,
+          quest = request.quest,
+          reward = -author.penaltyForIACQuest))
         removeQuestIncomeFromDailyResult(RemoveQuestIncomeFromDailyResultRequest(author, request.quest.id))
         removeFromTimeLine(RemoveFromTimeLineRequest(author, request.quest.id))
 

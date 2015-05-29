@@ -7,7 +7,8 @@ import logic.SolutionLogic
 import models.domain.common.Assets
 import models.domain.quest.QuestStatus
 import models.domain.solution.SolutionStatus
-import models.domain.user.{SolutionResult, User}
+import models.domain.user.User
+import models.domain.user.dailyresults.SolutionResult
 import org.mockito.Matchers.{eq => mEq}
 import org.mockito.Mockito._
 import testhelpers.domainstubs._
@@ -88,9 +89,7 @@ class QuestSolutionAPISpecs extends BaseAPISpecs {
       there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = SolutionStatus.CheatingBanned), user1))
       there was one(user).storeSolutionInDailyResult(mEq(user1.id), mEq(SolutionResult(
         solutionId = sol.id,
-        battleId = None,
-        reward = None,
-        penalty = Some(Assets(rating = 4510)),
+        reward = -Assets(rating = 4510),
         status = SolutionStatus.CheatingBanned)))
       there was one(user).removeEntryFromTimeLineByObjectId(mEq(user1.id), mEq(sol.id))
 

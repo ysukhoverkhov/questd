@@ -10,6 +10,7 @@ import models.domain.common.Assets
 import models.domain.quest.{QuestStatus, Quest}
 import models.domain.solution.Solution
 import models.domain.user._
+import models.domain.user.dailyresults.{SolutionResult, QuestIncome, QuestResult, DailyResult}
 import play.Logger
 import logic.constants._
 
@@ -28,15 +29,20 @@ case class AddQuestIncomeToDailyResultResult(user: User)
 case class RemoveQuestIncomeFromDailyResultRequest(user: User, questId: String)
 case class RemoveQuestIncomeFromDailyResultResult(user: User)
 
-case class StoreQuestInDailyResultRequest(user: User, quest: Quest, reward: Option[Assets] = None, penalty: Option[Assets] = None)
+case class StoreQuestInDailyResultRequest(
+  user: User,
+  quest: Quest,
+  reward: Assets)
 case class StoreQuestInDailyResultResult(user: User)
+
+// TODO: apply daily results for battles
+case class StoreBattleInDailyResultRequest(user: User, battle: Battle, reward: Assets)
+case class StoreBattleInDailyResultResult(user: User)
 
 case class StoreSolutionInDailyResultRequest(
   user: User,
   solution: Solution,
-  battle: Option[Battle] = None,
-  reward: Option[Assets] = None,
-  penalty: Option[Assets] = None)
+  reward: Assets)
 case class StoreSolutionInDailyResultResult(user: User)
 
 
@@ -76,19 +82,26 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     def applyDailyResults(u: User) = {
 
-      val deltaAssets = u.profile.dailyResults.foldLeft(Assets()) { (a, dr) =>
+      val deltaAssets = u.profile.dailyResults.foldLeft(Assets()) { (a, dailyResult) =>
 
-        val assetsAfterQuests = dr.decidedQuests.foldLeft(a) { (a, dqp) =>
-          a + dqp.reward.getOrElse(Assets()) - dqp.penalty.getOrElse(Assets())
+        // TODO: fold three functions here (use inheritance of common result).
+        val assetsAfterQuests = dailyResult.decidedQuests.foldLeft(a) { (a, result) =>
+          a + result.reward
         }
 
-        val assetsAfterSolutions = dr.decidedSolutions.foldLeft(assetsAfterQuests) { (a, dqs) =>
-          a + dqs.reward.getOrElse(Assets()) - dqs.penalty.getOrElse(Assets())
+        val assetsAfterSolutions = dailyResult.decidedSolutions.foldLeft(assetsAfterQuests) { (a, result) =>
+          a + result.reward
         }
 
-        dr.questsIncome.foldLeft(assetsAfterSolutions) { (a, dqi) =>
-          a + dqi.likesIncome + dqi.passiveIncome + dqi.solutionsIncome
+        val assetsAfterBattles = dailyResult.decidedBattles.foldLeft(assetsAfterSolutions) { (a, result) =>
+          a + result.reward
         }
+
+        dailyResult.questsIncome.foldLeft(assetsAfterBattles) { (a, questIncome) =>
+          a + questIncome.likesIncome + questIncome.passiveIncome + questIncome.solutionsIncome
+        }
+        // end of todo.
+
       }
 
       adjustAssets(AdjustAssetsRequest(user = u, change = deltaAssets))
@@ -185,7 +198,6 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val qpr = QuestResult(
       questId = request.quest.id,
       reward = request.reward,
-      penalty = request.penalty,
       status = request.quest.status)
 
     db.user.storeQuestInDailyResult(user.id, qpr) ifSome { v =>
@@ -201,14 +213,21 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
     val qsr = SolutionResult(
       solutionId = request.solution.id,
-      battleId = request.battle.map(_.id),
       reward = request.reward,
-      penalty = request.penalty,
       status = request.solution.status)
 
     db.user.storeSolutionInDailyResult(user.id, qsr) ifSome { v =>
       OkApiResult(StoreSolutionInDailyResultResult(v))
     }
+  }
+
+  /**
+   * Stores battle in daily result.
+   */
+  // TODO: implement me.
+  // TODO: test me.
+  def storeBattleInDailyResult(request: StoreBattleInDailyResultRequest): ApiResult[StoreBattleInDailyResultResult] = handleDbException {
+    OkApiResult(StoreBattleInDailyResultResult(request.user))
   }
 
   private def createQuestIncomeForQuest(quest: Quest): QuestIncome = {

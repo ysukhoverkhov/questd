@@ -1,4 +1,4 @@
-package models.domain.user
+package models.domain.user.dailyresults
 
 import java.util.Date
 
@@ -7,6 +7,7 @@ import java.util.Date
  */
 case class DailyResult(
   startOfPeriod: Date,
-  decidedSolutions: List[SolutionResult] = List.empty,
   decidedQuests: List[QuestResult] = List.empty,
+  decidedSolutions: List[SolutionResult] = List.empty,
+  decidedBattles: List[BattleResult] = List.empty,
   questsIncome: List[QuestIncome] = List.empty)

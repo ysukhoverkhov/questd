@@ -6,6 +6,7 @@ import controllers.domain.{DomainAPIComponent, _}
 import controllers.sn.client.{User => SNUser}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
+import models.domain.user.dailyresults.DailyResult
 import play.Logger
 
 case class GetUserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
