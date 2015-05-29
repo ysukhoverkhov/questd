@@ -21,7 +21,6 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
   /**
    * Updates battle according to vote.
    */
-  // TODO: test me.
   def voteBattle(request: VoteBattleRequest): ApiResult[VoteBattleResult] = handleDbException {
     import request._
 
