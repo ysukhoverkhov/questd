@@ -127,7 +127,6 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
    * @param request Request with battle.
    * @return Result.
    */
-  // TODO: test me.
   def rewardBattleParticipants(request: RewardBattleParticipantsRequest): ApiResult[RewardBattleParticipantsResult] = handleDbException {
     import request._
 

@@ -167,6 +167,7 @@ package object domainstubs {
     id: String = ID.generateUUID(),
     solutionIds: List[String] = List("1", "2"),
     authorIds: List[String] = List("a1", "a2"),
+    points: List[Int] = List(0, 0),
     status: BattleStatus.Value = BattleStatus.Fighting,
     level: Int = 19,
     vip: Boolean = false,
@@ -177,11 +178,12 @@ package object domainstubs {
     Battle(
       id = id,
       info = BattleInfo(
-        battleSides = (solutionIds, authorIds).zipped.map {
-          case (s, a) =>
+        battleSides = (solutionIds, authorIds, points).zipped.map {
+          case (s, a, p) =>
             BattleSide(
               solutionId = s,
               authorId = a,
+              pointsRandom = p,
               isWinner = winnerIds.contains(a)
             )
         },

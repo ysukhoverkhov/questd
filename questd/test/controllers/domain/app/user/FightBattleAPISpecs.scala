@@ -1,6 +1,7 @@
 package controllers.domain.app.user
 
 import controllers.domain.{OkApiResult, BaseAPISpecs}
+import models.domain.battle.BattleStatus
 import models.domain.solution.SolutionStatus
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
@@ -136,49 +137,18 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       result must beAnInstanceOf[OkApiResult[TryCreateBattleResult]]
     }
 
-    // TODO: implement me.
     "Reward participants" in context {
-      val battle = createBattleStub()
+      val battle = createBattleStub(status = BattleStatus.Resolved)
+      val u1 = createUserStub(id = battle.info.battleSides(0).authorId)
+      val u2 = createUserStub(id = battle.info.battleSides(1).authorId)
 
-//      val ss = List(
-//        createSolutionStub(
-//          status = SolutionStatus.InRotation,
-//          authorId = "aid1"),
-//        createSolutionStub(
-//          status = SolutionStatus.InRotation,
-//          authorId = "aid1"))
-//
-//      solution.allWithParams(
-//        status = mEq(List(SolutionStatus.InRotation)),
-//        authorIds = any,
-//        authorIdsExclude = any,
-//        levels = any,
-//        skip = any,
-//        vip = any,
-//        ids = any,
-//        idsExclude = any,
-//        questIds = mEq(List(ss(0).info.questId)),
-//        themeIds = any,
-//        cultureId = mEq(Some(ss(0).cultureId))) returns ss.iterator
+      user.readById(u1.id) returns Some(u1)
+      user.readById(u2.id) returns Some(u2)
+      user.storeBattleInDailyResult(any, any) returns Some(u1)
 
       val result = api.rewardBattleParticipants(RewardBattleParticipantsRequest(battle))
 
-//      there was one(solution).allWithParams(
-//        status = mEq(List(SolutionStatus.InRotation)),
-//        authorIds = any,
-//        authorIdsExclude = any,
-//        levels = any,
-//        skip = any,
-//        vip = any,
-//        ids = any,
-//        idsExclude = any,
-//        questIds = mEq(List(ss(0).info.questId)),
-//        themeIds = any,
-//        cultureId = mEq(Some(ss(0).cultureId)))
-//
-//      there was no(battle).create(any)
-//      there was no(solution).updateStatus(any, any, any)
-
+      there were two(user).storeBattleInDailyResult(any, any)
       result must beAnInstanceOf[OkApiResult[RewardBattleParticipantsResult]]
     }
   }

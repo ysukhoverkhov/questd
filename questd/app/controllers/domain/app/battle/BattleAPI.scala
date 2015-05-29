@@ -43,9 +43,8 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
   }
 
   /**
-   * Update state of quest solution with votes.
+   * Check update state of battle if we should.
    */
-  // TODO: test me.
   def updateBattleState(request: UpdateBattleStateRequest): ApiResult[UpdateBattleStateResult] = handleDbException {
     import request._
 
