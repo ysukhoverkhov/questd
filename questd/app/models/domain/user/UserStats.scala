@@ -35,9 +35,9 @@ case class UserStats (
   // TODO: test it's filled
   // TODO: test it's used for voting.
   /**
-   * Battles we took part in.
+   * Ids of battles we participated in. Key is competitor solution id.
    */
-  participatedBattles: List[String] = List.empty,
+  participatedBattles: Map[String, String] = Map.empty,
 
   // TODO: test it's filled
   // TODO: test it's used for voting.

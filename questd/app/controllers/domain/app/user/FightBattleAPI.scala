@@ -54,7 +54,8 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
       }
     }
 
-    // TODO: filter out here somehow solutions with battles.
+    // TODO: filter out here somehow solutions with a least one battle.
+    // We have battleIds in solution, should filter in DAO call for solutions with no battles.
     val possibleCompetitors = db.solution.allWithParams(
       status = List(SolutionStatus.InRotation),
       questIds = List(solution.info.questId),
@@ -88,8 +89,16 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         Logger.trace(s"  Battle created")
 
         solutions.foreach { s =>
+
+          db.solution.updateStatus(
+            id = s.id,
+            battleId = Some(battle.id)
+          )
+
           db.user.readById(s.info.authorId) ifSome { u =>
             {
+              // TODO: add competitor to "stats.participatedBattles"
+              // TODO: test it's added.
               addToTimeLine(AddToTimeLineRequest(
                 user = u,
                 reason = TimeLineReason.Created,

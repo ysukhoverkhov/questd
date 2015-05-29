@@ -47,7 +47,7 @@ class SolutionAPISpecs extends BaseAPISpecs {
         authorIds = List(user1.id),
         skip = 0)
 
-      there was one(solution).updateStatus(mEq(sol.id), mEq(SolutionStatus.CheatingBanned), any)
+      there was one(solution).updateStatus(mEq(sol.id), mEq(Some(SolutionStatus.CheatingBanned)), any)
       there was one(user).readById(user1.id)
       there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = SolutionStatus.CheatingBanned), user1))
 
@@ -84,7 +84,7 @@ class SolutionAPISpecs extends BaseAPISpecs {
         authorIds = List(user1.id),
         skip = 0)
 
-      there was one(solution).updateStatus(mEq(sol.id), mEq(SolutionStatus.CheatingBanned), any)
+      there was one(solution).updateStatus(mEq(sol.id), mEq(Some(SolutionStatus.CheatingBanned)), any)
       there was one(user).readById(user1.id)
       there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = SolutionStatus.CheatingBanned), user1))
       there was one(user).storeSolutionInDailyResult(mEq(user1.id), mEq(SolutionResult(

@@ -186,8 +186,8 @@ class SolutionDAOSpecs extends Specification
       createSolutionInDB(id1)
       createSolutionInDB(id2)
 
-      val su1 = db.solution.updateStatus(id1, SolutionStatus.CheatingBanned)
-      val su2 = db.solution.updateStatus(id2, SolutionStatus.OldBanned, Some(id1))
+      val su1 = db.solution.updateStatus(id1, Some(SolutionStatus.CheatingBanned))
+      val su2 = db.solution.updateStatus(id2, Some(SolutionStatus.OldBanned), Some(id1))
 
       su1 must beSome[Solution].which(s => s.status == SolutionStatus.CheatingBanned && s.battleIds == List.empty)
       su2 must beSome[Solution].which(s => s.status == SolutionStatus.OldBanned && s.battleIds == List(id1))

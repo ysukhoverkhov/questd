@@ -224,7 +224,6 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   /**
    * Stores battle in daily result.
    */
-  // TODO: test me.
   def storeBattleInDailyResult(request: StoreBattleInDailyResultRequest): ApiResult[StoreBattleInDailyResultResult] = handleDbException {
     import request._
 
