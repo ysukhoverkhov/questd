@@ -232,5 +232,11 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
     OkApiResult(WSDebugResult("Done"))
   }
+
+  def generateErrorLog = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>
+    Logger.error(s"Error log generated with request by ${r.user.id}")
+
+    OkApiResult(WSDebugResult("Error log generated"))
+  }
 }
 

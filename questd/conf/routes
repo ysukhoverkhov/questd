@@ -107,6 +107,7 @@ POST	/rest/debug/setFriendship						controllers.web.rest.DebugWS.setFriendshipDe
 POST	/rest/debug/makeBattle						    controllers.web.rest.DebugWS.makeBattle
 POST	/rest/debug/resetTutorial					    controllers.web.rest.DebugWS.resetTutorial
 POST	/rest/debug/setLevel					        controllers.web.rest.DebugWS.setLevel
+POST	/rest/debug/generateErrorLog			        controllers.web.rest.DebugWS.generateErrorLog
 
 
 
