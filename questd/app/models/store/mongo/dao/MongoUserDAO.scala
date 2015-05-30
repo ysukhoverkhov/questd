@@ -181,6 +181,22 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
+  // TODO: test me.
+  def recordBattleParticipation(id: String, battleId: String, rivalSolutionIds: List[String]): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$set" -> MongoDBObject(
+      s"stats.participatedBattles.$battleId" -> rivalSolutionIds))
+
+    findAndModify(
+      MongoDBObject(
+        "id" -> id),
+      queryBuilder.result())
+  }
+
+  /**
+   * @inheritdoc
+   */
   def setQuestBookmark(id: String, quest: QuestView): Option[User] = {
     findAndModify(
       id,

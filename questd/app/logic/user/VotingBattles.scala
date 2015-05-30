@@ -18,7 +18,7 @@ trait VotingBattles { this: UserLogic =>
     else if (user.stats.votedBattles.contains(battleId))
       InvalidState
     else if (user.stats.participatedBattles.contains(battleId))
-      OutOfContent
+      InvalidState
     else if (!bioComplete)
       IncompleteBio
     else

@@ -32,14 +32,12 @@ case class UserStats (
    */
   votedSolutions: Map[String, ContentVote.Value] = Map.empty,
 
-  // TODO: test it's filled
   // TODO: test it's used for voting.
   /**
    * Ids of battles we participated in. Key is competitor solution id.
    */
-  participatedBattles: Map[String, String] = Map.empty,
+  participatedBattles: Map[String, List[String]] = Map.empty,
 
-  // TODO: test it's filled
   // TODO: test it's used for voting.
   /**
    * All voted battles. Value is id of solution in battle we voted for.

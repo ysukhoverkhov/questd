@@ -90,26 +90,27 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
 
         solutions.foreach { s =>
 
+          // TODO: create another db call here and call it "addParticipatedBattle"
           db.solution.updateStatus(
             id = s.id,
             battleId = Some(battle.id)
           )
 
           db.user.readById(s.info.authorId) ifSome { u =>
-            {
-              // TODO: add competitor to "stats.participatedBattles"
-              // TODO: test it's added.
-              addToTimeLine(AddToTimeLineRequest(
-                user = u,
-                reason = TimeLineReason.Created,
-                objectType = TimeLineType.Battle,
-                objectId = battle.id))
-            } map { r =>
-              addToWatchersTimeLine(AddToWatchersTimeLineRequest(
-                user = u,
-                reason = TimeLineReason.Created,
-                objectType = TimeLineType.Quest,
-                objectId = battle.id))
+            db.user.recordBattleParticipation(u.id, battle.id, solutions.filter(_.id != s.id).map(_.id)) ifSome { u => // TODO: test it's added (check ids are correct)
+              {
+                addToTimeLine(AddToTimeLineRequest(
+                  user = u,
+                  reason = TimeLineReason.Created,
+                  objectType = TimeLineType.Battle,
+                  objectId = battle.id))
+              } map { r =>
+                addToWatchersTimeLine(AddToWatchersTimeLineRequest(
+                  user = u,
+                  reason = TimeLineReason.Created,
+                  objectType = TimeLineType.Quest,
+                  objectId = battle.id))
+              }
             }
           }
         }

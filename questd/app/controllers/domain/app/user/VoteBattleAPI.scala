@@ -17,7 +17,6 @@ private[domain] trait VoteBattleAPI {
   /**
    * Vote for a Battle.
    */
-  // TODO: test me.
   def voteBattleByUser(request: VoteBattleByUserRequest): ApiResult[VoteBattleByUserResult] = handleDbException {
     import request._
 
@@ -43,6 +42,7 @@ private[domain] trait VoteBattleAPI {
                   {
                     voteBattle(VoteBattleRequest(b, solutionId, isFriend))
                     // TODO: make task here.
+                    // TODO: it's being made.
                     //                          } map { r =>
 
                     //                            if (request.vote == ContentVote.Cool)

@@ -74,6 +74,16 @@ trait UserDAO extends BaseDAO[User] {
   def recordBattleVote(id: String, battleId: String, solutionId: String): Option[User]
 
   /**
+   * Records a battle user participated in.
+   *
+   * @param id Id of user.
+   * @param battleId Id of battle
+   * @param rivalSolutionIds Our rival in battle
+   * @return
+   */
+  def recordBattleParticipation(id: String, battleId: String, rivalSolutionIds: List[String]): Option[User]
+
+  /**
    * Set quest bookmark for a user.
    * @param id Id of a user setting a bookmark.
    * @param questId Id of a quest set bookmark.

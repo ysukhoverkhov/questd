@@ -57,6 +57,8 @@ class FightBattleAPISpecs extends BaseAPISpecs {
           status = SolutionStatus.InRotation,
           authorId = "aid2"))
 
+      val u = createUserStub()
+
       solution.allWithParams(
         status = mEq(List(SolutionStatus.InRotation)),
         authorIds = any,
@@ -69,8 +71,9 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         questIds = mEq(List(ss(0).info.questId)),
         themeIds = any,
         cultureId = mEq(Some(ss(0).cultureId))) returns ss.iterator
-      user.readById(any) returns Some(createUserStub())
-      user.addEntryToTimeLine(any, any) returns Some(createUserStub())
+      user.readById(any) returns Some(u)
+      user.addEntryToTimeLine(any, any) returns Some(u)
+      user.recordBattleParticipation(any, any, any) returns Some(u)
 
       val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
 
@@ -89,6 +92,8 @@ class FightBattleAPISpecs extends BaseAPISpecs {
 
       there was one(battle).create(any)
       there was two(solution).updateStatus(any, any, any)
+      there was one(user).recordBattleParticipation(mEq("aid1"), any, mEq(List(ss(1)).map(_.id)))
+      there was one(user).recordBattleParticipation(mEq("aid2"), any, mEq(List(ss(0)).map(_.id)))
       there were two(user).addEntryToTimeLine(any, any)
       there were two(user).addEntryToTimeLineMulti(any, any)
       result must beAnInstanceOf[OkApiResult[TryCreateBattleRequest]]
