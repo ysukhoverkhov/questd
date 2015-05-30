@@ -12,12 +12,14 @@ case class TutorialTask(
   taskType: TaskType.Value,
   description: String,
   requiredCount: Int,
-  reward: Assets) extends ID {
+  reward: Assets,
+  triggersReward: Boolean = false) extends ID { // TODO: remove default false in 0.40.06
 
   def task = Task(
     taskType = taskType,
     description = description,
     requiredCount = requiredCount,
     reward = reward,
-    tutorialTaskId = Some(this.id))
+    tutorialTaskId = Some(this.id),
+    triggersReward = triggersReward)
 }

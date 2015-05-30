@@ -11,5 +11,6 @@ case class Task(
   reward: Assets = Assets(),
   requiredCount: Int,
   currentCount: Int = 0,
-  tutorialTaskId: Option[String] = None) extends ID
+  tutorialTaskId: Option[String] = None,
+  triggersReward: Boolean = true) extends ID
 

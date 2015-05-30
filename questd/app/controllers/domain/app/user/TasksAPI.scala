@@ -50,8 +50,9 @@ private[domain] trait TasksAPI {
       dt.tasks.map(t => t.currentCount.toFloat / t.requiredCount).sum / dt.tasks.size
     }
 
-    def allTasksCompleted(dt: DailyTasks): Boolean = {
-      dt.tasks.foldLeft(true)((r, v) => if (v.currentCount >= v.requiredCount) r else false)
+    def shouldGiveTasksReward(dt: DailyTasks, completedTasks: List[Task]): Boolean = {
+      dt.tasks.foldLeft(true)((r, v) => if (v.currentCount >= v.requiredCount) r else false) &&
+        completedTasks.foldLeft(false)((r, v) => r || v.triggersReward)
     }
 
     Logger.trace(s"Making task of type $taskType and/or id $taskId")
@@ -95,7 +96,7 @@ private[domain] trait TasksAPI {
           db.user.setTasksCompletedFraction(id = u.id, completedFraction = completedFraction(u.profile.dailyTasks))
         },
         { u =>
-          if (allTasksCompleted(u.profile.dailyTasks)) {
+          if (shouldGiveTasksReward(u.profile.dailyTasks, completedTasks)) {
             db.user.setTasksRewardReceived(id = u.id, rewardReceived = true)
           } else {
             Some(u)
@@ -112,7 +113,7 @@ private[domain] trait TasksAPI {
             }
           } map { r =>
             // give reward for all completed.
-            if (allTasksCompleted(r.user.profile.dailyTasks)) {
+            if (shouldGiveTasksReward(r.user.profile.dailyTasks, completedTasks)) {
               {
                 adjustAssets(AdjustAssetsRequest(user = r.user, change = r.user.profile.dailyTasks.reward))
               } map { r =>
