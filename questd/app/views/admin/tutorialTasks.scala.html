@@ -24,6 +24,7 @@
 			    		<td>Reward Coins</td>
 			    		<td>Reward Money</td>
 			    		<td>Reward Rating</td>
+						<td>Triggers Reward</td>
 			    	</tr>
 
 					@for(t <- tasks) {
@@ -36,6 +37,7 @@
 				    		<td>@t.reward.coins</td>
 				    		<td>@t.reward.money</td>
 				    		<td>@t.reward.rating</td>
+							<td>@t.triggersReward</td>
 							<td><a href="@controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(t.id)">edit</a></td>
 
 	    				</tr>
@@ -51,6 +53,7 @@
 					@inputText(newTaskForm("rewardCoins"), 'size -> 5)
 					@inputText(newTaskForm("rewardMoney"), 'size -> 5)
 					@inputText(newTaskForm("rewardRating"), 'size -> 5)
+					@checkbox(newTaskForm("triggersReward"))
 					@if(newTaskForm("id").value == None) {
 			 			<input type="submit" value="Create">
 					} else {

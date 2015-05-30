@@ -2,7 +2,6 @@ package controllers.web.admin.component
 
 import controllers.domain.admin._
 import controllers.domain.{DomainAPIComponent, OkApiResult}
-import models.domain._
 import models.domain.common.Assets
 import models.domain.tutorialtask.TutorialTask
 import models.domain.user.TaskType
@@ -19,7 +18,8 @@ case class TutorialTaskForm(
   requiredCount: Int,
   rewardCoins: Int,
   rewardMoney: Int,
-  rewardRating: Int)
+  rewardRating: Int,
+  triggersReward: Boolean)
 
 class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
@@ -31,7 +31,8 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
       "requiredCount" -> number,
       "rewardCoins" -> number,
       "rewardMoney" -> number,
-      "rewardRating" -> number)(TutorialTaskForm.apply)(TutorialTaskForm.unapply))
+      "rewardRating" -> number,
+      "triggersReward" -> boolean)(TutorialTaskForm.apply)(TutorialTaskForm.unapply))
 
   /**
    * Get all tutorial tasks
@@ -51,7 +52,8 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
             requiredCount = task.requiredCount,
             rewardCoins = task.reward.coins.toInt,
             rewardMoney = task.reward.money.toInt,
-            rewardRating = task.reward.rating.toInt))
+            rewardRating = task.reward.rating.toInt,
+            triggersReward = task.triggersReward))
         case _ => form
       }
     }
@@ -95,11 +97,12 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
           reward = Assets(
             coins = taskForm.rewardCoins,
             money = taskForm.rewardMoney,
-            rating = taskForm.rewardRating))
+            rating = taskForm.rewardRating),
+          triggersReward = taskForm.triggersReward)
 
         if (taskForm.id == "") {
           api.createTutorialTaskAdmin(CreateTutorialTaskAdminRequest(tt))
-        } else {
+        } else { Logger.error(s"!!!! $tt")
           api.updateTutorialTaskAdmin(UpdateTutorialTaskAdminRequest(tt))
         }
 
