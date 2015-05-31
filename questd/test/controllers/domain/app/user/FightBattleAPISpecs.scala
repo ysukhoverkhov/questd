@@ -49,15 +49,17 @@ class FightBattleAPISpecs extends BaseAPISpecs {
     }
 
     "Create battle if rival found" in context {
+      val uu = List(createUserStub(), createUserStub())
+
       val ss = List(
         createSolutionStub(
+          id = "sid1",
           status = SolutionStatus.InRotation,
-          authorId = "aid1"),
+          authorId = uu(0).id),
         createSolutionStub(
+          id = "sid2",
           status = SolutionStatus.InRotation,
-          authorId = "aid2"))
-
-      val u = createUserStub()
+          authorId = uu(1).id))
 
       solution.allWithParams(
         status = mEq(List(SolutionStatus.InRotation)),
@@ -71,9 +73,12 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         questIds = mEq(List(ss(0).info.questId)),
         themeIds = any,
         cultureId = mEq(Some(ss(0).cultureId))) returns ss.iterator
-      user.readById(any) returns Some(u)
-      user.addEntryToTimeLine(any, any) returns Some(u)
-      user.recordBattleParticipation(any, any, any) returns Some(u)
+      user.readById(uu(0).id) returns Some(uu(0))
+      user.readById(uu(1).id) returns Some(uu(1))
+      user.addEntryToTimeLine(mEq(uu(0).id), any) returns Some(uu(0))
+      user.addEntryToTimeLine(mEq(uu(1).id), any) returns Some(uu(1))
+      user.recordBattleParticipation(mEq(uu(0).id), any, any) returns Some(uu(0))
+      user.recordBattleParticipation(mEq(uu(1).id), any, any) returns Some(uu(1))
 
       val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
 
@@ -92,8 +97,8 @@ class FightBattleAPISpecs extends BaseAPISpecs {
 
       there was one(battle).create(any)
       there was two(solution).updateStatus(any, any, any)
-      there was one(user).recordBattleParticipation(mEq("aid1"), any, mEq(List(ss(1)).map(_.id)))
-      there was one(user).recordBattleParticipation(mEq("aid2"), any, mEq(List(ss(0)).map(_.id)))
+      there was one(user).recordBattleParticipation(mEq(uu(0).id), any, mEq(List(ss(1)).map(_.id)))
+      there was one(user).recordBattleParticipation(mEq(uu(1).id), any, mEq(List(ss(0)).map(_.id)))
       there were two(user).addEntryToTimeLine(any, any)
       there were two(user).addEntryToTimeLineMulti(any, any)
       result must beAnInstanceOf[OkApiResult[TryCreateBattleRequest]]

@@ -97,7 +97,8 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
           )
 
           db.user.readById(s.info.authorId) ifSome { u =>
-            db.user.recordBattleParticipation(u.id, battle.id, solutions.filter(_.id != s.id).map(_.id)) ifSome { u => // TODO: test it's added (check ids are correct)
+
+            db.user.recordBattleParticipation(u.id, battle.id, solutions.filter(_.id != s.id).map(_.id)) ifSome { u =>
               {
                 addToTimeLine(AddToTimeLineRequest(
                   user = u,
