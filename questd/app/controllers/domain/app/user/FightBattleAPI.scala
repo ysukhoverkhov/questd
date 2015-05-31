@@ -7,7 +7,7 @@ import logic.BattleLogic
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
 import models.domain.common.Assets
 import models.domain.solution.{Solution, SolutionStatus}
-import models.domain.user.{TimeLineReason, TimeLineType}
+import models.domain.user.{SolutionsInBattle, TimeLineReason, TimeLineType}
 import play.Logger
 
 import scala.language.postfixOps
@@ -97,8 +97,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
           )
 
           db.user.readById(s.info.authorId) ifSome { u =>
-
-            db.user.recordBattleParticipation(u.id, battle.id, solutions.filter(_.id != s.id).map(_.id)) ifSome { u =>
+            db.user.recordBattleParticipation(u.id, battle.id, SolutionsInBattle(solutions.map(_.id))) ifSome { u =>
               {
                 addToTimeLine(AddToTimeLineRequest(
                   user = u,
