@@ -211,6 +211,8 @@ package object domainstubs {
     solvedQuests: List[String] = List.empty,
     votedQuests: Map[String, ContentVote.Value] = Map.empty,
     votedSolutions: Map[String, ContentVote.Value] = Map.empty,
+    votedBattles: Map[String, String] = Map.empty,
+    participatedBattles: Map[String, String] = Map.empty,
     takenTheme: Option[ThemeInfoWithID] = Some(ThemeInfoWithID("theme_id", createThemeStub().info)),
     rights: Rights = Rights.full,
     timeLine: List[TimeLineEntry] = List.empty,
@@ -248,6 +250,8 @@ package object domainstubs {
         createdSolutions = createdSolutions,
         solvedQuests = solvedQuests,
         votedQuests = votedQuests,
-        votedSolutions = votedSolutions))
+        votedSolutions = votedSolutions,
+        votedBattles = votedBattles,
+        participatedBattles = participatedBattles.map{case (k, v) => (k, SolutionsInBattle(List(v)))}))
   }
 }

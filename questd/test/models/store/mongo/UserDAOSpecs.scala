@@ -7,7 +7,7 @@ import java.util.Date
 import models.domain.common.{Assets, ContentVote}
 import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
-import models.domain.user.auth.{CrossPromotedApp, LoginMethod, AuthInfo}
+import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
 import models.domain.user.dailyresults.BattleResult
 import models.domain.user.message.MessageInformation
 import models.store._
@@ -445,6 +445,21 @@ class UserDAOSpecs
 
       val ou1 = db.user.readById(u.id)
       ou1 must beSome.which((u: User) => u.stats.votedBattles.get(b.id).contains(s.id))
+    }
+
+    "recordBattleParticipation works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val u = createUserStub()
+      val s = createSolutionStub()
+      val b = createBattleStub()
+
+      db.user.create(u)
+      db.user.recordBattleParticipation(u.id, b.id, SolutionsInBattle(List(s.id)))
+
+      val ou1 = db.user.readById(u.id)
+      ou1 must beSome
+      ou1.get.stats.participatedBattles.get(b.id).contains(SolutionsInBattle(List(s.id))) must beTrue
     }
 
     "Add entry to time line" in new WithApplication(appWithTestDatabase) {

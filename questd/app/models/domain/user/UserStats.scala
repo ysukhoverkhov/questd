@@ -3,6 +3,13 @@ package models.domain.user
 import models.domain.common.ContentVote
 
 /**
+ * Solutions in battle we participated in.
+ */
+case class SolutionsInBattle(
+  solutionIds: List[String] = List.empty
+  )
+
+/**
  * Statistics about user used to calculate how he affects shared things.
  */
 case class UserStats (
@@ -32,13 +39,11 @@ case class UserStats (
    */
   votedSolutions: Map[String, ContentVote.Value] = Map.empty,
 
-  // TODO: test it's used for voting.
   /**
    * Ids of battles we participated in. Key is competitor solution id.
    */
-  participatedBattles: Map[String, List[String]] = Map.empty,
+  participatedBattles: Map[String, SolutionsInBattle] = Map.empty,
 
-  // TODO: test it's used for voting.
   /**
    * All voted battles. Value is id of solution in battle we voted for.
    */

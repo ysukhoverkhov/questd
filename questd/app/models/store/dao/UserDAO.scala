@@ -81,7 +81,7 @@ trait UserDAO extends BaseDAO[User] {
    * @param rivalSolutionIds Our rival in battle
    * @return
    */
-  def recordBattleParticipation(id: String, battleId: String, rivalSolutionIds: List[String]): Option[User]
+  def recordBattleParticipation(id: String, battleId: String, rivalSolutionIds: SolutionsInBattle): Option[User]
 
   /**
    * Set quest bookmark for a user.

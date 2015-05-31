@@ -181,12 +181,11 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  // TODO: test me.
-  def recordBattleParticipation(id: String, battleId: String, rivalSolutionIds: List[String]): Option[User] = {
+  def recordBattleParticipation(id: String, battleId: String, rivalSolutionIds: SolutionsInBattle): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 
     queryBuilder += ("$set" -> MongoDBObject(
-      s"stats.participatedBattles.$battleId" -> rivalSolutionIds))
+      s"stats.participatedBattles.$battleId" -> grater[SolutionsInBattle].asDBObject(rivalSolutionIds)))
 
     findAndModify(
       MongoDBObject(
