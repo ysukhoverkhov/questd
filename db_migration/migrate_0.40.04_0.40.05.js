@@ -8,4 +8,30 @@ db.users.find().forEach(
 )
 
 
+db.quests.find({"info.solveReward" : {$exists : false}}).forEach(
+    function(doc) {
+	doc.info.solveReward = doc.info.solveRewardLost;
+
+        delete doc.info.solveRewardLost;
+        delete doc.info.solveRewardWon;
+
+        db.quests.save(doc);
+   }
+)
+
+db.solutions.find().forEach(
+    function(doc) {
+        doc.status = "InRotation";
+        db.solutions.save(doc);
+   }
+)
+
+db.battles.find({"info.victoryReward" : {$exists : false}}).forEach(
+    function(doc) {
+	doc.info.victoryReward = { "coins" : NumberInt("10") ,		"money" : NumberInt("0") , "rating" : NumberInt("0")};
+	doc.info.defeatReward =  { "coins" : NumberInt("10") ,		"money" : NumberInt("0") , "rating" : NumberInt("0")};
+
+        db.battles.save(doc);
+   }
+)
 
