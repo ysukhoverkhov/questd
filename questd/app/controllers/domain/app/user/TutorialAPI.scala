@@ -141,7 +141,12 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
     import request._
 
     db.user.update(
-      user.copy(tutorialStates = TutorialPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())})
+      user.copy(
+        tutorialStates = TutorialPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
+        profile = user.profile.copy(
+          dailyTasks = DailyTasks()
+        )
+      )
     )
 
     OkApiResult(ResetTutorialResult(OK, Some(user.profile)))
