@@ -9,18 +9,18 @@ object constants {
   // user level restriction constants.
   val restrictions: Map[Functionality.Value, Int] = Map(
     Functionality.VoteQuestSolutions -> 1,
-    Functionality.AddToFollowing -> 2,
-    Functionality.SubmitPhotoSolutions -> 3,
-    Functionality.SubmitVideoSolutions -> 4,
-    Functionality.Report -> 5,
-    Functionality.InviteFriends -> 6,
-    Functionality.SubmitPhotoQuests -> 7,
-    Functionality.SubmitVideoQuests -> 8,
+    Functionality.AddToFollowing -> 1,
+    Functionality.SubmitPhotoSolutions -> 1,
+    Functionality.SubmitVideoSolutions -> 1,
+    Functionality.Report -> 1,
+    Functionality.InviteFriends -> 1,
+    Functionality.SubmitPhotoQuests -> 1,
+    Functionality.SubmitVideoQuests -> 1,
     Functionality.VoteQuests -> 1, // TODO: tweak it.
     Functionality.VoteReviews -> 1,
     Functionality.SubmitReviewsForSolutions -> 1,
     Functionality.SubmitReviewsForQuests -> 1,
-    Functionality.GiveRewards -> 20)
+    Functionality.GiveRewards -> 1)
 
   def levelFor(f: Functionality.Value): Int = {
     restrictions(f)
@@ -97,7 +97,7 @@ object constants {
   /**
    * Friends
    */
-  val NumberOfFriendsOnLastLevel = 100
+  val NumberOfFriendsOnLastLevel = 10000
 
 
   /**
