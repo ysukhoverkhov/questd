@@ -41,13 +41,13 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       ))
 
     val userWithNewRights = newLevel.copy(
-      profile = user.profile.copy(
-        rights = user.calculateRights,
-        ratingToNextLevel = user.ratingToNextLevel
+      profile = newLevel.profile.copy(
+        rights = newLevel.calculateRights,
+        ratingToNextLevel = newLevel.ratingToNextLevel
       ),
       privateDailyResults = List(
         DailyResult(
-          user.getStartOfCurrentDailyResultPeriod)
+          newLevel.getStartOfCurrentDailyResultPeriod)
       ))
     db.user.update(userWithNewRights)
 
