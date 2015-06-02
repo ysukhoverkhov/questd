@@ -2,6 +2,7 @@ package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import controllers.domain.app.protocol.ProfileModificationResult
+import models.domain.common.Assets
 import models.domain.solution.{Solution, SolutionInfo}
 import models.domain.user.{FriendshipStatus, Friendship, TimeLineType, TimeLineReason}
 import org.mockito.Matchers.{eq => mEq}
@@ -15,7 +16,10 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       val uid = "uid"
 
-      val q = createQuestStub()
+      val q = createQuestStub(
+        solveCost = Assets(1, 0, 0),
+        solveReward = Assets(0, 0, 2)
+      )
       val tl = createTimeLineEntryStub(actorId = uid, objectId = q.id, objectType = TimeLineType.Quest)
       val t2 = createTimeLineEntryStub(objectType = TimeLineType.Solution, actorId = "uid", reason = TimeLineReason.Created)
       val t3 = createTimeLineEntryStub(objectType = TimeLineType.Quest)
@@ -72,7 +76,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(quest).readById(q.id)
       there was one(user).recordQuestSolving(mEq(u.id), mEq(q.id), mEq(false))
       there was one(user).addEntryToTimeLine(mEq(u.id), any)
-      there was one(user).addToAssets(mEq(u.id), any)
+      there was one(user).addToAssets(mEq(u.id), mEq(q.info.solveReward - q.info.solveCost))
       there was one(user).addEntryToTimeLineMulti(mEq(List("fid1")), any)
       there was one(quest).updatePoints(mEq(q.id), mEq(2), anyInt, anyInt, anyInt, anyInt, anyInt)
       there was one(user).storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any)

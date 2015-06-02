@@ -45,6 +45,7 @@ package object domainstubs {
     cultureId: String = "cultureId",
     points: Int = 0,
     solveCost: Assets = Assets(0, 0, 0),
+    solveReward: Assets = Assets(0, 0, 0),
     likes: Int = 0) = {
 
     Quest(
@@ -62,7 +63,7 @@ package object domainstubs {
           icon = None,
           description = "desc"),
           solveCost = solveCost,
-          solveReward = Assets(),
+          solveReward = solveReward,
           victoryReward = Assets(1, 1, 1),
           defeatReward =Assets(2, 2, 2)),
       rating = QuestRating(timelinePoints = points, likesCount = likes),
