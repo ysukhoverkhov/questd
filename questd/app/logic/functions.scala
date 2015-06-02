@@ -61,7 +61,7 @@ object functions {
    * How much rating we will receive for losing quest.
    */
   def ratingToSolveQuest(level: Int): Int = {
-    math.round(ratingForSubmitResult(level) * QuestLosingMultiplier).toInt
+    math.round(ratingForSubmitResult(level) * QuestSolvingMultiplier).toInt
   }
 
   /**
@@ -77,7 +77,7 @@ object functions {
    * How much rating we will receive for winning quest.
    */
   def ratingToWinQuest(level: Int): Int = {
-    ratingToLoseQuest(level) * QuestVictoryMultiplier
+    math.round(ratingForSubmitResult(level) * QuestVictoryMultiplier).toInt
   }
 
   /**

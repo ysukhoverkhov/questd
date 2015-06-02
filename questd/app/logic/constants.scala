@@ -60,14 +60,19 @@ object constants {
   val NumberOfFavoriteThemesForOtherQuests = 1
 
   /**
-   * Multiplier is relative to base (average) rating for resolving quests per day.
+   * Multiplier relative to daily xp income to quest solving.
    */
-  val QuestLosingMultiplier = 0.6666667
+  val QuestSolvingMultiplier = 0.5
 
   /**
-   * Multiplier is relative to quest losing
+   * Multiplier is relative to base (average) rating for resolving quests per day.
    */
-  val QuestVictoryMultiplier = 2
+  val QuestLosingMultiplier = 1.0 / 3.0
+
+  /**
+   * Multiplier is relative to base (average) rating for resolving quests per day.
+   */
+  val QuestVictoryMultiplier = 2.0 / 3.0
 
   val QuestSolutionCheatingPenalty = 10
 

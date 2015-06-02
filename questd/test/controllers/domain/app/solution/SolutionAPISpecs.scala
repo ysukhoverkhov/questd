@@ -84,16 +84,15 @@ class SolutionAPISpecs extends BaseAPISpecs {
         authorIds = List(user1.id),
         skip = 0)
 
+      result must beEqualTo(OkApiResult(UpdateSolutionStateResult()))
       there was one(solution).updateStatus(mEq(sol.id), mEq(Some(SolutionStatus.CheatingBanned)), any)
       there was one(user).readById(user1.id)
       there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = SolutionStatus.CheatingBanned), user1))
       there was one(user).storeSolutionInDailyResult(mEq(user1.id), mEq(SolutionResult(
         solutionId = sol.id,
-        reward = -Assets(rating = 4510),
+        reward = -Assets(rating = 3380),
         status = SolutionStatus.CheatingBanned)))
       there was one(user).removeEntryFromTimeLineByObjectId(mEq(user1.id), mEq(sol.id))
-
-      result must beEqualTo(OkApiResult(UpdateSolutionStateResult()))
     }
 
     "setQuestBookmark does it" in context {

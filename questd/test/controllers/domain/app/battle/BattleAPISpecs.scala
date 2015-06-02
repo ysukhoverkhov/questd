@@ -25,21 +25,23 @@ class BattleAPISpecs extends BaseAPISpecs {
         points = List(20, 1),
         status = BattleStatus.Fighting)
       val u = createUserStub()
+      val q = createQuestStub()
 
       battle.updateStatus(any, any, any) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
 
       user.readById(any) returns Some(u)
+      quest.readById(any) returns Some(q)
       user.storeBattleInDailyResult(any, any) returns Some(u)
 
       val result = api.updateBattleState(UpdateBattleStateRequest(b))
 
+      result must beEqualTo(OkApiResult(UpdateBattleStateResult()))
       there was one(battle).updateStatus(any, any, any)
       there were two(user).storeBattleInDailyResult(any, any)
-
-      result must beEqualTo(OkApiResult(UpdateBattleStateResult()))
     }
 
     "Nominate battle side with higher points as winners " in context {
+      val q = createQuestStub()
       val ss = List(
         createSolutionStub(id = "sid1", status = SolutionStatus.InRotation),
         createSolutionStub(id = "sid2", status = SolutionStatus.InRotation))
@@ -52,24 +54,26 @@ class BattleAPISpecs extends BaseAPISpecs {
         authorIds = uu.map(_.id),
         winnerIds = List(uu(0).id),
         points = List(20, 1),
-        status = BattleStatus.Fighting)
+        status = BattleStatus.Fighting,
+        questId = q.id)
 
       battle.updateStatus(any, any, any) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
 
+      quest.readById(any) returns Some(q)
       user.readById(uu(0).id) returns Some(uu(0))
       user.readById(uu(1).id) returns Some(uu(1))
       user.storeBattleInDailyResult(any, any) returns Some(uu(0))
 
       val result = api.updateBattleState(UpdateBattleStateRequest(b))
 
-      there was one(battle).updateStatus(any, any, any)
-      there was one(user).storeBattleInDailyResult(mEq(uu(0).id), mEq(BattleResult(b.id, b.info.victoryReward, isVictory = true)))
-      there was one(user).storeBattleInDailyResult(mEq(uu(1).id), mEq(BattleResult(b.id, b.info.defeatReward, isVictory = false)))
-
       result must beEqualTo(OkApiResult(UpdateBattleStateResult()))
+      there was one(battle).updateStatus(any, any, any)
+      there was one(user).storeBattleInDailyResult(mEq(uu(0).id), mEq(BattleResult(b.id, q.info.victoryReward, isVictory = true)))
+      there was one(user).storeBattleInDailyResult(mEq(uu(1).id), mEq(BattleResult(b.id, q.info.defeatReward, isVictory = false)))
     }
 
     "Nominate both as winners in case of equal points" in context {
+      val q = createQuestStub()
       val ss = List(
         createSolutionStub(id = "sid1", status = SolutionStatus.InRotation),
         createSolutionStub(id = "sid2", status = SolutionStatus.InRotation))
@@ -82,21 +86,22 @@ class BattleAPISpecs extends BaseAPISpecs {
         authorIds = uu.map(_.id),
         winnerIds = uu.map(_.id),
         points = List(20, 1),
-        status = BattleStatus.Fighting)
+        status = BattleStatus.Fighting,
+        questId = q.id)
 
       battle.updateStatus(any, any, any) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
 
+      quest.readById(any) returns Some(q)
       user.readById(uu(0).id) returns Some(uu(0))
       user.readById(uu(1).id) returns Some(uu(1))
       user.storeBattleInDailyResult(any, any) returns Some(uu(0))
 
       val result = api.updateBattleState(UpdateBattleStateRequest(b))
 
-      there was one(battle).updateStatus(any, any, any)
-      there was one(user).storeBattleInDailyResult(mEq(uu(0).id), mEq(BattleResult(b.id, b.info.victoryReward, isVictory = true)))
-      there was one(user).storeBattleInDailyResult(mEq(uu(1).id), mEq(BattleResult(b.id, b.info.defeatReward, isVictory = true)))
-
       result must beEqualTo(OkApiResult(UpdateBattleStateResult()))
+      there was one(battle).updateStatus(any, any, any)
+      there was one(user).storeBattleInDailyResult(mEq(uu(0).id), mEq(BattleResult(b.id, q.info.victoryReward, isVictory = true)))
+      there was one(user).storeBattleInDailyResult(mEq(uu(1).id), mEq(BattleResult(b.id, q.info.victoryReward, isVictory = true)))
     }
 
     "voteBattle updates points correctly" in context {

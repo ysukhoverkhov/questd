@@ -152,15 +152,17 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       val battle = createBattleStub(status = BattleStatus.Resolved)
       val u1 = createUserStub(id = battle.info.battleSides(0).authorId)
       val u2 = createUserStub(id = battle.info.battleSides(1).authorId)
+      val q = createQuestStub()
 
+      quest.readById(any) returns Some(q)
       user.readById(u1.id) returns Some(u1)
       user.readById(u2.id) returns Some(u2)
       user.storeBattleInDailyResult(any, any) returns Some(u1)
 
       val result = api.rewardBattleParticipants(RewardBattleParticipantsRequest(battle))
 
-      there were two(user).storeBattleInDailyResult(any, any)
       result must beAnInstanceOf[OkApiResult[RewardBattleParticipantsResult]]
+      there were two(user).storeBattleInDailyResult(any, any)
     }
   }
 }

@@ -62,7 +62,9 @@ package object domainstubs {
           icon = None,
           description = "desc"),
           solveCost = solveCost,
-          solveReward = Assets()),
+          solveReward = Assets(),
+          victoryReward = Assets(1, 1, 1),
+          defeatReward =Assets(2, 2, 2)),
       rating = QuestRating(timelinePoints = points, likesCount = likes),
       status = status)
   }
@@ -165,6 +167,7 @@ package object domainstubs {
 
   def createBattleStub(
     id: String = ID.generateUUID(),
+    questId: String = "questId",
     solutionIds: List[String] = List("1", "2"),
     authorIds: List[String] = List("a1", "a2"),
     points: List[Int] = List(0, 0),
@@ -187,10 +190,9 @@ package object domainstubs {
               isWinner = winnerIds.contains(a)
             )
         },
+        questId = questId,
         status = status,
-        voteEndDate = voteEndDate,
-        victoryReward = Assets(),
-        defeatReward = Assets()),
+        voteEndDate = voteEndDate),
       level = level,
       vip = vip,
       cultureId = cultureId

@@ -4,8 +4,7 @@ import java.util.Date
 
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
-import models.domain.common.Assets
-import models.domain.quest.{Quest, QuestInfo, QuestStatus}
+import models.domain.quest.QuestStatus
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
@@ -29,17 +28,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
       there was one(user).addEntryToTimeLine(any, any)
       there was one(user).addEntryToTimeLineMulti(any, any)
       there was no(user).addQuestIncomeToDailyResult(any, any)
-      there was one(quest).create(
-        Quest(
-          id = anyString,
-          cultureId = "cultureId",
-          info = QuestInfo(
-            authorId = u.id,
-            level = 10,
-            content = q.info.content,
-            vip = false,
-            solveCost = Assets(),
-            solveReward = Assets())))
+      there was one(quest).create(q.copy(id = anyString))
     }
 
     "Create VIP quests for VIP users" in context {
@@ -58,17 +47,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
       there was one(user).addEntryToTimeLine(any, any)
       there was one(user).addEntryToTimeLineMulti(any, any)
       there was no(user).addQuestIncomeToDailyResult(any, any)
-      there was one(quest).create(
-        Quest(
-          id = anyString,
-          cultureId = "cultureId",
-          info = QuestInfo(
-            authorId = u.id,
-            level = 10,
-            content = q.info.content,
-            vip = true,
-            solveCost = Assets(),
-            solveReward = Assets())))
+      there was one(quest).create(q.copy(id = anyString))
     }
 
     "rewardQuestAuthor removes quest from daily income and timeline if it's banned" in context {

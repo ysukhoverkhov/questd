@@ -5,7 +5,6 @@ import controllers.domain._
 import controllers.domain.helpers._
 import logic.BattleLogic
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
-import models.domain.common.Assets
 import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.{SolutionsInBattle, TimeLineReason, TimeLineType}
 import play.Logger
@@ -76,9 +75,8 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
                 authorId = s.info.authorId
               )
             },
-            voteEndDate = BattleLogic.voteEndDate(solution.questLevel),
-            victoryReward = Assets(), // TODO: calculate it.
-            defeatReward = Assets()
+            questId = solution.info.questId,
+            voteEndDate = BattleLogic.voteEndDate(solution.questLevel)
           ),
           level = competitor.questLevel,
           vip = competitor.info.vip || solution.info.vip,
@@ -133,17 +131,18 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
 
     require(battle.info.status == BattleStatus.Resolved, "Only battles in Resolved state should be passed here")
 
-    battle.info.battleSides.foldLeft[ApiResult[_]](OkApiResult()) {
-      case (OkApiResult(_), bs) =>
-        db.user.readById(bs.authorId) ifSome { user =>
+    db.quest.readById(battle.info.questId) ifSome { q =>
+      battle.info.battleSides.foldLeft[ApiResult[_]](OkApiResult()) {
+        case (OkApiResult(_), bs) =>
+          db.user.readById(bs.authorId) ifSome { user =>
+            storeBattleInDailyResult(StoreBattleInDailyResultRequest(
+              user = user,
+              battle = battle,
+              reward = if (bs.isWinner) q.info.victoryReward else q.info.defeatReward))
+          }
 
-          storeBattleInDailyResult(StoreBattleInDailyResultRequest(
-            user = user,
-            battle = battle,
-            reward = if (bs.isWinner) battle.info.victoryReward else battle.info.defeatReward))
-        }
-
-      case (_ @ result, _) => result
+        case (_ @ result, _) => result
+      }
     } map OkApiResult(RewardBattleParticipantsResult())
   }
 }

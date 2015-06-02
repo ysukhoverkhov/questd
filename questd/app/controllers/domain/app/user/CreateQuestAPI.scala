@@ -5,6 +5,7 @@ import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import logic.QuestLogic
+import models.domain.common.Assets
 import models.domain.quest.{Quest, QuestInfo, QuestInfoContent, QuestStatus}
 import models.domain.user._
 
@@ -39,7 +40,10 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
             content = request.quest,
             vip = u.profile.publicProfile.vip,
             solveCost = QuestLogic.costOfSolvingQuest(level),
-            solveReward = QuestLogic.rewardForSolvingQuest(level, this)))
+            solveReward = QuestLogic.rewardForSolvingQuest(level, this),
+            victoryReward = Assets(),
+            defeatReward = Assets()
+          ))
 
         db.quest.create(quest)
 
