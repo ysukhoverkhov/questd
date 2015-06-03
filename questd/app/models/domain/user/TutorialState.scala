@@ -5,5 +5,5 @@ package models.domain.user
  */
 case class TutorialState(
     closedElementIds: List[String] = List.empty,
-    assignedTutorialTaskIds: List[String] = List.empty
+    usedTutorialTaskIds: List[String] = List.empty
 )

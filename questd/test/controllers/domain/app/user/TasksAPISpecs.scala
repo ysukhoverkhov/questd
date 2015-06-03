@@ -18,7 +18,7 @@ class TasksAPISpecs extends BaseAPISpecs {
         ratingToNextLevel = 10000000,
         rights = Rights.full),
       tutorialStates = Map(TutorialPlatform.iPhone.toString -> TutorialState(
-        assignedTutorialTaskIds = assignedTutorialTaskIds)))
+        usedTutorialTaskIds = assignedTutorialTaskIds)))
   }
 
   "Tasks API" should {

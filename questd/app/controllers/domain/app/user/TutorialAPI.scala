@@ -77,7 +77,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def assignTutorialTask(request: AssignTutorialTaskRequest): ApiResult[AssignTutorialTaskResult] = handleDbException {
     import request._
     // 1. check is the task was already given.
-    if (user.tutorialStates(platform.toString).assignedTutorialTaskIds.contains(taskId)) {
+    if (user.tutorialStates(platform.toString).usedTutorialTaskIds.contains(taskId)) {
       OkApiResult(AssignTutorialTaskResult(LimitExceeded))
     } else {
       db.tutorialTask.readById(taskId) match {
