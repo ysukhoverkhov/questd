@@ -27,7 +27,7 @@ class SolutionAPISpecs extends BaseAPISpecs {
 
       when(spiedQuestSolutionLogic.shouldBanCheating).thenReturn(true)
       when(spiedQuestSolutionLogic.shouldBanIAC).thenReturn(false)
-      solution.updateStatus(any, any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))
+      solution.updateStatus(any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))
       user.readById(user1.id) returns Some(user1)
       user.addPrivateDailyResult(any, any) returns Some(user1)
       user.storeSolutionInDailyResult(any, any) returns Some(user1)
@@ -47,7 +47,7 @@ class SolutionAPISpecs extends BaseAPISpecs {
         authorIds = List(user1.id),
         skip = 0)
 
-      there was one(solution).updateStatus(mEq(sol.id), mEq(Some(SolutionStatus.CheatingBanned)), any)
+      there was one(solution).updateStatus(mEq(sol.id), mEq(SolutionStatus.CheatingBanned))
       there was one(user).readById(user1.id)
       there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = SolutionStatus.CheatingBanned), user1))
 
@@ -64,7 +64,7 @@ class SolutionAPISpecs extends BaseAPISpecs {
 
       when(spiedQuestSolutionLogic.shouldBanCheating).thenReturn(true)
       when(spiedQuestSolutionLogic.shouldBanIAC).thenReturn(false)
-      solution.updateStatus(any, any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))
+      solution.updateStatus(any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))
       user.readById(user1.id) returns Some(user1)
       user.addPrivateDailyResult(any, any) returns Some(user1)
       user.storeSolutionInDailyResult(any, any) returns Some(user1)
@@ -85,7 +85,7 @@ class SolutionAPISpecs extends BaseAPISpecs {
         skip = 0)
 
       result must beEqualTo(OkApiResult(UpdateSolutionStateResult()))
-      there was one(solution).updateStatus(mEq(sol.id), mEq(Some(SolutionStatus.CheatingBanned)), any)
+      there was one(solution).updateStatus(mEq(sol.id), mEq(SolutionStatus.CheatingBanned))
       there was one(user).readById(user1.id)
       there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = SolutionStatus.CheatingBanned), user1))
       there was one(user).storeSolutionInDailyResult(mEq(user1.id), mEq(SolutionResult(

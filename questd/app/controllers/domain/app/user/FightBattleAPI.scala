@@ -88,10 +88,9 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
 
         solutions.foreach { s =>
 
-          // TODO: create another db call here and call it "addParticipatedBattle"
-          db.solution.updateStatus(
+          db.solution.addParticipatedBattle(
             id = s.id,
-            battleId = Some(battle.id)
+            battleId = battle.id
           )
 
           db.user.readById(s.info.authorId) ifSome { u =>

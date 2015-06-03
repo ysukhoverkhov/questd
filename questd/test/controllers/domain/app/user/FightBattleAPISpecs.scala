@@ -97,7 +97,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         cultureId = mEq(Some(ss(0).cultureId)))
 
       there was one(battle).create(any)
-      there was two(solution).updateStatus(any, any, any)
+      there was two(solution).addParticipatedBattle(any, any)
       there was one(user).recordBattleParticipation(mEq(uu(0).id), any, mEq(SolutionsInBattle(ss.map(_.id))))
       there was one(user).recordBattleParticipation(mEq(uu(1).id), any, mEq(SolutionsInBattle(ss.map(_.id))))
       there were two(user).addEntryToTimeLine(any, any)
@@ -143,7 +143,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         cultureId = mEq(Some(ss(0).cultureId)))
 
       there was no(battle).create(any)
-      there was no(solution).updateStatus(any, any, any)
+      there was no(solution).addParticipatedBattle(any, any)
 
       result must beAnInstanceOf[OkApiResult[TryCreateBattleResult]]
     }

@@ -59,14 +59,14 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
     def checkCheatingSolution(qs: Solution) = {
       if (qs.shouldBanCheating)
-        db.solution.updateStatus(solution.id, Some(SolutionStatus.CheatingBanned))
+        db.solution.updateStatus(solution.id, SolutionStatus.CheatingBanned)
       else
         Some(qs)
     }
 
     def checkAICSolution(qs: Solution) = {
       if (qs.shouldBanIAC)
-        db.solution.updateStatus(solution.id, Some(SolutionStatus.IACBanned))
+        db.solution.updateStatus(solution.id, SolutionStatus.IACBanned)
       else
         Some(qs)
     }

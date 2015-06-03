@@ -673,7 +673,7 @@ private[mongo] class MongoUserDAO
       id,
       MongoDBObject(
         "$addToSet" -> MongoDBObject(
-          s"tutorialStates.$platform.assignedTutorialTaskIds" -> taskId)))
+          s"tutorialStates.$platform.usedTutorialTaskIds" -> taskId)))
   }
 
   /**

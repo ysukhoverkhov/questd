@@ -82,32 +82,35 @@ private[mongo] class MongoSolutionDAO
 
   def updateStatus(
     id: String,
-    status: Option[SolutionStatus.Value] = None,
-    battleId: Option[String]): Option[Solution] = {
+    newStatus: SolutionStatus.Value): Option[Solution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    status.fold {
-      queryBuilder +=
-        ("$set" -> MongoDBObject(
-          "lastModDate" -> new Date()))
-    } { status =>
-      queryBuilder +=
-        ("$set" -> MongoDBObject(
-          "status" -> status.toString,
-          "lastModDate" -> new Date()))
-    }
-
-    battleId.fold() { bid =>
-      queryBuilder +=
-        ("$push" -> MongoDBObject(
-          "battleIds" -> bid))
-    }
+    queryBuilder +=
+      ("$set" -> MongoDBObject(
+        "status" -> newStatus.toString,
+        "lastModDate" -> new Date()))
 
     findAndModify(
       id,
       queryBuilder.result())
   }
+
+  def addParticipatedBattle(
+    id: String,
+    battleId: String): Option[Solution] = {
+
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder +=
+      ("$push" -> MongoDBObject(
+        "battleIds" -> battleId))
+
+    findAndModify(
+      id,
+      queryBuilder.result())
+  }
+
 
   def updatePoints(
     id: String,

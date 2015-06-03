@@ -178,7 +178,7 @@ class SolutionDAOSpecs extends Specification
       excludingAuthorIds.map(_.id).sorted must beEqualTo(List(qs(0).id, qs(2).id).sorted)
     }
 
-    "updateStatus for solution updates rival correctly" in new WithApplication(appWithTestDatabase) {
+    "updateStatus for solution works" in new WithApplication(appWithTestDatabase) {
       clearDB()
 
       val id1 = "id1"
@@ -186,11 +186,22 @@ class SolutionDAOSpecs extends Specification
       createSolutionInDB(id1)
       createSolutionInDB(id2)
 
-      val su1 = db.solution.updateStatus(id1, Some(SolutionStatus.CheatingBanned))
-      val su2 = db.solution.updateStatus(id2, Some(SolutionStatus.OldBanned), Some(id1))
+      val su1 = db.solution.updateStatus(id1, SolutionStatus.CheatingBanned)
+      val su2 = db.solution.updateStatus(id2, SolutionStatus.OldBanned)
 
       su1 must beSome[Solution].which(s => s.status == SolutionStatus.CheatingBanned && s.battleIds == List.empty)
-      su2 must beSome[Solution].which(s => s.status == SolutionStatus.OldBanned && s.battleIds == List(id1))
+      su2 must beSome[Solution].which(s => s.status == SolutionStatus.OldBanned && s.battleIds == List.empty)
+    }
+
+    "participateInBattle for solution updates rival correctly" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val id1 = "id1"
+      createSolutionInDB(id1)
+
+      val su1 = db.solution.addParticipatedBattle(id1, "bid")
+
+      su1 must beSome[Solution].which(s =>  s.battleIds == List("bid"))
     }
 
     "Replace cultures" in new WithApplication(appWithTestDatabase) {
