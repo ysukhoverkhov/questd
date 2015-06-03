@@ -36,7 +36,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
 
         Logger.trace(s"    Analysing competitor $other")
 
-        if (other.info.authorId != request.solution.info.authorId) {
+        if (other.info.authorId != request.solution.info.authorId && other.battleIds.isEmpty) {
 
           Logger.debug("Found fight pair for quest " + request.solution.info.questId + " :")
           Logger.debug("  s1.id=" + request.solution.id)
@@ -53,7 +53,6 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
       }
     }
 
-    // TODO: filter out here somehow solutions with a least one battle.
     // We have battleIds in solution, should filter in DAO call for solutions with no battles.
     val possibleCompetitors = db.solution.allWithParams(
       status = List(SolutionStatus.InRotation),

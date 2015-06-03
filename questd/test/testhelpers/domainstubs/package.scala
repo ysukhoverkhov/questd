@@ -87,7 +87,8 @@ package object domainstubs {
     level: Int = 1,
     points: Int = 0,
     vip: Boolean = false,
-    lastModDate: Date = new Date((new Date).getTime + 100000)) = {
+    lastModDate: Date = new Date((new Date).getTime + 100000),
+    battleIds: List[String] = List.empty) = {
 
     Solution(
       id = id,
@@ -101,7 +102,8 @@ package object domainstubs {
       status = status,
       rating = SolutionRating(
         timelinePoints = points),
-      lastModDate = lastModDate)
+      lastModDate = lastModDate,
+      battleIds = battleIds)
   }
 
   def createTimeLineEntryStub(

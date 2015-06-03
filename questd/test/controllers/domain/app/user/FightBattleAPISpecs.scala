@@ -14,6 +14,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
 
     "Do not create battle if rival not found" in context {
       val s = createSolutionStub()
+      val s2 = createSolutionStub(battleIds = List("bid"))
 
       solution.allWithParams(
         status = mEq(List(SolutionStatus.InRotation)),
@@ -26,7 +27,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         idsExclude = any,
         questIds = mEq(List(s.info.questId)),
         themeIds = any,
-        cultureId = mEq(Some(s.cultureId))) returns List(s).iterator
+        cultureId = mEq(Some(s.cultureId))) returns List(s, s2).iterator
 
       val result = api.tryCreateBattle(TryCreateBattleRequest(s))
 
