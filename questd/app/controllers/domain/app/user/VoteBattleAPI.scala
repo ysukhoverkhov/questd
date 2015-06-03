@@ -42,7 +42,7 @@ private[domain] trait VoteBattleAPI {
                   {
                     voteBattle(VoteBattleRequest(b, solutionId, isFriend))
                     // TODO: make task here.
-                    // TODO: it's being made.
+                    // TODO: test it's being made.
                     //                          } map { r =>
 
                     //                            if (request.vote == ContentVote.Cool)

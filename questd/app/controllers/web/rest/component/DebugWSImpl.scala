@@ -115,7 +115,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
     def logOrGet[T](log: String)(it: Iterator[T]) = {
       if (!it.hasNext) {
-        Logger.debug(log)
+        Logger.error(log)
       }
 
       it.next()
@@ -186,9 +186,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
               storage = "url",
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
       } map { rr =>
+        Logger.debug(s"Quest solved with result ${rr.allowed}")
         assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
-
-        Logger.debug(s"Quest solved")
 
         api.addToTimeLine(AddToTimeLineRequest(
           user = peer,
@@ -200,7 +199,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
       } map { rr =>
 
-        Logger.debug(s"Quest added to timeline")
+        Logger.debug(s"Quest added to timeline of peer")
 
         api.solveQuest(SolveQuestRequest(
           rr.user,
@@ -212,9 +211,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
       }
     } map { rr =>
+      Logger.debug(s"Quest solved by peer with result ${rr.allowed}")
       assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
-
-      Logger.debug(s"Quest solved")
 
       OkApiResult(WSDebugResult("Done"))
     }
