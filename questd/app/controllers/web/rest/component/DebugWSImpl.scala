@@ -121,18 +121,21 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
       it.next()
     }
 
-    def randomUserExcluding(exclude: Seq[String], vip: Boolean = false) =
-      logOrGet(s"Unable to find random user with vip = $vip and excluding $exclude"){
+    def randomUserExcluding(exclude: Seq[String], culture: String, vip: Boolean = false) =
+      logOrGet(s"Unable to find random user with vip = $vip and excluding $exclude and cultureId $culture"){
         api.allUsers(AllUsersRequest()).body.get.users.filter(u =>
           !exclude.contains(u.id)
-            && u.demo.cultureId.isDefined
+            && u.demo.cultureId.contains(culture)
             && (u.profile.publicProfile.bio.gender != Gender.Unknown)
             && (u.profile.publicProfile.vip == vip))
       }
 
+    assert(r.user.demo.cultureId.isDefined, "Culture id of calling user should be defined")
+    Logger.debug(s"We found ${r.user.id} / ${r.user.profile.publicProfile.bio.name} / ${r.user.demo.cultureId}")
+
     val peer = {
       v.rivalId.fold[User] {
-        randomUserExcluding(List(r.user.id))
+        randomUserExcluding(List(r.user.id), r.user.demo.cultureId.get)
       } {
         rivalId =>
           logOrGet(s"Unable to find user with id = $rivalId"){
@@ -142,10 +145,11 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
                 && (u.profile.publicProfile.bio.gender != Gender.Unknown))}
       }
     }
-    Logger.debug(s"Peer found ${peer.id} / ${peer.profile.publicProfile.bio.name}")
+    assert(peer.demo.cultureId.isDefined, "Culture id of peer should be defined")
+    Logger.debug(s"Peer found ${peer.id} / ${peer.profile.publicProfile.bio.name} / ${peer.demo.cultureId}")
 
-    val author = randomUserExcluding(List(r.user.id, peer.id), vip = true)
-    Logger.debug(s"Author found ${author.id} / ${author.profile.publicProfile.bio.name}")
+    val author = randomUserExcluding(List(r.user.id, peer.id), r.user.demo.cultureId.get, vip = true)
+    Logger.debug(s"Author found ${author.id} / ${author.profile.publicProfile.bio.name} / ${author.demo.cultureId}")
 
     {
       // creating quest.

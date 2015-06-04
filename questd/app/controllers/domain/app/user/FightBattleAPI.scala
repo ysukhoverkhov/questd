@@ -34,7 +34,8 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
       if (possibleCompetitors.hasNext) {
         val other = possibleCompetitors.next()
 
-        Logger.trace(s"    Analysing competitor $other")
+        Logger.trace(s"    Analysing competitor solution ${other.id} - $other")
+        Logger.trace(s"    ${other.info.authorId} != ${request.solution.info.authorId} && ${other.battleIds.isEmpty}")
 
         if (other.info.authorId != request.solution.info.authorId && other.battleIds.isEmpty) {
 
