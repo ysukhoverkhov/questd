@@ -299,7 +299,7 @@ class UserDAOSpecs
       val ou = db.user.addClosedTutorialElement(userid, TutorialPlatform.iPhone.toString, elementid)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.tutorialStates(TutorialPlatform.iPhone.toString).closedElementIds == List(elementid))
+      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).closedElementIds == List(elementid))
     }
 
     "addTutorialTaskAssigned works" in new WithApplication(appWithTestDatabase) {
@@ -316,7 +316,7 @@ class UserDAOSpecs
       val ou = db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.tutorialStates(TutorialPlatform.iPhone.toString).usedTutorialTaskIds.length == 3)
+      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).usedTutorialTaskIds.length == 3)
     }
 
     "updateCultureId works" in new WithApplication(appWithTestDatabase) {

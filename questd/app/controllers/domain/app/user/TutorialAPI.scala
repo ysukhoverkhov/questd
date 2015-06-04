@@ -14,9 +14,6 @@ case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])
 case class GetTutorialRequest(user: User, platform: TutorialPlatform.Value)
 case class GetTutorialResult(tutorialElements: List[TutorialElement])
 
-case class GetTutorialElementsStateRequest(user: User, platform: TutorialPlatform.Value)
-case class GetTutorialElementsStateResult(state: TutorialState)
-
 case class CloseTutorialElementRequest(user: User, platform: TutorialPlatform.Value, elementId: String)
 case class CloseTutorialElementResult(allowed: ProfileModificationResult, state: Option[TutorialState] = None)
 
@@ -52,22 +49,13 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
   }
 
   /**
-   * Get state of tutorial for a specified platform.
-   */
-  def getTutorialElementsState(request: GetTutorialElementsStateRequest): ApiResult[GetTutorialElementsStateResult] = handleDbException {
-    import request._
-
-    OkApiResult(GetTutorialElementsStateResult(user.tutorialStates(platform.toString)))
-  }
-
-  /**
    * Set state of tutorial for a specified platform.
    */
   def closeTutorialElement(request: CloseTutorialElementRequest): ApiResult[CloseTutorialElementResult] = handleDbException {
     import request._
 
     db.user.addClosedTutorialElement(user.id, platform.toString, elementId) ifSome { v =>
-      OkApiResult(CloseTutorialElementResult(OK, Some(v.tutorialStates(platform.toString))))
+      OkApiResult(CloseTutorialElementResult(OK, Some(v.profile.tutorialStates(platform.toString))))
     }
   }
 
@@ -77,7 +65,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def assignTutorialTask(request: AssignTutorialTaskRequest): ApiResult[AssignTutorialTaskResult] = handleDbException {
     import request._
     // 1. check is the task was already given.
-    if (user.tutorialStates(platform.toString).usedTutorialTaskIds.contains(taskId)) {
+    if (user.profile.tutorialStates(platform.toString).usedTutorialTaskIds.contains(taskId)) {
       OkApiResult(AssignTutorialTaskResult(LimitExceeded))
     } else {
       db.tutorialTask.readById(taskId) match {
@@ -142,8 +130,8 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
     db.user.update(
       user.copy(
-        tutorialStates = TutorialPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
         profile = user.profile.copy(
+          tutorialStates = TutorialPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
           dailyTasks = DailyTasks()
         )
       )

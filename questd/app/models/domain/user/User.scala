@@ -1,7 +1,6 @@
 package models.domain.user
 
 import models.domain.base.ID
-import models.domain.tutorial.TutorialPlatform
 import models.domain.user.auth.AuthInfo
 import models.domain.user.dailyresults.DailyResult
 
@@ -21,6 +20,4 @@ case class User(
   followers: List[String] = List.empty,
   friends: List[Friendship] = List.empty,
   mustVoteSolutions: List[String] = List.empty,
-  tutorialStates: Map[String, TutorialState] =
-    TutorialPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
   payedAuthor: Boolean = false) extends ID

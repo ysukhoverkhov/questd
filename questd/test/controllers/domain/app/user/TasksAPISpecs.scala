@@ -16,9 +16,9 @@ class TasksAPISpecs extends BaseAPISpecs {
       profile = Profile(
         dailyTasks = dt,
         ratingToNextLevel = 10000000,
-        rights = Rights.full),
-      tutorialStates = Map(TutorialPlatform.iPhone.toString -> TutorialState(
-        usedTutorialTaskIds = assignedTutorialTaskIds)))
+        rights = Rights.full,
+        tutorialStates = Map(TutorialPlatform.iPhone.toString -> TutorialState(
+          usedTutorialTaskIds = assignedTutorialTaskIds))))
   }
 
   "Tasks API" should {

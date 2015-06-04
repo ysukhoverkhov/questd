@@ -83,7 +83,6 @@ POST	/rest/getTime									controllers.web.rest.MiscWS.getTime
 
 # Tutorial
 POST	/rest/getTutorial	    						controllers.web.rest.TutorialWS.getTutorial
-POST	/rest/getTutorialElementsState					controllers.web.rest.TutorialWS.getTutorialElementsState
 POST	/rest/closeTutorialElement						controllers.web.rest.TutorialWS.closeTutorialElement
 POST	/rest/assignTutorialTask						controllers.web.rest.TutorialWS.assignTutorialTask
 POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
