@@ -40,7 +40,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
             vip = u.profile.publicProfile.vip,
             solveCost = QuestLogic.costOfSolvingQuest(level),
             solveReward = QuestLogic.rewardForSolvingQuest(level, this),
-            victoryReward = QuestLogic.rewardForWinningBattle(level, this), // TODO: test these three values are applied.
+            victoryReward = QuestLogic.rewardForWinningBattle(level, this),
             defeatReward = QuestLogic.rewardForLosingBattle(level, this)
           ))
 
