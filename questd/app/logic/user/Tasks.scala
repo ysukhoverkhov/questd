@@ -65,7 +65,7 @@ trait Tasks { this: UserLogic =>
       TaskType.SubmitReviewsForQuests -> createSubmitReviewsForQuestsTask,
       TaskType.GiveRewards -> createGiveRewardsTask,
       TaskType.LookThroughFriendshipProposals -> createReviewFriendshipRequestsTask,
-      TaskType.Client -> createClientTask)
+      TaskType.Custom -> createClientTask)
   }
 
   /**
