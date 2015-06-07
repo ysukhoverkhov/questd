@@ -113,7 +113,8 @@ class TasksAPISpecs extends BaseAPISpecs {
       db.user.setTasksCompletedFraction(any, any) returns Some(createUserInternal(5))
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.LookThroughFriendshipProposals)))
-      result must beEqualTo(OkApiResult(MakeTaskResult(u)))
+
+      result must beAnInstanceOf[OkApiResult[MakeTaskResult]]
 
       there was one(db.user).incTask(u.id, taskId)
       there was one(db.user).setTasksCompletedFraction(any, mEq(0.5f))
@@ -148,8 +149,8 @@ class TasksAPISpecs extends BaseAPISpecs {
 
       val u = createUserInternal(4)
 
-      db.user.incTask(any, any) returns Some(createUserInternal(5))
-      db.user.setTasksCompletedFraction(any, any) returns Some(createUserInternal(5))
+      db.user.incTask(any, any) returns Some(u)
+      db.user.setTasksCompletedFraction(any, any) returns Some(u)
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.AddToFollowing)))
       result must beEqualTo(OkApiResult(MakeTaskResult(u)))
@@ -428,6 +429,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, tutorialTaskId))
 
       result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.LimitExceeded)))
+      there was no(db.user).setTasksCompletedFraction(any, any)
     }
 
     "Do not assign tutorial ask what is not exists" in context {
@@ -442,6 +444,7 @@ class TasksAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.OutOfContent)))
       there was one(db.tutorialTask).readById(any)
+      there was no(db.user).setTasksCompletedFraction(any, any)
     }
 
     "Assign tutorial task" in context {
@@ -461,6 +464,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       db.user.resetTasks(any, any, any) returns Some(u)
       db.user.addTutorialTaskAssigned(any, any, any) returns Some(u)
       db.user.addTasks(any, any, any) returns Some(u)
+      db.user.setTasksCompletedFraction(any, any) returns Some(u)
 
       val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, tutorialTaskId))
 
@@ -469,6 +473,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       there was one(db.user).resetTasks(any, any, any)
       there was one(db.user).addTutorialTaskAssigned(any, any, any)
       there was one(db.user).addTasks(any, any, mEq(Some(Assets(rating = 10))))
+      there was one(db.user).setTasksCompletedFraction(any, any)
     }
   }
 }

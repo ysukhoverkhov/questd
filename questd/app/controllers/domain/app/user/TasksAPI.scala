@@ -10,6 +10,9 @@ import play.Logger
 case class ResetDailyTasksRequest(user: User)
 case class ResetDailyTasksResult(user: User)
 
+case class UpdateDailyTasksCompletedFractionRequest(user: User)
+case class UpdateDailyTasksCompletedFractionResult(user: User)
+
 case class MakeTaskRequest(
   user: User,
   taskType: Option[TaskType.Value] = None,
@@ -40,15 +43,25 @@ private[domain] trait TasksAPI {
   }
 
   /**
+   * Recalculates current assigned daily tasks completed fraction.
+   */
+  private [app] def updateDailyTasksCompletedFraction(request: UpdateDailyTasksCompletedFractionRequest): ApiResult[UpdateDailyTasksCompletedFractionResult] = handleDbException {
+    def completedFraction(dt: DailyTasks): Float = {
+      dt.tasks.map(t => t.currentCount.toFloat / t.requiredCount).sum / dt.tasks.size
+    }
+
+    db.user.setTasksCompletedFraction(id = request.user.id, completedFraction = completedFraction(request.user.profile.dailyTasks)) ifSome { u =>
+      OkApiResult(UpdateDailyTasksCompletedFractionResult(u))
+    }
+  }
+
+  /**
    * Increase by one number of completed tasks for given task. Recalculate percentage and schedule reward if all tasks are completed.
    * Do everything in other words.
    */
   def makeTask(request: MakeTaskRequest): ApiResult[MakeTaskResult] = handleDbException {
     import request._
 
-    def completedFraction(dt: DailyTasks): Float = {
-      dt.tasks.map(t => t.currentCount.toFloat / t.requiredCount).sum / dt.tasks.size
-    }
 
     def shouldGiveTasksReward(dt: DailyTasks, completedTasks: List[Task]): Boolean = {
       dt.tasks.foldLeft(true)((r, v) => if (v.currentCount >= v.requiredCount) r else false) &&
@@ -93,9 +106,6 @@ private[domain] trait TasksAPI {
       u ifSome { u =>
         runWhileSome(u)(
         { u =>
-          db.user.setTasksCompletedFraction(id = u.id, completedFraction = completedFraction(u.profile.dailyTasks))
-        },
-        { u =>
           if (shouldGiveTasksReward(u.profile.dailyTasks, completedTasks)) {
             db.user.setTasksRewardReceived(id = u.id, rewardReceived = true)
           } else {
@@ -105,7 +115,7 @@ private[domain] trait TasksAPI {
           // Running API calls.
 
           // Give reward for currently completed tasks.
-          completedTasks.foldLeft[ApiResult[SendMessageResult]](OkApiResult(SendMessageResult(user))) { (r, t) =>
+          completedTasks.foldLeft[ApiResult[SendMessageResult]](OkApiResult(SendMessageResult(u))) { (r, t) =>
             r map { r =>
               adjustAssets(AdjustAssetsRequest(user = r.user, change = t.reward))
             } map { r =>
@@ -122,6 +132,8 @@ private[domain] trait TasksAPI {
             } else {
               OkApiResult(SendMessageResult(r.user))
             }
+          } map { r =>
+            updateDailyTasksCompletedFraction(UpdateDailyTasksCompletedFractionRequest(r.user))
           } map { r =>
             OkApiResult(MakeTaskResult(r.user))
           }

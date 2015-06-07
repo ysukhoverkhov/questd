@@ -94,9 +94,13 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
             db.user.addTasks(
               user.id,
               List(taskToAdd.copy(reward = Assets(coins = taskToAdd.reward.coins, money = taskToAdd.reward.money))),
-              ratingReward) ifSome { v =>
-                OkApiResult(AssignTutorialTaskResult(OK, Some(v.profile)))
+              ratingReward) ifSome { u =>
+              {
+                updateDailyTasksCompletedFraction(UpdateDailyTasksCompletedFractionRequest(u.user))
+              } map { r =>
+                OkApiResult(AssignTutorialTaskResult(OK, Some(r.user.profile)))
               }
+            }
           }
         case None =>
           OkApiResult(AssignTutorialTaskResult(OutOfContent))
