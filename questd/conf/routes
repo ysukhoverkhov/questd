@@ -91,9 +91,13 @@ POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
 POST	/rest/postComment	    						controllers.web.rest.CommentsWS.postComment
 POST	/rest/getCommentsForObject 						controllers.web.rest.CommentsWS.getCommentsForObject
 
+# Challenges
+POST    /rest/challengeBattle 	    					controllers.web.rest.ChallengesWS.challengeBattle
+
 # Upload
 POST    /cdn/upload                                     controllers.web.rest.UploadWS.upload
 POST    /cdn/getContentURLById                          controllers.web.rest.UploadWS.getContentURLById
+
 
 #######################
 # Debug (Should be removed in production)
