@@ -50,3 +50,10 @@ db.battles.find({"info.questId" : {$exists : false}}).forEach(
    }
 )
 
+db.battles.find({"info.battleSides" : {$exists : false}}).forEach(
+    function(doc) {
+	doc.info.battleSides = [ { "solutionId" : doc.info.solutionIds[0], "authorId" : doc.info.authorIds[0], "isWinner" : true }, { "solutionId" : doc.info.solutionIds[1], "authorId" : doc.info.authorIds[1], "isWinner" : true } ]
+
+        db.battles.save(doc);
+   }
+)
