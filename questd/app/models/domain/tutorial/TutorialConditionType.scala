@@ -9,4 +9,5 @@ object TutorialConditionType extends Enumeration {
   val TutorialTaskCompleted = Value
   val ProfileVariableState = Value
   val ScreenOpened = Value
+  val ModalScreenOpened = Value
 }

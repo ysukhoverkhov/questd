@@ -8,6 +8,7 @@ object TutorialTriggerType extends Enumeration {
   val TutorialElementClosed = Value
   val TutorialTaskCompleted = Value
   val ScreenOpened = Value
+  val ModalScreenOpened = Value
   val ButtonPressed = Value
   val LevelGained = Value
   val TasksPanelMaximized = Value
