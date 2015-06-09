@@ -19,6 +19,7 @@ object DebugWS extends Controller with AccessToWSInstance {
 
   def resetTutorial = ws.resetTutorial
   def setLevel = ws.setLevel
+  def resetProfile = ws.resetProfile
 
   def generateErrorLog = ws.generateErrorLog
 }

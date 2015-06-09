@@ -141,7 +141,9 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
       )
     )
 
-    OkApiResult(ResetTutorialResult(OK, Some(user.profile)))
+    db.user.readById(user.id) ifSome { user =>
+      OkApiResult(ResetTutorialResult(OK, Some(user.profile)))
+    }
   }
 }
 

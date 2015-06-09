@@ -99,6 +99,7 @@ POST    /cdn/getContentURLById                          controllers.web.rest.Upl
 # Debug (Should be removed in production)
 #######################
 POST	/rest/debug/shiftDailyResult					controllers.web.rest.DebugWS.shiftDailyResult
+POST	/rest/debug/resetProfile     					controllers.web.rest.DebugWS.resetProfile
 POST	/rest/debug/test								controllers.web.rest.DebugWS.test
 POST	/rest/debug/voteQuest							controllers.web.rest.DebugWS.voteQuestDebug
 POST	/rest/debug/voteSolution						controllers.web.rest.DebugWS.voteSolutionDebug
@@ -107,6 +108,7 @@ POST	/rest/debug/makeBattle						    controllers.web.rest.DebugWS.makeBattle
 POST	/rest/debug/resetTutorial					    controllers.web.rest.DebugWS.resetTutorial
 POST	/rest/debug/setLevel					        controllers.web.rest.DebugWS.setLevel
 POST	/rest/debug/generateErrorLog			        controllers.web.rest.DebugWS.generateErrorLog
+POST	/rest/debug/resetProfile     					controllers.web.rest.DebugWS.resetProfile
 
 
 
