@@ -1,7 +1,7 @@
 #!/bin/bash
 
 hg pull
-hg up -r "0.40.05"
+hg up -r "0.40.05" --clean
 
 ./stage.sh
 
