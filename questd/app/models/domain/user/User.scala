@@ -2,6 +2,7 @@ package models.domain.user
 
 import models.domain.base.ID
 import models.domain.user.auth.AuthInfo
+import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults.DailyResult
 import models.domain.user.demo.UserDemographics
 import models.domain.user.friends.Friendship
@@ -25,5 +26,6 @@ case class User(
   following: List[String] = List.empty,
   followers: List[String] = List.empty,
   friends: List[Friendship] = List.empty,
+  battleRequests: List[BattleRequest] = List.empty,
   mustVoteSolutions: List[String] = List.empty,
   payedAuthor: Boolean = false) extends ID
