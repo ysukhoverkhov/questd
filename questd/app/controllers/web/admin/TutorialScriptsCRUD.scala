@@ -13,6 +13,9 @@ object TutorialScriptsCRUD extends Controller {
   def updateAction(platform: String, elementId: String) = admin.tutorialScripts.updateAction(platform, elementId)
   def addElement(platform: String) = admin.tutorialScripts.addElement(platform)
   def deleteElement(platform: String, elementId: String) = admin.tutorialScripts.deleteElement(platform, elementId)
+  def upElement(platform: String, elementId: String) = admin.tutorialScripts.upElement(platform, elementId)
+  def downElement(platform: String, elementId: String) = admin.tutorialScripts.downElement(platform, elementId)
+
   def addParamToElementAction(platform: String, elementId: String) = admin.tutorialScripts.addParamToElementAction(platform, elementId)
   def deleteParamFromElementAction(platform: String, elementId: String, paramKey: String) = admin.tutorialScripts.deleteParamFromElementAction(platform, elementId, paramKey)
   def saveParamInElementAction(platform: String, elementId: String, paramKey: String) = admin.tutorialScripts.saveParamInElementAction(platform, elementId, paramKey)

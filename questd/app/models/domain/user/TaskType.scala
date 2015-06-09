@@ -14,5 +14,5 @@ object TaskType extends Enumeration {
   val SubmitReviewsForQuests = Value
   val GiveRewards = Value
   val LookThroughFriendshipProposals = Value
-  val Client = Value(1000)
+  val Custom = Value(1000)
 }

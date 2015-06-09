@@ -2,7 +2,6 @@ package controllers.web.admin.component
 
 import controllers.domain.app.user.{GetCommonTutorialRequest, GetCommonTutorialResult}
 import controllers.domain.{DomainAPIComponent, OkApiResult}
-import models.domain._
 import models.domain.tutorial._
 import org.json4s.ext.EnumNameSerializer
 import play.api.Logger
@@ -176,6 +175,60 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
   def deleteElement(platform: String, elementId: String) = Authenticated { implicit request =>
     api.db.tutorial.deleteElement(platform, elementId)
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Moves an element up in list of elements.
+   *
+   * @param platform Platform element for.
+   * @param elementId Id of element to move.
+   * @return ontent.
+   */
+  def upElement(platform: String, elementId: String) = Authenticated { implicit request =>
+
+    def swapWithPrev[T](l: List[T], e : T) : List[T] = l match {
+      case Nil => Nil
+      case prev::`e`::tl => e::prev::tl
+      case hd::tl => hd::swapWithPrev(tl, e)
+    }
+
+    api.db.tutorial.readById(platform).fold {
+      Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+    } { tutorial =>
+      tutorial.elements.find(_.id == elementId).fold {
+        Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+      } { element =>
+        api.db.tutorial.update(tutorial.copy(elements = swapWithPrev(tutorial.elements, element)))
+        Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+      }
+    }
+  }
+
+  /**
+   * Moves an element down in list of elements.
+   *
+   * @param platform Platform element for.
+   * @param elementId Id of element to move.
+   * @return ontent.
+   */
+  def downElement(platform: String, elementId: String) = Authenticated { implicit request =>
+
+    def swapWithNext[T](l: List[T], e : T) : List[T] = l match {
+      case Nil => Nil
+      case `e`::next::tl => next::e::tl
+      case hd::tl => hd::swapWithNext(tl, e)
+    }
+
+    api.db.tutorial.readById(platform).fold {
+      Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+    } { tutorial =>
+      tutorial.elements.find(_.id == elementId).fold {
+        Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+      } { element =>
+        api.db.tutorial.update(tutorial.copy(elements = swapWithNext(tutorial.elements, element)))
+        Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+      }
+    }
   }
 
   /**

@@ -27,12 +27,12 @@ class TasksAPISpecs extends BaseAPISpecs {
       val u = createUser(DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10,
             currentCount = 10))))
 
-      val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.Client)))
+      val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.Custom)))
 
       result must beEqualTo(OkApiResult(MakeTaskResult(u)))
     }
@@ -67,7 +67,7 @@ class TasksAPISpecs extends BaseAPISpecs {
             requiredCount = 10,
             currentCount = 0),
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10,
             currentCount = 10,
@@ -100,7 +100,7 @@ class TasksAPISpecs extends BaseAPISpecs {
               requiredCount = 5,
               currentCount = 5),
             Task(
-              taskType = TaskType.Client,
+              taskType = TaskType.Custom,
               description = "",
               requiredCount = 10,
               currentCount = 5,
@@ -113,7 +113,8 @@ class TasksAPISpecs extends BaseAPISpecs {
       db.user.setTasksCompletedFraction(any, any) returns Some(createUserInternal(5))
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.LookThroughFriendshipProposals)))
-      result must beEqualTo(OkApiResult(MakeTaskResult(u)))
+
+      result must beAnInstanceOf[OkApiResult[MakeTaskResult]]
 
       there was one(db.user).incTask(u.id, taskId)
       there was one(db.user).setTasksCompletedFraction(any, mEq(0.5f))
@@ -139,7 +140,7 @@ class TasksAPISpecs extends BaseAPISpecs {
               requiredCount = 10,
               currentCount = cc),
             Task(
-              taskType = TaskType.Client,
+              taskType = TaskType.Custom,
               description = "",
               requiredCount = 10,
               currentCount = 5,
@@ -148,8 +149,8 @@ class TasksAPISpecs extends BaseAPISpecs {
 
       val u = createUserInternal(4)
 
-      db.user.incTask(any, any) returns Some(createUserInternal(5))
-      db.user.setTasksCompletedFraction(any, any) returns Some(createUserInternal(5))
+      db.user.incTask(any, any) returns Some(u)
+      db.user.setTasksCompletedFraction(any, any) returns Some(u)
 
       val result = api.makeTask(MakeTaskRequest(u, taskType = Some(TaskType.AddToFollowing)))
       result must beEqualTo(OkApiResult(MakeTaskResult(u)))
@@ -182,7 +183,7 @@ class TasksAPISpecs extends BaseAPISpecs {
             requiredCount = 5,
             currentCount = 5),
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10,
             currentCount = 10,
@@ -234,7 +235,7 @@ class TasksAPISpecs extends BaseAPISpecs {
           Task(
             id = taskId,
             reward = r2,
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10,
             currentCount = 9,
@@ -287,7 +288,7 @@ class TasksAPISpecs extends BaseAPISpecs {
           Task(
             id = taskId,
             reward = r2,
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10,
             currentCount = 9,
@@ -344,7 +345,7 @@ class TasksAPISpecs extends BaseAPISpecs {
     "Carry tutorial tasks to next day if all tasks are not completed" in context {
       val r = Assets(10, 20, 30)
       val tutorialTask = Task(
-        taskType = TaskType.Client,
+        taskType = TaskType.Custom,
         description = "",
         requiredCount = 10,
         tutorialTaskId = Some("lala"))
@@ -382,7 +383,7 @@ class TasksAPISpecs extends BaseAPISpecs {
     "Do not carry tutorial tasks to next day if all tasks are completed" in context {
       val r = Assets(10, 20, 30)
       val tutorialTask = Task(
-        taskType = TaskType.Client,
+        taskType = TaskType.Custom,
         description = "",
         requiredCount = 10,
         currentCount = 10,
@@ -428,6 +429,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, tutorialTaskId))
 
       result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.LimitExceeded)))
+      there was no(db.user).setTasksCompletedFraction(any, any)
     }
 
     "Do not assign tutorial ask what is not exists" in context {
@@ -442,6 +444,7 @@ class TasksAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.OutOfContent)))
       there was one(db.tutorialTask).readById(any)
+      there was no(db.user).setTasksCompletedFraction(any, any)
     }
 
     "Assign tutorial task" in context {
@@ -454,13 +457,14 @@ class TasksAPISpecs extends BaseAPISpecs {
       db.tutorialTask.readById(tutorialTaskId) returns Some(
         TutorialTask(
           id = "taskId",
-          taskType = TaskType.Client,
+          taskType = TaskType.Custom,
           description = "",
           requiredCount = 10,
           reward = Assets(rating = 10)))
       db.user.resetTasks(any, any, any) returns Some(u)
       db.user.addTutorialTaskAssigned(any, any, any) returns Some(u)
       db.user.addTasks(any, any, any) returns Some(u)
+      db.user.setTasksCompletedFraction(any, any) returns Some(u)
 
       val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, tutorialTaskId))
 
@@ -469,6 +473,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       there was one(db.user).resetTasks(any, any, any)
       there was one(db.user).addTutorialTaskAssigned(any, any, any)
       there was one(db.user).addTasks(any, any, mEq(Some(Assets(rating = 10))))
+      there was one(db.user).setTasksCompletedFraction(any, any)
     }
   }
 }

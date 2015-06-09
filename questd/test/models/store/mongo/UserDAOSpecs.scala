@@ -165,7 +165,7 @@ class UserDAOSpecs
       val tasks = DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10),
           Task(
@@ -181,7 +181,7 @@ class UserDAOSpecs
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client).head.currentCount == 1)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Custom).head.currentCount == 1)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards).head.currentCount == 2)
     }
 
@@ -193,7 +193,7 @@ class UserDAOSpecs
       val tasks = DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10)))
 
@@ -214,7 +214,7 @@ class UserDAOSpecs
       val tasks = DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10)))
 
