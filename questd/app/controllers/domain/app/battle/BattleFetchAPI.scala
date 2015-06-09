@@ -5,7 +5,8 @@ import controllers.domain.helpers._
 import controllers.domain.{ApiResult, OkApiResult}
 import models.domain.battle.{Battle, BattleStatus}
 import models.domain.common.ContentVote
-import models.domain.user.{FriendshipStatus, User}
+import models.domain.user.User
+import models.domain.user.friends.FriendshipStatus
 
 case class GetAllBattlesInternalRequest()
 case class GetAllBattlesInternalResult(battles: Iterator[Battle])

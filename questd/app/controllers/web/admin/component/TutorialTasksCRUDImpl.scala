@@ -4,7 +4,7 @@ import controllers.domain.admin._
 import controllers.domain.{DomainAPIComponent, OkApiResult}
 import models.domain.common.Assets
 import models.domain.tutorialtask.TutorialTask
-import models.domain.user.TaskType
+import models.domain.user.profile.TaskType
 import org.json4s.ext.EnumNameSerializer
 import play.api._
 import play.api.data.Forms._

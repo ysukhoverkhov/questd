@@ -1,4 +1,4 @@
-package models.domain.user
+package models.domain.user.profile
 
 import models.domain.base.ID
 import models.domain.common.Assets

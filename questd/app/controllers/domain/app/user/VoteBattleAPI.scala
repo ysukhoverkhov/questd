@@ -7,6 +7,8 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import models.domain.battle.BattleStatus
 import models.domain.user._
+import models.domain.user.friends.FriendshipStatus
+import models.domain.user.profile.Profile
 
 case class VoteBattleByUserRequest(user: User, battleId: String, solutionId: String)
 case class VoteBattleByUserResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)

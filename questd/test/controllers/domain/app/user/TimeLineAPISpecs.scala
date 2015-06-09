@@ -2,7 +2,7 @@ package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain._
-import models.domain.user.{TimeLineType, TimeLineReason}
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
 import testhelpers.domainstubs._
 import org.mockito.Matchers.{eq => mockEq}
 

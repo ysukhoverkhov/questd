@@ -1,4 +1,4 @@
-package models.domain.user
+package models.domain.user.stats
 
 import models.domain.common.ContentVote
 

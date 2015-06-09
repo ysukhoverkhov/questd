@@ -3,6 +3,12 @@ package models.domain.user
 import models.domain.base.ID
 import models.domain.user.auth.AuthInfo
 import models.domain.user.dailyresults.DailyResult
+import models.domain.user.demo.UserDemographics
+import models.domain.user.friends.Friendship
+import models.domain.user.profile.Profile
+import models.domain.user.schedules.UserSchedules
+import models.domain.user.stats.UserStats
+import models.domain.user.timeline.TimeLineEntry
 
 /**
  * Structure representing beloved user.

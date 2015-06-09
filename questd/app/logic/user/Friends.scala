@@ -5,7 +5,8 @@ import logic.functions._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import models.domain._
 import models.domain.common.Assets
-import models.domain.user.{User, Functionality}
+import models.domain.user.User
+import models.domain.user.profile.Functionality
 
 /**
  * All friends related logic.

@@ -1,9 +1,10 @@
-package models.domain.user
+package models.domain.user.profile
 
 import models.domain.base.ID
 import models.domain.common.Assets
 import models.domain.quest.QuestSolutionContext
 import models.domain.tutorial.TutorialPlatform
+import models.domain.user._
 import models.domain.user.dailyresults.DailyResult
 import models.domain.user.message.Message
 

@@ -3,7 +3,8 @@ package controllers.domain.app.quest
 import controllers.domain._
 import models.domain._
 import models.domain.quest.QuestStatus
-import models.domain.user.{FriendshipStatus, Friendship, User}
+import models.domain.user.friends.{FriendshipStatus, Friendship}
+import models.domain.user.User
 import testhelpers.domainstubs._
 
 class QuestFetchAPISpecs extends BaseAPISpecs {

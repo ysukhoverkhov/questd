@@ -2,7 +2,7 @@ package logic.user
 
 import controllers.domain.app.protocol.ProfileModificationResult._
 import logic._
-import models.domain.user.Functionality
+import models.domain.user.profile.Functionality
 
 /**
  * All logic about voting quest solutions is here.

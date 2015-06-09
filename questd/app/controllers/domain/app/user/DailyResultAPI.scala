@@ -11,6 +11,7 @@ import models.domain.quest.{QuestStatus, Quest}
 import models.domain.solution.Solution
 import models.domain.user._
 import models.domain.user.dailyresults._
+import models.domain.user.profile.Profile
 import play.Logger
 import logic.constants._
 

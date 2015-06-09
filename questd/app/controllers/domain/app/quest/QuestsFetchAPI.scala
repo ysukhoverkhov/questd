@@ -4,7 +4,8 @@ import components.DBAccessor
 import controllers.domain._
 import controllers.domain.helpers._
 import models.domain.quest.{Quest, QuestStatus}
-import models.domain.user.{FriendshipStatus, User}
+import models.domain.user.User
+import models.domain.user.friends.FriendshipStatus
 import play.Logger
 
 case class GetMyQuestsRequest(

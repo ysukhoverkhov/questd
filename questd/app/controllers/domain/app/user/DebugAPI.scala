@@ -6,6 +6,7 @@ import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import models.domain.user._
 import models.domain.user.dailyresults.DailyResult
+import models.domain.user.profile.Profile
 
 case class SetDebugRequest(user: User, debug: String)
 case class SetDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)

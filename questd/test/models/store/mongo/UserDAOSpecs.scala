@@ -9,7 +9,12 @@ import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
 import models.domain.user.dailyresults.BattleResult
+import models.domain.user.demo.UserDemographics
+import models.domain.user.friends.{ReferralStatus, FriendshipStatus, Friendship}
 import models.domain.user.message.MessageInformation
+import models.domain.user.profile._
+import models.domain.user.stats.SolutionsInBattle
+import models.domain.user.timeline.{TimeLineType, TimeLineReason, TimeLineEntry}
 import models.store._
 import models.view.QuestView
 import org.specs2.mutable._

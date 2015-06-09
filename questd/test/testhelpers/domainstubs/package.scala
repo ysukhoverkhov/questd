@@ -12,6 +12,11 @@ import models.domain.tag.{Theme, ThemeInfo}
 import models.domain.user._
 import models.domain.user.auth.{LoginMethod, AuthInfo}
 import models.domain.user.dailyresults._
+import models.domain.user.demo.UserDemographics
+import models.domain.user.friends.Friendship
+import models.domain.user.profile._
+import models.domain.user.stats.{SolutionsInBattle, UserStats}
+import models.domain.user.timeline.{TimeLineType, TimeLineReason, TimeLineEntry}
 import models.view.{QuestView, ThemeInfoWithID}
 
 

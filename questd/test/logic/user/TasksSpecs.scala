@@ -3,6 +3,8 @@ package logic.user
 import logic.BaseLogicSpecs
 import models.domain._
 import models.domain.user._
+import models.domain.user.friends.{FriendshipStatus, Friendship}
+import models.domain.user.profile.{TaskType, Task, PublicProfile, Profile}
 import testhelpers.domainstubs._
 
 class TasksSpecs extends BaseLogicSpecs {

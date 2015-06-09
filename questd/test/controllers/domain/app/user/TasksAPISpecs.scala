@@ -6,6 +6,7 @@ import models.domain.common.Assets
 import models.domain.tutorial.TutorialPlatform
 import models.domain.tutorialtask.TutorialTask
 import models.domain.user._
+import models.domain.user.profile._
 import org.mockito.Matchers.{eq => mEq}
 
 class TasksAPISpecs extends BaseAPISpecs {

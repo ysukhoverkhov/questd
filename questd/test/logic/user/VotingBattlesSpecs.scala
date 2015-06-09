@@ -2,7 +2,7 @@ package logic.user
 
 import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
-import models.domain.user.Rights
+import models.domain.user.profile.Rights
 import testhelpers.domainstubs._
 
 class VotingBattlesSpecs extends BaseLogicSpecs {

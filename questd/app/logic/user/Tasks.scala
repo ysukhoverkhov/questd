@@ -5,6 +5,8 @@ import logic.constants._
 import logic.functions._
 import models.domain.common.Assets
 import models.domain.user._
+import models.domain.user.friends.FriendshipStatus
+import models.domain.user.profile.{TaskType, Task, DailyTasks, Functionality}
 
 trait Tasks { this: UserLogic =>
 

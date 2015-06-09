@@ -1,6 +1,6 @@
 package logic
 
-import models.domain.user.Functionality
+import models.domain.user.profile.Functionality
 
 object constants {
 

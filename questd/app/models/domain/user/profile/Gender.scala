@@ -1,4 +1,4 @@
-package models.domain.user
+package models.domain.user.profile
 
 /**
  * User's gender.

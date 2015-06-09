@@ -1,5 +1,4 @@
-package models.domain.user
-
+package models.domain.user.friends
 
 /**
  * Represents friendship status

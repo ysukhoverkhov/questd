@@ -7,6 +7,7 @@ import controllers.domain.helpers._
 import models.domain.common.Assets
 import models.domain.tutorial.{TutorialElement, TutorialPlatform}
 import models.domain.user._
+import models.domain.user.profile.{TutorialState, Task, DailyTasks, Profile}
 
 case class GetCommonTutorialRequest(platform: TutorialPlatform.Value)
 case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])

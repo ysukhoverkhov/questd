@@ -3,7 +3,7 @@ package controllers.domain.app.user
 import controllers.domain.{OkApiResult, BaseAPISpecs}
 import models.domain.battle.BattleStatus
 import models.domain.solution.SolutionStatus
-import models.domain.user.SolutionsInBattle
+import models.domain.user.stats.SolutionsInBattle
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 

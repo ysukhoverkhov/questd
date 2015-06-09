@@ -1,10 +1,9 @@
 package logic.user
 
 import logic.UserLogic
-import models.domain._
 import logic.constants._
 import logic.functions._
-import models.domain.user.{Functionality, Rights}
+import models.domain.user.profile.{Functionality, Rights}
 
 /**
  * All logic related to calculating user rights.

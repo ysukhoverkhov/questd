@@ -6,7 +6,7 @@ import models.domain._
 import models.domain.common.ContentType
 import ContentType._
 import models.domain.quest.Quest
-import models.domain.user.Functionality
+import models.domain.user.profile.Functionality
 
 /**
  * All logic related to solving quests.

@@ -7,6 +7,8 @@ import controllers.domain.app.quest.SolveQuestUpdateRequest
 import controllers.domain.helpers._
 import models.domain.solution.{Solution, SolutionInfo, SolutionInfoContent, SolutionStatus}
 import models.domain.user._
+import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
 import models.view.QuestView
 import play.Logger
 

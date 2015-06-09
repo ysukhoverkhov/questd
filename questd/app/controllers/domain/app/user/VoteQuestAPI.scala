@@ -8,6 +8,8 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain._
 import models.domain.common.ContentVote
 import models.domain.user._
+import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
 
 case class VoteQuestByUserRequest(
   user: User,

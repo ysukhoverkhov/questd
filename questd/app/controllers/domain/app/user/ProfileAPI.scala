@@ -8,6 +8,8 @@ import logic.constants
 import models.domain.common.Assets
 import models.domain.culture.Culture
 import models.domain.user._
+import models.domain.user.friends.ReferralStatus
+import models.domain.user.profile.{Functionality, Rights, Profile, Gender}
 import play.{Logger, Play}
 
 case class AdjustAssetsRequest(user: User, change: Assets)

@@ -8,7 +8,11 @@ import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
 import models.domain.user.dailyresults._
+import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
+import models.domain.user.profile.{Task, DailyTasks, Rights}
+import models.domain.user.stats.SolutionsInBattle
+import models.domain.user.timeline.TimeLineEntry
 import models.store.dao._
 import models.store.mongo.SalatContext._
 import models.store.mongo.helpers._

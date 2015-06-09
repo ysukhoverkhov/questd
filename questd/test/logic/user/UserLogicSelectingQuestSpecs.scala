@@ -4,7 +4,9 @@ import controllers.domain.OkApiResult
 import controllers.domain.app.quest._
 import logic.BaseLogicSpecs
 import models.domain.common.ContentVote
-import models.domain.user.{Friendship, PublicProfile, Profile, User}
+import models.domain.user.friends.Friendship
+import models.domain.user.profile.{PublicProfile, Profile}
+import models.domain.user.User
 import testhelpers.domainstubs._
 
 class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {

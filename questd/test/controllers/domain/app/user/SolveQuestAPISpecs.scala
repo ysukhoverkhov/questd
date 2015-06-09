@@ -4,7 +4,8 @@ import controllers.domain.{BaseAPISpecs, OkApiResult}
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.common.Assets
 import models.domain.solution.{Solution, SolutionInfo}
-import models.domain.user.{FriendshipStatus, Friendship, TimeLineType, TimeLineReason}
+import models.domain.user.friends.{FriendshipStatus, Friendship}
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 

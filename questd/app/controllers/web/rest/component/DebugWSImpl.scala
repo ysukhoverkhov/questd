@@ -11,6 +11,9 @@ import models.domain.common.{ContentVote, ContentType, ContentReference}
 import models.domain.quest.QuestInfoContent
 import models.domain.solution.SolutionInfoContent
 import models.domain.user._
+import models.domain.user.friends.FriendshipStatus
+import models.domain.user.profile.Gender
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
 import play.Logger
 
 private object DebugWSImplTypes {

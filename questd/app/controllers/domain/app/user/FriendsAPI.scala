@@ -7,7 +7,9 @@ import controllers.domain.helpers._
 import controllers.sn.client.{User => SNUser}
 import models.domain.common.Assets
 import models.domain.user._
+import models.domain.user.friends.{ReferralStatus, FriendshipStatus, Friendship}
 import models.domain.user.message.{MessageFriendshipAccepted, MessageFriendshipRemoved}
+import models.domain.user.profile.{TaskType, Profile}
 import play.Logger
 
 case class GetFriendsRequest(

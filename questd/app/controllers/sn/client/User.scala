@@ -1,6 +1,6 @@
 package controllers.sn.client
 
-import models.domain.user.Gender
+import models.domain.user.profile.Gender
 
 trait User extends Item {
 

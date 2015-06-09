@@ -5,6 +5,8 @@ import controllers.domain._
 import controllers.domain.app.quest.SelectQuestToTimeLineRequest
 import controllers.domain.helpers._
 import models.domain.user._
+import models.domain.user.friends.FriendshipStatus
+import models.domain.user.timeline.{TimeLineType, TimeLineReason, TimeLineEntry}
 import play.Logger
 
 
