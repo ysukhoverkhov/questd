@@ -5,10 +5,11 @@ import java.util.Date
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
+import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
-import models.domain.user.profile.{Task, DailyTasks, Rights}
+import models.domain.user.profile.{DailyTasks, Rights, Task}
 import models.domain.user.stats.SolutionsInBattle
 import models.domain.user.timeline.TimeLineEntry
 import models.view.QuestView
@@ -186,4 +187,13 @@ trait UserDAO extends BaseDAO[User] {
    * @return user after modifications.
    */
   def removeEntryFromTimeLineByObjectId(id: String, entryId: String): Option[User]
+
+  /**
+   * Adds battle request to user.
+   *
+   * @param id Id of user to add request to.
+   * @param battleRequest Request to add.
+   * @return Modified user.
+   */
+  def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User]
 }

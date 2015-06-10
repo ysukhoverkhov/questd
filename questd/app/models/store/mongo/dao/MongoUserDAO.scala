@@ -7,6 +7,7 @@ import com.novus.salat._
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
+import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
@@ -756,6 +757,18 @@ private[mongo] class MongoUserDAO
         "$pull" -> MongoDBObject(
           "timeLine" -> MongoDBObject(
           "objectId" -> objectId))))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  // TODO: test everything here.
+  def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$push" -> MongoDBObject(
+          "battleRequests" -> grater[BattleRequest].asDBObject(battleRequest))))
   }
 }
 
