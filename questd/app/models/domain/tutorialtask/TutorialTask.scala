@@ -13,7 +13,7 @@ case class TutorialTask(
   description: String,
   requiredCount: Int,
   reward: Assets,
-  triggersReward: Boolean = false) extends ID { // TODO: remove default false in 0.40.06
+  triggersReward: Boolean) extends ID {
 
   def task = Task(
     taskType = taskType,
