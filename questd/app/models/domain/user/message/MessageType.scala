@@ -10,4 +10,6 @@ object MessageType extends Enumeration {
   val AllTasksCompleted = Value
   val TaskCompleted = Value
   val Information = Value
+  val BattleRequestAccepted = Value
+  val BattleRequestRejected = Value
 }

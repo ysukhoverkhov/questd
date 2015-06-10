@@ -7,6 +7,7 @@ import controllers.domain.helpers._
 import models.domain.solution.Solution
 import models.domain.user.User
 import models.domain.user.battlerequests.{BattleRequest, BattleRequestStatus}
+import models.domain.user.message.{MessageBattleRequestRejected, MessageBattleRequestAccepted}
 import models.domain.user.profile.Profile
 import play.Logger
 
@@ -94,8 +95,6 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
       Logger.trace(s"Unable to find battle request with status Requests and opponentSolutionId equal to $opponentSolutionId")
       OkApiResult(RespondBattleRequestResult(OutOfContent))
     } { br =>
-      // TODO: implement me.
-      // TODO: send messages about accepted/rejected battles.
       val newStatus = if (accept) BattleRequestStatus.Accepted else BattleRequestStatus.Rejected
 
       db.user.updateBattleRequest(user.id, br.mySolutionId, br.opponentSolutionId, newStatus.toString) ifSome { user =>
@@ -106,15 +105,16 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
               db.solution.readById(br.opponentSolutionId).fold[ApiResult[RespondBattleRequestResult]](
                 OkApiResult(RespondBattleRequestResult(OutOfContent))) { opponentSolution =>
                 createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
-                  // TODO: send message here.
-
+                  sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(request.user.id)))
+                } map {
                   OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
                 }
               }
             }
           } else {
-            // TODO: send message here.
-            OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
+            sendMessage(SendMessageRequest(opponent, MessageBattleRequestRejected(request.user.id))) map {
+              OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
+            }
           }
         }
       }

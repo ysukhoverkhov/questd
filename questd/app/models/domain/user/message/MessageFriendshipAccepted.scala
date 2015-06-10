@@ -2,7 +2,6 @@ package models.domain.user.message
 
 import scala.language.implicitConversions
 
-
 /**
  * A message about accepted friendship.
  * @param newFriendId id of a user who accepts the friendship.
