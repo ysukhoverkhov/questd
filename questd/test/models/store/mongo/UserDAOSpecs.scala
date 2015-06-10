@@ -8,6 +8,7 @@ import models.domain.common.{Assets, ContentVote}
 import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
+import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
 import models.domain.user.dailyresults.BattleResult
 import models.domain.user.demo.UserDemographics
 import models.domain.user.friends.{ReferralStatus, FriendshipStatus, Friendship}
@@ -727,6 +728,37 @@ class UserDAOSpecs
 
       ou must beSome
       ou.get.privateDailyResults.head.decidedBattles.head must beEqualTo(br)
+    }
+
+    "addBattleRequest adds it" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val br = BattleRequest("1", "2", "3", BattleRequestStatus.Accepted)
+
+      db.user.create(user)
+      db.user.addBattleRequest(user.id, br)
+
+      val ou = db.user.readById(user.id)
+
+      ou must beSome
+      ou.get.battleRequests.head must beEqualTo(br)
+    }
+
+    "updateBattleRequest works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val br = BattleRequest("1", "2", "3", BattleRequestStatus.Accepted)
+
+      db.user.create(user)
+      db.user.addBattleRequest(user.id, br)
+      db.user.updateBattleRequest(user.id, "2", "3", BattleRequestStatus.Rejected.toString)
+
+      val ou = db.user.readById(user.id)
+
+      ou must beSome
+      ou.get.battleRequests.head must beEqualTo(br.copy(status = BattleRequestStatus.Rejected))
     }
   }
 }

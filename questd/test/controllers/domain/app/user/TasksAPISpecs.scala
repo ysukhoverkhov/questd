@@ -461,7 +461,8 @@ class TasksAPISpecs extends BaseAPISpecs {
           taskType = TaskType.Custom,
           description = "",
           requiredCount = 10,
-          reward = Assets(rating = 10)))
+          reward = Assets(rating = 10),
+          triggersReward = false))
       db.user.resetTasks(any, any, any) returns Some(u)
       db.user.addTutorialTaskAssigned(any, any, any) returns Some(u)
       db.user.addTasks(any, any, any) returns Some(u)

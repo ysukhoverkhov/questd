@@ -762,7 +762,6 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  // TODO: test everything here.
   def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User] = {
     findAndModify(
       id,
@@ -774,7 +773,6 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  // TODO: test everything here.
   def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User] = {
     findAndModify(
       MongoDBObject(
