@@ -8,5 +8,6 @@ import play.api.mvc._
 object ChallengesWS extends Controller with AccessToWSInstance {
 
   def challengeBattle = ws.challengeBattle
+  def getBattleRequests = ws.getBattleRequests
 }
 

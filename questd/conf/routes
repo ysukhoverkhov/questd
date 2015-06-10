@@ -93,6 +93,9 @@ POST	/rest/getCommentsForObject 						controllers.web.rest.CommentsWS.getComment
 
 # Challenges
 POST    /rest/challengeBattle 	    					controllers.web.rest.ChallengesWS.challengeBattle
+POST	/rest/getBattleRequests						    controllers.web.rest.ChallengesWS.getBattleRequests
+#POST	/rest/costToChallenge							controllers.web.rest.ChallengesWS.costToChallenge
+
 
 # Upload
 POST    /cdn/upload                                     controllers.web.rest.UploadWS.upload

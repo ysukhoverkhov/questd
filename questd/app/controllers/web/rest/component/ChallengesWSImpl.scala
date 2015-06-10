@@ -1,6 +1,6 @@
 package controllers.web.rest.component
 
-import controllers.domain.app.user.{ChallengeBattleRequest, ChallengeBattleResult}
+import controllers.domain.app.user._
 import controllers.web.helpers._
 
 private object ChallengesWSImplTypes {
@@ -14,6 +14,8 @@ private object ChallengesWSImplTypes {
     )
   type WSChallengeBattleResult = ChallengeBattleResult
 
+
+  type WSGetBattleRequestsResult = GetBattleRequestsResult
 }
 
 trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
@@ -29,6 +31,15 @@ trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSCom
     val v = Json.read[WSChallengeBattleRequest](js.toString)
 
     api.challengeBattle(ChallengeBattleRequest(r.user, v.mySolutionId, v.opponentSolutionId))
+  }
+
+  /**
+   * Get all our and to us battle requests.
+   *
+   * @return
+   */
+  def getBattleRequests = wrapApiCallReturnBody[WSGetBattleRequestsResult] { r =>
+    api.getBattleRequests(GetBattleRequestsRequest(r.user))
   }
 }
 

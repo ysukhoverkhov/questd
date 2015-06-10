@@ -9,7 +9,6 @@ import models.domain.user.User
 import models.domain.user.battlerequests.{BattleRequest, BattleRequestStatus}
 import models.domain.user.profile.Profile
 
-
 case class ChallengeBattleRequest(
   user: User,
   mySolutionId: String,
@@ -17,6 +16,13 @@ case class ChallengeBattleRequest(
 case class ChallengeBattleResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None)
+
+case class GetBattleRequestsRequest(
+  user: User)
+case class GetBattleRequestsResult(
+  allowed: ProfileModificationResult,
+  requests: List[BattleRequest])
+
 
 private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -53,6 +59,15 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
         }
       }
     }
+  }
+
+  /**
+   * Get all battle requests we have.
+   */
+  def getBattleRequests(request: GetBattleRequestsRequest): ApiResult[GetBattleRequestsResult] = handleDbException {
+    OkApiResult(GetBattleRequestsResult(
+      allowed = OK,
+      requests = request.user.battleRequests))
   }
 }
 
