@@ -196,4 +196,14 @@ trait UserDAO extends BaseDAO[User] {
    * @return Modified user.
    */
   def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User]
+
+  /**
+   * Updates status of batle request.
+   *
+   * @param id Id of user to update request for.
+   * @param mySolutionId Id of user's challenged solution.
+   * @param opponentSolutionId Id of opponent's sopution.
+   * @param status new status.
+   */
+  def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User]
 }

@@ -16,6 +16,15 @@ private object ChallengesWSImplTypes {
 
 
   type WSGetBattleRequestsResult = GetBattleRequestsResult
+
+
+  case class WSRespondBattleRequestRequest(
+    /// Id of solution we were challenged with.
+    opponentSolutionId: String,
+
+    /// Are we accept the challenge.
+    accepted: Boolean)
+  type WSRespondBattleRequestResult = RespondBattleRequestResult
 }
 
 trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
@@ -24,8 +33,6 @@ trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSCom
 
   /**
    * Challenge someone to a battle.
-   *
-   * @return
    */
   def challengeBattle = wrapJsonApiCallReturnBody[WSChallengeBattleResult] { (js, r) =>
     val v = Json.read[WSChallengeBattleRequest](js.toString)
@@ -35,11 +42,18 @@ trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSCom
 
   /**
    * Get all our and to us battle requests.
-   *
-   * @return
    */
   def getBattleRequests = wrapApiCallReturnBody[WSGetBattleRequestsResult] { r =>
     api.getBattleRequests(GetBattleRequestsRequest(r.user))
+  }
+
+  /**
+   * Give a response on battle request.
+   */
+  def respondBattleRequest = wrapJsonApiCallReturnBody[WSRespondBattleRequestResult] { (js, r) =>
+    val v = Json.read[WSRespondBattleRequestRequest](js.toString)
+
+    api.respondBattleRequest(RespondBattleRequestRequest(r.user, v.opponentSolutionId, v.accepted))
   }
 }
 

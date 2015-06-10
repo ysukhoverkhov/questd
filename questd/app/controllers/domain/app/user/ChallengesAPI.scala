@@ -8,6 +8,7 @@ import models.domain.solution.Solution
 import models.domain.user.User
 import models.domain.user.battlerequests.{BattleRequest, BattleRequestStatus}
 import models.domain.user.profile.Profile
+import play.Logger
 
 case class ChallengeBattleRequest(
   user: User,
@@ -22,6 +23,14 @@ case class GetBattleRequestsRequest(
 case class GetBattleRequestsResult(
   allowed: ProfileModificationResult,
   requests: List[BattleRequest])
+
+case class RespondBattleRequestRequest(
+  user: User,
+  opponentSolutionId: String,
+  accept: Boolean)
+case class RespondBattleRequestResult(
+  allowed: ProfileModificationResult,
+  profile: Option[Profile] = None)
 
 
 private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -68,6 +77,48 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
     OkApiResult(GetBattleRequestsResult(
       allowed = OK,
       requests = request.user.battleRequests))
+  }
+
+  /**
+   * Respond on battle request.
+   */
+  // TODO: test me.
+  def respondBattleRequest(request: RespondBattleRequestRequest): ApiResult[RespondBattleRequestResult] = handleDbException {
+    import request._
+
+    user.battleRequests.find(
+      br =>
+        (br.status == BattleRequestStatus.Requests) &&
+          (br.opponentSolutionId == opponentSolutionId)
+    ).fold[ApiResult[RespondBattleRequestResult]] {
+      Logger.trace(s"Unable to find battle request with status Requests and opponentSolutionId equal to $opponentSolutionId")
+      OkApiResult(RespondBattleRequestResult(OutOfContent))
+    } { br =>
+      // TODO: implement me.
+      // TODO: send messages about accepted/rejected battles.
+      val newStatus = if (accept) BattleRequestStatus.Accepted else BattleRequestStatus.Rejected
+
+      db.user.updateBattleRequest(user.id, br.mySolutionId, br.opponentSolutionId, newStatus.toString) ifSome { user =>
+        db.user.updateBattleRequest(br.opponentId, br.opponentSolutionId, br.mySolutionId, newStatus.toString) ifSome { opponent =>
+          if (accept) {
+            db.solution.readById(br.mySolutionId).fold[ApiResult[RespondBattleRequestResult]](OkApiResult(RespondBattleRequestResult(OutOfContent)))
+            { mySolution =>
+              db.solution.readById(br.opponentSolutionId).fold[ApiResult[RespondBattleRequestResult]](
+                OkApiResult(RespondBattleRequestResult(OutOfContent))) { opponentSolution =>
+                createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
+                  // TODO: send message here.
+
+                  OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
+                }
+              }
+            }
+          } else {
+            // TODO: send message here.
+            OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
+          }
+        }
+      }
+    }
   }
 }
 

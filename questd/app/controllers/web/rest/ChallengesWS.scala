@@ -9,5 +9,6 @@ object ChallengesWS extends Controller with AccessToWSInstance {
 
   def challengeBattle = ws.challengeBattle
   def getBattleRequests = ws.getBattleRequests
+  def respondBattleRequest = ws.respondBattleRequest
 }
 

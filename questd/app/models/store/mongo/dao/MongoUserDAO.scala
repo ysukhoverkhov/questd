@@ -770,5 +770,20 @@ private[mongo] class MongoUserDAO
         "$push" -> MongoDBObject(
           "battleRequests" -> grater[BattleRequest].asDBObject(battleRequest))))
   }
+
+  /**
+   * @inheritdoc
+   */
+  // TODO: test everything here.
+  def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "battleRequests.mySolutionId" -> mySolutionId,
+        "battleRequests.opponentSolutionId" -> opponentSolutionId),
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "battleRequests.$.status" -> status)))
+  }
 }
 
