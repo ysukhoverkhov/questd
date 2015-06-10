@@ -1,11 +1,10 @@
 #!/bin/bash
 
-hg pull
-hg up -r "0.40.05" --clean
-
-./stage.sh
-
 service questd stop
+
+hg pull
+hg up -r "0.40.06" --clean
+./stage.sh
 
 cp -f ../install/questd.conf /etc/init/
 
