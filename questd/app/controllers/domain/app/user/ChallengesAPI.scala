@@ -39,7 +39,6 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
   /**
    * Challenge someone to jon a battle.
    */
-  // TODO: test it calls db correctly.
   def challengeBattle(request: ChallengeBattleRequest): ApiResult[ChallengeBattleResult] = handleDbException {
     import request._
 
@@ -48,12 +47,17 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
         opponentSolution.info.authorId,
         BattleRequest(user.id, opponentSolution.id, mySolution.id, BattleRequestStatus.Requests)) ifSome { opponent =>
 
-        db.user.addBattleRequest(
-          user.id,
-          BattleRequest(
-            opponent.id, mySolution.id, opponentSolution.id, BattleRequestStatus.Requested)) ifSome { user =>
-
+        runWhileSome(user) ( { user =>
+          db.user.addBattleRequest(
+            user.id,
+            BattleRequest(
+              opponent.id, mySolution.id, opponentSolution.id, BattleRequestStatus.Requested))
+        }, { user =>
           // TODO: substract assets for invitation.
+          // TODO: test it calls db correctly.
+          Some(user)
+        }
+        ) ifSome { user =>
           OkApiResult(ChallengeBattleResult(OK, Some(user.profile)))
         }
       }
@@ -87,21 +91,15 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
   def respondBattleRequest(request: RespondBattleRequestRequest): ApiResult[RespondBattleRequestResult] = handleDbException {
     import request._
 
-    user.battleRequests.find(
-      br =>
-        (br.status == BattleRequestStatus.Requests) &&
-          (br.opponentSolutionId == opponentSolutionId)
-    ).fold[ApiResult[RespondBattleRequestResult]] {
-      Logger.trace(s"Unable to find battle request with status Requests and opponentSolutionId equal to $opponentSolutionId")
-      OkApiResult(RespondBattleRequestResult(OutOfContent))
-    } { br =>
+    def createBattleForRequest(br: BattleRequest): ApiResult[RespondBattleRequestResult] = {
       val newStatus = if (accept) BattleRequestStatus.Accepted else BattleRequestStatus.Rejected
 
       db.user.updateBattleRequest(user.id, br.mySolutionId, br.opponentSolutionId, newStatus.toString) ifSome { user =>
-        db.user.updateBattleRequest(br.opponentId, br.opponentSolutionId, br.mySolutionId, newStatus.toString) ifSome { opponent =>
+        db.user.updateBattleRequest(
+          br.opponentId, br.opponentSolutionId, br.mySolutionId, newStatus.toString) ifSome { opponent =>
           if (accept) {
-            db.solution.readById(br.mySolutionId).fold[ApiResult[RespondBattleRequestResult]](OkApiResult(RespondBattleRequestResult(OutOfContent)))
-            { mySolution =>
+            db.solution.readById(br.mySolutionId).fold[ApiResult[RespondBattleRequestResult]](
+              OkApiResult(RespondBattleRequestResult(OutOfContent))) { mySolution =>
               db.solution.readById(br.opponentSolutionId).fold[ApiResult[RespondBattleRequestResult]](
                 OkApiResult(RespondBattleRequestResult(OutOfContent))) { opponentSolution =>
                 createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
@@ -112,12 +110,25 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
               }
             }
           } else {
+            // TODO: return money back.
+
             sendMessage(SendMessageRequest(opponent, MessageBattleRequestRejected(request.user.id))) map {
               OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
             }
           }
         }
       }
+    }
+
+    user.battleRequests.find(
+      br =>
+        (br.status == BattleRequestStatus.Requests) &&
+          (br.opponentSolutionId == opponentSolutionId)
+    ).fold[ApiResult[RespondBattleRequestResult]] {
+      Logger.trace(s"Unable to find battle request with status Requests and opponentSolutionId equal to $opponentSolutionId")
+      OkApiResult(RespondBattleRequestResult(OutOfContent))
+    } { br =>
+      createBattleForRequest(br)
     }
   }
 }
