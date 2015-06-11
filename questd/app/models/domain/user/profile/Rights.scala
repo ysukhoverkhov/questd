@@ -9,6 +9,7 @@ object Functionality extends Enumeration {
   val VoteBattles = Value
   val SubmitPhotoSolutions = Value
   val SubmitVideoSolutions = Value
+  val ChallengeBattles = Value
   val Report = Value
   val InviteFriends = Value
   val AddToFollowing = Value

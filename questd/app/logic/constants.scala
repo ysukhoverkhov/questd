@@ -14,7 +14,7 @@ object constants {
     Functionality.VoteReviews -> 1,
     Functionality.AddToFollowing -> 1,
     Functionality.SubmitPhotoSolutions -> 2,
-    // Functionality.ChallengeBattles -> 3,
+    Functionality.ChallengeBattles -> 3, // TODO: think what level they should be given at.
     Functionality.Report -> 4,
     Functionality.SubmitVideoSolutions -> 5,
     Functionality.InviteFriends -> 6,

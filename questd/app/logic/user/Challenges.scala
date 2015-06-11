@@ -4,6 +4,7 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import logic._
 import models.domain.common.Assets
 import models.domain.solution.Solution
+import models.domain.user.profile.Functionality
 
 /**
  * All battle challenges related logic.
@@ -11,7 +12,6 @@ import models.domain.solution.Solution
 trait Challenges { this: UserLogic =>
 
   // TODO: check rights here.
-  // TODO: test everything here.
   def canChallengeBattle(mySolution: Solution, opponentSolution: Solution) = {
     lazy val mySolutionExists = user.stats.solvedQuests.values.exists(_ == mySolution.id)
     lazy val alreadyHasRequest = user.battleRequests
@@ -25,8 +25,8 @@ trait Challenges { this: UserLogic =>
       OutOfContent
     else if (opponentSolution.info.questId != mySolution.info.questId)
       InvalidState
-//    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.AddToFollowing))
-//      NotEnoughRights
+    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.ChallengeBattles))
+      NotEnoughRights
     else if (!(user.profile.assets canAfford costToChallengeBattle))
       NotEnoughAssets
     else

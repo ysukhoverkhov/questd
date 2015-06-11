@@ -87,7 +87,6 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
   /**
    * Respond on battle request.
    */
-  // TODO: test me.
   def respondBattleRequest(request: RespondBattleRequestRequest): ApiResult[RespondBattleRequestResult] = handleDbException {
     import request._
 
@@ -111,7 +110,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
             }
           } else {
             // TODO: return money back.
-
+            // TODO: test me.
             sendMessage(SendMessageRequest(opponent, MessageBattleRequestRejected(request.user.id))) map {
               OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
             }
