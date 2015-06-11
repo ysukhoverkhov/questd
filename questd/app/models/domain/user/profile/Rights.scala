@@ -34,21 +34,7 @@ object Rights {
   /**
    * All rights given.
    */
-  val full: Rights = Rights(Set(
-    Functionality.VoteQuests,
-    Functionality.VoteSolutions,
-    Functionality.VoteBattles,
-    Functionality.SubmitPhotoSolutions,
-    Functionality.SubmitVideoSolutions,
-    Functionality.Report,
-    Functionality.InviteFriends,
-    Functionality.AddToFollowing,
-    Functionality.SubmitPhotoQuests,
-    Functionality.SubmitVideoQuests,
-    Functionality.VoteReviews,
-    Functionality.SubmitReviewsForSolutions,
-    Functionality.SubmitReviewsForQuests,
-    Functionality.GiveRewards))
+  val full: Rights = Rights(Functionality.values)
 
   val none: Rights = Rights(Set())
 }

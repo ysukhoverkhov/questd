@@ -27,11 +27,11 @@ class ChallengesAPISpecs extends BaseAPISpecs {
         mySolutionId = mySolutionId,
         opponentSolutionId = opponentSolutionId))
 
+      result must beEqualTo(OkApiResult(ChallengeBattleResult(ProfileModificationResult.OK, Some(u1.profile))))
+
       there was one(solution).readById(mySolutionId)
       there was one(solution).readById(opponentSolutionId)
       there were two(user).addBattleRequest(any, any)
-
-      result must beEqualTo(OkApiResult(ChallengeBattleResult(ProfileModificationResult.OK, Some(u1.profile))))
     }
 
     "respondBattleRequest crates battle" in context {
