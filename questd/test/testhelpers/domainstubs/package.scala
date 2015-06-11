@@ -217,8 +217,7 @@ package object domainstubs {
     level: Int = 18,
     questCreationCoolDown: Date = new Date(Long.MaxValue),
     createdQuests: List[String] = List.empty,
-    createdSolutions: List[String] = List.empty,
-    solvedQuests: List[String] = List.empty,
+    solvedQuests: Map[String, String] = Map.empty,
     votedQuests: Map[String, ContentVote.Value] = Map.empty,
     votedSolutions: Map[String, ContentVote.Value] = Map.empty,
     votedBattles: Map[String, String] = Map.empty,
@@ -257,7 +256,6 @@ package object domainstubs {
       timeLine = timeLine,
       stats = UserStats(
         createdQuests = createdQuests,
-        createdSolutions = createdSolutions,
         solvedQuests = solvedQuests,
         votedQuests = votedQuests,
         votedSolutions = votedSolutions,

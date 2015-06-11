@@ -11,7 +11,7 @@ import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
-import models.domain.user.profile.{Task, DailyTasks, Rights}
+import models.domain.user.profile.{DailyTasks, Rights, Task}
 import models.domain.user.stats.SolutionsInBattle
 import models.domain.user.timeline.TimeLineEntry
 import models.store.dao._
@@ -127,20 +127,6 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def recordSolutionCreation(id: String, solutionId: String): Option[User] = {
-    val queryBuilder = MongoDBObject.newBuilder
-
-    queryBuilder += ("$push" -> MongoDBObject(
-      "stats.createdSolutions" -> solutionId))
-
-    findAndModify(
-      id,
-      queryBuilder.result())
-  }
-
-  /**
-   * @inheritdoc
-   */
   def recordQuestVote(id: String, questId: String, vote: ContentVote.Value): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -213,7 +199,7 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def recordQuestSolving(id: String, questId: String, removeBookmark: Boolean): Option[User] = {
+  def recordQuestSolving(id: String, questId: String, solutionId: String, removeBookmark: Boolean): Option[User] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -222,8 +208,8 @@ private[mongo] class MongoUserDAO
         "profile.questSolutionContext.bookmarkedQuest" -> ""))
     }
 
-    queryBuilder += ("$push" -> MongoDBObject(
-      "stats.solvedQuests" -> questId))
+    queryBuilder += ("$set" -> MongoDBObject(
+      s"stats.solvedQuests.$questId" -> solutionId))
 
     findAndModify(
       id,

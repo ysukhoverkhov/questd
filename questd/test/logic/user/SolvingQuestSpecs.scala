@@ -63,7 +63,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
 
       val questId = "qid"
       val tl = List(createTimeLineEntryStub(objectId = questId))
-      val user = createUserStub(timeLine = tl, solvedQuests = List(questId))
+      val user = createUserStub(timeLine = tl, solvedQuests = Map(questId -> "sid"))
       val q = createQuestStub(id = questId)
 
       val rv = user.canSolveQuest(ContentType.Photo, q)

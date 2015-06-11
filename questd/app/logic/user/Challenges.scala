@@ -13,7 +13,7 @@ trait Challenges { this: UserLogic =>
   // TODO: check rights here.
   // TODO: test everything here.
   def canChallengeBattle(mySolution: Solution, opponentSolution: Solution) = {
-    lazy val mySolutionExists = user.stats.createdSolutions.contains(mySolution.id)
+    lazy val mySolutionExists = user.stats.solvedQuests.values.exists(_ == mySolution.id)
     lazy val alreadyHasRequest = user.battleRequests
       .exists(br => (br.mySolutionId == mySolution.id) && (br.opponentSolutionId == opponentSolution.id))
 

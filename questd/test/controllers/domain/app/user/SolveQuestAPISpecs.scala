@@ -43,8 +43,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       quest.readById(mEq(q.id)) returns Some(q)
       quest.updatePoints(mEq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
-      user.recordQuestSolving(mEq(u.id), mEq(q.id), mEq(false)) returns Some(u)
-      user.recordSolutionCreation(mEq(u.id), any) returns Some(u)
+      user.recordQuestSolving(mEq(u.id), mEq(q.id), any, mEq(false)) returns Some(u)
       user.addEntryToTimeLine(mEq(u.id), any) returns Some(u)
       user.addToAssets(mEq(u.id), any) returns Some(u)
       user.readById(q.info.authorId) returns Some(author)
@@ -75,7 +74,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
             questId = q.id,
             vip = true)))
       there was one(quest).readById(q.id)
-      there was one(user).recordQuestSolving(mEq(u.id), mEq(q.id), mEq(false))
+      there was one(user).recordQuestSolving(mEq(u.id), mEq(q.id), any, mEq(false))
       there was one(user).addEntryToTimeLine(mEq(u.id), any)
       there was one(user).addToAssets(mEq(u.id), mEq(q.info.solveReward - q.info.solveCost))
       there was one(user).addEntryToTimeLineMulti(mEq(List("fid1")), any)

@@ -50,7 +50,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
 
       val uid = "uid"
       val s = createSolutionStub()
-      val user = createUserStub(id = uid, createdSolutions = List(s.id))
+      val user = createUserStub(id = uid, solvedQuests = Map("q" -> s.id))
 
       val rv = user.canVoteSolution(s.id)
 

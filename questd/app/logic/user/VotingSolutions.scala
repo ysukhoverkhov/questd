@@ -17,7 +17,7 @@ trait VotingSolutions { this: UserLogic =>
       NotEnoughRights
     else if (user.stats.votedSolutions.contains(solutionId))
       InvalidState
-    else if (user.stats.createdSolutions.contains(solutionId))
+    else if (user.stats.solvedQuests.values.exists(_ == solutionId))
       OutOfContent
     else if (!bioComplete)
       IncompleteBio
