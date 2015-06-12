@@ -213,6 +213,7 @@ package object domainstubs {
     cultureId: Option[String] = Some("cultureId"),
     vip: Boolean = false,
     friends: List[Friendship] = List.empty,
+    followers: List[String] = List.empty,
     assets: Assets = Assets(100000, 100000, 100000),
     mustVoteSolutions: List[String] = List.empty,
     level: Int = 18,
@@ -254,6 +255,7 @@ package object domainstubs {
             gender = Gender.Male)),
         rights = rights),
       friends = friends,
+      followers = followers,
       mustVoteSolutions = mustVoteSolutions,
       timeLine = timeLine,
       stats = UserStats(

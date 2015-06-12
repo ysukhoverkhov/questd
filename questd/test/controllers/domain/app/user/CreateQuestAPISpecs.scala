@@ -26,7 +26,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
       result.body must beSome[CreateQuestResult].which(r => r.allowed == ProfileModificationResult.OK)
 
       there was one(user).addEntryToTimeLine(any, any)
-      there was one(user).addEntryToTimeLineMulti(any, any)
+//      there was one(user).addEntryToTimeLineMulti(any, any)
       there was no(user).addQuestIncomeToDailyResult(any, any)
       there was one(quest).create(q.copy(id = anyString))
     }
@@ -45,7 +45,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
       result.body must beSome[CreateQuestResult].which(r => r.allowed == ProfileModificationResult.OK)
 
       there was one(user).addEntryToTimeLine(any, any)
-      there was one(user).addEntryToTimeLineMulti(any, any)
+//      there was one(user).addEntryToTimeLineMulti(any, any)
       there was no(user).addQuestIncomeToDailyResult(any, any)
       there was one(quest).create(q.copy(id = anyString))
     }

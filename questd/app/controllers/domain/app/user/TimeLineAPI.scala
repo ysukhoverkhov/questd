@@ -49,14 +49,18 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def addToTimeLine(request: AddToTimeLineRequest): ApiResult[AddToTimeLineResult] = handleDbException {
     import request._
 
-    db.user.addEntryToTimeLine(
-      user.id,
-      TimeLineEntry(
-        reason = reason,
-        actorId = actorId.getOrElse(user.id),
-        objectType = objectType,
-        objectId = objectId)) ifSome { u =>
-      OkApiResult(AddToTimeLineResult(u))
+    if (user.timeLine.exists(_.objectId == objectId)) {
+      OkApiResult(AddToTimeLineResult(user))
+    } else {
+      db.user.addEntryToTimeLine(
+        user.id,
+        TimeLineEntry(
+          reason = reason,
+          actorId = actorId.getOrElse(user.id),
+          objectType = objectType,
+          objectId = objectId)) ifSome { u =>
+        OkApiResult(AddToTimeLineResult(u))
+      }
     }
   }
 
@@ -80,13 +84,25 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def addToWatchersTimeLine(request: AddToWatchersTimeLineRequest): ApiResult[AddToWatchersTimeLineResult] = handleDbException {
     import request._
 
-    db.user.addEntryToTimeLineMulti(
-      user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId) ::: user.followers,
-      TimeLineEntry(
-        reason = reason,
-        actorId = user.id,
-        objectType = objectType,
-        objectId = objectId))
+    val userIds = user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId) ::: user.followers
+
+    userIds.foreach{
+      db.user.readById(_).fold() { friend =>
+        addToTimeLine(AddToTimeLineRequest(
+          user = friend,
+          reason = reason,
+          objectType = objectType,
+          objectId = objectId,
+          actorId = Some(user.id)))
+      }
+    }
+//    db.user.addEntryToTimeLineMulti(
+//      user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId) ::: user.followers,
+//      TimeLineEntry(
+//        reason = reason,
+//        actorId = user.id,
+//        objectType = objectType,
+//        objectId = objectId))
 
     OkApiResult(AddToWatchersTimeLineResult(user))
   }

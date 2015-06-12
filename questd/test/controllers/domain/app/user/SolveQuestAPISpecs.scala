@@ -16,6 +16,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
     "Create regular solution for regular users" in context {
 
       val uid = "uid"
+      val friend = createUserStub(id = "fid1")
 
       val q = createQuestStub(
         solveCost = Assets(1, 0, 0),
@@ -25,7 +26,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val t2 = createTimeLineEntryStub(objectType = TimeLineType.Solution, actorId = "uid", reason = TimeLineReason.Created)
       val t3 = createTimeLineEntryStub(objectType = TimeLineType.Quest)
       val t4 = createTimeLineEntryStub(objectType = TimeLineType.Quest)
-      val friends = List(Friendship("fid1", FriendshipStatus.Accepted), Friendship("fid2", FriendshipStatus.Invited))
+      val friends = List(Friendship(friend.id, FriendshipStatus.Accepted), Friendship("fid2", FriendshipStatus.Invited))
       val u = createUserStub(
         id = uid,
         cultureId = Some("cid"),
@@ -44,9 +45,10 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       quest.readById(mEq(q.id)) returns Some(q)
       quest.updatePoints(mEq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
       user.recordQuestSolving(mEq(u.id), mEq(q.id), any, mEq(false)) returns Some(u)
-      user.addEntryToTimeLine(mEq(u.id), any) returns Some(u)
+      user.addEntryToTimeLine(any, any) returns Some(u)
       user.addToAssets(mEq(u.id), any) returns Some(u)
       user.readById(q.info.authorId) returns Some(author)
+      user.readById(friend.id) returns Some(friend)
       user.storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any) returns Some(author)
       solution.allWithParams(
         status = any,
@@ -77,7 +79,8 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(user).recordQuestSolving(mEq(u.id), mEq(q.id), any, mEq(false))
       there was one(user).addEntryToTimeLine(mEq(u.id), any)
       there was one(user).addToAssets(mEq(u.id), mEq(q.info.solveReward - q.info.solveCost))
-      there was one(user).addEntryToTimeLineMulti(mEq(List("fid1")), any)
+//      there was one(user).addEntryToTimeLineMulti(mEq(List("fid1")), any)
+      there was one(user).addEntryToTimeLine(mEq(friend.id), any)
       there was one(quest).updatePoints(mEq(q.id), mEq(2), anyInt, anyInt, anyInt, anyInt, anyInt)
       there was one(user).storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any)
 
