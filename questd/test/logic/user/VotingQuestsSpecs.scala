@@ -3,7 +3,7 @@ package logic.user
 import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
 import models.domain.common.ContentVote
-import models.domain.user.profile.Rights
+import models.domain.user.profile.{Functionality, Rights}
 import testhelpers.domainstubs._
 
 class VotingQuestsSpecs extends BaseLogicSpecs {
@@ -16,7 +16,18 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
       val user = createUserStub(rights = Rights.none)
       val q = createQuestStub()
 
-      val rv = user.canVoteQuest(q.id)
+      val rv = user.canVoteQuest(q.id, ContentVote.Cool)
+
+      rv must beEqualTo(ProfileModificationResult.NotEnoughRights)
+    }
+
+    "Do not allow cheating for quests without rights" in {
+      api.config returns createStubConfig
+
+      val user = createUserStub(rights = Rights(unlockedFunctionality = Set(Functionality.VoteQuests)))
+      val q = createQuestStub()
+
+      val rv = user.canVoteQuest(q.id, ContentVote.Cheating)
 
       rv must beEqualTo(ProfileModificationResult.NotEnoughRights)
     }
@@ -27,7 +38,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
       val user = createUserStub()
       val q = createQuestStub()
 
-      val rv = user.canVoteQuest(q.id)
+      val rv = user.canVoteQuest(q.id, ContentVote.Cheating)
 
       rv must beEqualTo(ProfileModificationResult.OK)
     }
@@ -40,7 +51,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
         timeLine = List(createTimeLineEntryStub(objectId = q.id)),
         votedQuests = Map(q.id -> ContentVote.Cool))
 
-      val rv = user.canVoteQuest(q.id)
+      val rv = user.canVoteQuest(q.id, ContentVote.Cheating)
 
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
@@ -54,7 +65,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
         id = userId,
         createdQuests = List(q.id))
 
-      val rv = user.canVoteQuest(q.id)
+      val rv = user.canVoteQuest(q.id, ContentVote.Cheating)
 
       rv must beEqualTo(ProfileModificationResult.OutOfContent)
     }
@@ -65,7 +76,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
       val q = createQuestStub()
       val user = createUserStub(timeLine = List(createTimeLineEntryStub(objectId = q.id)))
 
-      val rv = user.canVoteQuest(q.id)
+      val rv = user.canVoteQuest(q.id, ContentVote.Cool)
 
       rv must beEqualTo(ProfileModificationResult.OK)
     }

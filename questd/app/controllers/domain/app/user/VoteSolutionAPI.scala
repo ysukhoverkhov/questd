@@ -1,16 +1,15 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.helpers._
-import models.domain._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.solution.VoteSolutionRequest
+import controllers.domain.helpers._
 import models.domain.common.ContentVote
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
-import models.domain.user.profile.{TaskType, Profile}
-import models.domain.user.timeline.{TimeLineType, TimeLineReason}
+import models.domain.user.profile.{Profile, TaskType}
+import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 
 case class VoteSolutionByUserRequest(user: User, solutionId: String, vote: ContentVote.Value)
 
@@ -25,7 +24,7 @@ private[domain] trait VoteSolutionAPI {
   def voteSolutionByUser(request: VoteSolutionByUserRequest): ApiResult[VoteSolutionByUserResult] = handleDbException {
     import request._
 
-    user.canVoteSolution(solutionId) match {
+    user.canVoteSolution(solutionId, vote) match {
       case OK =>
 
         db.solution.readById(solutionId) ifSome { s =>

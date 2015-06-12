@@ -1,15 +1,14 @@
 package controllers.domain.app.user
 
 import components._
+import controllers.domain._
+import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.quest._
 import controllers.domain.helpers._
-import models.domain._
-import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.domain._
 import models.domain.common.ContentVote
 import models.domain.user._
-import models.domain.user.profile.{TaskType, Profile}
-import models.domain.user.timeline.{TimeLineType, TimeLineReason}
+import models.domain.user.profile.{Profile, TaskType}
+import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 
 case class VoteQuestByUserRequest(
   user: User,
@@ -26,10 +25,8 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
    */
   def voteQuestByUser(request: VoteQuestByUserRequest): ApiResult[VoteQuestByUserResult] = handleDbException {
 
-    request.user.canVoteQuest(request.questId) match {
+    request.user.canVoteQuest(request.questId, request.vote) match {
       case OK =>
-
-
         db.quest.readById(request.questId) ifSome { q =>
           {
             voteQuest(VoteQuestRequest(q, request.vote))
