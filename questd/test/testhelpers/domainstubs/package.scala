@@ -11,6 +11,7 @@ import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
 import models.domain.user._
 import models.domain.user.auth.{LoginMethod, AuthInfo}
+import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.demo.UserDemographics
 import models.domain.user.friends.Friendship
@@ -217,8 +218,7 @@ package object domainstubs {
     level: Int = 18,
     questCreationCoolDown: Date = new Date(Long.MaxValue),
     createdQuests: List[String] = List.empty,
-    createdSolutions: List[String] = List.empty,
-    solvedQuests: List[String] = List.empty,
+    solvedQuests: Map[String, String] = Map.empty,
     votedQuests: Map[String, ContentVote.Value] = Map.empty,
     votedSolutions: Map[String, ContentVote.Value] = Map.empty,
     votedBattles: Map[String, String] = Map.empty,
@@ -227,7 +227,8 @@ package object domainstubs {
     rights: Rights = Rights.full,
     timeLine: List[TimeLineEntry] = List.empty,
     questBookmark: Option[String] = None,
-    privateDailyResults: List[DailyResult] = List(createDailyResultStub())) = {
+    privateDailyResults: List[DailyResult] = List(createDailyResultStub()),
+    battleRequests: List[BattleRequest] = List.empty) = {
 
     User(
       id = id,
@@ -257,11 +258,11 @@ package object domainstubs {
       timeLine = timeLine,
       stats = UserStats(
         createdQuests = createdQuests,
-        createdSolutions = createdSolutions,
         solvedQuests = solvedQuests,
         votedQuests = votedQuests,
         votedSolutions = votedSolutions,
         votedBattles = votedBattles,
-        participatedBattles = participatedBattles.map{case (k, v) => (k, SolutionsInBattle(List(v)))}))
+        participatedBattles = participatedBattles.map{case (k, v) => (k, SolutionsInBattle(List(v)))}),
+      battleRequests = battleRequests)
   }
 }

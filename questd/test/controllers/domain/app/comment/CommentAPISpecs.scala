@@ -9,7 +9,7 @@ import testhelpers.domainstubs._
 //noinspection ZeroIndexToHead
 class CommentAPISpecs extends BaseAPISpecs {
 
-  "Battle API" should {
+  "Comments API" should {
 
     "Correctly formed comment is created" in context {
       val c = createCommentStub()

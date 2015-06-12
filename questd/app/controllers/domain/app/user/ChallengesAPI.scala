@@ -7,6 +7,7 @@ import controllers.domain.helpers._
 import models.domain.solution.Solution
 import models.domain.user.User
 import models.domain.user.battlerequests.{BattleRequest, BattleRequestStatus}
+import models.domain.user.message.{MessageBattleRequestRejected, MessageBattleRequestAccepted}
 import models.domain.user.profile.Profile
 import play.Logger
 
@@ -38,7 +39,6 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
   /**
    * Challenge someone to jon a battle.
    */
-  // TODO: test it calls db correctly.
   def challengeBattle(request: ChallengeBattleRequest): ApiResult[ChallengeBattleResult] = handleDbException {
     import request._
 
@@ -47,12 +47,17 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
         opponentSolution.info.authorId,
         BattleRequest(user.id, opponentSolution.id, mySolution.id, BattleRequestStatus.Requests)) ifSome { opponent =>
 
-        db.user.addBattleRequest(
-          user.id,
-          BattleRequest(
-            opponent.id, mySolution.id, opponentSolution.id, BattleRequestStatus.Requested)) ifSome { user =>
-
+        runWhileSome(user) ( { user =>
+          db.user.addBattleRequest(
+            user.id,
+            BattleRequest(
+              opponent.id, mySolution.id, opponentSolution.id, BattleRequestStatus.Requested))
+        }, { user =>
           // TODO: substract assets for invitation.
+          // TODO: test it calls db correctly.
+          Some(user)
+        }
+        ) ifSome { user =>
           OkApiResult(ChallengeBattleResult(OK, Some(user.profile)))
         }
       }
@@ -82,9 +87,37 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
   /**
    * Respond on battle request.
    */
-  // TODO: test me.
   def respondBattleRequest(request: RespondBattleRequestRequest): ApiResult[RespondBattleRequestResult] = handleDbException {
     import request._
+
+    def createBattleForRequest(br: BattleRequest): ApiResult[RespondBattleRequestResult] = {
+      val newStatus = if (accept) BattleRequestStatus.Accepted else BattleRequestStatus.Rejected
+
+      db.user.updateBattleRequest(user.id, br.mySolutionId, br.opponentSolutionId, newStatus.toString) ifSome { user =>
+        db.user.updateBattleRequest(
+          br.opponentId, br.opponentSolutionId, br.mySolutionId, newStatus.toString) ifSome { opponent =>
+          if (accept) {
+            db.solution.readById(br.mySolutionId).fold[ApiResult[RespondBattleRequestResult]](
+              OkApiResult(RespondBattleRequestResult(OutOfContent))) { mySolution =>
+              db.solution.readById(br.opponentSolutionId).fold[ApiResult[RespondBattleRequestResult]](
+                OkApiResult(RespondBattleRequestResult(OutOfContent))) { opponentSolution =>
+                createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
+                  sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(request.user.id)))
+                } map {
+                  OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
+                }
+              }
+            }
+          } else {
+            // TODO: return money back.
+            // TODO: test me.
+            sendMessage(SendMessageRequest(opponent, MessageBattleRequestRejected(request.user.id))) map {
+              OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
+            }
+          }
+        }
+      }
+    }
 
     user.battleRequests.find(
       br =>
@@ -94,30 +127,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
       Logger.trace(s"Unable to find battle request with status Requests and opponentSolutionId equal to $opponentSolutionId")
       OkApiResult(RespondBattleRequestResult(OutOfContent))
     } { br =>
-      // TODO: implement me.
-      // TODO: send messages about accepted/rejected battles.
-      val newStatus = if (accept) BattleRequestStatus.Accepted else BattleRequestStatus.Rejected
-
-      db.user.updateBattleRequest(user.id, br.mySolutionId, br.opponentSolutionId, newStatus.toString) ifSome { user =>
-        db.user.updateBattleRequest(br.opponentId, br.opponentSolutionId, br.mySolutionId, newStatus.toString) ifSome { opponent =>
-          if (accept) {
-            db.solution.readById(br.mySolutionId).fold[ApiResult[RespondBattleRequestResult]](OkApiResult(RespondBattleRequestResult(OutOfContent)))
-            { mySolution =>
-              db.solution.readById(br.opponentSolutionId).fold[ApiResult[RespondBattleRequestResult]](
-                OkApiResult(RespondBattleRequestResult(OutOfContent))) { opponentSolution =>
-                createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
-                  // TODO: send message here.
-
-                  OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
-                }
-              }
-            }
-          } else {
-            // TODO: send message here.
-            OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
-          }
-        }
-      }
+      createBattleForRequest(br)
     }
   }
 }

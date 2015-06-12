@@ -43,14 +43,6 @@ trait UserDAO extends BaseDAO[User] {
   def recordQuestCreation(id: String, questId: String): Option[User]
 
   /**
-   * Records solution creation.
-   * @param id Id of user creating a solution.
-   * @param solutionId Id of a created solution.
-   * @return Modified user.
-   */
-  def recordSolutionCreation(id: String, solutionId: String): Option[User]
-
-  /**
    * Records vote for quest proposal.
    * @param id Id of user making a vote.
    * @param questId id of quest we vote for.
@@ -100,10 +92,11 @@ trait UserDAO extends BaseDAO[User] {
    * Records quest solving and optionally resets bookmark.
    * @param id Id of user solving a quest.
    * @param questId If of a quest to solve
+   * @param solutionId Id of solution we solved quest with.
    * @param removeBookmark Should we reset bookmark.
    * @return Modified user.
    */
-  def recordQuestSolving(id: String, questId: String, removeBookmark: Boolean): Option[User]
+  def recordQuestSolving(id: String, questId: String, solutionId: String, removeBookmark: Boolean): Option[User]
 
   /**
    * Updates cool down for inventing quests.

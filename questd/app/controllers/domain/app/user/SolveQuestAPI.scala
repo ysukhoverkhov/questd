@@ -71,11 +71,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               db.user.recordQuestSolving(
                 u.id,
                 questToSolve.id,
+                sol.id,
                 u.profile.questSolutionContext.bookmarkedQuest.map(_.id).contains(questToSolve.id))
-            }, { u: User =>
-              db.user.recordSolutionCreation(
-                u.id,
-                sol.id)
             }) ifSome { u =>
 
               // Running API actions

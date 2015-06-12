@@ -535,14 +535,15 @@ class UserDAOSpecs
       db.user.clear()
 
       val questId = "qiq"
+      val solutionId = "siq"
       val user = createUserStub(questBookmark = Some(questId))
       db.user.create(user)
 
-      db.user.recordQuestSolving(user.id, questId, removeBookmark = true)
+      db.user.recordQuestSolving(user.id, questId, solutionId, removeBookmark = true)
 
       val ou1 = db.user.readById(user.id)
       ou1 must beSome[User]
-      ou1.get.stats.solvedQuests must beEqualTo(List(questId))
+      ou1.get.stats.solvedQuests must beEqualTo(Map(questId -> solutionId))
       ou1.get.profile.questSolutionContext.bookmarkedQuest must beNone
     }
 
