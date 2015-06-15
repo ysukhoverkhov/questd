@@ -2,6 +2,7 @@ package controllers.domain.app.user
 
 import components._
 import controllers.domain._
+import controllers.domain.app.battle.SelectBattleToTimeLineRequest
 import controllers.domain.app.quest.SelectQuestToTimeLineRequest
 import controllers.domain.app.solution.SelectSolutionToTimeLineRequest
 import controllers.domain.helpers._
@@ -201,9 +202,9 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
               objectType = TimeLineType.Battle,
               objectId = b.id))
           } map { res =>
-// TODO: record selection here.
-
-            OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
+            selectBattleToTimeLine(SelectBattleToTimeLineRequest(b)) map {
+              OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
+            }
           }
           case _ =>
             r

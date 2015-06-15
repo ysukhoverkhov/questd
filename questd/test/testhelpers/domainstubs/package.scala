@@ -185,8 +185,8 @@ package object domainstubs {
     vip: Boolean = false,
     cultureId: String = "c1",
     winnerIds: List[String] = List("a1"),
-    voteEndDate: Date = new Date()
-    ) = {
+    voteEndDate: Date = new Date(),
+    timelinePoints: Int = 0) = {
     Battle(
       id = id,
       info = BattleInfo(
@@ -204,8 +204,8 @@ package object domainstubs {
         voteEndDate = voteEndDate),
       level = level,
       vip = vip,
-      cultureId = cultureId
-    )
+      cultureId = cultureId,
+      timelinePoints = timelinePoints)
   }
 
   def createUserStub(

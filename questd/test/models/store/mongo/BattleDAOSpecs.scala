@@ -53,7 +53,8 @@ class BattleDAOSpecs extends Specification
           status = BattleStatus.Fighting,
           level = 3,
           vip = false,
-          cultureId = "c1"),
+          cultureId = "c1",
+          timelinePoints = 300),
 
         createBattleStub(
           id = "b2",
@@ -62,7 +63,8 @@ class BattleDAOSpecs extends Specification
           status = BattleStatus.Resolved,
           level = 7,
           vip = false,
-          cultureId = "c1"),
+          cultureId = "c1",
+          timelinePoints = 30),
 
         createBattleStub(
           id = "b3",
@@ -71,18 +73,17 @@ class BattleDAOSpecs extends Specification
           status = BattleStatus.Fighting,
           level = 3,
           vip = true,
-          cultureId = "c2"))
+          cultureId = "c2",
+          timelinePoints = 60))
 
       bs.head.info.battleSides.map(_.solutionId).sorted must beEqualTo(List("s1_id", "s2_id").sorted)
       bs.head.info.battleSides.map(_.authorId).sorted must beEqualTo(List("a1_id", "a2_id").sorted)
 
       bs.foreach(db.battle.create)
 
-      db.battle.all.toList.sortBy(_.id) must beEqualTo(bs.sortBy(_.id))
-
       val all = db.battle.allWithParams().toList
       all.size must beEqualTo(bs.size)
-      all.map(_.id).sorted must beEqualTo(List(bs(0).id, bs(2).id, bs(1).id).sorted)
+      all.map(_.id) must beEqualTo(bs.sortBy(_.timelinePoints)(Ordering[Int].reverse).map(_.id))
 
       val status = db.battle.allWithParams(status = List(BattleStatus.Fighting)).toList
       status.map(_.id).size must beEqualTo(2)

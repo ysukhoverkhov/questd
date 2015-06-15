@@ -16,6 +16,9 @@ case class VoteBattleResult()
 case class UpdateBattleStateRequest(battle: Battle)
 case class UpdateBattleStateResult()
 
+case class SelectBattleToTimeLineRequest(battle: Battle)
+case class SelectBattleToTimeLineResult(battle: Battle)
+
 private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -71,6 +74,19 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
       OkApiResult(UpdateBattleStateResult())
     }
   }
-}
 
+  /**
+   * Do everything required with battle when it's selected to timeline.
+   */
+  def selectBattleToTimeLine(request: SelectBattleToTimeLineRequest): ApiResult[SelectBattleToTimeLineResult] = handleDbException {
+    import request._
+
+    {
+      db.battle.updatePoints(battle.id, timelinePointsChange = -1)
+    } ifSome { b =>
+      OkApiResult(SelectBattleToTimeLineResult(b))
+    }
+  }
+
+}
 
