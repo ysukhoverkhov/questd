@@ -173,6 +173,20 @@ class BattleDAOSpecs extends Specification
       ob.get.info.battleSides.head.pointsRandom must beEqualTo(1)
     }
 
+    "Update battle points updates timeline points" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val battle = createBattleStub(status = BattleStatus.Fighting)
+      db.battle.create(battle)
+      val ob = db.battle.updatePoints(
+        id = battle.id,
+        timelinePointsChange = 2)
+
+      ob must beSome
+
+      ob.get.timelinePoints must beEqualTo(2)
+    }
+
     "Replace cultures" in new WithApplication(appWithTestDatabase) {
       clearDB()
 
