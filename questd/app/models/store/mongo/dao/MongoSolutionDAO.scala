@@ -76,7 +76,9 @@ private[mongo] class MongoSolutionDAO
 
     findByExample(
       queryBuilder.result(),
-      MongoDBObject("lastModDate" -> 1),
+      MongoDBObject(
+        "rating.timelinePoints" -> -1,
+        "lastModDate" -> 1),
       skip)
   }
 

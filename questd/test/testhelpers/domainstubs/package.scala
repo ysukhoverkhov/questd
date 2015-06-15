@@ -49,7 +49,7 @@ package object domainstubs {
     level: Int = 10,
     vip: Boolean = false,
     cultureId: String = "cultureId",
-    points: Int = 0,
+    timelinePoints: Int = 0,
     solveCost: Assets = Assets(0, 0, 0),
     solveReward: Assets = Assets(0, 0, 0),
     likes: Int = 0) = {
@@ -72,7 +72,7 @@ package object domainstubs {
           solveReward = solveReward,
           victoryReward = Assets(1, 1, 1),
           defeatReward =Assets(2, 2, 2)),
-      rating = QuestRating(timelinePoints = points, likesCount = likes),
+      rating = QuestRating(timelinePoints = timelinePoints, likesCount = likes),
       status = status)
   }
 
@@ -91,7 +91,7 @@ package object domainstubs {
     themeId: String = "themeId",
     status: SolutionStatus.Value = SolutionStatus.InRotation,
     level: Int = 1,
-    points: Int = 0,
+    timelinePoints: Int = 0,
     vip: Boolean = false,
     lastModDate: Date = new Date((new Date).getTime + 100000),
     battleIds: List[String] = List.empty) = {
@@ -107,7 +107,7 @@ package object domainstubs {
         questId = questId),
       status = status,
       rating = SolutionRating(
-        timelinePoints = points),
+        timelinePoints = timelinePoints),
       lastModDate = lastModDate,
       battleIds = battleIds)
   }
