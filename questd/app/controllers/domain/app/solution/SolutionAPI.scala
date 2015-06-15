@@ -15,7 +15,11 @@ case class VoteSolutionRequest(
 case class VoteSolutionResult()
 
 case class UpdateSolutionStateRequest(solution: Solution)
-case class UpdateSolutionStateResult()
+case class UpdateSolutionStateResult(solution: Solution)
+
+case class SelectSolutionToTimeLineRequest(solution: Solution)
+case class SelectSolutionToTimeLineResult(solution: Solution)
+
 
 private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -50,6 +54,21 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
   }
 
   /**
+   * Do everything required with solution when it's selected to timeline.
+   */
+  def selectSolutionToTimeLine(request: SelectSolutionToTimeLineRequest): ApiResult[SelectSolutionToTimeLineResult] = handleDbException {
+    import request._
+
+    {
+      db.solution.updatePoints(solution.id, timelinePointsChange = -1)
+    } ifSome { v =>
+      updateSolutionState(UpdateSolutionStateRequest(v))
+    } map { r =>
+      OkApiResult(SelectSolutionToTimeLineResult(r.solution))
+    }
+  }
+
+  /**
    * Update state of quest solution with votes.
    */
   def updateSolutionState(request: UpdateSolutionStateRequest): ApiResult[UpdateSolutionStateResult] = handleDbException {
@@ -75,14 +94,12 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
       checkCheatingSolution _,
       checkAICSolution _)
 
-    val updatedSolution = functions.foldLeft[Option[Solution]](Some(solution))((r, f) => {
+    functions.foldLeft[Option[Solution]](Some(solution))((r, f) => {
       r.flatMap(f)
-    })
-
-    updatedSolution ifSome { s =>
+    }) ifSome { s =>
       val authorUpdateResult =
-        if (s.status != solution.status) {
-          val authorId = solution.info.authorId
+        if (solution.status != s.status) {
+          val authorId = s.info.authorId
 
           db.user.readById(authorId) match {
             case None =>
@@ -94,7 +111,7 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
           OkApiResult(None)
         }
 
-      authorUpdateResult map OkApiResult(UpdateSolutionStateResult())
+      authorUpdateResult map OkApiResult(UpdateSolutionStateResult(s))
     }
   }
 }

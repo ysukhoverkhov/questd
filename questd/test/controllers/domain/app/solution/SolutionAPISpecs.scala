@@ -17,17 +17,44 @@ class SolutionAPISpecs extends BaseAPISpecs {
 
   "Solution API" should {
 
-    "updateQuestSolutionState calls rewardQuestSolutionAuthor if solution state is changed" in context {
+    "Decease solution points if it was selected to time line" in context {
+      val s = createSolutionStub()
+
+      solution.updatePoints(
+        id = mEq(s.id),
+        timelinePointsChange = mEq(-1),
+        likesChange = any,
+        votersCountChange = any,
+        cheatingChange = any,
+        spamChange = any,
+        pornChange = any) returns Some(s)
+
+      val result = api.selectSolutionToTimeLine(SelectSolutionToTimeLineRequest(s))
+
+      result must beEqualTo(OkApiResult(SelectSolutionToTimeLineResult(s)))
+
+      there was one(solution).updatePoints(
+        id = mEq(s.id),
+        timelinePointsChange = mEq(-1),
+        likesChange = any,
+        votersCountChange = any,
+        cheatingChange = any,
+        spamChange = any,
+        pornChange = any)
+    }
+
+    "updateSolutionState calls rewardSolutionAuthor if solution state is changed" in context {
       val q = createQuestStub(id = "qid")
       val user1 = User(id = "uid")
       val sol = createSolutionStub(id = "sid", authorId = user1.id, questId = q.id)
+      val updatedSolution = sol.copy(status = SolutionStatus.CheatingBanned)
 
       val spiedQuestSolutionLogic = spy(new SolutionLogic(sol, api.api))
       when(api.solution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
 
       when(spiedQuestSolutionLogic.shouldBanCheating).thenReturn(true)
       when(spiedQuestSolutionLogic.shouldBanIAC).thenReturn(false)
-      solution.updateStatus(any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))
+      solution.updateStatus(any, any) returns Some(updatedSolution)
       user.readById(user1.id) returns Some(user1)
       user.addPrivateDailyResult(any, any) returns Some(user1)
       user.storeSolutionInDailyResult(any, any) returns Some(user1)
@@ -42,29 +69,28 @@ class SolutionAPISpecs extends BaseAPISpecs {
 
       val result = api.updateSolutionState(UpdateSolutionStateRequest(sol))
 
+      result must beEqualTo(OkApiResult(UpdateSolutionStateResult(updatedSolution)))
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(user1.id),
         skip = 0)
-
       there was one(solution).updateStatus(mEq(sol.id), mEq(SolutionStatus.CheatingBanned))
       there was one(user).readById(user1.id)
-      there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = SolutionStatus.CheatingBanned), user1))
-
-      result must beEqualTo(OkApiResult(UpdateSolutionStateResult()))
+      there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(updatedSolution, user1))
     }
 
     "Cheated solution creates correct daily result" in context {
       val q = createQuestStub(id = "qid")
       val user1 = User(id = "uid")
       val sol = createSolutionStub(id = "sid", authorId = user1.id, questId = q.id)
+      val updatedSolution = sol.copy(status = SolutionStatus.CheatingBanned)
 
       val spiedQuestSolutionLogic = spy(new SolutionLogic(sol, api.api))
       when(api.solution2Logic(sol)).thenReturn(spiedQuestSolutionLogic)
 
       when(spiedQuestSolutionLogic.shouldBanCheating).thenReturn(true)
       when(spiedQuestSolutionLogic.shouldBanIAC).thenReturn(false)
-      solution.updateStatus(any, any) returns Some(sol.copy(status = SolutionStatus.CheatingBanned))
+      solution.updateStatus(any, any) returns Some(updatedSolution)
       user.readById(user1.id) returns Some(user1)
       user.addPrivateDailyResult(any, any) returns Some(user1)
       user.storeSolutionInDailyResult(any, any) returns Some(user1)
@@ -84,7 +110,7 @@ class SolutionAPISpecs extends BaseAPISpecs {
         authorIds = List(user1.id),
         skip = 0)
 
-      result must beEqualTo(OkApiResult(UpdateSolutionStateResult()))
+      result must beEqualTo(OkApiResult(UpdateSolutionStateResult(updatedSolution)))
       there was one(solution).updateStatus(mEq(sol.id), mEq(SolutionStatus.CheatingBanned))
       there was one(user).readById(user1.id)
       there was one(api).rewardSolutionAuthor(RewardSolutionAuthorRequest(sol.copy(status = SolutionStatus.CheatingBanned), user1))

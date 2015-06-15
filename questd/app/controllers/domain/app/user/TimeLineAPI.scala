@@ -3,6 +3,7 @@ package controllers.domain.app.user
 import components._
 import controllers.domain._
 import controllers.domain.app.quest.SelectQuestToTimeLineRequest
+import controllers.domain.app.solution.SelectSolutionToTimeLineRequest
 import controllers.domain.helpers._
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
@@ -125,7 +126,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
    */
   def populateTimeLineWithRandomThings(request: PopulateTimeLineWithRandomThingsRequest): ApiResult[PopulateTimeLineWithRandomThingsResult] = handleDbException {
     import request._
-
+// TODO: test the entire function.
     Logger.trace(s"Populating time line for user ${user.id}")
 
     // BATCH
@@ -151,9 +152,9 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
               objectId = q.id,
               actorId = Some(q.info.authorId)))
             } map { res =>
-              selectQuestToTimeLine(SelectQuestToTimeLineRequest(q))
-            } map {
-              OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
+              selectQuestToTimeLine(SelectQuestToTimeLineRequest(q)) map {
+                OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
+              }
             }
           case _ =>
             r
@@ -176,7 +177,9 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
               objectId = s.id,
               actorId = Some(s.info.authorId)))
           } map { res =>
-            OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
+            selectSolutionToTimeLine(SelectSolutionToTimeLineRequest(s)) map {
+              OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
+            }
           }
           case _ =>
             r
@@ -198,6 +201,8 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
               objectType = TimeLineType.Battle,
               objectId = b.id))
           } map { res =>
+// TODO: record selection here.
+
             OkApiResult(PopulateTimeLineWithRandomThingsResult(res.user))
           }
           case _ =>
