@@ -18,7 +18,7 @@ case class SolveQuestRequest(
   user: User,
   questId: String,
   solution: SolutionInfoContent)
-case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, solutionId: Option[String] = None)
 
 case class RewardSolutionAuthorRequest(solution: Solution, author: User)
 case class RewardSolutionAuthorResult()
@@ -117,7 +117,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               } map {
                 tryCreateBattle(TryCreateBattleRequest(sol))
               } map {
-                OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
+                OkApiResult(SolveQuestResult(
+                  allowed = OK,
+                  profile = Some(r.user.profile),
+                  solutionId = Some(sol.id)))
               }
             }
 

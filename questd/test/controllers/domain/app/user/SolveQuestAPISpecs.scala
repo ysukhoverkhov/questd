@@ -84,7 +84,8 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(quest).updatePoints(mEq(q.id), mEq(2), anyInt, anyInt, anyInt, anyInt, anyInt)
       there was one(user).storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any)
 
-      result must beEqualTo(OkApiResult(SolveQuestResult(ProfileModificationResult.OK, Some(u.profile))))
+      result must beAnInstanceOf[OkApiResult[SolveQuestResult]]
+      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
     }
 
     // FIX: clean me up.
