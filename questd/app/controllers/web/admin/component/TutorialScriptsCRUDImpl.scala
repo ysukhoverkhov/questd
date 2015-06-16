@@ -153,6 +153,9 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @return Content to display to user.
    */
   def addElement(platform: String) = Authenticated { implicit request =>
+
+    ensurePlatformExists(platform)
+
     val tc = TutorialCondition(TutorialConditionType.TutorialElementClosed)
     val tt = TutorialTrigger(TutorialTriggerType.Any)
     val te = TutorialElement(
@@ -587,6 +590,9 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def importTutorialScript(platform: String) = Authenticated(parse.multipartFormData) { request =>
     import controllers.web.helpers._
+
+    ensurePlatformExists(platform)
+
     request.body.file("tutorialScript").map { tutorialScript =>
 
       val serializers = List(
@@ -604,5 +610,12 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         "error" -> "Missing file")
     }
   }
+
+  private def ensurePlatformExists(platform: String): Unit = {
+    if (api.db.tutorial.readById(platform).isEmpty) {
+      api.db.tutorial.create(Tutorial(id = platform))
+    }
+  }
+
 }
 
