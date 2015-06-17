@@ -143,7 +143,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         }
       })
 
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
   /**
@@ -165,7 +165,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
     api.db.tutorial.addElement(platform, te)
 
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+    redirectToElement(platform, te)
   }
 
   /**
@@ -177,7 +177,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def deleteElement(platform: String, elementId: String) = Authenticated { implicit request =>
     api.db.tutorial.deleteElement(platform, elementId)
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
   /**
@@ -185,7 +185,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    *
    * @param platform Platform element for.
    * @param elementId Id of element to move.
-   * @return ontent.
+   * @return Content.
    */
   def upElement(platform: String, elementId: String) = Authenticated { implicit request =>
 
@@ -196,13 +196,13 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
 
     api.db.tutorial.readById(platform).fold {
-      Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+              redirectToElement(platform, elementId)
     } { tutorial =>
       tutorial.elements.find(_.id == elementId).fold {
-        Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+                redirectToElement(platform, elementId)
       } { element =>
         api.db.tutorial.update(tutorial.copy(elements = swapWithPrev(tutorial.elements, element)))
-        Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+        redirectToElement(platform, elementId)
       }
     }
   }
@@ -212,7 +212,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    *
    * @param platform Platform element for.
    * @param elementId Id of element to move.
-   * @return ontent.
+   * @return Content.
    */
   def downElement(platform: String, elementId: String) = Authenticated { implicit request =>
 
@@ -223,13 +223,13 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
 
     api.db.tutorial.readById(platform).fold {
-      Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+      redirectToElement(platform, elementId)
     } { tutorial =>
       tutorial.elements.find(_.id == elementId).fold {
-        Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+        redirectToElement(platform, elementId)
       } { element =>
         api.db.tutorial.update(tutorial.copy(elements = swapWithNext(tutorial.elements, element)))
-        Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+        redirectToElement(platform, elementId)
       }
     }
   }
@@ -242,10 +242,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @return Content to display.
    */
   def addParamToElementAction(platform: String, elementId: String) = Authenticated { implicit request =>
-
     addParamToElementActionImpl(platform, elementId, "", "")
-
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+    redirectToElement(platform, elementId)
   }
 
   /**
@@ -258,7 +256,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def deleteParamFromElementAction(platform: String, elementId: String, paramKey: String) = Authenticated { implicit request =>
     deleteParamFromActionImpl(platform, elementId, paramKey)
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+    redirectToElement(platform, elementId)
   }
 
   /**
@@ -286,7 +284,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         addParamToElementActionImpl(platform, elementId, keyValueForm.key, keyValueForm.value)
       })
 
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+    redirectToElement(platform, elementId)
   }
 
 
@@ -310,7 +308,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         Logger.error(s"Tutorial script or element not found")
     }
 
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+    redirectToElement(platform, elementId)
   }
 
 
@@ -333,7 +331,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         Logger.error(s"Tutorial script or element not found")
     }
 
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
   /**
@@ -367,7 +365,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         }
       })
 
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
   /**
@@ -380,7 +378,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def addParamToElementCondition(platform: String, elementId: String, conditionIndex: Int) = Authenticated { implicit request =>
     addParamToElementConditionImpl(platform, elementId, conditionIndex, "", "")
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
   /**
@@ -394,7 +392,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def deleteParamFromElemCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String) = Authenticated { implicit request =>
     deleteParamToElementConditionImpl(platform, elementId, conditionIndex, paramKey)
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
   /**
@@ -423,7 +421,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         addParamToElementConditionImpl(platform, elementId, conditionIndex, keyValueForm.key, keyValueForm.value)
       })
 
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
 
@@ -458,7 +456,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         }
       })
 
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
   /**
@@ -481,7 +479,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         Logger.error(s"Tutorial script or element not found")
     }
 
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
 
@@ -504,7 +502,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         Logger.error(s"Tutorial script or element not found")
     }
 
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
   /**
@@ -517,7 +515,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def addParamToElementTrigger(platform: String, elementId: String, index: Int) = Authenticated { implicit request =>
     addParamToElementTriggerImpl(platform, elementId, index, "", "")
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
   /**
@@ -531,7 +529,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def deleteParamFromElemTrigger(platform: String, elementId: String, index: Int, paramKey: String) = Authenticated { implicit request =>
     deleteParamToElementTriggerImpl(platform, elementId, index, paramKey)
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
   /**
@@ -560,7 +558,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         addParamToElementTriggerImpl(platform, elementId, index, keyValueForm.key, keyValueForm.value)
       })
 
-    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+            redirectToElement(platform, elementId)
   }
 
   /**
@@ -617,5 +615,20 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
   }
 
+  /**
+   * Generates result with redirect to specified element and platform.
+   *
+   * @param platform Platform to redirect to.
+   * @param element Element to anchor to.
+   * @return Generated result.
+   */
+  private def redirectToElement(platform: String, element: TutorialElement): Result = {
+    redirectToElement(platform, element.id)
+  }
+
+  private def redirectToElement(platform: String, elementId: String): Result = {
+    val callToTutorial = controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform)
+    Redirect(callToTutorial.copy(url = callToTutorial.url + s"#$elementId"))
+  }
 }
 
