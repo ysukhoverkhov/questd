@@ -4,7 +4,6 @@ import models.domain.base.ID
 import models.domain.common.Assets
 import models.domain.quest.QuestSolutionContext
 import models.domain.tutorial.TutorialPlatform
-import models.domain.user._
 import models.domain.user.dailyresults.DailyResult
 import models.domain.user.message.Message
 
@@ -16,7 +15,7 @@ case class Profile(
   profileVersion: Int = 1,
   publicProfile: PublicProfile = PublicProfile(),
   ratingToNextLevel: Int = 0,
-  assets: Assets = Assets(100000, 0, 0), // Should be (0, 0, 0) here.
+  assets: Assets = Assets(0, 0, 0),
   rights: Rights = Rights(),
   dailyResults: List[DailyResult] = List.empty,
   dailyTasks: DailyTasks = DailyTasks(),
