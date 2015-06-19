@@ -43,10 +43,9 @@ trait ConfigHolder { this: APIAccessor =>
   /**
    * Updates a field in configuration section.
    */
-  // TODO: use it.
-//  def updateConfig(field: (String, String)): Unit = {
-//    api.setConfigSection(SetConfigSectionRequest(config.copy(values = config.values + field)))
-//  }
+  def updateConfig(field: (String, String), sectionName: String = defaultSectionName): Unit = {
+    api.setConfigSection(SetConfigSectionRequest(configNamed(sectionName).copy(values = config.values + field)))
+  }
 
   /**
    * Resets component's configuration to default one.
