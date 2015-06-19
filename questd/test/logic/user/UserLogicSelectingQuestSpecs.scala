@@ -11,17 +11,6 @@ import testhelpers.domainstubs._
 
 class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
-  /**
-   * Creates user we will test algorithm with
-   */
-  private def createUser(friends: List[Friendship]) = {
-    User(friends = friends)
-  }
-
-  private def createFriend(newid: String) = {
-    User(id = newid)
-  }
-
   "User Logic" should {
 
     "Return quest from friends if dice rolls so" in {
@@ -67,7 +56,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
       api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
-      val u = User()
+      val u = createUserStub()
       val q = u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
@@ -147,7 +136,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       val qid = "qid"
       val u = User(
         profile = Profile(
-          publicProfile = PublicProfile(level = 1)))
+          publicProfile = PublicProfile(level = 2)))
 
       applyConfigMock()
       rand.nextDouble returns 0.0
@@ -164,7 +153,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       val qid = "qid"
       val u = User(
         profile = Profile(
-          publicProfile = PublicProfile(level = 1)))
+          publicProfile = PublicProfile(level = 2)))
 
       applyConfigMock()
       rand.nextDouble returns 1.0
@@ -179,7 +168,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
     "Starting quests does not return other quests ignoring recent quests list if no quests available otherwise" in {
       val qid = "qid"
-      val u = createUserStub(level = 1, timeLine = List(createTimeLineEntryStub(objectId = qid)))
+      val u = createUserStub(level = 2, timeLine = List(createTimeLineEntryStub(objectId = qid)))
 
       applyConfigMock()
       rand.nextDouble returns 1.0 thenReturns 1.0
@@ -199,7 +188,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
     "Starting quests does not return other quests ignoring voted quests quests list if no quests available otherwise" in {
       val qid = "qid"
-      val u = createUserStub(level = 1, votedQuests = Map(qid -> ContentVote.Cheating))
+      val u = createUserStub(level = 2, votedQuests = Map(qid -> ContentVote.Cheating))
 
       applyConfigMock()
       rand.nextDouble returns 1.0 thenReturns 1.0

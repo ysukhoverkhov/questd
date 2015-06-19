@@ -36,19 +36,19 @@ trait QuestSelectUserLogic { this: UserLogic =>
   private[user] def getTutorialQuests: Option[Iterator[Quest]] = {
     Logger.trace("getTutorialQuests")
 
-//    val tutorialQuestId = api.configNamed("Tutorial")(api.TutorialConfigParams.TutorialQuestId)
-//
-//    if (user.timeLine.exists(_.objectId == tutorialQuestId) || user.profile.publicProfile.level > 1) {
-//      Logger.trace("  returning None since it's already there")
+    val tutorialQuestId = api.configNamed("Tutorial")(api.TutorialConfigParams.TutorialQuestId)
+
+    if (user.timeLine.exists(_.objectId == tutorialQuestId) || user.profile.publicProfile.level > 1) { // TODO: remove this when QuestME-991 will be fixed.
+      Logger.trace("  returning None since it's already there")
       None
-//    } else {
-//      Logger.trace("  adding tutorial quest (if it'll be found)")
-//      checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
-//        user = user,
-//        status = QuestStatus.InRotation,
-//        cultureId = None,
-//        ids = List(tutorialQuestId))).body.get.quests))
-//    }
+    } else {
+      Logger.trace("  adding tutorial quest (if it'll be found)")
+      checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
+        user = user,
+        status = QuestStatus.InRotation,
+        cultureId = None,
+        ids = List(tutorialQuestId))).body.get.quests))
+    }
   }
 
   private[user] def getStartingQuests(implicit selected: List[Quest]): Option[Iterator[Quest]] = {
