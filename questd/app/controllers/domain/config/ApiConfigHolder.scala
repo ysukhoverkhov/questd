@@ -70,7 +70,8 @@ class _DefaultConfigParams {
 }
 
 class _TutorialConfigParams {
-  val DailyTasksStartsFromLevel = "35 01 Daily Tasks Starts From Level"
+  val DailyTasksStartsFromLevel = "01 01 Daily Tasks Starts From Level"
+  val TutorialQuestId = "05 01 Tutorial Quest Id"
 }
 
 object _DefaultConfigParams extends _DefaultConfigParams
@@ -152,7 +153,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     "Tutorial" -> ConfigSection(
       "Tutorial",
       Map(
-        TutorialConfigParams.DailyTasksStartsFromLevel -> "2"
+        TutorialConfigParams.DailyTasksStartsFromLevel -> "2",
+        TutorialConfigParams.TutorialQuestId -> "09792649-4095-4c79-9b3a-332a9f3317ca" // TODO: set correct id here.
       ))
   )
 }
