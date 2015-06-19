@@ -1,10 +1,9 @@
 package controllers.domain.app.quest
 
 import controllers.domain._
-import models.domain._
 import models.domain.quest.QuestStatus
-import models.domain.user.friends.{FriendshipStatus, Friendship}
 import models.domain.user.User
+import models.domain.user.friends.{Friendship, FriendshipStatus}
 import testhelpers.domainstubs._
 
 class QuestFetchAPISpecs extends BaseAPISpecs {
@@ -81,6 +80,8 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         status = QuestStatus.InRotation,
         levels = Some((1, 2))))
 
+      result must beAnInstanceOf[OkApiResult[GetFriendsQuestsResult]]
+
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = List(f1.id),
@@ -134,6 +135,8 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         status = QuestStatus.InRotation,
         levels = Some((1, 2))))
 
+      result must beAnInstanceOf[OkApiResult[GetVIPQuestsResult]]
+
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = null,
@@ -165,6 +168,8 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         levels = Some((1, 2)),
         cultureId = Some("cid")))
 
+      result must beAnInstanceOf[OkApiResult[GetAllQuestsResult]]
+
       there was one(quest).allWithParams(
         status = List(QuestStatus.InRotation),
         authorIds = null,
@@ -172,7 +177,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         levels = Some((1, 2)),
         skip = 0,
         vip = null,
-        ids = null,
+        ids = List.empty,
         idsExclude = List.empty,
         cultureId = Some("cid"))
     }
