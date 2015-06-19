@@ -26,7 +26,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
     "Return quest from friends if dice rolls so" in {
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.13
 
       val qid = "qid"
@@ -43,7 +43,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
     }
 
     "Return quest from following if dice rolls so" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.38
 
       val qid = "qid"
@@ -60,7 +60,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
     }
 
     "Do not return liked quest if dice rolls so for voting" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.98
 
       val qid = "qid"
@@ -77,7 +77,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
     }
 
     "Return VIP quest if dice rolls so" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.75
 
       val qid = "qid"
@@ -149,7 +149,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
         profile = Profile(
           publicProfile = PublicProfile(level = 1)))
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.0
 
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List(createQuestStub(qid, "author")).iterator))
@@ -166,7 +166,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
         profile = Profile(
           publicProfile = PublicProfile(level = 1)))
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 1.0
 
       api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
@@ -181,7 +181,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       val qid = "qid"
       val u = createUserStub(level = 1, timeLine = List(createTimeLineEntryStub(objectId = qid)))
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 1.0 thenReturns 1.0
 
       api.getAllQuests(any[GetAllQuestsRequest]) returns
@@ -201,7 +201,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       val qid = "qid"
       val u = createUserStub(level = 1, votedQuests = Map(qid -> ContentVote.Cheating))
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 1.0 thenReturns 1.0
 
       api.getAllQuests(any[GetAllQuestsRequest]) returns
@@ -221,7 +221,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       val qid = "qid"
       val u = createUserStub()
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.75
 
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List.empty.iterator))
@@ -238,7 +238,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       val qid = "qid"
       val u = createUserStub()
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.75
 
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List.empty.iterator))
@@ -255,7 +255,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       val qid = "qid"
       val u = createUserStub()
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.75
 
       api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List.empty.iterator))

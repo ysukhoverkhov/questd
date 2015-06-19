@@ -13,7 +13,7 @@ class CreatingQuestSpecs extends BaseLogicSpecs {
   "User Logic for creating quests" should {
 
     "Do not allow creation of quests with very long description" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub(questCreationCoolDown = new Date(0))
       val veryLongDescription = "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
@@ -25,7 +25,7 @@ class CreatingQuestSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow creation of quests on cool down" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub(questCreationCoolDown = new Date(Long.MaxValue))
       val qic = createQuestStub().info.content
@@ -36,7 +36,7 @@ class CreatingQuestSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow creation of quests without rights" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub(rights = Rights.none, questCreationCoolDown = new Date(0))
       val qic = createQuestStub().info.content
@@ -47,7 +47,7 @@ class CreatingQuestSpecs extends BaseLogicSpecs {
     }
 
     "Allow creating of quests in normal situations" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub(rights = Rights.full, questCreationCoolDown = new Date(0))
       val qic = createQuestStub().info.content

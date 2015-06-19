@@ -131,9 +131,9 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
     Logger.trace(s"Populating time line for user ${user.id}")
 
     // BATCH
-    val questsCount = config(api.ConfigParams.TimeLineRandomQuestsDaily).toInt
-    val solutionsCount = config(api.ConfigParams.TimeLineRandomSolutionsDaily).toInt
-    val battlesCount = config(api.ConfigParams.TimeLineRandomBattlesDaily).toInt
+    val questsCount = config(api.DefaultConfigParams.TimeLineRandomQuestsDaily).toInt
+    val solutionsCount = config(api.DefaultConfigParams.TimeLineRandomSolutionsDaily).toInt
+    val battlesCount = config(api.DefaultConfigParams.TimeLineRandomBattlesDaily).toInt
     Logger.trace(s"  quests count = $questsCount")
     Logger.trace(s"  solutions count = $solutionsCount")
     Logger.trace(s"  battles count = $battlesCount")

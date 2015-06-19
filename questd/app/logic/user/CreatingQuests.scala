@@ -36,7 +36,7 @@ trait CreatingQuests { this: UserLogic =>
       NotEnoughRights
     else if (!canProposeQuestToday)
       CoolDown
-    else if (questContent.description.length > api.config(api.ConfigParams.QuestMaxDescriptionLength).toInt)
+    else if (questContent.description.length > api.config(api.DefaultConfigParams.QuestMaxDescriptionLength).toInt)
       LimitExceeded
     else if (!bioComplete)
       IncompleteBio

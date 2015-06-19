@@ -18,7 +18,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
     "Return solution from friends if dice rolls so" in {
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.13
 
       val qid = "qid"
@@ -36,7 +36,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
     }
 
     "Return solution from following if dice rolls so" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.38
 
       val qid = "qid"
@@ -54,7 +54,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
     }
 
     "Return liked quest if dice rolls so" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.58
 
       val qid = "qid"
@@ -72,7 +72,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
     }
 
     "Return VIP solutions if dice rolls so" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.75
 
       val qid = "qid"
@@ -143,7 +143,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
         profile = Profile(
           publicProfile = PublicProfile(level = 1)))
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.0
 
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
@@ -161,7 +161,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
         profile = Profile(
           publicProfile = PublicProfile(level = 1)))
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 1.0
 
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
@@ -177,7 +177,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       val qid = "qid"
       val u = createUserStub()
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.75
 
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
@@ -196,7 +196,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       val u = createUserStub()
       val s = createSolutionStub(id = qid, authorId = "author")
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.75
 
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
@@ -217,7 +217,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       val qid = "qid"
       val u = User(mustVoteSolutions = List(qid))
 
-      api.config returns createStubConfig
+      applyConfigMock()
       api.getHelpWantedSolutions(any[GetHelpWantedSolutionsRequest]) returns OkApiResult(GetHelpWantedSolutionsResult(List(createSolutionStub(id = qid)).iterator))
 
       u.getRandomSolution
@@ -229,7 +229,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       val qid = "qid"
       val u = User()
 
-      api.config returns createStubConfig
+      applyConfigMock()
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List(createSolutionStub(id = qid)).iterator))
 
       u.getRandomSolution

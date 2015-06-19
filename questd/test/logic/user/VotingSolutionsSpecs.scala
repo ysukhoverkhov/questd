@@ -11,7 +11,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
   "User Logic for voting for solutions" should {
 
     "Do not allow voting for solutions without rights" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub(rights = Rights.none)
       val s = createSolutionStub()
@@ -22,7 +22,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow cheating for solutions without rights" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub(rights = Rights(unlockedFunctionality = Set(Functionality.VoteSolutions)))
       val s = createSolutionStub()
@@ -33,7 +33,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
     }
 
     "Do allow cheating for solutions without rights" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub(rights = Rights(unlockedFunctionality = Set(Functionality.VoteSolutions, Functionality.Report)))
       val s = createSolutionStub()
@@ -44,7 +44,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
     }
 
     "Do allow voting for solutions not in time line" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub()
       val s = createSolutionStub()
@@ -55,7 +55,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow voting for solutions in time line but we already voted for" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val s = createSolutionStub()
       val user = createUserStub(
@@ -68,7 +68,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow voting for solutions created by us" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val uid = "uid"
       val s = createSolutionStub()
@@ -80,7 +80,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow voting solutions with incomplete bio" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val s = createSolutionStub()
       val user = createUserStub(cultureId = None)
@@ -91,7 +91,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
     }
 
     "Allow voting for solutions in normal situations" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val s = createSolutionStub()
       val user = createUserStub(timeLine = List(createTimeLineEntryStub(objectId = s.id)))

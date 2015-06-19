@@ -11,7 +11,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
   "User Logic for voting for quests" should {
 
     "Do not allow voting for quests without rights" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub(rights = Rights.none)
       val q = createQuestStub()
@@ -22,7 +22,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow cheating for quests without rights" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub(rights = Rights(unlockedFunctionality = Set(Functionality.VoteQuests)))
       val q = createQuestStub()
@@ -33,7 +33,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
     }
 
     "Do allow voting for quests not in time line" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub()
       val q = createQuestStub()
@@ -44,7 +44,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow voting for quests in time line but we already voted for" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val q = createQuestStub()
       val user = createUserStub(
@@ -57,7 +57,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow voting for own quests" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val userId = "userId"
       val q = createQuestStub()
@@ -71,7 +71,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
     }
 
     "Allow voting for quests in normal situations" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val q = createQuestStub()
       val user = createUserStub(timeLine = List(createTimeLineEntryStub(objectId = q.id)))

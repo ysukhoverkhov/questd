@@ -22,7 +22,7 @@ trait MiscUserLogic { this: UserLogic =>
    * Check is current user an active user.
    */
   def isActive = {
-    val activeDays = api.config(api.ConfigParams.ActiveUserDays).toInt
+    val activeDays = api.config(api.DefaultConfigParams.ActiveUserDays).toInt
 
     user.auth.lastLogin match {
       case None => false

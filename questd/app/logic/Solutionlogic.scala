@@ -13,8 +13,8 @@ class SolutionLogic(
    */
   def shouldBanCheating = {
     val votesToThreatAsCheating = Math.max(
-      api.config(api.ConfigParams.SolutionCheatingRatio).toDouble * qs.rating.votersCount,
-      api.config(api.ConfigParams.SolutionMinCheatingVotes).toLong)
+      api.config(api.DefaultConfigParams.SolutionCheatingRatio).toDouble * qs.rating.votersCount,
+      api.config(api.DefaultConfigParams.SolutionMinCheatingVotes).toLong)
 
     qs.rating.cheating > votesToThreatAsCheating
   }
@@ -24,8 +24,8 @@ class SolutionLogic(
    */
   def shouldBanIAC = {
     val pointsToBan = Math.max(
-      api.config(api.ConfigParams.SolutionIACRatio).toDouble * qs.rating.votersCount,
-      api.config(api.ConfigParams.SolutionMinIACVotes).toLong)
+      api.config(api.DefaultConfigParams.SolutionIACRatio).toDouble * qs.rating.votersCount,
+      api.config(api.DefaultConfigParams.SolutionMinIACVotes).toLong)
 
     val maxPoints = List(
       qs.rating.iacpoints.porn,

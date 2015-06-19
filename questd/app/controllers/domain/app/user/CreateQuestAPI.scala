@@ -51,7 +51,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
         // making all db calls
         runWhileSome(u)(
         { u: User =>
-          if ((config(api.ConfigParams.DebugDisableQuestCreationCoolDown) == "1") || u.profile.publicProfile.vip) {
+          if ((config(api.DefaultConfigParams.DebugDisableQuestCreationCoolDown) == "1") || u.profile.publicProfile.vip) {
             Some(u)
           } else {
             db.user.updateQuestCreationCoolDown(

@@ -11,7 +11,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
   "User Logic for solving quests" should {
 
     "Do not allow solving of quests without rights" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub(rights = Rights.none)
       val q = createQuestStub()
@@ -22,7 +22,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow solving of quests without money" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val q = createQuestStub(solveCost = Assets(100, 0, 0))
       val tl = List(createTimeLineEntryStub(objectId = q.id))
@@ -46,7 +46,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
 //    }
 
     "Do not allow solving of own quests" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val questId = "qid"
       val tl = List(createTimeLineEntryStub(objectId = questId))
@@ -59,7 +59,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow solving of quests already solved" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val questId = "qid"
       val tl = List(createTimeLineEntryStub(objectId = questId))
@@ -72,7 +72,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
     }
 
     "Allow creating of quests in normal situations" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val q = createQuestStub(solveCost = Assets(100, 0, 0))
       val tl = List(createTimeLineEntryStub(objectId = q.id))

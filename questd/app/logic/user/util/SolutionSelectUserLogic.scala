@@ -68,14 +68,14 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   private[user] def getStartingSolutions(implicit selected: List[Solution]): Option[Iterator[Solution]] = {
     Logger.trace("getStartingSolutions")
 
-    if (user.profile.publicProfile.level > api.config(api.ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions).toInt) {
+    if (user.profile.publicProfile.level > api.config(api.DefaultConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions).toInt) {
       None
     } else {
 
       val algorithms = List(
-        (api.config(api.ConfigParams.SolutionProbabilityStartingVIPSolutions).toDouble, () => getVIPSolutions),
-        (api.config(api.ConfigParams.SolutionProbabilityStartingFriendSolutions).toDouble, () => getFriendsSolutions),
-        (api.config(api.ConfigParams.SolutionProbabilityStartingFollowingSolutions).toDouble, () => getFollowingSolutions),
+        (api.config(api.DefaultConfigParams.SolutionProbabilityStartingVIPSolutions).toDouble, () => getVIPSolutions),
+        (api.config(api.DefaultConfigParams.SolutionProbabilityStartingFriendSolutions).toDouble, () => getFriendsSolutions),
+        (api.config(api.DefaultConfigParams.SolutionProbabilityStartingFollowingSolutions).toDouble, () => getFollowingSolutions),
         (1.00, () => getSolutionsWithTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
@@ -87,10 +87,10 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("getDefaultSolutions")
 
     val algorithms = List(
-      (api.config(api.ConfigParams.SolutionProbabilityFriends).toDouble, () => getFriendsSolutions),
-      (api.config(api.ConfigParams.SolutionProbabilityFollowing).toDouble, () => getFollowingSolutions),
-      (api.config(api.ConfigParams.SolutionProbabilityLiked).toDouble, () => getSolutionsForLikedQuests),
-      (api.config(api.ConfigParams.SolutionProbabilityVIP).toDouble, () => getVIPSolutions),
+      (api.config(api.DefaultConfigParams.SolutionProbabilityFriends).toDouble, () => getFriendsSolutions),
+      (api.config(api.DefaultConfigParams.SolutionProbabilityFollowing).toDouble, () => getFollowingSolutions),
+      (api.config(api.DefaultConfigParams.SolutionProbabilityLiked).toDouble, () => getSolutionsForLikedQuests),
+      (api.config(api.DefaultConfigParams.SolutionProbabilityVIP).toDouble, () => getVIPSolutions),
       (1.00, () => getSolutionsWithTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
       )
 
@@ -185,7 +185,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   private[user] def getAnySolutionsDefaultCultureIgnoringLevels(implicit selected: List[Solution]) = {
     Logger.trace("  Returning from all solutions (ignoring levels and for default culture)")
 
-    val defaultCultureId = api.config(api.ConfigParams.DefaultCultureId)
+    val defaultCultureId = api.config(api.DefaultConfigParams.DefaultCultureId)
 
     checkNotEmptyIterator(Some(api.getAllSolutions(GetAllSolutionsRequest(
       user,
