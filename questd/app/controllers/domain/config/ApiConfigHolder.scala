@@ -74,75 +74,76 @@ object _ConfigParams extends _ConfigParams
 
 trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
 
-  val configSectionName = "API"
-
   def ConfigParams = _ConfigParams
 
-  val defaultConfiguration = ConfigSection(
-    configSectionName,
-    Map(
-      ConfigParams.DebugExpMultiplier -> "1",
-      ConfigParams.DebugDisableQuestCreationCoolDown -> "0",
+  protected override val defaultSectionName = "API"
 
-      ConfigParams.ActiveUserDays -> "7",
-      ConfigParams.DefaultCultureId -> "68349b7a-20ee-4f6e-8406-f468b30be783",
+  protected override def defaultConfiguration = Map(defaultSectionName -> ConfigSection(
+          defaultSectionName,
+          Map(
+            ConfigParams.DebugExpMultiplier -> "1",
+            ConfigParams.DebugDisableQuestCreationCoolDown -> "0",
 
-      ConfigParams.SolutionVoteTaskCountMean -> "3",
-      ConfigParams.SolutionVoteTaskCountDeviation -> "1",
-      ConfigParams.CreateSolutionTaskProbability -> "0.5",
-      ConfigParams.AddToFollowingTaskProbability -> "0.3",
-      ConfigParams.QuestVoteTaskCountMean -> "2",
-      ConfigParams.QuestVoteTaskCountDeviation -> "0.5",
-      ConfigParams.CreateQuestTaskProbability -> "0.3",
-      ConfigParams.WriteCommentTaskProbability -> "0.3",
-      ConfigParams.DailyTasksStartsFromLevel -> "2",
+            ConfigParams.ActiveUserDays -> "7",
+            ConfigParams.DefaultCultureId -> "68349b7a-20ee-4f6e-8406-f468b30be783",
 
-      ConfigParams.FavoriteThemesShare -> "0.2",
-      ConfigParams.FavoriteThemesProbability -> "0.75",
+            ConfigParams.SolutionVoteTaskCountMean -> "3",
+            ConfigParams.SolutionVoteTaskCountDeviation -> "1",
+            ConfigParams.CreateSolutionTaskProbability -> "0.5",
+            ConfigParams.AddToFollowingTaskProbability -> "0.3",
+            ConfigParams.QuestVoteTaskCountMean -> "2",
+            ConfigParams.QuestVoteTaskCountDeviation -> "0.5",
+            ConfigParams.CreateQuestTaskProbability -> "0.3",
+            ConfigParams.WriteCommentTaskProbability -> "0.3",
+            ConfigParams.DailyTasksStartsFromLevel -> "2",
 
-      ConfigParams.CommentsMaxLength -> "420",
+            ConfigParams.FavoriteThemesShare -> "0.2",
+            ConfigParams.FavoriteThemesProbability -> "0.75",
 
-      ConfigParams.QuestCheatingRatio -> "0.1",
-      ConfigParams.QuestMinCheatingVotes -> "10",
-      ConfigParams.QuestIACRatio -> "0.03",
-      ConfigParams.QuestMinIACVotes -> "10",
-      ConfigParams.QuestMaxDescriptionLength -> "140",
+            ConfigParams.CommentsMaxLength -> "420",
 
-      ConfigParams.SolutionCheatingRatio -> "0.1",
-      ConfigParams.SolutionMinCheatingVotes -> "5",
-      ConfigParams.SolutionIACRatio -> "0.03",
-      ConfigParams.SolutionMinIACVotes -> "5",
+            ConfigParams.QuestCheatingRatio -> "0.1",
+            ConfigParams.QuestMinCheatingVotes -> "10",
+            ConfigParams.QuestIACRatio -> "0.03",
+            ConfigParams.QuestMinIACVotes -> "10",
+            ConfigParams.QuestMaxDescriptionLength -> "140",
 
-      ConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "5",
-      ConfigParams.QuestProbabilityStartingVIPQuests -> "0.5",
-      ConfigParams.QuestProbabilityStartingFriendQuests -> "0.2",
-      ConfigParams.QuestProbabilityStartingFollowingQuests -> "0.2",
+            ConfigParams.SolutionCheatingRatio -> "0.1",
+            ConfigParams.SolutionMinCheatingVotes -> "5",
+            ConfigParams.SolutionIACRatio -> "0.03",
+            ConfigParams.SolutionMinIACVotes -> "5",
 
-      ConfigParams.QuestProbabilityFriends -> "0.40",
-      ConfigParams.QuestProbabilityFollowing -> "0.30",
-      ConfigParams.QuestProbabilityVIP -> "0.10",
+            ConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "5",
+            ConfigParams.QuestProbabilityStartingVIPQuests -> "0.5",
+            ConfigParams.QuestProbabilityStartingFriendQuests -> "0.2",
+            ConfigParams.QuestProbabilityStartingFollowingQuests -> "0.2",
 
-      ConfigParams.TimeLineRandomQuestsDaily -> "5",
-      ConfigParams.TimeLineRandomSolutionsDaily -> "5",
-      ConfigParams.TimeLineRandomBattlesDaily -> "5",
+            ConfigParams.QuestProbabilityFriends -> "0.40",
+            ConfigParams.QuestProbabilityFollowing -> "0.30",
+            ConfigParams.QuestProbabilityVIP -> "0.10",
 
-      ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions -> "5",
-      ConfigParams.SolutionProbabilityStartingVIPSolutions -> "0.5",
-      ConfigParams.SolutionProbabilityStartingFriendSolutions -> "0.2",
-      ConfigParams.SolutionProbabilityStartingFollowingSolutions -> "0.2",
+            ConfigParams.TimeLineRandomQuestsDaily -> "5",
+            ConfigParams.TimeLineRandomSolutionsDaily -> "5",
+            ConfigParams.TimeLineRandomBattlesDaily -> "5",
 
-      ConfigParams.SolutionProbabilityFriends -> "0.25",
-      ConfigParams.SolutionProbabilityFollowing -> "0.25",
-      ConfigParams.SolutionProbabilityLiked -> "0.20",
-      ConfigParams.SolutionProbabilityVIP -> "0.10",
+            ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions -> "5",
+            ConfigParams.SolutionProbabilityStartingVIPSolutions -> "0.5",
+            ConfigParams.SolutionProbabilityStartingFriendSolutions -> "0.2",
+            ConfigParams.SolutionProbabilityStartingFollowingSolutions -> "0.2",
 
-      ConfigParams.BattleProbabilityLevelsToGiveStartingBattles -> "5",
-      ConfigParams.BattleProbabilityStartingVIPBattles -> "0.5",
+            ConfigParams.SolutionProbabilityFriends -> "0.25",
+            ConfigParams.SolutionProbabilityFollowing -> "0.25",
+            ConfigParams.SolutionProbabilityLiked -> "0.20",
+            ConfigParams.SolutionProbabilityVIP -> "0.10",
 
-      ConfigParams.BattleProbabilityFriends -> "0.25",
-      ConfigParams.BattleProbabilityFollowing -> "0.25",
-      ConfigParams.BattleProbabilityLikedSolutions -> "0.20",
-      ConfigParams.BattleProbabilityVIP -> "0.10"
-    ))
+            ConfigParams.BattleProbabilityLevelsToGiveStartingBattles -> "5",
+            ConfigParams.BattleProbabilityStartingVIPBattles -> "0.5",
+
+            ConfigParams.BattleProbabilityFriends -> "0.25",
+            ConfigParams.BattleProbabilityFollowing -> "0.25",
+            ConfigParams.BattleProbabilityLikedSolutions -> "0.20",
+            ConfigParams.BattleProbabilityVIP -> "0.10"
+          ))
+  )
 }
 

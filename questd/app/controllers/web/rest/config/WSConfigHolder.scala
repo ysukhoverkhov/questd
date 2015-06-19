@@ -12,13 +12,13 @@ trait WSConfigHolder extends ConfigHolder { this: APIAccessor =>
     val UploadedContentBaseURL = "Uploaded Content Base URL"
   }
 
-  val configSectionName = "Web Service"
-  val defaultConfiguration = ConfigSection(
-    configSectionName,
+  protected val defaultSectionName = "Web Service"
+  protected def defaultConfiguration = Map(defaultSectionName -> ConfigSection(
+    defaultSectionName,
     Map(
       ConfigParams.MinAppVersion -> "1",
       ConfigParams.ContentUploadDir -> "d:/tmp/",
       ConfigParams.UploadedContentBaseURL -> "http://static-1.questmeapp.com/"
-    ))
+    )))
 }
 
