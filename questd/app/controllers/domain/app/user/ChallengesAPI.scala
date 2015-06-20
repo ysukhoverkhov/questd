@@ -102,7 +102,8 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
               db.solution.readById(br.opponentSolutionId).fold[ApiResult[RespondBattleRequestResult]](
                 OkApiResult(RespondBattleRequestResult(OutOfContent))) { opponentSolution =>
                 createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
-                  sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(request.user.id)))
+                  sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(
+                    opponentSolutionId = br.opponentSolutionId)))
                 } map {
                   OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
                 }
@@ -111,7 +112,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
           } else {
             // TODO: return money back.
             // TODO: test me.
-            sendMessage(SendMessageRequest(opponent, MessageBattleRequestRejected(request.user.id))) map {
+            sendMessage(SendMessageRequest(opponent, MessageBattleRequestRejected(br.opponentSolutionId))) map {
               OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
             }
           }
