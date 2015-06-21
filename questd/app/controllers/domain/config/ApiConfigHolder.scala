@@ -154,7 +154,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
       "Tutorial",
       Map(
         TutorialConfigParams.DailyTasksStartsFromLevel -> "2",
-        TutorialConfigParams.TutorialQuestId -> "09792649-4095-4c79-9b3a-332a9f3317ca" // TODO: set correct id here.
+        TutorialConfigParams.TutorialQuestId -> "tutorial_1"
       ))
   )
 }
