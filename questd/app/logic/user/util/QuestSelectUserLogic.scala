@@ -43,11 +43,16 @@ trait QuestSelectUserLogic { this: UserLogic =>
       None
     } else {
       Logger.trace("  adding tutorial quest (if it'll be found)")
-      checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
-        user = user,
-        status = QuestStatus.InRotation,
-        cultureId = None,
-        ids = List(tutorialQuestId))).body.get.quests))
+      val maybeQuests = checkNotEmptyIterator(
+        Some(
+          api.getAllQuests(
+            GetAllQuestsRequest(
+              user = user,
+              status = QuestStatus.ForTutorial,
+              cultureId = None,
+              ids = List(tutorialQuestId))).body.get.quests))
+      if (maybeQuests.isEmpty) Logger.error(s"Tutorial quest not found but it should be!")
+      maybeQuests
     }
   }
 

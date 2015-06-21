@@ -153,7 +153,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     "Tutorial" -> ConfigSection(
       "Tutorial",
       Map(
-        TutorialConfigParams.DailyTasksStartsFromLevel -> "2",
+        TutorialConfigParams.DailyTasksStartsFromLevel -> "2", // TODO: change the level with updating tutorial.
         TutorialConfigParams.TutorialQuestId -> "tutorial_1"
       ))
   )
