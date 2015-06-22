@@ -1,6 +1,7 @@
 package logic.user
 
 import com.github.nscala_time.time.Imports._
+import models.domain.user.dailyresults.DailyResult
 import models.domain.user.profile.Gender
 import org.joda.time.DateTime
 import logic.{functions, UserLogic}
@@ -36,5 +37,19 @@ trait MiscUserLogic { this: UserLogic =>
    */
   def bioComplete = {
     user.demo.cultureId.isDefined && user.profile.publicProfile.bio.gender != Gender.Unknown
+  }
+
+  /**
+   * Returns initialized version of the user
+   */
+  def initialized = {
+    user.copy(
+      profile = user.profile.copy(
+        rights = calculateRights,
+        ratingToNextLevel = ratingToNextLevel
+      ),
+      privateDailyResults = List(DailyResult(
+        getStartOfCurrentDailyResultPeriod)
+      ))
   }
 }

@@ -1,5 +1,15 @@
 @(menuItems: Map[String, String])
 
 @main("Home")(menuItems, Map.empty) {
-    @{misc.BuildInfo}
+    <p>
+        @{misc.BuildInfo}
+    </p>
+
+    <p>
+        <a href="@controllers.web.admin.routes.Maintains.cleanup">Cleanup everything</a>
+    </p>
+
+    <p>
+        <a href="@controllers.web.admin.routes.Maintains.resetProfiles">Reset all profiles</a>
+    </p>
 }
