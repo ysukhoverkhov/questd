@@ -1,0 +1,219 @@
+@(
+menuItems: Map[String, String],
+leftMenuItems: Map[String, String],
+currentPlatform: String,
+elements: List[models.domain.tutorial.TutorialElement])
+
+@import helper._
+
+@possibleActions = @{
+    import models.domain.tutorial._
+    TutorialActionType.values.map(_.toString).toList
+}
+
+@possibleConditions = @{
+    import models.domain.tutorial._
+    TutorialConditionType.values.map(_.toString).toList
+}
+
+@possibleTriggers = @{
+    import models.domain.tutorial._
+    TutorialTriggerType.values.map(_.toString).toList
+}
+
+
+
+@main(s"Tutorial script for: $currentPlatform")(menuItems, leftMenuItems) {
+
+<a href="@controllers.web.admin.routes.TutorialScriptsCRUD.exportTutorialScript(currentPlatform)">Export</a>
+@helper.form(action = controllers.web.admin.routes.TutorialScriptsCRUD.importTutorialScript(currentPlatform), 'enctype -> "multipart/form-data") {
+    <input type="file" name="tutorialScript">
+    <input type="submit" value="Import">
+}
+
+<table border="1">
+    <tr>
+        <td width="10%">id</td>
+        <td>action</td>
+        <td>conditions</td>
+        <td>triggers</td>
+        <td>Action!</td>
+    </tr>
+
+    @for(element <- elements) {
+    <tr id="@element.id">
+        <td>@element.id</td>
+
+        <!-- Action -->
+        <td nowrap="nowrap">
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateAction(currentPlatform, element.id)) {
+            <select id="entityType" name="entityType">
+                @for(action <- possibleActions) {
+                    @if(action == element.action.actionType.toString) {
+                        <option value="@action" selected="selected">@action</option>
+                    } else {
+                        <option value="@action">@action</option>
+                    }
+                }
+            </select>
+            <input type='submit' value='Save' />
+            }
+
+            @for((key, value) <- element.action.params) {
+                <p>
+                    @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementAction(currentPlatform, element.id, key)) {
+                        <input type="text" id="key" name="key" value='@key' size="5">
+                        <input type="text" id="value" name="value" value='@value' size="5">
+                        <input type='submit' value='Save' />
+                    }
+                    @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteParamFromElementAction(currentPlatform, element.id, key)) {
+                        <input type='submit' value='Del' />
+                    }
+                </p>
+            }
+
+            <p>
+                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addParamToElementAction(currentPlatform, element.id)) {
+                    <input type='submit' value='Add Param' />
+                }
+            </p>
+        </td>
+
+        <!-- Conditions -->
+        <td>
+            <table border="1">
+                @for((condition, index) <- element.conditions.zipWithIndex) {
+                    <tr>
+                        <td nowrap="nowrap">
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateCondition(currentPlatform, element.id, index)) {
+                                <select id="entityType" name="entityType">
+                                    @for(ct <- possibleConditions) {
+                                        @if(ct == condition.conditionType.toString) {
+                                            <option value="@ct" selected="selected">@ct</option>
+                                        } else {
+                                            <option value="@ct">@ct</option>
+                                        }
+                                    }
+                                </select>
+                                <input type='submit' value='Save' />
+                            }
+
+
+                            @for((key, value) <- condition.params) {
+                            <p>
+                                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementCondition(currentPlatform, element.id, index, key)) {
+                                <input type="text" id="key" name="key" value='@key' size="5">
+                                <input type="text" id="value" name="value" value='@value' size="5">
+                                <input type='submit' value='Save' />
+                                }
+                                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteParamFromElemCondition(currentPlatform, element.id, index, key)) {
+                                    <input type='submit' value='Del' />
+                                }
+                            </p>
+                            }
+
+                            <p>
+                                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addParamToElementCondition(currentPlatform, element.id, index)) {
+                                    <input type='submit' value='Add Param' />
+                                }
+                            </p>
+
+                        </td>
+                        <td>
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteConditionFromElement(currentPlatform, element.id, index)) {
+                                <input type='submit' value='Del' />
+                            }
+                        </td>
+                    </tr>
+                }
+
+                <tr><td>
+                    @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addConditionToElement(currentPlatform, element.id)) {
+                        <input type='submit' value='Add Condition' />
+                    }
+                </td></tr>
+            </table>
+        </td>
+
+        <!-- Triggers -->
+        <td>
+            <table border="1">
+                @for((trigger, index) <- element.triggers.zipWithIndex) {
+                <tr>
+                    <td nowrap="nowrap">
+                        @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateTrigger(currentPlatform, element.id, index)) {
+                            <select id="entityType" name="entityType">
+                                @for(tt <- possibleTriggers) {
+                                    @if(tt == trigger.triggerType.toString) {
+                                        <option value="@tt" selected="selected">@tt</option>
+                                    } else {
+                                        <option value="@tt">@tt</option>
+                                    }
+                                }
+                            </select>
+                            <input type='submit' value='Save' />
+                        }
+
+                        @for((key, value) <- trigger.params) {
+                        <p>
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementTrigger(currentPlatform, element.id, index, key)) {
+                                <input type="text" id="key" name="key" value='@key' size="5">
+                                <input type="text" id="value" name="value" value='@value' size="5">
+                                <input type='submit' value='Save' />
+                            }
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteParamFromElemTrigger(currentPlatform, element.id, index, key)) {
+                                <input type='submit' value='Del' />
+                            }
+                        </p>
+                        }
+
+                        <p>
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addParamToElementTrigger(currentPlatform, element.id, index)) {
+                                <input type='submit' value='Add Param' />
+                            }
+                        </p>
+
+                    </td>
+
+                    <td>
+                        @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteTriggerFromElement(currentPlatform, element.id, index)) {
+                            <input type='submit' value='Del' />
+                        }
+                    </td>
+                </tr>
+                }
+
+                <tr><td>
+                    @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addTriggerToElement(currentPlatform, element.id)) {
+                        <input type='submit' value='Add Trigger' />
+                    }
+                </td></tr>
+            </table>
+
+        </td>
+
+        <td nowrap="nowrap">
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.upElement(currentPlatform, element.id)) {
+            <input type='submit' value='UP' />
+            }
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.downElement(currentPlatform, element.id)) {
+            <input type='submit' value='DOWN' />
+            }
+            <p>
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteElement(currentPlatform, element.id)) {
+                <input type='submit' value='DELETE' />
+            }
+            </p>
+        </td>
+    </tr>
+    }
+    <tr>
+        <td colspan="5">
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addElement(currentPlatform)) {
+                <input type='submit' value='Add Element' />
+            }
+        </td>
+    </tr>
+</table>
+
+}
