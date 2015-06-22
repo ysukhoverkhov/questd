@@ -495,14 +495,16 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
     findTutorialElement(platform, elementId) match {
       case Some(e) =>
-        val updatedElement = e.copy(triggers = e.triggers.take(index) ++ e.triggers.drop(index + 1))
-        api.db.tutorial.updateElement(platform, updatedElement)
+        if (e.triggers.nonEmpty) {
+          val updatedElement = e.copy(triggers = e.triggers.take(index) ++ e.triggers.drop(index + 1))
+          api.db.tutorial.updateElement(platform, updatedElement)
+        }
 
       case None =>
         Logger.error(s"Tutorial script or element not found")
     }
 
-            redirectToElement(platform, elementId)
+    redirectToElement(platform, elementId)
   }
 
   /**
