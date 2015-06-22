@@ -7,8 +7,8 @@ import controllers.domain.helpers._
 import logic.QuestLogic
 import models.domain.quest.{Quest, QuestInfo, QuestInfoContent, QuestStatus}
 import models.domain.user._
-import models.domain.user.profile.{TaskType, Profile}
-import models.domain.user.timeline.{TimeLineType, TimeLineReason}
+import models.domain.user.profile.{Profile, TaskType}
+import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 
 case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List.empty)
 case class CreateQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -31,7 +31,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
         require(u.demo.cultureId.isDefined)
 
         val culture = u.demo.cultureId.get
-        val level = u.profile.publicProfile.level
+        val level = u.calculateQuestLevel
 
         val quest = Quest(
           cultureId = culture,

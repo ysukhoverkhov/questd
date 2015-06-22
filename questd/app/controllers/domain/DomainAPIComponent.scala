@@ -64,7 +64,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     with BattlesAdminAPI
     with CulturesAdminAPI
     with ConfigAdminAPI
-
+    with MaintenanceAdminAPI
 
     with ApiConfigHolder
 

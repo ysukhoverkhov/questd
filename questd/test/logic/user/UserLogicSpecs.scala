@@ -4,13 +4,13 @@ import logic.BaseLogicSpecs
 import models.domain.common.Assets
 import models.domain.user._
 import models.domain.user.profile.{Rights, PublicProfile, Profile, Bio}
+import testhelpers.domainstubs._
 
 class UserLogicSpecs extends BaseLogicSpecs {
 
   "User Logic" should {
 
     "Report different cool down for users in different timezone" in {
-
       val u1 = User(
         id = "",
         profile = Profile(
@@ -32,7 +32,13 @@ class UserLogicSpecs extends BaseLogicSpecs {
       t2.before(t1) must beEqualTo(true)
     }
 
+    "Calculate correct quest level" in {
+      createUserStub(level = 7).calculateQuestLevel must beOneOf(1, 2)
+      createUserStub(level = 9).calculateQuestLevel must beOneOf(4, 5)
+      createUserStub(level = 13).calculateQuestLevel must beOneOf(9, 10)
+      createUserStub(level = 17).calculateQuestLevel must beOneOf(15, 16)
+      createUserStub(level = 20).calculateQuestLevel must beEqualTo(20)
+    }
   }
 }
-
 

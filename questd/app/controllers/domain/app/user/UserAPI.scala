@@ -6,7 +6,6 @@ import controllers.domain.{DomainAPIComponent, _}
 import controllers.sn.client.{User => SNUser}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
-import models.domain.user.dailyresults.DailyResult
 import play.Logger
 
 case class GetUserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
@@ -89,21 +88,10 @@ private[domain] trait UserAPI { this: DomainAPIComponent#DomainAPI with DBAccess
   }
 
   /**
-   * Updates cross promotion info of current user.
+   * Creates user filling all required initial profile info.
    */
   def createUser(request: CreateUserRequest): ApiResult[CreateUserResult] = handleDbException {
-    def initializeUser(user: User): User = {
-      user.copy(
-        profile = user.profile.copy(
-          rights = user.calculateRights,
-          ratingToNextLevel = user.ratingToNextLevel
-        ),
-        privateDailyResults = List(DailyResult(
-          user.getStartOfCurrentDailyResultPeriod)
-        ))
-    }
-
-    val user = initializeUser(request.user)
+    val user = request.user.initialized
     db.user.create(user)
 
     OkApiResult(CreateUserResult(user))

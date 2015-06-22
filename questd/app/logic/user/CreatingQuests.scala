@@ -1,12 +1,13 @@
 package logic.user
 
 import java.util.Date
+
+import controllers.domain.app.protocol.ProfileModificationResult._
 import logic._
 import logic.functions._
-import controllers.domain.app.protocol.ProfileModificationResult._
-import models.domain._
-import models.domain.common.{Assets, ContentType}
-import ContentType._
+import logic.constants._
+import models.domain.common.Assets
+import models.domain.common.ContentType._
 import models.domain.quest.QuestInfoContent
 import models.domain.user.profile.Functionality
 
@@ -42,6 +43,19 @@ trait CreatingQuests { this: UserLogic =>
       IncompleteBio
     else
       OK
+  }
+
+  /**
+   * Calculates what level should hve quest created by user.
+   */
+  def calculateQuestLevel: Int = {
+    val k = MaxLevel / (MaxLevel - levelFor(Functionality.SubmitPhotoQuests) + 1).toDouble
+    val fractionalLevel: Double = (user.profile.publicProfile.level - levelFor(Functionality.SubmitPhotoQuests) + 1) * k
+
+    if (rand.nextDouble() > 0)
+      fractionalLevel.floor.toInt
+    else
+      fractionalLevel.ceil.toInt
   }
 
   /**

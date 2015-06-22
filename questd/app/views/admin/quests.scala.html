@@ -2,11 +2,17 @@
 
 @import helper._
 
+
+@questStatuses = @{
+    models.domain.quest.QuestStatus.values.map(_.toString).toList
+}
+
+
 @main("Quests")(menuItems, Map.empty) {
 
 	@form(action = controllers.web.admin.routes.QuestsCRUD.updateQuest()) {
 		@inputText(newQuestForm("id"), 'size -> 18, 'readonly -> "readonly") <br />
-		@select(newQuestForm("status"), options(List("InRotation", "CheatingBanned", "IACBanned", "OldBanned"))) <br />
+		@select(newQuestForm("status"), options(questStatuses)) <br />
 		@inputText(newQuestForm("description"), 'size -> 140) <br />
 		@inputText(newQuestForm("level"), 'size -> 5) <br />
 		@inputText(newQuestForm("points"), 'size -> 5) <br />
