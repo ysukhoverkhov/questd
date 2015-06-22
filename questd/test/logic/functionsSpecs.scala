@@ -7,15 +7,15 @@ class functionsSpecs extends Specification {
 
   "Functions should" should {
 
-    "questProposalPeriod" in {
-      questProposalPeriod(12) must beEqualTo(7)
-      questProposalPeriod(13) must beEqualTo(7)
-      questProposalPeriod(20) must beEqualTo(7)
+    "questCreationPeriod" in {
+      questCreationPeriod(12) must beEqualTo(7)
+      questCreationPeriod(13) must beEqualTo(7)
+      questCreationPeriod(20) must beEqualTo(7)
     }
 
-    "coinsToInviteFriendForVoteQuestProposal" in {
-      coinsToInviteFriendForVoteQuestProposal(1) must beEqualTo(4)
-      coinsToInviteFriendForVoteQuestProposal(20) must beEqualTo(4)
+    "coinsToInviteFriendForVoteQuest" in {
+      coinsToInviteFriendForVoteQuest(1) must beEqualTo(4)
+      coinsToInviteFriendForVoteQuest(20) must beEqualTo(4)
     }
 
     "coinSelectQuest" in {
@@ -31,17 +31,17 @@ class functionsSpecs extends Specification {
     }
 
     "ratingToLoseQuest" in {
-      ratingToLoseQuest(3) must beEqualTo(75)
-      ratingToLoseQuest(11) must beEqualTo(567)
-      ratingToLoseQuest(12) must beEqualTo(709)
-      ratingToLoseQuest(20) must beEqualTo(3800)
+      ratingToLoseQuest(3) must beEqualTo(37)
+      ratingToLoseQuest(11) must beEqualTo(284)
+      ratingToLoseQuest(12) must beEqualTo(355)
+      ratingToLoseQuest(20) must beEqualTo(1900)
     }
 
     "ratingToWinQuest" in {
-      ratingToWinQuest(3) must beEqualTo(150)
-      ratingToWinQuest(11) must beEqualTo(1134)
-      ratingToWinQuest(12) must beEqualTo(1418)
-      ratingToWinQuest(20) must beEqualTo(7600)
+      ratingToWinQuest(3) must beEqualTo(75)
+      ratingToWinQuest(11) must beEqualTo(567)
+      ratingToWinQuest(12) must beEqualTo(709)
+      ratingToWinQuest(20) must beEqualTo(3800)
     }
 
     "dailyQuestPassiveIncome" in {
@@ -74,11 +74,10 @@ class functionsSpecs extends Specification {
     }
 
     "maxNumberOfFriendsOnLevel" in {
-      maxNumberOfFriendsOnLevel(1) must beEqualTo(1)
-      maxNumberOfFriendsOnLevel(2) must beEqualTo(1)
       maxNumberOfFriendsOnLevel(6) must beEqualTo(4)
       maxNumberOfFriendsOnLevel(10) must beEqualTo(10)
-      maxNumberOfFriendsOnLevel(15) must beEqualTo(33)
+      maxNumberOfFriendsOnLevel(13) must beEqualTo(21)
+      maxNumberOfFriendsOnLevel(17) must beEqualTo(51)
       maxNumberOfFriendsOnLevel(20) must beEqualTo(100)
     }
 
@@ -92,14 +91,12 @@ class functionsSpecs extends Specification {
     }
 
     "costToInviteFriend" in {
-      costToInviteFriend(1) must beEqualTo(6)
-      costToInviteFriend(5) must beEqualTo(118)
-      costToInviteFriend(6) must beEqualTo(165)
-      costToInviteFriend(13) must beEqualTo(1030)
+      costToInviteFriend(6) must beEqualTo(181)
+      costToInviteFriend(10) must beEqualTo(500)
+      costToInviteFriend(13) must beEqualTo(1016)
+      costToInviteFriend(17) must beEqualTo(2539)
       costToInviteFriend(20) must beEqualTo(5000)
     }
   }
-
 }
-
 

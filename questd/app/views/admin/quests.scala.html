@@ -1,4 +1,4 @@
-@(menuItems: Map[String, String], quests: List[models.domain.Quest], newQuestForm: Form[controllers.web.admin.component.QuestForm])
+@(menuItems: Map[String, String], quests: List[models.domain.quest.Quest], newQuestForm: Form[controllers.web.admin.component.QuestForm])
 
 @import helper._
 
@@ -41,7 +41,7 @@
 
 				    		<td>@q.info.content.description</td>
 				    		<td>@q.status</td>
-				    		<td>@q.rating.points</td>
+				    		<td>@q.rating.timelinePoints</td>
 				    		<td>@q.rating.cheating</td>
 				    		<td>@q.rating.votersCount</td>
 				    		<td>@q.info.level</td>

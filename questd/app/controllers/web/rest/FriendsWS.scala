@@ -1,8 +1,7 @@
 package controllers.web.rest
 
-import play.api._
+import controllers.web.rest.helpers.AccessToWSInstance
 import play.api.mvc._
-import controllers.web.rest.component.helpers.AccessToWSInstance
 
 
 object FriendsWS extends Controller with AccessToWSInstance {
@@ -11,6 +10,8 @@ object FriendsWS extends Controller with AccessToWSInstance {
   def costToRequestFriendship = ws.costToRequestFriendship
   def askFriendship = ws.askFriendship
   def respondFriendship = ws.respondFriendship
+
+  //noinspection EmptyParenMethodAccessedAsParameterless,MutatorLikeMethodIsParameterless
   def removeFromFriends = ws.removeFromFriends
 }
 

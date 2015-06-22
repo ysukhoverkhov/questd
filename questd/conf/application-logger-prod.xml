@@ -35,7 +35,7 @@
             <pattern>%relative%level%logger%msg</pattern>
         </layout>
         <cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTracker">
-            <bufferSize>100</bufferSize>
+            <bufferSize>256</bufferSize>
         </cyclicBufferTracker>
     </appender>
 

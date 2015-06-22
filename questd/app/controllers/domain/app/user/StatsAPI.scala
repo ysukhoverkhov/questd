@@ -4,6 +4,7 @@ import components._
 import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.helpers._
 import models.domain._
+import models.domain.user.User
 
 case class ShiftStatsRequest(user: User)
 case class ShiftStatsResult()

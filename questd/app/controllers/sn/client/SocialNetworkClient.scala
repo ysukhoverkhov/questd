@@ -19,4 +19,11 @@ trait SocialNetworkClient {
    * @param invitation Invitation to delete.
    */
   def deleteInvitation(token: String, invitation: Invitation): Unit
+
+  /**
+   * Fetch user ids in other app.
+   * @param token Token we use for auth.
+   * @return List of ids in other apps.
+   */
+  def fetchIdsInOtherApps(token: String): List[UserIdInApplication]
 }

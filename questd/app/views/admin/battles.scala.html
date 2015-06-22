@@ -1,10 +1,9 @@
-@(menuItems: Map[String, String], battles: List[models.domain.Battle])
+@(menuItems: Map[String, String], battles: List[models.domain.battle.Battle])
 
 @import helper._
 
 @main("Battles")(menuItems, Map.empty) {
 
-	<p>
 	<table border="1">
 	    	<tr>
 	    		<!--<td>battleId</td>-->
@@ -21,14 +20,13 @@
 	    		<td>@b.info.status</td>
                 <td>@b.level</td>
                 <td>@b.vip</td>
-                <td><pre>@b.info.solutionIds.mkString("\n")</pre></td>
-                <td><pre>@b.info.authorIds.mkString("\n")</pre></td>
-                <td><pre>@b.info.winnerIds.mkString("\n")</pre></td>
+                <td><pre>@b.info.battleSides.map(_.solutionId).mkString("\n")</pre></td>
+                <td><pre>@b.info.battleSides.map(_.authorId).mkString("\n")</pre></td>
+                <td><pre>@b.info.battleSides.map(_.isWinner).mkString("\n")</pre></td>
                 <td>@b.info.voteEndDate</td>
 	    	</tr>
 	    }
 	</table>
-	</p>
 
 }
 

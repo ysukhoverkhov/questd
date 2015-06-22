@@ -1,6 +1,6 @@
 package controllers.web.admin.component
 
-import models.domain.TutorialPlatform
+import models.domain.tutorial.TutorialPlatform
 import play.api.mvc._
 
 private[admin] object Menu {

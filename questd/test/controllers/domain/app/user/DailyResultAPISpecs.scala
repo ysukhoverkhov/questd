@@ -1,7 +1,10 @@
 package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
-import models.domain._
+import models.domain.common.Assets
+import models.domain.quest.QuestStatus
+import models.domain.solution.SolutionStatus
+import models.domain.user.dailyresults._
 import org.mockito.Matchers.{eq => mEq}
 import org.mockito.{ArgumentMatcher, Matchers}
 import testhelpers.domainstubs._
@@ -71,7 +74,18 @@ class DailyResultAPISpecs extends BaseAPISpecs {
             likesIncome = Assets(32, 32, 32),
             solutionsIncome = Assets(64, 64, 64))
         ),
-        questSolutionResult = List(QuestSolutionResult("1", None, None, Some(Assets(rating = -128)), SolutionStatus.CheatingBanned))
+        questResult = List(QuestResult(
+          questId = "1",
+          reward = Assets(256, 256, 256),
+          status = QuestStatus.InRotation)),
+        solutionResult = List(SolutionResult(
+          solutionId = "1",
+          reward = -Assets(-128, -128, -128),
+          status = SolutionStatus.CheatingBanned)),
+        battleResult = List(BattleResult(
+          battleId = "1",
+          reward = Assets(512, 512, 512),
+          isVictory = true))
       )
 
       val u = createUserStub(privateDailyResults = List(
@@ -91,7 +105,7 @@ class DailyResultAPISpecs extends BaseAPISpecs {
       val result = api.getDailyResult(GetDailyResultRequest(u))
 
       there was one(user).movePrivateDailyResultsToPublic(u.id, u.privateDailyResults.tail)
-      there was one(user).addToAssets(u.id, Assets(126, 126, 254))
+      there was one(user).addToAssets(u.id, Assets(1022, 1022, 1022))
       result must beAnInstanceOf[OkApiResult[GetDailyResultResult]]
     }
   }

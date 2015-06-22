@@ -1,9 +1,10 @@
 package logic
 
-import logic.functions._
-import logic.constants._
-import models.domain._
 import controllers.domain.DomainAPIComponent
+import logic.constants._
+import logic.functions._
+import models.domain.common.Assets
+import models.domain.quest.Quest
 import play.Logger
 
 class QuestLogic(
@@ -47,14 +48,14 @@ class QuestLogic(
    * Penalty for cheating solution
    */
   def penaltyForCheatingSolution = {
-    QuestLogic.rewardForLosingQuest(quest.info.level, api) * QuestSolutionCheatingPenalty
+    QuestLogic.rewardForSolvingQuest(quest.info.level, api) * QuestSolutionCheatingPenalty
   }
 
   /**
    * Penalty for IAC solution
    */
   def penaltyForIACSolution = {
-    QuestLogic.rewardForLosingQuest(quest.info.level, api) * QuestSolutionIACPenalty
+    QuestLogic.rewardForSolvingQuest(quest.info.level, api) * QuestSolutionIACPenalty
   }
 
   /**
@@ -62,8 +63,8 @@ class QuestLogic(
    */
   def shouldBanIAC = {
     val votesToBan = Math.max(
-        api.config(api.ConfigParams.ProposalIACRatio).toDouble * quest.rating.votersCount,
-        api.config(api.ConfigParams.ProposalMinIACVotes).toLong)
+        api.config(api.DefaultConfigParams.QuestIACRatio).toDouble * quest.rating.votersCount,
+        api.config(api.DefaultConfigParams.QuestMinIACVotes).toLong)
 
     val maxVotes = List(
         quest.rating.iacpoints.porn,
@@ -77,8 +78,8 @@ class QuestLogic(
   def shouldBanCheating = {
 
     val maxCheatingVotes = Math.max(
-      api.config(api.ConfigParams.ProposalCheatingRatio).toDouble * quest.rating.votersCount,
-      api.config(api.ConfigParams.ProposalMinCheatingVotes).toLong)
+      api.config(api.DefaultConfigParams.QuestCheatingRatio).toDouble * quest.rating.votersCount,
+      api.config(api.DefaultConfigParams.QuestMinCheatingVotes).toLong)
 
     quest.rating.cheating > maxCheatingVotes
   }
@@ -93,17 +94,24 @@ object QuestLogic {
   }
 
   /**
-   * Reward for lost quest.
+   * Reward for won battle.
    */
-  def rewardForLosingQuest(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
-    Assets(rating = ratingToLoseQuest(questLevel)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+  def rewardForWinningBattle(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
+    Assets(rating = ratingToWinQuest(questLevel)) * api.config(api.DefaultConfigParams.DebugExpMultiplier).toDouble
   }
 
   /**
-   * Reward for won quest.
+   * Reward for lost battle.
    */
-  def rewardForWinningQuest(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
-    Assets(rating = ratingToWinQuest(questLevel)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+  def rewardForLosingBattle(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
+    Assets(rating = ratingToLoseQuest(questLevel)) * api.config(api.DefaultConfigParams.DebugExpMultiplier).toDouble
+  }
+
+  /**
+   * Reward for solving quest.
+   */
+  def rewardForSolvingQuest(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
+    Assets(rating = ratingToSolveQuest(questLevel)) * api.config(api.DefaultConfigParams.DebugExpMultiplier).toDouble
   }
 
 }

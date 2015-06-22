@@ -2,7 +2,11 @@ package controllers.domain.app.user
 
 import controllers.domain._
 import controllers.sn.client.User
-import models.domain._
+import models.domain.culture.Culture
+import models.domain.user._
+import models.domain.user.auth.{AuthInfo, LoginMethod}
+import models.domain.user.demo.UserDemographics
+import models.domain.user.profile.{PublicProfile, Profile, Bio}
 import models.store
 import org.mockito.Matchers.{eq => mockEq}
 
@@ -14,6 +18,7 @@ class AuthAPISpecs extends BaseAPISpecs {
     val userfb = mock[User]
     userfb.snId returns fbid
     userfb.invitations returns List.empty
+    userfb.idsInOtherApps returns List.empty
 
     userfb
   }
@@ -27,13 +32,14 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       val u = Some(User(
         id = "userid",
-        auth = AuthInfo(snids = Map("FB" -> userfb.snId)),
+        auth = AuthInfo(loginMethods = List(LoginMethod("FB", userfb.snId))),
         demo = UserDemographics(cultureId = Some(countryName)),
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(
               country = Some(countryName))))))
 
+      db.user.updateSessionId(any, any) returns u
       db.user.readBySNid("FB", userfb.snId) returns None thenReturns u
       db.user.levelUp(anyString, anyInt) returns u
       db.user.setNextLevelRatingAndRights(
@@ -53,8 +59,8 @@ class AuthAPISpecs extends BaseAPISpecs {
       there were atLeast(1)(solution).allWithParams(any, any, any, any, any, any, any, any, any, any, any)
       there were atLeast(1)(battle).allWithParams(any, any, any, any, any, any, any, any, any, any)
       // Update allowed.
-      there were two(user).readBySNid("FB", userfb.snId)
-      there were one(user).create(any)
+      there was one(user).readBySNid("FB", userfb.snId)
+      there was one(user).create(any)
 
       rv must beAnInstanceOf[OkApiResult[LoginResult]]
       rv.body must beSome[LoginResult]
@@ -67,13 +73,14 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       val u = Some(User(
         id = "userid",
-        auth = AuthInfo(snids = Map("FB" -> userfb.snId)),
+        auth = AuthInfo(loginMethods = List(LoginMethod("FB", userfb.snId))),
         demo = UserDemographics(cultureId = Some(countryName)),
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(
               country = Some(countryName))))))
 
+      db.user.updateSessionId(any, any) returns u
       db.user.readBySNid("FB", userfb.snId) returns u
       db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
 
@@ -104,11 +111,11 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       db.user.readBySessionId(sesid) returns Some(User("", AuthInfo(session = Some(sesid))))
 
-      val rv = api.getUser(UserRequest(sessionId = Some(sesid)))
+      val rv = api.getUser(GetUserRequest(sessionId = Some(sesid)))
 
-      rv must beAnInstanceOf[OkApiResult[UserResult]]
-      rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
-        u.user.get.auth.session == Some(sesid))
+      rv must beAnInstanceOf[OkApiResult[GetUserResult]]
+      rv.body must beSome[GetUserResult] and beSome.which((u: GetUserResult) =>
+        u.user.get.auth.session.contains(sesid))
     }
 
     "Do not return none existing user" in context {
@@ -116,10 +123,10 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       db.user.readBySessionId(sesid) returns None
 
-      val rv = api.getUser(UserRequest(sessionId = Some(sesid)))
+      val rv = api.getUser(GetUserRequest(sessionId = Some(sesid)))
 
-      rv must beAnInstanceOf[OkApiResult[UserResult]]
-      rv.body must beSome[UserResult] and beSome.which((u: UserResult) =>
+      rv must beAnInstanceOf[OkApiResult[GetUserResult]]
+      rv.body must beSome[GetUserResult] and beSome.which((u: GetUserResult) =>
         u.code == UserResultCode.NotFound)
     }
 
@@ -132,13 +139,14 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       val u = Some(User(
         id = userid,
-        auth = AuthInfo(snids = Map("FB" -> userfb.snId)),
+        auth = AuthInfo(loginMethods = List(LoginMethod("FB", userfb.snId))),
         demo = UserDemographics(cultureId = Some(currentCulture)),
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(
               country = Some(currentCulture))))))
 
+      db.user.updateSessionId(any, any) returns u
       db.user.readBySNid("FB", userfb.snId) returns u
       db.culture.findByCountry(currentCulture) returns Some(Culture(id = actualCulture, name = actualCulture))
       db.user.updateCultureId(userid, actualCulture) returns u
@@ -160,7 +168,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       val u = Some(User(
         id = userid,
-        auth = AuthInfo(snids = Map("FB" -> userfb.snId)),
+        auth = AuthInfo(loginMethods = List(LoginMethod("FB", userfb.snId))),
         demo = UserDemographics(cultureId = Some(currentCulture)),
         profile = Profile(
           publicProfile = PublicProfile(
@@ -169,6 +177,7 @@ class AuthAPISpecs extends BaseAPISpecs {
 
 
       userfb.snId returns userfb.snId
+      db.user.updateSessionId(any, any) returns u
       db.user.readBySNid("FB", userfb.snId) returns u
       db.culture.findByCountry(currentCulture) returns None
 

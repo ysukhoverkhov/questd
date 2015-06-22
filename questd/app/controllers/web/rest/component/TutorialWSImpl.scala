@@ -1,9 +1,9 @@
 package controllers.web.rest.component
 
 import controllers.domain.app.user._
-import controllers.web.rest.component.helpers._
-import models.domain.TutorialPlatform
+import controllers.web.helpers._
 import com.vita.scala.extensions._
+import models.domain.tutorial.TutorialPlatform
 
 private object TutorialWSImplTypes {
 
@@ -14,13 +14,6 @@ private object TutorialWSImplTypes {
   /// Get current actual tutorial for the user.
   type WSGetTutorialResult = GetTutorialResult
 
-
-  case class WSGetTutorialElementsStateRequest(
-    /// Platform to get state for.
-    platform: String)
-
-  /// if no state for platform present empty result will be returned.
-  type WSGetTutorialElementsStateResult = GetTutorialElementsStateResult
 
   case class WSCloseTutorialElementRequest(
     /// Platform to get state for.
@@ -54,12 +47,6 @@ trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSCompo
     val v = Json.read[WSGetTutorialRequest](js)
 
     api.getTutorial(GetTutorialRequest(r.user, TutorialPlatform.withNameEx(v.platform)))
-  }
-
-  def getTutorialElementsState = wrapJsonApiCallReturnBody[WSGetTutorialElementsStateResult] { (js, r) =>
-    val v = Json.read[WSGetTutorialElementsStateRequest](js)
-
-    api.getTutorialElementsState(GetTutorialElementsStateRequest(r.user, TutorialPlatform.withNameEx(v.platform)))
   }
 
   def closeTutorialElement = wrapJsonApiCallReturnBody[WSCloseTutorialElementResult] { (js, r) =>

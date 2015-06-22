@@ -1,12 +1,14 @@
 package controllers.domain.app.user
 
-import models.domain._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.sn.client.{User => SNUser}
+import models.domain.common.Assets
+import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.User
 
 case class GetFollowingRequest(
   user: User)
@@ -96,7 +98,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
         } map { r =>
 
           val cost = request.user.costToFollowing
-          adjustAssets(AdjustAssetsRequest(user = r.user, cost = Some(cost)))
+          adjustAssets(AdjustAssetsRequest(user = r.user, change = -cost))
 
         } map { r =>
 
@@ -142,7 +144,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
           // OPTIMIZE: test batch call
 
           db.user.readBySNid(i.snName, i.snId)
-        }).filter(_ != None).map(_.get).map(_.id).filter(!request.user.friends.map(_.friendId).contains(_)).filter(!request.user.following.contains(_))
+        }).filter(_.isDefined).map(_.get).map(_.id).filter(!request.user.friends.map(_.friendId).contains(_)).filter(!request.user.following.contains(_))
 
         OkApiResult(GetSuggestsForFollowingResult(OK, Some(friends)))
       case a => OkApiResult(GetSuggestsForFollowingResult(a))

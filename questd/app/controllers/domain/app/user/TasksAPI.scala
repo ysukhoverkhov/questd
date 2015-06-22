@@ -3,11 +3,16 @@ package controllers.domain.app.user
 import components._
 import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.helpers._
-import models.domain._
+import models.domain.user._
+import models.domain.user.message.MessageTaskCompleted
+import models.domain.user.profile.{TaskType, Task, DailyTasks}
 import play.Logger
 
 case class ResetDailyTasksRequest(user: User)
 case class ResetDailyTasksResult(user: User)
+
+case class UpdateDailyTasksCompletedFractionRequest(user: User)
+case class UpdateDailyTasksCompletedFractionResult(user: User)
 
 case class MakeTaskRequest(
   user: User,
@@ -23,21 +28,31 @@ private[domain] trait TasksAPI {
    */
   def resetDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
     import request._
-    val tutorialTasksToCarry = if (!user.profile.dailyTasks.rewardReceived) {
-      user.profile.dailyTasks.tasks.filter(t => t.tutorialTaskId != None && t.currentCount < t.requiredCount)
-    } else {
-      List.empty
-    }
+    val tutorialTasksToCarry =
+      user.profile.dailyTasks.tasks.filter(t => t.tutorialTaskId.isDefined && t.currentCount < t.requiredCount)
 
-    db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout) ifSome { v =>
+    db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout) ifSome { u =>
 
       (if (tutorialTasksToCarry != List.empty) {
-        db.user.addTasks(user.id, tutorialTasksToCarry)
+        db.user.addTasks(u.id, tutorialTasksToCarry)
       } else {
-        Some(user)
+        Some(u)
       }) ifSome { u =>
         OkApiResult(ResetDailyTasksResult(u))
       }
+    }
+  }
+
+  /**
+   * Recalculates current assigned daily tasks completed fraction.
+   */
+  private [app] def updateDailyTasksCompletedFraction(request: UpdateDailyTasksCompletedFractionRequest): ApiResult[UpdateDailyTasksCompletedFractionResult] = handleDbException {
+    def completedFraction(dt: DailyTasks): Float = {
+      dt.tasks.map(t => t.currentCount.toFloat / t.requiredCount).sum / dt.tasks.size
+    }
+
+    db.user.setTasksCompletedFraction(id = request.user.id, completedFraction = completedFraction(request.user.profile.dailyTasks)) ifSome { u =>
+      OkApiResult(UpdateDailyTasksCompletedFractionResult(u))
     }
   }
 
@@ -48,12 +63,10 @@ private[domain] trait TasksAPI {
   def makeTask(request: MakeTaskRequest): ApiResult[MakeTaskResult] = handleDbException {
     import request._
 
-    def completedFraction(dt: DailyTasks): Float = {
-      dt.tasks.map(t => t.currentCount.toFloat / t.requiredCount).sum / dt.tasks.size
-    }
 
-    def allTasksCompleted(dt: DailyTasks): Boolean = {
-      dt.tasks.foldLeft(true)((r, v) => if (v.currentCount >= v.requiredCount) r else false)
+    def shouldGiveTasksReward(dt: DailyTasks, completedTasks: List[Task]): Boolean = {
+      dt.tasks.foldLeft(true)((r, v) => if (v.currentCount >= v.requiredCount) r else false) &&
+        completedTasks.foldLeft(false)((r, v) => r || v.triggersReward)
     }
 
     Logger.trace(s"Making task of type $taskType and/or id $taskId")
@@ -94,10 +107,7 @@ private[domain] trait TasksAPI {
       u ifSome { u =>
         runWhileSome(u)(
         { u =>
-          db.user.setTasksCompletedFraction(id = u.id, completedFraction = completedFraction(u.profile.dailyTasks))
-        },
-        { u =>
-          if (allTasksCompleted(u.profile.dailyTasks)) {
+          if (shouldGiveTasksReward(u.profile.dailyTasks, completedTasks)) {
             db.user.setTasksRewardReceived(id = u.id, rewardReceived = true)
           } else {
             Some(u)
@@ -106,23 +116,25 @@ private[domain] trait TasksAPI {
           // Running API calls.
 
           // Give reward for currently completed tasks.
-          completedTasks.foldLeft[ApiResult[SendMessageResult]](OkApiResult(SendMessageResult(user))) { (r, t) =>
+          completedTasks.foldLeft[ApiResult[SendMessageResult]](OkApiResult(SendMessageResult(u))) { (r, t) =>
             r map { r =>
-              adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(t.reward)))
+              adjustAssets(AdjustAssetsRequest(user = r.user, change = t.reward))
             } map { r =>
               sendMessage(SendMessageRequest(user = r.user, message = MessageTaskCompleted(t.id)))
             }
           } map { r =>
             // give reward for all completed.
-            if (allTasksCompleted(r.user.profile.dailyTasks)) {
+            if (shouldGiveTasksReward(r.user.profile.dailyTasks, completedTasks)) {
               {
-                adjustAssets(AdjustAssetsRequest(user = r.user, reward = Some(r.user.profile.dailyTasks.reward)))
+                adjustAssets(AdjustAssetsRequest(user = r.user, change = r.user.profile.dailyTasks.reward))
               } map { r =>
-                sendMessage(SendMessageRequest(r.user, MessageAllTasksCompleted()))
+                sendMessage(SendMessageRequest(r.user, message.MessageAllTasksCompleted()))
               }
             } else {
               OkApiResult(SendMessageResult(r.user))
             }
+          } map { r =>
+            updateDailyTasksCompletedFraction(UpdateDailyTasksCompletedFractionRequest(r.user))
           } map { r =>
             OkApiResult(MakeTaskResult(r.user))
           }

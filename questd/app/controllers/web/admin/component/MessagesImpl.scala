@@ -2,7 +2,7 @@ package controllers.web.admin.component
 
 import controllers.domain.DomainAPIComponent
 import controllers.domain.app.user.BroadcastMessageRequest
-import models.domain.MessageInformation
+import models.domain.user.message.MessageInformation
 import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._

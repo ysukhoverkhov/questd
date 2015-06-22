@@ -2,7 +2,10 @@ package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import controllers.domain.app.protocol.ProfileModificationResult
-import models.domain._
+import models.domain.common.Assets
+import models.domain.solution.{Solution, SolutionInfo}
+import models.domain.user.friends.{FriendshipStatus, Friendship}
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
@@ -13,13 +16,17 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
     "Create regular solution for regular users" in context {
 
       val uid = "uid"
+      val friend = createUserStub(id = "fid1")
 
-      val q = createQuestStub()
+      val q = createQuestStub(
+        solveCost = Assets(1, 0, 0),
+        solveReward = Assets(0, 0, 2)
+      )
       val tl = createTimeLineEntryStub(actorId = uid, objectId = q.id, objectType = TimeLineType.Quest)
       val t2 = createTimeLineEntryStub(objectType = TimeLineType.Solution, actorId = "uid", reason = TimeLineReason.Created)
       val t3 = createTimeLineEntryStub(objectType = TimeLineType.Quest)
       val t4 = createTimeLineEntryStub(objectType = TimeLineType.Quest)
-      val friends = List(Friendship("fid1", FriendshipStatus.Accepted), Friendship("fid2", FriendshipStatus.Invited))
+      val friends = List(Friendship(friend.id, FriendshipStatus.Accepted), Friendship("fid2", FriendshipStatus.Invited))
       val u = createUserStub(
         id = uid,
         cultureId = Some("cid"),
@@ -37,11 +44,11 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       quest.readById(mEq(q.id)) returns Some(q)
       quest.updatePoints(mEq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
-      user.recordQuestSolving(mEq(u.id), mEq(q.id), mEq(false)) returns Some(u)
-      user.recordSolutionCreation(mEq(u.id), any) returns Some(u)
-      user.addEntryToTimeLine(mEq(u.id), any) returns Some(u)
+      user.recordQuestSolving(mEq(u.id), mEq(q.id), any, mEq(false)) returns Some(u)
+      user.addEntryToTimeLine(any, any) returns Some(u)
       user.addToAssets(mEq(u.id), any) returns Some(u)
       user.readById(q.info.authorId) returns Some(author)
+      user.readById(friend.id) returns Some(friend)
       user.storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any) returns Some(author)
       solution.allWithParams(
         status = any,
@@ -69,14 +76,16 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
             questId = q.id,
             vip = true)))
       there was one(quest).readById(q.id)
-      there was one(user).recordQuestSolving(mEq(u.id), mEq(q.id), mEq(false))
+      there was one(user).recordQuestSolving(mEq(u.id), mEq(q.id), any, mEq(false))
       there was one(user).addEntryToTimeLine(mEq(u.id), any)
-      there was one(user).addToAssets(mEq(u.id), any)
-      there was one(user).addEntryToTimeLineMulti(mEq(List("fid1")), any)
+      there was one(user).addToAssets(mEq(u.id), mEq(q.info.solveReward - q.info.solveCost))
+//      there was one(user).addEntryToTimeLineMulti(mEq(List("fid1")), any)
+      there was one(user).addEntryToTimeLine(mEq(friend.id), any)
       there was one(quest).updatePoints(mEq(q.id), mEq(2), anyInt, anyInt, anyInt, anyInt, anyInt)
       there was one(user).storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any)
 
-      result must beEqualTo(OkApiResult(SolveQuestResult(ProfileModificationResult.OK, Some(u.profile))))
+      result must beAnInstanceOf[OkApiResult[SolveQuestResult]]
+      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
     }
 
     // FIX: clean me up.

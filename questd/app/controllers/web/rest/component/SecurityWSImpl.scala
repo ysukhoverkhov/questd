@@ -3,8 +3,8 @@ package controllers.web.rest.component
 import components._
 import controllers.domain._
 import controllers.domain.app.user._
-import controllers.web.rest.component.helpers._
-import models.domain._
+import controllers.web.helpers.{InternalErrorLogger, _}
+import models.domain.user.User
 import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
@@ -12,7 +12,7 @@ import play.api.mvc._
 import scala.concurrent._
 import scala.language.postfixOps
 
-object SecurityWSImpl {
+private object SecurityWSImplTypes {
   // Constant for session name in cookie
   val SessionIdKey = "sessionid"
 }
@@ -20,10 +20,11 @@ object SecurityWSImpl {
 trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
 
   import controllers.web.rest.component.LoginWSImplTypes._
+  import SecurityWSImplTypes._
 
   // Store Auth Info
   def storeAuthInfoInResult(result: Result, session: String) = {
-    result.withSession(SecurityWSImpl.SessionIdKey -> session)
+    result.withSession(SessionIdKey -> session)
   }
 
   // Configure Authorized check
@@ -31,15 +32,15 @@ trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
 
   object Authenticated extends ActionBuilder[AuthenticatedRequest] {
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
-      request.session.get(SecurityWSImpl.SessionIdKey) match {
+      request.session.get(SessionIdKey) match {
 
         case Some(sessionid: String) =>
           Future {
 
-            api.getUser(UserRequest(sessionId = Some(sessionid))) match {
-              case OkApiResult(UserResult(UserResultCode.OK, Some(user))) => user
+            api.getUser(GetUserRequest(sessionId = Some(sessionid))) match {
+              case OkApiResult(GetUserResult(UserResultCode.OK, Some(user))) => user
 
-              case OkApiResult(UserResult(UserResultCode.NotFound, _)) =>
+              case OkApiResult(GetUserResult(UserResultCode.NotFound, _)) =>
                 Unauthorized(
                   Json.write(WSUnauthorisedResult(UnauthorisedReason.SessionNotFound))).as(JSON)
 

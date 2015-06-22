@@ -2,6 +2,8 @@ package controllers.web.admin.component
 
 import controllers.domain._
 import controllers.domain.admin._
+import models.domain.common.{ContentType, ContentReference}
+import models.domain.tag.{ThemeInfo, Theme}
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._

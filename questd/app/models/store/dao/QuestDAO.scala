@@ -1,6 +1,6 @@
 package models.store.dao
 
-import models.domain._
+import models.domain.quest.{Quest, QuestStatus}
 
 trait QuestDAO extends BaseDAO[Quest] {
 
@@ -30,7 +30,7 @@ trait QuestDAO extends BaseDAO[Quest] {
    */
   def updatePoints(
     id: String,
-    pointsChange: Int,
+    timelinePointsChange: Int,
     likesChange: Int = 0,
     votersCountChange: Int = 0,
     cheatingChange: Int = 0,

@@ -27,6 +27,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
 
     with AuthAPI
     with ProfileAPI
+    with UserAPI
     with DailyResultAPI
     with StatsAPI
     with CreateQuestAPI
@@ -34,14 +35,18 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     with FightBattleAPI
     with VoteQuestAPI
     with VoteSolutionAPI
+    with VoteBattleAPI
     with ContentAPI
     with FollowingAPI
     with FriendsAPI
     with MessagesAPI
+    with CommentsAPI
+    with ChallengesAPI
     with MiscAPI
     with TasksAPI
     with TutorialAPI
     with TimeLineAPI
+    with DebugAPI
 
     with QuestAPI
     with QuestsFetchAPI

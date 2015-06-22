@@ -2,8 +2,11 @@ package controllers.web.rest.component
 
 import com.vita.scala.extensions._
 import controllers.domain.app.user._
-import controllers.web.rest.component.helpers._
+import controllers.web.helpers._
 import models.domain._
+import models.domain.battle.BattleStatus
+import models.domain.quest.QuestStatus
+import models.domain.solution.SolutionStatus
 
 
 private object ContentWSImplTypes

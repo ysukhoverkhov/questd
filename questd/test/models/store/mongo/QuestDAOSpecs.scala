@@ -2,11 +2,13 @@
 
 package models.store.mongo
 
+import models.domain.common.{ContentReference, ContentType}
+import models.domain.quest.{Quest, QuestStatus}
 import org.specs2.mutable._
 import play.api.test._
-import models.domain._
 import testhelpers.domainstubs._
 
+//noinspection ZeroIndexToHead
 //@RunWith(classOf[JUnitRunner])
 class QuestDAOSpecs extends Specification
   with MongoDatabaseComponent
@@ -79,7 +81,7 @@ class QuestDAOSpecs extends Specification
           level = 3,
           vip = false,
           cultureId = "c1",
-          points = 321),
+          timelinePoints = 321),
 
         createQuestStub(
           id = "q2",
@@ -88,7 +90,7 @@ class QuestDAOSpecs extends Specification
           level = 13,
           vip = true,
           cultureId = "c2",
-          points = 21),
+          timelinePoints = 21),
 
         createQuestStub(
           id = "q3",
@@ -97,21 +99,21 @@ class QuestDAOSpecs extends Specification
           level = 7,
           vip = true,
           cultureId = "c3",
-          points = 60))
+          timelinePoints = 60))
 
       qs.foreach(db.quest.create)
 
-      // Sorted by poins.
+      // Sorted by points.
       val all = db.quest.allWithParams().toList
       all.size must beEqualTo(qs.size)
-      all.map(_.id) must beEqualTo(List(qs(0).id, qs(2).id, qs(1).id))
+      all.map(_.id) must beEqualTo(qs.sortBy(_.rating.timelinePoints)(Ordering[Int].reverse).map(_.id))
 
       val status = db.quest.allWithParams(status = List(QuestStatus.CheatingBanned)).toList
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
 
-      val userids = db.quest.allWithParams(authorIds = List("q2_author id")).toList
-      userids.map(_.id) must beEqualTo(List(qs(1).id))
+      val userIds = db.quest.allWithParams(authorIds = List("q2_author id")).toList
+      userIds.map(_.id) must beEqualTo(List(qs(1).id))
 
       val levels = db.quest.allWithParams(levels = Some((1, 10))).toList
       levels.map(_.id).size must beEqualTo(2)
@@ -181,7 +183,7 @@ class QuestDAOSpecs extends Specification
 
       db.quest.updatePoints(
         id = quest.id,
-        pointsChange = 1,
+        timelinePointsChange = 1,
         likesChange = 2,
         votersCountChange = 3,
         cheatingChange = 4,
@@ -190,7 +192,7 @@ class QuestDAOSpecs extends Specification
 
       val ou1 = db.quest.readById(quest.id)
       ou1 must beSome.which((q: Quest) => q.id == quest.id)
-      ou1 must beSome.which((u: Quest) => u.rating.points == 1)
+      ou1 must beSome.which((u: Quest) => u.rating.timelinePoints == 1)
       ou1 must beSome.which((u: Quest) => u.rating.likesCount == 2)
       ou1 must beSome.which((u: Quest) => u.rating.votersCount == 3)
       ou1 must beSome.which((u: Quest) => u.rating.cheating == 4)

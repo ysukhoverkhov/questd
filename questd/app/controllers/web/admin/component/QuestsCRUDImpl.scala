@@ -44,7 +44,7 @@ class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller w
             status = quest.status.toString,
             level = quest.info.level,
             description = quest.info.content.description,
-            points = quest.rating.points,
+            points = quest.rating.timelinePoints,
             cheating = quest.rating.cheating,
             votersCount = quest.rating.votersCount))
         case _ => form

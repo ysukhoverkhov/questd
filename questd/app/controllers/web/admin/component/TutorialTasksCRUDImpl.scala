@@ -2,7 +2,10 @@ package controllers.web.admin.component
 
 import controllers.domain.admin._
 import controllers.domain.{DomainAPIComponent, OkApiResult}
-import models.domain._
+import models.domain.common.Assets
+import models.domain.tutorialtask.TutorialTask
+import models.domain.user.profile.TaskType
+import org.json4s.ext.EnumNameSerializer
 import play.api._
 import play.api.data.Forms._
 import play.api.data._
@@ -15,7 +18,8 @@ case class TutorialTaskForm(
   requiredCount: Int,
   rewardCoins: Int,
   rewardMoney: Int,
-  rewardRating: Int)
+  rewardRating: Int,
+  triggersReward: Boolean)
 
 class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
@@ -27,7 +31,8 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
       "requiredCount" -> number,
       "rewardCoins" -> number,
       "rewardMoney" -> number,
-      "rewardRating" -> number)(TutorialTaskForm.apply)(TutorialTaskForm.unapply))
+      "rewardRating" -> number,
+      "triggersReward" -> boolean)(TutorialTaskForm.apply)(TutorialTaskForm.unapply))
 
   /**
    * Get all tutorial tasks
@@ -47,7 +52,8 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
             requiredCount = task.requiredCount,
             rewardCoins = task.reward.coins.toInt,
             rewardMoney = task.reward.money.toInt,
-            rewardRating = task.reward.rating.toInt))
+            rewardRating = task.reward.rating.toInt,
+            triggersReward = task.triggersReward))
         case _ => form
       }
     }
@@ -91,16 +97,53 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
           reward = Assets(
             coins = taskForm.rewardCoins,
             money = taskForm.rewardMoney,
-            rating = taskForm.rewardRating))
+            rating = taskForm.rewardRating),
+          triggersReward = taskForm.triggersReward)
 
         if (taskForm.id == "") {
           api.createTutorialTaskAdmin(CreateTutorialTaskAdminRequest(tt))
-        } else {
+        } else { Logger.error(s"!!!! $tt")
           api.updateTutorialTaskAdmin(UpdateTutorialTaskAdminRequest(tt))
         }
 
         Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
       })
+  }
+
+
+  /**
+   * Exports tutorial tasks to file.
+   *
+   * @return Redirect
+   */
+  def exportTutorialTasks = Authenticated { implicit request =>
+    import controllers.web.helpers._
+
+    val tasks = api.db.tutorialTask.all.toList
+    Ok(Json.write(tasks)).withHeaders(CACHE_CONTROL -> "max-age=0", CONTENT_DISPOSITION -> s"attachment; filename=tutorialTasks.js", CONTENT_TYPE -> "application/x-download")
+  }
+
+  /**
+   * Imports Tutorial tasks from file.
+   *
+   * @return Redirect
+   */
+  def importTutorialTasks = Authenticated(parse.multipartFormData) { request =>
+    import controllers.web.helpers._
+    request.body.file("tutorialTasks").map { tutorialTasks =>
+
+      val serializers = List(new EnumNameSerializer(TaskType))
+
+      val tasks = Json.read[List[TutorialTask]](scala.io.Source.fromFile(tutorialTasks.ref.file).mkString, serializers)
+
+      api.db.tutorialTask.clear()
+      tasks.foreach(api.db.tutorialTask.create)
+
+      Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
+    }.getOrElse {
+      Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks("")).flashing(
+        "error" -> "Missing file")
+    }
   }
 
 }

@@ -1,7 +1,7 @@
 package controllers.web.rest
 
+import controllers.web.rest.helpers.AccessToWSInstance
 import play.api.mvc._
-import controllers.web.rest.component.helpers.AccessToWSInstance
 
 object DailyResultWS extends Controller with AccessToWSInstance {
 

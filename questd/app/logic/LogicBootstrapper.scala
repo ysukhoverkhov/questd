@@ -2,6 +2,10 @@ package logic
 
 import components._
 import models.domain._
+import models.domain.battle.Battle
+import models.domain.quest.Quest
+import models.domain.solution.Solution
+import models.domain.user.User
 
 trait LogicBootstrapper { this: APIAccessor with RandomAccessor =>
 

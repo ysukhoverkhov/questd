@@ -3,7 +3,7 @@ package logic.user.util
 import controllers.domain.app.battle._
 import logic.UserLogic
 import logic.constants._
-import models.domain._
+import models.domain.battle.{BattleStatus, Battle}
 import play.Logger
 
 
@@ -42,13 +42,13 @@ trait BattleSelectUserLogic { this: UserLogic =>
   private[user] def getStartingBattles(implicit selected: List[Battle]): Option[Iterator[Battle]] = {
     Logger.trace("getStartingBattles")
 
-    if (user.profile.publicProfile.level > api.config(api.ConfigParams.BattleProbabilityLevelsToGiveStartingBattles).toInt) {
+    if (user.profile.publicProfile.level > api.config(api.DefaultConfigParams.BattleProbabilityLevelsToGiveStartingBattles).toInt) {
       Logger.trace("  returns None because of high level")
       None
     } else {
 
       val algorithms = List(
-        (api.config(api.ConfigParams.BattleProbabilityStartingVIPBattles).toDouble, () => getVIPBattles),
+        (api.config(api.DefaultConfigParams.BattleProbabilityStartingVIPBattles).toDouble, () => getVIPBattles),
         (1.00, () => getBattlesWithMyTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
@@ -60,10 +60,10 @@ trait BattleSelectUserLogic { this: UserLogic =>
     Logger.trace("getDefaultBattle")
 
     val algorithms = List(
-      (api.config(api.ConfigParams.BattleProbabilityFriends).toDouble, () => getFriendsBattles),
-      (api.config(api.ConfigParams.BattleProbabilityFollowing).toDouble, () => getFollowingBattles),
-      (api.config(api.ConfigParams.BattleProbabilityLikedSolutions).toDouble, () => getBattlesForLikedSolutions),
-      (api.config(api.ConfigParams.BattleProbabilityVIP).toDouble, () => getVIPBattles),
+      (api.config(api.DefaultConfigParams.BattleProbabilityFriends).toDouble, () => getFriendsBattles),
+      (api.config(api.DefaultConfigParams.BattleProbabilityFollowing).toDouble, () => getFollowingBattles),
+      (api.config(api.DefaultConfigParams.BattleProbabilityLikedSolutions).toDouble, () => getBattlesForLikedSolutions),
+      (api.config(api.DefaultConfigParams.BattleProbabilityVIP).toDouble, () => getVIPBattles),
       (1.00, () => getBattlesWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 

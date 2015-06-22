@@ -2,17 +2,34 @@
 menuItems: Map[String, String],
 leftMenuItems: Map[String, String],
 currentPlatform: String,
-elements: List[models.domain.TutorialElement],
-possibleActions: List[String],
-possibleConditions: List[String],
-possibleTriggers: List[String])
+elements: List[models.domain.tutorial.TutorialElement])
 
 @import helper._
 
-@* TODO: move me to a file with custom styles  *@
+@possibleActions = @{
+    import models.domain.tutorial._
+    TutorialActionType.values.map(_.toString).toList
+}
+
+@possibleConditions = @{
+    import models.domain.tutorial._
+    TutorialConditionType.values.map(_.toString).toList
+}
+
+@possibleTriggers = @{
+    import models.domain.tutorial._
+    TutorialTriggerType.values.map(_.toString).toList
+}
 
 
-@main(s"Tutorial sctipt for: $currentPlatform")(menuItems, leftMenuItems) {
+
+@main(s"Tutorial script for: $currentPlatform")(menuItems, leftMenuItems) {
+
+<a href="@controllers.web.admin.routes.TutorialScriptsCRUD.exportTutorialScript(currentPlatform)">Export</a>
+@helper.form(action = controllers.web.admin.routes.TutorialScriptsCRUD.importTutorialScript(currentPlatform), 'enctype -> "multipart/form-data") {
+    <input type="file" name="tutorialScript">
+    <input type="submit" value="Import">
+}
 
 <table border="1">
     <tr>
@@ -24,7 +41,7 @@ possibleTriggers: List[String])
     </tr>
 
     @for(element <- elements) {
-    <tr>
+    <tr id="@element.id">
         <td>@element.id</td>
 
         <!-- Action -->
@@ -175,17 +192,25 @@ possibleTriggers: List[String])
 
         </td>
 
-        <td>
+        <td nowrap="nowrap">
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.upElement(currentPlatform, element.id)) {
+            <input type='submit' value='UP' />
+            }
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.downElement(currentPlatform, element.id)) {
+            <input type='submit' value='DOWN' />
+            }
+            <p>
             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteElement(currentPlatform, element.id)) {
                 <input type='submit' value='DELETE' />
             }
+            </p>
         </td>
     </tr>
     }
     <tr>
         <td colspan="5">
             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addElement(currentPlatform)) {
-            <input type='submit' value='Add Element' />
+                <input type='submit' value='Add Element' />
             }
         </td>
     </tr>

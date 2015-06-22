@@ -6,8 +6,14 @@ import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
-import controllers.web.rest.component.helpers._
-import models.domain._
+import controllers.web.helpers._
+import models.domain.common.{ContentVote, ContentType, ContentReference}
+import models.domain.quest.QuestInfoContent
+import models.domain.solution.SolutionInfoContent
+import models.domain.user._
+import models.domain.user.friends.FriendshipStatus
+import models.domain.user.profile.Gender
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
 import play.Logger
 
 private object DebugWSImplTypes {
@@ -38,6 +44,14 @@ private object DebugWSImplTypes {
   case class WSMakeBattleDebugRequest (
     rivalId: Option[String]
     )
+
+  case class WSSetLevelRequest (
+    level: Int
+    )
+
+  type WSResetProfileDebugResult = ResetProfileDebugResult
+
+  type WSResetTutorialResult = ResetTutorialResult
 }
 
 trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
@@ -108,37 +122,41 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
     def logOrGet[T](log: String)(it: Iterator[T]) = {
       if (!it.hasNext) {
-        Logger.debug(log)
+        Logger.error(log)
       }
 
       it.next()
     }
 
-    def randomUserExcluding(exclude: Seq[String], vip: Boolean = false) =
-      logOrGet(s"Unable to find random user with vip = $vip and excluding $exclude"){
+    def randomUserExcluding(exclude: Seq[String], culture: String, vip: Boolean = false) =
+      logOrGet(s"Unable to find random user with vip = $vip and excluding $exclude and cultureId $culture"){
         api.allUsers(AllUsersRequest()).body.get.users.filter(u =>
           !exclude.contains(u.id)
-            && (u.demo.cultureId != None)
+            && u.demo.cultureId.contains(culture)
             && (u.profile.publicProfile.bio.gender != Gender.Unknown)
             && (u.profile.publicProfile.vip == vip))
       }
 
+    assert(r.user.demo.cultureId.isDefined, "Culture id of calling user should be defined")
+    Logger.debug(s"We found ${r.user.id} / ${r.user.profile.publicProfile.bio.name} / ${r.user.demo.cultureId}")
+
     val peer = {
       v.rivalId.fold[User] {
-        randomUserExcluding(List(r.user.id))
+        randomUserExcluding(List(r.user.id), r.user.demo.cultureId.get)
       } {
         rivalId =>
           logOrGet(s"Unable to find user with id = $rivalId"){
             api.allUsers(AllUsersRequest()).body.get.users.filter( u =>
               u.id == rivalId
-                && (u.demo.cultureId != None)
+                && u.demo.cultureId.isDefined
                 && (u.profile.publicProfile.bio.gender != Gender.Unknown))}
       }
     }
-    Logger.debug(s"Peer found ${peer.id} / ${peer.profile.publicProfile.bio.name}")
+    assert(peer.demo.cultureId.isDefined, "Culture id of peer should be defined")
+    Logger.debug(s"Peer found ${peer.id} / ${peer.profile.publicProfile.bio.name} / ${peer.demo.cultureId}")
 
-    val author = randomUserExcluding(List(r.user.id, peer.id), vip = true)
-    Logger.debug(s"Author found ${author.id} / ${author.profile.publicProfile.bio.name}")
+    val author = randomUserExcluding(List(r.user.id, peer.id), r.user.demo.cultureId.get, vip = true)
+    Logger.debug(s"Author found ${author.id} / ${author.profile.publicProfile.bio.name} / ${author.demo.cultureId}")
 
     {
       // creating quest.
@@ -154,7 +172,9 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     } map { rr =>
       assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
 
-      val questId = api.getUser(UserRequest(userId = Some(author.id))).body.get.user.get.stats.createdQuests.last
+      val questId = api.getUser(GetUserRequest(userId = Some(author.id))).body.get.user.get.stats.createdQuests.last
+
+      Logger.debug(s"Quest for debug battle created id = $questId")
 
       {
         api.addToTimeLine(AddToTimeLineRequest(
@@ -166,6 +186,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
         ))
       } map { rr =>
 
+        Logger.debug(s"Quest added to timeline")
+
         api.solveQuest(SolveQuestRequest(
           rr.user,
           questId,
@@ -175,6 +197,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
               storage = "url",
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
       } map { rr =>
+        Logger.debug(s"Quest solved with result ${rr.allowed}")
         assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
 
         api.addToTimeLine(AddToTimeLineRequest(
@@ -187,6 +210,8 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
       } map { rr =>
 
+        Logger.debug(s"Quest added to timeline of peer")
+
         api.solveQuest(SolveQuestRequest(
           rr.user,
           questId,
@@ -197,10 +222,39 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
       }
     } map { rr =>
+      Logger.debug(s"Quest solved by peer with result ${rr.allowed}")
       assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
 
       OkApiResult(WSDebugResult("Done"))
     }
+  }
+
+  def resetTutorial = wrapJsonApiCallReturnBody[WSResetTutorialResult] { (js, r) =>
+    api.resetTutorial(ResetTutorialRequest(r.user))
+  }
+
+  //noinspection MutatorLikeMethodIsParameterless
+  def setLevel = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>
+    val v = Json.read[WSSetLevelRequest](js)
+
+    api.setLevelDebug(SetLevelDebugRequest(r.user, v.level))
+
+    OkApiResult(WSDebugResult("Done"))
+  }
+
+  /**
+   * Resets our profile to no tutorial, level one and no assets.
+   *
+   * @return
+   */
+  def resetProfile = wrapApiCallReturnBody[WSResetProfileDebugResult] { r =>
+    api.resetProfileDebug(ResetProfileDebugRequest(r.user))
+  }
+
+  def generateErrorLog = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>
+    Logger.error(s"Error log generated with request by ${r.user.id}")
+
+    OkApiResult(WSDebugResult("Error log generated"))
   }
 }
 

@@ -4,9 +4,20 @@ package models.store.mongo
 
 import java.util.Date
 
-import models.domain._
-import models.domain.view.QuestView
+import models.domain.common.{Assets, ContentVote}
+import models.domain.tutorial.TutorialPlatform
+import models.domain.user._
+import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
+import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
+import models.domain.user.dailyresults.BattleResult
+import models.domain.user.demo.UserDemographics
+import models.domain.user.friends.{ReferralStatus, FriendshipStatus, Friendship}
+import models.domain.user.message.MessageInformation
+import models.domain.user.profile._
+import models.domain.user.stats.SolutionsInBattle
+import models.domain.user.timeline.{TimeLineType, TimeLineReason, TimeLineEntry}
 import models.store._
+import models.view.QuestView
 import org.specs2.mutable._
 import play.api.test._
 import testhelpers.domainstubs._
@@ -30,7 +41,7 @@ class UserDAOSpecs
     "Find user by FB id" in new WithApplication(appWithTestDatabase) {
       val fbid = "idid_fbid"
       val user_id = "session name"
-      db.user.create(User(user_id, AuthInfo(snids = Map("FB" -> fbid))))
+      db.user.create(User(user_id, AuthInfo(loginMethods = List(LoginMethod("FB", fbid)))))
       val u = db.user.readBySNid("FB", fbid)
 
       u must beSome
@@ -43,8 +54,8 @@ class UserDAOSpecs
       db.user.create(User(testsess, AuthInfo(session = Some(sessid))))
       val u = db.user.readBySessionId(sessid)
       u must beSome.which((u: User) => u.id.toString == testsess) and
-        beSome.which((u: User) => u.auth.snids == Map.empty) and
-        beSome.which((u: User) => u.auth.session == Some(sessid))
+        beSome.which((u: User) => u.auth.loginMethods == List.empty) and
+        beSome.which((u: User) => u.auth.session.contains(sessid))
     }
 
     "Update user in DB" in new WithApplication(appWithTestDatabase) {
@@ -63,14 +74,16 @@ class UserDAOSpecs
       val u2 = db.user.readById(u1unlifted.id)
 
       u1 must beSome.which((u: User) => u.id.toString == id) and
-        beSome.which((u: User) => u.auth.snids == Map.empty) and
-        beSome.which((u: User) => u.auth.session == Some(sessid))
+        beSome.which((u: User) => u.auth.loginMethods == List.empty) and
+        beSome.which((u: User) => u.auth.session.contains(sessid))
       u2 must beSome.which((u: User) => u.id.toString == id) and
-        beSome.which((u: User) => u.auth.snids == Map.empty) and
-        beSome.which((u: User) => u.auth.session == Some(newsessid))
+        beSome.which((u: User) => u.auth.loginMethods == List.empty) and
+        beSome.which((u: User) => u.auth.session.contains(newsessid))
     }
 
     "Delete user in DB" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
       val userid = "id to test delete"
 
       db.user.create(User(userid))
@@ -104,11 +117,24 @@ class UserDAOSpecs
     }
 
     """Return "None" in search for not existing user""" in new WithApplication(appWithTestDatabase) {
-      val u = db.user.readBySessionId("Another id of another never existign user")
+      val u = db.user.readBySessionId("Another id of another never existing user")
       u must beNone
     }
 
-// TODO: TAGS: clean me up.
+    "Add cross promotions" in new WithApplication(appWithTestDatabase) {
+      val user: User = createUserStub()
+      db.user.create(user)
+
+      val u = db.user.addCrossPromotions(user.id, "FB", List(CrossPromotedApp("appName", "userId"), CrossPromotedApp("appName2", "userId2")))
+
+      u must beSome
+      val u2 = u.get
+      u2.auth.loginMethods.find(_.methodName == "FB").get.crossPromotion.apps.length must beEqualTo(2)
+      u2.auth.loginMethods.find(_.methodName == "FB").get.crossPromotion.apps.find(_.appName == "appName") must beSome
+    }
+
+
+    // TODO: TAGS: clean me up.
 //    "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {
 //      val userId = "takeQuest2"
 //      val themeId = "tid"
@@ -145,7 +171,7 @@ class UserDAOSpecs
       val tasks = DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10),
           Task(
@@ -161,7 +187,7 @@ class UserDAOSpecs
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client).head.currentCount == 1)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Custom).head.currentCount == 1)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards).head.currentCount == 2)
     }
 
@@ -173,7 +199,7 @@ class UserDAOSpecs
       val tasks = DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10)))
 
@@ -194,7 +220,7 @@ class UserDAOSpecs
       val tasks = DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10)))
 
@@ -260,11 +286,11 @@ class UserDAOSpecs
             tasks = List(t, t, t),
             reward = Assets(1, 2, 3)))))
 
-      val ou = db.user.addTasks(userid, List(t, t))
+      val ou = db.user.addTasks(userid, List(t, t), Some(Assets(rating = 10)))
 
       ou must beSome.which((u: User) => u.id.toString == userid)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.length == 5)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(1, 2, 3))
+      ou must beSome.which((u: User) => u.profile.dailyTasks.reward == Assets(1, 2, 13))
     }
 
     "addClosedTutorialElement works" in new WithApplication(appWithTestDatabase) {
@@ -279,7 +305,7 @@ class UserDAOSpecs
       val ou = db.user.addClosedTutorialElement(userid, TutorialPlatform.iPhone.toString, elementid)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.tutorialStates(TutorialPlatform.iPhone.toString).closedElementIds == List(elementid))
+      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).closedElementIds == List(elementid))
     }
 
     "addTutorialTaskAssigned works" in new WithApplication(appWithTestDatabase) {
@@ -296,7 +322,7 @@ class UserDAOSpecs
       val ou = db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.tutorialStates(TutorialPlatform.iPhone.toString).assignedTutorialTaskIds.length == 3)
+      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).usedTutorialTaskIds.length == 3)
     }
 
     "updateCultureId works" in new WithApplication(appWithTestDatabase) {
@@ -312,7 +338,7 @@ class UserDAOSpecs
       val ou = db.user.updateCultureId(userid, cultureId)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.demo.cultureId == Some(cultureId))
+      ou must beSome.which((u: User) => u.demo.cultureId.contains(cultureId))
     }
 
     "replaceCultureIds works" in new WithApplication(appWithTestDatabase) {
@@ -341,15 +367,15 @@ class UserDAOSpecs
 
       val ou1 = db.user.readById(userid1)
       ou1 must beSome.which((u: User) => u.id.toString == userid1)
-      ou1 must beSome.which((u: User) => u.demo.cultureId == Some(newC))
+      ou1 must beSome.which((u: User) => u.demo.cultureId.contains(newC))
 
       val ou2 = db.user.readById(userid2)
       ou2 must beSome.which((u: User) => u.id.toString == userid2)
-      ou2 must beSome.which((u: User) => u.demo.cultureId == Some(newC))
+      ou2 must beSome.which((u: User) => u.demo.cultureId.contains(newC))
 
       val ou3 = db.user.readById(userid3)
       ou3 must beSome.which((u: User) => u.id.toString == userid3)
-      ou3 must beSome.which((u: User) => u.demo.cultureId == Some(oldC + "1"))
+      ou3 must beSome.which((u: User) => u.demo.cultureId.contains(oldC + "1"))
     }
 
     "populate mustVoteSolutions list" in new WithApplication(appWithTestDatabase) {
@@ -397,7 +423,7 @@ class UserDAOSpecs
       db.user.recordQuestVote(u.id, q.id, ContentVote.Cheating)
 
       val ou1 = db.user.readById(u.id)
-      ou1 must beSome.which((u: User) => u.stats.votedQuests.get(q.id) == Some(ContentVote.Cheating))
+      ou1 must beSome.which((u: User) => u.stats.votedQuests.get(q.id).contains(ContentVote.Cheating))
     }
 
     "recordSolutionVote works" in new WithApplication(appWithTestDatabase) {
@@ -410,7 +436,36 @@ class UserDAOSpecs
       db.user.recordSolutionVote(u.id, s.id, ContentVote.Cheating)
 
       val ou1 = db.user.readById(u.id)
-      ou1 must beSome.which((u: User) => u.stats.votedSolutions.get(s.id) == Some(ContentVote.Cheating))
+      ou1 must beSome.which((u: User) => u.stats.votedSolutions.get(s.id).contains(ContentVote.Cheating))
+    }
+
+    "recordBattleVote works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val u = createUserStub()
+      val s = createSolutionStub()
+      val b = createBattleStub()
+
+      db.user.create(u)
+      db.user.recordBattleVote(u.id, b.id, s.id)
+
+      val ou1 = db.user.readById(u.id)
+      ou1 must beSome.which((u: User) => u.stats.votedBattles.get(b.id).contains(s.id))
+    }
+
+    "recordBattleParticipation works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val u = createUserStub()
+      val s = createSolutionStub()
+      val b = createBattleStub()
+
+      db.user.create(u)
+      db.user.recordBattleParticipation(u.id, b.id, SolutionsInBattle(List(s.id)))
+
+      val ou1 = db.user.readById(u.id)
+      ou1 must beSome
+      ou1.get.stats.participatedBattles.get(b.id).contains(SolutionsInBattle(List(s.id))) must beTrue
     }
 
     "Add entry to time line" in new WithApplication(appWithTestDatabase) {
@@ -480,14 +535,15 @@ class UserDAOSpecs
       db.user.clear()
 
       val questId = "qiq"
+      val solutionId = "siq"
       val user = createUserStub(questBookmark = Some(questId))
       db.user.create(user)
 
-      db.user.recordQuestSolving(user.id, questId, removeBookmark = true)
+      db.user.recordQuestSolving(user.id, questId, solutionId, removeBookmark = true)
 
       val ou1 = db.user.readById(user.id)
       ou1 must beSome[User]
-      ou1.get.stats.solvedQuests must beEqualTo(List(questId))
+      ou1.get.stats.solvedQuests must beEqualTo(Map(questId -> solutionId))
       ou1.get.profile.questSolutionContext.bookmarkedQuest must beNone
     }
 
@@ -585,7 +641,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val m = MessageAllTasksCompleted().toMessage
+      val m = message.MessageAllTasksCompleted().toMessage
 
       db.user.create(user)
       db.user.addMessage(user.id, m)
@@ -613,7 +669,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val m = MessageAllTasksCompleted().toMessage
+      val m = message.MessageAllTasksCompleted().toMessage
 
       db.user.create(user)
       db.user.addMessage(user.id, m)
@@ -631,7 +687,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val ms = (1 to 5).map(n => MessageAllTasksCompleted().toMessage)
+      val ms = (1 to 5).map(n => message.MessageAllTasksCompleted().toMessage)
 
       db.user.create(user)
       ms.foreach(db.user.addMessage(user.id, _))
@@ -640,6 +696,70 @@ class UserDAOSpecs
 
       val ou2 = db.user.readById(user.id)
       ou2 must beSome[User].which(_.profile.messages == ms.tail)
+    }
+
+    "Setting friendship works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val friend = createUserStub()
+      val fs = Friendship(friend.id, FriendshipStatus.Invited)
+
+      db.user.create(user)
+      db.user.addFriendship(user.id, fs)
+      db.user.updateFriendship(user.id, friend.id, Some(FriendshipStatus.Accepted.toString), Some(ReferralStatus.ReferredBy.toString))
+
+      val ou2 = db.user.readById(user.id)
+      ou2 must beSome[User]
+      val u = ou2.get
+      u.friends.head.status must beEqualTo(FriendshipStatus.Accepted)
+      u.friends.head.referralStatus must beEqualTo(ReferralStatus.ReferredBy)
+    }
+
+    "storeBattleInDailyResult works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val br = BattleResult("1", Assets(1, 2, 3), isVictory = true)
+
+      db.user.create(user)
+      db.user.storeBattleInDailyResult(user.id, br)
+
+      val ou = db.user.readById(user.id)
+
+      ou must beSome
+      ou.get.privateDailyResults.head.decidedBattles.head must beEqualTo(br)
+    }
+
+    "addBattleRequest adds it" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val br = BattleRequest("1", "2", "3", BattleRequestStatus.Accepted)
+
+      db.user.create(user)
+      db.user.addBattleRequest(user.id, br)
+
+      val ou = db.user.readById(user.id)
+
+      ou must beSome
+      ou.get.battleRequests.head must beEqualTo(br)
+    }
+
+    "updateBattleRequest works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val br = BattleRequest("1", "2", "3", BattleRequestStatus.Accepted)
+
+      db.user.create(user)
+      db.user.addBattleRequest(user.id, br)
+      db.user.updateBattleRequest(user.id, "2", "3", BattleRequestStatus.Rejected.toString)
+
+      val ou = db.user.readById(user.id)
+
+      ou must beSome
+      ou.get.battleRequests.head must beEqualTo(br.copy(status = BattleRequestStatus.Rejected))
     }
   }
 }

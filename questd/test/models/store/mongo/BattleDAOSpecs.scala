@@ -2,11 +2,12 @@
 
 package models.store.mongo
 
-import models.domain._
+import models.domain.battle.{Battle, BattleStatus}
 import org.specs2.mutable._
 import play.api.test.WithApplication
 import testhelpers.domainstubs._
 
+//noinspection ZeroIndexToHead
 //@RunWith(classOf[JUnitRunner])
 class BattleDAOSpecs extends Specification
   with MongoDatabaseComponent
@@ -17,6 +18,26 @@ class BattleDAOSpecs extends Specification
   }
 
   "Mongo Battle DAO" should {
+
+    "Create battle" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val b = createBattleStub(
+        id = "b1",
+        solutionIds = List("s1_id", "s2_id"),
+        authorIds = List("a1_id", "a2_id"),
+        status = BattleStatus.Fighting,
+        level = 3,
+        vip = false,
+        cultureId = "c1")
+
+      db.battle.create(b)
+
+      val ob = db.battle.readById(b.id)
+
+      ob must beSome
+      ob.get must beEqualTo(b)
+    }
 
     "Get all battles" in new WithApplication(appWithTestDatabase) {
 
@@ -32,7 +53,8 @@ class BattleDAOSpecs extends Specification
           status = BattleStatus.Fighting,
           level = 3,
           vip = false,
-          cultureId = "c1"),
+          cultureId = "c1",
+          timelinePoints = 300),
 
         createBattleStub(
           id = "b2",
@@ -41,7 +63,8 @@ class BattleDAOSpecs extends Specification
           status = BattleStatus.Resolved,
           level = 7,
           vip = false,
-          cultureId = "c1"),
+          cultureId = "c1",
+          timelinePoints = 30),
 
         createBattleStub(
           id = "b3",
@@ -50,13 +73,17 @@ class BattleDAOSpecs extends Specification
           status = BattleStatus.Fighting,
           level = 3,
           vip = true,
-          cultureId = "c2"))
+          cultureId = "c2",
+          timelinePoints = 60))
+
+      bs.head.info.battleSides.map(_.solutionId).sorted must beEqualTo(List("s1_id", "s2_id").sorted)
+      bs.head.info.battleSides.map(_.authorId).sorted must beEqualTo(List("a1_id", "a2_id").sorted)
 
       bs.foreach(db.battle.create)
 
       val all = db.battle.allWithParams().toList
       all.size must beEqualTo(bs.size)
-      all.map(_.id).sorted must beEqualTo(List(bs(0).id, bs(2).id, bs(1).id).sorted)
+      all.map(_.id) must beEqualTo(bs.sortBy(_.timelinePoints)(Ordering[Int].reverse).map(_.id))
 
       val status = db.battle.allWithParams(status = List(BattleStatus.Fighting)).toList
       status.map(_.id).size must beEqualTo(2)
@@ -126,7 +153,39 @@ class BattleDAOSpecs extends Specification
 
       var r = db.battle.readById(battle.id)
 
-      r must beSome.which(b => b.info.status == BattleStatus.Resolved && b.info.winnerIds == winnerIds)
+      r must beSome.which(b => b.info.status == BattleStatus.Resolved && b.info.battleSides.filter(s => winnerIds.contains(s.solutionId)).filter(
+        s => s.isWinner).map(_.solutionId).sorted == winnerIds.sorted)
+    }
+
+    "Update battle points" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val battle = createBattleStub(status = BattleStatus.Fighting)
+      db.battle.create(battle)
+      val ob = db.battle.updatePoints(
+        id = battle.id,
+        solutionId = battle.info.battleSides.head.solutionId,
+        randomPointsChange = 1,
+        friendsPointsChange = 2)
+
+      ob must beSome
+
+      ob.get.info.battleSides.head.pointsFriends must beEqualTo(2)
+      ob.get.info.battleSides.head.pointsRandom must beEqualTo(1)
+    }
+
+    "Update battle points updates timeline points" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val battle = createBattleStub(status = BattleStatus.Fighting)
+      db.battle.create(battle)
+      val ob = db.battle.updatePoints(
+        id = battle.id,
+        timelinePointsChange = 2)
+
+      ob must beSome
+
+      ob.get.timelinePoints must beEqualTo(2)
     }
 
     "Replace cultures" in new WithApplication(appWithTestDatabase) {

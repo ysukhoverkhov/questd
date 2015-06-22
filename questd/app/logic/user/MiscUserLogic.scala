@@ -1,7 +1,7 @@
 package logic.user
 
 import com.github.nscala_time.time.Imports._
-import models.domain.Gender
+import models.domain.user.profile.Gender
 import org.joda.time.DateTime
 import logic.{functions, UserLogic}
 
@@ -22,7 +22,7 @@ trait MiscUserLogic { this: UserLogic =>
    * Check is current user an active user.
    */
   def isActive = {
-    val activeDays = api.config(api.ConfigParams.ActiveUserDays).toInt
+    val activeDays = api.config(api.DefaultConfigParams.ActiveUserDays).toInt
 
     user.auth.lastLogin match {
       case None => false
@@ -35,6 +35,6 @@ trait MiscUserLogic { this: UserLogic =>
    * Check is the user has complete bio.
    */
   def bioComplete = {
-    user.demo.cultureId != None && user.profile.publicProfile.bio.gender != Gender.Unknown
+    user.demo.cultureId.isDefined && user.profile.publicProfile.bio.gender != Gender.Unknown
   }
 }

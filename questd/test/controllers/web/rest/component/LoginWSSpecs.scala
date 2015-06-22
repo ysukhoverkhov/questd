@@ -7,7 +7,7 @@ import controllers.sn.client.{SocialNetworkClient, User => SNUser}
 import controllers.sn.component.SocialNetworkComponent
 import controllers.sn.exception._
 import controllers.web.rest.component.LoginWSImplTypes.WSLoginRequest
-import models.domain._
+import models.domain.user.User
 import models.store._
 import org.specs2.mock.Mockito
 import org.specs2.mutable._
@@ -47,7 +47,7 @@ class LoginWSSpecs extends Specification
       fbsn.fetchUserByToken(facebookToken) returns user
       api.login(LoginRequest("FB", user)) returns OkApiResult(LoginResult  (sessid, userId))
 
-      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
+      val data = AnyContentAsJson(Json.parse(controllers.web.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,
@@ -60,7 +60,7 @@ class LoginWSSpecs extends Specification
       status(r) must equalTo(OK)
       contentType(r) must beSome("application/json")
       contentAsString(r) must contain(sessid)
-      session(r).get(controllers.web.rest.component.SecurityWSImpl.SessionIdKey) must beSome
+      session(r).get(controllers.web.rest.component.SecurityWSImplTypes.SessionIdKey) must beSome
     }
 
     "Do not login user with incorrect FB token" in new WithApplication {
@@ -73,7 +73,7 @@ class LoginWSSpecs extends Specification
       fbsn.fetchUserByToken(facebookToken) throws new AuthException()
 
 
-      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
+      val data = AnyContentAsJson(Json.parse(controllers.web.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,
@@ -95,7 +95,7 @@ class LoginWSSpecs extends Specification
       sn.clientForName("FB") returns fbsn
       fbsn.fetchUserByToken(facebookToken) throws new NetworkException()
 
-      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
+      val data = AnyContentAsJson(Json.parse(controllers.web.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,
@@ -117,7 +117,7 @@ class LoginWSSpecs extends Specification
       sn.clientForName("FB") returns fbsn
       fbsn.fetchUserByToken(facebookToken) throws new SocialNetworkClientNotFound()
 
-      val data = AnyContentAsJson(Json.parse(controllers.web.rest.component.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
+      val data = AnyContentAsJson(Json.parse(controllers.web.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
 
       val fakeRequest = FakeRequest(
         Helpers.POST,

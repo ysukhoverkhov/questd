@@ -4,6 +4,7 @@ import components.random.RandomComponent
 import controllers.domain._
 import controllers.domain.app.user.{GetAllUsersResult, GetAllUsersRequest}
 import models.domain._
+import models.domain.user.User
 import play.Logger
 
 

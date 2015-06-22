@@ -1,6 +1,6 @@
 package models.store.dao
 
-import models.domain._
+import models.domain.battle.{BattleStatus, Battle}
 
 trait BattleDAO extends BaseDAO[Battle] {
 
@@ -28,7 +28,30 @@ trait BattleDAO extends BaseDAO[Battle] {
   def updateStatus(
     id: String,
     newStatus: BattleStatus.Value,
-    addWinners: List[String] = List.empty): Option[Battle]
+    setWinnerSolutionIds: List[String] = List.empty): Option[Battle]
+
+  /**
+   * Updates voting points of battle.
+   *
+   * @param id id of battle to vote for.
+   * @param solutionId Solution we vote for.
+   * @param randomPointsChange Random votes.
+   * @param friendsPointsChange Friend votes.
+   */
+  def updatePoints(
+    id: String,
+    solutionId: String,
+    randomPointsChange: Int,
+    friendsPointsChange: Int): Option[Battle]
+
+  /**
+   * @param id Id of battle to change points.
+   * @param timelinePointsChange Change of timeline points.
+   * @return updated battle.
+   */
+  def updatePoints(
+    id: String,
+    timelinePointsChange: Int): Option[Battle]
 
   /**
    * Replaces culture ids of battles with old one.

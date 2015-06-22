@@ -1,9 +1,11 @@
 package controllers.domain.app.quest
 
 import components.DBAccessor
-import models.domain._
-import controllers.domain.helpers._
 import controllers.domain._
+import controllers.domain.helpers._
+import models.domain.quest.{Quest, QuestStatus}
+import models.domain.user.User
+import models.domain.user.friends.FriendshipStatus
 import play.Logger
 
 case class GetMyQuestsRequest(
@@ -37,6 +39,7 @@ case class GetVIPQuestsResult(quests: Iterator[Quest])
 
 case class GetAllQuestsRequest(
   user: User,
+  ids: List[String] = List.empty,
   idsExclude: List[String] = List.empty,
   authorsExclude: List[String] = List.empty,
   status: QuestStatus.Value,
@@ -89,6 +92,7 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
       status = List(request.status),
       authorIdsExclude = request.authorsExclude,
       levels = request.levels,
+      ids = request.ids,
       idsExclude = request.idsExclude,
       cultureId = request.cultureId)))
   }

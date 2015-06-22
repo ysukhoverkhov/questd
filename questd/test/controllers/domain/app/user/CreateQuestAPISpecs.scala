@@ -4,7 +4,7 @@ import java.util.Date
 
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
-import models.domain._
+import models.domain.quest.QuestStatus
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
@@ -26,20 +26,9 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
       result.body must beSome[CreateQuestResult].which(r => r.allowed == ProfileModificationResult.OK)
 
       there was one(user).addEntryToTimeLine(any, any)
-      there was one(user).addEntryToTimeLineMulti(any, any)
+//      there was one(user).addEntryToTimeLineMulti(any, any)
       there was no(user).addQuestIncomeToDailyResult(any, any)
-      there was one(quest).create(
-        Quest(
-          id = anyString,
-          cultureId = "cultureId",
-          info = QuestInfo(
-            authorId = u.id,
-            level = 10,
-            content = q.info.content,
-            vip = false,
-            solveCost = Assets(),
-            solveRewardWon = Assets(),
-            solveRewardLost = Assets())))
+      there was one(quest).create(q.copy(id = anyString))
     }
 
     "Create VIP quests for VIP users" in context {
@@ -56,20 +45,9 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
       result.body must beSome[CreateQuestResult].which(r => r.allowed == ProfileModificationResult.OK)
 
       there was one(user).addEntryToTimeLine(any, any)
-      there was one(user).addEntryToTimeLineMulti(any, any)
+//      there was one(user).addEntryToTimeLineMulti(any, any)
       there was no(user).addQuestIncomeToDailyResult(any, any)
-      there was one(quest).create(
-        Quest(
-          id = anyString,
-          cultureId = "cultureId",
-          info = QuestInfo(
-            authorId = u.id,
-            level = 10,
-            content = q.info.content,
-            vip = true,
-            solveCost = Assets(),
-            solveRewardWon = Assets(),
-            solveRewardLost = Assets())))
+      there was one(quest).create(q.copy(id = anyString))
     }
 
     "rewardQuestAuthor removes quest from daily income and timeline if it's banned" in context {
@@ -77,7 +55,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
       val q = createQuestStub(status = QuestStatus.CheatingBanned)
 
       user.addToAssets(any, any) returns Some(u)
-      user.storeProposalInDailyResult(any, any) returns Some(u)
+      user.storeQuestInDailyResult(any, any) returns Some(u)
       user.removeQuestIncomeFromDailyResult(any, any) returns Some(u)
       user.removeEntryFromTimeLineByObjectId(any, any) returns Some(u)
 

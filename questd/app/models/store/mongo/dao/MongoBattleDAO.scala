@@ -3,13 +3,13 @@ package models.store.mongo.dao
 import java.util.Date
 
 import com.mongodb.casbah.commons.MongoDBObject
-import models.domain._
+import models.domain.battle.{Battle, BattleStatus}
 import models.store.dao._
 import models.store.mongo.helpers._
 import play.Logger
 
 /**
- * DOA for Quest solution objects
+ * DOA for Battles
  */
 private[mongo] class MongoBattleDAO
   extends BaseMongoDAO[Battle](collectionName = "battles")
@@ -32,41 +32,41 @@ private[mongo] class MongoBattleDAO
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (status.length > 0) {
+    if (status.nonEmpty) {
       queryBuilder += ("info.status" -> MongoDBObject("$in" -> status.map(_.toString)))
     }
 
-    if (authorIds.length > 0) {
-      queryBuilder += ("info.authorIds" -> MongoDBObject("$in" -> authorIds))
+    if (authorIds.nonEmpty) {
+      queryBuilder += ("info.battleSides.authorId" -> MongoDBObject("$in" -> authorIds))
     }
 
-    if (solutionIds.length > 0) {
-      queryBuilder += ("info.solutionIds" -> MongoDBObject("$in" -> solutionIds))
+    if (solutionIds.nonEmpty) {
+      queryBuilder += ("info.battleSides.solutionId" -> MongoDBObject("$in" -> solutionIds))
     }
 
-    if (authorIdsExclude.length > 0) {
-      queryBuilder += ("info.authorIds" -> MongoDBObject("$nin" -> authorIdsExclude))
+    if (authorIdsExclude.nonEmpty) {
+      queryBuilder += ("info.battleSides.authorId" -> MongoDBObject("$nin" -> authorIdsExclude))
     }
 
-    if (levels != None) {
+    if (levels.isDefined) {
       queryBuilder += ("$and" -> Array(
         MongoDBObject("level" -> MongoDBObject("$gte" -> levels.get._1)),
         MongoDBObject("level" -> MongoDBObject("$lte" -> levels.get._2))))
     }
 
-    if (vip != None) {
+    if (vip.isDefined) {
       queryBuilder += ("vip" -> vip.get)
     }
 
-    if (ids.length > 0) {
+    if (ids.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
     }
 
-    if (idsExclude.length > 0) {
+    if (idsExclude.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$nin" -> idsExclude))
     }
 
-    if (cultureId != None) {
+    if (cultureId.isDefined) {
       queryBuilder += ("cultureId" -> cultureId.get)
     }
 
@@ -75,6 +75,7 @@ private[mongo] class MongoBattleDAO
     findByExample(
       example = queryBuilder.result(),
       sort = MongoDBObject(
+        "timelinePoints" -> -1,
         "lastModDate" -> 1),
       skip = skip)
   }
@@ -85,25 +86,77 @@ private[mongo] class MongoBattleDAO
   def updateStatus(
     id: String,
     newStatus: BattleStatus.Value,
-    addWinners: List[String] = List.empty): Option[Battle] = {
+    setWinnerSolutions: List[String] = List.empty): Option[Battle] = {
 
-    val queryBuilder = MongoDBObject.newBuilder
+    // REFACTOR: remove "for" here and make atomic call when this will be implemented.  https://jira.mongodb.org/browse/SERVER-1243
 
-    queryBuilder +=
-      ("$set" -> MongoDBObject(
-        "info.status" -> newStatus.toString,
-        "lastModDate" -> new Date()))
-
-    if (addWinners.length > 0) {
-      queryBuilder +=
-        ("$push" -> MongoDBObject(
-          "info.winnerIds" -> MongoDBObject(
-            "$each" -> addWinners)))
+    val winnersUpdated = setWinnerSolutions.foldLeft(true) {
+      case (true, winnerSolutionId) =>
+        findAndModify(
+          MongoDBObject(
+            "id" -> id,
+            "info.battleSides" -> MongoDBObject("$elemMatch" -> MongoDBObject("solutionId" -> winnerSolutionId))
+          ),
+          MongoDBObject(
+           "$set" -> MongoDBObject(
+             "info.battleSides.$.isWinner" -> true
+           )
+          )
+        ).isDefined
+      case (false, _) =>
+        false
     }
 
+    if (winnersUpdated) {
+      val queryBuilder = MongoDBObject.newBuilder
+
+      queryBuilder +=
+        ("$set" -> MongoDBObject(
+          "info.status" -> newStatus.toString,
+          "lastModDate" -> new Date()))
+
+      findAndModify(
+        id,
+        queryBuilder.result())
+    } else {
+      None
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def updatePoints(
+    id: String,
+    solutionId: String,
+    randomPointsChange: Int,
+    friendsPointsChange: Int): Option[Battle] = {
+
     findAndModify(
-      id,
-      queryBuilder.result())
+      MongoDBObject(
+        "id" -> id,
+        "info.battleSides" -> MongoDBObject("$elemMatch" -> MongoDBObject("solutionId" -> solutionId))
+      ),
+      MongoDBObject(
+        "$inc" -> MongoDBObject(
+          "info.battleSides.$.pointsRandom" -> randomPointsChange,
+          "info.battleSides.$.pointsFriends" -> friendsPointsChange),
+        "$set" -> MongoDBObject(
+          "lastModDate" -> new Date())))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def updatePoints(
+    id: String,
+    timelinePointsChange: Int): Option[Battle] = {
+
+    findAndModify(
+      MongoDBObject("id" -> id),
+      MongoDBObject(
+        "$inc" -> MongoDBObject(
+          "timelinePoints" -> timelinePointsChange)))
   }
 
   /**

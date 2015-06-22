@@ -4,11 +4,20 @@ import java.util.Date
 
 import com.mongodb.casbah.commons._
 import com.novus.salat._
-import models.domain._
-import models.domain.view.QuestView
+import models.domain.common.{Assets, ContentVote}
+import models.domain.user._
+import models.domain.user.auth.CrossPromotedApp
+import models.domain.user.battlerequests.BattleRequest
+import models.domain.user.dailyresults._
+import models.domain.user.friends.Friendship
+import models.domain.user.message.Message
+import models.domain.user.profile.{DailyTasks, Rights, Task}
+import models.domain.user.stats.SolutionsInBattle
+import models.domain.user.timeline.TimeLineEntry
 import models.store.dao._
-import models.store.mongo.helpers._
 import models.store.mongo.SalatContext._
+import models.store.mongo.helpers._
+import models.view.QuestView
 
 /**
  * DOA for User objects
@@ -20,15 +29,19 @@ private[mongo] class MongoUserDAO
   /**
    * Read by session id
    */
-  def readBySessionId(sessid: String): Option[User] = {
-    readByExample("auth.session", sessid)
+  def readBySessionId(sessionId: String): Option[User] = {
+    readByExample("auth.session", sessionId)
   }
 
   /**
    * Read by fb id
    */
-  def readBySNid(snName: String, snid: String): Option[User] = {
-    readByExample(s"auth.snids.$snName", snid)
+  def readBySNid(snName: String, userId: String): Option[User] = {
+    readByExample(
+      MongoDBObject(
+        "auth.loginMethods.methodName" -> snName,
+        "auth.loginMethods.userId" -> userId
+      ))
   }
 
   /**
@@ -57,7 +70,21 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
+   */
+  def addCrossPromotions(id: String, snName: String, apps: List[CrossPromotedApp]): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "auth.loginMethods.methodName" -> snName),
+      MongoDBObject(
+        "$addToSet" -> MongoDBObject(
+          "auth.loginMethods.$.crossPromotion.apps" -> MongoDBObject(
+            "$each" -> apps.map(grater[CrossPromotedApp].asDBObject)))))
+  }
+
+  /**
+   * @inheritdoc
    */
   def populateMustVoteSolutionsList(userIds: List[String], solutionId: String): Unit = {
     update(
@@ -100,20 +127,6 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def recordSolutionCreation(id: String, solutionId: String): Option[User] = {
-    val queryBuilder = MongoDBObject.newBuilder
-
-    queryBuilder += ("$push" -> MongoDBObject(
-      "stats.createdSolutions" -> solutionId))
-
-    findAndModify(
-      id,
-      queryBuilder.result())
-  }
-
-  /**
-   * @inheritdoc
-   */
   def recordQuestVote(id: String, questId: String, vote: ContentVote.Value): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -144,6 +157,36 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
+  def recordBattleVote(id: String, battleId: String, solutionId: String): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$set" -> MongoDBObject(
+      s"stats.votedBattles.$battleId" -> solutionId))
+
+    findAndModify(
+      MongoDBObject(
+        "id" -> id),
+      queryBuilder.result())
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def recordBattleParticipation(id: String, battleId: String, rivalSolutionIds: SolutionsInBattle): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$set" -> MongoDBObject(
+      s"stats.participatedBattles.$battleId" -> grater[SolutionsInBattle].asDBObject(rivalSolutionIds)))
+
+    findAndModify(
+      MongoDBObject(
+        "id" -> id),
+      queryBuilder.result())
+  }
+
+  /**
+   * @inheritdoc
+   */
   def setQuestBookmark(id: String, quest: QuestView): Option[User] = {
     findAndModify(
       id,
@@ -156,7 +199,7 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def recordQuestSolving(id: String, questId: String, removeBookmark: Boolean): Option[User] = {
+  def recordQuestSolving(id: String, questId: String, solutionId: String, removeBookmark: Boolean): Option[User] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -165,8 +208,8 @@ private[mongo] class MongoUserDAO
         "profile.questSolutionContext.bookmarkedQuest" -> ""))
     }
 
-    queryBuilder += ("$push" -> MongoDBObject(
-      "stats.solvedQuests" -> questId))
+    queryBuilder += ("$set" -> MongoDBObject(
+      s"stats.solvedQuests.$questId" -> solutionId))
 
     findAndModify(
       id,
@@ -266,27 +309,38 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def storeProposalInDailyResult(id: String, proposal: QuestProposalResult): Option[User] = {
+  def storeQuestInDailyResult(id: String, proposal: QuestResult): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$push" -> MongoDBObject(
-          "privateDailyResults.0.decidedQuestProposals" -> grater[QuestProposalResult].asDBObject(proposal))))
+          "privateDailyResults.0.decidedQuests" -> grater[QuestResult].asDBObject(proposal))))
   }
 
   /**
-   *
+   * @inheritdoc
    */
-  def storeSolutionInDailyResult(id: String, solution: QuestSolutionResult): Option[User] = {
+  def storeSolutionInDailyResult(id: String, solution: SolutionResult): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$push" -> MongoDBObject(
-          "privateDailyResults.0.decidedQuestSolutions" -> grater[QuestSolutionResult].asDBObject(solution))))
+          "privateDailyResults.0.decidedSolutions" -> grater[SolutionResult].asDBObject(solution))))
   }
 
   /**
-   *
+   * @inheritdoc
+   */
+  def storeBattleInDailyResult(id: String, battle: BattleResult): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$push" -> MongoDBObject(
+          "privateDailyResults.0.decidedBattles" -> grater[BattleResult].asDBObject(battle))))
+  }
+
+  /**
+   * @inheritdoc
    */
   def levelUp(id: String, ratingToNextLevel: Int): Option[User] = {
     findAndModify(
@@ -363,14 +417,24 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def updateFriendship(id: String, friendId: String, status: String): Option[User] = {
+  def updateFriendship(id: String, friendId: String, status: Option[String], referralStatus: Option[String]): Option[User] = {
+
+    val queryBuilder = MongoDBObject.newBuilder
+
+    status.foreach { status =>
+      queryBuilder += "friends.$.status" -> status
+    }
+
+    referralStatus.foreach { referralStatus =>
+      queryBuilder += "friends.$.referralStatus" -> referralStatus
+    }
+
     findAndModify(
       MongoDBObject(
         "id" -> id,
         "friends.friendId" -> friendId),
       MongoDBObject(
-        "$set" -> MongoDBObject(
-          "friends.$.status" -> status)))
+        "$set" -> queryBuilder.result()))
   }
 
   /**
@@ -482,13 +546,25 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
-  def addTasks(id: String, newTasks: List[Task]): Option[User] = {
+  def addTasks(id: String, newTasks: List[Task], addReward: Option[Assets] = None): Option[User] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$push" -> MongoDBObject(
+      "profile.dailyTasks.tasks" -> MongoDBObject(
+        "$each" -> newTasks.map(grater[Task].asDBObject))))
+
+    addReward match {
+      case Some(assets) =>
+        queryBuilder += ("$inc" -> MongoDBObject(
+          "profile.dailyTasks.reward.coins" -> assets.coins,
+          "profile.dailyTasks.reward.money" -> assets.money,
+          "profile.dailyTasks.reward.rating" -> assets.rating))
+      case _ =>
+    }
+
     findAndModify(
       id,
-      MongoDBObject(
-        "$push" -> MongoDBObject(
-          "profile.dailyTasks.tasks" -> MongoDBObject(
-            "$each" -> newTasks.map(grater[Task].asDBObject)))))
+      queryBuilder.result())
   }
 
   /**
@@ -577,7 +653,7 @@ private[mongo] class MongoUserDAO
       id,
       MongoDBObject(
         "$addToSet" -> MongoDBObject(
-          s"tutorialStates.$platform.closedElementIds" -> elementId)))
+          s"profile.tutorialStates.$platform.closedElementIds" -> elementId)))
   }
 
   /**
@@ -588,7 +664,7 @@ private[mongo] class MongoUserDAO
       id,
       MongoDBObject(
         "$addToSet" -> MongoDBObject(
-          s"tutorialStates.$platform.assignedTutorialTaskIds" -> taskId)))
+          s"profile.tutorialStates.$platform.usedTutorialTaskIds" -> taskId)))
   }
 
   /**
@@ -667,6 +743,31 @@ private[mongo] class MongoUserDAO
         "$pull" -> MongoDBObject(
           "timeLine" -> MongoDBObject(
           "objectId" -> objectId))))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$push" -> MongoDBObject(
+          "battleRequests" -> grater[BattleRequest].asDBObject(battleRequest))))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "battleRequests.mySolutionId" -> mySolutionId,
+        "battleRequests.opponentSolutionId" -> opponentSolutionId),
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "battleRequests.$.status" -> status)))
   }
 }
 

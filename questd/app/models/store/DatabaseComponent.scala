@@ -19,6 +19,7 @@ trait DatabaseComponent {
     val culture: CultureDAO
     val tutorial: TutorialDAO
     val tutorialTask: TutorialTaskDAO
+    val comment: CommentDAO
   }
 
 }

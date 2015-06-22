@@ -1,13 +1,13 @@
 package controllers.sn.component
 
-import controllers.sn.client.SocialNetoworkImpl
+import controllers.sn.client.SocialNetworkImpl
 
 trait SocialNetworkComponent {
 
   protected val sn: SocialNetwork
 
-  class SocialNetwork extends SocialNetoworkImpl {
-    
+  class SocialNetwork extends SocialNetworkImpl {
+
   }
 
 }

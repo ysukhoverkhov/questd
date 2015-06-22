@@ -1,6 +1,6 @@
 package controllers.sn.client
 
-import models.domain.Gender
+import models.domain.user.profile.Gender
 
 trait User extends Item {
 
@@ -24,4 +24,10 @@ trait User extends Item {
    * @return All current invitations
    */
   def invitations: List[Invitation]
+
+  /**
+   * @return List of the user ids in all other applications.
+   */
+  def idsInOtherApps: List[UserIdInApplication]
 }
+

@@ -1,6 +1,6 @@
 package logic
 
-import models.domain._
+import models.domain.user.profile.Functionality
 
 object constants {
 
@@ -8,18 +8,22 @@ object constants {
 
   // user level restriction constants.
   val restrictions: Map[Functionality.Value, Int] = Map(
-    Functionality.VoteQuestSolutions -> 1,
-    Functionality.AddToFollowing -> 2,
-    Functionality.SubmitPhotoResults -> 3,
-    Functionality.SubmitVideoResults -> 4,
-    Functionality.Report -> 5,
+    Functionality.VoteQuests -> 1,
+    Functionality.VoteSolutions -> 1,
+    Functionality.VoteBattles -> 1,
+    Functionality.VoteReviews -> 1,
+    Functionality.AddToFollowing -> 1,
+    Functionality.SubmitPhotoSolutions -> 2,
+    Functionality.ChallengeBattles -> 3, // TODO: write me in desdoc.
+    Functionality.Report -> 4,
+    Functionality.SubmitVideoSolutions -> 5,
     Functionality.InviteFriends -> 6,
     Functionality.SubmitPhotoQuests -> 7,
-    Functionality.SubmitVideoQuests -> 8,
-    Functionality.VoteQuests -> 10,
-    Functionality.VoteReviews -> 14,
-    Functionality.SubmitReviewsForResults -> 16,
-    Functionality.SubmitReviewsForProposals -> 18,
+    // Functionality.AssignQuests -> 8,
+    Functionality.SubmitReviewsForSolutions -> 9,
+    Functionality.SubmitReviewsForQuests -> 9,
+    Functionality.SubmitVideoQuests -> 10,
+
     Functionality.GiveRewards -> 20)
 
   def levelFor(f: Functionality.Value): Int = {
@@ -46,12 +50,6 @@ object constants {
 
   val MaxRewardedQuestSolutionsPerDay = 2
 
-  /**
-   * Quest proposing.
-   */
-  val QuestProposalCheatingPenalty = 10
-
-  val QuestProposalIACPenalty = 10
 
 
   /**
@@ -62,14 +60,19 @@ object constants {
   val NumberOfFavoriteThemesForOtherQuests = 1
 
   /**
-   * Multiplier is relative to base (average) rating for resolving quests per day.
+   * Multiplier relative to daily xp income to quest solving.
    */
-  val QuestLosingMultiplier = 0.6666667
+  val QuestSolvingMultiplier = 0.5
 
   /**
-   * Multiplier is relative to quest losing
+   * Multiplier is relative to base (average) rating for resolving quests per day.
    */
-  val QuestVictoryMultiplier = 2
+  val QuestLosingMultiplier = 1.0 / 3.0
+
+  /**
+   * Multiplier is relative to base (average) rating for resolving quests per day.
+   */
+  val QuestVictoryMultiplier = 2.0 / 3.0
 
   val QuestSolutionCheatingPenalty = 10
 
@@ -104,7 +107,7 @@ object constants {
    * Tasks
    */
   val DailyTasksRatingForCompleting = 250
-  val DailyTasksRatingDeviation = 0.15
+  val DailyTasksCoinsDeviation = 0.15
 
 }
 

@@ -1,13 +1,30 @@
 package models.store.dao
 
-import models.domain._
 import java.util.Date
 
-import models.domain.view.QuestView
+import models.domain.common.{Assets, ContentVote}
+import models.domain.user._
+import models.domain.user.auth.CrossPromotedApp
+import models.domain.user.battlerequests.BattleRequest
+import models.domain.user.dailyresults._
+import models.domain.user.friends.Friendship
+import models.domain.user.message.Message
+import models.domain.user.profile.{DailyTasks, Rights, Task}
+import models.domain.user.stats.SolutionsInBattle
+import models.domain.user.timeline.TimeLineEntry
+import models.view.QuestView
 
 trait UserDAO extends BaseDAO[User] {
 
-  def updateSessionId(id: String, sessionid: String): Option[User]
+  def updateSessionId(id: String, sessionId: String): Option[User]
+
+  /**
+   * Adds one or some cross promoted apps info.
+   * @param id Id of a user to modify
+   * @param snName name of network to modify.
+   * @param apps List of apps to add.
+   */
+  def addCrossPromotions(id: String, snName: String, apps: List[CrossPromotedApp]): Option[User]
 
   def readBySessionId(sessionid: String): Option[User]
   def readBySNid(snName:String, snid: String): Option[User]
@@ -24,14 +41,6 @@ trait UserDAO extends BaseDAO[User] {
    * @return Modified user.
    */
   def recordQuestCreation(id: String, questId: String): Option[User]
-
-  /**
-   * Records solution creation.
-   * @param id Id of user creating a solution.
-   * @param solutionId Id of a created solution.
-   * @return Modified user.
-   */
-  def recordSolutionCreation(id: String, solutionId: String): Option[User]
 
   /**
    * Records vote for quest proposal.
@@ -52,6 +61,26 @@ trait UserDAO extends BaseDAO[User] {
   def recordSolutionVote(id: String, solutionId: String, vote: ContentVote.Value): Option[User]
 
   /**
+   * Record vote of battle.
+   *
+   * @param id Id of user to record vote.
+   * @param battleId Battle id we voted.
+   * @param solutionId Solution we voted for.
+   * @return Updated user.
+   */
+  def recordBattleVote(id: String, battleId: String, solutionId: String): Option[User]
+
+  /**
+   * Records a battle user participated in.
+   *
+   * @param id Id of user.
+   * @param battleId Id of battle
+   * @param rivalSolutionIds Our rival in battle
+   * @return
+   */
+  def recordBattleParticipation(id: String, battleId: String, rivalSolutionIds: SolutionsInBattle): Option[User]
+
+  /**
    * Set quest bookmark for a user.
    * @param id Id of a user setting a bookmark.
    * @param questId Id of a quest set bookmark.
@@ -63,10 +92,11 @@ trait UserDAO extends BaseDAO[User] {
    * Records quest solving and optionally resets bookmark.
    * @param id Id of user solving a quest.
    * @param questId If of a quest to solve
+   * @param solutionId Id of solution we solved quest with.
    * @param removeBookmark Should we reset bookmark.
    * @return Modified user.
    */
-  def recordQuestSolving(id: String, questId: String, removeBookmark: Boolean): Option[User]
+  def recordQuestSolving(id: String, questId: String, solutionId: String, removeBookmark: Boolean): Option[User]
 
   /**
    * Updates cool down for inventing quests.
@@ -81,8 +111,9 @@ trait UserDAO extends BaseDAO[User] {
   def addQuestIncomeToDailyResult(id: String, questIncome: QuestIncome): Option[User]
   def removeQuestIncomeFromDailyResult(id: String, questId: String): Option[User]
   def storeQuestSolvingInDailyResult(id: String, questId: String, reward: Assets): Option[User]
-  def storeProposalInDailyResult(id: String, proposal: QuestProposalResult): Option[User]
-  def storeSolutionInDailyResult(id: String, solution: QuestSolutionResult): Option[User]
+  def storeQuestInDailyResult(id: String, proposal: QuestResult): Option[User]
+  def storeSolutionInDailyResult(id: String, solution: SolutionResult): Option[User]
+  def storeBattleInDailyResult(id: String, battle: BattleResult): Option[User]
 
   def levelUp(id: String, ratingToNextLevel: Int): Option[User]
   def setNextLevelRatingAndRights(id: String, newRatingToNextLevel: Int, rights: Rights): Option[User]
@@ -91,9 +122,9 @@ trait UserDAO extends BaseDAO[User] {
   def removeFromFollowing(id: String, idToRemove: String): Option[User]
 
   def askFriendship(id: String, idToAdd: String, myFriendship: Friendship, hisFriendship: Friendship): Option[User]
-  def updateFriendship(id: String, friendId: String, status: String): Option[User]
-  def addFriendship(id: String, friendship: Friendship): Option[User]
+  def updateFriendship(id: String, friendId: String, status: Option[String], referralStatus: Option[String]): Option[User]
   def updateFriendship(id: String, friendId: String, myStatus: String, friendStatus: String): Option[User]
+  def addFriendship(id: String, friendship: Friendship): Option[User]
   def removeFriendship(id: String, friendId: String): Option[User]
 
   def addMessage(id: String, message: Message): Option[User]
@@ -102,7 +133,7 @@ trait UserDAO extends BaseDAO[User] {
   def removeMessage(id: String, messageId: String): Option[User]
 
   def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User]
-  def addTasks(id: String, newTasks: List[Task]): Option[User]
+  def addTasks(id: String, newTasks: List[Task], addReward: Option[Assets] = None): Option[User]
   def incTask(id: String, taskId: String): Option[User]
   def setTasksCompletedFraction(id: String, completedFraction: Float): Option[User]
   def setTasksRewardReceived(id: String, rewardReceived: Boolean): Option[User]
@@ -149,4 +180,23 @@ trait UserDAO extends BaseDAO[User] {
    * @return user after modifications.
    */
   def removeEntryFromTimeLineByObjectId(id: String, entryId: String): Option[User]
+
+  /**
+   * Adds battle request to user.
+   *
+   * @param id Id of user to add request to.
+   * @param battleRequest Request to add.
+   * @return Modified user.
+   */
+  def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User]
+
+  /**
+   * Updates status of batle request.
+   *
+   * @param id Id of user to update request for.
+   * @param mySolutionId Id of user's challenged solution.
+   * @param opponentSolutionId Id of opponent's sopution.
+   * @param status new status.
+   */
+  def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User]
 }

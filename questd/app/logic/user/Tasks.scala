@@ -3,7 +3,10 @@ package logic.user
 import logic._
 import logic.constants._
 import logic.functions._
-import models.domain._
+import models.domain.common.Assets
+import models.domain.user._
+import models.domain.user.friends.FriendshipStatus
+import models.domain.user.profile.{TaskType, Task, DailyTasks, Functionality}
 
 trait Tasks { this: UserLogic =>
 
@@ -16,19 +19,23 @@ trait Tasks { this: UserLogic =>
    * List of tasks to give user for next day.
    */
   def getTasksForTomorrow = {
-    val dailyRatingReward = dailyTasksRatingReward
-    val allTasksCoinsReward = dailyTasksCoinsReward
+    if (user.profile.publicProfile.level < api.configNamed("Tutorial")(api.TutorialConfigParams.DailyTasksStartsFromLevel).toInt) {
+      DailyTasks(tasks = List.empty, reward = Assets())
+    } else {
+      val dailyRatingReward = dailyTasksRatingReward
+      val allTasksCoinsReward = dailyTasksCoinsReward
 
-    val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
-      case Some(t) => t :: c
-      case None => c
-    })
+      val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
+        case Some(t) => t :: c
+        case None => c
+      })
 
-    val tasksWithRewards = tasks.map { t =>
-      t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = DailyTasksRatingDeviation))
+      val tasksWithRewards = tasks.map { t =>
+        t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = DailyTasksCoinsDeviation))
+      }
+
+      DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
     }
-
-    DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
   }
 
   /**
@@ -49,17 +56,18 @@ trait Tasks { this: UserLogic =>
    */
   private def taskGenerationAlgorithms: Map[TaskType.Value, (User) => Option[Task]] = {
 
-    Map(TaskType.LikeSolutions -> createLikeSolutionsTask,
+    Map(
+      TaskType.LikeSolutions -> createLikeSolutionsTask,
       TaskType.CreateSolution -> createCreateSolutionTask,
       TaskType.AddToFollowing -> createAddToFollowingTask,
       TaskType.LikeQuests -> createLikeQuestsTask,
       TaskType.CreateQuest -> createCreateQuestTask,
       TaskType.VoteReviews -> createVoteReviewsTask,
       TaskType.SubmitReviewsForResults -> createSubmitReviewsForResultsTask,
-      TaskType.SubmitReviewsForProposals -> createSubmitReviewsForProposalsTask,
+      TaskType.SubmitReviewsForQuests -> createSubmitReviewsForQuestsTask,
       TaskType.GiveRewards -> createGiveRewardsTask,
       TaskType.LookThroughFriendshipProposals -> createReviewFriendshipRequestsTask,
-      TaskType.Client -> createClientTask)
+      TaskType.Custom -> createClientTask)
   }
 
   /**
@@ -75,24 +83,26 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating task for voting quests.
    */
-  private def createLikeSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteQuestSolutions) {
-    def likesCount = {
-      val mean = api.config(api.ConfigParams.SolutionVoteTaskCountMean).toDouble
-      val dev = api.config(api.ConfigParams.SolutionVoteTaskCountDeviation).toDouble
-      math.max(math.round(rand.nextGaussian(mean, dev)), 0).toInt
+  private def createLikeSolutionsTask(user: User) = ifHasRightTo(Functionality.VoteSolutions) {
+    {
+      val mean = api.config(api.DefaultConfigParams.SolutionVoteTaskCountMean).toDouble
+      val dev = api.config(api.DefaultConfigParams.SolutionVoteTaskCountDeviation).toDouble
+      math.round(rand.nextGaussian(mean, dev)).toInt
+    } match {
+      case likesCount if likesCount > 0 =>
+        Some(Task(
+          taskType = TaskType.LikeSolutions,
+          description = "",
+          requiredCount = likesCount))
+      case _ => None
     }
-
-    Some(Task(
-      taskType = TaskType.LikeSolutions,
-      description = "",
-      requiredCount = likesCount))
   }
 
   /**
    * Algorithm for generating task for submitting quest.
    */
-  private def createCreateSolutionTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoResults) {
-    val taskProbability = api.config(api.ConfigParams.CreateSolutionTaskProbability).toDouble
+  private def createCreateSolutionTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoSolutions) {
+    val taskProbability = api.config(api.DefaultConfigParams.CreateSolutionTaskProbability).toDouble
     if (canSolveQuestToday && rand.nextDouble() < taskProbability)
       Some(Task(
         taskType = TaskType.CreateSolution,
@@ -106,7 +116,7 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating tasks for following.
    */
   private def createAddToFollowingTask(user: User) = ifHasRightTo(Functionality.AddToFollowing) {
-    val prob = api.config(api.ConfigParams.AddToFollowingTaskProbability).toDouble
+    val prob = api.config(api.DefaultConfigParams.AddToFollowingTaskProbability).toDouble
     if (rand.nextDouble < prob)
       Some(Task(
         taskType = TaskType.AddToFollowing,
@@ -120,23 +130,25 @@ trait Tasks { this: UserLogic =>
    * Algorithm for creating task for votes for proposals.
    */
   private def createLikeQuestsTask(user: User) = ifHasRightTo(Functionality.VoteQuests) {
-    def likesCount = {
-      val mean = api.config(api.ConfigParams.QuestVoteTaskCountMean).toDouble
-      val dev = api.config(api.ConfigParams.QuestVoteTaskCountDeviation).toDouble
-      math.max(math.round(rand.nextGaussian(mean, dev)), 0).toInt
+    {
+      val mean = api.config(api.DefaultConfigParams.QuestVoteTaskCountMean).toDouble
+      val dev = api.config(api.DefaultConfigParams.QuestVoteTaskCountDeviation).toDouble
+      math.round(rand.nextGaussian(mean, dev)).toInt
+    } match {
+      case likesCount if likesCount > 0 =>
+        Some(Task(
+          taskType = TaskType.LikeQuests,
+          description = "",
+          requiredCount = likesCount))
+      case _ => None
     }
-
-    Some(Task(
-      taskType = TaskType.LikeQuests,
-      description = "",
-      requiredCount = likesCount))
   }
 
   /**
    * Algorithm for generating task for submitting quest proposal.
    */
   private def createCreateQuestTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
-    val taskProbability = api.config(api.ConfigParams.CreateQuestTaskProbability).toDouble
+    val taskProbability = api.config(api.DefaultConfigParams.CreateQuestTaskProbability).toDouble
     if (canProposeQuestToday && rand.nextDouble() < taskProbability)
       Some(Task(
         taskType = TaskType.CreateQuest,
@@ -160,7 +172,7 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating tasks for submiting reviews for solutions.
    */
-  private def createSubmitReviewsForResultsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForResults) {
+  private def createSubmitReviewsForResultsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForSolutions) {
     //    Some(Task(
     //      taskType = TaskType.SubmitReviewsForResults,
     //      description = "",
@@ -171,12 +183,15 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for generating tasks for submiting reviews for proposals.
    */
-  private def createSubmitReviewsForProposalsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForProposals) {
-    //    Some(Task(
-    //      taskType = TaskType.SubmitReviewsForProposals,
-    //      description = "",
-    //      requiredCount = 10))
-    None
+  private def createSubmitReviewsForQuestsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForQuests) {
+    val taskProbability = api.config(api.DefaultConfigParams.WriteCommentTaskProbability).toDouble
+    if (rand.nextDouble() < taskProbability)
+      Some(Task(
+        taskType = TaskType.SubmitReviewsForQuests,
+        description = "",
+        requiredCount = 1))
+    else
+      None
   }
 
   /**

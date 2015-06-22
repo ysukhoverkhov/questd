@@ -1,11 +1,12 @@
 package controllers.domain.app.quest
 
-import models.domain._
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.domain.helpers._
+import models.domain.common.ContentVote
+import models.domain.quest.{QuestStatus, Quest}
 import play.Logger
 
 case class UpdateQuestStatusRequest(quest: Quest)
@@ -21,9 +22,6 @@ case class VoteQuestRequest(
   quest: Quest,
   vote: ContentVote.Value)
 case class VoteQuestResult()
-
-case class CalculateProposalThresholdsRequest(proposalsVoted: Double, proposalsLiked: Double)
-case class CalculateProposalThresholdsResult()
 
 private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -86,7 +84,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     import request._
 
     {
-      db.quest.updatePoints(quest.id, pointsChange = -1)
+      db.quest.updatePoints(quest.id, timelinePointsChange = -1)
     } ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } map {
@@ -105,7 +103,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       } map {
         db.quest.updatePoints(
           id = quest.id,
-          pointsChange = ratio) ifSome { v =>
+          timelinePointsChange = ratio) ifSome { v =>
           updateQuestStatus(UpdateQuestStatusRequest(v))
         }
       } map {
@@ -119,13 +117,13 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
    */
   def voteQuest(request: VoteQuestRequest): ApiResult[VoteQuestResult] = handleDbException {
     import request._
-    import models.domain.ContentVote._
+    import ContentVote._
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
     val q = db.quest.updatePoints(
       id = quest.id,
-      pointsChange = checkInc(vote, Cool),
+      timelinePointsChange = checkInc(vote, Cool),
       likesChange = checkInc(vote, Cool),
       votersCountChange = 1,
       cheatingChange = checkInc(vote, Cheating),

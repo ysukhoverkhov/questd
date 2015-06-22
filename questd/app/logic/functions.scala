@@ -17,13 +17,13 @@ object functions {
   /**
    * Period in days to give players a task to make quest.
    */
-  def questProposalPeriod(level: Int): Int = 7
+  def questCreationPeriod(level: Int): Int = 7
 
   /**
    * Takes proposal period into account.
-   * @return Cost for inviting one friend to help with proposal.
+   * @return Cost for inviting one friend to help with quest.
    */
-  def coinsToInviteFriendForVoteQuestProposal(level: Int): Int = {
+  def coinsToInviteFriendForVoteQuest(level: Int): Int = {
     // THis will be redone anyways.
     4
   }
@@ -60,6 +60,14 @@ object functions {
    * @param level level of the quest.
    * How much rating we will receive for losing quest.
    */
+  def ratingToSolveQuest(level: Int): Int = {
+    math.round(ratingForSubmitResult(level) * QuestSolvingMultiplier).toInt
+  }
+
+  /**
+   * @param level level of the quest.
+   * How much rating we will receive for losing quest.
+   */
   def ratingToLoseQuest(level: Int): Int = {
     math.round(ratingForSubmitResult(level) * QuestLosingMultiplier).toInt
   }
@@ -69,7 +77,7 @@ object functions {
    * How much rating we will receive for winning quest.
    */
   def ratingToWinQuest(level: Int): Int = {
-    ratingToLoseQuest(level) * QuestVictoryMultiplier
+    math.round(ratingForSubmitResult(level) * QuestVictoryMultiplier).toInt
   }
 
   /**

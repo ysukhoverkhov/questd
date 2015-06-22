@@ -1,8 +1,10 @@
 package controllers.web.rest.component
 
+import controllers.domain.app.misc.{GetCountryListRequest, GetCountryListResult}
 import controllers.domain.app.user._
-import controllers.web.rest.component.helpers._
-import models.domain.{Gender, Profile}
+import controllers.web.helpers._
+import models.domain.user.profile.{Profile, Gender}
+
 
 private object ProfileWSImplTypes {
 

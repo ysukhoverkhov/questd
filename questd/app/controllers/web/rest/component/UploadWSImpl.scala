@@ -3,7 +3,7 @@ package controllers.web.rest.component
 import java.util.UUID
 
 import controllers.domain.OkApiResult
-import controllers.web.rest.component.helpers._
+import controllers.web.helpers._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.Future

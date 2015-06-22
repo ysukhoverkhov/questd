@@ -6,6 +6,7 @@ import controllers.domain.app.user._
 import controllers.tasks.crawlers.base.BaseCrawler
 import models.domain._
 import components.random.RandomComponent
+import models.domain.user.User
 
 object ShiftUserStats {
   def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {

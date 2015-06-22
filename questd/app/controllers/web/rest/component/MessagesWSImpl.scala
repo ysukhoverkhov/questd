@@ -1,9 +1,9 @@
 package controllers.web.rest.component
 
 import controllers.domain.app.user._
-import controllers.web.rest.component.helpers._
+import controllers.web.helpers._
 
-private object MessagesWSImpl {
+private object MessagesWSImplTypes {
 
   case class WSRemoveMessageRequest(
     /// Id of a message to remove.
@@ -12,14 +12,12 @@ private object MessagesWSImpl {
 }
 
 trait MessagesWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
-
-  import MessagesWSImpl._
+  import MessagesWSImplTypes.{WSRemoveMessageRequest, WSRemoveMessageResult}
 
   def removeMessage() = wrapJsonApiCallReturnBody[WSRemoveMessageResult] { (js, r) =>
     val v = Json.read[WSRemoveMessageRequest](js.toString)
 
     api.removeMessage(RemoveMessageRequest(r.user, v.id))
   }
-
 }
 

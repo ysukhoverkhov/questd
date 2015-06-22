@@ -9,43 +9,49 @@ trait ConfigHolder { this: APIAccessor =>
   /**
    *  Name of config section we use to store our configuration.
    */
-  def configSectionName: String
+  protected def defaultSectionName: String
 
   /**
    * Default configuration if empty or should be reset.
    */
-  def defaultConfiguration: ConfigSection
+  protected def defaultConfiguration: Map[String, ConfigSection]
+
 
   /**
    * Read values from configuration.
    */
-  def config: ConfigSection = {
-    api.getConfigSection(GetConfigSectionRequest(configSectionName)) match {
+  def config: ConfigSection = configNamed(defaultSectionName)
+
+  /**
+   * Read values from configuration.
+   */
+  def configNamed(sectionName: String): ConfigSection = {
+    api.getConfigSection(GetConfigSectionRequest(sectionName)) match {
       case OkApiResult(GetConfigSectionResult(Some(c: ConfigSection))) =>
-        if (c.values.keySet == defaultConfiguration.values.keySet)
+        if (c.values.keySet == defaultConfiguration(sectionName).values.keySet)
           c
         else {
-          resetConfig()
-          defaultConfiguration
+          resetConfigSection(sectionName)
+          defaultConfiguration(sectionName)
         }
       case _ =>
-        resetConfig()
-        defaultConfiguration
+        resetConfigSection(sectionName)
+        defaultConfiguration(sectionName)
     }
   }
 
   /**
    * Updates a field in configuration section.
    */
-  def updateConfig(field: (String, String)): Unit = {
-    api.setConfigSection(SetConfigSectionRequest(config.copy(values = config.values + field)))
+  def updateConfig(field: (String, String), sectionName: String = defaultSectionName): Unit = {
+    api.setConfigSection(SetConfigSectionRequest(configNamed(sectionName).copy(values = config.values + field)))
   }
 
   /**
    * Resets component's configuration to default one.
    */
-  def resetConfig(): Unit = {
-    api.setConfigSection(SetConfigSectionRequest(defaultConfiguration))
+  private def resetConfigSection(sectionName: String): Unit = {
+    api.setConfigSection(SetConfigSectionRequest(defaultConfiguration(sectionName)))
   }
 }
 

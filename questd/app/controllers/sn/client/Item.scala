@@ -8,12 +8,12 @@ package controllers.sn.client
 trait Item {
 
   /**
+   * @return Identifier of the item in SN.
+   */
+  def snId: String
+
+  /**
    * @return name of our social network.
    */
   def snName: String
-
-  /**
-   * @return Identifier of the invitation in SN.
-   */
-  def snId: String
 }

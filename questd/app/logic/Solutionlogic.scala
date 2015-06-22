@@ -1,7 +1,7 @@
 package logic
 
-import models.domain._
 import controllers.domain.DomainAPIComponent
+import models.domain.solution.Solution
 
 
 class SolutionLogic(
@@ -13,8 +13,8 @@ class SolutionLogic(
    */
   def shouldBanCheating = {
     val votesToThreatAsCheating = Math.max(
-      api.config(api.ConfigParams.SolutionCheatingRatio).toDouble * qs.rating.reviewsCount,
-      api.config(api.ConfigParams.SolutionMinCheatingVotes).toLong)
+      api.config(api.DefaultConfigParams.SolutionCheatingRatio).toDouble * qs.rating.votersCount,
+      api.config(api.DefaultConfigParams.SolutionMinCheatingVotes).toLong)
 
     qs.rating.cheating > votesToThreatAsCheating
   }
@@ -24,8 +24,8 @@ class SolutionLogic(
    */
   def shouldBanIAC = {
     val pointsToBan = Math.max(
-      api.config(api.ConfigParams.SolutionIACRatio).toDouble * qs.rating.reviewsCount,
-      api.config(api.ConfigParams.SolutionMinIACVotes).toLong)
+      api.config(api.DefaultConfigParams.SolutionIACRatio).toDouble * qs.rating.votersCount,
+      api.config(api.DefaultConfigParams.SolutionMinIACVotes).toLong)
 
     val maxPoints = List(
       qs.rating.iacpoints.porn,
@@ -34,13 +34,5 @@ class SolutionLogic(
     maxPoints > pointsToBan
   }
 
-  /**
-   * Calculate points for quest solution voting.
-   */
-  def votingPoints = {
-    List(
-      qs.rating.pointsRandom,
-      qs.rating.pointsFriends * constants.FriendsVoteMult).sum
-  }
 }
 

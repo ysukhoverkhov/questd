@@ -1,9 +1,8 @@
 package controllers.domain.admin
 
+import models.domain.quest.{QuestStatus, Quest}
 import play.Logger
-
 import components.DBAccessor
-import models.domain._
 import controllers.domain.helpers._
 import controllers.domain._
 
@@ -59,7 +58,7 @@ private[domain] trait QuestsAdminAPI { this: DBAccessor =>
               content = q.info.content.copy(
                 description = request.description)),
             rating = q.rating.copy(
-              points = request.points,
+              timelinePoints = request.points,
               cheating = request.cheating,
               votersCount = request.votersCount)))
 

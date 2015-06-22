@@ -5,7 +5,10 @@ import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import logic.QuestLogic
-import models.domain._
+import models.domain.quest.{Quest, QuestInfo, QuestInfoContent, QuestStatus}
+import models.domain.user._
+import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
 
 case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List.empty)
 case class CreateQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -25,7 +28,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
         import request.{user => u}
 
         // creating quest
-        require(u.demo.cultureId != None)
+        require(u.demo.cultureId.isDefined)
 
         val culture = u.demo.cultureId.get
         val level = u.profile.publicProfile.level
@@ -38,15 +41,17 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
             content = request.quest,
             vip = u.profile.publicProfile.vip,
             solveCost = QuestLogic.costOfSolvingQuest(level),
-            solveRewardWon = QuestLogic.rewardForWinningQuest(level, this),
-            solveRewardLost = QuestLogic.rewardForLosingQuest(level, this)))
+            solveReward = QuestLogic.rewardForSolvingQuest(level, this),
+            victoryReward = QuestLogic.rewardForWinningBattle(level, this),
+            defeatReward = QuestLogic.rewardForLosingBattle(level, this)
+          ))
 
         db.quest.create(quest)
 
         // making all db calls
         runWhileSome(u)(
         { u: User =>
-          if ((config(api.ConfigParams.DebugDisableProposalCoolDown) == "1") || u.profile.publicProfile.vip) {
+          if ((config(api.DefaultConfigParams.DebugDisableQuestCreationCoolDown) == "1") || u.profile.publicProfile.vip) {
             Some(u)
           } else {
             db.user.updateQuestCreationCoolDown(
@@ -93,20 +98,27 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
     (quest.status match {
 
       case QuestStatus.CheatingBanned =>
-        storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForCheatingQuest)))
+        storeQuestInDailyResult(StoreQuestInDailyResultRequest(
+          user = author,
+          quest = request.quest,
+          reward = -author.penaltyForCheatingQuest))
         removeQuestIncomeFromDailyResult(RemoveQuestIncomeFromDailyResultRequest(author, request.quest.id))
         removeFromTimeLine(RemoveFromTimeLineRequest(author, request.quest.id))
 
       case QuestStatus.IACBanned =>
-        storeProposalInDailyResult(StoreProposalInDailyResultRequest(author, request.quest, penalty = Some(author.penaltyForIACQuest)))
+        storeQuestInDailyResult(StoreQuestInDailyResultRequest(
+          user = author,
+          quest = request.quest,
+          reward = -author.penaltyForIACQuest))
         removeQuestIncomeFromDailyResult(RemoveQuestIncomeFromDailyResultRequest(author, request.quest.id))
         removeFromTimeLine(RemoveFromTimeLineRequest(author, request.quest.id))
 
       case QuestStatus.OldBanned =>
-        OkApiResult(StoreProposalInDailyResultResult(author))
+        // We do nothing here.
+        OkApiResult(RewardQuestAuthorResult())
 
       case _ =>
-        InternalErrorApiResult[StoreProposalInDailyResultResult]("Rewarding quest author but quest status is Unexpected")
+        InternalErrorApiResult[StoreQuestInDailyResultResult]("Rewarding quest author but quest status is Unexpected")
     }) map {
       OkApiResult(RewardQuestAuthorResult())
     }

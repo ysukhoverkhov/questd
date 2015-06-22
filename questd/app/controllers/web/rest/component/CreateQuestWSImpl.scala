@@ -1,8 +1,8 @@
 package controllers.web.rest.component
 
 import controllers.domain.app.user._
-import controllers.web.rest.component.helpers._
-import models.domain.QuestInfoContent
+import controllers.web.helpers._
+import models.domain.quest.QuestInfoContent
 
 private object CreateQuestWSImplTypes {
 
@@ -28,7 +28,7 @@ trait CreateQuestWSImpl extends QuestController with SecurityWSImpl with CommonF
 
   import controllers.web.rest.component.CreateQuestWSImplTypes._
 
-  def proposeQuest = wrapJsonApiCallReturnBody[WSCreateQuestResult] { (js, r) =>
+  def createQuest = wrapJsonApiCallReturnBody[WSCreateQuestResult] { (js, r) =>
     val v = Json.read[WSCreateQuestRequest](js)
 
     api.createQuest(CreateQuestRequest(r.user, v))

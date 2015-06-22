@@ -3,7 +3,7 @@ package logic
 import components.{APIAccessor, RandomAccessor}
 import components.random.RandomComponent
 import controllers.domain.DomainAPIComponent
-import controllers.domain.config._ConfigParams
+import controllers.domain.config.{_TutorialConfigParams, _DefaultConfigParams}
 import controllers.sn.component.SocialNetworkComponent
 import models.domain.admin.ConfigSection
 import models.store.DatabaseComponent
@@ -31,51 +31,69 @@ private[logic] abstract class BaseLogicSpecs extends Specification
   /**
    * Creates stub config for our tests.
    */
-  protected final def createStubConfig = {
-    api.ConfigParams returns _ConfigParams
+  protected final def createStubDefaultConfig = {
+    api.DefaultConfigParams returns _DefaultConfigParams
 
-    val config = mock[ConfigSection]
+    val configSection = mock[ConfigSection]
 
-    config.apply(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests) returns "5"
-    config.apply(api.ConfigParams.QuestProbabilityStartingVIPQuests) returns "0.50"
-    config.apply(api.ConfigParams.QuestProbabilityStartingFriendQuests) returns "0.20"
-    config.apply(api.ConfigParams.QuestProbabilityStartingFollowingQuests) returns "0.20"
+    configSection.apply(api.DefaultConfigParams.QuestProbabilityLevelsToGiveStartingQuests) returns "5"
+    configSection.apply(api.DefaultConfigParams.QuestProbabilityStartingVIPQuests) returns "0.50"
+    configSection.apply(api.DefaultConfigParams.QuestProbabilityStartingFriendQuests) returns "0.20"
+    configSection.apply(api.DefaultConfigParams.QuestProbabilityStartingFollowingQuests) returns "0.20"
 
-    config.apply(api.ConfigParams.QuestProbabilityFriends) returns "0.25"
-    config.apply(api.ConfigParams.QuestProbabilityFollowing) returns "0.45"
-    config.apply(api.ConfigParams.QuestProbabilityVIP) returns "0.10"
+    configSection.apply(api.DefaultConfigParams.QuestProbabilityFriends) returns "0.25"
+    configSection.apply(api.DefaultConfigParams.QuestProbabilityFollowing) returns "0.45"
+    configSection.apply(api.DefaultConfigParams.QuestProbabilityVIP) returns "0.10"
 
-    config.apply(api.ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions) returns "5"
-    config.apply(api.ConfigParams.SolutionProbabilityStartingVIPSolutions) returns "0.50"
-    config.apply(api.ConfigParams.SolutionProbabilityStartingFriendSolutions) returns "0.20"
-    config.apply(api.ConfigParams.SolutionProbabilityStartingFollowingSolutions) returns "0.20"
+    configSection.apply(api.DefaultConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions) returns "5"
+    configSection.apply(api.DefaultConfigParams.SolutionProbabilityStartingVIPSolutions) returns "0.50"
+    configSection.apply(api.DefaultConfigParams.SolutionProbabilityStartingFriendSolutions) returns "0.20"
+    configSection.apply(api.DefaultConfigParams.SolutionProbabilityStartingFollowingSolutions) returns "0.20"
 
-    config.apply(api.ConfigParams.SolutionProbabilityFriends) returns "0.25"
-    config.apply(api.ConfigParams.SolutionProbabilityFollowing) returns "0.25"
-    config.apply(api.ConfigParams.SolutionProbabilityLiked) returns "0.20"
-    config.apply(api.ConfigParams.SolutionProbabilityVIP) returns "0.10"
+    configSection.apply(api.DefaultConfigParams.SolutionProbabilityFriends) returns "0.25"
+    configSection.apply(api.DefaultConfigParams.SolutionProbabilityFollowing) returns "0.25"
+    configSection.apply(api.DefaultConfigParams.SolutionProbabilityLiked) returns "0.20"
+    configSection.apply(api.DefaultConfigParams.SolutionProbabilityVIP) returns "0.10"
 
-    config.apply(api.ConfigParams.BattleProbabilityLevelsToGiveStartingBattles) returns "5"
-    config.apply(api.ConfigParams.BattleProbabilityStartingVIPBattles) returns "0.50"
-    config.apply(api.ConfigParams.BattleProbabilityFriends) returns "0.25"
-    config.apply(api.ConfigParams.BattleProbabilityFollowing) returns "0.25"
-    config.apply(api.ConfigParams.BattleProbabilityLikedSolutions) returns "0.20"
-    config.apply(api.ConfigParams.BattleProbabilityVIP) returns "0.10"
+    configSection.apply(api.DefaultConfigParams.BattleProbabilityLevelsToGiveStartingBattles) returns "5"
+    configSection.apply(api.DefaultConfigParams.BattleProbabilityStartingVIPBattles) returns "0.50"
+    configSection.apply(api.DefaultConfigParams.BattleProbabilityFriends) returns "0.25"
+    configSection.apply(api.DefaultConfigParams.BattleProbabilityFollowing) returns "0.25"
+    configSection.apply(api.DefaultConfigParams.BattleProbabilityLikedSolutions) returns "0.20"
+    configSection.apply(api.DefaultConfigParams.BattleProbabilityVIP) returns "0.10"
 
-    config.apply(api.ConfigParams.ProposalMaxDescriptionLength) returns "100"
+    configSection.apply(api.DefaultConfigParams.QuestMaxDescriptionLength) returns "100"
+    configSection.apply(api.DefaultConfigParams.CommentsMaxLength) returns "420"
 
-    config.apply(api.ConfigParams.SolutionVoteTaskCountMean) returns "3"
-    config.apply(api.ConfigParams.SolutionVoteTaskCountDeviation) returns "1"
-    config.apply(api.ConfigParams.CreateSolutionTaskProbability) returns "0.5"
-    config.apply(api.ConfigParams.AddToFollowingTaskProbability) returns "0.3"
-    config.apply(api.ConfigParams.QuestVoteTaskCountMean) returns "3"
-    config.apply(api.ConfigParams.QuestVoteTaskCountDeviation) returns "1"
-    config.apply(api.ConfigParams.CreateQuestTaskProbability) returns "0.3"
+    configSection.apply(api.DefaultConfigParams.SolutionVoteTaskCountMean) returns "3"
+    configSection.apply(api.DefaultConfigParams.SolutionVoteTaskCountDeviation) returns "1"
+    configSection.apply(api.DefaultConfigParams.CreateSolutionTaskProbability) returns "0.5"
+    configSection.apply(api.DefaultConfigParams.AddToFollowingTaskProbability) returns "0.3"
+    configSection.apply(api.DefaultConfigParams.QuestVoteTaskCountMean) returns "3"
+    configSection.apply(api.DefaultConfigParams.QuestVoteTaskCountDeviation) returns "1"
+    configSection.apply(api.DefaultConfigParams.CreateQuestTaskProbability) returns "0.3"
+    configSection.apply(api.DefaultConfigParams.WriteCommentTaskProbability) returns "0.3"
 
-    config.apply(api.ConfigParams.FavoriteThemesShare) returns "0.20"
-    config.apply(api.ConfigParams.FavoriteThemesProbability) returns "0.75"
+    configSection.apply(api.DefaultConfigParams.FavoriteThemesShare) returns "0.20"
+    configSection.apply(api.DefaultConfigParams.FavoriteThemesProbability) returns "0.75"
 
-    config
+    configSection
   }
 
+  protected final def createStubTutorialConfig = {
+    api.TutorialConfigParams returns _TutorialConfigParams
+
+    val configSection = mock[ConfigSection]
+
+    configSection.apply(api.TutorialConfigParams.DailyTasksStartsFromLevel) returns "2"
+
+    configSection
+  }
+
+  protected final def applyConfigMock(): Unit = {
+    api.config returns createStubDefaultConfig
+    api.configNamed("Tutorial") returns createStubTutorialConfig
+  }
 }
+
+

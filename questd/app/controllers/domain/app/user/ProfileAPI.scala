@@ -5,13 +5,14 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import logic.constants
-import models.domain._
+import models.domain.common.Assets
+import models.domain.culture.Culture
+import models.domain.user._
+import models.domain.user.friends.ReferralStatus
+import models.domain.user.profile.{Functionality, Rights, Profile, Gender}
 import play.{Logger, Play}
 
-case class GetAllUsersRequest()
-case class GetAllUsersResult(users: Iterator[User])
-
-case class AdjustAssetsRequest(user: User, reward: Option[Assets] = None, cost: Option[Assets] = None)
+case class AdjustAssetsRequest(user: User, change: Assets)
 case class AdjustAssetsResult(user: User)
 
 case class CheckIncreaseLevelRequest(user: User)
@@ -21,10 +22,7 @@ case class GetRightsAtLevelsRequest(user: User, levelFrom: Int, levelTo: Int)
 case class GetRightsAtLevelsResult(rights: List[Rights])
 
 case class GetLevelsForRightsRequest(user: User, functionality: List[Functionality.Value])
-case class GetLevelsForRightsResult(levels: Map[Functionality.Value, Int])
-
-case class SetDebugRequest(user: User, debug: String)
-case class SetDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class GetLevelsForRightsResult(levels: Map[String, Int])
 
 case class SetGenderRequest(user: User, gender: Gender.Value)
 case class SetGenderResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -35,21 +33,10 @@ case class SetCityResult(allowed: ProfileModificationResult, profile: Option[Pro
 case class SetCountryRequest(user: User, country: String)
 case class SetCountryResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class GetCountryListRequest(user: User)
-case class GetCountryListResult(countries: List[String])
-
 case class UpdateUserCultureRequest(user: User)
 case class UpdateUserCultureResult(user: User)
 
-
 private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
-
-  /**
-   * Get iterator for all users.
-   */
-  def getAllUsers(request: GetAllUsersRequest): ApiResult[GetAllUsersResult] = handleDbException {
-    OkApiResult(GetAllUsersResult(db.user.all))
-  }
 
   /**
    * Adjust assets value and performs other modifications on profile because of this.
@@ -59,14 +46,12 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     Logger.debug("API - adjustAssets for user " + user.id)
 
-    val del = reward.getOrElse(Assets()) - cost.getOrElse(Assets())
-
-    val del2 = if ((del + user.profile.assets).rating < 0)
-      Assets(del.coins, del.money, -user.profile.assets.rating)
+    val delta = if ((change + user.profile.assets).rating < 0)
+      Assets(change.coins, change.money, -user.profile.assets.rating)
     else
-      del
+      change
 
-    db.user.addToAssets(user.id, del2) ifSome { u =>
+    db.user.addToAssets(user.id, delta) ifSome { u =>
       checkIncreaseLevel(CheckIncreaseLevelRequest(u)) map { r => OkApiResult(AdjustAssetsResult(r.user)) }
     }
   }
@@ -81,6 +66,19 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
           user.id,
           user.ratingToNextLevel,
           user.calculateRights) ifSome { user =>
+
+          def userFishingId(user: User): String = {
+            user.auth.loginMethods.find(_.methodName == "FB")
+              .fold("missing")(_.crossPromotion.apps.find(_.appName == "fishing_paradise").fold("missing")(_.userId))
+          }
+
+          val myIdInFishing = userFishingId(user)
+          val referrerIdInFishing = user.friends.find(_.referralStatus == ReferralStatus.ReferredBy).fold("missing")(f => db.user.readById(f.friendId).fold("missing")(userFishingId))
+
+          Logger.error(s"User ${user.id} leveled up to level ${user.profile.publicProfile.level}. " +
+            s"His fishing id is $myIdInFishing. " +
+            s"His referrer fishing id is $referrerIdInFishing.")
+
           OkApiResult(CheckIncreaseLevelResult(user))
         }
       }
@@ -107,21 +105,9 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get level required to get a right.
    */
   def getLevelsForRights(request: GetLevelsForRightsRequest): ApiResult[GetLevelsForRightsResult] = handleDbException {
-    val rv = constants.restrictions.filterKeys(f => request.functionality.contains(f))
+    val rv = constants.restrictions.filterKeys(f => request.functionality.contains(f)).map(r => r._1.toString -> r._2)
 
     OkApiResult(GetLevelsForRightsResult(rv))
-  }
-
-  /**
-   * Updates debug string in user profile.
-   */
-  def setDebug(request: SetDebugRequest): ApiResult[SetDebugResult] = handleDbException {
-    import request._
-
-    db.user.setDebug(user.id, debug) ifSome { v =>
-      OkApiResult(SetDebugResult(OK, Some(v.profile)))
-    }
-
   }
 
   /**
@@ -152,7 +138,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def setCountry(request: SetCountryRequest): ApiResult[SetCountryResult] = handleDbException {
     import request._
 
-    val countries = scala.io.Source.fromFile("conf/countries.txt", "utf-8").getLines().toList
+    val countries = scala.io.Source.fromFile(Play.application().getFile("conf/countries.txt"), "utf-8").getLines().toList
 
     if (!countries.contains(country)) {
       OkApiResult(SetCountryResult(OutOfContent, None))
@@ -163,15 +149,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         }
       }
     }
-  }
-
-  /**
-   * Get list of possible countries.
-   */
-  def getCountryList(request: GetCountryListRequest): ApiResult[GetCountryListResult] = handleDbException {
-    val countries = scala.io.Source.fromFile(Play.application().getFile("conf/countries.txt")).getLines().toList
-
-    OkApiResult(GetCountryListResult(countries))
   }
 
   /**

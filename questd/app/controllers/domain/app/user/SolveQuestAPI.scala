@@ -5,8 +5,11 @@ import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.quest.SolveQuestUpdateRequest
 import controllers.domain.helpers._
-import models.domain._
-import models.domain.view.QuestView
+import models.domain.solution.{Solution, SolutionInfo, SolutionInfoContent, SolutionStatus}
+import models.domain.user._
+import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
+import models.view.QuestView
 import play.Logger
 
 import scala.language.postfixOps
@@ -15,9 +18,9 @@ case class SolveQuestRequest(
   user: User,
   questId: String,
   solution: SolutionInfoContent)
-case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, solutionId: Option[String] = None)
 
-case class RewardSolutionAuthorRequest(solution: Solution, author: User, battle: Option[Battle] = None)
+case class RewardSolutionAuthorRequest(solution: Solution, author: User)
 case class RewardSolutionAuthorResult()
 
 case class BookmarkQuestRequest(user: User, questId: String)
@@ -46,7 +49,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
             import request.{user => u}
 
-            require(u.demo.cultureId != None)
+            require(u.demo.cultureId.isDefined)
 
             // creating solution.
             val culture = u.demo.cultureId.get
@@ -68,18 +71,15 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               db.user.recordQuestSolving(
                 u.id,
                 questToSolve.id,
-                u.profile.questSolutionContext.bookmarkedQuest.map(_.id) == Some(questToSolve.id))
-            }, { u: User =>
-              db.user.recordSolutionCreation(
-                u.id,
-                sol.id)
+                sol.id,
+                u.profile.questSolutionContext.bookmarkedQuest.map(_.id).contains(questToSolve.id))
             }) ifSome { u =>
 
               // Running API actions
               // Adjusting assets for solving quests.
               adjustAssets(AdjustAssetsRequest(
                 user = u,
-                cost = Some(questToSolve.info.solveCost)))
+                change = -questToSolve.info.solveCost + questToSolve.info.solveReward))
             } map { r =>
               makeTask(MakeTaskRequest(r.user, taskType = Some(TaskType.CreateSolution)))
             } map { r =>
@@ -117,7 +117,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               } map {
                 tryCreateBattle(TryCreateBattleRequest(sol))
               } map {
-                OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
+                OkApiResult(SolveQuestResult(
+                  allowed = OK,
+                  profile = Some(r.user.profile),
+                  solutionId = Some(sol.id)))
               }
             }
 
@@ -145,38 +148,25 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
     try {
       val r = solution.status match {
-        case SolutionStatus.WaitingForCompetitor =>
-          InternalErrorApiResult("We are rewarding player for solution what is waiting for competitor")
+        case SolutionStatus.InRotation =>
+          InternalErrorApiResult("We are rewarding player for solution what is in rotation")
 
-        case SolutionStatus.OnVoting =>
-          InternalErrorApiResult("We are rewarding player for solution what is on voting.")
-
-        case SolutionStatus.Won =>
-          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
-            user = author,
-            solution = request.solution,
-            battle = request.battle,
-            reward = Some(q.info.solveRewardWon)))
-
-        case SolutionStatus.Lost =>
-          storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
-            user = author,
-            solution = request.solution,
-            battle = request.battle,
-            reward = Some(q.info.solveRewardLost)))
+        case SolutionStatus.OldBanned =>
+          // We do nothing here.
+          OkApiResult(RewardSolutionAuthorResult())
 
         case SolutionStatus.CheatingBanned =>
           storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
             user = author,
             solution = request.solution,
-            penalty = Some(q.penaltyForCheatingSolution)))
+            reward = -q.penaltyForCheatingSolution))
           removeFromTimeLine(RemoveFromTimeLineRequest(author, request.solution.id))
 
         case SolutionStatus.IACBanned =>
           storeSolutionInDailyResult(StoreSolutionInDailyResultRequest(
             user = author,
             solution = request.solution,
-            penalty = Some(q.penaltyForIACSolution)))
+            reward = -q.penaltyForIACSolution))
           removeFromTimeLine(RemoveFromTimeLineRequest(author, request.solution.id))
       }
 

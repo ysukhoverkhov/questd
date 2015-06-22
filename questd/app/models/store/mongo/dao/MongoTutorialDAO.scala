@@ -3,6 +3,7 @@ package models.store.mongo.dao
 import com.mongodb.casbah.commons.MongoDBObject
 import com.novus.salat._
 import models.domain._
+import models.domain.tutorial.{Tutorial, TutorialElement}
 import models.store.dao._
 import models.store.mongo.helpers._
 import models.store.mongo.SalatContext._

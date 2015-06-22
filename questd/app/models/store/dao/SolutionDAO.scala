@@ -1,6 +1,6 @@
 package models.store.dao
 
-import models.domain._
+import models.domain.solution.{Solution, SolutionStatus}
 
 trait SolutionDAO extends BaseDAO[Solution] {
 
@@ -22,18 +22,16 @@ trait SolutionDAO extends BaseDAO[Solution] {
 
   def updateStatus(
     id: String,
-    newStatus: SolutionStatus.Value,
-    battleId: Option[String] = None): Option[Solution]
+    newStatus: SolutionStatus.Value): Option[Solution]
+
+  def addParticipatedBattle(id: String, battleId: String): Option[Solution]
 
   def updatePoints(
     id: String,
-
-    reviewsCountChange: Int = 0,
-    pointsRandomChange: Int = 0,
-    pointsFriendsChange: Int = 0,
-    likesCountChange: Int = 0,
+    timelinePointsChange: Int,
+    likesChange: Int = 0,
+    votersCountChange: Int = 0,
     cheatingChange: Int = 0,
-
     spamChange: Int = 0,
     pornChange: Int = 0): Option[Solution]
 

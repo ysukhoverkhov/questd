@@ -2,7 +2,7 @@ package controllers.domain.app.user
 
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{OkApiResult, BaseAPISpecs}
-import models.domain._
+import models.domain.user.friends.{FriendshipStatus, Friendship}
 import testhelpers.domainstubs._
 
 class FriendsAPISpecs extends BaseAPISpecs {

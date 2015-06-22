@@ -4,11 +4,13 @@ package models.store.mongo
 
 import java.util.Date
 
+import models.domain.common.{ContentReference, ContentType}
+import models.domain.solution.{Solution, SolutionStatus}
 import org.specs2.mutable._
 import play.api.test._
-import models.domain._
 import testhelpers.domainstubs._
 
+//noinspection ZeroIndexToHead
 //@RunWith(classOf[JUnitRunner])
 class SolutionDAOSpecs extends Specification
   with MongoDatabaseComponent
@@ -25,7 +27,7 @@ class SolutionDAOSpecs extends Specification
     themeId: String = "theme id",
     questLevel: Int = 5,
     vip: Boolean = false,
-    status: SolutionStatus.Value = SolutionStatus.OnVoting) = {
+    status: SolutionStatus.Value = SolutionStatus.InRotation) = {
 
     db.solution.create(createSolutionStub(
       id = id,
@@ -96,8 +98,9 @@ class SolutionDAOSpecs extends Specification
           themeId = "q1_theme_id",
           level = 3,
           vip = false,
-          status = SolutionStatus.OnVoting,
-          lastModDate = new Date(5000)),
+          status = SolutionStatus.InRotation,
+          lastModDate = new Date(5000),
+          timelinePoints = 321),
         createSolutionStub(
           id = "q2",
           questId = "t2",
@@ -105,8 +108,9 @@ class SolutionDAOSpecs extends Specification
           themeId = "q2_theme_id",
           level = 13,
           vip = true,
-          status = SolutionStatus.Won,
-          lastModDate = new Date(3000)),
+          status = SolutionStatus.OldBanned,
+          lastModDate = new Date(3000),
+          timelinePoints = 21),
         createSolutionStub(
           id = "q3",
           questId = "t3",
@@ -114,17 +118,17 @@ class SolutionDAOSpecs extends Specification
           themeId = "q3_theme_id",
           level = 7,
           vip = true,
-          status = SolutionStatus.OnVoting,
-          lastModDate = new Date(4000)))
+          status = SolutionStatus.InRotation,
+          lastModDate = new Date(4000),
+          timelinePoints = 70))
 
       qs.foreach(db.solution.create)
 
       val all = db.solution.allWithParams().toList
       all.size must beEqualTo(qs.size)
-      // Checking order with lastModDate
-      all must beEqualTo(List(qs(1), qs(2), qs(0)))
+      all.map(_.id) must beEqualTo(qs.sortBy(_.rating.timelinePoints)(Ordering[Int].reverse).map(_.id))
 
-      val status = db.solution.allWithParams(status = List(SolutionStatus.OnVoting)).toList
+      val status = db.solution.allWithParams(status = List(SolutionStatus.InRotation)).toList
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
 
@@ -143,7 +147,7 @@ class SolutionDAOSpecs extends Specification
       vip.map(_.id).size must beEqualTo(2)
       vip.map(_.id) must contain(qs(1).id) and contain(qs(2).id)
 
-      val statusVip = db.solution.allWithParams(status = List(SolutionStatus.OnVoting), vip = Some(false)).toList
+      val statusVip = db.solution.allWithParams(status = List(SolutionStatus.InRotation), vip = Some(false)).toList
       statusVip.map(_.id).size must beEqualTo(1)
       statusVip.map(_.id) must beEqualTo(List(qs(0).id))
 
@@ -163,7 +167,7 @@ class SolutionDAOSpecs extends Specification
       themeIdsAndIds.map(_.id).size must beEqualTo(1)
       themeIdsAndIds.map(_.id) must beEqualTo(List(qs(0).id))
 
-      val statusWithQuestIds = db.solution.allWithParams(ids = List("q1", "q2"), status = List(SolutionStatus.OnVoting)).toList
+      val statusWithQuestIds = db.solution.allWithParams(ids = List("q1", "q2"), status = List(SolutionStatus.InRotation)).toList
       statusWithQuestIds.map(_.id).size must beEqualTo(1)
       statusWithQuestIds.map(_.id) must beEqualTo(List(qs(0).id))
 
@@ -176,7 +180,7 @@ class SolutionDAOSpecs extends Specification
       excludingAuthorIds.map(_.id).sorted must beEqualTo(List(qs(0).id, qs(2).id).sorted)
     }
 
-    "updateStatus for solution updates rival correctly" in new WithApplication(appWithTestDatabase) {
+    "updateStatus for solution works" in new WithApplication(appWithTestDatabase) {
       clearDB()
 
       val id1 = "id1"
@@ -184,11 +188,22 @@ class SolutionDAOSpecs extends Specification
       createSolutionInDB(id1)
       createSolutionInDB(id2)
 
-      val su1 = db.solution.updateStatus(id1, SolutionStatus.Lost)
-      val su2 = db.solution.updateStatus(id2, SolutionStatus.Won, Some(id1))
+      val su1 = db.solution.updateStatus(id1, SolutionStatus.CheatingBanned)
+      val su2 = db.solution.updateStatus(id2, SolutionStatus.OldBanned)
 
-      su1 must beSome[Solution].which(s => s.status == SolutionStatus.Lost && s.battleIds == List.empty)
-      su2 must beSome[Solution].which(s => s.status == SolutionStatus.Won && s.battleIds == List(id1))
+      su1 must beSome[Solution].which(s => s.status == SolutionStatus.CheatingBanned && s.battleIds == List.empty)
+      su2 must beSome[Solution].which(s => s.status == SolutionStatus.OldBanned && s.battleIds == List.empty)
+    }
+
+    "participateInBattle for solution updates rival correctly" in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val id1 = "id1"
+      createSolutionInDB(id1)
+
+      val su1 = db.solution.addParticipatedBattle(id1, "bid")
+
+      su1 must beSome[Solution].which(s =>  s.battleIds == List("bid"))
     }
 
     "Replace cultures" in new WithApplication(appWithTestDatabase) {

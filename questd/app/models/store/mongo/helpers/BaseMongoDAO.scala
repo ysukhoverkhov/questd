@@ -76,10 +76,17 @@ abstract class BaseMongoDAO[T <: ID : Manifest](collectionName: String)
   }
 
   /**
-   * Searches for object by query object.
+   * Searches for object by query field.
    */
   def readByExample[R](fieldName: String, key: String)(implicit view: T => R): Option[R] = wrapMongoException {
     findOne(makeKeyDbObject(fieldName, key)).map(view)
+  }
+
+  /**
+   * Searches for object by query object.
+   */
+  def readByExample[R](example: DBObject)(implicit view: T => R): Option[R] = wrapMongoException {
+    findOne(example).map(view)
   }
 
   private def makeKeyDbObject(fieldName: String, key: String): DBObject = {

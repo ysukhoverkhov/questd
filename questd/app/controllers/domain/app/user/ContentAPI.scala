@@ -4,8 +4,11 @@ import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
-import models.domain._
-import models.domain.view._
+import models.domain.battle.BattleStatus
+import models.domain.quest.QuestStatus
+import models.domain.solution.SolutionStatus
+import models.domain.user.User
+import models.view.{BattleView, QuestView, ProfileView, SolutionView}
 
 case class GetQuestsRequest(user: User, questIds: List[String])
 case class GetQuestsResult(
@@ -184,7 +187,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForUser = db.solution.allWithParams(
-      status = request.status.filter(Set(SolutionStatus.Won, SolutionStatus.Lost).contains),
+      status = request.status.filter(Set(SolutionStatus.InRotation).contains),
       authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
@@ -211,7 +214,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForQuest = db.solution.allWithParams(
-      status = request.status.filter(Set(SolutionStatus.Won, SolutionStatus.Lost).contains),
+      status = request.status.filter(Set(SolutionStatus.InRotation).contains),
       questIds = List(request.questId),
       skip = pageNumber * pageSize)
 

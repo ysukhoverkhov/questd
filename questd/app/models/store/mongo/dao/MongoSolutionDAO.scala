@@ -1,11 +1,12 @@
 package models.store.mongo.dao
 
-import play.Logger
-import models.store.mongo.helpers._
-import models.store.dao._
-import models.domain._
-import com.mongodb.casbah.commons.MongoDBObject
 import java.util.Date
+
+import com.mongodb.casbah.commons.MongoDBObject
+import models.domain.solution.{Solution, SolutionStatus}
+import models.store.dao._
+import models.store.mongo.helpers._
+import play.Logger
 
 /**
  * DOA for Quest solution objects
@@ -29,45 +30,45 @@ private[mongo] class MongoSolutionDAO
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (status.length > 0) {
+    if (status.nonEmpty) {
       queryBuilder += ("status" -> MongoDBObject("$in" -> status.map(_.toString)))
     }
 
-    if (authorIds.length > 0) {
+    if (authorIds.nonEmpty) {
       queryBuilder += ("info.authorId" -> MongoDBObject("$in" -> authorIds))
     }
 
-    if (authorIdsExclude.length > 0) {
+    if (authorIdsExclude.nonEmpty) {
       queryBuilder += ("info.authorId" -> MongoDBObject("$nin" -> authorIdsExclude))
     }
 
-    if (levels != None) {
+    if (levels.isDefined) {
       queryBuilder += ("$and" -> Array(
         MongoDBObject("questLevel" -> MongoDBObject("$gte" -> levels.get._1)),
         MongoDBObject("questLevel" -> MongoDBObject("$lte" -> levels.get._2))))
     }
 
-    if (vip != None) {
+    if (vip.isDefined) {
       queryBuilder += ("info.vip" -> vip.get)
     }
 
-    if (ids.length > 0) {
+    if (ids.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
     }
 
-    if (idsExclude.length > 0) {
+    if (idsExclude.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$nin" -> idsExclude))
     }
 
-    if (questIds.length > 0) {
+    if (questIds.nonEmpty) {
       queryBuilder += ("info.questId" -> MongoDBObject("$in" -> questIds))
     }
 
-    if (themeIds.length > 0) {
+    if (themeIds.nonEmpty) {
       queryBuilder += ("info.themeId" -> MongoDBObject("$in" -> themeIds))
     }
 
-    if (cultureId != None) {
+    if (cultureId.isDefined) {
       queryBuilder += ("cultureId" -> cultureId.get)
     }
 
@@ -75,14 +76,15 @@ private[mongo] class MongoSolutionDAO
 
     findByExample(
       queryBuilder.result(),
-      MongoDBObject("lastModDate" -> 1),
+      MongoDBObject(
+        "rating.timelinePoints" -> -1,
+        "lastModDate" -> 1),
       skip)
   }
 
   def updateStatus(
     id: String,
-    newStatus: SolutionStatus.Value,
-    battleId: Option[String]): Option[Solution] = {
+    newStatus: SolutionStatus.Value): Option[Solution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -91,26 +93,32 @@ private[mongo] class MongoSolutionDAO
         "status" -> newStatus.toString,
         "lastModDate" -> new Date()))
 
-    battleId match {
-      case None =>
-      case Some(bid) =>
-        queryBuilder +=
-          ("$push" -> MongoDBObject(
-            "battleIds" -> bid))
-    }
+    findAndModify(
+      id,
+      queryBuilder.result())
+  }
+
+  def addParticipatedBattle(
+    id: String,
+    battleId: String): Option[Solution] = {
+
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder +=
+      ("$push" -> MongoDBObject(
+        "battleIds" -> battleId))
 
     findAndModify(
       id,
       queryBuilder.result())
   }
 
+
   def updatePoints(
     id: String,
-
-    reviewsCountChange: Int = 0,
-    pointsRandomChange: Int = 0,
-    pointsFriendsChange: Int = 0,
-    likesCountChange: Int = 0,
+    timelinePointsChange: Int,
+    likesChange: Int,
+    votersCountChange: Int = 0,
     cheatingChange: Int = 0,
 
     spamChange: Int = 0,
@@ -120,13 +128,9 @@ private[mongo] class MongoSolutionDAO
       id,
       MongoDBObject(
         "$inc" -> MongoDBObject(
-          "rating.reviewsCount" -> reviewsCountChange,
-
-          "rating.pointsRandom" -> pointsRandomChange,
-          "rating.pointsFriends" -> pointsFriendsChange,
-
-          "rating.likesCount" -> likesCountChange,
-
+          "rating.timelinePoints" -> timelinePointsChange,
+          "rating.likesCount" -> likesChange,
+          "rating.votersCount" -> votersCountChange,
           "rating.cheating" -> cheatingChange,
 
           "rating.iacpoints.spam" -> spamChange,

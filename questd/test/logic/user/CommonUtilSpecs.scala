@@ -1,10 +1,10 @@
 package logic.user
 
 import logic.BaseLogicSpecs
-import models.domain.User
 import com.mongodb.casbah.commons.MongoDBList
 import com.mongodb.BasicDBList
 import com.mongodb.casbah.commons.Implicits._
+import models.domain.user.User
 
 class CommonUtilSpecs extends BaseLogicSpecs {
 

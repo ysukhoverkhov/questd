@@ -1,5 +1,6 @@
 package models.store.mongo.dao
 
+import models.domain.tutorialtask.TutorialTask
 import models.store.mongo.helpers._
 import models.store.dao._
 import models.domain._

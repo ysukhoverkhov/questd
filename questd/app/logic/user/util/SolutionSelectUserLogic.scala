@@ -1,10 +1,10 @@
 package logic.user.util
 
-import logic.constants._
-import models.domain._
-import logic.UserLogic
-import play.Logger
 import controllers.domain.app.solution._
+import logic.UserLogic
+import logic.constants._
+import models.domain.solution.{Solution, SolutionStatus}
+import play.Logger
 
 trait SolutionSelectUserLogic { this: UserLogic =>
 
@@ -16,7 +16,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       () => getSolutionsWithTags,
       () => getAnySolutions,
       () => getAnySolutionsIgnoringLevels,
-      () => getAnySolutionsIgnoringLevelsAndCulture)
+      () => getAnySolutionsDefaultCultureIgnoringLevels)
 
 
     val it = selectFromChain(algorithms).getOrElse(Iterator.empty)
@@ -47,7 +47,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
         user = user,
         idsExclude = solutionIdsToExclude,
         authorsExclude = solutionAuthorIdsToExclude,
-        status = List(SolutionStatus.Won, SolutionStatus.Lost))).body.get.solutions)
+        status = List(SolutionStatus.InRotation))).body.get.solutions)
     } else {
       None
     }
@@ -60,7 +60,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user = user,
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost))).body.get.solutions
+      status = List(SolutionStatus.InRotation))).body.get.solutions
 
     if (solutions.isEmpty) None else Some(solutions)
   }
@@ -68,14 +68,14 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   private[user] def getStartingSolutions(implicit selected: List[Solution]): Option[Iterator[Solution]] = {
     Logger.trace("getStartingSolutions")
 
-    if (user.profile.publicProfile.level > api.config(api.ConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions).toInt) {
+    if (user.profile.publicProfile.level > api.config(api.DefaultConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions).toInt) {
       None
     } else {
 
       val algorithms = List(
-        (api.config(api.ConfigParams.SolutionProbabilityStartingVIPSolutions).toDouble, () => getVIPSolutions),
-        (api.config(api.ConfigParams.SolutionProbabilityStartingFriendSolutions).toDouble, () => getFriendsSolutions),
-        (api.config(api.ConfigParams.SolutionProbabilityStartingFollowingSolutions).toDouble, () => getFollowingSolutions),
+        (api.config(api.DefaultConfigParams.SolutionProbabilityStartingVIPSolutions).toDouble, () => getVIPSolutions),
+        (api.config(api.DefaultConfigParams.SolutionProbabilityStartingFriendSolutions).toDouble, () => getFriendsSolutions),
+        (api.config(api.DefaultConfigParams.SolutionProbabilityStartingFollowingSolutions).toDouble, () => getFollowingSolutions),
         (1.00, () => getSolutionsWithTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
@@ -87,10 +87,10 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("getDefaultSolutions")
 
     val algorithms = List(
-      (api.config(api.ConfigParams.SolutionProbabilityFriends).toDouble, () => getFriendsSolutions),
-      (api.config(api.ConfigParams.SolutionProbabilityFollowing).toDouble, () => getFollowingSolutions),
-      (api.config(api.ConfigParams.SolutionProbabilityLiked).toDouble, () => getSolutionsForLikedQuests),
-      (api.config(api.ConfigParams.SolutionProbabilityVIP).toDouble, () => getVIPSolutions),
+      (api.config(api.DefaultConfigParams.SolutionProbabilityFriends).toDouble, () => getFriendsSolutions),
+      (api.config(api.DefaultConfigParams.SolutionProbabilityFollowing).toDouble, () => getFollowingSolutions),
+      (api.config(api.DefaultConfigParams.SolutionProbabilityLiked).toDouble, () => getSolutionsForLikedQuests),
+      (api.config(api.DefaultConfigParams.SolutionProbabilityVIP).toDouble, () => getVIPSolutions),
       (1.00, () => getSolutionsWithTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
       )
 
@@ -101,7 +101,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning Solutions from friends")
     checkNotEmptyIterator(Some(api.getFriendsSolutions(GetFriendsSolutionsRequest(
       user = user,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       levels = levels)).body.get.solutions))
@@ -111,7 +111,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning solutions from Following")
     checkNotEmptyIterator(Some(api.getFollowingSolutions(GetFollowingSolutionsRequest(
       user = user,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       levels = levels)).body.get.solutions))
@@ -121,7 +121,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning solutions for quests we liked recently")
     checkNotEmptyIterator(Some(api.getSolutionsForLikedQuests(GetSolutionsForLikedQuestsRequest(
       user = user,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       levels = levels)).body.get.solutions))
@@ -135,7 +135,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     checkNotEmptyIterator(Some(api.getVIPSolutions(GetVIPSolutionsRequest(
       user = user,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       levels = levels,
@@ -150,7 +150,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
 
     checkNotEmptyIterator(Some(api.getAllSolutions(GetAllSolutionsRequest(
       user = user,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
       levels = levels,
@@ -165,7 +165,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user = user,
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       levels = levels,
       cultureId = user.demo.cultureId)).body.get.solutions))
   }
@@ -177,21 +177,23 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user,
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       levels = None,
       cultureId = user.demo.cultureId)).body.get.solutions))
   }
 
-  private[user] def getAnySolutionsIgnoringLevelsAndCulture(implicit selected: List[Solution]) = {
-    Logger.trace("  Returning from all solutions (ignoring levels and culture)")
+  private[user] def getAnySolutionsDefaultCultureIgnoringLevels(implicit selected: List[Solution]) = {
+    Logger.trace("  Returning from all solutions (ignoring levels and for default culture)")
+
+    val defaultCultureId = api.config(api.DefaultConfigParams.DefaultCultureId)
 
     checkNotEmptyIterator(Some(api.getAllSolutions(GetAllSolutionsRequest(
       user,
       idsExclude = solutionIdsToExclude,
       authorsExclude = solutionAuthorIdsToExclude,
-      status = List(SolutionStatus.Won, SolutionStatus.Lost),
+      status = List(SolutionStatus.InRotation),
       levels = None,
-      cultureId = None)).body.get.solutions))
+      cultureId = Some(defaultCultureId))).body.get.solutions))
   }
 
   private def solutionIdsToExclude(implicit selected: List[Solution]) = {

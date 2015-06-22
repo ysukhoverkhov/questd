@@ -3,7 +3,7 @@ package models.store.mongo.dao
 import java.util.Date
 
 import com.mongodb.casbah.commons.MongoDBObject
-import models.domain._
+import models.domain.tag.Theme
 import models.store.dao._
 import models.store.mongo.helpers._
 
@@ -33,7 +33,7 @@ private[mongo] class MongoThemeDAO
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (cultureId != None) {
+    if (cultureId.isDefined) {
       queryBuilder += ("cultureId" -> cultureId.get)
     }
 

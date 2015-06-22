@@ -1,9 +1,24 @@
 package testhelpers
 
 import java.util.Date
-import models.domain._
+
 import models.domain.base.ID
-import models.domain.view.{QuestView, ThemeInfoWithID}
+import models.domain.battle.{BattleSide, Battle, BattleInfo, BattleStatus}
+import models.domain.comment.{CommentInfo, Comment}
+import models.domain.common.{Assets, ContentReference, ContentType, ContentVote}
+import models.domain.quest._
+import models.domain.solution._
+import models.domain.tag.{Theme, ThemeInfo}
+import models.domain.user._
+import models.domain.user.auth.{LoginMethod, AuthInfo}
+import models.domain.user.battlerequests.BattleRequest
+import models.domain.user.dailyresults._
+import models.domain.user.demo.UserDemographics
+import models.domain.user.friends.Friendship
+import models.domain.user.profile._
+import models.domain.user.stats.{SolutionsInBattle, UserStats}
+import models.domain.user.timeline.{TimeLineType, TimeLineReason, TimeLineEntry}
+import models.view.{QuestView, ThemeInfoWithID}
 
 
 package object domainstubs {
@@ -34,8 +49,9 @@ package object domainstubs {
     level: Int = 10,
     vip: Boolean = false,
     cultureId: String = "cultureId",
-    points: Int = 0,
+    timelinePoints: Int = 0,
     solveCost: Assets = Assets(0, 0, 0),
+    solveReward: Assets = Assets(0, 0, 0),
     likes: Int = 0) = {
 
     Quest(
@@ -53,9 +69,10 @@ package object domainstubs {
           icon = None,
           description = "desc"),
           solveCost = solveCost,
-          solveRewardWon = Assets(),
-          solveRewardLost = Assets()),
-      rating = QuestRating(points = points, likesCount = likes),
+          solveReward = solveReward,
+          victoryReward = Assets(1, 1, 1),
+          defeatReward =Assets(2, 2, 2)),
+      rating = QuestRating(timelinePoints = timelinePoints, likesCount = likes),
       status = status)
   }
 
@@ -72,11 +89,12 @@ package object domainstubs {
     authorId: String = "uid",
     questId: String = "qid",
     themeId: String = "themeId",
-    status: SolutionStatus.Value = SolutionStatus.OnVoting,
+    status: SolutionStatus.Value = SolutionStatus.InRotation,
     level: Int = 1,
-    points: Int = 0,
+    timelinePoints: Int = 0,
     vip: Boolean = false,
-    lastModDate: Date = new Date((new Date).getTime + 100000)) = {
+    lastModDate: Date = new Date((new Date).getTime + 100000),
+    battleIds: List[String] = List.empty) = {
 
     Solution(
       id = id,
@@ -89,8 +107,9 @@ package object domainstubs {
         questId = questId),
       status = status,
       rating = SolutionRating(
-        pointsRandom = points),
-      lastModDate = lastModDate)
+        timelinePoints = timelinePoints),
+      lastModDate = lastModDate,
+      battleIds = battleIds)
   }
 
   def createTimeLineEntryStub(
@@ -129,37 +148,64 @@ package object domainstubs {
   def createDailyResultStub(
     startOfPeriod: Date = new Date(),
     questsIncome: List[QuestIncome] = List(createQuestIncomeStub()),
-    questSolutionResult: List[QuestSolutionResult] = List.empty) = {
+    questResult: List[QuestResult] = List.empty,
+    solutionResult: List[SolutionResult] = List.empty,
+    battleResult: List[BattleResult] = List.empty) = {
     DailyResult(
       startOfPeriod = startOfPeriod,
       questsIncome = questsIncome,
-      decidedQuestSolutions = questSolutionResult
+      decidedQuests = questResult,
+      decidedSolutions = solutionResult,
+      decidedBattles = battleResult
     )
+  }
+
+  def createCommentStub(
+    id: String = ID.generateUUID(),
+    message: String = "the message") = {
+    Comment(
+      id = id,
+      info = CommentInfo(
+        commentedObjectId = ID.generateUUID(),
+        authorId = ID.generateUUID(),
+        respondedCommentId = Some(ID.generateUUID()),
+        postingDate = new Date(),
+        message = message
+      ))
   }
 
   def createBattleStub(
     id: String = ID.generateUUID(),
+    questId: String = "questId",
     solutionIds: List[String] = List("1", "2"),
     authorIds: List[String] = List("a1", "a2"),
+    points: List[Int] = List(0, 0),
     status: BattleStatus.Value = BattleStatus.Fighting,
     level: Int = 19,
     vip: Boolean = false,
     cultureId: String = "c1",
     winnerIds: List[String] = List("a1"),
-    voteEndDate: Date = new Date()
-    ) = {
+    voteEndDate: Date = new Date(),
+    timelinePoints: Int = 0) = {
     Battle(
       id = id,
       info = BattleInfo(
-        solutionIds = solutionIds,
-        authorIds = authorIds,
+        battleSides = (solutionIds, authorIds, points).zipped.map {
+          case (s, a, p) =>
+            BattleSide(
+              solutionId = s,
+              authorId = a,
+              pointsRandom = p,
+              isWinner = winnerIds.contains(a)
+            )
+        },
+        questId = questId,
         status = status,
-        voteEndDate = voteEndDate,
-        winnerIds = winnerIds),
+        voteEndDate = voteEndDate),
       level = level,
       vip = vip,
-      cultureId = cultureId
-    )
+      cultureId = cultureId,
+      timelinePoints = timelinePoints)
   }
 
   def createUserStub(
@@ -167,23 +213,31 @@ package object domainstubs {
     cultureId: Option[String] = Some("cultureId"),
     vip: Boolean = false,
     friends: List[Friendship] = List.empty,
+    followers: List[String] = List.empty,
     assets: Assets = Assets(100000, 100000, 100000),
     mustVoteSolutions: List[String] = List.empty,
     level: Int = 18,
     questCreationCoolDown: Date = new Date(Long.MaxValue),
     createdQuests: List[String] = List.empty,
-    createdSolutions: List[String] = List.empty,
-    solvedQuests: List[String] = List.empty,
+    solvedQuests: Map[String, String] = Map.empty,
     votedQuests: Map[String, ContentVote.Value] = Map.empty,
     votedSolutions: Map[String, ContentVote.Value] = Map.empty,
+    votedBattles: Map[String, String] = Map.empty,
+    participatedBattles: Map[String, String] = Map.empty,
     takenTheme: Option[ThemeInfoWithID] = Some(ThemeInfoWithID("theme_id", createThemeStub().info)),
     rights: Rights = Rights.full,
     timeLine: List[TimeLineEntry] = List.empty,
     questBookmark: Option[String] = None,
-    privateDailyResults: List[DailyResult] = List(createDailyResultStub())) = {
+    privateDailyResults: List[DailyResult] = List(createDailyResultStub()),
+    battleRequests: List[BattleRequest] = List.empty) = {
 
     User(
       id = id,
+      auth = AuthInfo(
+        loginMethods = List(LoginMethod(
+          methodName = "FB",
+          userId = "adasd"
+        ))),
       demo = UserDemographics(
         cultureId = cultureId),
       privateDailyResults = privateDailyResults,
@@ -201,13 +255,16 @@ package object domainstubs {
             gender = Gender.Male)),
         rights = rights),
       friends = friends,
+      followers = followers,
       mustVoteSolutions = mustVoteSolutions,
       timeLine = timeLine,
       stats = UserStats(
         createdQuests = createdQuests,
-        createdSolutions = createdSolutions,
         solvedQuests = solvedQuests,
         votedQuests = votedQuests,
-        votedSolutions = votedSolutions))
+        votedSolutions = votedSolutions,
+        votedBattles = votedBattles,
+        participatedBattles = participatedBattles.map{case (k, v) => (k, SolutionsInBattle(List(v)))}),
+      battleRequests = battleRequests)
   }
 }

@@ -1,7 +1,7 @@
 package controllers.domain.app.quest
 
 import controllers.domain._
-import models.domain.ContentVote
+import models.domain.common.ContentVote
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
@@ -10,12 +10,11 @@ class QuestAPISpecs extends BaseAPISpecs {
   "Quest API" should {
 
     "Decease quest points if it was selected to time line" in context {
-
       val q = createQuestStub()
 
       quest.updatePoints(
         id = mEq(q.id),
-        pointsChange = mEq(-1),
+        timelinePointsChange = mEq(-1),
         likesChange = any,
         votersCountChange = any,
         cheatingChange = any,
@@ -28,7 +27,7 @@ class QuestAPISpecs extends BaseAPISpecs {
 
       there was one(quest).updatePoints(
         id = mEq(q.id),
-        pointsChange = mEq(-1),
+        timelinePointsChange = mEq(-1),
         likesChange = any,
         votersCountChange = any,
         cheatingChange = any,
@@ -41,7 +40,7 @@ class QuestAPISpecs extends BaseAPISpecs {
 
       quest.updatePoints(
         id = mEq(q.id),
-        pointsChange = mEq(1),
+        timelinePointsChange = mEq(1),
         likesChange = mEq(1),
         votersCountChange = any,
         cheatingChange = any,
@@ -54,7 +53,7 @@ class QuestAPISpecs extends BaseAPISpecs {
 
       there was one(quest).updatePoints(
         id = mEq(q.id),
-        pointsChange = mEq(1),
+        timelinePointsChange = mEq(1),
         likesChange = mEq(1),
         votersCountChange = any,
         cheatingChange = any,

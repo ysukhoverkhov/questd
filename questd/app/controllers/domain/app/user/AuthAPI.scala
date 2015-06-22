@@ -4,20 +4,14 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import controllers.sn.client.{User => SNUser}
-import models.domain._
+import models.domain.common.{ContentReference, ContentType}
+import models.domain.user._
+import models.domain.user.auth.{AuthInfo, LoginMethod}
+import models.domain.user.profile.{PublicProfile, Profile, Bio}
 import play.Logger
 
 case class LoginRequest(snName: String, snuser: SNUser)
 case class LoginResult(sessionId: String, userId: String)
-
-
-case class UserRequest(userId: Option[String] = None, sessionId: Option[String] = None)
-
-object UserResultCode extends Enumeration {
-  val OK, NotFound = Value
-}
-case class UserResult(code: UserResultCode.Value, user: Option[User] = None)
-
 
 private[domain] trait AuthAPI {
   this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -29,25 +23,22 @@ private[domain] trait AuthAPI {
 
     def loginUser(user: User) = {
       val uuid = java.util.UUID.randomUUID().toString
-      db.user.updateSessionId(user.id, uuid)
 
-      // Update here country from time to time.
-      updateUserCulture(UpdateUserCultureRequest(user)) map {
-        api.processFriendshipInvitationsFromSN(ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
-          case InternalErrorApiResult(a) =>
-            InternalErrorApiResult[LoginResult](a)
-          case _ =>
-            OkApiResult(LoginResult(uuid, user.id))
+      db.user.updateSessionId(user.id, uuid) ifSome { u =>
+        {
+          updateCrossPromotion(UpdateCrossPromotionRequest(user, request.snuser))
+        } map {
+          updateUserCulture(UpdateUserCultureRequest(user))
+        } map {
+          api.processFriendshipInvitationsFromSN(
+            ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
+            case InternalErrorApiResult(a) =>
+              InternalErrorApiResult[LoginResult](a)
+            case _ =>
+              OkApiResult(LoginResult(uuid, user.id))
+          }
         }
       }
-    }
-
-    def initializeUser(user: User): User = {
-      user.copy(
-        profile = user.profile.copy(rights = user.calculateRights),
-        privateDailyResults = List(DailyResult(
-          user.getStartOfCurrentDailyResultPeriod)
-        ))
     }
 
     def createUserAndLogin() = {
@@ -55,7 +46,9 @@ private[domain] trait AuthAPI {
 
       val newUser = User(
         auth = AuthInfo(
-          snids = Map(request.snName -> request.snuser.snId)),
+          loginMethods = List(LoginMethod(
+            methodName = request.snName,
+            userId = request.snuser.snId))),
         profile = Profile(
           publicProfile = PublicProfile(
             bio = Bio(
@@ -67,13 +60,13 @@ private[domain] trait AuthAPI {
               avatar = Some(
                 ContentReference(contentType = ContentType.Photo, storage = "fb_avatar", reference = request.snuser.snId))))))
 
-      db.user.create(initializeUser(newUser))
-
-      db.user.readBySNid(request.snName, request.snuser.snId) ifSome { user =>
-        populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user)) map { r =>
-          Logger.debug(s"New user created with FB: ${user.id} / ${user.profile.publicProfile.bio.name}")
-          loginUser(user)
-        }
+      {
+        createUser(CreateUserRequest(newUser))
+      } map { r =>
+        populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(r.user))
+      } map { r =>
+        Logger.debug(s"New user created with FB: ${r.user.id} / ${r.user.profile.publicProfile.bio.name}")
+        loginUser(r.user)
       }
     }
 
@@ -81,7 +74,6 @@ private[domain] trait AuthAPI {
 
     db.user.readBySNid(request.snName, request.snuser.snId) match {
       case None =>
-        Logger.debug("New user login with FB")
         createUserAndLogin()
 
       case Some(user) =>
@@ -90,27 +82,5 @@ private[domain] trait AuthAPI {
     }
   }
 
-  /**
-   * User by session or id.
-   */
-  def getUser(params: UserRequest): ApiResult[UserResult] = handleDbException {
-
-    (params.sessionId, params.userId) match {
-      case (Some(sessionId), None) =>
-        db.user.readBySessionId(sessionId) match {
-          case None => OkApiResult(UserResult(UserResultCode.NotFound))
-          case Some(user: User) => OkApiResult(UserResult(UserResultCode.OK, Some(user)))
-        }
-
-      case (None, Some(userId)) =>
-        db.user.readById(userId) match {
-          case None => OkApiResult(UserResult(UserResultCode.NotFound))
-          case Some(user: User) => OkApiResult(UserResult(UserResultCode.OK, Some(user)))
-        }
-
-      case _ =>
-        InternalErrorApiResult("Wrong request for user")
-    }
-  }
 }
 

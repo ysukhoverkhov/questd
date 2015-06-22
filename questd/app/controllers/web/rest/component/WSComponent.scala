@@ -15,7 +15,8 @@ trait WSComponent { component: DomainAPIComponent with SocialNetworkComponent =>
     with CreateQuestWSImpl
     with SolveQuestWSImpl
     with VoteQuestWSImpl
-    with VoteQuestSolutionWSImpl
+    with VoteSolutionWSImpl
+    with VoteBattleWSImpl
     with DailyResultWSImpl
     with TimeLineWSImpl
     with ContentWSImpl
@@ -24,6 +25,8 @@ trait WSComponent { component: DomainAPIComponent with SocialNetworkComponent =>
     with MessagesWSImpl
     with MiscWSImpl
     with TutorialWSImpl
+    with CommentsWSImpl
+    with ChallengesWSImpl
     with UploadWSImpl
     with DebugWSImpl
 
