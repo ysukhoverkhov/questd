@@ -91,14 +91,23 @@ POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
 POST	/rest/postComment	    						controllers.web.rest.CommentsWS.postComment
 POST	/rest/getCommentsForObject 						controllers.web.rest.CommentsWS.getCommentsForObject
 
+# Challenges
+#POST	/rest/costToChallenge							controllers.web.rest.ChallengesWS.costToChallenge
+POST    /rest/challengeBattle 	    					controllers.web.rest.ChallengesWS.challengeBattle
+POST	/rest/getBattleRequests						    controllers.web.rest.ChallengesWS.getBattleRequests
+POST    /rest/respondBattleRequest    					controllers.web.rest.ChallengesWS.respondBattleRequest
+
+
 # Upload
 POST    /cdn/upload                                     controllers.web.rest.UploadWS.upload
 POST    /cdn/getContentURLById                          controllers.web.rest.UploadWS.getContentURLById
+
 
 #######################
 # Debug (Should be removed in production)
 #######################
 POST	/rest/debug/shiftDailyResult					controllers.web.rest.DebugWS.shiftDailyResult
+POST	/rest/debug/resetProfile     					controllers.web.rest.DebugWS.resetProfile
 POST	/rest/debug/test								controllers.web.rest.DebugWS.test
 POST	/rest/debug/voteQuest							controllers.web.rest.DebugWS.voteQuestDebug
 POST	/rest/debug/voteSolution						controllers.web.rest.DebugWS.voteSolutionDebug
@@ -107,6 +116,7 @@ POST	/rest/debug/makeBattle						    controllers.web.rest.DebugWS.makeBattle
 POST	/rest/debug/resetTutorial					    controllers.web.rest.DebugWS.resetTutorial
 POST	/rest/debug/setLevel					        controllers.web.rest.DebugWS.setLevel
 POST	/rest/debug/generateErrorLog			        controllers.web.rest.DebugWS.generateErrorLog
+POST	/rest/debug/resetProfile     					controllers.web.rest.DebugWS.resetProfile
 
 
 
@@ -148,6 +158,8 @@ GET     /admin/tutorial                                 controllers.web.admin.Tu
 POST    /admin/tutorial/updateAction                    controllers.web.admin.TutorialScriptsCRUD.updateAction(platform: String, elementId: String)
 POST    /admin/tutorial/addElement                      controllers.web.admin.TutorialScriptsCRUD.addElement(platform: String)
 POST    /admin/tutorial/deleteElement                   controllers.web.admin.TutorialScriptsCRUD.deleteElement(platform: String, elementId: String)
+POST    /admin/tutorial/upElement                       controllers.web.admin.TutorialScriptsCRUD.upElement(platform: String, elementId: String)
+POST    /admin/tutorial/downElement                     controllers.web.admin.TutorialScriptsCRUD.downElement(platform: String, elementId: String)
 POST    /admin/tutorial/addParamToElementAction         controllers.web.admin.TutorialScriptsCRUD.addParamToElementAction(platform: String, elementId: String)
 POST    /admin/tutorial/deleteParamFromElementAction    controllers.web.admin.TutorialScriptsCRUD.deleteParamFromElementAction(platform: String, elementId: String, paramKey: String)
 POST    /admin/tutorial/saveParamInElementAction        controllers.web.admin.TutorialScriptsCRUD.saveParamInElementAction(platform: String, elementId: String, paramKey: String)

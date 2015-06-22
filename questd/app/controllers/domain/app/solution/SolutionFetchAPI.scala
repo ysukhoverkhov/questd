@@ -5,7 +5,8 @@ import controllers.domain._
 import controllers.domain.helpers._
 import models.domain.common.ContentVote
 import models.domain.solution.{Solution, SolutionStatus}
-import models.domain.user.{FriendshipStatus, User}
+import models.domain.user.User
+import models.domain.user.friends.FriendshipStatus
 
 case class GetFriendsSolutionsRequest(
   user: User,

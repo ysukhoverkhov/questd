@@ -99,7 +99,8 @@ class SolutionDAOSpecs extends Specification
           level = 3,
           vip = false,
           status = SolutionStatus.InRotation,
-          lastModDate = new Date(5000)),
+          lastModDate = new Date(5000),
+          timelinePoints = 321),
         createSolutionStub(
           id = "q2",
           questId = "t2",
@@ -108,7 +109,8 @@ class SolutionDAOSpecs extends Specification
           level = 13,
           vip = true,
           status = SolutionStatus.OldBanned,
-          lastModDate = new Date(3000)),
+          lastModDate = new Date(3000),
+          timelinePoints = 21),
         createSolutionStub(
           id = "q3",
           questId = "t3",
@@ -117,14 +119,14 @@ class SolutionDAOSpecs extends Specification
           level = 7,
           vip = true,
           status = SolutionStatus.InRotation,
-          lastModDate = new Date(4000)))
+          lastModDate = new Date(4000),
+          timelinePoints = 70))
 
       qs.foreach(db.solution.create)
 
       val all = db.solution.allWithParams().toList
       all.size must beEqualTo(qs.size)
-      // Checking order with lastModDate
-      all must beEqualTo(List(qs(1), qs(2), qs(0)))
+      all.map(_.id) must beEqualTo(qs.sortBy(_.rating.timelinePoints)(Ordering[Int].reverse).map(_.id))
 
       val status = db.solution.allWithParams(status = List(SolutionStatus.InRotation)).toList
       status.map(_.id).size must beEqualTo(2)

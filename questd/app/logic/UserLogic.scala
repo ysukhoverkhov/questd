@@ -21,6 +21,7 @@ class UserLogic(
   with DailyResults
   with Friends
   with Tasks
+  with Challenges
   with TimeLineLogic
   with MiscUserLogic
   with CommonUserLogic

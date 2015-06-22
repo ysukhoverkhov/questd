@@ -2,7 +2,7 @@ package models.domain.tutorialtask
 
 import models.domain.base.ID
 import models.domain.common.Assets
-import models.domain.user.{Task, TaskType}
+import models.domain.user.profile.{TaskType, Task}
 
 /**
  * Task created by tutorial script.
@@ -13,7 +13,7 @@ case class TutorialTask(
   description: String,
   requiredCount: Int,
   reward: Assets,
-  triggersReward: Boolean = false) extends ID { // TODO: remove default false in 0.40.06
+  triggersReward: Boolean) extends ID {
 
   def task = Task(
     taskType = taskType,

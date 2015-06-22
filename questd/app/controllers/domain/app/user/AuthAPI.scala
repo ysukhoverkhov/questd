@@ -7,6 +7,7 @@ import controllers.sn.client.{User => SNUser}
 import models.domain.common.{ContentReference, ContentType}
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, LoginMethod}
+import models.domain.user.profile.{PublicProfile, Profile, Bio}
 import play.Logger
 
 case class LoginRequest(snName: String, snuser: SNUser)

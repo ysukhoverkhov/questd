@@ -7,7 +7,8 @@ import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import models.domain.comment.{Comment, CommentInfo}
-import models.domain.user.{TaskType, Profile, User}
+import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.User
 import models.view.CommentView
 
 
@@ -40,7 +41,7 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
    */
   def postComment(request: PostCommentRequest): ApiResult[PostCommentResult] = handleDbException {
 
-    lazy val charLimitExceeded = request.message.length > config(api.ConfigParams.CommentsMaxLength).toInt
+    lazy val charLimitExceeded = request.message.length > config(api.DefaultConfigParams.CommentsMaxLength).toInt
 
     lazy val respondNotFound = !request.respondedCommentId.fold(true)(db.comment.readById(_).isDefined)
 

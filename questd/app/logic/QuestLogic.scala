@@ -63,8 +63,8 @@ class QuestLogic(
    */
   def shouldBanIAC = {
     val votesToBan = Math.max(
-        api.config(api.ConfigParams.QuestIACRatio).toDouble * quest.rating.votersCount,
-        api.config(api.ConfigParams.QuestMinIACVotes).toLong)
+        api.config(api.DefaultConfigParams.QuestIACRatio).toDouble * quest.rating.votersCount,
+        api.config(api.DefaultConfigParams.QuestMinIACVotes).toLong)
 
     val maxVotes = List(
         quest.rating.iacpoints.porn,
@@ -78,8 +78,8 @@ class QuestLogic(
   def shouldBanCheating = {
 
     val maxCheatingVotes = Math.max(
-      api.config(api.ConfigParams.QuestCheatingRatio).toDouble * quest.rating.votersCount,
-      api.config(api.ConfigParams.QuestMinCheatingVotes).toLong)
+      api.config(api.DefaultConfigParams.QuestCheatingRatio).toDouble * quest.rating.votersCount,
+      api.config(api.DefaultConfigParams.QuestMinCheatingVotes).toLong)
 
     quest.rating.cheating > maxCheatingVotes
   }
@@ -97,21 +97,21 @@ object QuestLogic {
    * Reward for won battle.
    */
   def rewardForWinningBattle(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
-    Assets(rating = ratingToWinQuest(questLevel)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+    Assets(rating = ratingToWinQuest(questLevel)) * api.config(api.DefaultConfigParams.DebugExpMultiplier).toDouble
   }
 
   /**
    * Reward for lost battle.
    */
   def rewardForLosingBattle(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
-    Assets(rating = ratingToLoseQuest(questLevel)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+    Assets(rating = ratingToLoseQuest(questLevel)) * api.config(api.DefaultConfigParams.DebugExpMultiplier).toDouble
   }
 
   /**
    * Reward for solving quest.
    */
   def rewardForSolvingQuest(questLevel: Int, api: DomainAPIComponent#DomainAPI) = {
-    Assets(rating = ratingToSolveQuest(questLevel)) * api.config(api.ConfigParams.DebugExpMultiplier).toDouble
+    Assets(rating = ratingToSolveQuest(questLevel)) * api.config(api.DefaultConfigParams.DebugExpMultiplier).toDouble
   }
 
 }

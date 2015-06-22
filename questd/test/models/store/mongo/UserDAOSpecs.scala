@@ -8,8 +8,14 @@ import models.domain.common.{Assets, ContentVote}
 import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
+import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
 import models.domain.user.dailyresults.BattleResult
+import models.domain.user.demo.UserDemographics
+import models.domain.user.friends.{ReferralStatus, FriendshipStatus, Friendship}
 import models.domain.user.message.MessageInformation
+import models.domain.user.profile._
+import models.domain.user.stats.SolutionsInBattle
+import models.domain.user.timeline.{TimeLineType, TimeLineReason, TimeLineEntry}
 import models.store._
 import models.view.QuestView
 import org.specs2.mutable._
@@ -165,7 +171,7 @@ class UserDAOSpecs
       val tasks = DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10),
           Task(
@@ -181,7 +187,7 @@ class UserDAOSpecs
 
       val ou = db.user.readById(userid)
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Client).head.currentCount == 1)
+      ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.Custom).head.currentCount == 1)
       ou must beSome.which((u: User) => u.profile.dailyTasks.tasks.filter(_.taskType == TaskType.GiveRewards).head.currentCount == 2)
     }
 
@@ -193,7 +199,7 @@ class UserDAOSpecs
       val tasks = DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10)))
 
@@ -214,7 +220,7 @@ class UserDAOSpecs
       val tasks = DailyTasks(
         tasks = List(
           Task(
-            taskType = TaskType.Client,
+            taskType = TaskType.Custom,
             description = "",
             requiredCount = 10)))
 
@@ -529,14 +535,15 @@ class UserDAOSpecs
       db.user.clear()
 
       val questId = "qiq"
+      val solutionId = "siq"
       val user = createUserStub(questBookmark = Some(questId))
       db.user.create(user)
 
-      db.user.recordQuestSolving(user.id, questId, removeBookmark = true)
+      db.user.recordQuestSolving(user.id, questId, solutionId, removeBookmark = true)
 
       val ou1 = db.user.readById(user.id)
       ou1 must beSome[User]
-      ou1.get.stats.solvedQuests must beEqualTo(List(questId))
+      ou1.get.stats.solvedQuests must beEqualTo(Map(questId -> solutionId))
       ou1.get.profile.questSolutionContext.bookmarkedQuest must beNone
     }
 
@@ -722,6 +729,37 @@ class UserDAOSpecs
 
       ou must beSome
       ou.get.privateDailyResults.head.decidedBattles.head must beEqualTo(br)
+    }
+
+    "addBattleRequest adds it" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val br = BattleRequest("1", "2", "3", BattleRequestStatus.Accepted)
+
+      db.user.create(user)
+      db.user.addBattleRequest(user.id, br)
+
+      val ou = db.user.readById(user.id)
+
+      ou must beSome
+      ou.get.battleRequests.head must beEqualTo(br)
+    }
+
+    "updateBattleRequest works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val br = BattleRequest("1", "2", "3", BattleRequestStatus.Accepted)
+
+      db.user.create(user)
+      db.user.addBattleRequest(user.id, br)
+      db.user.updateBattleRequest(user.id, "2", "3", BattleRequestStatus.Rejected.toString)
+
+      val ou = db.user.readById(user.id)
+
+      ou must beSome
+      ou.get.battleRequests.head must beEqualTo(br.copy(status = BattleRequestStatus.Rejected))
     }
   }
 }

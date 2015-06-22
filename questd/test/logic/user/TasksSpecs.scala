@@ -1,8 +1,9 @@
 package logic.user
 
 import logic.BaseLogicSpecs
-import models.domain._
 import models.domain.user._
+import models.domain.user.friends.{Friendship, FriendshipStatus}
+import models.domain.user.profile.{Profile, PublicProfile, Task, TaskType}
 import testhelpers.domainstubs._
 
 class TasksSpecs extends BaseLogicSpecs {
@@ -15,7 +16,7 @@ class TasksSpecs extends BaseLogicSpecs {
   "Tasks Logic" should {
 
     "Generate DailyTasks on request" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextGaussian(any, any) returns 1
 
       val u = createUserStub(level = 20)
@@ -25,7 +26,7 @@ class TasksSpecs extends BaseLogicSpecs {
     }
 
     "Do not generate DailyTasks for 1st level users" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextGaussian(any, any) returns 1
 
       val u = createUserStub(level = 1)
@@ -35,7 +36,7 @@ class TasksSpecs extends BaseLogicSpecs {
     }
 
     "Generate tasks for voting for solutions" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextGaussian(any, any) returns 3
 
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
@@ -48,7 +49,7 @@ class TasksSpecs extends BaseLogicSpecs {
     }
 
     "Do not Generate tasks CreateSolution for low level users" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 1)))
       val dailyResult = u.getTasksForTomorrow
@@ -58,7 +59,7 @@ class TasksSpecs extends BaseLogicSpecs {
     }
 
     "Generate tasks CreateSolution" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble() returns 0.1
 
       val u = createUser(3)
@@ -72,7 +73,7 @@ class TasksSpecs extends BaseLogicSpecs {
     }
 
     "Generate tasks AddToFollowing" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.2
 
       val u = createUser(8)
@@ -86,7 +87,7 @@ class TasksSpecs extends BaseLogicSpecs {
     }
 
     "Do not generate tasks AddToFollowing" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.5
 
       val u = createUser(8)
@@ -99,7 +100,7 @@ class TasksSpecs extends BaseLogicSpecs {
     }
 
     "Generate tasks for voting for quests" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextGaussian(any, any) returns 3
 
       val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
@@ -111,7 +112,7 @@ class TasksSpecs extends BaseLogicSpecs {
     }
 
     "Generate tasks for creating quests" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.1
 
       val u = createUser(12)
@@ -125,7 +126,7 @@ class TasksSpecs extends BaseLogicSpecs {
     }
 
     "Generate tasks for reviewing friendship" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val u = createUser(12).copy(friends = List(Friendship(friendId = "", status = FriendshipStatus.Invites)))
       val dailyResult = u.getTasksForTomorrow
@@ -138,7 +139,7 @@ class TasksSpecs extends BaseLogicSpecs {
     }
 
     "Generate tasks for reviewing friendship if there are no requests" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val u = createUser(12)
       val dailyResult = u.getTasksForTomorrow

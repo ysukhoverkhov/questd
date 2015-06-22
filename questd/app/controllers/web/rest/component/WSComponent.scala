@@ -26,6 +26,7 @@ trait WSComponent { component: DomainAPIComponent with SocialNetworkComponent =>
     with MiscWSImpl
     with TutorialWSImpl
     with CommentsWSImpl
+    with ChallengesWSImpl
     with UploadWSImpl
     with DebugWSImpl
 

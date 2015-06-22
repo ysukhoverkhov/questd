@@ -3,7 +3,9 @@ package controllers.domain.app.solution
 import controllers.domain._
 import models.domain.quest.QuestStatus
 import models.domain.solution.SolutionStatus
-import models.domain.user.{FriendshipStatus, Friendship, User, TimeLineType}
+import models.domain.user.friends.{FriendshipStatus, Friendship}
+import models.domain.user.User
+import models.domain.user.timeline.TimeLineType
 import testhelpers.domainstubs._
 
 class SolutionFetchAPISpecs extends BaseAPISpecs {

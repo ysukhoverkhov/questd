@@ -1,4 +1,4 @@
-package models.domain.user
+package models.domain.user.profile
 
 /**
  * Solution voting context. Perhaps useless.

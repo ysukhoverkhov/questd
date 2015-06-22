@@ -84,7 +84,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     import request._
 
     {
-      db.quest.updatePoints(quest.id, pointsChange = -1)
+      db.quest.updatePoints(quest.id, timelinePointsChange = -1)
     } ifSome { v =>
       updateQuestStatus(UpdateQuestStatusRequest(v))
     } map {
@@ -103,7 +103,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
       } map {
         db.quest.updatePoints(
           id = quest.id,
-          pointsChange = ratio) ifSome { v =>
+          timelinePointsChange = ratio) ifSome { v =>
           updateQuestStatus(UpdateQuestStatusRequest(v))
         }
       } map {
@@ -123,7 +123,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     val q = db.quest.updatePoints(
       id = quest.id,
-      pointsChange = checkInc(vote, Cool),
+      timelinePointsChange = checkInc(vote, Cool),
       likesChange = checkInc(vote, Cool),
       votersCountChange = 1,
       cheatingChange = checkInc(vote, Cheating),

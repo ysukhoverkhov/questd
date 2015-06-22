@@ -3,7 +3,7 @@ package controllers.domain.app.user
 import controllers.domain.{OkApiResult, BaseAPISpecs}
 import models.domain.battle.BattleStatus
 import models.domain.solution.SolutionStatus
-import models.domain.user.SolutionsInBattle
+import models.domain.user.stats.SolutionsInBattle
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
@@ -102,7 +102,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       there was one(user).recordBattleParticipation(mEq(uu(0).id), any, mEq(SolutionsInBattle(ss.map(_.id))))
       there was one(user).recordBattleParticipation(mEq(uu(1).id), any, mEq(SolutionsInBattle(ss.map(_.id))))
       there were two(user).addEntryToTimeLine(any, any)
-      there were two(user).addEntryToTimeLineMulti(any, any)
+//      there were two(user).addEntryToTimeLineMulti(any, any)
       result must beAnInstanceOf[OkApiResult[TryCreateBattleRequest]]
     }
 

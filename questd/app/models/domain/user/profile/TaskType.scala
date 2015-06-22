@@ -1,4 +1,4 @@
-package models.domain.user
+package models.domain.user.profile
 
 /**
  * All types of tasks.
@@ -14,5 +14,5 @@ object TaskType extends Enumeration {
   val SubmitReviewsForQuests = Value
   val GiveRewards = Value
   val LookThroughFriendshipProposals = Value
-  val Client = Value(1000)
+  val Custom = Value(1000)
 }

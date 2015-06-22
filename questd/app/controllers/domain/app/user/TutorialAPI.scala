@@ -7,6 +7,7 @@ import controllers.domain.helpers._
 import models.domain.common.Assets
 import models.domain.tutorial.{TutorialElement, TutorialPlatform}
 import models.domain.user._
+import models.domain.user.profile.{TutorialState, Task, DailyTasks, Profile}
 
 case class GetCommonTutorialRequest(platform: TutorialPlatform.Value)
 case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])
@@ -94,9 +95,13 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
             db.user.addTasks(
               user.id,
               List(taskToAdd.copy(reward = Assets(coins = taskToAdd.reward.coins, money = taskToAdd.reward.money))),
-              ratingReward) ifSome { v =>
-                OkApiResult(AssignTutorialTaskResult(OK, Some(v.profile)))
+              ratingReward) ifSome { u =>
+              {
+                updateDailyTasksCompletedFraction(UpdateDailyTasksCompletedFractionRequest(u.user))
+              } map { r =>
+                OkApiResult(AssignTutorialTaskResult(OK, Some(r.user.profile)))
               }
+            }
           }
         case None =>
           OkApiResult(AssignTutorialTaskResult(OutOfContent))
@@ -137,7 +142,9 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
       )
     )
 
-    OkApiResult(ResetTutorialResult(OK, Some(user.profile)))
+    db.user.readById(user.id) ifSome { user =>
+      OkApiResult(ResetTutorialResult(OK, Some(user.profile)))
+    }
   }
 }
 

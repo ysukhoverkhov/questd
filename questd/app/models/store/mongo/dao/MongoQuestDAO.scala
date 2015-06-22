@@ -72,7 +72,7 @@ private[mongo] class MongoQuestDAO
     findByExample(
       queryBuilder.result(),
       MongoDBObject(
-        "rating.points" -> -1,
+        "rating.timelinePoints" -> -1,
         "lastModDate" -> 1),
       skip)
   }

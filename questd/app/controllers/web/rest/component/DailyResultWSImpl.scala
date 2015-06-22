@@ -4,7 +4,7 @@ import com.vita.scala.extensions._
 import controllers.domain.OkApiResult
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import models.domain.user.Functionality
+import models.domain.user.profile.Functionality
 
 import scala.language.existentials
 

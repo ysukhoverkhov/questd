@@ -1,4 +1,4 @@
-package models.domain.user
+package models.domain.user.timeline
 
 /**
   * Reason why the entry is in time line.

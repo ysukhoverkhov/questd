@@ -2,7 +2,7 @@ package logic.user
 
 import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
-import models.domain.user.Rights
+import models.domain.user.profile.Rights
 import testhelpers.domainstubs._
 
 class VotingBattlesSpecs extends BaseLogicSpecs {
@@ -10,7 +10,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
   "User Logic for battle voting" should {
 
     "Do not allow voting for battles without rights" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub(rights = Rights.none)
       val battle = createBattleStub()
@@ -21,7 +21,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
     }
 
     "Do allow voting for battles not in time line" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val user = createUserStub()
       val battle = createBattleStub()
@@ -32,7 +32,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow voting for battles in time line but we already voted for" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val battle = createBattleStub()
       val user = createUserStub(
@@ -44,7 +44,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow voting for battle we are participating in" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val uid = "uid"
       val battle = createBattleStub()
@@ -57,7 +57,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow voting battles with incomplete bio" in {
-      api.config returns createStubConfig
+      applyConfigMock()
 
       val battle = createBattleStub()
       val user = createUserStub(cultureId = None)

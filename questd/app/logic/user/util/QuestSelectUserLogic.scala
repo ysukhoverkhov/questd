@@ -34,22 +34,40 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private[user] def getTutorialQuests: Option[Iterator[Quest]] = {
-    Logger.trace("getTutorialQuests returns None since does not implemented")
-    None
+    Logger.trace("getTutorialQuests")
+
+    val tutorialQuestId = api.configNamed("Tutorial")(api.TutorialConfigParams.TutorialQuestId)
+
+    if (user.timeLine.exists(_.objectId == tutorialQuestId) || user.profile.publicProfile.level > 1) { // TODO: remove this when QuestME-991 will be fixed.
+      Logger.trace("  returning None since it's already there")
+      None
+    } else {
+      Logger.trace("  adding tutorial quest (if it'll be found)")
+      val maybeQuests = checkNotEmptyIterator(
+        Some(
+          api.getAllQuests(
+            GetAllQuestsRequest(
+              user = user,
+              status = QuestStatus.ForTutorial,
+              cultureId = None,
+              ids = List(tutorialQuestId))).body.get.quests))
+      if (maybeQuests.isEmpty) Logger.error(s"Tutorial quest not found but it should be!")
+      maybeQuests
+    }
   }
 
   private[user] def getStartingQuests(implicit selected: List[Quest]): Option[Iterator[Quest]] = {
     Logger.trace("getStartingQuests")
 
-    if (user.profile.publicProfile.level > api.config(api.ConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
+    if (user.profile.publicProfile.level > api.config(api.DefaultConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
       Logger.trace("  returns None because of high level")
       None
     } else {
 
       val algorithms = List(
-        (api.config(api.ConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests),
-        (api.config(api.ConfigParams.QuestProbabilityStartingFriendQuests).toDouble, () => getFriendsQuests),
-        (api.config(api.ConfigParams.QuestProbabilityStartingFollowingQuests).toDouble, () => getFollowingQuests),
+        (api.config(api.DefaultConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests),
+        (api.config(api.DefaultConfigParams.QuestProbabilityStartingFriendQuests).toDouble, () => getFriendsQuests),
+        (api.config(api.DefaultConfigParams.QuestProbabilityStartingFollowingQuests).toDouble, () => getFollowingQuests),
         (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
@@ -61,9 +79,9 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("getDefaultQuests")
 
     val algorithms = List(
-      (api.config(api.ConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests),
-      (api.config(api.ConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests),
-      (api.config(api.ConfigParams.QuestProbabilityVIP).toDouble, () => getVIPQuests),
+      (api.config(api.DefaultConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests),
+      (api.config(api.DefaultConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests),
+      (api.config(api.DefaultConfigParams.QuestProbabilityVIP).toDouble, () => getVIPQuests),
       (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 
@@ -147,7 +165,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   private[user] def getAnyQuestsDefaultCultureIgnoringLevels(implicit selected: List[Quest]) = {
     Logger.trace("  Returning from any quests ignoring levels and for default culture")
 
-    val defaultCultureId = api.config(api.ConfigParams.DefaultCultureId)
+    val defaultCultureId = api.config(api.DefaultConfigParams.DefaultCultureId)
 
     checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
       user = user,

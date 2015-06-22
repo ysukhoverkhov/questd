@@ -7,7 +7,7 @@ object Global extends GlobalSettings {
 
     ComponentRegistrySingleton
     Logger.info(s"Starting Application ${misc.BuildInfo}")
-    Logger.trace(s"Trace log is enabled starting in development mode")
+    Logger.trace(s"Trace log is enabled. Starting in development mode.")
   }
 
 }

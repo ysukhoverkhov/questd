@@ -11,6 +11,9 @@ import models.domain.common.{ContentVote, ContentType, ContentReference}
 import models.domain.quest.QuestInfoContent
 import models.domain.solution.SolutionInfoContent
 import models.domain.user._
+import models.domain.user.friends.FriendshipStatus
+import models.domain.user.profile.Gender
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
 import play.Logger
 
 private object DebugWSImplTypes {
@@ -45,6 +48,10 @@ private object DebugWSImplTypes {
   case class WSSetLevelRequest (
     level: Int
     )
+
+  type WSResetProfileDebugResult = ResetProfileDebugResult
+
+  type WSResetTutorialResult = ResetTutorialResult
 }
 
 trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
@@ -222,7 +229,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     }
   }
 
-  def resetTutorial = wrapJsonApiCallReturnBody[ResetTutorialResult] { (js, r) =>
+  def resetTutorial = wrapJsonApiCallReturnBody[WSResetTutorialResult] { (js, r) =>
     api.resetTutorial(ResetTutorialRequest(r.user))
   }
 
@@ -233,6 +240,15 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     api.setLevelDebug(SetLevelDebugRequest(r.user, v.level))
 
     OkApiResult(WSDebugResult("Done"))
+  }
+
+  /**
+   * Resets our profile to no tutorial, level one and no assets.
+   *
+   * @return
+   */
+  def resetProfile = wrapApiCallReturnBody[WSResetProfileDebugResult] { r =>
+    api.resetProfileDebug(ResetProfileDebugRequest(r.user))
   }
 
   def generateErrorLog = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>

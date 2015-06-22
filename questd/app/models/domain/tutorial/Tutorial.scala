@@ -7,5 +7,5 @@ import models.domain.base.ID
  */
 case class Tutorial (
   id: String,
-  elements: List[TutorialElement]
+  elements: List[TutorialElement] = List.empty
   ) extends ID

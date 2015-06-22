@@ -5,6 +5,8 @@ import controllers.sn.client.User
 import models.domain.culture.Culture
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, LoginMethod}
+import models.domain.user.demo.UserDemographics
+import models.domain.user.profile.{PublicProfile, Profile, Bio}
 import models.store
 import org.mockito.Matchers.{eq => mockEq}
 

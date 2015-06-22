@@ -7,6 +7,8 @@ import controllers.domain.app.quest.SolveQuestUpdateRequest
 import controllers.domain.helpers._
 import models.domain.solution.{Solution, SolutionInfo, SolutionInfoContent, SolutionStatus}
 import models.domain.user._
+import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
 import models.view.QuestView
 import play.Logger
 
@@ -16,7 +18,7 @@ case class SolveQuestRequest(
   user: User,
   questId: String,
   solution: SolutionInfoContent)
-case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, solutionId: Option[String] = None)
 
 case class RewardSolutionAuthorRequest(solution: Solution, author: User)
 case class RewardSolutionAuthorResult()
@@ -69,11 +71,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               db.user.recordQuestSolving(
                 u.id,
                 questToSolve.id,
+                sol.id,
                 u.profile.questSolutionContext.bookmarkedQuest.map(_.id).contains(questToSolve.id))
-            }, { u: User =>
-              db.user.recordSolutionCreation(
-                u.id,
-                sol.id)
             }) ifSome { u =>
 
               // Running API actions
@@ -118,7 +117,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               } map {
                 tryCreateBattle(TryCreateBattleRequest(sol))
               } map {
-                OkApiResult(SolveQuestResult(OK, Some(r.user.profile)))
+                OkApiResult(SolveQuestResult(
+                  allowed = OK,
+                  profile = Some(r.user.profile),
+                  solutionId = Some(sol.id)))
               }
             }
 

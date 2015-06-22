@@ -60,7 +60,7 @@ class LoginWSSpecs extends Specification
       status(r) must equalTo(OK)
       contentType(r) must beSome("application/json")
       contentAsString(r) must contain(sessid)
-      session(r).get(controllers.web.rest.component.SecurityWSImpl.SessionIdKey) must beSome
+      session(r).get(controllers.web.rest.component.SecurityWSImplTypes.SessionIdKey) must beSome
     }
 
     "Do not login user with incorrect FB token" in new WithApplication {

@@ -81,7 +81,7 @@ class QuestDAOSpecs extends Specification
           level = 3,
           vip = false,
           cultureId = "c1",
-          points = 321),
+          timelinePoints = 321),
 
         createQuestStub(
           id = "q2",
@@ -90,7 +90,7 @@ class QuestDAOSpecs extends Specification
           level = 13,
           vip = true,
           cultureId = "c2",
-          points = 21),
+          timelinePoints = 21),
 
         createQuestStub(
           id = "q3",
@@ -99,14 +99,14 @@ class QuestDAOSpecs extends Specification
           level = 7,
           vip = true,
           cultureId = "c3",
-          points = 60))
+          timelinePoints = 60))
 
       qs.foreach(db.quest.create)
 
-      // Sorted by poins.
+      // Sorted by points.
       val all = db.quest.allWithParams().toList
       all.size must beEqualTo(qs.size)
-      all.map(_.id).sorted must beEqualTo(qs.map(_.id).sorted)
+      all.map(_.id) must beEqualTo(qs.sortBy(_.rating.timelinePoints)(Ordering[Int].reverse).map(_.id))
 
       val status = db.quest.allWithParams(status = List(QuestStatus.CheatingBanned)).toList
       status.map(_.id).size must beEqualTo(2)

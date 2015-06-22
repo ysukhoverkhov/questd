@@ -11,7 +11,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 
     "Return battle from friends if dice rolls so" in {
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.13
 
       val bid = "qid"
@@ -28,7 +28,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
     }
 
     "Return battles from following if dice rolls so" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.38
 
       val bid = "qid"
@@ -80,7 +80,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //    }
 
     "Return VIP battles if dice rolls so" in {
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.75
 
       val bid = "qid"
@@ -221,7 +221,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
       val qid = "qid"
       val u = createUserStub()
 
-      api.config returns createStubConfig
+      applyConfigMock()
       rand.nextDouble returns 0.75
 
       api.getVIPBattles(any[GetVIPBattlesRequest]) returns OkApiResult(GetVIPBattlesResult(List.empty.iterator))

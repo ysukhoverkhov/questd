@@ -45,6 +45,15 @@ trait BattleDAO extends BaseDAO[Battle] {
     friendsPointsChange: Int): Option[Battle]
 
   /**
+   * @param id Id of battle to change points.
+   * @param timelinePointsChange Change of timeline points.
+   * @return updated battle.
+   */
+  def updatePoints(
+    id: String,
+    timelinePointsChange: Int): Option[Battle]
+
+  /**
    * Replaces culture ids of battles with old one.
    * @param oldCultureId Replace thi culture id
    * @param newCultureId With this culture id.

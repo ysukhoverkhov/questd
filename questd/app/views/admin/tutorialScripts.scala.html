@@ -41,7 +41,7 @@ elements: List[models.domain.tutorial.TutorialElement])
     </tr>
 
     @for(element <- elements) {
-    <tr>
+    <tr id="@element.id">
         <td>@element.id</td>
 
         <!-- Action -->
@@ -192,17 +192,25 @@ elements: List[models.domain.tutorial.TutorialElement])
 
         </td>
 
-        <td>
+        <td nowrap="nowrap">
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.upElement(currentPlatform, element.id)) {
+            <input type='submit' value='UP' />
+            }
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.downElement(currentPlatform, element.id)) {
+            <input type='submit' value='DOWN' />
+            }
+            <p>
             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteElement(currentPlatform, element.id)) {
                 <input type='submit' value='DELETE' />
             }
+            </p>
         </td>
     </tr>
     }
     <tr>
         <td colspan="5">
             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addElement(currentPlatform)) {
-            <input type='submit' value='Add Element' />
+                <input type='submit' value='Add Element' />
             }
         </td>
     </tr>

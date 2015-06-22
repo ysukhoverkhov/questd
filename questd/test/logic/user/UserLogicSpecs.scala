@@ -3,6 +3,7 @@ package logic.user
 import logic.BaseLogicSpecs
 import models.domain.common.Assets
 import models.domain.user._
+import models.domain.user.profile.{Rights, PublicProfile, Profile, Bio}
 
 class UserLogicSpecs extends BaseLogicSpecs {
 

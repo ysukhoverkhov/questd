@@ -1,6 +1,6 @@
 package logic
 
-import models.domain.user.Functionality
+import models.domain.user.profile.Functionality
 
 object constants {
 
@@ -14,7 +14,7 @@ object constants {
     Functionality.VoteReviews -> 1,
     Functionality.AddToFollowing -> 1,
     Functionality.SubmitPhotoSolutions -> 2,
-    // Functionality.ChallengeBattles -> 3,
+    Functionality.ChallengeBattles -> 3, // TODO: write me in desdoc.
     Functionality.Report -> 4,
     Functionality.SubmitVideoSolutions -> 5,
     Functionality.InviteFriends -> 6,

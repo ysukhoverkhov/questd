@@ -6,12 +6,16 @@ import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import models.domain.user._
 import models.domain.user.dailyresults.DailyResult
+import models.domain.user.profile.Profile
 
 case class SetDebugRequest(user: User, debug: String)
 case class SetDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class SetLevelDebugRequest(user: User, level: Int)
 case class SetLevelDebugResult(user: User)
+
+case class ResetProfileDebugRequest(user: User)
+case class ResetProfileDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -53,5 +57,24 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     OkApiResult(SetLevelDebugResult(userWithNewRights))
   }
+
+
+  /**
+   * Resets money and tutorial and level.
+   */
+  def resetProfileDebug(request: ResetProfileDebugRequest): ApiResult[ResetProfileDebugResult] = handleDbException {
+    import request._
+
+    {
+      adjustAssets(AdjustAssetsRequest(user, -user.profile.assets))
+    } map { r =>
+      setLevelDebug(SetLevelDebugRequest(r.user, 1))
+    } map { r =>
+      resetTutorial(ResetTutorialRequest(r.user))
+    } map { r =>
+      OkApiResult(ResetProfileDebugResult(OK, r.profile))
+    }
+  }
+
 }
 

@@ -3,7 +3,7 @@ import spray.http.DateTime
 
 name := """questd"""
 
-version := "0.40.05-SNAPSHOT"
+version := "0.40.06-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 

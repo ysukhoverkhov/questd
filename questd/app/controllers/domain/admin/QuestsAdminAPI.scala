@@ -2,9 +2,7 @@ package controllers.domain.admin
 
 import models.domain.quest.{QuestStatus, Quest}
 import play.Logger
-
 import components.DBAccessor
-import models.domain._
 import controllers.domain.helpers._
 import controllers.domain._
 

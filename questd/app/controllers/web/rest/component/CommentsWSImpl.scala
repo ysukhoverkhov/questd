@@ -3,7 +3,7 @@ package controllers.web.rest.component
 import controllers.domain.app.user.{GetCommentsForObjectResult, GetCommentsForObjectRequest, PostCommentResult, PostCommentRequest}
 import controllers.web.helpers._
 
-private object CommentsWSImpl {
+private object CommentsWSImplTypes {
 
   case class WSPostCommentRequest(
     /// id of object we comment.
@@ -33,7 +33,7 @@ private object CommentsWSImpl {
 
 trait CommentsWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
 
-  import CommentsWSImpl._
+  import CommentsWSImplTypes._
 
   /**
    * Post a single comment to arbitrary object.

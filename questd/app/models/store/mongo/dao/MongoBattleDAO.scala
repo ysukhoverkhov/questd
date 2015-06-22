@@ -75,6 +75,7 @@ private[mongo] class MongoBattleDAO
     findByExample(
       example = queryBuilder.result(),
       sort = MongoDBObject(
+        "timelinePoints" -> -1,
         "lastModDate" -> 1),
       skip = skip)
   }
@@ -142,6 +143,20 @@ private[mongo] class MongoBattleDAO
           "info.battleSides.$.pointsFriends" -> friendsPointsChange),
         "$set" -> MongoDBObject(
           "lastModDate" -> new Date())))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def updatePoints(
+    id: String,
+    timelinePointsChange: Int): Option[Battle] = {
+
+    findAndModify(
+      MongoDBObject("id" -> id),
+      MongoDBObject(
+        "$inc" -> MongoDBObject(
+          "timelinePoints" -> timelinePointsChange)))
   }
 
   /**

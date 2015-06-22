@@ -1,4 +1,4 @@
-package models.domain.user
+package models.domain.user.stats
 
 import models.domain.common.ContentVote
 
@@ -25,14 +25,9 @@ case class UserStats (
   votedQuests: Map[String, ContentVote.Value] = Map.empty,
 
   /**
-   * List of all solved quests.
+   * List of all solved quests with corresponding solution ids.
    */
-  solvedQuests: List[String] = List.empty,
-
-  /**
-   * List of all our created solutions.
-   */
-  createdSolutions: List[String] = List.empty,
+  solvedQuests: Map[String, String] = Map.empty,
 
   /**
    * All voted solutions.

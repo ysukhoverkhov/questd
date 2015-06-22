@@ -7,8 +7,13 @@ import com.novus.salat._
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
+import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
+import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
+import models.domain.user.profile.{DailyTasks, Rights, Task}
+import models.domain.user.stats.SolutionsInBattle
+import models.domain.user.timeline.TimeLineEntry
 import models.store.dao._
 import models.store.mongo.SalatContext._
 import models.store.mongo.helpers._
@@ -122,20 +127,6 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def recordSolutionCreation(id: String, solutionId: String): Option[User] = {
-    val queryBuilder = MongoDBObject.newBuilder
-
-    queryBuilder += ("$push" -> MongoDBObject(
-      "stats.createdSolutions" -> solutionId))
-
-    findAndModify(
-      id,
-      queryBuilder.result())
-  }
-
-  /**
-   * @inheritdoc
-   */
   def recordQuestVote(id: String, questId: String, vote: ContentVote.Value): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -208,7 +199,7 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def recordQuestSolving(id: String, questId: String, removeBookmark: Boolean): Option[User] = {
+  def recordQuestSolving(id: String, questId: String, solutionId: String, removeBookmark: Boolean): Option[User] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -217,8 +208,8 @@ private[mongo] class MongoUserDAO
         "profile.questSolutionContext.bookmarkedQuest" -> ""))
     }
 
-    queryBuilder += ("$push" -> MongoDBObject(
-      "stats.solvedQuests" -> questId))
+    queryBuilder += ("$set" -> MongoDBObject(
+      s"stats.solvedQuests.$questId" -> solutionId))
 
     findAndModify(
       id,
@@ -752,6 +743,31 @@ private[mongo] class MongoUserDAO
         "$pull" -> MongoDBObject(
           "timeLine" -> MongoDBObject(
           "objectId" -> objectId))))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$push" -> MongoDBObject(
+          "battleRequests" -> grater[BattleRequest].asDBObject(battleRequest))))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "battleRequests.mySolutionId" -> mySolutionId,
+        "battleRequests.opponentSolutionId" -> opponentSolutionId),
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "battleRequests.$.status" -> status)))
   }
 }
 

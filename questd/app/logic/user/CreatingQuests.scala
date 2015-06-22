@@ -8,7 +8,7 @@ import models.domain._
 import models.domain.common.{Assets, ContentType}
 import ContentType._
 import models.domain.quest.QuestInfoContent
-import models.domain.user.Functionality
+import models.domain.user.profile.Functionality
 
 /**
  * All logic related to proposing quests.
@@ -36,7 +36,7 @@ trait CreatingQuests { this: UserLogic =>
       NotEnoughRights
     else if (!canProposeQuestToday)
       CoolDown
-    else if (questContent.description.length > api.config(api.ConfigParams.QuestMaxDescriptionLength).toInt)
+    else if (questContent.description.length > api.config(api.DefaultConfigParams.QuestMaxDescriptionLength).toInt)
       LimitExceeded
     else if (!bioComplete)
       IncompleteBio

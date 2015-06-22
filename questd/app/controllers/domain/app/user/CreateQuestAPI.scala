@@ -7,6 +7,8 @@ import controllers.domain.helpers._
 import logic.QuestLogic
 import models.domain.quest.{Quest, QuestInfo, QuestInfoContent, QuestStatus}
 import models.domain.user._
+import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.timeline.{TimeLineType, TimeLineReason}
 
 case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List.empty)
 case class CreateQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -49,7 +51,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
         // making all db calls
         runWhileSome(u)(
         { u: User =>
-          if ((config(api.ConfigParams.DebugDisableQuestCreationCoolDown) == "1") || u.profile.publicProfile.vip) {
+          if ((config(api.DefaultConfigParams.DebugDisableQuestCreationCoolDown) == "1") || u.profile.publicProfile.vip) {
             Some(u)
           } else {
             db.user.updateQuestCreationCoolDown(

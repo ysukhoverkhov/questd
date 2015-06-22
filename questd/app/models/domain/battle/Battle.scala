@@ -11,6 +11,7 @@ case class Battle(
   id: String = ID.generateUUID(),
   info: BattleInfo,
   lastModDate: Date = new Date(),
+  timelinePoints: Int = 0,
   level: Int,
   vip: Boolean,
   cultureId: String
