@@ -81,7 +81,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(user).addToAssets(mEq(u.id), mEq(q.info.solveReward - q.info.solveCost))
 //      there was one(user).addEntryToTimeLineMulti(mEq(List("fid1")), any)
       there was one(user).addEntryToTimeLine(mEq(friend.id), any)
-      there was one(quest).updatePoints(mEq(q.id), mEq(2), anyInt, anyInt, anyInt, anyInt, anyInt)
+      there was one(quest).updatePoints(mEq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt)
       there was one(user).storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any)
 
       result must beAnInstanceOf[OkApiResult[SolveQuestResult]]
