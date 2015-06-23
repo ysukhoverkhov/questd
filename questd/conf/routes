@@ -86,6 +86,8 @@ POST	/rest/getTutorial	    						controllers.web.rest.TutorialWS.getTutorial
 POST	/rest/closeTutorialElement						controllers.web.rest.TutorialWS.closeTutorialElement
 POST	/rest/assignTutorialTask						controllers.web.rest.TutorialWS.assignTutorialTask
 POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
+POST	/rest/assignTutorialQuest						controllers.web.rest.TutorialWS.assignTutorialQuest
+
 
 # Comments
 POST	/rest/postComment	    						controllers.web.rest.CommentsWS.postComment
