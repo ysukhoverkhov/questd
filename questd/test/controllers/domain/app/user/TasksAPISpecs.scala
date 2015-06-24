@@ -481,7 +481,7 @@ class TasksAPISpecs extends BaseAPISpecs {
   }
 
   "Assign tutorial quest" in context {
-    val tutorialQuestId = "tqid"
+    val tutorialQuestId = "tutorial_1"
     val u = createUserStub()
     val q = createQuestStub(id = tutorialQuestId)
 
@@ -501,7 +501,6 @@ class TasksAPISpecs extends BaseAPISpecs {
   "Do not assign tutorial quest if it was assigned" in context {
     val tutorialQuestId = "tqid"
     val u = createUserStub(tutorialState = TutorialState(usedTutorialQuestIds = List(tutorialQuestId)))
-    val q = createQuestStub(id = tutorialQuestId)
 
     val result = api.assignTutorialQuest(AssignTutorialQuestRequest(u, TutorialPlatform.iPhone, tutorialQuestId))
 

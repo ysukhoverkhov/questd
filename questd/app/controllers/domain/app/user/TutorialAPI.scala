@@ -139,6 +139,8 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
     if (user.profile.tutorialStates(platform.toString).usedTutorialQuestIds.contains(questId)) {
       OkApiResult(AssignTutorialQuestResult(LimitExceeded))
+    } else if (api.configNamed("Tutorial")(api.TutorialConfigParams.TutorialQuestId) != questId) {
+      OkApiResult(AssignTutorialQuestResult(OutOfContent))
     } else {
       db.quest.readById(questId) match {
         case Some(q) =>
