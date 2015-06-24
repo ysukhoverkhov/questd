@@ -1,0 +1,78 @@
+@(menuItems: Map[String, String], themes: List[models.domain.tag.Theme], cultures: List[models.domain.culture.Culture], newThemeForm: Form[controllers.web.admin.component.ThemeForm])
+
+@import helper._
+
+@main("Themes")(menuItems, Map.empty) {
+
+	<p>
+		@form(action = controllers.web.admin.routes.ThemesCRUD.createThemeCB()) {
+			@inputText(newThemeForm("id"), 'size -> 50, 'readonly -> "readonly") <br />
+			@inputText(newThemeForm("name"), 'size -> 20, 'placeholder -> "Name") <br />
+			@inputText(newThemeForm("description"), 'size -> 100, 'placeholder -> "Description") <br />
+			@select(newThemeForm("cultureId"), options(cultures.foldLeft(Map[String,String]())((r, v) => r + (v.id -> v.name)))) <br />
+
+			@select(newThemeForm("iconType"), options(List("Photo", "Video"))) <br />
+			@inputText(newThemeForm("iconStorage"), 'size -> 20, 'placeholder -> "Storage") <br />
+			@inputText(newThemeForm("iconReference"), 'size -> 100, 'placeholder -> "Reference") <br />
+
+			@select(newThemeForm("mediaType"), options(List("Photo", "Video"))) <br />
+			@inputText(newThemeForm("mediaStorage"), 'size -> 20, 'placeholder -> "Storage") <br />
+			@inputText(newThemeForm("mediaReference"), 'size -> 100, 'placeholder -> "Reference") <br />
+
+			@if(newThemeForm("id").value == None) {
+				<input type="submit" value="Create">
+			} else {
+				<input type="submit" value="Update">
+			}
+   		}
+	</p>
+
+    <table border="1">
+        <tr>
+            <td>id</td>
+            <td>text</td>
+            <td>comment</td>
+            <td>culture</td>
+
+            <td>icon.contentType</td>
+            <td>icon.storage</td>
+            <td>icon.reference</td>
+            <td>icon</td>
+
+            <td>media.contentType</td>
+            <td>media.storage</td>
+            <td>media.reference</td>
+            <td>media</td>
+        </tr>
+
+        @for(t <- themes) {
+            <tr>
+                <td>@t.id</td>
+                <td>@t.info.name</td>
+                <td>@t.info.description</td>
+                <td>@cultures.find(_.id == t.cultureId).map(_.name).getOrElse("!!Unknown!!")</td>
+
+                @if(t.info.icon != None) {
+                    <td>@t.info.icon.get.contentType.toString</td>
+                    <td>@t.info.icon.get.storage</td>
+                    <td>@t.info.icon.get.reference</td>
+                    <td><img src="@t.info.icon.get.reference" alt="@t.info.icon.get.reference" width="102" height="77"></td>
+                } else {
+                    <td>None</td>
+                    <td>None</td>
+                    <td>None</td>
+                    <td>None</td>
+                }
+
+                <td>@t.info.media.contentType.toString</td>
+                <td>@t.info.media.storage</td>
+                <td>@t.info.media.reference</td>
+                <td><img src="@t.info.media.reference" alt="@t.info.media.reference" width="102" height="77"></td>
+
+                <td><a href="@controllers.web.admin.routes.ThemesCRUD.themes(t.id.toString)">edit</a></td>
+                <td><a onClick='deleteFun("@controllers.web.admin.routes.ThemesCRUD.deleteThemeCB(t.id.toString)")' >delete</a></td>
+            </tr>
+        }
+    </table>
+}
+
