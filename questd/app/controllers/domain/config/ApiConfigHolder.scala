@@ -31,6 +31,7 @@ class _DefaultConfigParams {
   val QuestIACRatio = "50 13 Quest IAC to Total Votes Ratio"
   val QuestMinIACVotes = "50 14 Quest min IAC Votes"
   val QuestMaxDescriptionLength = "50 30 Quest Max Description Length"
+  val QuestMaxTimeLinePointsForSolve = "50 40 Quest Max Time Line Points For Solve"
 
   val SolutionCheatingRatio = "60 10 Solution Cheating to Votes Ratio"
   val SolutionMinCheatingVotes = "60 11 Solution minimum votes to thing it's a cheating"
@@ -113,6 +114,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.QuestIACRatio -> "0.03",
             DefaultConfigParams.QuestMinIACVotes -> "10",
             DefaultConfigParams.QuestMaxDescriptionLength -> "140",
+            DefaultConfigParams.QuestMaxTimeLinePointsForSolve -> "20",
 
             DefaultConfigParams.SolutionCheatingRatio -> "0.1",
             DefaultConfigParams.SolutionMinCheatingVotes -> "5",

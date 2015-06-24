@@ -37,6 +37,13 @@ private object TutorialWSImplTypes {
 
   /// OutOfContent if the task is not in active tasks.
   type WSIncTutorialTaskResult = IncTutorialTaskResult
+
+
+  case class WSAssignTutorialQuestRequest(
+    platform: String,
+    questId: String)
+
+  type WSAssignTutorialQuestResult = AssignTutorialQuestResult
 }
 
 trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
@@ -68,6 +75,12 @@ trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSCompo
     val v = Json.read[WSIncTutorialTaskRequest](js)
 
     api.incTutorialTask(IncTutorialTaskRequest(r.user, v.taskId))
+  }
+
+  def assignTutorialQuest = wrapJsonApiCallReturnBody[WSAssignTutorialQuestResult] { (js, r) =>
+    val v = Json.read[WSAssignTutorialQuestRequest](js)
+
+    api.assignTutorialQuest(AssignTutorialQuestRequest(r.user, TutorialPlatform.withNameEx(v.platform), v.questId))
   }
 
 }

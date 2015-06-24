@@ -8,6 +8,7 @@ import models.domain.tutorialtask.TutorialTask
 import models.domain.user._
 import models.domain.user.profile._
 import org.mockito.Matchers.{eq => mEq}
+import testhelpers.domainstubs._
 
 class TasksAPISpecs extends BaseAPISpecs {
 
@@ -420,7 +421,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       there was no(db.user).addTasks(any, any, any)
     }
 
-    "Do not assign already assigned tutorial ask" in context {
+    "Do not assign already assigned tutorial task" in context {
       val tutorialTaskId = "ttid"
       val u = createUser(DailyTasks(
         reward = Assets(1, 2, 3),
@@ -478,5 +479,38 @@ class TasksAPISpecs extends BaseAPISpecs {
       there was one(db.user).setTasksCompletedFraction(any, any)
     }
   }
+
+  "Assign tutorial quest" in context {
+    val tutorialQuestId = "tqid"
+    val u = createUserStub()
+    val q = createQuestStub(id = tutorialQuestId)
+
+    quest.readById(tutorialQuestId) returns Some(q)
+    user.addTutorialQuestAssigned(any, any, any) returns Some(u)
+    user.addEntryToTimeLine(any, any) returns Some(u)
+
+    val result = api.assignTutorialQuest(AssignTutorialQuestRequest(u, TutorialPlatform.iPhone, tutorialQuestId))
+
+    result must beAnInstanceOf[OkApiResult[AssignTutorialQuestResult]]
+
+    there was one(quest).readById(tutorialQuestId)
+    there was one(user).addTutorialQuestAssigned(mEq(u.id), any, mEq(tutorialQuestId))
+    there was one(user).addEntryToTimeLine(any, any)
+  }
+
+  "Do not assign tutorial quest if it was assigned" in context {
+    val tutorialQuestId = "tqid"
+    val u = createUserStub(tutorialState = TutorialState(usedTutorialQuestIds = List(tutorialQuestId)))
+    val q = createQuestStub(id = tutorialQuestId)
+
+    val result = api.assignTutorialQuest(AssignTutorialQuestRequest(u, TutorialPlatform.iPhone, tutorialQuestId))
+
+    result must beEqualTo(OkApiResult(AssignTutorialQuestResult(ProfileModificationResult.LimitExceeded)))
+
+    there was no(quest).readById(tutorialQuestId)
+    there was no(user).addTutorialQuestAssigned(mEq(u.id), any, mEq(tutorialQuestId))
+    there was no(user).addEntryToTimeLine(any, any)
+  }
+
 }
 

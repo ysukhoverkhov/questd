@@ -1,13 +1,14 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
+import controllers.domain.{DomainAPIComponent, _}
 import models.domain.common.Assets
 import models.domain.tutorial.{TutorialElement, TutorialPlatform}
 import models.domain.user._
-import models.domain.user.profile.{TutorialState, Task, DailyTasks, Profile}
+import models.domain.user.profile.{DailyTasks, Profile, Task, TutorialState}
+import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 
 case class GetCommonTutorialRequest(platform: TutorialPlatform.Value)
 case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])
@@ -23,6 +24,9 @@ case class AssignTutorialTaskResult(allowed: ProfileModificationResult, profile:
 
 case class IncTutorialTaskRequest(user: User, taskId: String)
 case class IncTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+
+case class AssignTutorialQuestRequest(user: User, platform: TutorialPlatform.Value, questId: String)
+case class AssignTutorialQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class ResetTutorialRequest(user: User)
 case class ResetTutorialResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -123,6 +127,38 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
         makeTask(MakeTaskRequest(user = user, taskId = Some(t.id)))
       } map { r =>
         OkApiResult(IncTutorialTaskResult(OK, Some(r.user.profile)))
+      }
+    }
+  }
+
+  /**
+   * Assigns new tutorial quest by client's request.
+   */
+  def assignTutorialQuest(request: AssignTutorialQuestRequest): ApiResult[AssignTutorialQuestResult] = handleDbException {
+    import request._
+
+    if (user.profile.tutorialStates(platform.toString).usedTutorialQuestIds.contains(questId)) {
+      OkApiResult(AssignTutorialQuestResult(LimitExceeded))
+    } else {
+      db.quest.readById(questId) match {
+        case Some(q) =>
+          db.user.addTutorialQuestAssigned(
+            user.id,
+            platform.toString,
+            questId) ifSome { user =>
+
+            addToTimeLine(
+              AddToTimeLineRequest(
+                user = user,
+                reason = TimeLineReason.Has,
+                objectType = TimeLineType.Quest,
+                objectId = questId,
+                actorId = Some(q.info.authorId))) map { r =>
+              OkApiResult(AssignTutorialQuestResult(OK, Some(r.user.profile)))
+            }
+          }
+        case None =>
+          OkApiResult(AssignTutorialQuestResult(OutOfContent))
       }
     }
   }

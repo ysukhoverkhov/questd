@@ -9,6 +9,7 @@ import models.domain.common.{Assets, ContentReference, ContentType, ContentVote}
 import models.domain.quest._
 import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
+import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
 import models.domain.user.auth.{LoginMethod, AuthInfo}
 import models.domain.user.battlerequests.BattleRequest
@@ -229,7 +230,8 @@ package object domainstubs {
     timeLine: List[TimeLineEntry] = List.empty,
     questBookmark: Option[String] = None,
     privateDailyResults: List[DailyResult] = List(createDailyResultStub()),
-    battleRequests: List[BattleRequest] = List.empty) = {
+    battleRequests: List[BattleRequest] = List.empty,
+    tutorialState: TutorialState = TutorialState()) = {
 
     User(
       id = id,
@@ -253,7 +255,8 @@ package object domainstubs {
           level = level,
           bio = Bio(
             gender = Gender.Male)),
-        rights = rights),
+        rights = rights,
+        tutorialStates = Map(TutorialPlatform.iPhone.toString -> tutorialState)),
       friends = friends,
       followers = followers,
       mustVoteSolutions = mustVoteSolutions,

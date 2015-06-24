@@ -670,6 +670,17 @@ private[mongo] class MongoUserDAO
   /**
    *
    */
+  def addTutorialQuestAssigned(id: String, platform: String, questId: String): Option[User] = {
+    findAndModify( // TODO: test me.
+      id,
+      MongoDBObject(
+        "$addToSet" -> MongoDBObject(
+          s"profile.tutorialStates.$platform.usedTutorialQuestIds" -> questId)))
+  }
+
+  /**
+   *
+   */
   def updateCultureId(id: String, cultureId: String): Option[User] = {
     findAndModify(
       id,

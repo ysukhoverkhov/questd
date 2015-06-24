@@ -102,17 +102,16 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                   ((te.objectType == TimeLineType.Quest)
                     && (te.actorId != u.id || te.reason != TimeLineReason.Created))
                 }
-                val numberOfSolvedQuests = u.timeLine.count { te =>
-                  ((te.objectType == TimeLineType.Solution)
-                    && (te.reason == TimeLineReason.Created)
-                    && (te.actorId == u.id))
-                }
+                val numberOfSolvedQuests = u.stats.solvedQuests.size
 
                 // Updating quest points.
                 val ratio = if (numberOfSolvedQuests == 0)
                   1
                 else
-                  Math.round(numberOfReviewedQuests / numberOfSolvedQuests)
+                  Math.max(
+                    Math.round(numberOfReviewedQuests / numberOfSolvedQuests),
+                    config(DefaultConfigParams.QuestMaxTimeLinePointsForSolve).toInt)
+
                 solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio))
               } map {
                 tryCreateBattle(TryCreateBattleRequest(sol))
