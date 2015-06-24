@@ -88,47 +88,66 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
 
     Logger.trace(s"Trying to create battle")
 
-    def selectCompetitor(possibleCompetitors: Iterator[Solution]): Option[Solution] = {
-      if (possibleCompetitors.hasNext) {
-        val other = possibleCompetitors.next()
+    /**
+     * Selects out of provided competitors suitable one.
+     */
+    def selectCompetitorSolution(possibleCompetitorSolutions: Iterator[Solution], exclusive: Boolean): Option[Solution] = {
+      if (possibleCompetitorSolutions.hasNext) {
+        val other = possibleCompetitorSolutions.next()
 
         Logger.trace(s"    Analysing competitor solution ${other.id} - $other")
-        Logger.trace(s"    ${other.info.authorId} != ${request.solution.info.authorId} && ${other.battleIds.isEmpty}")
+        Logger.trace(s"    ${other.info.authorId} != ${solution.info.authorId} && (${other.battleIds.isEmpty} && $exclusive)")
 
-        if (other.info.authorId != request.solution.info.authorId && other.battleIds.isEmpty) {
+        if (other.info.authorId != solution.info.authorId && (other.battleIds.isEmpty || !exclusive)) {
 
-          Logger.debug("Found fight pair for quest " + request.solution.info.questId + " :")
-          Logger.debug("  s1.id=" + request.solution.id)
+          Logger.debug("Found fight pair for quest " + solution.info.questId + " :")
+          Logger.debug("  s1.id=" + solution.id)
           Logger.debug("  s2.id=" + other.id)
 
           Some(other)
 
         } else {
           // Skipping to next if current is we are.
-          selectCompetitor(possibleCompetitors)
+          selectCompetitorSolution(possibleCompetitorSolutions, exclusive)
         }
       } else {
         None
       }
     }
 
-    // We have battleIds in solution, should filter in DAO call for solutions with no battles.
-    val possibleCompetitors = db.solution.allWithParams(
-      status = List(SolutionStatus.InRotation),
-      questIds = List(solution.info.questId),
-      cultureId = Some(solution.cultureId))
+    /**
+     * Selects possible rivals with statuses.
+     */
+    def solutionsForStatus(status: SolutionStatus.Value): Iterator[Solution] = {
+      db.solution.allWithParams(
+        status = List(status),
+        questIds = List(solution.info.questId),
+        cultureId = Some(solution.cultureId))
+    }
 
-    selectCompetitor(possibleCompetitors) match {
-      case Some(competitor) =>
+    selectCompetitorSolution(solutionsForStatus(SolutionStatus.InRotation), exclusive = true) match {
+      case Some(competitorSolution) =>
 
-        Logger.trace(s"  Selected competitor solution $competitor}")
-        val solutions = List(solution, competitor)
+        Logger.trace(s"  Selected competitor solution $competitorSolution}")
+        val solutions = List(solution, competitorSolution)
 
         createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
 
       case None =>
-        Logger.trace(s"  Competitor not selected")
-        OkApiResult(TryCreateBattleResult())
+        Logger.trace(s"  Competitor not selected, trying to find tutorial one.")
+
+        selectCompetitorSolution(solutionsForStatus(SolutionStatus.ForTutorial), exclusive = false) match {
+          case Some(competitorSolution) =>
+
+            Logger.trace(s"  Selected tutorial competitor solution $competitorSolution}")
+            val solutions = List(solution, competitorSolution)
+
+            createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
+
+          case None =>
+            Logger.trace(s"  Competitor not selected")
+            OkApiResult(TryCreateBattleResult())
+        }
     }
   }
 
