@@ -9,7 +9,7 @@ import models.domain.common.Assets
 import models.domain.culture.Culture
 import models.domain.user._
 import models.domain.user.friends.ReferralStatus
-import models.domain.user.profile.{Functionality, Rights, Profile, Gender}
+import models.domain.user.profile.{Functionality, Gender, Profile, Rights}
 import play.{Logger, Play}
 
 case class AdjustAssetsRequest(user: User, change: Assets)
@@ -60,6 +60,46 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Check is user should increase its level and increases it if he should.
    */
   def checkIncreaseLevel(request: CheckIncreaseLevelRequest): ApiResult[CheckIncreaseLevelResult] = handleDbException {
+
+    def rewardForFishingCrossPromotion(user: User): Unit = {
+      def userFishingId(user: User): String = {
+        user.auth.loginMethods.find(_.methodName == "FB")
+          .fold("missing")(_.crossPromotion.apps.find(_.appName == "fishing_paradise").fold("missing")(_.userId))
+      }
+
+      val myIdInFishing = userFishingId(user)
+      val referrerIdInFishing = user.friends.find(_.referralStatus == ReferralStatus.ReferredBy)
+        .fold("missing")(f => db.user.readById(f.friendId).fold("missing")(userFishingId))
+
+      Logger.error(
+        s"User ${user.id} leveled up to level ${user.profile.publicProfile.level}. " +
+          s"His fishing id is $myIdInFishing. " +
+          s"His referrer fishing id is $referrerIdInFishing.")
+
+
+      import play.api.Play.current
+      import play.api.libs.json._
+      import play.api.libs.ws._
+      import scala.concurrent.Future
+      import scala.concurrent.ExecutionContext.Implicits.global
+
+      val data = Json.obj(
+        "key1" -> "value1",
+        "key2" -> "value2"
+      )
+      val futureResponse: Future[WSResponse] = WS.url("").post(data)
+
+      futureResponse.onSuccess {
+        case v =>
+          Logger.debug(s"successfully sent cross promotion for user ${user.id}")
+      }
+      futureResponse.onFailure {
+        case t =>
+          Logger.error(s"Unable to send cross promotion for user ${user.id}")
+      }
+    }
+
+
     if (request.user.profile.ratingToNextLevel <= request.user.profile.assets.rating) {
       db.user.levelUp(request.user.id, request.user.profile.ratingToNextLevel) ifSome { user =>
         db.user.setNextLevelRatingAndRights(
@@ -67,17 +107,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
           user.ratingToNextLevel,
           user.calculateRights) ifSome { user =>
 
-          def userFishingId(user: User): String = {
-            user.auth.loginMethods.find(_.methodName == "FB")
-              .fold("missing")(_.crossPromotion.apps.find(_.appName == "fishing_paradise").fold("missing")(_.userId))
-          }
-
-          val myIdInFishing = userFishingId(user)
-          val referrerIdInFishing = user.friends.find(_.referralStatus == ReferralStatus.ReferredBy).fold("missing")(f => db.user.readById(f.friendId).fold("missing")(userFishingId))
-
-          Logger.error(s"User ${user.id} leveled up to level ${user.profile.publicProfile.level}. " +
-            s"His fishing id is $myIdInFishing. " +
-            s"His referrer fishing id is $referrerIdInFishing.")
+          rewardForFishingCrossPromotion(user)
 
           OkApiResult(CheckIncreaseLevelResult(user))
         }
