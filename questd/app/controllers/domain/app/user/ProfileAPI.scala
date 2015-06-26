@@ -9,6 +9,7 @@ import models.domain.common.Assets
 import models.domain.culture.Culture
 import models.domain.user._
 import models.domain.user.friends.ReferralStatus
+import models.domain.user.message.MessageInformation
 import models.domain.user.profile.{Functionality, Gender, Profile, Rights}
 import play.{Logger, Play}
 
@@ -84,14 +85,24 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       import scala.concurrent.ExecutionContext.Implicits.global
 
       val data = Json.obj(
-        "key1" -> "value1",
-        "key2" -> "value2"
+        "userId" -> s"fbk:$myIdInFishing",
+        "shinersReward" -> s"${user.profile.publicProfile.level * 10}",
+        "appName" -> "QuestMe",
+        "appIconUrl" -> "https://web1.fishingparadise3d.com/www_promo_images/i/questme-1.jpg"
       )
-      val futureResponse: Future[WSResponse] = WS.url("").post(data)
+
+      val futureResponse: Future[WSResponse] = WS.url("http://web1.fishingparadise3d.com:9000/api/cross/giveReward").post(data)
 
       futureResponse.onSuccess {
         case v =>
           Logger.debug(s"successfully sent cross promotion for user ${user.id}")
+
+          sendMessage(SendMessageRequest(
+            user,
+            MessageInformation(
+              s"${user.profile.publicProfile.level * 10} Shiners were sent to Fishing Paradise 3d. " +
+                s"Launch Facebook version and get grab them!",
+              None)))
       }
       futureResponse.onFailure {
         case t =>
