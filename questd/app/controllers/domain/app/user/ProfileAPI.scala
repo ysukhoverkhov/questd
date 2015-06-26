@@ -94,11 +94,11 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
           "appIconUrl" -> "https://web1.fishingparadise3d.com/www_promo_images/i/questme-1.jpg"
         )
 
-        val futureResponse: Future[WSResponse] = WS.url("http://web1.fishingparadise3d.com/api/cross/giveReward").post(data)
+        val futureResponse: Future[WSResponse] = WS.url("http://web1.fishingparadise3d.com/api/cross/giveReward1").post(data)
 //        val futureResponse: Future[WSResponse] = WS.url("http://webz.fishingparadise3d.com/api/cross/giveReward").post(data)
 
         futureResponse.onSuccess {
-          case v =>
+          case v if v.status == 200 =>
             Logger.debug(s"Successfully sent cross promotion for user ${user.id}")
 
             sendMessage(SendMessageRequest(
@@ -107,6 +107,9 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
                 s"${user.profile.publicProfile.level * 10} Shiners were sent to Fishing Paradise 3d. " +
                   s"Launch Facebook version and get grab them!",
                 None)))
+
+          case v =>
+            Logger.error(s"Unable to send cross promotion for user ${user.id}: ${v.status} - ${v.statusText}")
         }
         futureResponse.onFailure {
           case t =>
