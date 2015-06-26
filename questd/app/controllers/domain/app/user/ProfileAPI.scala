@@ -91,7 +91,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
         "appIconUrl" -> "https://web1.fishingparadise3d.com/www_promo_images/i/questme-1.jpg"
       )
 
-      val futureResponse: Future[WSResponse] = WS.url("http://web1.fishingparadise3d.com:9000/api/cross/giveReward").post(data)
+      val futureResponse: Future[WSResponse] = WS.url("http://web1.fishingparadise3d.com/api/cross/giveReward").post(data)
 
       futureResponse.onSuccess {
         case v =>
