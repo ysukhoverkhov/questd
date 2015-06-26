@@ -63,14 +63,15 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def checkIncreaseLevel(request: CheckIncreaseLevelRequest): ApiResult[CheckIncreaseLevelResult] = handleDbException {
 
     def rewardForFishingCrossPromotion(user: User): Unit = {
+      val missing = "missing"
       def userFishingId(user: User): String = {
         user.auth.loginMethods.find(_.methodName == "FB")
-          .fold("missing")(_.crossPromotion.apps.find(_.appName == "fishing_paradise").fold("missing")(_.userId))
+          .fold(missing)(_.crossPromotion.apps.find(_.appName == "fishing_paradise").fold(missing)(_.userId))
       }
 
       val myIdInFishing = userFishingId(user)
       val referrerIdInFishing = user.friends.find(_.referralStatus == ReferralStatus.ReferredBy)
-        .fold("missing")(f => db.user.readById(f.friendId).fold("missing")(userFishingId))
+        .fold(missing)(f => db.user.readById(f.friendId).fold(missing)(userFishingId))
 
       Logger.error(
         s"User ${user.id} leveled up to level ${user.profile.publicProfile.level}. " +
@@ -81,32 +82,38 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       import play.api.Play.current
       import play.api.libs.json._
       import play.api.libs.ws._
-      import scala.concurrent.Future
+
       import scala.concurrent.ExecutionContext.Implicits.global
+      import scala.concurrent.Future
 
-      val data = Json.obj(
-        "userId" -> s"fbk:$myIdInFishing",
-        "shinersReward" -> s"${user.profile.publicProfile.level * 10}",
-        "appName" -> "QuestMe",
-        "appIconUrl" -> "https://web1.fishingparadise3d.com/www_promo_images/i/questme-1.jpg"
-      )
+      if (myIdInFishing != missing) {
+        val data = Json.obj(
+          "userId" -> s"fbk:$myIdInFishing",
+          "shinersReward" -> s"${user.profile.publicProfile.level * 10}",
+          "appName" -> "QuestMe",
+          "appIconUrl" -> "https://web1.fishingparadise3d.com/www_promo_images/i/questme-1.jpg"
+        )
 
-      val futureResponse: Future[WSResponse] = WS.url("http://web1.fishingparadise3d.com/api/cross/giveReward").post(data)
+        val futureResponse: Future[WSResponse] = WS.url("http://web1.fishingparadise3d.com/api/cross/giveReward").post(data)
+//        val futureResponse: Future[WSResponse] = WS.url("http://webz.fishingparadise3d.com/api/cross/giveReward").post(data)
 
-      futureResponse.onSuccess {
-        case v =>
-          Logger.debug(s"successfully sent cross promotion for user ${user.id}")
+        futureResponse.onSuccess {
+          case v =>
+            Logger.debug(s"Successfully sent cross promotion for user ${user.id}")
 
-          sendMessage(SendMessageRequest(
-            user,
-            MessageInformation(
-              s"${user.profile.publicProfile.level * 10} Shiners were sent to Fishing Paradise 3d. " +
-                s"Launch Facebook version and get grab them!",
-              None)))
-      }
-      futureResponse.onFailure {
-        case t =>
-          Logger.error(s"Unable to send cross promotion for user ${user.id}")
+            sendMessage(SendMessageRequest(
+              user,
+              MessageInformation(
+                s"${user.profile.publicProfile.level * 10} Shiners were sent to Fishing Paradise 3d. " +
+                  s"Launch Facebook version and get grab them!",
+                None)))
+        }
+        futureResponse.onFailure {
+          case t =>
+            Logger.error(s"Unable to send cross promotion for user ${user.id}")
+        }
+      } else {
+        Logger.debug(s"Not sending request to FP3D since fishign id is missing for user ${user.id}")
       }
     }
 

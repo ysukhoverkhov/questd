@@ -7,7 +7,7 @@ import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import models.domain.common.{ContentVote, ContentType, ContentReference}
+import models.domain.common.{Assets, ContentVote, ContentType, ContentReference}
 import models.domain.quest.QuestInfoContent
 import models.domain.solution.SolutionInfoContent
 import models.domain.user._
@@ -65,7 +65,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
   }
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
-    api.populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(r.user))
+    api.adjustAssets(AdjustAssetsRequest(r.user, change = Assets(0, 0, 1000000)))
 
     OkApiResult(WSDebugResult("lalai"))
   }

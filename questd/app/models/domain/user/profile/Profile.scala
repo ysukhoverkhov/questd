@@ -15,7 +15,7 @@ case class Profile(
   profileVersion: Int = 1,
   publicProfile: PublicProfile = PublicProfile(),
   ratingToNextLevel: Int = 0,
-  assets: Assets = Assets(0, 0, 0),
+  assets: Assets = Assets(0, 0, 100000000), // TODO: 0,0,0 here
   rights: Rights = Rights(),
   dailyResults: List[DailyResult] = List.empty,
   dailyTasks: DailyTasks = DailyTasks(),
