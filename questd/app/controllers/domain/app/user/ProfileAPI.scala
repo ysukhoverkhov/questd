@@ -63,15 +63,16 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
   def checkIncreaseLevel(request: CheckIncreaseLevelRequest): ApiResult[CheckIncreaseLevelResult] = handleDbException {
 
     def rewardForFishingCrossPromotion(user: User): Unit = {
-      val missing = "missing"
+      val Missing = "missing"
+
       def userFishingId(user: User): String = {
         user.auth.loginMethods.find(_.methodName == "FB")
-          .fold(missing)(_.crossPromotion.apps.find(_.appName == "fishing_paradise").fold(missing)(_.userId))
+          .fold(Missing)(_.crossPromotion.apps.find(_.appName == "fishing_paradise").fold(Missing)(_.userId))
       }
 
       val myIdInFishing = userFishingId(user)
       val referrerIdInFishing = user.friends.find(_.referralStatus == ReferralStatus.ReferredBy)
-        .fold(missing)(f => db.user.readById(f.friendId).fold(missing)(userFishingId))
+        .fold(Missing)(f => db.user.readById(f.friendId).fold(Missing)(userFishingId))
 
       Logger.error(
         s"User ${user.id} leveled up to level ${user.profile.publicProfile.level}. " +
@@ -86,7 +87,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       import scala.concurrent.ExecutionContext.Implicits.global
       import scala.concurrent.Future
 
-      if (myIdInFishing != missing) {
+      if (myIdInFishing != Missing) {
         val data = Json.obj(
           "userId" -> s"fbk:$myIdInFishing",
           "shinersReward" -> s"${user.profile.publicProfile.level * 10}",
@@ -116,7 +117,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
             Logger.error(s"Unable to send cross promotion for user ${user.id}")
         }
       } else {
-        Logger.debug(s"Not sending request to FP3D since fishign id is missing for user ${user.id}")
+        Logger.debug(s"Not sending request to FP3D since fishing id is missing for user ${user.id}")
       }
     }
 
