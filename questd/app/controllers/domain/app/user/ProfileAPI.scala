@@ -121,7 +121,6 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       }
     }
 
-
     if (request.user.profile.ratingToNextLevel <= request.user.profile.assets.rating) {
       db.user.levelUp(request.user.id, request.user.profile.ratingToNextLevel) ifSome { user =>
         db.user.setNextLevelRatingAndRights(

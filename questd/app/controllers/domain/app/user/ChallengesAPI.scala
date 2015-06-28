@@ -8,7 +8,7 @@ import models.domain.solution.Solution
 import models.domain.user.User
 import models.domain.user.battlerequests.{BattleRequest, BattleRequestStatus}
 import models.domain.user.message.{MessageBattleRequestRejected, MessageBattleRequestAccepted}
-import models.domain.user.profile.Profile
+import models.domain.user.profile.{TaskType, Profile}
 import play.Logger
 
 case class ChallengeBattleRequest(
@@ -58,7 +58,11 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
           Some(user)
         }
         ) ifSome { user =>
-          OkApiResult(ChallengeBattleResult(OK, Some(user.profile)))
+          {
+            makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle))) // TODO: test me.
+          } map {
+            OkApiResult(ChallengeBattleResult(OK, Some(user.profile)))
+          }
         }
       }
     }

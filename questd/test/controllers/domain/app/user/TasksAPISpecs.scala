@@ -163,7 +163,7 @@ class TasksAPISpecs extends BaseAPISpecs {
     "Give reward if everything is completed" in context {
       val taskId = "asdasjdkas"
       val r1 = Assets(10, 20, 30)
-      val r2 = Assets(100, 200, 300)
+      val r2 = Assets(1, 2, 3)
       val u = createUser(DailyTasks(
         reward = r1,
         tasks = List(
@@ -215,7 +215,7 @@ class TasksAPISpecs extends BaseAPISpecs {
       val taskId = "tid"
       val tutorialTaskId = "tuttid"
       val r1 = Assets(10, 20, 30)
-      val r2 = Assets(100, 200, 300)
+      val r2 = Assets(1, 2, 3)
       val u = createUser(DailyTasks(
         reward = r1,
         tasks = List(

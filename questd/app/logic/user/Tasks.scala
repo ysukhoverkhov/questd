@@ -62,6 +62,7 @@ trait Tasks { this: UserLogic =>
       TaskType.AddToFollowing -> createAddToFollowingTask,
       TaskType.LikeQuests -> createLikeQuestsTask,
       TaskType.CreateQuest -> createCreateQuestTask,
+      TaskType.ChallengeBattle -> createChallengeBattleTask,
       TaskType.VoteReviews -> createVoteReviewsTask,
       TaskType.SubmitReviewsForResults -> createSubmitReviewsForResultsTask,
       TaskType.SubmitReviewsForQuests -> createSubmitReviewsForQuestsTask,
@@ -156,6 +157,13 @@ trait Tasks { this: UserLogic =>
         requiredCount = 1))
     else
       None
+  }
+
+  /**
+   * Create tasks for challenging people.
+   */
+  private def createChallengeBattleTask(user: User) = ifHasRightTo(Functionality.ChallengeBattles) {
+    None
   }
 
   /**
