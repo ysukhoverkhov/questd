@@ -13,5 +13,5 @@ case class Quest(
   lastModDate: Date = new Date(),
   info: QuestInfo,
   rating: QuestRating = QuestRating(),
-  solutionIds: List[String] = List.empty,
+  solutionsCount: Int = 0,
   status: QuestStatus.Value = QuestStatus.InRotation) extends ID

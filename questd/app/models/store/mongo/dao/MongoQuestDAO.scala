@@ -68,8 +68,8 @@ private[mongo] class MongoQuestDAO
       queryBuilder += ("cultureId" -> cultureId.get)
     }
 
-    if (withSolutions) { // TODO: test it.
-      queryBuilder += ("solutionIds.1" -> MongoDBObject("$exists" -> true))
+    if (withSolutions) {
+      queryBuilder += ("solutionsCount" -> MongoDBObject("$gt" -> 0))
     }
 
     Logger.trace("DB - allWithParams - " + queryBuilder.result)
@@ -147,12 +147,12 @@ private[mongo] class MongoQuestDAO
   /**
    * @inheritdoc
    */
-  def addSolutionId(id: String, solutionId: String): Option[Quest] = {
+  def addSolution(id: String): Option[Quest] = {
     findAndModify(
       id,
       MongoDBObject(
-        "$push" -> MongoDBObject(
-          "solutionIds" -> solutionId)))
+        "$inc" -> MongoDBObject(
+          "solutionsCount" -> 1)))
   }
 }
 

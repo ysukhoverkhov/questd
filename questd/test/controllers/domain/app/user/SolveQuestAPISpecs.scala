@@ -44,7 +44,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       quest.readById(mEq(q.id)) returns Some(q)
       quest.updatePoints(mEq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
-      quest.addSolutionId(any, any) returns Some(q)
+      quest.addSolution(any) returns Some(q)
       user.recordQuestSolving(mEq(u.id), mEq(q.id), any, mEq(false)) returns Some(u)
       user.addEntryToTimeLine(any, any) returns Some(u)
       user.addToAssets(mEq(u.id), any) returns Some(u)
@@ -88,7 +88,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 //      there was one(user).addEntryToTimeLineMulti(mEq(List("fid1")), any)
       there was one(user).addEntryToTimeLine(mEq(friend.id), any)
       there was one(quest).updatePoints(mEq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt)
-      there was one(quest).addSolutionId(mEq(q.id), any)
+      there was one(quest).addSolution(mEq(q.id))
       there was one(user).storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any)
     }
 

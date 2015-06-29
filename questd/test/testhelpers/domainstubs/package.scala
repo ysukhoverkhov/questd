@@ -53,7 +53,8 @@ package object domainstubs {
     timelinePoints: Int = 0,
     solveCost: Assets = Assets(0, 0, 0),
     solveReward: Assets = Assets(0, 0, 0),
-    likes: Int = 0) = {
+    likes: Int = 0,
+    solutionsCount: Int = 0) = {
 
     Quest(
       id = id,
@@ -74,7 +75,8 @@ package object domainstubs {
           victoryReward = Assets(1, 1, 1),
           defeatReward =Assets(2, 2, 2)),
       rating = QuestRating(timelinePoints = timelinePoints, likesCount = likes),
-      status = status)
+      status = status,
+      solutionsCount = solutionsCount)
   }
 
   def createSolutionInfoContent = {

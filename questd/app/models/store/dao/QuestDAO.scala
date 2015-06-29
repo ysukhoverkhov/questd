@@ -55,10 +55,9 @@ trait QuestDAO extends BaseDAO[Quest] {
    * Adds solution id to list of quest's solutions.
    *
    * @param id Id of a quest to add solution id to.
-   * @param solutionId Id of solution to add.
    * @return updated quest.
    */
-  def addSolutionId(id: String, solutionId: String): Option[Quest]
+  def addSolution(id: String): Option[Quest]
 
 }
 

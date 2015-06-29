@@ -104,7 +104,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
           id = quest.id,
           timelinePointsChange = ratio)
       }, { q: Quest =>
-        db.quest.addSolutionId(q.id, request.solutionId)
+        db.quest.addSolution(q.id)
       }) ifSome { v =>
         updateQuestStatus(UpdateQuestStatusRequest(v))
       } map {
