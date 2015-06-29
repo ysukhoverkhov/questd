@@ -5,6 +5,7 @@ import models.domain.quest.QuestStatus
 import models.domain.user.User
 import models.domain.user.friends.{Friendship, FriendshipStatus}
 import testhelpers.domainstubs._
+import org.mockito.Matchers.{eq => mEq}
 
 class QuestFetchAPISpecs extends BaseAPISpecs {
 
@@ -15,29 +16,31 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       val u = createUserStub()
 
       db.quest.allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List(u.id),
-        authorIdsExclude = List.empty,
-        levels = None,
-        skip = 0,
-        vip = Some(false),
-        ids = List.empty,
-        idsExclude = List.empty,
-        cultureId = None) returns List.empty.iterator
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = mEq(List(u.id)),
+        authorIdsExclude = mEq(List.empty),
+        levels = mEq(None),
+        skip = mEq(0),
+        vip = mEq(Some(false)),
+        ids = mEq(List.empty),
+        idsExclude = mEq(List.empty),
+        cultureId = mEq(None),
+        withSolutions = mEq(false)) returns List.empty.iterator
 
       val result = api.getMyQuests(GetMyQuestsRequest(u, QuestStatus.InRotation))
 
       result must beAnInstanceOf[OkApiResult[GetMyQuestsResult]]
       there was one(quest).allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List(u.id),
-        authorIdsExclude = null,
-        levels = null,
-        skip = 0,
-        vip = null,
-        ids = null,
-        idsExclude = null,
-        cultureId = null)
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = mEq(List(u.id)),
+        authorIdsExclude = any,
+        levels = any,
+        skip = mEq(0),
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        cultureId = any,
+        withSolutions = any)
     }
 
     "getFriendsQuests return quests for confirmed friends only" in context {
@@ -56,24 +59,29 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       val u = createUser(List(Friendship(f1.id, FriendshipStatus.Accepted), Friendship(f2.id, FriendshipStatus.Invited)))
 
       db.quest.allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List(f1.id),
-        authorIdsExclude = List.empty,
-        levels = Some((1, 2)),
-        skip = 0,
-        vip = None,
-        ids = List.empty,
-        idsExclude = List.empty
-      ) returns List.empty.iterator
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = mEq(List(f1.id)),
+        authorIdsExclude = mEq(List.empty),
+        levels = mEq(Some((1, 2))),
+        skip = mEq(0),
+        vip = mEq(None),
+        ids = mEq(List.empty),
+        idsExclude = mEq(List.empty),
+        cultureId = any,
+        withSolutions = mEq(false)
+      ) returns Iterator.empty
       db.quest.allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List(f1.id, f2.id),
-        levels = Some((1, 2)),
-        skip = 0,
-        vip = None,
-        ids = List.empty,
-        idsExclude = List.empty
-      ) returns List.empty.iterator
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = mEq(List(f1.id, f2.id)),
+        authorIdsExclude = mEq(List.empty),
+        levels = mEq(Some((1, 2))),
+        skip = mEq(0),
+        vip = mEq(None),
+        ids = mEq(List.empty),
+        idsExclude = mEq(List.empty),
+        cultureId = any,
+        withSolutions = mEq(false)
+      ) returns Iterator.empty
 
       val result = api.getFriendsQuests(GetFriendsQuestsRequest(
         user = u,
@@ -83,51 +91,56 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       result must beAnInstanceOf[OkApiResult[GetFriendsQuestsResult]]
 
       there was one(quest).allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List(f1.id),
-        authorIdsExclude = List.empty,
-        levels = Some((1, 2)),
-        skip = 0,
-        vip = null,
-        ids = null,
-        idsExclude = List.empty,
-        cultureId = u.demo.cultureId)
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = mEq(List(f1.id)),
+        authorIdsExclude = mEq(List.empty),
+        levels = mEq(Some((1, 2))),
+        skip = mEq(0),
+        vip = any,
+        ids = any,
+        idsExclude = mEq(List.empty),
+        cultureId = mEq(u.demo.cultureId),
+        withSolutions = mEq(false))
 
       there was no(quest).allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List.empty,
-        authorIdsExclude = List.empty,
-        levels = Some((1, 2)),
-        skip = 0,
-        vip = null,
-        ids = null,
-        idsExclude = List.empty,
-        cultureId = u.demo.cultureId)
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = mEq(List.empty),
+        authorIdsExclude = mEq(List.empty),
+        levels = mEq(Some((1, 2))),
+        skip = mEq(0),
+        vip = any,
+        ids = any,
+        idsExclude = mEq(List.empty),
+        cultureId = mEq(u.demo.cultureId),
+        withSolutions = mEq(false))
 
       there was no(quest).allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List(f1.id, f2.id),
-        authorIdsExclude = List.empty,
-        levels = Some((1, 2)),
-        skip = 0,
-        vip = null,
-        ids = null,
-        idsExclude = List.empty,
-        cultureId = u.demo.cultureId)
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = mEq(List(f1.id, f2.id)),
+        authorIdsExclude = mEq(List.empty),
+        levels = mEq(Some((1, 2))),
+        skip = mEq(0),
+        vip = any,
+        ids = any,
+        idsExclude = mEq(List.empty),
+        cultureId = mEq(u.demo.cultureId),
+        withSolutions = mEq(false))
     }
 
     "getVIPQuests calls db correctly" in context {
 
       db.quest.allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List.empty,
-        authorIdsExclude = List.empty,
-        levels = Some((1, 2)),
-        skip = 0,
-        vip = Some(true),
-        ids = List.empty,
-        idsExclude = List.empty
-      ) returns List.empty.iterator
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = mEq(List.empty),
+        authorIdsExclude = mEq(List.empty),
+        levels = mEq(Some((1, 2))),
+        skip = mEq(0),
+        vip = mEq(Some(true)),
+        ids = mEq(List.empty),
+        idsExclude = mEq(List.empty),
+        cultureId = any,
+        withSolutions = any
+      ) returns Iterator.empty
 
       val u = createUserStub()
       val result = api.getVIPQuests(GetVIPQuestsRequest(
@@ -138,28 +151,31 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       result must beAnInstanceOf[OkApiResult[GetVIPQuestsResult]]
 
       there was one(quest).allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = null,
-        authorIdsExclude = List.empty,
-        levels = Some((1, 2)),
-        skip = 0,
-        vip = Some(true),
-        ids = null,
-        idsExclude = List.empty,
-        cultureId = u.demo.cultureId)
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = any,
+        authorIdsExclude = mEq(List.empty),
+        levels = mEq(Some((1, 2))),
+        skip = mEq(0),
+        vip = mEq(Some(true)),
+        ids = any,
+        idsExclude = mEq(List.empty),
+        cultureId = mEq(u.demo.cultureId),
+        withSolutions = any)
     }
 
     "getAllQuests calls db correctly" in context {
 
       db.quest.allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List.empty,
-        authorIdsExclude = List.empty,
-        levels = Some((1, 2)),
-        skip = 0,
-        vip = None,
-        ids = List.empty,
-        idsExclude = List.empty
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = mEq(List.empty),
+        authorIdsExclude = mEq(List.empty),
+        levels = mEq(Some((1, 2))),
+        skip = mEq(0),
+        vip = mEq(None),
+        ids = mEq(List.empty),
+        idsExclude = mEq(List.empty),
+        cultureId = any,
+        withSolutions = any
       ) returns List.empty.iterator
 
       val result = api.getAllQuests(GetAllQuestsRequest(
@@ -171,15 +187,16 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       result must beAnInstanceOf[OkApiResult[GetAllQuestsResult]]
 
       there was one(quest).allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = null,
-        authorIdsExclude = List.empty,
-        levels = Some((1, 2)),
-        skip = 0,
-        vip = null,
-        ids = List.empty,
-        idsExclude = List.empty,
-        cultureId = Some("cid"))
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = any,
+        authorIdsExclude = mEq(List.empty),
+        levels = mEq(Some((1, 2))),
+        skip = mEq(0),
+        vip = any,
+        ids = mEq(List.empty),
+        idsExclude = mEq(List.empty),
+        cultureId = mEq(Some("cid")),
+        withSolutions = any)
     }
   }
 }

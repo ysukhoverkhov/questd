@@ -45,6 +45,8 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         status = List(SolutionStatus.InRotation),
         levels = Some((1, 2))))
 
+      result must beAnInstanceOf[OkApiResult[GetFriendsSolutionsResult]]
+
       there was one(solution).allWithParams(
         status = List(SolutionStatus.InRotation),
         authorIds = List(f1.id),
@@ -135,6 +137,8 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         levels = Some((1, 2)),
         themeIds = List("a")))
 
+      result must beAnInstanceOf[OkApiResult[GetVIPSolutionsResult]]
+
       there was one(solution).allWithParams(
         status = List(SolutionStatus.InRotation),
         authorIds = null,
@@ -152,7 +156,7 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
 
       val result = api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(User(), List(SolutionStatus.InRotation)))
 
-//      result must beEqualTo(OkApiResult(GetHelpWantedSolutionsResult(List.empty.iterator)))
+      result must beAnInstanceOf[OkApiResult[GetHelpWantedSolutionsResult]]
 
       there was no(solution).allWithParams(
         status = List(SolutionStatus.InRotation),
@@ -214,7 +218,8 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         vip = any[Option[Boolean]],
         ids = any[List[String]],
         idsExclude = any[List[String]],
-        cultureId = any[Option[String]]
+        cultureId = any[Option[String]],
+        withSolutions = any[Boolean]
       ) returns List(qu).iterator
 
       db.solution.allWithParams(
@@ -243,7 +248,8 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         vip = any[Option[Boolean]],
         ids = any[List[String]],
         idsExclude = any[List[String]],
-        cultureId = any[Option[String]])
+        cultureId = any[Option[String]],
+        withSolutions = any[Boolean])
 
       there was one(solution).allWithParams(
         status = List(SolutionStatus.InRotation),

@@ -29,7 +29,8 @@ private[mongo] class MongoQuestDAO
     vip: Option[Boolean] = None,
     ids: List[String] = List.empty,
     idsExclude: List[String] = List.empty,
-    cultureId: Option[String] = None): Iterator[Quest] = {
+    cultureId: Option[String] = None,
+    withSolutions: Boolean = false): Iterator[Quest] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -65,6 +66,10 @@ private[mongo] class MongoQuestDAO
 
     if (cultureId.isDefined) {
       queryBuilder += ("cultureId" -> cultureId.get)
+    }
+
+    if (withSolutions) { // TODO: test it.
+      queryBuilder += ("solutionIds.1" -> MongoDBObject("$exists" -> true))
     }
 
     Logger.trace("DB - allWithParams - " + queryBuilder.result)

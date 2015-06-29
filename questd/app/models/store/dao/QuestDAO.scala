@@ -23,7 +23,8 @@ trait QuestDAO extends BaseDAO[Quest] {
     vip: Option[Boolean] = None,
     ids: List[String] = List.empty,
     idsExclude: List[String] = List.empty,
-    cultureId: Option[String] = None): Iterator[Quest]
+    cultureId: Option[String] = None,
+    withSolutions: Boolean = false): Iterator[Quest]
 
   /**
    * Update quest's points.

@@ -48,14 +48,14 @@ class AuthAPISpecs extends BaseAPISpecs {
         any) returns u
 
       db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
-      quest.allWithParams(any, any, any, any, any, any, any, any, any) returns List.empty.iterator
+      quest.allWithParams(any, any, any, any, any, any, any, any, any, any) returns List.empty.iterator
       solution.allWithParams(any, any, any, any, any, any, any, any, any, any, any) returns List.empty.iterator
       battle.allWithParams(any, any, any, any, any, any, any, any, any, any) returns List.empty.iterator
       user.setTimeLinePopulationTime(any, any) returns u
 
       val rv = api.login(LoginRequest("FB", userfb))
 
-      there were atLeast(1)(quest).allWithParams(any, any, any, any, any, any, any, any, any)
+      there were atLeast(1)(quest).allWithParams(any, any, any, any, any, any, any, any, any, any)
       there were atLeast(1)(solution).allWithParams(any, any, any, any, any, any, any, any, any, any, any)
       there were atLeast(1)(battle).allWithParams(any, any, any, any, any, any, any, any, any, any)
       // Update allowed.
