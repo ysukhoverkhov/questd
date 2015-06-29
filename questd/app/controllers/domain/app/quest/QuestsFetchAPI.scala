@@ -18,7 +18,8 @@ case class GetFriendsQuestsRequest(
   status: QuestStatus.Value,
   idsExclude: List[String] = List.empty,
   authorsExclude: List[String] = List.empty,
-  levels: Option[(Int, Int)] = None)
+  levels: Option[(Int, Int)] = None,
+  withSolutions: Boolean = false)
 case class GetFriendsQuestsResult(quests: Iterator[Quest])
 
 case class GetFollowingQuestsRequest(
@@ -26,7 +27,8 @@ case class GetFollowingQuestsRequest(
   idsExclude: List[String] = List.empty,
   authorsExclude: List[String] = List.empty,
   status: QuestStatus.Value,
-  levels: Option[(Int, Int)] = None)
+  levels: Option[(Int, Int)] = None,
+  withSolutions: Boolean = false)
 case class GetFollowingQuestsResult(quests: Iterator[Quest])
 
 case class GetVIPQuestsRequest(
@@ -34,7 +36,8 @@ case class GetVIPQuestsRequest(
   idsExclude: List[String] = List.empty,
   authorsExclude: List[String] = List.empty,
   status: QuestStatus.Value,
-  levels: Option[(Int, Int)] = None)
+  levels: Option[(Int, Int)] = None,
+  withSolutions: Boolean = false)
 case class GetVIPQuestsResult(quests: Iterator[Quest])
 
 case class GetAllQuestsRequest(
@@ -44,7 +47,8 @@ case class GetAllQuestsRequest(
   authorsExclude: List[String] = List.empty,
   status: QuestStatus.Value,
   levels: Option[(Int, Int)] = None,
-  cultureId: Option[String])
+  cultureId: Option[String],
+  withSolutions: Boolean = false)
 case class GetAllQuestsResult(quests: Iterator[Quest])
 
 private[domain] trait QuestsFetchAPI { this: DBAccessor =>
@@ -62,7 +66,8 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
       authorIdsExclude = request.authorsExclude,
       levels = request.levels,
       idsExclude = request.idsExclude,
-      cultureId = request.user.demo.cultureId)))
+      cultureId = request.user.demo.cultureId,
+      withSolutions = request.withSolutions)))
   }
 
   def getFollowingQuests(request: GetFollowingQuestsRequest): ApiResult[GetFollowingQuestsResult] = handleDbException {
@@ -72,7 +77,8 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
       authorIdsExclude = request.authorsExclude,
       levels = request.levels,
       idsExclude = request.idsExclude,
-      cultureId = request.user.demo.cultureId)))
+      cultureId = request.user.demo.cultureId,
+      withSolutions = request.withSolutions)))
   }
 
   def getVIPQuests(request: GetVIPQuestsRequest): ApiResult[GetVIPQuestsResult] = handleDbException {
@@ -82,7 +88,8 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
       levels = request.levels,
       vip = Some(true),
       idsExclude = request.idsExclude,
-      cultureId = request.user.demo.cultureId)))
+      cultureId = request.user.demo.cultureId,
+      withSolutions = request.withSolutions)))
   }
 
   def getAllQuests(request: GetAllQuestsRequest): ApiResult[GetAllQuestsResult] = handleDbException {
@@ -94,6 +101,7 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
       levels = request.levels,
       ids = request.ids,
       idsExclude = request.idsExclude,
-      cultureId = request.cultureId)))
+      cultureId = request.cultureId,
+      withSolutions = request.withSolutions)))
   }
 }
