@@ -12,4 +12,5 @@ object TutorialActionType extends Enumeration {
   val RemoveFocus = Value
   val PlayAnimation = Value
   val StopAnimation = Value
+  val ScrollToNearestBattleInTimeLine = Value
 }
