@@ -14,7 +14,7 @@ import scala.language.postfixOps
 case class CreateBattleRequest(solutions: List[Solution])
 case class CreateBattleResult()
 
-case class TryCreateBattleRequest(solution: Solution)
+case class TryCreateBattleRequest(solution: Solution, useTutorialCompetitor: Boolean)
 case class TryCreateBattleResult()
 
 case class RewardBattleParticipantsRequest(battle: Battle)
@@ -145,6 +145,12 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
             createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
 
           case None =>
+
+            // TODO: test it.
+            // TODO: if this is a "must have battle" solution, generate rival here.
+
+
+
             Logger.trace(s"  Competitor not selected")
             OkApiResult(TryCreateBattleResult())
         }

@@ -28,6 +28,9 @@ case class IncTutorialTaskResult(allowed: ProfileModificationResult, profile: Op
 case class AssignTutorialQuestRequest(user: User, platform: TutorialPlatform.Value, questId: String)
 case class AssignTutorialQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
+case class CreateTutorialBattlesRequest(user: User, platform: TutorialPlatform.Value)
+case class CreateTutorialBattlesResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+
 case class ResetTutorialRequest(user: User)
 case class ResetTutorialResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
@@ -161,6 +164,38 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
           }
         case None =>
           OkApiResult(AssignTutorialQuestResult(OutOfContent))
+      }
+    }
+  }
+
+  /**
+   * Creates tutorial battles for all solutions without battles.
+   */ // TODO: test me.
+  def createTutorialBattles(request: CreateTutorialBattlesRequest): ApiResult[CreateTutorialBattlesResult] = handleDbException {
+    import request._
+
+    if (user.profile.tutorialStates(platform.toString).requestForTutorialBattlesUsed) {
+      OkApiResult(CreateTutorialBattlesResult(LimitExceeded))
+    } else {
+
+      db.user.setRequestForTutorialBattlesUsed(
+        id = user.id,
+        platform = platform.toString,
+        used = true) ifSome { user =>
+
+        user.stats.solvedQuests.valuesIterator.foldLeft[ApiResult[CreateTutorialBattlesResult]]{
+          OkApiResult(CreateTutorialBattlesResult(OK, Some(user.profile)))
+        } {
+          case (OkApiResult(result), solutionId) =>
+
+            db.solution.readById(solutionId) ifSome { solution =>
+              tryCreateBattle(TryCreateBattleRequest(solution = solution, useTutorialCompetitor = true))
+            } map {
+              OkApiResult(CreateTutorialBattlesResult(OK, Some(user.profile)))
+            }
+          case (_ @ badResult, _) =>
+            badResult
+        }
       }
     }
   }

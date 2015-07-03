@@ -60,7 +60,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("getStartingQuests")
 
     if (user.profile.publicProfile.level > api.config(api.DefaultConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
-      Logger.trace("  returns None because of high level")
+      Logger.trace("  Returns None because of high level")
       None
     } else {
 

@@ -42,7 +42,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         themeIds = any,
         cultureId = mEq(Some(s.cultureId))) returns Iterator.empty
 
-      val result = api.tryCreateBattle(TryCreateBattleRequest(s))
+      val result = api.tryCreateBattle(TryCreateBattleRequest(s, useTutorialCompetitor = false))
 
       there was one(solution).allWithParams(
         status = mEq(List(SolutionStatus.InRotation)),
@@ -95,7 +95,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       user.recordBattleParticipation(mEq(uu(0).id), any, any) returns Some(uu(0))
       user.recordBattleParticipation(mEq(uu(1).id), any, any) returns Some(uu(1))
 
-      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
+      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), useTutorialCompetitor = false))
 
       there was one(solution).allWithParams(
         status = mEq(List(SolutionStatus.InRotation)),
@@ -154,7 +154,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         themeIds = any,
         cultureId = mEq(Some(ss(0).cultureId))) returns Iterator.empty
 
-      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
+      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), useTutorialCompetitor = false))
 
       there was one(solution).allWithParams(
         status = mEq(List(SolutionStatus.InRotation)),
@@ -220,7 +220,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       user.recordBattleParticipation(mEq(uu(1).id), any, any) returns Some(uu(1))
 
 
-      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
+      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), useTutorialCompetitor = false))
 
       there was one(solution).allWithParams(
         status = mEq(List(SolutionStatus.ForTutorial)),

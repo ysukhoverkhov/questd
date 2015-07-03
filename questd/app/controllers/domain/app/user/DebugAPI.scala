@@ -68,7 +68,7 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     {
       adjustAssets(AdjustAssetsRequest(user, -user.profile.assets))
     } map { r =>
-      setLevelDebug(SetLevelDebugRequest(r.user, 2))
+      setLevelDebug(SetLevelDebugRequest(r.user, 1))
     } map { r =>
       resetTutorial(ResetTutorialRequest(r.user))
     } map { r =>

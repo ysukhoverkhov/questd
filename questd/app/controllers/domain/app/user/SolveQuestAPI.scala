@@ -115,7 +115,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
                 solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio, newSolution.id))
               } map {
-                tryCreateBattle(TryCreateBattleRequest(newSolution))
+                tryCreateBattle(TryCreateBattleRequest(newSolution, useTutorialCompetitor = false))
               } map {
 
                 // Giving reward to author of the quest.
