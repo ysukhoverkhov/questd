@@ -244,6 +244,90 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       there were two(user).addEntryToTimeLine(any, any)
     }
 
+    "Find must tutorial rival if there is one" in context {
+      val uu = List(createUserStub(), createUserStub())
+      val ss = List(
+        createSolutionStub(
+          status = SolutionStatus.ForTutorial,
+          questId = "qid1",
+          authorId = uu(0).id),
+        createSolutionStub(
+          status = SolutionStatus.ForTutorial,
+          questId = "qid2",
+          authorId = uu(1).id)
+      )
+
+      solution.allWithParams(
+        status = mEq(List(SolutionStatus.InRotation)),
+        authorIds = any,
+        authorIdsExclude = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        questIds = mEq(List(ss(0).info.questId)),
+        themeIds = any,
+        cultureId = mEq(Some(ss(0).cultureId))) returns Iterator.empty
+
+      solution.allWithParams(
+        status = mEq(List(SolutionStatus.ForTutorial)),
+        authorIds = any,
+        authorIdsExclude = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        questIds = mEq(List(ss(0).info.questId)),
+        themeIds = any,
+        cultureId = mEq(Some(ss(0).cultureId))) returns Iterator.empty
+
+      solution.allWithParams(
+        status = mEq(List(SolutionStatus.ForTutorial)),
+        authorIds = any,
+        authorIdsExclude = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        questIds = mEq(List.empty),
+        themeIds = any,
+        cultureId = mEq(Some(ss(0).cultureId))) returns ss.tail.iterator
+
+      user.readById(uu(0).id) returns Some(uu(0))
+      user.readById(uu(1).id) returns Some(uu(1))
+      user.addEntryToTimeLine(mEq(uu(0).id), any) returns Some(uu(0))
+      user.addEntryToTimeLine(mEq(uu(1).id), any) returns Some(uu(1))
+      user.recordBattleParticipation(mEq(uu(0).id), any, any) returns Some(uu(0))
+      user.recordBattleParticipation(mEq(uu(1).id), any, any) returns Some(uu(1))
+
+
+      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), useTutorialCompetitor = true))
+
+      there was one(solution).allWithParams(
+        status = mEq(List(SolutionStatus.ForTutorial)),
+        authorIds = any,
+        authorIdsExclude = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        questIds = mEq(List.empty),
+        themeIds = any,
+        cultureId = mEq(Some(ss(0).cultureId)))
+
+      result must beAnInstanceOf[OkApiResult[TryCreateBattleResult]]
+
+      there was one(battle).create(any)
+      there were two(solution).addParticipatedBattle(any, any)
+      there was one(user).recordBattleParticipation(mEq(uu(0).id), any, any)
+      there was one(user).recordBattleParticipation(mEq(uu(1).id), any, any)
+      there were two(user).addEntryToTimeLine(any, any)
+    }
+
     "Reward participants" in context {
       val battle = createBattleStub(status = BattleStatus.Resolved)
       val u1 = createUserStub(id = battle.info.battleSides(0).authorId)

@@ -151,7 +151,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
             if (request.useTutorialCompetitor) {
               selectCompetitorSolution(solutionsForStatus(SolutionStatus.ForTutorial, None), exclusive = false) match {
                 case Some(competitorSolution) =>
-                // TODO: test it.
+
                   val updatedCompetitorSolution = if (competitorSolution.info.questId != solution.info.questId) {
                     competitorSolution.copy(
                       id = ID.generateUUID(),
