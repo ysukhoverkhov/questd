@@ -46,7 +46,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
     )
     db.battle.create(battle)
 
-    Logger.trace(s"  Battle created")
+    Logger.trace(s"  Battle created with id ${battle.id}")
 
     solutions.foreach { s =>
 
@@ -68,7 +68,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
             AddToWatchersTimeLineRequest(
               user = u,
               reason = TimeLineReason.Created,
-              objectType = TimeLineType.Quest,
+              objectType = TimeLineType.Battle,
               objectId = battle.id))
         }
         }

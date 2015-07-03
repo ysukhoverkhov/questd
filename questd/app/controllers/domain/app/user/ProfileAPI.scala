@@ -106,7 +106,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
               user,
               MessageInformation(
                 s"${user.profile.publicProfile.level * 10} Shiners were sent to Fishing Paradise 3d. " +
-                  s"Launch Facebook version and get grab them!",
+                  s"Launch Facebook version and grab them!",
                 None)))
 
           case v =>
