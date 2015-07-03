@@ -4,11 +4,13 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import logic.BattleLogic
+import models.domain.base.ID
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
-import models.domain.solution.{Solution, SolutionStatus}
+import models.domain.solution.{Solution, SolutionRating, SolutionStatus}
 import models.domain.user.stats.SolutionsInBattle
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger
+
 import scala.language.postfixOps
 
 case class CreateBattleRequest(solutions: List[Solution])
@@ -118,14 +120,14 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
     /**
      * Selects possible rivals with statuses.
      */
-    def solutionsForStatus(status: SolutionStatus.Value): Iterator[Solution] = {
+    def solutionsForStatus(status: SolutionStatus.Value, questId: Option[String]): Iterator[Solution] = {
       db.solution.allWithParams(
         status = List(status),
-        questIds = List(solution.info.questId),
+        questIds = questId.fold[List[String]](List.empty){questId => List(questId)},
         cultureId = Some(solution.cultureId))
     }
 
-    selectCompetitorSolution(solutionsForStatus(SolutionStatus.InRotation), exclusive = true) match {
+    selectCompetitorSolution(solutionsForStatus(SolutionStatus.InRotation, Some(solution.info.questId)), exclusive = true) match {
       case Some(competitorSolution) =>
 
         Logger.trace(s"  Selected competitor solution $competitorSolution}")
@@ -136,7 +138,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
       case None =>
         Logger.trace(s"  Competitor not selected, trying to find tutorial one.")
 
-        selectCompetitorSolution(solutionsForStatus(SolutionStatus.ForTutorial), exclusive = false) match {
+        selectCompetitorSolution(solutionsForStatus(SolutionStatus.ForTutorial, Some(solution.info.questId)), exclusive = false) match {
           case Some(competitorSolution) =>
 
             Logger.trace(s"  Selected tutorial competitor solution $competitorSolution}")
@@ -146,13 +148,35 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
 
           case None =>
 
-            // TODO: test it.
-            // TODO: if this is a "must have battle" solution, generate rival here.
+            if (request.useTutorialCompetitor) {
+              selectCompetitorSolution(solutionsForStatus(SolutionStatus.ForTutorial, None), exclusive = false) match {
+                case Some(competitorSolution) =>
+                // TODO: test it.
+                  val updatedCompetitorSolution = if (competitorSolution.info.questId != solution.info.questId) {
+                    competitorSolution.copy(
+                      id = ID.generateUUID(),
+                      battleIds = List.empty,
+                      rating = SolutionRating(),
+                      info = competitorSolution.info.copy(
+                        questId = solution.info.questId
+                      )
+                    )
+                  } else {
+                    competitorSolution
+                  }
 
+                  Logger.trace(s"  Selected tutorial must competitor solution $updatedCompetitorSolution}")
+                  val solutions = List(solution, updatedCompetitorSolution)
 
-
-            Logger.trace(s"  Competitor not selected")
-            OkApiResult(TryCreateBattleResult())
+                  createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
+                case None =>
+                  Logger.error(s"  Competitor not selected for solution with useTutorialCompetitor set to $useTutorialCompetitor")
+                  OkApiResult(TryCreateBattleResult())
+              }
+            } else {
+              Logger.trace(s"  Competitor not selected")
+              OkApiResult(TryCreateBattleResult())
+            }
         }
     }
   }
