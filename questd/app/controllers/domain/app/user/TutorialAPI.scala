@@ -170,7 +170,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
   /**
    * Creates tutorial battles for all solutions without battles.
-   */ // TODO: test me.
+   */
   def createTutorialBattles(request: CreateTutorialBattlesRequest): ApiResult[CreateTutorialBattlesResult] = handleDbException {
     import request._
 
