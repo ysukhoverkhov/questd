@@ -1,2 +1,1 @@
-start activator compile stage
-
+activator compile stage
