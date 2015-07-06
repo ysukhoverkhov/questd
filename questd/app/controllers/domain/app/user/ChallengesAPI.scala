@@ -60,8 +60,8 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
         ) ifSome { user =>
           {
             makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle))) // TODO: test me.
-          } map {
-            OkApiResult(ChallengeBattleResult(OK, Some(user.profile)))
+          } map { r =>
+            OkApiResult(ChallengeBattleResult(OK, Some(r.user.profile)))
           }
         }
       }
