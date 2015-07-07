@@ -4,7 +4,7 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import logic.QuestLogic
-import models.domain.quest.{QuestStatus, Quest}
+import models.domain.quest.{Quest, QuestStatus}
 import models.domain.solution.SolutionStatus
 import models.domain.user.User
 
@@ -66,6 +66,13 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       db.user.update(
         removeObjectsFromTimeline(user.initialized, objectsToRemove)
       )
+    }
+
+    db.tutorial.all.foreach { tutorial =>
+      db.tutorial.update(tutorial)
+//      tutorial.elements.foreach{ element =>
+//        db.tutorial.updateElement(tutorial.id, element.copy(actions = List(element.action, TutorialAction(TutorialActionType.CloseTutorialElement, params = Map("elementId" -> element.id)))))
+//      }
     }
 
     OkApiResult(CleanUpObjectsResult())

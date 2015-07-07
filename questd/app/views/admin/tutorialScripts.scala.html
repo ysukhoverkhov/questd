@@ -44,39 +44,60 @@ elements: List[models.domain.tutorial.TutorialElement])
     <tr id="@element.id">
         <td>@element.id</td>
 
-        <!-- Action -->
+        <!-- Actions -->
         <td nowrap="nowrap">
-            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateAction(currentPlatform, element.id)) {
-            <select id="entityType" name="entityType">
-                @for(action <- possibleActions) {
-                    @if(action == element.action.actionType.toString) {
-                        <option value="@action" selected="selected">@action</option>
-                    } else {
-                        <option value="@action">@action</option>
-                    }
-                }
-            </select>
-            <input type='submit' value='Save' />
-            }
+            <table border="1">
+                @for((action, index) <- element.actions.zipWithIndex) {
+                    <tr>
+                        <td nowrap="nowrap">
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateAction(currentPlatform, element.id, index)) {
+                            <select id="entityType" name="entityType">
+                                @for(actionType <- possibleActions) {
+                                    @if(actionType == action.actionType.toString) {
+                                        <option value="@actionType" selected="selected">@actionType</option>
+                                    } else {
+                                        <option value="@actionType">@actionType</option>
+                                    }
+                                }
+                            </select>
+                            <input type='submit' value='Save' />
+                            }
 
-            @for((key, value) <- element.action.params) {
-                <p>
-                    @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementAction(currentPlatform, element.id, key)) {
-                        <input type="text" id="key" name="key" value='@key' size="5">
-                        <input type="text" id="value" name="value" value='@value' size="5">
-                        <input type='submit' value='Save' />
-                    }
-                    @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteParamFromElementAction(currentPlatform, element.id, key)) {
-                        <input type='submit' value='Del' />
-                    }
-                </p>
-            }
+                            @for((key, value) <- action.params) {
+                            <p>
+                                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementAction(currentPlatform, element.id, index, key)) {
+                                    <input type="text" id="key" name="key" value='@key' size="5">
+                                    <input type="text" id="value" name="value" value='@value' size="5">
+                                    <input type='submit' value='Save' />
+                                }
+                                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteParamFromElementAction(currentPlatform, element.id, index, key)) {
+                                    <input type='submit' value='Del' />
+                                }
+                            </p>
+                            }
 
-            <p>
-                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addParamToElementAction(currentPlatform, element.id)) {
-                    <input type='submit' value='Add Param' />
+                            <p>
+                                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addParamToElementAction(currentPlatform, element.id, index)) {
+                                    <input type='submit' value='Add Param' />
+                                }
+                            </p>
+                        </td>
+                        <td>
+                            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteActionFromElement(currentPlatform, element.id, index)) {
+                                <input type='submit' value='Del' />
+                            }
+                        </td>
+                    </tr>
                 }
-            </p>
+
+                <tr><td>
+                    @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addActionToElement(currentPlatform, element.id)) {
+                        <input type='submit' value='Add Action' />
+                    }
+                </td></tr>
+            </table>
+
+
         </td>
 
         <!-- Conditions -->

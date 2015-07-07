@@ -156,7 +156,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         }
       })
 
-            redirectToElement(platform, elementId)
+    redirectToElement(platform, elementId)
   }
 
 
