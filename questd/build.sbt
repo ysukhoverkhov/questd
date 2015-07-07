@@ -39,7 +39,9 @@ libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19"
 
 libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.0.0"
 
-libraryDependencies += "javax.mail" % "javax.mail-api" % "1.5.3"
+// libraryDependencies += "javax.mail" % "javax.mail-api" % "1.5.3"
+
+libraryDependencies += "javax.mail" % "mail" % "1.4.7"
 
 
 // fork in run := true
@@ -61,4 +63,7 @@ buildInfoKeys := Seq[BuildInfoKey](
   )
 
 buildInfoPackage := "misc"
+
+
+
 
