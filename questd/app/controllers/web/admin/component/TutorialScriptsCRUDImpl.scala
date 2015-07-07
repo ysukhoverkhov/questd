@@ -124,7 +124,15 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       elements = els))
   }
 
-  def updateAction(platform: String, elementId: String) = Authenticated { implicit request =>
+  /**
+   * Updates action.
+   *
+   * @param platform Platform to update action fro.
+   * @param elementId Id of element with action.
+   * @param actionIndex Acion index.
+   * @return redirect.
+   */
+  def updateAction(platform: String, elementId: String, actionIndex: Int) = Authenticated { implicit request =>
 
     val form = Form(
     mapping(
@@ -135,10 +143,12 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         Logger.error(s"$formWithErrors.errors")
       },
 
-      actionForm => {
+      actionTypeForm => {
         findTutorialElement(platform, elementId) match {
           case Some(e) =>
-            val updatedElement = e.copy(action = e.action.copy(actionType = TutorialActionType.withName(actionForm.entityType)))
+            val updatedAction = e.actions(actionIndex).copy(actionType = TutorialActionType.withName(actionTypeForm.entityType))
+            val updatedElement = e.copy(actions = e.actions.take(actionIndex) ++ List(updatedAction) ++ e.actions.drop(actionIndex + 1))
+
             api.db.tutorial.updateElement(platform, updatedElement)
 
           case None =>
@@ -148,6 +158,51 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
             redirectToElement(platform, elementId)
   }
+
+
+  /**
+   * Adds new action to element.
+   *
+   * @param platform Platform of element.
+   * @param elementId Id of element.
+   * @return Redirect.
+   */
+  def addActionToElement(platform: String, elementId: String) = Authenticated { implicit request =>
+    val ta = TutorialAction(TutorialActionType.Message)
+
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedElement = e.copy(actions = ta :: e.actions)
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+
+    redirectToElement(platform, elementId)
+  }
+
+  /**
+   * Deletes action from element.
+   *
+   * @param platform Platform of element.
+   * @param elementId Id of element.
+   * @param actionIndex Index of action to delete.
+   * @return
+   */
+  def deleteActionFromElement(platform: String, elementId: String, actionIndex: Int) = Authenticated { implicit request =>
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedElement = e.copy(actions = e.actions.take(actionIndex) ++ e.actions.drop(actionIndex + 1))
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+
+    redirectToElement(platform, elementId)
+  }
+
 
   /**
    * Adds new default element to list of elements in tutorial.
@@ -162,7 +217,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     val tc = TutorialCondition(TutorialConditionType.TutorialElementClosed)
     val tt = TutorialTrigger(TutorialTriggerType.Any)
     val te = TutorialElement(
-      actions = List(TutorialAction(TutorialActionType.Message), TutorialAction(TutorialActionType.Close)),
+      actions = List(TutorialAction(TutorialActionType.Message), TutorialAction(TutorialActionType.CloseTutorialElement)),
       conditions = List(tc),
       triggers = List(tt))
 
@@ -244,8 +299,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @param elementId Id if element to delete.
    * @return Content to display.
    */
-  def addParamToElementAction(platform: String, elementId: String) = Authenticated { implicit request =>
-    addParamToElementActionImpl(platform, elementId, "", "")
+  def addParamToElementAction(platform: String, elementId: String, actionIndex: Int) = Authenticated { implicit request =>
+    addParamToElementActionImpl(platform, elementId, actionIndex, "", "")
     redirectToElement(platform, elementId)
   }
 
@@ -257,8 +312,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @param paramKey Key of param we should remove.
    * @return Updated content.
    */
-  def deleteParamFromElementAction(platform: String, elementId: String, paramKey: String) = Authenticated { implicit request =>
-    deleteParamFromActionImpl(platform, elementId, paramKey)
+  def deleteParamFromElementAction(platform: String, elementId: String, actionIndex: Int, paramKey: String) = Authenticated { implicit request =>
+    deleteParamFromActionImpl(platform, elementId, actionIndex, paramKey)
     redirectToElement(platform, elementId)
   }
 
@@ -270,7 +325,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @param paramKey Key of the parameter to save.
    * @return Content.
    */
-  def saveParamInElementAction(platform: String, elementId: String, paramKey: String) = Authenticated { implicit request =>
+  def saveParamInElementAction(platform: String, elementId: String, actionIndex: Int, paramKey: String) = Authenticated { implicit request =>
 
     val form = Form(
       mapping(
@@ -283,8 +338,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       },
 
       keyValueForm => {
-        deleteParamFromActionImpl(platform, elementId, paramKey)
-        addParamToElementActionImpl(platform, elementId, keyValueForm.key, keyValueForm.value)
+        deleteParamFromActionImpl(platform, elementId, actionIndex, paramKey)
+        addParamToElementActionImpl(platform, elementId, actionIndex, keyValueForm.key, keyValueForm.value)
       })
 
     redirectToElement(platform, elementId)
@@ -334,7 +389,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         Logger.error(s"Tutorial script or element not found")
     }
 
-            redirectToElement(platform, elementId)
+    redirectToElement(platform, elementId)
   }
 
   /**
@@ -368,7 +423,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         }
       })
 
-            redirectToElement(platform, elementId)
+      redirectToElement(platform, elementId)
   }
 
   /**
@@ -395,7 +450,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def deleteParamFromElemCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String) = Authenticated { implicit request =>
     deleteParamToElementConditionImpl(platform, elementId, conditionIndex, paramKey)
-            redirectToElement(platform, elementId)
+    redirectToElement(platform, elementId)
   }
 
   /**

@@ -4,6 +4,7 @@ package models.domain.tutorial
  * Types of tutorial actions.
  */
 object TutorialActionType extends Enumeration {
+  val CloseTutorialElement = Value
   val AssignTutorialTask = Value
   val AssignTutorialQuest = Value
   val IncTutorialTask = Value

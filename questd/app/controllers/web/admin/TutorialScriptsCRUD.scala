@@ -10,15 +10,17 @@ object TutorialScriptsCRUD extends Controller {
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
   def tutorial(platform: String) = admin.tutorialScripts.tutorial(platform)
-  def updateAction(platform: String, elementId: String) = admin.tutorialScripts.updateAction(platform, elementId)
   def addElement(platform: String) = admin.tutorialScripts.addElement(platform)
   def deleteElement(platform: String, elementId: String) = admin.tutorialScripts.deleteElement(platform, elementId)
   def upElement(platform: String, elementId: String) = admin.tutorialScripts.upElement(platform, elementId)
   def downElement(platform: String, elementId: String) = admin.tutorialScripts.downElement(platform, elementId)
 
-  def addParamToElementAction(platform: String, elementId: String) = admin.tutorialScripts.addParamToElementAction(platform, elementId)
-  def deleteParamFromElementAction(platform: String, elementId: String, paramKey: String) = admin.tutorialScripts.deleteParamFromElementAction(platform, elementId, paramKey)
-  def saveParamInElementAction(platform: String, elementId: String, paramKey: String) = admin.tutorialScripts.saveParamInElementAction(platform, elementId, paramKey)
+  def updateAction(platform: String, elementId: String, actionIndex: Int) = admin.tutorialScripts.updateAction(platform, elementId, actionIndex)
+  def addActionToElement(platform: String, elementId: String) = admin.tutorialScripts.addActionToElement(platform, elementId)
+  def deleteActionFromElement(platform: String, elementId: String, actionIndex: Int) = admin.tutorialScripts.deleteActionFromElement(platform, elementId, actionIndex)
+  def addParamToElementAction(platform: String, elementId: String, actionIndex: Int) = admin.tutorialScripts.addParamToElementAction(platform, elementId, actionIndex)
+  def deleteParamFromElementAction(platform: String, elementId: String, actionIndex: Int, paramKey: String) = admin.tutorialScripts.deleteParamFromElementAction(platform, elementId, actionIndex, paramKey)
+  def saveParamInElementAction(platform: String, elementId: String, actionIndex: Int, paramKey: String) = admin.tutorialScripts.saveParamInElementAction(platform, elementId, actionIndex, paramKey)
 
   def updateCondition(platform: String, elementId: String, conditionIndex: Int) = admin.tutorialScripts.updateCondition(platform, elementId, conditionIndex)
   def addConditionToElement(platform: String, elementId: String) = admin.tutorialScripts.addConditionToElement(platform, elementId)
