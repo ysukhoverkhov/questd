@@ -7,7 +7,7 @@ import models.domain.base.ID
  */
 case class TutorialElement(
   id: String = ID.generateUUID(),
-  action: TutorialAction,
+  actions: List[TutorialAction],
   conditions: List[TutorialCondition] = List.empty,
   triggers: List[TutorialTrigger]
   ) extends ID
