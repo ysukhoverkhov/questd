@@ -90,7 +90,8 @@ class QuestDAOSpecs extends Specification
           level = 13,
           vip = true,
           cultureId = "c2",
-          timelinePoints = 21),
+          timelinePoints = 21,
+          solutionsCount = 1),
 
         createQuestStub(
           id = "q3",
@@ -146,6 +147,10 @@ class QuestDAOSpecs extends Specification
       val excludingAuthorIds = db.quest.allWithParams(authorIdsExclude = List("q2_author id")).toList
       excludingAuthorIds.map(_.id).size must beEqualTo(2)
       excludingAuthorIds.map(_.id).sorted must beEqualTo(List(qs(0).id, qs(2).id).sorted)
+
+      val withSolutions = db.quest.allWithParams(withSolutions = true).toList
+      withSolutions.map(_.id).size must beEqualTo(1)
+      withSolutions.map(_.id).sorted must beEqualTo(List(qs(1).id).sorted)
     }
 
     "Replace cultures" in new WithApplication(appWithTestDatabase) {
@@ -198,6 +203,20 @@ class QuestDAOSpecs extends Specification
       ou1 must beSome.which((u: Quest) => u.rating.cheating == 4)
       ou1 must beSome.which((u: Quest) => u.rating.iacpoints.spam == 5)
       ou1 must beSome.which((u: Quest) => u.rating.iacpoints.porn == 6)
+    }
+
+    "Adds solution id"  in new WithApplication(appWithTestDatabase) {
+      clearDB()
+
+      val quest = createQuestStub()
+      val solutionId = "solutionId"
+
+      db.quest.create(quest)
+
+      db.quest.addSolution(quest.id)
+
+      val ou1 = db.quest.readById(quest.id)
+      ou1 must beSome.which((q: Quest) => q.solutionsCount == 1)
     }
 
   }

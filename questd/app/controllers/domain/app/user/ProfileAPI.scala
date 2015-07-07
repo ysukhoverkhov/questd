@@ -9,7 +9,8 @@ import models.domain.common.Assets
 import models.domain.culture.Culture
 import models.domain.user._
 import models.domain.user.friends.ReferralStatus
-import models.domain.user.profile.{Functionality, Rights, Profile, Gender}
+import models.domain.user.message.MessageInformation
+import models.domain.user.profile.{Functionality, Gender, Profile, Rights}
 import play.{Logger, Play}
 
 case class AdjustAssetsRequest(user: User, change: Assets)
@@ -60,6 +61,66 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Check is user should increase its level and increases it if he should.
    */
   def checkIncreaseLevel(request: CheckIncreaseLevelRequest): ApiResult[CheckIncreaseLevelResult] = handleDbException {
+
+    def rewardForFishingCrossPromotion(user: User): Unit = {
+      val Missing = "missing"
+
+      def userFishingId(user: User): String = {
+        user.auth.loginMethods.find(_.methodName == "FB")
+          .fold(Missing)(_.crossPromotion.apps.find(_.appName == "fishing_paradise").fold(Missing)(_.userId))
+      }
+
+      val myIdInFishing = userFishingId(user)
+      val referrerIdInFishing = user.friends.find(_.referralStatus == ReferralStatus.ReferredBy)
+        .fold(Missing)(f => db.user.readById(f.friendId).fold(Missing)(userFishingId))
+
+      Logger.error(
+        s"User ${user.id} leveled up to level ${user.profile.publicProfile.level}. " +
+          s"His fishing id is $myIdInFishing. " +
+          s"His referrer fishing id is $referrerIdInFishing.")
+
+
+      import play.api.Play.current
+      import play.api.libs.json._
+      import play.api.libs.ws._
+
+      import scala.concurrent.ExecutionContext.Implicits.global
+      import scala.concurrent.Future
+
+      if (myIdInFishing != Missing) {
+        val data = Json.obj(
+          "userId" -> s"fbk:$myIdInFishing",
+          "shinersReward" -> s"${user.profile.publicProfile.level * 10}",
+          "appName" -> "QuestMe",
+          "appIconUrl" -> "https://web1.fishingparadise3d.com/www_promo_images/i/questme-1.jpg"
+        )
+
+        val futureResponse: Future[WSResponse] = WS.url("http://web1.fishingparadise3d.com/api/cross/giveReward").post(data)
+//        val futureResponse: Future[WSResponse] = WS.url("http://webz.fishingparadise3d.com/api/cross/giveReward").post(data)
+
+        futureResponse.onSuccess {
+          case v if v.status == 200 =>
+            Logger.debug(s"Successfully sent cross promotion for user ${user.id}")
+
+            sendMessage(SendMessageRequest(
+              user,
+              MessageInformation(
+                s"Your Fishing Paradise 3D account has been credited with ${user.profile.publicProfile.level * 10} shiners, " +
+                  s"launch Facebook version to claim them",
+                None)))
+
+          case v =>
+            Logger.error(s"Unable to send cross promotion for user ${user.id}: ${v.status} - ${v.statusText}")
+        }
+        futureResponse.onFailure {
+          case t =>
+            Logger.error(s"Unable to send cross promotion for user ${user.id}")
+        }
+      } else {
+        Logger.debug(s"Not sending request to FP3D since fishing id is missing for user ${user.id}")
+      }
+    }
+
     if (request.user.profile.ratingToNextLevel <= request.user.profile.assets.rating) {
       db.user.levelUp(request.user.id, request.user.profile.ratingToNextLevel) ifSome { user =>
         db.user.setNextLevelRatingAndRights(
@@ -67,17 +128,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
           user.ratingToNextLevel,
           user.calculateRights) ifSome { user =>
 
-          def userFishingId(user: User): String = {
-            user.auth.loginMethods.find(_.methodName == "FB")
-              .fold("missing")(_.crossPromotion.apps.find(_.appName == "fishing_paradise").fold("missing")(_.userId))
-          }
-
-          val myIdInFishing = userFishingId(user)
-          val referrerIdInFishing = user.friends.find(_.referralStatus == ReferralStatus.ReferredBy).fold("missing")(f => db.user.readById(f.friendId).fold("missing")(userFishingId))
-
-          Logger.error(s"User ${user.id} leveled up to level ${user.profile.publicProfile.level}. " +
-            s"His fishing id is $myIdInFishing. " +
-            s"His referrer fishing id is $referrerIdInFishing.")
+          rewardForFishingCrossPromotion(user)
 
           OkApiResult(CheckIncreaseLevelResult(user))
         }

@@ -86,6 +86,9 @@ POST	/rest/getTutorial	    						controllers.web.rest.TutorialWS.getTutorial
 POST	/rest/closeTutorialElement						controllers.web.rest.TutorialWS.closeTutorialElement
 POST	/rest/assignTutorialTask						controllers.web.rest.TutorialWS.assignTutorialTask
 POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
+POST	/rest/assignTutorialQuest						controllers.web.rest.TutorialWS.assignTutorialQuest
+POST	/rest/createTutorialBattles						controllers.web.rest.TutorialWS.createTutorialBattles
+
 
 # Comments
 POST	/rest/postComment	    						controllers.web.rest.CommentsWS.postComment
@@ -127,6 +130,9 @@ POST	/rest/debug/resetProfile     					controllers.web.rest.DebugWS.resetProfile
 GET		/admin											controllers.web.admin.AdminApp.index
 
 GET		/admin/loginJ0hETru60HiWwmEywG2q	            controllers.web.admin.AdminApp.login
+
+GET     /admin/maintains/cleanup                        controllers.web.admin.Maintains.cleanup
+GET     /admin/maintains/resetProfiles                  controllers.web.admin.Maintains.resetProfiles
 
 GET		/admin/themes									controllers.web.admin.ThemesCRUD.themes(id = "")
 GET		/admin/themes/byid/:id							controllers.web.admin.ThemesCRUD.themes(id)

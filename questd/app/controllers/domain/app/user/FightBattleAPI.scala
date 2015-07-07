@@ -4,17 +4,19 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import logic.BattleLogic
+import models.domain.base.ID
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
-import models.domain.solution.{Solution, SolutionStatus}
+import models.domain.solution.{Solution, SolutionRating, SolutionStatus}
 import models.domain.user.stats.SolutionsInBattle
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger
+
 import scala.language.postfixOps
 
 case class CreateBattleRequest(solutions: List[Solution])
 case class CreateBattleResult()
 
-case class TryCreateBattleRequest(solution: Solution)
+case class TryCreateBattleRequest(solution: Solution, useTutorialCompetitor: Boolean)
 case class TryCreateBattleResult()
 
 case class RewardBattleParticipantsRequest(battle: Battle)
@@ -46,7 +48,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
     )
     db.battle.create(battle)
 
-    Logger.trace(s"  Battle created")
+    Logger.trace(s"  Battle created with id ${battle.id}")
 
     solutions.foreach { s =>
 
@@ -68,7 +70,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
             AddToWatchersTimeLineRequest(
               user = u,
               reason = TimeLineReason.Created,
-              objectType = TimeLineType.Quest,
+              objectType = TimeLineType.Battle,
               objectId = battle.id))
         }
         }
@@ -88,47 +90,94 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
 
     Logger.trace(s"Trying to create battle")
 
-    def selectCompetitor(possibleCompetitors: Iterator[Solution]): Option[Solution] = {
-      if (possibleCompetitors.hasNext) {
-        val other = possibleCompetitors.next()
+    /**
+     * Selects out of provided competitors suitable one.
+     */
+    def selectCompetitorSolution(possibleCompetitorSolutions: Iterator[Solution], exclusive: Boolean): Option[Solution] = {
+      if (possibleCompetitorSolutions.hasNext) {
+        val other = possibleCompetitorSolutions.next()
 
         Logger.trace(s"    Analysing competitor solution ${other.id} - $other")
-        Logger.trace(s"    ${other.info.authorId} != ${request.solution.info.authorId} && ${other.battleIds.isEmpty}")
+        Logger.trace(s"    ${other.info.authorId} != ${solution.info.authorId} && (${other.battleIds.isEmpty} && $exclusive)")
 
-        if (other.info.authorId != request.solution.info.authorId && other.battleIds.isEmpty) {
+        if (other.info.authorId != solution.info.authorId && (other.battleIds.isEmpty || !exclusive)) {
 
-          Logger.debug("Found fight pair for quest " + request.solution.info.questId + " :")
-          Logger.debug("  s1.id=" + request.solution.id)
+          Logger.debug("Found fight pair for quest " + solution.info.questId + " :")
+          Logger.debug("  s1.id=" + solution.id)
           Logger.debug("  s2.id=" + other.id)
 
           Some(other)
 
         } else {
           // Skipping to next if current is we are.
-          selectCompetitor(possibleCompetitors)
+          selectCompetitorSolution(possibleCompetitorSolutions, exclusive)
         }
       } else {
         None
       }
     }
 
-    // We have battleIds in solution, should filter in DAO call for solutions with no battles.
-    val possibleCompetitors = db.solution.allWithParams(
-      status = List(SolutionStatus.InRotation),
-      questIds = List(solution.info.questId),
-      cultureId = Some(solution.cultureId))
+    /**
+     * Selects possible rivals with statuses.
+     */
+    def solutionsForStatus(status: SolutionStatus.Value, questId: Option[String]): Iterator[Solution] = {
+      db.solution.allWithParams(
+        status = List(status),
+        questIds = questId.fold[List[String]](List.empty){questId => List(questId)},
+        cultureId = Some(solution.cultureId))
+    }
 
-    selectCompetitor(possibleCompetitors) match {
-      case Some(competitor) =>
+    selectCompetitorSolution(solutionsForStatus(SolutionStatus.InRotation, Some(solution.info.questId)), exclusive = true) match {
+      case Some(competitorSolution) =>
 
-        Logger.trace(s"  Selected competitor solution $competitor}")
-        val solutions = List(solution, competitor)
+        Logger.trace(s"  Selected competitor solution $competitorSolution}")
+        val solutions = List(solution, competitorSolution)
 
         createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
 
       case None =>
-        Logger.trace(s"  Competitor not selected")
-        OkApiResult(TryCreateBattleResult())
+        Logger.trace(s"  Competitor not selected, trying to find tutorial one.")
+
+        selectCompetitorSolution(solutionsForStatus(SolutionStatus.ForTutorial, Some(solution.info.questId)), exclusive = false) match {
+          case Some(competitorSolution) =>
+
+            Logger.trace(s"  Selected tutorial competitor solution $competitorSolution}")
+            val solutions = List(solution, competitorSolution)
+
+            createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
+
+          case None =>
+
+            if (request.useTutorialCompetitor) {
+              selectCompetitorSolution(solutionsForStatus(SolutionStatus.ForTutorial, None), exclusive = false) match {
+                case Some(competitorSolution) =>
+
+                  val updatedCompetitorSolution = if (competitorSolution.info.questId != solution.info.questId) {
+                    competitorSolution.copy(
+                      id = ID.generateUUID(),
+                      battleIds = List.empty,
+                      rating = SolutionRating(),
+                      info = competitorSolution.info.copy(
+                        questId = solution.info.questId
+                      )
+                    )
+                  } else {
+                    competitorSolution
+                  }
+
+                  Logger.trace(s"  Selected tutorial must competitor solution $updatedCompetitorSolution}")
+                  val solutions = List(solution, updatedCompetitorSolution)
+
+                  createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
+                case None =>
+                  Logger.error(s"  Competitor not selected for solution with useTutorialCompetitor set to $useTutorialCompetitor")
+                  OkApiResult(TryCreateBattleResult())
+              }
+            } else {
+              Logger.trace(s"  Competitor not selected")
+              OkApiResult(TryCreateBattleResult())
+            }
+        }
     }
   }
 

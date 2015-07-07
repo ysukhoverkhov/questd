@@ -7,7 +7,7 @@ import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import models.domain.common.{ContentVote, ContentType, ContentReference}
+import models.domain.common.{Assets, ContentVote, ContentType, ContentReference}
 import models.domain.quest.QuestInfoContent
 import models.domain.solution.SolutionInfoContent
 import models.domain.user._
@@ -65,7 +65,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
   }
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
-    api.populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(r.user))
+    api.adjustAssets(AdjustAssetsRequest(r.user, change = Assets(0, 0, 1000000)))
 
     OkApiResult(WSDebugResult("lalai"))
   }
@@ -128,13 +128,18 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
       it.next()
     }
 
-    def randomUserExcluding(exclude: Seq[String], culture: String, vip: Boolean = false) =
-      logOrGet(s"Unable to find random user with vip = $vip and excluding $exclude and cultureId $culture"){
+    def randomUserExcluding(
+      exclude: Seq[String],
+      culture: String,
+      vip: Boolean = false,
+      minLevel: Int = 0) =
+      logOrGet(s"Unable to find random user with vip = $vip and excluding $exclude and cultureId $culture and minLevel $minLevel"){
         api.allUsers(AllUsersRequest()).body.get.users.filter(u =>
           !exclude.contains(u.id)
             && u.demo.cultureId.contains(culture)
             && (u.profile.publicProfile.bio.gender != Gender.Unknown)
-            && (u.profile.publicProfile.vip == vip))
+            && (u.profile.publicProfile.vip == vip)
+            && (u.profile.publicProfile.level >= minLevel))
       }
 
     assert(r.user.demo.cultureId.isDefined, "Culture id of calling user should be defined")
@@ -142,7 +147,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
     val peer = {
       v.rivalId.fold[User] {
-        randomUserExcluding(List(r.user.id), r.user.demo.cultureId.get)
+        randomUserExcluding(List(r.user.id), r.user.demo.cultureId.get, minLevel = 7)
       } {
         rivalId =>
           logOrGet(s"Unable to find user with id = $rivalId"){
@@ -155,7 +160,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     assert(peer.demo.cultureId.isDefined, "Culture id of peer should be defined")
     Logger.debug(s"Peer found ${peer.id} / ${peer.profile.publicProfile.bio.name} / ${peer.demo.cultureId}")
 
-    val author = randomUserExcluding(List(r.user.id, peer.id), r.user.demo.cultureId.get, vip = true)
+    val author = randomUserExcluding(List(r.user.id, peer.id), r.user.demo.cultureId.get, vip = true, minLevel = 10)
     Logger.debug(s"Author found ${author.id} / ${author.profile.publicProfile.bio.name} / ${author.demo.cultureId}")
 
     {

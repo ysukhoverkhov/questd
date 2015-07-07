@@ -15,7 +15,7 @@ case class UpdateQuestStatusResult()
 case class SelectQuestToTimeLineRequest(quest: Quest)
 case class SelectQuestToTimeLineResult()
 
-case class SolveQuestUpdateRequest(quest: Quest, ratio: Int)
+case class SolveQuestUpdateRequest(quest: Quest, ratio: Int, solutionId: String)
 case class SolveQuestUpdateResult()
 
 case class VoteQuestRequest(
@@ -98,14 +98,15 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def solveQuestUpdate(request: SolveQuestUpdateRequest): ApiResult[SolveQuestUpdateResult] = handleDbException {
     import request._
     {
-      db.user.readById(quest.info.authorId) ifSome { u =>
-        storeQuestSolvingInDailyResult(StoreQuestSolvingInDailyResultRequest(u, quest))
-      } map {
+      runWhileSome(quest)(
+      { q: Quest =>
         db.quest.updatePoints(
           id = quest.id,
-          timelinePointsChange = ratio) ifSome { v =>
-          updateQuestStatus(UpdateQuestStatusRequest(v))
-        }
+          timelinePointsChange = ratio)
+      }, { q: Quest =>
+        db.quest.addSolution(q.id)
+      }) ifSome { v =>
+        updateQuestStatus(UpdateQuestStatusRequest(v))
       } map {
         OkApiResult(SolveQuestUpdateResult())
       }

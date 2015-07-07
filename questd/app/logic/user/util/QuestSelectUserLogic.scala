@@ -13,7 +13,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   private def getRandomQuest(implicit selected: List[Quest]): Option[Quest] = {
     val algorithms = List(
       () => getQuestsWithSuperAlgorithm,
-      () => getQuestsWithMyTags,
+      () => getQuestsWithMyTags(withSolutions = false),
       () => getAnyQuests,
       () => getAnyQuestsIgnoringLevels,
       () => getAnyQuestsDefaultCultureIgnoringLevels)
@@ -34,41 +34,41 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private[user] def getTutorialQuests: Option[Iterator[Quest]] = {
-    Logger.trace("getTutorialQuests")
-
-    val tutorialQuestId = api.configNamed("Tutorial")(api.TutorialConfigParams.TutorialQuestId)
-
-    if (user.timeLine.exists(_.objectId == tutorialQuestId) || user.profile.publicProfile.level > 1) { // TODO: remove this when QuestME-991 will be fixed.
-      Logger.trace("  returning None since it's already there")
-      None
-    } else {
-      Logger.trace("  adding tutorial quest (if it'll be found)")
-      val maybeQuests = checkNotEmptyIterator(
-        Some(
-          api.getAllQuests(
-            GetAllQuestsRequest(
-              user = user,
-              status = QuestStatus.ForTutorial,
-              cultureId = None,
-              ids = List(tutorialQuestId))).body.get.quests))
-      if (maybeQuests.isEmpty) Logger.error(s"Tutorial quest not found but it should be!")
-      maybeQuests
-    }
+    Logger.trace("getTutorialQuests returns None since no client side tutorial is for now")
+    None
+//    val tutorialQuestId = api.configNamed("Tutorial")(api.TutorialConfigParams.TutorialQuestId)
+//
+//    if (user.timeLine.exists(_.objectId == tutorialQuestId) || user.profile.publicProfile.level > 1) {
+//      Logger.trace("  returning None since it's already there")
+//      None
+//    } else {
+//      Logger.trace("  adding tutorial quest (if it'll be found)")
+//      val maybeQuests = checkNotEmptyIterator(
+//        Some(
+//          api.getAllQuests(
+//            GetAllQuestsRequest(
+//              user = user,
+//              status = QuestStatus.ForTutorial,
+//              cultureId = None,
+//              ids = List(tutorialQuestId))).body.get.quests))
+//      if (maybeQuests.isEmpty) Logger.error(s"Tutorial quest not found but it should be!")
+//      maybeQuests
+//    }
   }
 
   private[user] def getStartingQuests(implicit selected: List[Quest]): Option[Iterator[Quest]] = {
     Logger.trace("getStartingQuests")
 
     if (user.profile.publicProfile.level > api.config(api.DefaultConfigParams.QuestProbabilityLevelsToGiveStartingQuests).toInt) {
-      Logger.trace("  returns None because of high level")
+      Logger.trace("  Returns None because of high level")
       None
     } else {
 
       val algorithms = List(
-        (api.config(api.DefaultConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests),
-        (api.config(api.DefaultConfigParams.QuestProbabilityStartingFriendQuests).toDouble, () => getFriendsQuests),
-        (api.config(api.DefaultConfigParams.QuestProbabilityStartingFollowingQuests).toDouble, () => getFollowingQuests),
-        (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
+        (api.config(api.DefaultConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests(withSolutions = true)),
+        (api.config(api.DefaultConfigParams.QuestProbabilityStartingFriendQuests).toDouble, () => getFriendsQuests(withSolutions = true)),
+        (api.config(api.DefaultConfigParams.QuestProbabilityStartingFollowingQuests).toDouble, () => getFollowingQuests(withSolutions = true)),
+        (1.00, () => getQuestsWithMyTags(withSolutions = true)) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
       selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
@@ -79,37 +79,39 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("getDefaultQuests")
 
     val algorithms = List(
-      (api.config(api.DefaultConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests),
-      (api.config(api.DefaultConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests),
-      (api.config(api.DefaultConfigParams.QuestProbabilityVIP).toDouble, () => getVIPQuests),
-      (1.00, () => getQuestsWithMyTags) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
+      (api.config(api.DefaultConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests(withSolutions = false)),
+      (api.config(api.DefaultConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests(withSolutions = false)),
+      (api.config(api.DefaultConfigParams.QuestProbabilityVIP).toDouble, () => getVIPQuests(withSolutions = false)),
+      (1.00, () => getQuestsWithMyTags(withSolutions = false)) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 
     selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
   }
 
-  private[user] def getFriendsQuests(implicit selected: List[Quest]) = {
+  private[user] def getFriendsQuests(withSolutions: Boolean)(implicit selected: List[Quest]) = {
     Logger.trace("  Returning quest from friends")
     checkNotEmptyIterator(Some(api.getFriendsQuests(GetFriendsQuestsRequest(
       user = user,
       status = QuestStatus.InRotation,
       idsExclude = questIdsToExclude,
       authorsExclude = questAuthorIdsToExclude,
-      levels = levels)).body.get.quests))
+      levels = levels,
+      withSolutions = withSolutions)).body.get.quests))
   }
 
-  private[user] def getFollowingQuests(implicit selected: List[Quest]) = {
+  private[user] def getFollowingQuests(withSolutions: Boolean)(implicit selected: List[Quest]) = {
     Logger.trace("  Returning quest from Following")
     checkNotEmptyIterator(Some(api.getFollowingQuests(GetFollowingQuestsRequest(
       user = user,
       status = QuestStatus.InRotation,
       levels = levels,
       idsExclude = questIdsToExclude,
-      authorsExclude = questAuthorIdsToExclude
+      authorsExclude = questAuthorIdsToExclude,
+      withSolutions = withSolutions
     )).body.get.quests))
   }
 
-  private[user] def getVIPQuests(implicit selected: List[Quest]) = {
+  private[user] def getVIPQuests(withSolutions: Boolean)(implicit selected: List[Quest]) = {
     Logger.trace("  Returning VIP quests")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPQuests)
@@ -120,10 +122,11 @@ trait QuestSelectUserLogic { this: UserLogic =>
       idsExclude = questIdsToExclude,
       authorsExclude = questAuthorIdsToExclude,
       status = QuestStatus.InRotation,
-      levels = levels)).body.get.quests))
+      levels = levels,
+      withSolutions = withSolutions)).body.get.quests))
   }
 
-  private[user] def getQuestsWithMyTags(implicit selected: List[Quest]) = {
+  private[user] def getQuestsWithMyTags(withSolutions: Boolean)(implicit selected: List[Quest]) = {
     Logger.trace("  Returning quests with my tags")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
@@ -135,7 +138,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
       status = QuestStatus.InRotation,
       authorsExclude = questAuthorIdsToExclude,
       levels = levels,
-      cultureId = user.demo.cultureId)).body.get.quests))
+      cultureId = user.demo.cultureId,
+      withSolutions = withSolutions)).body.get.quests))
   }
 
   private[user] def getAnyQuests(implicit selected: List[Quest]) = {

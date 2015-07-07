@@ -44,12 +44,14 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
 
       quest.readById(mEq(q.id)) returns Some(q)
       quest.updatePoints(mEq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)
+      quest.addSolution(any) returns Some(q)
       user.recordQuestSolving(mEq(u.id), mEq(q.id), any, mEq(false)) returns Some(u)
       user.addEntryToTimeLine(any, any) returns Some(u)
       user.addToAssets(mEq(u.id), any) returns Some(u)
       user.readById(q.info.authorId) returns Some(author)
       user.readById(friend.id) returns Some(friend)
       user.storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any) returns Some(author)
+
       solution.allWithParams(
         status = any,
         authorIds = any,
@@ -64,6 +66,10 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         cultureId = any) returns List.empty.iterator
 
       val result = api.solveQuest(SolveQuestRequest(u, q.id, s))
+
+
+      result must beAnInstanceOf[OkApiResult[SolveQuestResult]]
+      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
 
       there was one(solution).create(
         Solution(
@@ -81,11 +87,9 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       there was one(user).addToAssets(mEq(u.id), mEq(q.info.solveReward - q.info.solveCost))
 //      there was one(user).addEntryToTimeLineMulti(mEq(List("fid1")), any)
       there was one(user).addEntryToTimeLine(mEq(friend.id), any)
-      there was one(quest).updatePoints(mEq(q.id), mEq(2), anyInt, anyInt, anyInt, anyInt, anyInt)
+      there was one(quest).updatePoints(mEq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt)
+      there was one(quest).addSolution(mEq(q.id))
       there was one(user).storeQuestSolvingInDailyResult(mEq(q.info.authorId), any, any)
-
-      result must beAnInstanceOf[OkApiResult[SolveQuestResult]]
-      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
     }
 
     // FIX: clean me up.

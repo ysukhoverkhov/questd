@@ -9,6 +9,7 @@ import models.domain.common.{Assets, ContentReference, ContentType, ContentVote}
 import models.domain.quest._
 import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
+import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
 import models.domain.user.auth.{LoginMethod, AuthInfo}
 import models.domain.user.battlerequests.BattleRequest
@@ -52,7 +53,8 @@ package object domainstubs {
     timelinePoints: Int = 0,
     solveCost: Assets = Assets(0, 0, 0),
     solveReward: Assets = Assets(0, 0, 0),
-    likes: Int = 0) = {
+    likes: Int = 0,
+    solutionsCount: Int = 0) = {
 
     Quest(
       id = id,
@@ -73,7 +75,8 @@ package object domainstubs {
           victoryReward = Assets(1, 1, 1),
           defeatReward =Assets(2, 2, 2)),
       rating = QuestRating(timelinePoints = timelinePoints, likesCount = likes),
-      status = status)
+      status = status,
+      solutionsCount = solutionsCount)
   }
 
   def createSolutionInfoContent = {
@@ -229,7 +232,8 @@ package object domainstubs {
     timeLine: List[TimeLineEntry] = List.empty,
     questBookmark: Option[String] = None,
     privateDailyResults: List[DailyResult] = List(createDailyResultStub()),
-    battleRequests: List[BattleRequest] = List.empty) = {
+    battleRequests: List[BattleRequest] = List.empty,
+    tutorialState: TutorialState = TutorialState()) = {
 
     User(
       id = id,
@@ -253,7 +257,8 @@ package object domainstubs {
           level = level,
           bio = Bio(
             gender = Gender.Male)),
-        rights = rights),
+        rights = rights,
+        tutorialStates = Map(TutorialPlatform.iPhone.toString -> tutorialState)),
       friends = friends,
       followers = followers,
       mustVoteSolutions = mustVoteSolutions,

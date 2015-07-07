@@ -325,6 +325,39 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).usedTutorialTaskIds.length == 3)
     }
 
+    "addTutorialQuestAssigned works" in new WithApplication(appWithTestDatabase) {
+
+      val userid = "addQuestsTest"
+
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid))
+
+      db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t1")
+      db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
+      db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t3")
+      val ou = db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).usedTutorialQuestIds.length == 3)
+    }
+
+    "setRequestForTutorialBattlesUsed works" in new WithApplication(appWithTestDatabase) {
+
+      val userid = "setRequestForTutorialBattlesUsed"
+
+      db.user.delete(userid)
+      db.user.create(User(
+        id = userid))
+
+      val ou = db.user.setRequestForTutorialBattlesUsed(userid, TutorialPlatform.iPhone.toString, used = true)
+
+      ou must beSome.which((u: User) => u.id.toString == userid)
+      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString)
+        .requestForTutorialBattlesUsed)
+    }
+
+
     "updateCultureId works" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
 

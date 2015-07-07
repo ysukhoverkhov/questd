@@ -146,6 +146,8 @@ trait UserDAO extends BaseDAO[User] {
 
   def addClosedTutorialElement(id: String, platform: String, state: String): Option[User]
   def addTutorialTaskAssigned(id: String, platform: String, taskId: String): Option[User]
+  def addTutorialQuestAssigned(id: String, platform: String, questId: String): Option[User]
+  def setRequestForTutorialBattlesUsed(id: String, platform: String, used: Boolean): Option[User] // TODO: test me.
 
   def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit
 

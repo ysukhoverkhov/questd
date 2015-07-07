@@ -102,7 +102,7 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
 
         if (taskForm.id == "") {
           api.createTutorialTaskAdmin(CreateTutorialTaskAdminRequest(tt))
-        } else { Logger.error(s"!!!! $tt")
+        } else {
           api.updateTutorialTaskAdmin(UpdateTutorialTaskAdminRequest(tt))
         }
 

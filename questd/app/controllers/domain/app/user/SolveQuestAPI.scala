@@ -54,7 +54,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             // creating solution.
             val culture = u.demo.cultureId.get
 
-            val sol = Solution(
+            val newSolution = Solution(
               cultureId = culture,
               questLevel = questToSolve.info.level,
               info = SolutionInfo(
@@ -63,7 +63,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 questId = questToSolve.id,
                 vip = user.profile.publicProfile.vip))
 
-            db.solution.create(sol)
+            db.solution.create(newSolution)
 
             // Running db actions
             runWhileSome(u)(
@@ -71,7 +71,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               db.user.recordQuestSolving(
                 u.id,
                 questToSolve.id,
-                sol.id,
+                newSolution.id,
                 u.profile.questSolutionContext.bookmarkedQuest.map(_.id).contains(questToSolve.id))
             }) ifSome { u =>
 
@@ -80,6 +80,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               adjustAssets(AdjustAssetsRequest(
                 user = u,
                 change = -questToSolve.info.solveCost + questToSolve.info.solveReward))
+
             } map { r =>
               makeTask(MakeTaskRequest(r.user, taskType = Some(TaskType.CreateSolution)))
             } map { r =>
@@ -87,13 +88,13 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 user = r.user,
                 reason = TimeLineReason.Created,
                 objectType = TimeLineType.Solution,
-                objectId = sol.id))
+                objectId = newSolution.id))
             } map { r =>
               addToWatchersTimeLine(AddToWatchersTimeLineRequest(
                 user = r.user,
                 reason = TimeLineReason.Created,
                 objectType = TimeLineType.Solution,
-                objectId = sol.id))
+                objectId = newSolution.id))
               //                } ifOk { r =>
               //                  addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id))
             } map { r =>
@@ -102,25 +103,30 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                   ((te.objectType == TimeLineType.Quest)
                     && (te.actorId != u.id || te.reason != TimeLineReason.Created))
                 }
-                val numberOfSolvedQuests = u.timeLine.count { te =>
-                  ((te.objectType == TimeLineType.Solution)
-                    && (te.reason == TimeLineReason.Created)
-                    && (te.actorId == u.id))
-                }
+                val numberOfSolvedQuests = u.stats.solvedQuests.size
 
                 // Updating quest points.
                 val ratio = if (numberOfSolvedQuests == 0)
                   1
                 else
-                  Math.round(numberOfReviewedQuests / numberOfSolvedQuests)
-                solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio))
+                  Math.max(
+                    Math.round(numberOfReviewedQuests / numberOfSolvedQuests),
+                    config(DefaultConfigParams.QuestMaxTimeLinePointsForSolve).toInt)
+
+                solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio, newSolution.id))
               } map {
-                tryCreateBattle(TryCreateBattleRequest(sol))
+                tryCreateBattle(TryCreateBattleRequest(newSolution, useTutorialCompetitor = false))
+              } map {
+
+                // Giving reward to author of the quest.
+                db.user.readById(questToSolve.info.authorId) ifSome { author =>
+                  storeQuestSolvingInDailyResult(StoreQuestSolvingInDailyResultRequest(author, questToSolve))
+                }
               } map {
                 OkApiResult(SolveQuestResult(
                   allowed = OK,
                   profile = Some(r.user.profile),
-                  solutionId = Some(sol.id)))
+                  solutionId = Some(newSolution.id)))
               }
             }
 

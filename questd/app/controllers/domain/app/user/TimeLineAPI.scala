@@ -51,6 +51,8 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def addToTimeLine(request: AddToTimeLineRequest): ApiResult[AddToTimeLineResult] = handleDbException {
     import request._
 
+    Logger.trace(s"Adding to timeline reason = ${request.reason}, ${request.objectType}, objectId = ${request.objectId}, actorId = ${request.actorId}")
+
     if (user.timeLine.exists(_.objectId == objectId)) {
       OkApiResult(AddToTimeLineResult(user))
     } else {

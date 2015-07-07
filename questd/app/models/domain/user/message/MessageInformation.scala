@@ -6,7 +6,7 @@ import scala.language.implicitConversions
 /**
  * A message about removed friendship connection.
  */
-case class MessageInformation (text: String, url: Option[String])
+case class MessageInformation (text: String, url: Option[String] = None)
 
 
 /**

@@ -18,15 +18,16 @@ class DailyResultAPISpecs extends BaseAPISpecs {
       val q = createQuestStub(authorId = u.id, status = QuestStatus.InRotation, likes = 5)
 
       quest.allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List(u.id),
-        authorIdsExclude = null,
-        levels = null,
-        skip = 0,
-        vip = null,
-        ids = null,
-        idsExclude = null,
-        cultureId = null) returns List(q).iterator
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = mEq(List(u.id)),
+        authorIdsExclude = any,
+        levels = any,
+        skip = mEq(0),
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        cultureId = any,
+        withSolutions = any) returns List(q).iterator
       user.addPrivateDailyResult(any, any) returns Some(u)
       user.addQuestIncomeToDailyResult(any, any) returns Some(u)
 
@@ -34,15 +35,16 @@ class DailyResultAPISpecs extends BaseAPISpecs {
         user = u))
 
       there was one(quest).allWithParams(
-        status = List(QuestStatus.InRotation),
-        authorIds = List(u.id),
-        authorIdsExclude = null,
-        levels = null,
-        skip = 0,
-        vip = null,
-        ids = null,
-        idsExclude = null,
-        cultureId = null)
+        status = mEq(List(QuestStatus.InRotation)),
+        authorIds = mEq(List(u.id)),
+        authorIdsExclude = any,
+        levels = any,
+        skip = mEq(0),
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        cultureId = any,
+        withSolutions = any)
 
       there was one(user).addQuestIncomeToDailyResult(
         mEq(u.id),

@@ -28,10 +28,11 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     api.db.tutorial.readById(platform).flatMap(_.elements.find(_.id == elementId))
   }
 
-  private def deleteParamFromActionImpl(platform: String, elementId: String, paramKey: String): Unit = {
+  private def deleteParamFromActionImpl(platform: String, elementId: String, actionIndex: Int, paramKey: String): Unit = {
     findTutorialElement(platform, elementId) match {
       case Some(e) =>
-        val updatedElement = e.copy(action = e.action.copy(params = e.action.params - paramKey))
+        val updatedAction = e.actions(actionIndex).copy(params = e.actions(actionIndex).params - paramKey)
+        val updatedElement = e.copy(actions = e.actions.take(actionIndex) ++ List(updatedAction) ++ e.actions.drop(actionIndex + 1))
         api.db.tutorial.updateElement(platform, updatedElement)
 
       case None =>
@@ -39,10 +40,12 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
   }
 
-  private def addParamToElementActionImpl(platform: String, elementId: String, key: String, value: String): Unit = {
+  private def addParamToElementActionImpl(platform: String, elementId: String, actionIndex: Int, key: String, value: String): Unit = {
     findTutorialElement(platform, elementId) match {
       case Some(e) =>
-        val updatedElement = e.copy(action = e.action.copy(params = e.action.params + (key -> value)))
+        val updatedAction = e.actions(actionIndex).copy(params = e.actions(actionIndex).params + (key -> value))
+        val updatedElement = e.copy(actions = e.actions.take(actionIndex) ++ List(updatedAction) ++ e.actions.drop(actionIndex + 1))
+
         api.db.tutorial.updateElement(platform, updatedElement)
 
       case None =>
@@ -159,7 +162,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     val tc = TutorialCondition(TutorialConditionType.TutorialElementClosed)
     val tt = TutorialTrigger(TutorialTriggerType.Any)
     val te = TutorialElement(
-      action = TutorialAction(TutorialActionType.Message),
+      actions = List(TutorialAction(TutorialActionType.Message), TutorialAction(TutorialActionType.Close)),
       conditions = List(tc),
       triggers = List(tt))
 
@@ -495,14 +498,16 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
     findTutorialElement(platform, elementId) match {
       case Some(e) =>
-        val updatedElement = e.copy(triggers = e.triggers.take(index) ++ e.triggers.drop(index + 1))
-        api.db.tutorial.updateElement(platform, updatedElement)
+        if (e.triggers.nonEmpty) {
+          val updatedElement = e.copy(triggers = e.triggers.take(index) ++ e.triggers.drop(index + 1))
+          api.db.tutorial.updateElement(platform, updatedElement)
+        }
 
       case None =>
         Logger.error(s"Tutorial script or element not found")
     }
 
-            redirectToElement(platform, elementId)
+    redirectToElement(platform, elementId)
   }
 
   /**

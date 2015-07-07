@@ -668,7 +668,29 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
+   */
+  def addTutorialQuestAssigned(id: String, platform: String, questId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$addToSet" -> MongoDBObject(
+          s"profile.tutorialStates.$platform.usedTutorialQuestIds" -> questId)))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def setRequestForTutorialBattlesUsed(id: String, platform: String, used: Boolean): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          s"profile.tutorialStates.$platform.requestForTutorialBattlesUsed" -> used)))
+  }
+
+  /**
+   * @inheritdoc
    */
   def updateCultureId(id: String, cultureId: String): Option[User] = {
     findAndModify(

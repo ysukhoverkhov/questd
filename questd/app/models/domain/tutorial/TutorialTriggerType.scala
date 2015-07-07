@@ -16,4 +16,5 @@ object TutorialTriggerType extends Enumeration {
   val TasksPanelCollapsedFromMaximized = Value
   val ContentLiked = Value
   val SidePanelOpened = Value
+  val OurBattleIsShown = Value
 }

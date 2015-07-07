@@ -9,5 +9,7 @@ object TutorialWS extends Controller with AccessToWSInstance {
   def closeTutorialElement = ws.closeTutorialElement
   def assignTutorialTask = ws.assignTutorialTask
   def incTutorialTask = ws.incTutorialTask
+  def assignTutorialQuest = ws.assignTutorialQuest
+  def createTutorialBattles = ws.createTutorialBattles
 }
 

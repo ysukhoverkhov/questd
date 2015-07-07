@@ -4,8 +4,9 @@ import controllers.domain.OkApiResult
 import controllers.domain.app.quest._
 import logic.BaseLogicSpecs
 import models.domain.common.ContentVote
-import models.domain.user.profile.{PublicProfile, Profile}
+import models.domain.quest.QuestStatus
 import models.domain.user.User
+import models.domain.user.profile.{Profile, PublicProfile}
 import testhelpers.domainstubs._
 
 class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
@@ -131,7 +132,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 //      q must beSome.which(q => q.id == qid)
 //    }
 
-    "Starting quests return vip quests" in {
+    "Starting quests return vip quests and with solutions" in {
       val qid = "qid"
       val u = User(
         profile = Profile(
@@ -145,7 +146,13 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
-      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
+      there was one(api).getVIPQuests(GetVIPQuestsRequest(
+        user = u,
+        idsExclude = List.empty,
+        authorsExclude = List(u.id),
+        status = QuestStatus.InRotation,
+        levels = Some((1, 1)),
+        withSolutions = true))
     }
 
     "Starting quests return other quests" in {
