@@ -31,6 +31,12 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       )
     }
 
+    def updateQuestSolutionsCount(quest: Quest): Quest = {
+      quest.copy(
+        solutionsCount = db.solution.allWithParams(questIds = List(quest.id)).size
+      )
+    }
+
     def rememberObjectToRemoveFromTimeline(objId: String): Unit = {
       objectsToRemove.append(objId)
     }
@@ -42,10 +48,13 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
 
     db.quest.all.foreach { quest =>
       db.quest.update(
-        updateQuestValues(quest)
+        updateQuestValues(updateQuestSolutionsCount(quest))
       )
 
-      if (quest.status == QuestStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40,08"
+      // TODO: ban here all quests with facebook content.
+      // and solution.
+
+      if (quest.status == QuestStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40.08"
         rememberObjectToRemoveFromTimeline(quest.id)
       }
     }
@@ -53,7 +62,7 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
     db.solution.all.foreach { solution =>
       db.solution.update(solution)
 
-      if (solution.status == SolutionStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40,08"
+      if (solution.status == SolutionStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40.08"
         rememberObjectToRemoveFromTimeline(solution.id)
       }
     }

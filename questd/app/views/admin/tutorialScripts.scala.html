@@ -230,9 +230,9 @@ elements: List[models.domain.tutorial.TutorialElement])
             </p>
 
             <p>
-            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteElement(currentPlatform, element.id)) {
-                <input type='submit' value='DELETE' />
-            }
+                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteElement(currentPlatform, element.id)) {
+                    <input type='submit' value='DELETE' />
+                }
             </p>
         </td>
     </tr>
