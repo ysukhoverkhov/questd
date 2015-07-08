@@ -17,7 +17,7 @@ case class GetTutorialRequest(user: User, platform: TutorialPlatform.Value)
 case class GetTutorialResult(tutorialElements: List[TutorialElement])
 
 case class CloseTutorialElementRequest(user: User, platform: TutorialPlatform.Value, elementId: String)
-case class CloseTutorialElementResult(allowed: ProfileModificationResult, state: Option[TutorialState] = None)
+case class CloseTutorialElementResult(allowed: ProfileModificationResult, state: Option[Profile] = None)
 
 case class AssignTutorialTaskRequest(user: User, platform: TutorialPlatform.Value, taskId: String)
 case class AssignTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -63,7 +63,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
     import request._
 
     db.user.addClosedTutorialElement(user.id, platform.toString, elementId) ifSome { v =>
-      OkApiResult(CloseTutorialElementResult(OK, Some(v.profile.tutorialStates(platform.toString))))
+      OkApiResult(CloseTutorialElementResult(OK, Some(v.profile)))
     }
   }
 
