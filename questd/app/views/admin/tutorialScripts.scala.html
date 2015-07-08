@@ -63,7 +63,7 @@ elements: List[models.domain.tutorial.TutorialElement])
                             <input type='submit' value='Save' />
                             }
 
-                            @for((key, value) <- action.params) {
+                            @for((key, value) <- action.params.toSeq.sorted) {
                             <p>
                                 @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementAction(currentPlatform, element.id, index, key)) {
                                     <input type="text" id="key" name="key" value='@key' size="5">
@@ -120,7 +120,7 @@ elements: List[models.domain.tutorial.TutorialElement])
                             }
 
 
-                            @for((key, value) <- condition.params) {
+                            @for((key, value) <- condition.params.toSeq.sorted) {
                             <p>
                                 @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementCondition(currentPlatform, element.id, index, key)) {
                                 <input type="text" id="key" name="key" value='@key' size="5">
@@ -175,7 +175,7 @@ elements: List[models.domain.tutorial.TutorialElement])
                             <input type='submit' value='Save' />
                         }
 
-                        @for((key, value) <- trigger.params) {
+                        @for((key, value) <- trigger.params.toSeq.sorted) {
                         <p>
                             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.saveParamInElementTrigger(currentPlatform, element.id, index, key)) {
                                 <input type="text" id="key" name="key" value='@key' size="5">
@@ -214,12 +214,21 @@ elements: List[models.domain.tutorial.TutorialElement])
         </td>
 
         <td nowrap="nowrap">
-            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.upElement(currentPlatform, element.id)) {
-            <input type='submit' value='UP' />
-            }
-            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.downElement(currentPlatform, element.id)) {
-            <input type='submit' value='DOWN' />
-            }
+            <p>
+                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.upElement(currentPlatform, element.id)) {
+                    <input type='submit' value='UP' />
+                }
+                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.downElement(currentPlatform, element.id)) {
+                    <input type='submit' value='DOWN' />
+                }
+            </p>
+
+            <p>
+                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addElement(currentPlatform, Some(element.id))) {
+                    <input type='submit' value='INSERT' />
+                }
+            </p>
+
             <p>
             @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.deleteElement(currentPlatform, element.id)) {
                 <input type='submit' value='DELETE' />
@@ -230,7 +239,7 @@ elements: List[models.domain.tutorial.TutorialElement])
     }
     <tr>
         <td colspan="5">
-            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addElement(currentPlatform)) {
+            @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.addElement(currentPlatform, None)) {
                 <input type='submit' value='Add Element' />
             }
         </td>

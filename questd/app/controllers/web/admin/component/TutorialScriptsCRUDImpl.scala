@@ -210,7 +210,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @param platform platform to add element to.
    * @return Content to display to user.
    */
-  def addElement(platform: String) = Authenticated { implicit request =>
+  def addElement(platform: String, elementId: Option[String]) = Authenticated { implicit request =>
 
     ensurePlatformExists(platform)
 
@@ -221,7 +221,29 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       conditions = List(tc),
       triggers = List(tt))
 
-    api.db.tutorial.addElement(platform, te)
+    elementId.fold {
+      api.db.tutorial.addElement(platform, te)
+    } { elementId =>
+
+      api.db.tutorial.readById(platform).fold {
+        redirectToElement(platform, elementId)
+      } { tutorial =>
+        tutorial.elements.find(_.id == elementId).fold {
+          redirectToElement(platform, elementId)
+        } { element =>
+
+          val elementIndex = tutorial.elements.indexOf(element)
+
+//          actions = e.actions.take(actionIndex) ++ e.actions.drop(actionIndex + 1)
+
+          api.db.tutorial.update(tutorial.copy(
+            elements = tutorial.elements.take(elementIndex + 1) ++ List(te) ++ tutorial.elements.drop(elementIndex + 1)))
+          redirectToElement(platform, elementId)
+        }
+      }
+
+      api.db.tutorial.addElement(platform, te)
+    }
 
     redirectToElement(platform, te)
   }
@@ -254,10 +276,10 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
 
     api.db.tutorial.readById(platform).fold {
-              redirectToElement(platform, elementId)
+      redirectToElement(platform, elementId)
     } { tutorial =>
       tutorial.elements.find(_.id == elementId).fold {
-                redirectToElement(platform, elementId)
+        redirectToElement(platform, elementId)
       } { element =>
         api.db.tutorial.update(tutorial.copy(elements = swapWithPrev(tutorial.elements, element)))
         redirectToElement(platform, elementId)

@@ -161,7 +161,7 @@ POST	/admin/messages/send	    					controllers.web.admin.Messages.send
 
 
 GET     /admin/tutorial                                 controllers.web.admin.TutorialScriptsCRUD.tutorial(platform: String)
-POST    /admin/tutorial/addElement                      controllers.web.admin.TutorialScriptsCRUD.addElement(platform: String)
+POST    /admin/tutorial/addElement                      controllers.web.admin.TutorialScriptsCRUD.addElement(platform: String, elementId: Option[String])
 POST    /admin/tutorial/deleteElement                   controllers.web.admin.TutorialScriptsCRUD.deleteElement(platform: String, elementId: String)
 POST    /admin/tutorial/upElement                       controllers.web.admin.TutorialScriptsCRUD.upElement(platform: String, elementId: String)
 POST    /admin/tutorial/downElement                     controllers.web.admin.TutorialScriptsCRUD.downElement(platform: String, elementId: String)
