@@ -6,7 +6,6 @@ import com.mongodb.casbah.commons.MongoDBObject
 import models.domain.solution.{Solution, SolutionStatus}
 import models.store.dao._
 import models.store.mongo.helpers._
-import play.Logger
 
 /**
  * DOA for Quest solution objects
@@ -71,8 +70,6 @@ private[mongo] class MongoSolutionDAO
     if (cultureId.isDefined) {
       queryBuilder += ("cultureId" -> cultureId.get)
     }
-
-    Logger.trace("MongoQuestSolutionDAO - allWithParams - " + queryBuilder.result)
 
     findByExample(
       queryBuilder.result(),
