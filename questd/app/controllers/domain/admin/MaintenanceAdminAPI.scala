@@ -5,8 +5,9 @@ import controllers.domain._
 import controllers.domain.helpers._
 import logic.QuestLogic
 import models.domain.quest.{Quest, QuestStatus}
-import models.domain.solution.SolutionStatus
+import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.User
+import play.Logger
 
 case class CleanUpObjectsRequest()
 case class CleanUpObjectsResult()
@@ -30,11 +31,30 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
         )
       )
     }
-
+    
     def updateQuestSolutionsCount(quest: Quest): Quest = {
       quest.copy(
         solutionsCount = db.solution.allWithParams(questIds = List(quest.id)).size
       )
+    }
+
+
+    def checkBanQuest(quest: Quest): Quest = {
+      if (quest.info.content.media.storage == "fb" && quest.status == QuestStatus.InRotation) {
+        Logger.error(s"!!!! Banning quest $quest") // TODO: remove me.
+        quest.copy(status = QuestStatus.OldBanned) // TODO: replace it with Adminbanned in 0.40.08
+      } else {
+        quest
+      }
+    }
+
+    def checkBanSolution(solution: Solution): Solution = {
+      if (solution.info.content.media.storage == "fb" && solution.status == SolutionStatus.InRotation) {
+        Logger.error(s"!!!! Banning solution $solution") // TODO: remove me.
+        solution.copy(status = SolutionStatus.OldBanned) // TODO: replace it with Adminbanned in 0.40.08
+      } else {
+        solution
+      }
     }
 
     def rememberObjectToRemoveFromTimeline(objId: String): Unit = {
@@ -45,25 +65,23 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       user.copy(timeLine = user.timeLine.filterNot(p => objIds.contains(p.objectId)))
     }
 
-
     db.quest.all.foreach { quest =>
-      db.quest.update(
-        updateQuestValues(updateQuestSolutionsCount(quest))
-      )
+      val updatedQuest = (updateQuestSolutionsCount(updateQuestValues(checkBanQuest(quest)))
 
-      // TODO: ban here all quests with facebook content.
-      // and solution.
+      db.quest.update(updatedQuest)
 
-      if (quest.status == QuestStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40.08"
-        rememberObjectToRemoveFromTimeline(quest.id)
+      if (updatedQuest.status == QuestStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40.08"
+        rememberObjectToRemoveFromTimeline(updatedQuest.id)
       }
     }
 
     db.solution.all.foreach { solution =>
-      db.solution.update(solution)
+      val updatedSolution = checkBanSolution(solution)
 
-      if (solution.status == SolutionStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40.08"
-        rememberObjectToRemoveFromTimeline(solution.id)
+      db.solution.update(updatedSolution)
+
+      if (updatedSolution.status == SolutionStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40,08"
+        rememberObjectToRemoveFromTimeline(updatedSolution.id)
       }
     }
 
