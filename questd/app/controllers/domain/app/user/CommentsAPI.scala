@@ -67,7 +67,7 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
         message = request.message
       )))
 
-      makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.SubmitReviewsForQuests)))
+      makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.PostComments)))
 
       OkApiResult(PostCommentResult(OK, Some(request.user.profile)))
     }

@@ -63,9 +63,8 @@ trait Tasks { this: UserLogic =>
       TaskType.LikeQuests -> createLikeQuestsTask,
       TaskType.CreateQuest -> createCreateQuestTask,
       TaskType.ChallengeBattle -> createChallengeBattleTask,
-      TaskType.VoteReviews -> createVoteReviewsTask,
-      TaskType.SubmitReviewsForResults -> createSubmitReviewsForResultsTask,
-      TaskType.SubmitReviewsForQuests -> createSubmitReviewsForQuestsTask,
+      TaskType.VoteComments -> createVoteReviewsTask,
+      TaskType.PostComments -> createPostCommentsTask,
       TaskType.GiveRewards -> createGiveRewardsTask,
       TaskType.LookThroughFriendshipProposals -> createReviewFriendshipRequestsTask,
       TaskType.Custom -> createClientTask)
@@ -169,33 +168,23 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for selecting task for voting reviews.
    */
-  private def createVoteReviewsTask(user: User) = ifHasRightTo(Functionality.VoteReviews) {
-    //    Some(Task(
-    //      taskType = TaskType.VoteReviews,
-    //      description = "",
-    //      requiredCount = 10))
+  private def createVoteReviewsTask(user: User) = ifHasRightTo(Functionality.VoteComments) {
+//        Some(Task(
+//          taskType = TaskType.VoteComments,
+//          description = "",
+//          requiredCount = 10))
     None
   }
 
-  /**
-   * Algorithm for generating tasks for submiting reviews for solutions.
-   */
-  private def createSubmitReviewsForResultsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForSolutions) {
-    //    Some(Task(
-    //      taskType = TaskType.SubmitReviewsForResults,
-    //      description = "",
-    //      requiredCount = 10))
-    None
-  }
 
   /**
-   * Algorithm for generating tasks for submiting reviews for proposals.
+   * Algorithm for generating tasks for submitting reviews for proposals.
    */
-  private def createSubmitReviewsForQuestsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForQuests) {
+  private def createPostCommentsTask(user: User) = ifHasRightTo(Functionality.PostComments) {
     val taskProbability = api.config(api.DefaultConfigParams.WriteCommentTaskProbability).toDouble
     if (rand.nextDouble() < taskProbability)
       Some(Task(
-        taskType = TaskType.SubmitReviewsForQuests,
+        taskType = TaskType.PostComments,
         description = "",
         requiredCount = 1))
     else

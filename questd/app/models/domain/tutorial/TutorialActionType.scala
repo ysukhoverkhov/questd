@@ -15,4 +15,5 @@ object TutorialActionType extends Enumeration {
   val StopAnimation = Value
   val ScrollToNearestBattleInTimeLine = Value
   val CreateTutorialBattles = Value
+  val SetReminder = Value
 }
