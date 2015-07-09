@@ -16,6 +16,9 @@ case class KeyValueForm(
   key: String,
   value: String)
 
+case class SectionNameForm(
+  sectionName: String)
+
 class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   private def leftMenu(implicit request: RequestHeader): Map[String, String] = {
@@ -26,6 +29,10 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
   private def findTutorialElement(platform: String, elementId: String): Option[TutorialElement] = {
     api.db.tutorial.readById(platform).flatMap(_.elements.find(_.id == elementId))
+  }
+
+  private def findTutorialElementWithoutSection(platform: String): Option[TutorialElement] = {
+    api.db.tutorial.readById(platform).flatMap(_.elements.find(_.crud.sectionName.isEmpty))
   }
 
   private def deleteParamFromActionImpl(platform: String, elementId: String, actionIndex: Int, paramKey: String): Unit = {
@@ -640,7 +647,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         addParamToElementTriggerImpl(platform, elementId, index, keyValueForm.key, keyValueForm.value)
       })
 
-            redirectToElement(platform, elementId)
+      redirectToElement(platform, elementId)
   }
 
   /**
@@ -689,6 +696,33 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform)).flashing(
         "error" -> "Missing file")
     }
+  }
+
+  /**
+   * Adds section to first encountered nameless tutorial element.
+   *
+   * @param platform Platform to search element in.
+   * @return Redirect.
+   */
+  def addSection(platform: String) = Authenticated { implicit request =>
+    ensurePlatformExists(platform)
+
+    val form = Form(
+      mapping(
+        "sectionName" -> nonEmptyText)(SectionNameForm.apply)(SectionNameForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+      },
+
+      sectionNameForm => {
+        findTutorialElementWithoutSection(platform).fold[Any](None) { element =>
+          api.db.tutorial.updateElement(platform, element.copy(crud = element.crud.copy(sectionName = Some(sectionNameForm.sectionName))))
+        }
+      })
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }
 
   private def ensurePlatformExists(platform: String): Unit = {

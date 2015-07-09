@@ -38,5 +38,8 @@ object TutorialScriptsCRUD extends Controller {
 
   def exportTutorialScript(platform: String) = admin.tutorialScripts.exportTutorialScript(platform)
   def importTutorialScript(platform: String) = admin.tutorialScripts.importTutorialScript(platform)
+
+  def addSection(platform: String) = admin.tutorialScripts.addSection(platform)
+
 }
 

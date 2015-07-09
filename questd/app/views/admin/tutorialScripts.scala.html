@@ -21,14 +21,22 @@ elements: List[models.domain.tutorial.TutorialElement])
     TutorialTriggerType.values.map(_.toString).toList
 }
 
-
+@allSections = @{
+    elements.foldLeft[Set[String]](Set.empty){(r, v) => r + v.crud.sectionName.getOrElse("")}
+}
 
 @main(s"Tutorial script for: $currentPlatform")(menuItems, leftMenuItems) {
 
 <a href="@controllers.web.admin.routes.TutorialScriptsCRUD.exportTutorialScript(currentPlatform)">Export</a>
+
 @helper.form(action = controllers.web.admin.routes.TutorialScriptsCRUD.importTutorialScript(currentPlatform), 'enctype -> "multipart/form-data") {
     <input type="file" name="tutorialScript">
     <input type="submit" value="Import">
+}
+
+@helper.form(action = controllers.web.admin.routes.TutorialScriptsCRUD.addSection(currentPlatform)) {
+    <input type="text" name="sectionName">
+    <input type="submit" value="Add Section">
 }
 
 <table border="1">
@@ -42,7 +50,26 @@ elements: List[models.domain.tutorial.TutorialElement])
 
     @for(element <- elements) {
     <tr id="@element.id">
-        <td>@element.id</td>
+        <td nowrap="nowrap">
+            <p>
+                @element.id
+            </p>
+
+            <p>
+                @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.updateElementSectionName(currentPlatform, element.id)) {
+                <select id="sectionName" name="sectionName">
+                    @for(sectionName <- allSections) {
+                        @if(sectionName == element.crud.sectionName.getOrElse("")) {
+                            <option value="@sectionName" selected="selected">@sectionName</option>
+                        } else {
+                            <option value="@sectionName">@sectionName</option>
+                        }
+                    }
+                </select>
+                <input type='submit' value='Save' />
+                }
+            </p>
+        </td>
 
         <!-- Actions -->
         <td nowrap="nowrap">

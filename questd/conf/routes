@@ -190,6 +190,8 @@ POST    /admin/tutorial/saveParamInElementTrigger       controllers.web.admin.Tu
 GET     /admin/tutorial/exportTutorialScript            controllers.web.admin.TutorialScriptsCRUD.exportTutorialScript(platform: String)
 POST    /admin/tutorial/importTutorialScript            controllers.web.admin.TutorialScriptsCRUD.importTutorialScript(platform: String)
 
+POST    /admin/tutorial/addSection                      controllers.web.admin.TutorialScriptsCRUD.addSection(platform: String)
+
 GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")
 GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)
 POST	/admin/tutorialTasks/update						controllers.web.admin.TutorialTasksCRUD.updateTutorialTask
