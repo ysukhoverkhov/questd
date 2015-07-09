@@ -5,7 +5,7 @@ import controllers.domain._
 import controllers.domain.helpers._
 import logic.QuestLogic
 import models.domain.quest.{QuestStatus, Quest}
-import models.domain.solution.SolutionStatus
+import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.User
 import play.Logger
 
@@ -41,6 +41,15 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       }
     }
 
+    def checkBanSolution(solution: Solution): Solution = {
+      if (solution.info.content.media.storage == "fb" && solution.status == SolutionStatus.InRotation) {
+        Logger.error(s"!!!! Banning solution $solution") // TODO: remove me.
+        solution.copy(status = SolutionStatus.OldBanned) // TODO: replace it with Adminbanned in 0.40.08
+      } else {
+        solution
+      }
+    }
+
     def rememberObjectToRemoveFromTimeline(objId: String): Unit = {
       objectsToRemove.append(objId)
     }
@@ -60,10 +69,12 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
     }
 
     db.solution.all.foreach { solution =>
-      db.solution.update(solution)
+      val updatedSolution = checkBanSolution(solution)
 
-      if (solution.status == SolutionStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40,08"
-        rememberObjectToRemoveFromTimeline(solution.id)
+      db.solution.update(updatedSolution)
+
+      if (updatedSolution.status == SolutionStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40,08"
+        rememberObjectToRemoveFromTimeline(updatedSolution.id)
       }
     }
 
