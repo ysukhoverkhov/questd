@@ -40,6 +40,7 @@ object TutorialScriptsCRUD extends Controller {
   def importTutorialScript(platform: String) = admin.tutorialScripts.importTutorialScript(platform)
 
   def addSection(platform: String) = admin.tutorialScripts.addSection(platform)
-
+  def updateElementSectionName(platform: String, elementId: String) = admin.tutorialScripts.updateElementSectionName(platform, elementId)
+  def selectElementSectionName(platform: String) = admin.tutorialScripts.selectElementSectionName(platform)
 }
 

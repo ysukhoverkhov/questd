@@ -124,11 +124,22 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         List.empty
     }
 
+    val sectionName = request.cookies.get("sectionName").map(_.value)
+
+    val els2 = if (sectionName.isDefined) {
+      els.filter {sectionName == _.crud.sectionName}
+    } else {
+      els
+    }
+
+    val allSections = els.foldLeft[Set[String]](Set("")){(r, v) => r + v.crud.sectionName.getOrElse("")}
+
     Ok(views.html.admin.tutorialScripts(
       menuItems = Menu(request),
       leftMenuItems = leftMenu,
       currentPlatform = platform,
-      elements = els))
+      elements = els2,
+      allSections = allSections))
   }
 
   /**
@@ -709,7 +720,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
     val form = Form(
       mapping(
-        "sectionName" -> nonEmptyText)(SectionNameForm.apply)(SectionNameForm.unapply))
+        "sectionName" -> text)(SectionNameForm.apply)(SectionNameForm.unapply))
 
     form.bindFromRequest.fold(
       formWithErrors => {
@@ -718,12 +729,69 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
       sectionNameForm => {
         findTutorialElementWithoutSection(platform).fold[Any](None) { element =>
-          api.db.tutorial.updateElement(platform, element.copy(crud = element.crud.copy(sectionName = Some(sectionNameForm.sectionName))))
+          api.db.tutorial.updateElement(platform, element.copy(crud = element.crud.copy(sectionName = if (sectionNameForm.sectionName == "") None else Some(sectionNameForm.sectionName))))
         }
       })
 
     Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
   }
+
+  /**
+   * Sets section name for element.
+   *
+   * @param platform Platform to search element in.
+   * @param elementId id of element to sen section name for.
+   * @return Redirect.
+   */
+  def updateElementSectionName(platform: String, elementId: String) = Authenticated { implicit request =>
+    ensurePlatformExists(platform)
+
+    val form = Form(
+      mapping(
+        "sectionName" -> text)(SectionNameForm.apply)(SectionNameForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+      },
+
+      sectionNameForm => {
+        findTutorialElement(platform, elementId).fold[Any](None) { element =>
+          api.db.tutorial.updateElement(platform, element.copy(crud = element.crud.copy(sectionName = Some(sectionNameForm.sectionName))))
+        }
+      })
+
+    redirectToElement(platform, elementId)
+  }
+
+  /**
+   * select section to filter.
+   *
+   * @param platform Platform to search element in.
+   * @return
+   */
+  def selectElementSectionName(platform: String) = Authenticated { implicit request =>
+    ensurePlatformExists(platform)
+
+    val form = Form(
+      mapping(
+        "sectionName" -> text)(SectionNameForm.apply)(SectionNameForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+        Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+      },
+
+      sectionNameForm => {
+        if (sectionNameForm.sectionName == "") {
+          Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform)).discardingCookies(DiscardingCookie("sectionName"))
+        } else {
+          Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform)).withCookies(Cookie("sectionName", sectionNameForm.sectionName))
+        }
+      })
+  }
+
 
   private def ensurePlatformExists(platform: String): Unit = {
     if (api.db.tutorial.readById(platform).isEmpty) {

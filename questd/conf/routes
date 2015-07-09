@@ -191,6 +191,8 @@ GET     /admin/tutorial/exportTutorialScript            controllers.web.admin.Tu
 POST    /admin/tutorial/importTutorialScript            controllers.web.admin.TutorialScriptsCRUD.importTutorialScript(platform: String)
 
 POST    /admin/tutorial/addSection                      controllers.web.admin.TutorialScriptsCRUD.addSection(platform: String)
+POST    /admin/tutorial/updateElementSectionName        controllers.web.admin.TutorialScriptsCRUD.updateElementSectionName(platform: String, elementId: String)
+POST    /admin/tutorial/selectElementSectionName        controllers.web.admin.TutorialScriptsCRUD.selectElementSectionName(platform: String)
 
 GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")
 GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)
