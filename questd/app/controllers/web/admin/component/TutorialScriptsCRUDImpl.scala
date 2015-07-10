@@ -130,12 +130,12 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     val sectionName = selectedSectionName
 
     val els2 = if (sectionName.isDefined) {
-      els.filter {sectionName == _.crud.sectionName}
+      els.filter {e => sectionName == e.crud.sectionName || ((e.crud.sectionName.getOrElse("") == "") && sectionName.contains("Empty")) }
     } else {
       els
     }
 
-    val allSections = els.foldLeft[Set[String]](Set("")){(r, v) => r + v.crud.sectionName.getOrElse("")}
+    val allSections = els.foldLeft[Set[String]](Set("")){(r, v) => r + v.crud.sectionName.getOrElse("")}.toList.sorted
 
     Ok(views.html.admin.tutorialScripts(
       menuItems = Menu(request),
@@ -193,7 +193,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
     findTutorialElement(platform, elementId) match {
       case Some(e) =>
-        val updatedElement = e.copy(actions = ta :: e.actions)
+        val updatedElement = e.copy(actions = e.actions ::: List(ta))
         api.db.tutorial.updateElement(platform, updatedElement)
 
       case None =>

@@ -3,7 +3,7 @@ menuItems: Map[String, String],
 leftMenuItems: Map[String, String],
 currentPlatform: String,
 elements: List[models.domain.tutorial.TutorialElement],
-allSections: Set[String])
+allSections: List[String])
 
 @import helper._
 
@@ -38,7 +38,7 @@ allSections: Set[String])
 
 @form(action=controllers.web.admin.routes.TutorialScriptsCRUD.selectElementSectionName(currentPlatform)) {
     <select id="sectionName" name="sectionName">
-        @for(sectionName <- allSections) {
+        @for(sectionName <- "Empty" :: allSections) {
             <option value="@sectionName">@sectionName</option>
         }
     </select>
