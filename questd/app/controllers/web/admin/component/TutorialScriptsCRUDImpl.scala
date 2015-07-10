@@ -108,6 +108,9 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
   }
 
+  private def selectedSectionName(implicit request: AuthenticatedRequest[AnyContent]): Option[String] = {
+    request.cookies.get("sectionName").map(_.value)
+  }
 
   /**
    * Tutorial index page.
@@ -124,7 +127,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         List.empty
     }
 
-    val sectionName = request.cookies.get("sectionName").map(_.value)
+    val sectionName = selectedSectionName
 
     val els2 = if (sectionName.isDefined) {
       els.filter {sectionName == _.crud.sectionName}
@@ -237,7 +240,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     val te = TutorialElement(
       actions = List(TutorialAction(TutorialActionType.Message), TutorialAction(TutorialActionType.CloseTutorialElement)),
       conditions = List(tc),
-      triggers = List(tt))
+      triggers = List(tt),
+      crud = TutorialElementCRUD(sectionName = selectedSectionName))
 
     elementId.fold {
       api.db.tutorial.addElement(platform, te)
