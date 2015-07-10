@@ -105,8 +105,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
             sendMessage(SendMessageRequest(
               user,
               MessageInformation(
-                s"Your Fishing Paradise 3D account has been credited with ${user.profile.publicProfile.level * 10} shiners, " +
-                  s"launch Facebook version to claim them",
+                s"Your Fishing Paradise 3D account has been credited with ${user.profile.publicProfile.level * 10} shiners.",
                 None)))
 
           case v =>
