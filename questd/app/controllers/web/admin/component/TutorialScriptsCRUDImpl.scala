@@ -241,8 +241,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
     elementId.fold {
       api.db.tutorial.addElement(platform, te)
+      redirectToElement(platform, te)
     } { elementId =>
-
       api.db.tutorial.readById(platform).fold {
         redirectToElement(platform, elementId)
       } { tutorial =>
@@ -252,18 +252,12 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
           val elementIndex = tutorial.elements.indexOf(element)
 
-//          actions = e.actions.take(actionIndex) ++ e.actions.drop(actionIndex + 1)
-
           api.db.tutorial.update(tutorial.copy(
             elements = tutorial.elements.take(elementIndex + 1) ++ List(te) ++ tutorial.elements.drop(elementIndex + 1)))
           redirectToElement(platform, elementId)
         }
       }
-
-      api.db.tutorial.addElement(platform, te)
     }
-
-    redirectToElement(platform, te)
   }
 
   /**
