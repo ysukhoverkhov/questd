@@ -7,6 +7,7 @@ import controllers.domain.app.battle.UpdateBattleStateRequest
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
+import models.domain.battle.BattleStatus
 import models.domain.user._
 import models.domain.user.dailyresults.DailyResult
 import models.domain.user.profile.Profile
@@ -88,7 +89,8 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def resolveAllBattles(request: ResolveAllBattlesRequest): ApiResult[ResolveAllBattlesResult] = handleDbException {
 
     db.battle.all.foreach { battle =>
-      api.updateBattleState(UpdateBattleStateRequest(battle.copy(info = battle.info.copy(voteEndDate = new Date()))))
+      if (battle.info.status == BattleStatus.Fighting)
+        api.updateBattleState(UpdateBattleStateRequest(battle.copy(info = battle.info.copy(voteEndDate = new Date()))))
     }
 
     OkApiResult(ResolveAllBattlesResult(OK, Some(request.user.profile)))
