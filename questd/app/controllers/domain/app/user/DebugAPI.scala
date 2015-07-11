@@ -1,6 +1,9 @@
 package controllers.domain.app.user
 
+import java.util.Date
+
 import components._
+import controllers.domain.app.battle.UpdateBattleStateRequest
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
@@ -16,6 +19,9 @@ case class SetLevelDebugResult(user: User)
 
 case class ResetProfileDebugRequest(user: User)
 case class ResetProfileDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+
+case class ResolveAllBattlesRequest(user: User)
+case class ResolveAllBattlesResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -76,5 +82,16 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     }
   }
 
+  /**
+   * Makes all battles for user resolved.
+   */
+  def resolveAllBattles(request: ResolveAllBattlesRequest): ApiResult[ResolveAllBattlesResult] = handleDbException {
+
+    db.battle.all.foreach { battle =>
+      api.updateBattleState(UpdateBattleStateRequest(battle.copy(info = battle.info.copy(voteEndDate = new Date()))))
+    }
+
+    OkApiResult(ResolveAllBattlesResult(OK, Some(request.user.profile)))
+  }
 }
 

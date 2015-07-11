@@ -120,7 +120,7 @@ POST	/rest/debug/resetTutorial					    controllers.web.rest.DebugWS.resetTutoria
 POST	/rest/debug/setLevel					        controllers.web.rest.DebugWS.setLevel
 POST	/rest/debug/generateErrorLog			        controllers.web.rest.DebugWS.generateErrorLog
 POST	/rest/debug/resetProfile     					controllers.web.rest.DebugWS.resetProfile
-
+POST    /rest/debug/resolveAllBattles                   controllers.web.rest.DebugWS.resolveAllBattles
 
 
 
