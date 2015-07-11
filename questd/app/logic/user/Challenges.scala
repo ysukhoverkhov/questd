@@ -11,7 +11,6 @@ import models.domain.user.profile.Functionality
  */
 trait Challenges { this: UserLogic =>
 
-  // TODO: check rights here.
   def canChallengeBattle(mySolution: Solution, opponentSolution: Solution) = {
     lazy val mySolutionExists = user.stats.solvedQuests.values.exists(_ == mySolution.id)
     lazy val alreadyHasRequest = user.battleRequests
