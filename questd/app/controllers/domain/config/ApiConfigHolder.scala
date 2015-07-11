@@ -20,6 +20,8 @@ class _DefaultConfigParams {
   val QuestVoteTaskCountDeviation = "30 32 Quest Vote Task Count Deviation"
   val CreateQuestTaskProbability = "30 41 Create Quest Task Probability"
   val WriteCommentTaskProbability = "30 42 Write Comment Task Probability"
+  val BattleVoteTaskCountMean = "30 51 Battle Vote Task Count Mean"
+  val BattleVoteTaskCountDeviation = "30 52 Battle Vote Task Count Deviation"
 
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
@@ -103,6 +105,9 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.QuestVoteTaskCountDeviation -> "0.5",
             DefaultConfigParams.CreateQuestTaskProbability -> "0.3",
             DefaultConfigParams.WriteCommentTaskProbability -> "0.3",
+            DefaultConfigParams.BattleVoteTaskCountMean -> "3",
+            DefaultConfigParams.BattleVoteTaskCountDeviation -> "1",
+
 
             DefaultConfigParams.FavoriteThemesShare -> "0.2",
             DefaultConfigParams.FavoriteThemesProbability -> "0.75",
@@ -155,7 +160,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     "Tutorial" -> ConfigSection(
       "Tutorial",
       Map(
-        TutorialConfigParams.DailyTasksStartsFromLevel -> "3", // TODO: change the level with updating tutorial.
+        TutorialConfigParams.DailyTasksStartsFromLevel -> "4",
         TutorialConfigParams.TutorialQuestId -> "tutorial_1"
       ))
   )

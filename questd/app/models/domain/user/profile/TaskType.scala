@@ -13,6 +13,8 @@ object TaskType extends Enumeration {
   val PostComments = Value
   val VoteComments = Value
 
+  val VoteBattle = Value
+
   val GiveRewards = Value
   val LookThroughFriendshipProposals = Value
 

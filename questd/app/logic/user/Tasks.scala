@@ -65,6 +65,7 @@ trait Tasks { this: UserLogic =>
       TaskType.ChallengeBattle -> createChallengeBattleTask,
       TaskType.VoteComments -> createVoteReviewsTask,
       TaskType.PostComments -> createPostCommentsTask,
+      TaskType.VoteBattle -> createVoteBattlesTask,
       TaskType.GiveRewards -> createGiveRewardsTask,
       TaskType.LookThroughFriendshipProposals -> createReviewFriendshipRequestsTask,
       TaskType.Custom -> createClientTask)
@@ -189,6 +190,24 @@ trait Tasks { this: UserLogic =>
         requiredCount = 1))
     else
       None
+  }
+
+  /**
+   * Algorithm for generating task for voting quests.
+   */
+  private def createVoteBattlesTask(user: User) = ifHasRightTo(Functionality.VoteBattles) {
+    {
+      val mean = api.config(api.DefaultConfigParams.SolutionVoteTaskCountMean).toDouble
+      val dev = api.config(api.DefaultConfigParams.SolutionVoteTaskCountDeviation).toDouble
+      math.round(rand.nextGaussian(mean, dev)).toInt
+    } match {
+      case likesCount if likesCount > 0 =>
+        Some(Task(
+          taskType = TaskType.VoteBattle,
+          description = "",
+          requiredCount = likesCount))
+      case _ => None
+    }
   }
 
   /**
