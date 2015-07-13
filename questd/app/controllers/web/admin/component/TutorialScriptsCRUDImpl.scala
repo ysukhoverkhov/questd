@@ -699,7 +699,10 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         new EnumNameSerializer(TutorialConditionType)
       )
 
-      val tutorial = Json.read[Tutorial](scala.io.Source.fromFile(tutorialScript.ref.file).mkString, serializers)
+      val scriptText = scala.io.Source.fromFile(tutorialScript.ref.file).mkString
+      val tutorial = Json.read[Tutorial](scriptText, serializers)
+      Logger.trace(s"  Script Text : $scriptText")
+      Logger.trace(s"  Parsed script: $tutorial")
       api.db.tutorial.update(tutorial.copy(id = platform))
 
       Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
