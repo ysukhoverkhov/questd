@@ -24,7 +24,7 @@ trait Challenges { this: UserLogic =>
       OutOfContent
     else if (opponentSolution.info.questId != mySolution.info.questId)
       InvalidState
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.ChallengeBattles))
+    else if (!user.profile.rights.unlockedFunctionality.contains(Functionality.ChallengeBattles))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costToChallengeBattle))
       NotEnoughAssets
