@@ -4,6 +4,7 @@ package models.domain.tutorial
  * Types of tutorial triggers.
  */
 object TutorialTriggerType extends Enumeration {
+  val Dummy = Value
   val Any = Value
   val TutorialElementClosed = Value
   val TutorialTaskCompleted = Value

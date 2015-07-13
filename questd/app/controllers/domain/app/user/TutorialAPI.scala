@@ -5,7 +5,7 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import models.domain.common.Assets
-import models.domain.tutorial.{TutorialElement, TutorialPlatform}
+import models.domain.tutorial.{TutorialServerActionType, TutorialServerAction, TutorialElement, TutorialPlatform}
 import models.domain.user._
 import models.domain.user.profile.{DailyTasks, Profile, Task, TutorialState}
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
@@ -33,6 +33,10 @@ case class CreateTutorialBattlesResult(allowed: ProfileModificationResult, profi
 
 case class ResetTutorialRequest(user: User)
 case class ResetTutorialResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+
+case class ExecuteServerTutorialActionRequest(user: User, serverAction: TutorialServerAction)
+case class ExecuteServerTutorialActionResult(user: User)
+
 
 private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -62,9 +66,46 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def closeTutorialElement(request: CloseTutorialElementRequest): ApiResult[CloseTutorialElementResult] = handleDbException {
     import request._
 
-    db.user.addClosedTutorialElement(user.id, platform.toString, elementId) ifSome { v =>
-      OkApiResult(CloseTutorialElementResult(OK, Some(v.profile)))
+    db.tutorial.readById("platform") ifSome { tutorial =>
+      tutorial.elements.find(_.id == elementId) ifSome { element =>
+        element.serverActions.foldLeft[ApiResult[ExecuteServerTutorialActionResult]] {
+        OkApiResult(ExecuteServerTutorialActionResult(user))
+        } {
+          case (OkApiResult(ExecuteServerTutorialActionResult(u)), serverAction) =>
+            executeServerTutorialAction(ExecuteServerTutorialActionRequest(u, serverAction))
+          case (result, _) =>
+            result
+        }
+      }
+    } map { result =>
+      db.user.addClosedTutorialElement(user.id, platform.toString, elementId) ifSome { v =>
+        OkApiResult(CloseTutorialElementResult(OK, Some(v.profile)))
+      }
     }
+  }
+
+  /**
+   * Executing server tutorial action
+   */
+  def executeServerTutorialAction(request: ExecuteServerTutorialActionRequest): ApiResult[ExecuteServerTutorialActionResult] = handleDbException {
+    import request._
+
+    serverAction.actionType match {
+      case TutorialServerActionType.RemoveDailyTasksSuppression => {
+        db.user.setDailyTasksSuppressed(
+          id = user.id,
+          platform = "",
+          suppressed = false) ifSome { user =>
+          OkApiResult(ExecuteServerTutorialActionResult(user))
+        }
+        // TODO: get platform here.
+      }
+
+      case _ =>
+        OkApiResult(ExecuteServerTutorialActionResult(user))
+
+    }
+    // TODO: add it to CRUD
   }
 
   /**

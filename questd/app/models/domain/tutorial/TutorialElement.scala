@@ -8,6 +8,7 @@ import models.domain.base.ID
 case class TutorialElement(
   id: String = ID.generateUUID(),
   actions: List[TutorialAction],
+  serverActions: List[TutorialServerAction] = List.empty,
   conditions: List[TutorialCondition] = List.empty,
   triggers: List[TutorialTrigger],
   crud: TutorialElementCRUD = TutorialElementCRUD()

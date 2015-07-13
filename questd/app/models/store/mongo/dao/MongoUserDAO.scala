@@ -691,6 +691,17 @@ private[mongo] class MongoUserDAO
 
   /**
    * @inheritdoc
+   */ // TODO: test me.
+  def setDailyTasksSuppressed(id: String, platform: String, suppressed: Boolean): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          s"profile.tutorialStates.$platform.dailyTasksSuppression" -> suppressed)))
+  }
+
+  /**
+   * @inheritdoc
    */
   def updateCultureId(id: String, cultureId: String): Option[User] = {
     findAndModify(
