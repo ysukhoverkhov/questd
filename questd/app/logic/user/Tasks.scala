@@ -6,7 +6,7 @@ import logic.functions._
 import models.domain.common.Assets
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
-import models.domain.user.profile.{TaskType, Task, DailyTasks, Functionality}
+import models.domain.user.profile.{DailyTasks, Functionality, Task, TaskType}
 
 trait Tasks { this: UserLogic =>
 
@@ -19,7 +19,10 @@ trait Tasks { this: UserLogic =>
    * List of tasks to give user for next day.
    */
   def getTasksForTomorrow = {
-    if (user.profile.publicProfile.level < api.configNamed("Tutorial")(api.TutorialConfigParams.DailyTasksStartsFromLevel).toInt) {
+    if (user.profile.tutorialStates.valuesIterator.foldLeft(true){
+      case (false, _) => false
+      case (_, v) => v.dailyTasksSuppression
+    }) {
       DailyTasks(tasks = List.empty, reward = Assets())
     } else {
       val dailyRatingReward = dailyTasksRatingReward
@@ -150,6 +153,7 @@ trait Tasks { this: UserLogic =>
    */
   private def createCreateQuestTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
     val taskProbability = api.config(api.DefaultConfigParams.CreateQuestTaskProbability).toDouble
+
     if (canProposeQuestToday && rand.nextDouble() < taskProbability)
       Some(Task(
         taskType = TaskType.CreateQuest,

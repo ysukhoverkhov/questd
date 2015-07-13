@@ -220,7 +220,7 @@ package object domainstubs {
     assets: Assets = Assets(100000, 100000, 100000),
     mustVoteSolutions: List[String] = List.empty,
     level: Int = 18,
-    questCreationCoolDown: Date = new Date(Long.MaxValue),
+    questCreationCoolDown: Date = new Date(0),
     createdQuests: List[String] = List.empty,
     solvedQuests: Map[String, String] = Map.empty,
     votedQuests: Map[String, ContentVote.Value] = Map.empty,
@@ -233,7 +233,7 @@ package object domainstubs {
     questBookmark: Option[String] = None,
     privateDailyResults: List[DailyResult] = List(createDailyResultStub()),
     battleRequests: List[BattleRequest] = List.empty,
-    tutorialState: TutorialState = TutorialState()) = {
+    tutorialState: TutorialState = TutorialState(dailyTasksSuppression = false)) = {
 
     User(
       id = id,

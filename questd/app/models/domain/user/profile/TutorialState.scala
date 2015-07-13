@@ -7,5 +7,6 @@ case class TutorialState(
   closedElementIds: List[String] = List.empty,
   usedTutorialTaskIds: List[String] = List.empty,
   usedTutorialQuestIds: List[String] = List.empty,
-  requestForTutorialBattlesUsed: Boolean = false
+  requestForTutorialBattlesUsed: Boolean = false,
+  dailyTasksSuppression: Boolean = true
   )

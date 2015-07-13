@@ -3,13 +3,14 @@ package logic.user
 import logic.BaseLogicSpecs
 import models.domain.user._
 import models.domain.user.friends.{Friendship, FriendshipStatus}
-import models.domain.user.profile.{Profile, PublicProfile, Task, TaskType}
+import models.domain.user.profile._
+import play.api.Logger
 import testhelpers.domainstubs._
 
 class TasksSpecs extends BaseLogicSpecs {
 
   private def createUser(level: Int) = {
-    val u = User(profile = Profile(publicProfile = PublicProfile(level = level)))
+    val u = createUserStub(level = level)
     User(profile = u.profile.copy(rights = u.calculateRights))
   }
 
@@ -29,7 +30,7 @@ class TasksSpecs extends BaseLogicSpecs {
       applyConfigMock()
       rand.nextGaussian(any, any) returns 1
 
-      val u = createUserStub(level = 1)
+      val u = createUserStub(level = 1, tutorialState = TutorialState(dailyTasksSuppression = true))
       val dailyResult = u.getTasksForTomorrow
 
       dailyResult.tasks.length must beEqualTo(0)
@@ -39,7 +40,7 @@ class TasksSpecs extends BaseLogicSpecs {
       applyConfigMock()
       rand.nextGaussian(any, any) returns 3
 
-      val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
+      val u = createUser(10)
       val dailyResult = u.getTasksForTomorrow
 
       val t = dailyResult.tasks.find(_.taskType == TaskType.LikeSolutions)
@@ -103,7 +104,7 @@ class TasksSpecs extends BaseLogicSpecs {
       applyConfigMock()
       rand.nextGaussian(any, any) returns 3
 
-      val u = User(profile = Profile(publicProfile = PublicProfile(level = 10)))
+      val u = createUser(10)
       val dailyResult = u.getTasksForTomorrow
 
       val t = dailyResult.tasks.find(_.taskType == TaskType.LikeQuests)
@@ -117,7 +118,7 @@ class TasksSpecs extends BaseLogicSpecs {
 
       val u = createUser(12)
       val dailyResult = u.getTasksForTomorrow
-
+Logger.error(s"$dailyResult") // TODO: remove.
       u.canSolveQuestToday must beEqualTo(true)
 
       val t = dailyResult.tasks.find(_.taskType == TaskType.CreateQuest)

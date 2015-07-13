@@ -85,8 +85,6 @@ private[logic] abstract class BaseLogicSpecs extends Specification
 
     val configSection = mock[ConfigSection]
 
-    configSection.apply(api.TutorialConfigParams.DailyTasksStartsFromLevel) returns "2"
-
     configSection
   }
 
