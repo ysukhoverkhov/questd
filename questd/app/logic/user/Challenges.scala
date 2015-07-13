@@ -11,18 +11,16 @@ import models.domain.user.profile.Functionality
  */
 trait Challenges { this: UserLogic =>
 
-  def autoCreatedBattlePossible(
+  def canAutoCreatedBattle(
     mySolution: Solution,
     opponentSolution: Solution,
     opponentShouldNotHaveBattles: Boolean,
-    checkQuest: Boolean) = { // TODO: test me.
+    checkQuest: Boolean) = {
 
     lazy val alreadyHasRequest = user.battleRequests
       .exists(br => (br.mySolutionId == mySolution.id) && (br.opponentSolutionId == opponentSolution.id))
 
     if (mySolution.info.authorId == opponentSolution.info.authorId)
-      OutOfContent
-    else if (mySolution.id == opponentSolution.id)
       OutOfContent
     else if (opponentSolution.battleIds.nonEmpty && opponentShouldNotHaveBattles)
       InvalidState

@@ -103,7 +103,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         Logger.trace(s"    Analysing competitor solution ${other.id} - $other")
         Logger.trace(s"    ${other.info.authorId} != ${solution.info.authorId} && (${other.battleIds.isEmpty} && $exclusive)")
 
-        if (author.autoCreatedBattlePossible (solution, other, exclusive, checkQuest) == ProfileModificationResult.OK) { // TODO: test me.
+        if (author.canAutoCreatedBattle (solution, other, exclusive, checkQuest) == ProfileModificationResult.OK) {
 
           Logger.trace("Found fight pair for quest " + solution.info.questId + " :")
           Logger.trace("  s1.id=" + solution.id)
@@ -191,7 +191,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
       OkApiResult(TryCreateBattleResult())
     } else {
 
-      def makeChallenge(solutions: List[Solution]): ApiResult[TryCreateBattleResult] = { // TODO: test challenges are created.
+      def makeChallenge(solutions: List[Solution]): ApiResult[TryCreateBattleResult] = {
         val mySolution = solutions.head
         val opponentSolution = solutions(1)
         val myId = mySolution.info.authorId
