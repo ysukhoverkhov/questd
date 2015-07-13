@@ -32,7 +32,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
   }
 
   private def findTutorialElementWithoutSection(platform: String): Option[TutorialElement] = {
-    api.db.tutorial.readById(platform).flatMap(_.elements.find(_.crud.sectionName.isEmpty))
+    api.db.tutorial.readById(platform).flatMap(_.elements.find(_.crud.sectionName.getOrElse("") == ""))
   }
 
   private def deleteParamFromActionImpl(platform: String, elementId: String, actionIndex: Int, paramKey: String): Unit = {
