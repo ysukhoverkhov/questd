@@ -2,11 +2,14 @@ package controllers.domain.app.user
 
 import components._
 import controllers.domain._
+import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.helpers._
 import logic.BattleLogic
 import models.domain.base.ID
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
 import models.domain.solution.{Solution, SolutionRating, SolutionStatus}
+import models.domain.user.User
+import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
 import models.domain.user.stats.SolutionsInBattle
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger
@@ -16,7 +19,7 @@ import scala.language.postfixOps
 case class CreateBattleRequest(solutions: List[Solution])
 case class CreateBattleResult()
 
-case class TryCreateBattleRequest(solution: Solution, useTutorialCompetitor: Boolean)
+case class TryCreateBattleRequest(solution: Solution, author: User, useTutorialCompetitor: Boolean)
 case class TryCreateBattleResult()
 
 case class RewardBattleParticipantsRequest(battle: Battle)
@@ -93,24 +96,24 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
     /**
      * Selects out of provided competitors suitable one.
      */
-    def selectCompetitorSolution(possibleCompetitorSolutions: Iterator[Solution], exclusive: Boolean): Option[Solution] = {
+    def selectCompetitorSolution(possibleCompetitorSolutions: Iterator[Solution], exclusive: Boolean, checkQuest: Boolean): Option[Solution] = {
       if (possibleCompetitorSolutions.hasNext) {
         val other = possibleCompetitorSolutions.next()
 
         Logger.trace(s"    Analysing competitor solution ${other.id} - $other")
         Logger.trace(s"    ${other.info.authorId} != ${solution.info.authorId} && (${other.battleIds.isEmpty} && $exclusive)")
 
-        if (other.info.authorId != solution.info.authorId && (other.battleIds.isEmpty || !exclusive)) {
+        if (author.autoCreatedBattlePossible (solution, other, exclusive, checkQuest) == ProfileModificationResult.OK) { // TODO: test me.
 
-          Logger.debug("Found fight pair for quest " + solution.info.questId + " :")
-          Logger.debug("  s1.id=" + solution.id)
-          Logger.debug("  s2.id=" + other.id)
+          Logger.trace("Found fight pair for quest " + solution.info.questId + " :")
+          Logger.trace("  s1.id=" + solution.id)
+          Logger.trace("  s2.id=" + other.id)
 
           Some(other)
 
         } else {
           // Skipping to next if current is we are.
-          selectCompetitorSolution(possibleCompetitorSolutions, exclusive)
+          selectCompetitorSolution(possibleCompetitorSolutions, exclusive, checkQuest)
         }
       } else {
         None
@@ -127,29 +130,34 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         cultureId = Some(solution.cultureId))
     }
 
-    selectCompetitorSolution(solutionsForStatus(SolutionStatus.InRotation, Some(solution.info.questId)), exclusive = true) match {
+    val solutions = selectCompetitorSolution(
+      solutionsForStatus(SolutionStatus.InRotation, Some(solution.info.questId)),
+      exclusive = true,
+      checkQuest = true) match {
       case Some(competitorSolution) =>
 
         Logger.trace(s"  Selected competitor solution $competitorSolution}")
-        val solutions = List(solution, competitorSolution)
-
-        createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
+        List(solution, competitorSolution)
 
       case None =>
         Logger.trace(s"  Competitor not selected, trying to find tutorial one.")
 
-        selectCompetitorSolution(solutionsForStatus(SolutionStatus.ForTutorial, Some(solution.info.questId)), exclusive = false) match {
+        selectCompetitorSolution(
+          solutionsForStatus(SolutionStatus.ForTutorial, Some(solution.info.questId)),
+          exclusive = false,
+          checkQuest = true) match {
           case Some(competitorSolution) =>
 
             Logger.trace(s"  Selected tutorial competitor solution $competitorSolution}")
-            val solutions = List(solution, competitorSolution)
-
-            createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
+            List(solution, competitorSolution)
 
           case None =>
 
             if (request.useTutorialCompetitor) {
-              selectCompetitorSolution(solutionsForStatus(SolutionStatus.ForTutorial, None), exclusive = false) match {
+              selectCompetitorSolution(
+                solutionsForStatus(SolutionStatus.ForTutorial, None),
+                exclusive = false,
+                checkQuest = false) match {
                 case Some(competitorSolution) =>
 
                   val updatedCompetitorSolution = if (competitorSolution.info.questId != solution.info.questId) {
@@ -166,18 +174,43 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
                   }
 
                   Logger.trace(s"  Selected tutorial must competitor solution $updatedCompetitorSolution}")
-                  val solutions = List(solution, updatedCompetitorSolution)
+                  List(solution, updatedCompetitorSolution)
 
-                  createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
                 case None =>
                   Logger.error(s"  Competitor not selected for solution with useTutorialCompetitor set to $useTutorialCompetitor")
-                  OkApiResult(TryCreateBattleResult())
+                  List.empty
               }
             } else {
               Logger.trace(s"  Competitor not selected")
-              OkApiResult(TryCreateBattleResult())
+              List.empty
             }
         }
+    }
+
+    if (solutions.isEmpty) {
+      OkApiResult(TryCreateBattleResult())
+    } else {
+
+      def makeChallenge(solutions: List[Solution]): ApiResult[TryCreateBattleResult] = { // TODO: test challenges are created.
+        val mySolution = solutions.head
+        val opponentSolution = solutions(1)
+        val myId = mySolution.info.authorId
+        val opponentId = opponentSolution.info.authorId
+
+        db.user.addBattleRequest(
+          opponentId,
+          BattleRequest(myId, opponentSolution.id, mySolution.id, BattleRequestStatus.AutoCreated)) ifSome { op =>
+
+          db.user.addBattleRequest(
+            myId,
+            BattleRequest(
+              opponentId, mySolution.id, opponentSolution.id, BattleRequestStatus.AutoCreated)) ifSome { op =>
+            OkApiResult(TryCreateBattleResult())
+          }
+        }
+      }
+
+      makeChallenge(solutions) map createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
     }
   }
 

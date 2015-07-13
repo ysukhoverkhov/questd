@@ -42,7 +42,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         themeIds = any,
         cultureId = mEq(Some(s.cultureId))) returns Iterator.empty
 
-      val result = api.tryCreateBattle(TryCreateBattleRequest(s, useTutorialCompetitor = false))
+      val result = api.tryCreateBattle(TryCreateBattleRequest(s, createUserStub(), useTutorialCompetitor = false))
 
       there was one(solution).allWithParams(
         status = mEq(List(SolutionStatus.InRotation)),
@@ -94,8 +94,10 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       user.addEntryToTimeLine(mEq(uu(1).id), any) returns Some(uu(1))
       user.recordBattleParticipation(mEq(uu(0).id), any, any) returns Some(uu(0))
       user.recordBattleParticipation(mEq(uu(1).id), any, any) returns Some(uu(1))
+      user.addBattleRequest(mEq(uu(0).id), any) returns Some(uu(0))
+      user.addBattleRequest(mEq(uu(1).id), any) returns Some(uu(1))
 
-      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), useTutorialCompetitor = false))
+      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), createUserStub(), useTutorialCompetitor = false))
 
       there was one(solution).allWithParams(
         status = mEq(List(SolutionStatus.InRotation)),
@@ -116,6 +118,9 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       there was one(user).recordBattleParticipation(mEq(uu(1).id), any, mEq(SolutionsInBattle(ss.map(_.id))))
       there were two(user).addEntryToTimeLine(any, any)
 //      there were two(user).addEntryToTimeLineMulti(any, any)
+      there was one(user).addBattleRequest(mEq(uu(0).id), any)
+      there was one(user).addBattleRequest(mEq(uu(1).id), any)
+
       result must beAnInstanceOf[OkApiResult[TryCreateBattleRequest]]
     }
 
@@ -154,7 +159,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         themeIds = any,
         cultureId = mEq(Some(ss(0).cultureId))) returns Iterator.empty
 
-      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), useTutorialCompetitor = false))
+      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), createUserStub(), useTutorialCompetitor = false))
 
       there was one(solution).allWithParams(
         status = mEq(List(SolutionStatus.InRotation)),
@@ -218,9 +223,11 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       user.addEntryToTimeLine(mEq(uu(1).id), any) returns Some(uu(1))
       user.recordBattleParticipation(mEq(uu(0).id), any, any) returns Some(uu(0))
       user.recordBattleParticipation(mEq(uu(1).id), any, any) returns Some(uu(1))
+      user.addBattleRequest(mEq(uu(0).id), any) returns Some(uu(0))
+      user.addBattleRequest(mEq(uu(1).id), any) returns Some(uu(1))
 
 
-      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), useTutorialCompetitor = false))
+      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), createUserStub(), useTutorialCompetitor = false))
 
       there was one(solution).allWithParams(
         status = mEq(List(SolutionStatus.ForTutorial)),
@@ -242,6 +249,8 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       there was one(user).recordBattleParticipation(mEq(uu(0).id), any, mEq(SolutionsInBattle(ss.map(_.id))))
       there was one(user).recordBattleParticipation(mEq(uu(1).id), any, mEq(SolutionsInBattle(ss.map(_.id))))
       there were two(user).addEntryToTimeLine(any, any)
+      there was one(user).addBattleRequest(mEq(uu(0).id), any)
+      there was one(user).addBattleRequest(mEq(uu(1).id), any)
     }
 
     "Find must tutorial rival if there is one" in context {
@@ -302,9 +311,11 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       user.addEntryToTimeLine(mEq(uu(1).id), any) returns Some(uu(1))
       user.recordBattleParticipation(mEq(uu(0).id), any, any) returns Some(uu(0))
       user.recordBattleParticipation(mEq(uu(1).id), any, any) returns Some(uu(1))
+      user.addBattleRequest(mEq(uu(0).id), any) returns Some(uu(0))
+      user.addBattleRequest(mEq(uu(1).id), any) returns Some(uu(1))
 
 
-      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), useTutorialCompetitor = true))
+      val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0), createUserStub(), useTutorialCompetitor = true))
 
       there was one(solution).allWithParams(
         status = mEq(List(SolutionStatus.ForTutorial)),
@@ -326,6 +337,8 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       there was one(user).recordBattleParticipation(mEq(uu(0).id), any, any)
       there was one(user).recordBattleParticipation(mEq(uu(1).id), any, any)
       there were two(user).addEntryToTimeLine(any, any)
+      there was one(user).addBattleRequest(mEq(uu(0).id), any)
+      there was one(user).addBattleRequest(mEq(uu(1).id), any)
     }
 
     "Reward participants" in context {

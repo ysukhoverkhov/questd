@@ -189,7 +189,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
           case (OkApiResult(result), solutionId) =>
 
             db.solution.readById(solutionId) ifSome { solution =>
-              tryCreateBattle(TryCreateBattleRequest(solution = solution, useTutorialCompetitor = true))
+              tryCreateBattle(TryCreateBattleRequest(solution = solution, author = user, useTutorialCompetitor = true))
             } map {
               OkApiResult(CreateTutorialBattlesResult(OK, Some(user.profile)))
             }

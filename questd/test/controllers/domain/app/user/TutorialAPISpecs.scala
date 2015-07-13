@@ -333,7 +333,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
     user.setRequestForTutorialBattlesUsed(any, any, any) returns Some(u)
     solution.readById(solId) returns Some(s)
-    doReturn(OkApiResult(TryCreateBattleResult())).when(api).tryCreateBattle(TryCreateBattleRequest(solution = s, useTutorialCompetitor = true))
+    doReturn(OkApiResult(TryCreateBattleResult())).when(api).tryCreateBattle(TryCreateBattleRequest(solution = s, author = u, useTutorialCompetitor = true))
 
     val result = api.createTutorialBattles(CreateTutorialBattlesRequest(u, TutorialPlatform.iPhone))
 
