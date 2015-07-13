@@ -64,6 +64,7 @@ class TimeLineAPISpecs extends BaseAPISpecs {
       val u = createUserStub(friends = friends, followers = List("1"))
 
       user.readById(any) returns Some(u)
+      user.addEntryToTimeLine(any, any) returns Some(u)
 
       val result = api.addToWatchersTimeLine(AddToWatchersTimeLineRequest(
         user = u,
