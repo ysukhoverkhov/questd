@@ -130,6 +130,9 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
    */
   def importTutorialTasks = Authenticated(parse.multipartFormData) { request =>
     import controllers.web.helpers._
+
+    Logger.debug(s"Importing tutorial tasks")
+
     request.body.file("tutorialTasks").map { tutorialTasks =>
 
       val serializers = List(new EnumNameSerializer(TaskType))

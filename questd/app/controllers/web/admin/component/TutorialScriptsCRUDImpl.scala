@@ -687,6 +687,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
   def importTutorialScript(platform: String) = Authenticated(parse.multipartFormData) { request =>
     import controllers.web.helpers._
 
+    Logger.debug(s"Importing tutorial script")
+
     ensurePlatformExists(platform)
 
     request.body.file("tutorialScript").map { tutorialScript =>
