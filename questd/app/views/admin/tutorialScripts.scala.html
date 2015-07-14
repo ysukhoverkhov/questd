@@ -78,7 +78,10 @@ allSections: List[String])
             </p>
 
             <p>
-                @element.serverActions
+                @for(action <- element.serverActions) {
+                    @action.actionType
+                    <br>
+                }
             </p>
         </td>
 

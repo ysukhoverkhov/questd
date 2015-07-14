@@ -113,7 +113,6 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
         OkApiResult(ExecuteServerTutorialActionResult(user))
 
     }
-    // TODO: add it to CRUD
   }
 
   /**
