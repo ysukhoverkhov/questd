@@ -9,6 +9,7 @@ import models.domain.tutorial.{TutorialServerActionType, TutorialServerAction, T
 import models.domain.user._
 import models.domain.user.profile.{DailyTasks, Profile, Task, TutorialState}
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
+import play.Logger
 
 case class GetCommonTutorialRequest(platform: TutorialPlatform.Value)
 case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])
@@ -34,7 +35,7 @@ case class CreateTutorialBattlesResult(allowed: ProfileModificationResult, profi
 case class ResetTutorialRequest(user: User)
 case class ResetTutorialResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class ExecuteServerTutorialActionRequest(user: User, serverAction: TutorialServerAction)
+case class ExecuteServerTutorialActionRequest(user: User, platform: TutorialPlatform.Value, serverAction: TutorialServerAction)
 case class ExecuteServerTutorialActionResult(user: User)
 
 
@@ -72,7 +73,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
         OkApiResult(ExecuteServerTutorialActionResult(user))
         } {
           case (OkApiResult(ExecuteServerTutorialActionResult(u)), serverAction) =>
-            executeServerTutorialAction(ExecuteServerTutorialActionRequest(u, serverAction))
+            executeServerTutorialAction(ExecuteServerTutorialActionRequest(u, platform, serverAction)) // TODO: test this is called.
           case (result, _) =>
             result
         }
@@ -91,17 +92,21 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
     import request._
 
     serverAction.actionType match {
-      case TutorialServerActionType.RemoveDailyTasksSuppression => {
+      case TutorialServerActionType.RemoveDailyTasksSuppression =>
         db.user.setDailyTasksSuppressed(
           id = user.id,
-          platform = "",
+          platform = platform.toString,
           suppressed = false) ifSome { user =>
           OkApiResult(ExecuteServerTutorialActionResult(user))
         }
-        // TODO: get platform here.
-      }
 
-      case _ =>
+      case TutorialServerActionType.AssignDailyTasks =>
+        assignDailyTasks(ResetDailyTasksRequest(user)) map { r =>
+          OkApiResult(ExecuteServerTutorialActionResult(r.user))
+        }
+
+      case _ @ action =>
+        Logger.error(s"unknown server tutorial action $action")
         OkApiResult(ExecuteServerTutorialActionResult(user))
 
     }

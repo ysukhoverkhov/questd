@@ -11,10 +11,16 @@ import models.domain.user.profile.{DailyTasks, Functionality, Task, TaskType}
 trait Tasks { this: UserLogic =>
 
   /**
-   * Cooldown for reseting tasks. Should be reset in nearest 5am at user's time.
+   * Cooldown for resetting tasks. Should be reset in nearest 5am at user's time.
    */
   def getResetTasksTimeout = nextFlipHourDate
 
+  def canAssignDailyTasks = {
+    // TODO: check here time
+    // TODO: remove the check from another place.
+    // TODO: check here supression.
+    true
+  }
   /**
    * List of tasks to give user for next day.
    */
@@ -40,6 +46,7 @@ trait Tasks { this: UserLogic =>
       DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
     }
   }
+
 
   /**
    * Calculates total daily salary in coins for all tasks.

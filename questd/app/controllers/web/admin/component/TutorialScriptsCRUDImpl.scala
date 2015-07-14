@@ -696,7 +696,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       val serializers = List(
         new EnumNameSerializer(TutorialActionType),
         new EnumNameSerializer(TutorialTriggerType),
-        new EnumNameSerializer(TutorialConditionType)
+        new EnumNameSerializer(TutorialConditionType),
+        new EnumNameSerializer(TutorialServerActionType)
       )
 
       val scriptText = scala.io.Source.fromFile(tutorialScript.ref.file).mkString

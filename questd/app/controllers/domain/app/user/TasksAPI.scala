@@ -24,16 +24,29 @@ private[domain] trait TasksAPI {
   this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
-   * Resets daily tasks.
+   * Resets daily tasks if it's allowed by logic.
    */
   def resetDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
     import request._
+
+    if (user.canAssignDailyTasks) {
+      assignDailyTasks(request) map { r => OkApiResult(ResetDailyTasksResult(r.user)) }
+    } else {
+      OkApiResult(ResetDailyTasksResult(user))
+    }
+  }
+
+  /**
+   * Assigns new daily tasks disregarding everything.
+   */ // TODO: add types for params here.
+  def assignDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
+    import request._
     val tutorialTasksToCarry =
-      user.profile.dailyTasks.tasks.filter(t => t.tutorialTaskId.isDefined && t.currentCount < t.requiredCount)
+      user.profile.dailyTasks.tasks.filter(t => t.tutorialTaskId.isDefined && !user.profile.dailyTasks.rewardReceived)
 
     db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout) ifSome { u =>
 
-      (if (tutorialTasksToCarry != List.empty) {
+      (if (tutorialTasksToCarry.nonEmpty) {
         db.user.addTasks(u.id, tutorialTasksToCarry)
       } else {
         Some(u)

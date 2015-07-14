@@ -532,7 +532,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User] = {
     findAndModify(
@@ -544,7 +544,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def addTasks(id: String, newTasks: List[Task], addReward: Option[Assets] = None): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
