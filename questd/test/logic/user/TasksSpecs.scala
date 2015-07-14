@@ -26,14 +26,14 @@ class TasksSpecs extends BaseLogicSpecs {
       dailyResult.tasks.length must beGreaterThan(0)
     }
 
-    "Do not generate DailyTasks for 1st level users" in {
+    "Do not generate DailyTasks for users with tasks supressed by tutorial" in {
       applyConfigMock()
       rand.nextGaussian(any, any) returns 1
 
       val u = createUserStub(level = 1, tutorialState = TutorialState(dailyTasksSuppression = true))
-      val dailyResult = u.getTasksForTomorrow
+      val dailyResult = u.shouldAssignDailyTasks
 
-      dailyResult.tasks.length must beEqualTo(0)
+      dailyResult must beFalse
     }
 
     "Generate tasks for voting for solutions" in {

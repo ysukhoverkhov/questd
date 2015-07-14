@@ -1,5 +1,7 @@
 package logic.user
 
+import java.util.Date
+
 import logic._
 import logic.constants._
 import logic.functions._
@@ -15,36 +17,36 @@ trait Tasks { this: UserLogic =>
    */
   def getResetTasksTimeout = nextFlipHourDate
 
-  def canAssignDailyTasks = {
-    // TODO: check here time
-    // TODO: remove the check from another place.
-    // TODO: check here supression.
-    true
+  def shouldAssignDailyTasks = {
+
+    if (user.schedules.dailyTasks.after(new Date())) {
+      false
+    } else if (user.profile.tutorialStates.valuesIterator.foldLeft(true){
+      case (false, _) => false
+      case (_, v) => v.dailyTasksSuppression
+    }) {
+      false
+    } else {
+      true
+    }
   }
   /**
    * List of tasks to give user for next day.
    */
   def getTasksForTomorrow = {
-    if (user.profile.tutorialStates.valuesIterator.foldLeft(true){
-      case (false, _) => false
-      case (_, v) => v.dailyTasksSuppression
-    }) {
-      DailyTasks(tasks = List.empty, reward = Assets())
-    } else {
-      val dailyRatingReward = dailyTasksRatingReward
-      val allTasksCoinsReward = dailyTasksCoinsReward
+    val dailyRatingReward = dailyTasksRatingReward
+    val allTasksCoinsReward = dailyTasksCoinsReward
 
-      val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
-        case Some(t) => t :: c
-        case None => c
-      })
+    val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
+      case Some(t) => t :: c
+      case None => c
+    })
 
-      val tasksWithRewards = tasks.map { t =>
-        t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = DailyTasksCoinsDeviation))
-      }
-
-      DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
+    val tasksWithRewards = tasks.map { t =>
+      t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = DailyTasksCoinsDeviation))
     }
+
+    DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
   }
 
 

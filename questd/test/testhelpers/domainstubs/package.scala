@@ -3,22 +3,22 @@ package testhelpers
 import java.util.Date
 
 import models.domain.base.ID
-import models.domain.battle.{BattleSide, Battle, BattleInfo, BattleStatus}
-import models.domain.comment.{CommentInfo, Comment}
+import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
+import models.domain.comment.{Comment, CommentInfo}
 import models.domain.common.{Assets, ContentReference, ContentType, ContentVote}
 import models.domain.quest._
 import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
 import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
-import models.domain.user.auth.{LoginMethod, AuthInfo}
+import models.domain.user.auth.{AuthInfo, LoginMethod}
 import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.demo.UserDemographics
 import models.domain.user.friends.Friendship
 import models.domain.user.profile._
 import models.domain.user.stats.{SolutionsInBattle, UserStats}
-import models.domain.user.timeline.{TimeLineType, TimeLineReason, TimeLineEntry}
+import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import models.view.{QuestView, ThemeInfoWithID}
 
 
@@ -233,7 +233,8 @@ package object domainstubs {
     questBookmark: Option[String] = None,
     privateDailyResults: List[DailyResult] = List(createDailyResultStub()),
     battleRequests: List[BattleRequest] = List.empty,
-    tutorialState: TutorialState = TutorialState(dailyTasksSuppression = false)) = {
+    tutorialState: TutorialState = TutorialState(dailyTasksSuppression = false),
+    dailyTasks: DailyTasks = DailyTasks()) = {
 
     User(
       id = id,
@@ -258,7 +259,8 @@ package object domainstubs {
           bio = Bio(
             gender = Gender.Male)),
         rights = rights,
-        tutorialStates = Map(TutorialPlatform.iPhone.toString -> tutorialState)),
+        tutorialStates = Map(TutorialPlatform.iPhone.toString -> tutorialState),
+        dailyTasks = dailyTasks),
       friends = friends,
       followers = followers,
       mustVoteSolutions = mustVoteSolutions,

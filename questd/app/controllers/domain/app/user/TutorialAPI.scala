@@ -67,13 +67,13 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def closeTutorialElement(request: CloseTutorialElementRequest): ApiResult[CloseTutorialElementResult] = handleDbException {
     import request._
 
-    db.tutorial.readById("platform") ifSome { tutorial =>
+    db.tutorial.readById(platform.toString) ifSome { tutorial =>
       tutorial.elements.find(_.id == elementId) ifSome { element =>
         element.serverActions.foldLeft[ApiResult[ExecuteServerTutorialActionResult]] {
-        OkApiResult(ExecuteServerTutorialActionResult(user))
+          OkApiResult(ExecuteServerTutorialActionResult(user))
         } {
           case (OkApiResult(ExecuteServerTutorialActionResult(u)), serverAction) =>
-            executeServerTutorialAction(ExecuteServerTutorialActionRequest(u, platform, serverAction)) // TODO: test this is called.
+            executeServerTutorialAction(ExecuteServerTutorialActionRequest(u, platform, serverAction))
           case (result, _) =>
             result
         }
@@ -101,9 +101,12 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
         }
 
       case TutorialServerActionType.AssignDailyTasks =>
-        assignDailyTasks(ResetDailyTasksRequest(user)) map { r =>
+        assignDailyTasks(AssignDailyTasksRequest(user)) map { r =>
           OkApiResult(ExecuteServerTutorialActionResult(r.user))
         }
+
+      case TutorialServerActionType.Dummy =>
+        OkApiResult(ExecuteServerTutorialActionResult(user))
 
       case _ @ action =>
         Logger.error(s"unknown server tutorial action $action")

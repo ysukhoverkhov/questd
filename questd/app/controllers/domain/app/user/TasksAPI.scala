@@ -11,6 +11,9 @@ import play.Logger
 case class ResetDailyTasksRequest(user: User)
 case class ResetDailyTasksResult(user: User)
 
+case class AssignDailyTasksRequest(user: User)
+case class AssignDailyTasksResult(user: User)
+
 case class UpdateDailyTasksCompletedFractionRequest(user: User)
 case class UpdateDailyTasksCompletedFractionResult(user: User)
 
@@ -29,8 +32,8 @@ private[domain] trait TasksAPI {
   def resetDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
     import request._
 
-    if (user.canAssignDailyTasks) {
-      assignDailyTasks(request) map { r => OkApiResult(ResetDailyTasksResult(r.user)) }
+    if (user.shouldAssignDailyTasks) {
+      assignDailyTasks(AssignDailyTasksRequest(user)) map { r => OkApiResult(ResetDailyTasksResult(r.user)) }
     } else {
       OkApiResult(ResetDailyTasksResult(user))
     }
@@ -38,8 +41,8 @@ private[domain] trait TasksAPI {
 
   /**
    * Assigns new daily tasks disregarding everything.
-   */ // TODO: add types for params here.
-  def assignDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
+   */
+  def assignDailyTasks(request: AssignDailyTasksRequest): ApiResult[AssignDailyTasksResult] = handleDbException {
     import request._
     val tutorialTasksToCarry =
       user.profile.dailyTasks.tasks.filter(t => t.tutorialTaskId.isDefined && !user.profile.dailyTasks.rewardReceived)
@@ -51,7 +54,7 @@ private[domain] trait TasksAPI {
       } else {
         Some(u)
       }) ifSome { u =>
-        OkApiResult(ResetDailyTasksResult(u))
+        OkApiResult(AssignDailyTasksResult(u))
       }
     }
   }

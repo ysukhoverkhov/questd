@@ -3,9 +3,8 @@ package controllers.domain.app.user
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain.common.Assets
-import models.domain.tutorial.TutorialPlatform
+import models.domain.tutorial._
 import models.domain.tutorialtask.TutorialTask
-import models.domain.user._
 import models.domain.user.profile._
 import org.mockito.Matchers.{eq => mEq}
 import org.mockito.Mockito._
@@ -14,14 +13,12 @@ import testhelpers.domainstubs._
 class TutorialAPISpecs extends BaseAPISpecs {
 
   def createUser(dt: DailyTasks, assignedTutorialTaskIds: List[String] = List.empty) = {
-    User(
+    createUserStub(
       id = "user_id",
-      profile = Profile(
-        dailyTasks = dt,
-        ratingToNextLevel = 10000000,
-        rights = Rights.full,
-        tutorialStates = Map(TutorialPlatform.iPhone.toString -> TutorialState(
-          usedTutorialTaskIds = assignedTutorialTaskIds))))
+      dailyTasks = dt,
+      tutorialState = TutorialState(
+        usedTutorialTaskIds = assignedTutorialTaskIds,
+        dailyTasksSuppression = false))
   }
 
   "Tasks API" should {
@@ -341,6 +338,63 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
     there was one(user).setRequestForTutorialBattlesUsed(any, any, mEq(true))
     there was one(api).tryCreateBattle(any)
+  }
+
+  "closeTutorialElement calls server action"  in context {
+    val elementId = "elementId"
+    val u = createUserStub()
+    val tut = Tutorial(
+      id = TutorialPlatform.iPhone.toString,
+      elements = List(TutorialElement(
+        id = elementId,
+        actions = List.empty,
+        triggers = List.empty,
+        serverActions = List(TutorialServerAction(
+          actionType = TutorialServerActionType.Dummy
+        ))
+      ))
+    )
+
+    tutorial.readById(any) returns Some(tut)
+    doReturn(OkApiResult(ExecuteServerTutorialActionResult(u))).when(api).executeServerTutorialAction(any)
+    user.addClosedTutorialElement(any, any, any) returns Some(u)
+
+    val result = api.closeTutorialElement(CloseTutorialElementRequest(u, TutorialPlatform.iPhone, elementId))
+
+    result must beAnInstanceOf[OkApiResult[CloseTutorialElementResult]]
+    there was one(api).executeServerTutorialAction(any)
+  }
+
+  "executeServerTutorialAction executes RemoveDailyTasksSuppression"  in context {
+    user.setDailyTasksSuppressed(
+      id = any,
+      platform = any,
+      suppressed = mEq(false)) returns Some(createUserStub())
+
+    val result = api.executeServerTutorialAction(ExecuteServerTutorialActionRequest(
+      createUserStub(),
+      TutorialPlatform.iPhone,
+      TutorialServerAction(actionType = TutorialServerActionType.RemoveDailyTasksSuppression)))
+
+    result must beAnInstanceOf[OkApiResult[ExecuteServerTutorialActionResult]]
+    there was one(user).setDailyTasksSuppressed(
+      id = any,
+      platform = any,
+      suppressed = mEq(false))
+  }
+
+  "executeServerTutorialAction executes AssignDailyTasks"  in context {
+    val u = createUserStub()
+
+    doReturn(OkApiResult(AssignDailyTasksResult(u))).when(api).assignDailyTasks(any)
+
+    val result = api.executeServerTutorialAction(ExecuteServerTutorialActionRequest(
+      createUserStub(),
+      TutorialPlatform.iPhone,
+      TutorialServerAction(actionType = TutorialServerActionType.AssignDailyTasks)))
+
+    result must beAnInstanceOf[OkApiResult[ExecuteServerTutorialActionResult]]
+    there was one(api).assignDailyTasks(any)
   }
 }
 
