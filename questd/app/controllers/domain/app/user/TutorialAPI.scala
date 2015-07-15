@@ -218,7 +218,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
   /**
    * Creates tutorial battles for all solutions without battles.
-   */
+   */ // TODO: here we should just set flag on all solutions without battles to use tutorial competitors.
   def createTutorialBattles(request: CreateTutorialBattlesRequest): ApiResult[CreateTutorialBattlesResult] = handleDbException {
     import request._
 

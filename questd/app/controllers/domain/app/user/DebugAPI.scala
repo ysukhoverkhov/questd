@@ -11,6 +11,7 @@ import models.domain.battle.BattleStatus
 import models.domain.user._
 import models.domain.user.dailyresults.DailyResult
 import models.domain.user.profile.Profile
+import models.domain.user.stats.UserStats
 
 case class SetDebugRequest(user: User, debug: String)
 case class SetDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -71,6 +72,16 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
    */
   def resetProfileDebug(request: ResetProfileDebugRequest): ApiResult[ResetProfileDebugResult] = handleDbException {
     import request._
+
+    // TODO: remove me in release.
+      db.user.update(
+        user.copy(
+          stats = UserStats(),
+          following = List.empty,
+          followers = List.empty,
+          friends = List.empty
+        )
+      )
 
     {
       adjustAssets(AdjustAssetsRequest(user, -user.profile.assets))
