@@ -8,6 +8,9 @@ import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.User
 import models.domain.user.friends.FriendshipStatus
 
+case class GetAllSolutionsInternalRequest()
+case class GetAllSolutionsInternalResult(solutions: Iterator[Solution])
+
 case class GetFriendsSolutionsRequest(
   user: User,
   status: List[SolutionStatus.Value],
@@ -69,6 +72,14 @@ case class GetAllSolutionsResult(solutions: Iterator[Solution])
 
 
 private[domain] trait SolutionFetchAPI { this: DBAccessor =>
+
+  /**
+   * Get all battles in fighting state. used internally.
+   */
+  def getAllSolutionsInternal(request: GetAllSolutionsInternalRequest): ApiResult[GetAllSolutionsInternalResult] = handleDbException {
+    OkApiResult(GetAllSolutionsInternalResult(db.solution.allWithParams(
+      withBattles = Some(false))))
+  }
 
   def getFriendsSolutions(request: GetFriendsSolutionsRequest): ApiResult[GetFriendsSolutionsResult] = handleDbException {
     OkApiResult(GetFriendsSolutionsResult(db.solution.allWithParams(

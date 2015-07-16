@@ -55,8 +55,6 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
 
   /**
    * Get all battles in fighting state. used internally.
-   * @param request The request.
-   * @return
    */
   def getAllBattlesInternal(request: GetAllBattlesInternalRequest): ApiResult[GetAllBattlesInternalResult] = handleDbException {
     OkApiResult(GetAllBattlesInternalResult(db.battle.allWithParams(

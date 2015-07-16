@@ -25,7 +25,8 @@ private[mongo] class MongoSolutionDAO
     idsExclude: List[String] = List.empty,
     questIds: List[String] = List.empty,
     themeIds: List[String] = List.empty,
-    cultureId: Option[String] = None): Iterator[Solution] = {
+    cultureId: Option[String] = None,
+    withBattles: Option[Boolean] = None): Iterator[Solution] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -69,6 +70,19 @@ private[mongo] class MongoSolutionDAO
 
     if (cultureId.isDefined) {
       queryBuilder += ("cultureId" -> cultureId.get)
+    }
+
+    if (withBattles.isDefined) { // TODO: test both branches.
+      if (withBattles.get) {
+        queryBuilder += ("battleIds" -> MongoDBObject(
+          "$exists" -> true,
+          "$not" -> MongoDBObject(
+            "$size" -> 0)))
+      } else {
+        queryBuilder += ("battleIds" -> MongoDBObject(
+          "$exists" -> true,
+          "$size" -> 0))
+      }
     }
 
     findByExample(
