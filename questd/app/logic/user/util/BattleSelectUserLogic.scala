@@ -74,7 +74,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning Battle from friends")
     checkNotEmptyIterator(Some(api.getFriendsBattles(GetFriendsBattlesRequest(
       user,
-      List(BattleStatus.Fighting, BattleStatus.Resolved),
+      List(BattleStatus.Fighting),
       idsExclude = battleIdsToExclude,
       authorsExclude = battleParticipantsIdsToExclude,
       levels)).body.get.battles))
@@ -84,7 +84,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning Battle from Following")
     checkNotEmptyIterator(Some(api.getFollowingBattles(GetFollowingBattlesRequest(
       user = user,
-      status = List(BattleStatus.Fighting, BattleStatus.Resolved),
+      statuses = List(BattleStatus.Fighting),
       idsExclude = battleIdsToExclude,
       authorsExclude = battleParticipantsIdsToExclude,
       levels)).body.get.battles))
@@ -94,7 +94,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
     Logger.trace("  Returning Battles for liked solutions")
     checkNotEmptyIterator(Some(api.getLikedSolutionBattles(GetLikedSolutionBattlesRequest(
       user,
-      status = List(BattleStatus.Fighting, BattleStatus.Resolved),
+      statuses = List(BattleStatus.Fighting),
       idsExclude = battleIdsToExclude,
       authorsExclude = battleParticipantsIdsToExclude,
       levels = levels)).body.get.battles))
@@ -109,7 +109,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
 //
     checkNotEmptyIterator(Some(api.getVIPBattles(GetVIPBattlesRequest(
       user = user,
-      status = List(BattleStatus.Fighting, BattleStatus.Resolved),
+      statuses = List(BattleStatus.Fighting, BattleStatus.Resolved),
       idsExclude = battleIdsToExclude,
       authorsExclude = battleParticipantsIdsToExclude,
       levels = levels)).body.get.battles))
@@ -133,6 +133,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
 
     checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
       user = user,
+      statuses = List(BattleStatus.Fighting),
       idsExclude = battleIdsToExclude,
       authorIdsExclude = battleParticipantsIdsToExclude,
       levels = levels)).body.get.battles))
@@ -143,6 +144,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
 
     checkNotEmptyIterator(Some(api.getAllBattles(GetAllBattlesRequest(
       user = user,
+      statuses = List(BattleStatus.Fighting),
       idsExclude = battleIdsToExclude,
       authorIdsExclude = battleParticipantsIdsToExclude,
       levels = None)).body.get.battles))

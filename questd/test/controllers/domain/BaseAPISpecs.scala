@@ -55,6 +55,8 @@ private[domain] abstract class BaseAPISpecs
       db.comment returns comment
 
       config.readConfig returns mockConfiguration
+
+      api.user2Logic(any)
     }
   }
 }

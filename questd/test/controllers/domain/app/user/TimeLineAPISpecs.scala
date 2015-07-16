@@ -94,6 +94,14 @@ class TimeLineAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(GetTimeLineResult(entries.slice(0,2))))
     }
+
+//    "populateTimeLineWithRandomThings populates it" in context {
+//      val u = createUserStub()
+//
+//      val result = api.populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(u))
+//
+//      result must beAnInstanceOf[OkApiResult[PopulateTimeLineWithRandomThingsResult]]
+//    }
   }
 }
 

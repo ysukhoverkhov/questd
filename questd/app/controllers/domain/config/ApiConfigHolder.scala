@@ -136,7 +136,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
 
             DefaultConfigParams.TimeLineRandomQuestsDaily -> "5",
             DefaultConfigParams.TimeLineRandomSolutionsDaily -> "5",
-            DefaultConfigParams.TimeLineRandomBattlesDaily -> "5",
+            DefaultConfigParams.TimeLineRandomBattlesDaily -> "2",
 
             DefaultConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions -> "5",
             DefaultConfigParams.SolutionProbabilityStartingVIPSolutions -> "0.5",

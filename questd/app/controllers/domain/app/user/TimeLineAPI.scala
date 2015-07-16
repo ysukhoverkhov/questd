@@ -123,7 +123,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
    */
   def populateTimeLineWithRandomThings(request: PopulateTimeLineWithRandomThingsRequest): ApiResult[PopulateTimeLineWithRandomThingsResult] = handleDbException {
     import request._
-// TODO: test the entire function.
+
     Logger.trace(s"Populating time line for user ${user.id}")
 
     // BATCH
