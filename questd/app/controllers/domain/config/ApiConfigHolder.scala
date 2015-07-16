@@ -96,8 +96,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.ActiveUserDays -> "7",
             DefaultConfigParams.DefaultCultureId -> "68349b7a-20ee-4f6e-8406-f468b30be783",
 
-            DefaultConfigParams.SolutionVoteTaskCountMean -> "3",
-            DefaultConfigParams.SolutionVoteTaskCountDeviation -> "1",
+            DefaultConfigParams.SolutionVoteTaskCountMean -> "1",
+            DefaultConfigParams.SolutionVoteTaskCountDeviation -> "0.5",
             DefaultConfigParams.CreateSolutionTaskProbability -> "0.5",
             DefaultConfigParams.AddToFollowingTaskProbability -> "0.3",
             DefaultConfigParams.QuestVoteTaskCountMean -> "2",
