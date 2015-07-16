@@ -50,7 +50,8 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
     )
     db.battle.create(battle)
 
-    Logger.trace(s"  Battle created with id ${battle.id}")
+    // TODO: trace
+    Logger.error(s"  Battle created with id ${battle.id}")
 
     solutions.foreach { s =>
 
