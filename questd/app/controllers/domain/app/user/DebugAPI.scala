@@ -73,15 +73,14 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
   def resetProfileDebug(request: ResetProfileDebugRequest): ApiResult[ResetProfileDebugResult] = handleDbException {
     import request._
 
-    // TODO: remove me in release.
-      db.user.update(
-        user.copy(
-          stats = UserStats(),
-          following = List.empty,
-          followers = List.empty,
-          friends = List.empty
-        )
+    db.user.update(
+      user.copy(
+        stats = UserStats(),
+        following = List.empty,
+        followers = List.empty,
+        friends = List.empty
       )
+    )
 
     {
       adjustAssets(AdjustAssetsRequest(user, -user.profile.assets))

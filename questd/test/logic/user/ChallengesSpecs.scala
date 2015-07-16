@@ -1,5 +1,7 @@
 package logic.user
 
+import java.util.Date
+
 import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
 import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
@@ -111,6 +113,26 @@ class ChallengesSpecs extends BaseLogicSpecs {
         checkQuest = true)
 
       rv must beEqualTo(ProfileModificationResult.InvalidState)
+    }
+
+    "Do not allow battles for solutions created too early" in {
+      applyConfigMock()
+
+      val sol1Id = "s1id"
+      val sol2Id = "s2id"
+
+      val opponent = createUserStub()
+      val me = createUserStub()
+      val mySolution = createSolutionStub(id = sol1Id, authorId = me.id, creationDate = new Date())
+      val opponentSolution = createSolutionStub(id = sol2Id, authorId = opponent.id)
+
+      val rv = me.canAutoCreatedBattle(
+        mySolution = mySolution,
+        opponentSolution = opponentSolution,
+        opponentShouldNotHaveBattles = true,
+        checkQuest = true)
+
+      rv must beEqualTo(ProfileModificationResult.CoolDown)
     }
 
   }
