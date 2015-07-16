@@ -680,17 +680,6 @@ private[mongo] class MongoUserDAO
 
   /**
    * @inheritdoc
-   */
-  def setRequestForTutorialBattlesUsed(id: String, platform: String, used: Boolean): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$set" -> MongoDBObject(
-          s"profile.tutorialStates.$platform.requestForTutorialBattlesUsed" -> used)))
-  }
-
-  /**
-   * @inheritdoc
    */ // TODO: test me.
   def setDailyTasksSuppressed(id: String, platform: String, suppressed: Boolean): Option[User] = {
     findAndModify(

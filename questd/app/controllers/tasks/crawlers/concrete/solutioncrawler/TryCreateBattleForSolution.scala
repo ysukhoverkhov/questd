@@ -19,10 +19,9 @@ class TryCreateBattleForSolution(
     apiPar: DomainAPIComponent#DomainAPI,
     randPar: RandomComponent#Random) extends BaseCrawler[Solution](apiPar, randPar)  {
 
-  protected def check(battle: Solution) = {
-    api.tryCreateBattle(TryCreateBattleRequest())
-    // it gives us only battles in fighting state so no need in checking the state.
-//    api.updateBattleState(UpdateBattleStateRequest(battle))
+  protected def check(solution: Solution) = {
+    // Here are solutions without battles only.
+    api.tryCreateBattle(TryCreateBattleRequest(solution))
   }
 }
 

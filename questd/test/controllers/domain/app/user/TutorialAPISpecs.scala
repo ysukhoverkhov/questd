@@ -323,23 +323,6 @@ class TutorialAPISpecs extends BaseAPISpecs {
     there was no(user).addEntryToTimeLine(any, any)
   }
 
-  "createTutorialBattles should do its work" in context {
-    val solId = "sid1"
-    val u = createUserStub(solvedQuests = Map("qid1" -> solId))
-    val s = createSolutionStub(id = solId)
-
-    user.setRequestForTutorialBattlesUsed(any, any, any) returns Some(u)
-    solution.readById(solId) returns Some(s)
-    doReturn(OkApiResult(TryCreateBattleResult())).when(api).tryCreateBattle(TryCreateBattleRequest(solution = s, author = u, useTutorialCompetitor = true))
-
-    val result = api.createTutorialBattles(CreateTutorialBattlesRequest(u, TutorialPlatform.iPhone))
-
-    result must beAnInstanceOf[OkApiResult[AssignTutorialQuestResult]]
-
-    there was one(user).setRequestForTutorialBattlesUsed(any, any, mEq(true))
-    there was one(api).tryCreateBattle(any)
-  }
-
   "closeTutorialElement calls server action"  in context {
     val elementId = "elementId"
     val u = createUserStub()

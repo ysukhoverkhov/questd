@@ -5,6 +5,8 @@ import logic._
 import models.domain.common.Assets
 import models.domain.solution.Solution
 import models.domain.user.profile.Functionality
+import org.joda.time.DateTime
+import com.github.nscala_time.time.Imports._
 
 /**
  * All battle challenges related logic.
@@ -27,6 +29,10 @@ trait Challenges { this: UserLogic =>
     else if (alreadyHasRequest)
       InvalidState
     else if (checkQuest && (opponentSolution.info.questId != mySolution.info.questId))
+      InvalidState
+    else if (DateTime.now < (new DateTime(mySolution.creationDate) + 1.hour) ||
+      DateTime.now < (new DateTime(opponentSolution.creationDate) + 1.hour)) // TODO: test the branch.
+      // TODO: get the period in config.
       InvalidState
     else
       OK

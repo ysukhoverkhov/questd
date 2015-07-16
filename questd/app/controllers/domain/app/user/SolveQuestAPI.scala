@@ -115,8 +115,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
                 solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio, newSolution.id))
               } map {
-                tryCreateBattle(TryCreateBattleRequest(newSolution, r.user, useTutorialCompetitor = false))
-              } map {
 
                 // Giving reward to author of the quest.
                 db.user.readById(questToSolve.info.authorId) ifSome { author =>

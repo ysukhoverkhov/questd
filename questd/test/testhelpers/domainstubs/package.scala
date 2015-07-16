@@ -97,7 +97,8 @@ package object domainstubs {
     timelinePoints: Int = 0,
     vip: Boolean = false,
     lastModDate: Date = new Date((new Date).getTime + 100000),
-    battleIds: List[String] = List.empty) = {
+    battleIds: List[String] = List.empty,
+    creationDate: Date = new Date(0)) = {
 
     Solution(
       id = id,
@@ -112,6 +113,7 @@ package object domainstubs {
       rating = SolutionRating(
         timelinePoints = timelinePoints),
       lastModDate = lastModDate,
+      creationDate = creationDate,
       battleIds = battleIds)
   }
 
