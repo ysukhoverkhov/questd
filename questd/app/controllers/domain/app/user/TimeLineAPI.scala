@@ -126,10 +126,44 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
     Logger.trace(s"Populating time line for user ${user.id}")
 
-    // BATCH
-    val questsCount = config(api.DefaultConfigParams.TimeLineRandomQuestsDaily).toInt
-    val solutionsCount = config(api.DefaultConfigParams.TimeLineRandomSolutionsDaily).toInt
-    val battlesCount = config(api.DefaultConfigParams.TimeLineRandomBattlesDaily).toInt
+    def itemsCount(mean: Double, dev: Double, min: Double): Int = {
+      math.round(rand.nextGaussian(mean, dev)) match {
+        case a if a < min => min.toInt
+        case a => a.toInt
+      }
+    }
+
+    def questsCount: Int = {
+      itemsCount(
+        mean = if (user.timeLine.isEmpty)
+          api.config(api.DefaultConfigParams.TimeLineRandomQuestsDailyMeanFirstTime).toDouble
+        else
+          api.config(api.DefaultConfigParams.TimeLineRandomQuestsDailyMean).toDouble,
+        dev = api.config(api.DefaultConfigParams.TimeLineRandomQuestsDailyDeviation).toDouble,
+        min = api.config(api.DefaultConfigParams.TimeLineRandomQuestsDailyMin).toDouble)
+    }
+
+    def solutionsCount: Int = {
+      itemsCount(
+        mean = if (user.timeLine.isEmpty)
+          api.config(api.DefaultConfigParams.TimeLineRandomSolutionsDailyMeanFirstTime).toDouble
+        else
+          api.config(api.DefaultConfigParams.TimeLineRandomSolutionsDailyMean).toDouble,
+        dev = api.config(api.DefaultConfigParams.TimeLineRandomSolutionsDailyDeviation).toDouble,
+        min = api.config(api.DefaultConfigParams.TimeLineRandomSolutionsDailyMin).toDouble)
+    }
+
+    def battlesCount: Int = {
+      if (user.timeLine.isEmpty) {
+        api.config(api.DefaultConfigParams.TimeLineRandomBattlesDailyMeanFirstTime).toInt
+      } else {
+        itemsCount(
+          mean = api.config(api.DefaultConfigParams.TimeLineRandomBattlesDailyMean).toDouble,
+          dev = api.config(api.DefaultConfigParams.TimeLineRandomBattlesDailyDeviation).toDouble,
+          min = api.config(api.DefaultConfigParams.TimeLineRandomBattlesDailyMin).toDouble)
+      }
+    }
+
     Logger.trace(s"  quests count = $questsCount")
     Logger.trace(s"  solutions count = $solutionsCount")
     Logger.trace(s"  battles count = $battlesCount")

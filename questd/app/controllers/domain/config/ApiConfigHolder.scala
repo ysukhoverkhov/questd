@@ -49,8 +49,21 @@ class _DefaultConfigParams {
   val QuestProbabilityFollowing = "72 02 Probability of quests from Following"
   val QuestProbabilityVIP = "72 04 Probability of quests from Vips"
 
-  var TimeLineRandomQuestsDaily = "80 01 TimeLine Random Quests Daily"
-  var TimeLineRandomSolutionsDaily = "80 02 TimeLine Random Solutions Daily"
+  var TimeLineRandomQuestsDailyMean = "80 01 TimeLine Random Quests Daily Mean"
+  var TimeLineRandomQuestsDailyMeanFirstTime = "80 02 TimeLine Random Quests Daily Mean First Time"
+  var TimeLineRandomQuestsDailyDeviation = "80 03 TimeLine Random Quests Daily Deviation"
+  var TimeLineRandomQuestsDailyMin = "80 04 TimeLine Random Quests Daily Min"
+
+  var TimeLineRandomSolutionsDailyMean = "80 11 TimeLine Random Solutions Daily Mean"
+  var TimeLineRandomSolutionsDailyMeanFirstTime = "80 12 TimeLine Random Solutions Daily Mean First Time"
+  var TimeLineRandomSolutionsDailyDeviation = "80 13 TimeLine Random Solutions Daily Deviation"
+  var TimeLineRandomSolutionsDailyMin = "80 14 TimeLine Random Solutions Daily Min"
+
+  var TimeLineRandomBattlesDailyMean = "80 21 TimeLine Random Battles Daily Mean"
+  var TimeLineRandomBattlesDailyMeanFirstTime = "80 22 TimeLine Random Battles Daily Mean First Time"
+  var TimeLineRandomBattlesDailyDeviation = "80 23 TimeLine Random Battles Daily Deviation"
+  var TimeLineRandomBattlesDailyMin = "80 24 TimeLine Random Battles Daily Min"
+
   var TimeLineRandomBattlesDaily = "80 03 TimeLine Random Battles Daily"
 
   val SolutionProbabilityLevelsToGiveStartingSolutions = "91 01 Level to give starting Solutions"
@@ -134,9 +147,20 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.QuestProbabilityFollowing -> "0.30",
             DefaultConfigParams.QuestProbabilityVIP -> "0.10",
 
-            DefaultConfigParams.TimeLineRandomQuestsDaily -> "5",
-            DefaultConfigParams.TimeLineRandomSolutionsDaily -> "5",
-            DefaultConfigParams.TimeLineRandomBattlesDaily -> "2",
+            DefaultConfigParams.TimeLineRandomQuestsDailyMean -> "5",
+            DefaultConfigParams.TimeLineRandomQuestsDailyMeanFirstTime -> "15",
+            DefaultConfigParams.TimeLineRandomQuestsDailyDeviation -> "1",
+            DefaultConfigParams.TimeLineRandomQuestsDailyMin -> "4",
+
+            DefaultConfigParams.TimeLineRandomSolutionsDailyMean -> "5",
+            DefaultConfigParams.TimeLineRandomSolutionsDailyMeanFirstTime -> "15",
+            DefaultConfigParams.TimeLineRandomSolutionsDailyDeviation -> "1",
+            DefaultConfigParams.TimeLineRandomSolutionsDailyMin -> "4",
+
+            DefaultConfigParams.TimeLineRandomBattlesDailyMean -> "3",
+            DefaultConfigParams.TimeLineRandomBattlesDailyMeanFirstTime -> "0",
+            DefaultConfigParams.TimeLineRandomBattlesDailyDeviation -> "1",
+            DefaultConfigParams.TimeLineRandomBattlesDailyMin -> "1",
 
             DefaultConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions -> "5",
             DefaultConfigParams.SolutionProbabilityStartingVIPSolutions -> "0.5",

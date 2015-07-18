@@ -55,9 +55,6 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       val rv = api.login(LoginRequest("FB", userfb))
 
-      there were atLeast(1)(quest).allWithParams(any, any, any, any, any, any, any, any, any, any)
-      there were atLeast(1)(solution).allWithParams(any, any, any, any, any, any, any, any, any, any, any, any)
-      there were atLeast(1)(battle).allWithParams(any, any, any, any, any, any, any, any, any, any)
       // Update allowed.
       there was one(user).readBySNid("FB", userfb.snId)
       there was one(user).create(any)
