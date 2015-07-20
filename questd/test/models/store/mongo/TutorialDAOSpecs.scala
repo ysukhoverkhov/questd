@@ -21,10 +21,11 @@ class TutorialDAOSpecs extends Specification
 
       clearDB()
 
+      val ta = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg"))
       val tc = TutorialCondition(TutorialConditionType.ProfileVariableState, params = Map("param" -> "value"))
       val tt = TutorialTrigger(TutorialTriggerType.Any)
       val te = TutorialElement(
-        action = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg")),
+        actions = List(ta, ta),
         conditions = List(tc, tc),
         triggers = List(tt, tt))
 
@@ -41,10 +42,11 @@ class TutorialDAOSpecs extends Specification
     "Add element to tutorial" in new WithApplication(appWithTestDatabase) {
       clearDB()
 
+      val ta = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg"))
       val tc = TutorialCondition(TutorialConditionType.ProfileVariableState, params = Map("param" -> "value"))
       val tt = TutorialTrigger(TutorialTriggerType.Any)
       val te = TutorialElement(
-        action = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg")),
+        actions = List(ta, ta),
         conditions = List(tc, tc),
         triggers = List(tt, tt))
 
@@ -60,10 +62,11 @@ class TutorialDAOSpecs extends Specification
     "Remove element to tutorial" in new WithApplication(appWithTestDatabase) {
       clearDB()
 
+      val ta = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg"))
       val tc = TutorialCondition(TutorialConditionType.ProfileVariableState, params = Map("param" -> "value"))
       val tt = TutorialTrigger(TutorialTriggerType.Any)
       val te = TutorialElement(
-        action = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg")),
+        actions = List(ta, ta),
         conditions = List(tc, tc),
         triggers = List(tt, tt))
 
@@ -79,14 +82,15 @@ class TutorialDAOSpecs extends Specification
     "Update element to tutorial" in new WithApplication(appWithTestDatabase) {
       clearDB()
 
+      val ta = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg"))
       val tc = TutorialCondition(TutorialConditionType.ProfileVariableState, params = Map("param" -> "value"))
       val tt = TutorialTrigger(TutorialTriggerType.Any)
       val te = TutorialElement(
-        action = TutorialAction(TutorialActionType.PlayAnimation, params = Map("clip" -> "1.mpg")),
+        actions = List(ta, ta),
         conditions = List(tc, tc),
         triggers = List(tt, tt))
 
-      val updatedElement = te.copy(action = te.action.copy(actionType = TutorialActionType.Message))
+      val updatedElement = te.copy(actions = List(te.actions.head.copy(actionType = TutorialActionType.Message)))
 
       private val platform = TutorialPlatform.iPhone.toString
       val t = Tutorial(platform, List(te))
@@ -95,7 +99,7 @@ class TutorialDAOSpecs extends Specification
       val ot = db.tutorial.updateElement(platform, updatedElement)
       ot must beSome.which(_.id == t.id)
       ot must beSome.which(_.elements.length == 1)
-      ot must beSome.which(_.elements.head.action.actionType == TutorialActionType.Message)
+      ot must beSome.which(_.elements.head.actions.head.actionType == TutorialActionType.Message)
     }
   }
 }

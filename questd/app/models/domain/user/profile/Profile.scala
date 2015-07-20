@@ -24,7 +24,7 @@ case class Profile(
   questSolutionContext: QuestSolutionContext = QuestSolutionContext(),
   questVoteContext: QuestVoteContext = QuestVoteContext(),
   solutionVoteContext: SolutionVoteContext = SolutionVoteContext(),
-  tutorialStates: Map[String, TutorialState] =
+  tutorialStates: Map[String, TutorialState] = // TODO: do not split it by platforms.
     TutorialPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
   analytics: Analytics = Analytics(),
   debug: String = "")

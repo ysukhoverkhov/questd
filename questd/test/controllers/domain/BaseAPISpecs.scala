@@ -27,6 +27,7 @@ private[domain] abstract class BaseAPISpecs
   val battle = mock[BattleDAO]
   val config = mock[ConfigDAO]
   val tutorialTask = mock[TutorialTaskDAO]
+  val tutorial = mock[TutorialDAO]
   val culture = mock[CultureDAO]
   val theme = mock[ThemeDAO]
   val comment = mock[CommentDAO]
@@ -48,11 +49,14 @@ private[domain] abstract class BaseAPISpecs
       db.battle returns battle
       db.config returns config
       db.tutorialTask returns tutorialTask
+      db.tutorial returns tutorial
       db.culture returns culture
       db.theme returns theme
       db.comment returns comment
 
       config.readConfig returns mockConfiguration
+
+      api.user2Logic(any)
     }
   }
 }

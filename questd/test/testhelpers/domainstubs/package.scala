@@ -3,22 +3,22 @@ package testhelpers
 import java.util.Date
 
 import models.domain.base.ID
-import models.domain.battle.{BattleSide, Battle, BattleInfo, BattleStatus}
-import models.domain.comment.{CommentInfo, Comment}
+import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
+import models.domain.comment.{Comment, CommentInfo}
 import models.domain.common.{Assets, ContentReference, ContentType, ContentVote}
 import models.domain.quest._
 import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
 import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
-import models.domain.user.auth.{LoginMethod, AuthInfo}
+import models.domain.user.auth.{AuthInfo, LoginMethod}
 import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.demo.UserDemographics
 import models.domain.user.friends.Friendship
 import models.domain.user.profile._
 import models.domain.user.stats.{SolutionsInBattle, UserStats}
-import models.domain.user.timeline.{TimeLineType, TimeLineReason, TimeLineEntry}
+import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import models.view.{QuestView, ThemeInfoWithID}
 
 
@@ -87,7 +87,7 @@ package object domainstubs {
 
   // TODO: TAGS: replace themeId with tags.
   def createSolutionStub(
-    id: String = "sol id",
+    id: String = ID.generateUUID(),
     cultureId: String = "cultureId",
     authorId: String = "uid",
     questId: String = "qid",
@@ -97,7 +97,8 @@ package object domainstubs {
     timelinePoints: Int = 0,
     vip: Boolean = false,
     lastModDate: Date = new Date((new Date).getTime + 100000),
-    battleIds: List[String] = List.empty) = {
+    battleIds: List[String] = List.empty,
+    creationDate: Date = new Date(0)) = {
 
     Solution(
       id = id,
@@ -112,6 +113,7 @@ package object domainstubs {
       rating = SolutionRating(
         timelinePoints = timelinePoints),
       lastModDate = lastModDate,
+      creationDate = creationDate,
       battleIds = battleIds)
   }
 
@@ -220,7 +222,7 @@ package object domainstubs {
     assets: Assets = Assets(100000, 100000, 100000),
     mustVoteSolutions: List[String] = List.empty,
     level: Int = 18,
-    questCreationCoolDown: Date = new Date(Long.MaxValue),
+    questCreationCoolDown: Date = new Date(0),
     createdQuests: List[String] = List.empty,
     solvedQuests: Map[String, String] = Map.empty,
     votedQuests: Map[String, ContentVote.Value] = Map.empty,
@@ -233,7 +235,8 @@ package object domainstubs {
     questBookmark: Option[String] = None,
     privateDailyResults: List[DailyResult] = List(createDailyResultStub()),
     battleRequests: List[BattleRequest] = List.empty,
-    tutorialState: TutorialState = TutorialState()) = {
+    tutorialState: TutorialState = TutorialState(dailyTasksSuppression = false),
+    dailyTasks: DailyTasks = DailyTasks()) = {
 
     User(
       id = id,
@@ -258,7 +261,8 @@ package object domainstubs {
           bio = Bio(
             gender = Gender.Male)),
         rights = rights,
-        tutorialStates = Map(TutorialPlatform.iPhone.toString -> tutorialState)),
+        tutorialStates = Map(TutorialPlatform.iPhone.toString -> tutorialState),
+        dailyTasks = dailyTasks),
       friends = friends,
       followers = followers,
       mustVoteSolutions = mustVoteSolutions,

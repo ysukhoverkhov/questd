@@ -16,6 +16,9 @@ case class KeyValueForm(
   key: String,
   value: String)
 
+case class SectionNameForm(
+  sectionName: String)
+
 class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   private def leftMenu(implicit request: RequestHeader): Map[String, String] = {
@@ -26,6 +29,10 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
 
   private def findTutorialElement(platform: String, elementId: String): Option[TutorialElement] = {
     api.db.tutorial.readById(platform).flatMap(_.elements.find(_.id == elementId))
+  }
+
+  private def findTutorialElementWithoutSection(platform: String): Option[TutorialElement] = {
+    api.db.tutorial.readById(platform).flatMap(_.elements.find(_.crud.sectionName.getOrElse("") == ""))
   }
 
   private def deleteParamFromActionImpl(platform: String, elementId: String, actionIndex: Int, paramKey: String): Unit = {
@@ -101,6 +108,9 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
   }
 
+  private def selectedSectionName(implicit request: AuthenticatedRequest[AnyContent]): Option[String] = {
+    request.cookies.get("sectionName").map(_.value)
+  }
 
   /**
    * Tutorial index page.
@@ -117,14 +127,33 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         List.empty
     }
 
+    val sectionName = selectedSectionName
+
+    val els2 = if (sectionName.isDefined) {
+      els.filter {e => sectionName == e.crud.sectionName || ((e.crud.sectionName.getOrElse("") == "") && sectionName.contains("Empty")) }
+    } else {
+      els
+    }
+
+    val allSections = els.foldLeft[Set[String]](Set("")){(r, v) => r + v.crud.sectionName.getOrElse("")}.toList.sorted
+
     Ok(views.html.admin.tutorialScripts(
       menuItems = Menu(request),
       leftMenuItems = leftMenu,
       currentPlatform = platform,
-      elements = els))
+      elements = els2,
+      allSections = allSections))
   }
 
-  def updateAction(platform: String, elementId: String) = Authenticated { implicit request =>
+  /**
+   * Updates action.
+   *
+   * @param platform Platform to update action fro.
+   * @param elementId Id of element with action.
+   * @param actionIndex Acion index.
+   * @return redirect.
+   */
+  def updateAction(platform: String, elementId: String, actionIndex: Int) = Authenticated { implicit request =>
 
     val form = Form(
     mapping(
@@ -135,10 +164,12 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         Logger.error(s"$formWithErrors.errors")
       },
 
-      actionForm => {
+      actionTypeForm => {
         findTutorialElement(platform, elementId) match {
           case Some(e) =>
-            val updatedElement = e.copy(action = e.action.copy(actionType = TutorialActionType.withName(actionForm.entityType)))
+            val updatedAction = e.actions(actionIndex).copy(actionType = TutorialActionType.withName(actionTypeForm.entityType))
+            val updatedElement = e.copy(actions = e.actions.take(actionIndex) ++ List(updatedAction) ++ e.actions.drop(actionIndex + 1))
+
             api.db.tutorial.updateElement(platform, updatedElement)
 
           case None =>
@@ -146,8 +177,53 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         }
       })
 
-            redirectToElement(platform, elementId)
+    redirectToElement(platform, elementId)
   }
+
+
+  /**
+   * Adds new action to element.
+   *
+   * @param platform Platform of element.
+   * @param elementId Id of element.
+   * @return Redirect.
+   */
+  def addActionToElement(platform: String, elementId: String) = Authenticated { implicit request =>
+    val ta = TutorialAction(TutorialActionType.Message)
+
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedElement = e.copy(actions = e.actions ::: List(ta))
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+
+    redirectToElement(platform, elementId)
+  }
+
+  /**
+   * Deletes action from element.
+   *
+   * @param platform Platform of element.
+   * @param elementId Id of element.
+   * @param actionIndex Index of action to delete.
+   * @return
+   */
+  def deleteActionFromElement(platform: String, elementId: String, actionIndex: Int) = Authenticated { implicit request =>
+    findTutorialElement(platform, elementId) match {
+      case Some(e) =>
+        val updatedElement = e.copy(actions = e.actions.take(actionIndex) ++ e.actions.drop(actionIndex + 1))
+        api.db.tutorial.updateElement(platform, updatedElement)
+
+      case None =>
+        Logger.error(s"Tutorial script or element not found")
+    }
+
+    redirectToElement(platform, elementId)
+  }
+
 
   /**
    * Adds new default element to list of elements in tutorial.
@@ -155,20 +231,37 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @param platform platform to add element to.
    * @return Content to display to user.
    */
-  def addElement(platform: String) = Authenticated { implicit request =>
+  def addElement(platform: String, elementId: Option[String]) = Authenticated { implicit request =>
 
     ensurePlatformExists(platform)
 
     val tc = TutorialCondition(TutorialConditionType.TutorialElementClosed)
     val tt = TutorialTrigger(TutorialTriggerType.Any)
     val te = TutorialElement(
-      actions = List(TutorialAction(TutorialActionType.Message), TutorialAction(TutorialActionType.Close)),
+      actions = List(TutorialAction(TutorialActionType.Message), TutorialAction(TutorialActionType.CloseTutorialElement)),
       conditions = List(tc),
-      triggers = List(tt))
+      triggers = List(tt),
+      crud = TutorialElementCRUD(sectionName = selectedSectionName))
 
-    api.db.tutorial.addElement(platform, te)
+    elementId.fold {
+      api.db.tutorial.addElement(platform, te)
+      redirectToElement(platform, te)
+    } { elementId =>
+      api.db.tutorial.readById(platform).fold {
+        redirectToElement(platform, elementId)
+      } { tutorial =>
+        tutorial.elements.find(_.id == elementId).fold {
+          redirectToElement(platform, elementId)
+        } { element =>
 
-    redirectToElement(platform, te)
+          val elementIndex = tutorial.elements.indexOf(element)
+
+          api.db.tutorial.update(tutorial.copy(
+            elements = tutorial.elements.take(elementIndex + 1) ++ List(te) ++ tutorial.elements.drop(elementIndex + 1)))
+          redirectToElement(platform, elementId)
+        }
+      }
+    }
   }
 
   /**
@@ -199,10 +292,10 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
     }
 
     api.db.tutorial.readById(platform).fold {
-              redirectToElement(platform, elementId)
+      redirectToElement(platform, elementId)
     } { tutorial =>
       tutorial.elements.find(_.id == elementId).fold {
-                redirectToElement(platform, elementId)
+        redirectToElement(platform, elementId)
       } { element =>
         api.db.tutorial.update(tutorial.copy(elements = swapWithPrev(tutorial.elements, element)))
         redirectToElement(platform, elementId)
@@ -244,8 +337,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @param elementId Id if element to delete.
    * @return Content to display.
    */
-  def addParamToElementAction(platform: String, elementId: String) = Authenticated { implicit request =>
-    addParamToElementActionImpl(platform, elementId, "", "")
+  def addParamToElementAction(platform: String, elementId: String, actionIndex: Int) = Authenticated { implicit request =>
+    addParamToElementActionImpl(platform, elementId, actionIndex, "", "")
     redirectToElement(platform, elementId)
   }
 
@@ -257,8 +350,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @param paramKey Key of param we should remove.
    * @return Updated content.
    */
-  def deleteParamFromElementAction(platform: String, elementId: String, paramKey: String) = Authenticated { implicit request =>
-    deleteParamFromActionImpl(platform, elementId, paramKey)
+  def deleteParamFromElementAction(platform: String, elementId: String, actionIndex: Int, paramKey: String) = Authenticated { implicit request =>
+    deleteParamFromActionImpl(platform, elementId, actionIndex, paramKey)
     redirectToElement(platform, elementId)
   }
 
@@ -270,7 +363,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    * @param paramKey Key of the parameter to save.
    * @return Content.
    */
-  def saveParamInElementAction(platform: String, elementId: String, paramKey: String) = Authenticated { implicit request =>
+  def saveParamInElementAction(platform: String, elementId: String, actionIndex: Int, paramKey: String) = Authenticated { implicit request =>
 
     val form = Form(
       mapping(
@@ -283,8 +376,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       },
 
       keyValueForm => {
-        deleteParamFromActionImpl(platform, elementId, paramKey)
-        addParamToElementActionImpl(platform, elementId, keyValueForm.key, keyValueForm.value)
+        deleteParamFromActionImpl(platform, elementId, actionIndex, paramKey)
+        addParamToElementActionImpl(platform, elementId, actionIndex, keyValueForm.key, keyValueForm.value)
       })
 
     redirectToElement(platform, elementId)
@@ -334,7 +427,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         Logger.error(s"Tutorial script or element not found")
     }
 
-            redirectToElement(platform, elementId)
+    redirectToElement(platform, elementId)
   }
 
   /**
@@ -368,7 +461,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         }
       })
 
-            redirectToElement(platform, elementId)
+      redirectToElement(platform, elementId)
   }
 
   /**
@@ -395,7 +488,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def deleteParamFromElemCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String) = Authenticated { implicit request =>
     deleteParamToElementConditionImpl(platform, elementId, conditionIndex, paramKey)
-            redirectToElement(platform, elementId)
+    redirectToElement(platform, elementId)
   }
 
   /**
@@ -563,7 +656,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         addParamToElementTriggerImpl(platform, elementId, index, keyValueForm.key, keyValueForm.value)
       })
 
-            redirectToElement(platform, elementId)
+      redirectToElement(platform, elementId)
   }
 
   /**
@@ -594,6 +687,8 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
   def importTutorialScript(platform: String) = Authenticated(parse.multipartFormData) { request =>
     import controllers.web.helpers._
 
+    Logger.debug(s"Importing tutorial script")
+
     ensurePlatformExists(platform)
 
     request.body.file("tutorialScript").map { tutorialScript =>
@@ -601,10 +696,14 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
       val serializers = List(
         new EnumNameSerializer(TutorialActionType),
         new EnumNameSerializer(TutorialTriggerType),
-        new EnumNameSerializer(TutorialConditionType)
+        new EnumNameSerializer(TutorialConditionType),
+        new EnumNameSerializer(TutorialServerActionType)
       )
 
-      val tutorial = Json.read[Tutorial](scala.io.Source.fromFile(tutorialScript.ref.file).mkString, serializers)
+      val scriptText = scala.io.Source.fromFile(tutorialScript.ref.file).mkString
+      val tutorial = Json.read[Tutorial](scriptText, serializers)
+      Logger.trace(s"  Script Text : $scriptText")
+      Logger.trace(s"  Parsed script: $tutorial")
       api.db.tutorial.update(tutorial.copy(id = platform))
 
       Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
@@ -613,6 +712,90 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
         "error" -> "Missing file")
     }
   }
+
+  /**
+   * Adds section to first encountered nameless tutorial element.
+   *
+   * @param platform Platform to search element in.
+   * @return Redirect.
+   */
+  def addSection(platform: String) = Authenticated { implicit request =>
+    ensurePlatformExists(platform)
+
+    val form = Form(
+      mapping(
+        "sectionName" -> text)(SectionNameForm.apply)(SectionNameForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+      },
+
+      sectionNameForm => {
+        findTutorialElementWithoutSection(platform).fold[Any](None) { element =>
+          api.db.tutorial.updateElement(platform, element.copy(crud = element.crud.copy(sectionName = if (sectionNameForm.sectionName == "") None else Some(sectionNameForm.sectionName))))
+        }
+      })
+
+    Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+  }
+
+  /**
+   * Sets section name for element.
+   *
+   * @param platform Platform to search element in.
+   * @param elementId id of element to sen section name for.
+   * @return Redirect.
+   */
+  def updateElementSectionName(platform: String, elementId: String) = Authenticated { implicit request =>
+    ensurePlatformExists(platform)
+
+    val form = Form(
+      mapping(
+        "sectionName" -> text)(SectionNameForm.apply)(SectionNameForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+      },
+
+      sectionNameForm => {
+        findTutorialElement(platform, elementId).fold[Any](None) { element =>
+          api.db.tutorial.updateElement(platform, element.copy(crud = element.crud.copy(sectionName = Some(sectionNameForm.sectionName))))
+        }
+      })
+
+    redirectToElement(platform, elementId)
+  }
+
+  /**
+   * select section to filter.
+   *
+   * @param platform Platform to search element in.
+   * @return
+   */
+  def selectElementSectionName(platform: String) = Authenticated { implicit request =>
+    ensurePlatformExists(platform)
+
+    val form = Form(
+      mapping(
+        "sectionName" -> text)(SectionNameForm.apply)(SectionNameForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+        Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform))
+      },
+
+      sectionNameForm => {
+        if (sectionNameForm.sectionName == "") {
+          Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform)).discardingCookies(DiscardingCookie("sectionName"))
+        } else {
+          Redirect(controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(platform)).withCookies(Cookie("sectionName", sectionNameForm.sectionName))
+        }
+      })
+  }
+
 
   private def ensurePlatformExists(platform: String): Unit = {
     if (api.db.tutorial.readById(platform).isEmpty) {

@@ -8,7 +8,7 @@ import controllers.domain.helpers._
 import models.domain.battle.BattleStatus
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
-import models.domain.user.profile.Profile
+import models.domain.user.profile.{TaskType, Profile}
 
 case class VoteBattleByUserRequest(user: User, battleId: String, solutionId: String)
 case class VoteBattleByUserResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -43,17 +43,10 @@ private[domain] trait VoteBattleAPI {
                 ) ifSome { u =>
                   {
                     voteBattle(VoteBattleRequest(b, solutionId, isFriend))
-                    // TODO: make task here.
-                    // TODO: test it's being made.
-                    //                          } map { r =>
-
-                    //                            if (request.vote == ContentVote.Cool)
-                    //                              makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LikeSolutions)))
-                    //                            else
-                    //                              OkApiResult(MakeTaskResult(request.user))
-                    //
                   } map { r =>
-                    OkApiResult(VoteBattleByUserResult(OK, Some(u.profile)))
+                    makeTask(MakeTaskRequest(u, taskType = Some(TaskType.VoteBattle)))
+                  } map { r =>
+                    OkApiResult(VoteBattleByUserResult(OK, Some(r.user.profile)))
                   }
                 }
 

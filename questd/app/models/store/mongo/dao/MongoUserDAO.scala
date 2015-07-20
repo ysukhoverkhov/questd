@@ -532,7 +532,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User] = {
     findAndModify(
@@ -544,7 +544,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def addTasks(id: String, newTasks: List[Task], addReward: Option[Assets] = None): Option[User] = {
     val queryBuilder = MongoDBObject.newBuilder
@@ -680,13 +680,13 @@ private[mongo] class MongoUserDAO
 
   /**
    * @inheritdoc
-   */
-  def setRequestForTutorialBattlesUsed(id: String, platform: String, used: Boolean): Option[User] = {
+   */ // TODO: test me.
+  def setDailyTasksSuppressed(id: String, platform: String, suppressed: Boolean): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
-          s"profile.tutorialStates.$platform.requestForTutorialBattlesUsed" -> used)))
+          s"profile.tutorialStates.$platform.dailyTasksSuppression" -> suppressed)))
   }
 
   /**

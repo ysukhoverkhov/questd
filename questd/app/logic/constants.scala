@@ -11,17 +11,16 @@ object constants {
     Functionality.VoteQuests -> 1,
     Functionality.VoteSolutions -> 1,
     Functionality.VoteBattles -> 1,
-    Functionality.VoteReviews -> 1,
+    Functionality.VoteComments -> 1,
     Functionality.AddToFollowing -> 1,
     Functionality.SubmitPhotoSolutions -> 2,
-    Functionality.ChallengeBattles -> 3, // TODO: write me in desdoc.
+    Functionality.ChallengeBattles -> 3,
     Functionality.Report -> 4,
+    Functionality.PostComments -> 4,
     Functionality.SubmitVideoSolutions -> 5,
     Functionality.InviteFriends -> 6,
     Functionality.SubmitPhotoQuests -> 7,
-    // Functionality.AssignQuests -> 8,
-    Functionality.SubmitReviewsForSolutions -> 9,
-    Functionality.SubmitReviewsForQuests -> 9,
+    Functionality.AssignQuests -> 8,
     Functionality.SubmitVideoQuests -> 10,
 
     Functionality.GiveRewards -> 20)

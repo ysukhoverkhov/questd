@@ -32,6 +32,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       there was one(solution).readById(mySolutionId)
       there was one(solution).readById(opponentSolutionId)
       there were two(user).addBattleRequest(any, any)
+      there was one(api).makeTask(any)
     }
 
     "respondBattleRequest crates battle" in context {

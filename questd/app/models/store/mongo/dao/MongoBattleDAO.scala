@@ -6,7 +6,6 @@ import com.mongodb.casbah.commons.MongoDBObject
 import models.domain.battle.{Battle, BattleStatus}
 import models.store.dao._
 import models.store.mongo.helpers._
-import play.Logger
 
 /**
  * DOA for Battles
@@ -69,8 +68,6 @@ private[mongo] class MongoBattleDAO
     if (cultureId.isDefined) {
       queryBuilder += ("cultureId" -> cultureId.get)
     }
-
-    Logger.trace("MongoBattleDAO - allWithParams - " + queryBuilder.result)
 
     findByExample(
       example = queryBuilder.result(),

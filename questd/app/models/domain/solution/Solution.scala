@@ -11,6 +11,7 @@ case class Solution(
   id: String = ID.generateUUID(),
   cultureId: String,
   lastModDate: Date = new Date(),
+  creationDate: Date = new Date(),
   battleIds: List[String] = List.empty,
   questLevel: Int,
   info: SolutionInfo,

@@ -6,7 +6,6 @@ import controllers.domain.helpers._
 import models.domain.quest.{Quest, QuestStatus}
 import models.domain.user.User
 import models.domain.user.friends.FriendshipStatus
-import play.Logger
 
 case class GetMyQuestsRequest(
   user: User,
@@ -93,8 +92,6 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
   }
 
   def getAllQuests(request: GetAllQuestsRequest): ApiResult[GetAllQuestsResult] = handleDbException {
-    Logger.trace("getAllQuests - " + request.toString)
-
     OkApiResult(GetAllQuestsResult(db.quest.allWithParams(
       status = List(request.status),
       authorIdsExclude = request.authorsExclude,

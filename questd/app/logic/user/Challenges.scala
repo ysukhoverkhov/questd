@@ -5,13 +5,41 @@ import logic._
 import models.domain.common.Assets
 import models.domain.solution.Solution
 import models.domain.user.profile.Functionality
+import org.joda.time.DateTime
+import com.github.nscala_time.time.Imports._
 
 /**
  * All battle challenges related logic.
  */
 trait Challenges { this: UserLogic =>
 
-  // TODO: check rights here.
+  def canAutoCreatedBattle(
+    mySolution: Solution,
+    opponentSolution: Solution,
+    opponentShouldNotHaveBattles: Boolean,
+    checkQuest: Boolean) = {
+
+    lazy val alreadyHasRequest = user.battleRequests
+      .exists(br => (br.mySolutionId == mySolution.id) && (br.opponentSolutionId == opponentSolution.id))
+
+    // TODO: get the period in config.
+    lazy val battleCreationDelay = 1
+
+    if (mySolution.info.authorId == opponentSolution.info.authorId)
+      OutOfContent
+    else if (opponentSolution.battleIds.nonEmpty && opponentShouldNotHaveBattles)
+      InvalidState
+    else if (alreadyHasRequest)
+      InvalidState
+    else if (checkQuest && (opponentSolution.info.questId != mySolution.info.questId))
+      InvalidState
+    else if (DateTime.now < (new DateTime(mySolution.creationDate) + battleCreationDelay.hour) ||
+      DateTime.now < (new DateTime(opponentSolution.creationDate) + battleCreationDelay.hour))
+      CoolDown
+    else
+      OK
+  }
+
   def canChallengeBattle(mySolution: Solution, opponentSolution: Solution) = {
     lazy val mySolutionExists = user.stats.solvedQuests.values.exists(_ == mySolution.id)
     lazy val alreadyHasRequest = user.battleRequests
@@ -25,7 +53,7 @@ trait Challenges { this: UserLogic =>
       OutOfContent
     else if (opponentSolution.info.questId != mySolution.info.questId)
       InvalidState
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.ChallengeBattles))
+    else if (!user.profile.rights.unlockedFunctionality.contains(Functionality.ChallengeBattles))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costToChallengeBattle))
       NotEnoughAssets

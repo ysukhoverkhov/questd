@@ -87,7 +87,6 @@ POST	/rest/closeTutorialElement						controllers.web.rest.TutorialWS.closeTutori
 POST	/rest/assignTutorialTask						controllers.web.rest.TutorialWS.assignTutorialTask
 POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
 POST	/rest/assignTutorialQuest						controllers.web.rest.TutorialWS.assignTutorialQuest
-POST	/rest/createTutorialBattles						controllers.web.rest.TutorialWS.createTutorialBattles
 
 
 # Comments
@@ -120,7 +119,7 @@ POST	/rest/debug/resetTutorial					    controllers.web.rest.DebugWS.resetTutoria
 POST	/rest/debug/setLevel					        controllers.web.rest.DebugWS.setLevel
 POST	/rest/debug/generateErrorLog			        controllers.web.rest.DebugWS.generateErrorLog
 POST	/rest/debug/resetProfile     					controllers.web.rest.DebugWS.resetProfile
-
+POST    /rest/debug/resolveAllBattles                   controllers.web.rest.DebugWS.resolveAllBattles
 
 
 
@@ -161,14 +160,17 @@ POST	/admin/messages/send	    					controllers.web.admin.Messages.send
 
 
 GET     /admin/tutorial                                 controllers.web.admin.TutorialScriptsCRUD.tutorial(platform: String)
-POST    /admin/tutorial/updateAction                    controllers.web.admin.TutorialScriptsCRUD.updateAction(platform: String, elementId: String)
-POST    /admin/tutorial/addElement                      controllers.web.admin.TutorialScriptsCRUD.addElement(platform: String)
+POST    /admin/tutorial/addElement                      controllers.web.admin.TutorialScriptsCRUD.addElement(platform: String, elementId: Option[String])
 POST    /admin/tutorial/deleteElement                   controllers.web.admin.TutorialScriptsCRUD.deleteElement(platform: String, elementId: String)
 POST    /admin/tutorial/upElement                       controllers.web.admin.TutorialScriptsCRUD.upElement(platform: String, elementId: String)
 POST    /admin/tutorial/downElement                     controllers.web.admin.TutorialScriptsCRUD.downElement(platform: String, elementId: String)
-POST    /admin/tutorial/addParamToElementAction         controllers.web.admin.TutorialScriptsCRUD.addParamToElementAction(platform: String, elementId: String)
-POST    /admin/tutorial/deleteParamFromElementAction    controllers.web.admin.TutorialScriptsCRUD.deleteParamFromElementAction(platform: String, elementId: String, paramKey: String)
-POST    /admin/tutorial/saveParamInElementAction        controllers.web.admin.TutorialScriptsCRUD.saveParamInElementAction(platform: String, elementId: String, paramKey: String)
+
+POST    /admin/tutorial/updateAction                    controllers.web.admin.TutorialScriptsCRUD.updateAction(platform: String, elementId: String, actionIndex: Int)
+POST    /admin/tutorial/addActionToElement              controllers.web.admin.TutorialScriptsCRUD.addActionToElement(platform: String, elementId: String)
+POST    /admin/tutorial/deleteActionFromElement         controllers.web.admin.TutorialScriptsCRUD.deleteActionFromElement(platform: String, elementId: String, actionIndex: Int)
+POST    /admin/tutorial/addParamToElementAction         controllers.web.admin.TutorialScriptsCRUD.addParamToElementAction(platform: String, elementId: String, actionIndex: Int)
+POST    /admin/tutorial/deleteParamFromElementAction    controllers.web.admin.TutorialScriptsCRUD.deleteParamFromElementAction(platform: String, elementId: String, actionIndex: Int, paramKey: String)
+POST    /admin/tutorial/saveParamInElementAction        controllers.web.admin.TutorialScriptsCRUD.saveParamInElementAction(platform: String, elementId: String, actionIndex: Int, paramKey: String)
 
 POST    /admin/tutorial/updateCondition                 controllers.web.admin.TutorialScriptsCRUD.updateCondition(platform: String, elementId: String, conditionIndex: Int)
 POST    /admin/tutorial/addConditionToElement           controllers.web.admin.TutorialScriptsCRUD.addConditionToElement(platform: String, elementId: String)
@@ -186,6 +188,10 @@ POST    /admin/tutorial/saveParamInElementTrigger       controllers.web.admin.Tu
 
 GET     /admin/tutorial/exportTutorialScript            controllers.web.admin.TutorialScriptsCRUD.exportTutorialScript(platform: String)
 POST    /admin/tutorial/importTutorialScript            controllers.web.admin.TutorialScriptsCRUD.importTutorialScript(platform: String)
+
+POST    /admin/tutorial/addSection                      controllers.web.admin.TutorialScriptsCRUD.addSection(platform: String)
+POST    /admin/tutorial/updateElementSectionName        controllers.web.admin.TutorialScriptsCRUD.updateElementSectionName(platform: String, elementId: String)
+POST    /admin/tutorial/selectElementSectionName        controllers.web.admin.TutorialScriptsCRUD.selectElementSectionName(platform: String)
 
 GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")
 GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)
