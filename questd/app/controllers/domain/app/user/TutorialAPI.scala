@@ -5,10 +5,11 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import models.domain.common.Assets
-import models.domain.tutorial.{TutorialElement, TutorialPlatform}
+import models.domain.tutorial.{TutorialServerActionType, TutorialServerAction, TutorialElement, TutorialPlatform}
 import models.domain.user._
 import models.domain.user.profile.{DailyTasks, Profile, Task, TutorialState}
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
+import play.Logger
 
 case class GetCommonTutorialRequest(platform: TutorialPlatform.Value)
 case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])
@@ -17,7 +18,7 @@ case class GetTutorialRequest(user: User, platform: TutorialPlatform.Value)
 case class GetTutorialResult(tutorialElements: List[TutorialElement])
 
 case class CloseTutorialElementRequest(user: User, platform: TutorialPlatform.Value, elementId: String)
-case class CloseTutorialElementResult(allowed: ProfileModificationResult, state: Option[TutorialState] = None)
+case class CloseTutorialElementResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class AssignTutorialTaskRequest(user: User, platform: TutorialPlatform.Value, taskId: String)
 case class AssignTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
@@ -28,11 +29,12 @@ case class IncTutorialTaskResult(allowed: ProfileModificationResult, profile: Op
 case class AssignTutorialQuestRequest(user: User, platform: TutorialPlatform.Value, questId: String)
 case class AssignTutorialQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class CreateTutorialBattlesRequest(user: User, platform: TutorialPlatform.Value)
-case class CreateTutorialBattlesResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
-
 case class ResetTutorialRequest(user: User)
 case class ResetTutorialResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+
+case class ExecuteServerTutorialActionRequest(user: User, platform: TutorialPlatform.Value, serverAction: TutorialServerAction)
+case class ExecuteServerTutorialActionResult(user: User)
+
 
 private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -62,8 +64,51 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def closeTutorialElement(request: CloseTutorialElementRequest): ApiResult[CloseTutorialElementResult] = handleDbException {
     import request._
 
-    db.user.addClosedTutorialElement(user.id, platform.toString, elementId) ifSome { v =>
-      OkApiResult(CloseTutorialElementResult(OK, Some(v.profile.tutorialStates(platform.toString))))
+    db.tutorial.readById(platform.toString) ifSome { tutorial =>
+      tutorial.elements.find(_.id == elementId) ifSome { element =>
+        element.serverActions.foldLeft[ApiResult[ExecuteServerTutorialActionResult]] {
+          OkApiResult(ExecuteServerTutorialActionResult(user))
+        } {
+          case (OkApiResult(ExecuteServerTutorialActionResult(u)), serverAction) =>
+            executeServerTutorialAction(ExecuteServerTutorialActionRequest(u, platform, serverAction))
+          case (result, _) =>
+            result
+        }
+      }
+    } map { result =>
+      db.user.addClosedTutorialElement(user.id, platform.toString, elementId) ifSome { v =>
+        OkApiResult(CloseTutorialElementResult(OK, Some(v.profile)))
+      }
+    }
+  }
+
+  /**
+   * Executing server tutorial action
+   */
+  def executeServerTutorialAction(request: ExecuteServerTutorialActionRequest): ApiResult[ExecuteServerTutorialActionResult] = handleDbException {
+    import request._
+
+    serverAction.actionType match {
+      case TutorialServerActionType.RemoveDailyTasksSuppression =>
+        db.user.setDailyTasksSuppressed(
+          id = user.id,
+          platform = platform.toString,
+          suppressed = false) ifSome { user =>
+          OkApiResult(ExecuteServerTutorialActionResult(user))
+        }
+
+      case TutorialServerActionType.AssignDailyTasks =>
+        assignDailyTasks(AssignDailyTasksRequest(user)) map { r =>
+          OkApiResult(ExecuteServerTutorialActionResult(r.user))
+        }
+
+      case TutorialServerActionType.Dummy =>
+        OkApiResult(ExecuteServerTutorialActionResult(user))
+
+      case _ @ action =>
+        Logger.error(s"unknown server tutorial action $action")
+        OkApiResult(ExecuteServerTutorialActionResult(user))
+
     }
   }
 
@@ -164,38 +209,6 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
           }
         case None =>
           OkApiResult(AssignTutorialQuestResult(OutOfContent))
-      }
-    }
-  }
-
-  /**
-   * Creates tutorial battles for all solutions without battles.
-   */
-  def createTutorialBattles(request: CreateTutorialBattlesRequest): ApiResult[CreateTutorialBattlesResult] = handleDbException {
-    import request._
-
-    if (user.profile.tutorialStates(platform.toString).requestForTutorialBattlesUsed) {
-      OkApiResult(CreateTutorialBattlesResult(LimitExceeded))
-    } else {
-
-      db.user.setRequestForTutorialBattlesUsed(
-        id = user.id,
-        platform = platform.toString,
-        used = true) ifSome { user =>
-
-        user.stats.solvedQuests.valuesIterator.foldLeft[ApiResult[CreateTutorialBattlesResult]]{
-          OkApiResult(CreateTutorialBattlesResult(OK, Some(user.profile)))
-        } {
-          case (OkApiResult(result), solutionId) =>
-
-            db.solution.readById(solutionId) ifSome { solution =>
-              tryCreateBattle(TryCreateBattleRequest(solution = solution, useTutorialCompetitor = true))
-            } map {
-              OkApiResult(CreateTutorialBattlesResult(OK, Some(user.profile)))
-            }
-          case (_ @ badResult, _) =>
-            badResult
-        }
       }
     }
   }

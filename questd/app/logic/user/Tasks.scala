@@ -1,42 +1,54 @@
 package logic.user
 
+import java.util.Date
+
 import logic._
 import logic.constants._
 import logic.functions._
 import models.domain.common.Assets
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
-import models.domain.user.profile.{TaskType, Task, DailyTasks, Functionality}
+import models.domain.user.profile.{DailyTasks, Functionality, Task, TaskType}
 
 trait Tasks { this: UserLogic =>
 
   /**
-   * Cooldown for reseting tasks. Should be reset in nearest 5am at user's time.
+   * Cooldown for resetting tasks. Should be reset in nearest 5am at user's time.
    */
   def getResetTasksTimeout = nextFlipHourDate
 
+  def shouldAssignDailyTasks = {
+
+    if (user.schedules.dailyTasks.after(new Date())) {
+      false
+    } else if (user.profile.tutorialStates.valuesIterator.foldLeft(true){
+      case (false, _) => false
+      case (_, v) => v.dailyTasksSuppression
+    }) {
+      false
+    } else {
+      true
+    }
+  }
   /**
    * List of tasks to give user for next day.
    */
   def getTasksForTomorrow = {
-    if (user.profile.publicProfile.level < api.configNamed("Tutorial")(api.TutorialConfigParams.DailyTasksStartsFromLevel).toInt) {
-      DailyTasks(tasks = List.empty, reward = Assets())
-    } else {
-      val dailyRatingReward = dailyTasksRatingReward
-      val allTasksCoinsReward = dailyTasksCoinsReward
+    val dailyRatingReward = dailyTasksRatingReward
+    val allTasksCoinsReward = dailyTasksCoinsReward
 
-      val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
-        case Some(t) => t :: c
-        case None => c
-      })
+    val tasks = TaskType.values.foldLeft(List[Task]())((c, v) => taskGenerationAlgorithms(v)(user) match {
+      case Some(t) => t :: c
+      case None => c
+    })
 
-      val tasksWithRewards = tasks.map { t =>
-        t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = DailyTasksCoinsDeviation))
-      }
-
-      DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
+    val tasksWithRewards = tasks.map { t =>
+      t.copy(reward = allTasksCoinsReward / tasks.length * rand.nextGaussian(mean = 1, dev = DailyTasksCoinsDeviation))
     }
+
+    DailyTasks(tasks = tasksWithRewards, reward = dailyRatingReward)
   }
+
 
   /**
    * Calculates total daily salary in coins for all tasks.
@@ -63,9 +75,9 @@ trait Tasks { this: UserLogic =>
       TaskType.LikeQuests -> createLikeQuestsTask,
       TaskType.CreateQuest -> createCreateQuestTask,
       TaskType.ChallengeBattle -> createChallengeBattleTask,
-      TaskType.VoteReviews -> createVoteReviewsTask,
-      TaskType.SubmitReviewsForResults -> createSubmitReviewsForResultsTask,
-      TaskType.SubmitReviewsForQuests -> createSubmitReviewsForQuestsTask,
+      TaskType.VoteComments -> createVoteReviewsTask,
+      TaskType.PostComments -> createPostCommentsTask,
+      TaskType.VoteBattle -> createVoteBattlesTask,
       TaskType.GiveRewards -> createGiveRewardsTask,
       TaskType.LookThroughFriendshipProposals -> createReviewFriendshipRequestsTask,
       TaskType.Custom -> createClientTask)
@@ -150,6 +162,7 @@ trait Tasks { this: UserLogic =>
    */
   private def createCreateQuestTask(user: User) = ifHasRightTo(Functionality.SubmitPhotoQuests) {
     val taskProbability = api.config(api.DefaultConfigParams.CreateQuestTaskProbability).toDouble
+
     if (canProposeQuestToday && rand.nextDouble() < taskProbability)
       Some(Task(
         taskType = TaskType.CreateQuest,
@@ -169,37 +182,47 @@ trait Tasks { this: UserLogic =>
   /**
    * Algorithm for selecting task for voting reviews.
    */
-  private def createVoteReviewsTask(user: User) = ifHasRightTo(Functionality.VoteReviews) {
-    //    Some(Task(
-    //      taskType = TaskType.VoteReviews,
-    //      description = "",
-    //      requiredCount = 10))
+  private def createVoteReviewsTask(user: User) = ifHasRightTo(Functionality.VoteComments) {
+//        Some(Task(
+//          taskType = TaskType.VoteComments,
+//          description = "",
+//          requiredCount = 10))
     None
   }
 
-  /**
-   * Algorithm for generating tasks for submiting reviews for solutions.
-   */
-  private def createSubmitReviewsForResultsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForSolutions) {
-    //    Some(Task(
-    //      taskType = TaskType.SubmitReviewsForResults,
-    //      description = "",
-    //      requiredCount = 10))
-    None
-  }
 
   /**
-   * Algorithm for generating tasks for submiting reviews for proposals.
+   * Algorithm for generating tasks for submitting reviews for proposals.
    */
-  private def createSubmitReviewsForQuestsTask(user: User) = ifHasRightTo(Functionality.SubmitReviewsForQuests) {
+  private def createPostCommentsTask(user: User) = ifHasRightTo(Functionality.PostComments) {
     val taskProbability = api.config(api.DefaultConfigParams.WriteCommentTaskProbability).toDouble
     if (rand.nextDouble() < taskProbability)
       Some(Task(
-        taskType = TaskType.SubmitReviewsForQuests,
+        taskType = TaskType.PostComments,
         description = "",
         requiredCount = 1))
     else
       None
+  }
+
+  /**
+   * Algorithm for generating task for voting quests.
+   */
+  private def createVoteBattlesTask(user: User) = ifHasRightTo(Functionality.VoteBattles) {
+    // When we will record date of pos in timeline cap this amount by number of duels added during a day devided by 2.
+//    {
+//      val mean = api.config(api.DefaultConfigParams.SolutionVoteTaskCountMean).toDouble
+//      val dev = api.config(api.DefaultConfigParams.SolutionVoteTaskCountDeviation).toDouble
+//      math.round(rand.nextGaussian(mean, dev)).toInt
+//    } match {
+//      case likesCount if likesCount > 0 =>
+//        Some(Task(
+//          taskType = TaskType.VoteBattle,
+//          description = "",
+//          requiredCount = likesCount))
+//      case _ => None
+//    }
+    None
   }
 
   /**

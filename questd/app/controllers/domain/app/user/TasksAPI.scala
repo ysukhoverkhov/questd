@@ -11,6 +11,9 @@ import play.Logger
 case class ResetDailyTasksRequest(user: User)
 case class ResetDailyTasksResult(user: User)
 
+case class AssignDailyTasksRequest(user: User)
+case class AssignDailyTasksResult(user: User)
+
 case class UpdateDailyTasksCompletedFractionRequest(user: User)
 case class UpdateDailyTasksCompletedFractionResult(user: User)
 
@@ -24,21 +27,34 @@ private[domain] trait TasksAPI {
   this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
-   * Resets daily tasks.
+   * Resets daily tasks if it's allowed by logic.
    */
   def resetDailyTasks(request: ResetDailyTasksRequest): ApiResult[ResetDailyTasksResult] = handleDbException {
     import request._
+
+    if (user.shouldAssignDailyTasks) {
+      assignDailyTasks(AssignDailyTasksRequest(user)) map { r => OkApiResult(ResetDailyTasksResult(r.user)) }
+    } else {
+      OkApiResult(ResetDailyTasksResult(user))
+    }
+  }
+
+  /**
+   * Assigns new daily tasks disregarding everything.
+   */
+  def assignDailyTasks(request: AssignDailyTasksRequest): ApiResult[AssignDailyTasksResult] = handleDbException {
+    import request._
     val tutorialTasksToCarry =
-      user.profile.dailyTasks.tasks.filter(t => t.tutorialTaskId.isDefined && t.currentCount < t.requiredCount)
+      user.profile.dailyTasks.tasks.filter(t => t.tutorialTaskId.isDefined && !user.profile.dailyTasks.rewardReceived)
 
     db.user.resetTasks(user.id, user.getTasksForTomorrow, user.getResetTasksTimeout) ifSome { u =>
 
-      (if (tutorialTasksToCarry != List.empty) {
+      (if (tutorialTasksToCarry.nonEmpty) {
         db.user.addTasks(u.id, tutorialTasksToCarry)
       } else {
         Some(u)
       }) ifSome { u =>
-        OkApiResult(ResetDailyTasksResult(u))
+        OkApiResult(AssignDailyTasksResult(u))
       }
     }
   }

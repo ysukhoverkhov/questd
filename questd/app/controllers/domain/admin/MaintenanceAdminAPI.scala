@@ -4,8 +4,8 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import logic.QuestLogic
-import models.domain.quest.{QuestStatus, Quest}
-import models.domain.solution.SolutionStatus
+import models.domain.quest.{Quest, QuestStatus}
+import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.User
 
 case class CleanUpObjectsRequest()
@@ -31,6 +31,29 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       )
     }
 
+    def updateQuestSolutionsCount(quest: Quest): Quest = {
+      quest.copy(
+        solutionsCount = db.solution.allWithParams(questIds = List(quest.id)).size
+      )
+    }
+
+
+    def checkBanQuest(quest: Quest): Quest = {
+      if (quest.info.content.media.storage == "fb" && quest.status == QuestStatus.InRotation) {
+        quest.copy(status = QuestStatus.AdminBanned)
+      } else {
+        quest
+      }
+    }
+
+    def checkBanSolution(solution: Solution): Solution = {
+      if (solution.info.content.media.storage == "fb" && solution.status == SolutionStatus.InRotation) {
+        solution.copy(status = SolutionStatus.AdminBanned)
+      } else {
+        solution
+      }
+    }
+
     def rememberObjectToRemoveFromTimeline(objId: String): Unit = {
       objectsToRemove.append(objId)
     }
@@ -39,22 +62,23 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       user.copy(timeLine = user.timeLine.filterNot(p => objIds.contains(p.objectId)))
     }
 
-
     db.quest.all.foreach { quest =>
-      db.quest.update(
-        updateQuestValues(quest)
-      )
+      val updatedQuest = updateQuestSolutionsCount(updateQuestValues(checkBanQuest(quest)))
 
-      if (quest.status == QuestStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40,08"
-        rememberObjectToRemoveFromTimeline(quest.id)
+      db.quest.update(updatedQuest)
+
+      if (updatedQuest.status == QuestStatus.AdminBanned) {
+        rememberObjectToRemoveFromTimeline(updatedQuest.id)
       }
     }
 
     db.solution.all.foreach { solution =>
-      db.solution.update(solution)
+      val updatedSolution = checkBanSolution(solution)
 
-      if (solution.status == SolutionStatus.OldBanned) { // TODO: replace with AdminBanned in "0.40,08"
-        rememberObjectToRemoveFromTimeline(solution.id)
+      db.solution.update(updatedSolution)
+
+      if (updatedSolution.status == SolutionStatus.AdminBanned) {
+        rememberObjectToRemoveFromTimeline(updatedSolution.id)
       }
     }
 
@@ -66,6 +90,13 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       db.user.update(
         removeObjectsFromTimeline(user.initialized, objectsToRemove)
       )
+    }
+
+    db.tutorial.all.foreach { tutorial =>
+      db.tutorial.update(tutorial)
+//      tutorial.elements.foreach{ element =>
+//        db.tutorial.updateElement(tutorial.id, element.copy(actions = List(element.action, TutorialAction(TutorialActionType.CloseTutorialElement, params = Map("elementId" -> element.id)))))
+//      }
     }
 
     OkApiResult(CleanUpObjectsResult())

@@ -51,6 +51,8 @@ private object DebugWSImplTypes {
 
   type WSResetProfileDebugResult = ResetProfileDebugResult
 
+  type WSResolveAllBattlesResult = ResolveAllBattlesResult
+
   type WSResetTutorialResult = ResetTutorialResult
 }
 
@@ -254,6 +256,10 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
    */
   def resetProfile = wrapApiCallReturnBody[WSResetProfileDebugResult] { r =>
     api.resetProfileDebug(ResetProfileDebugRequest(r.user))
+  }
+
+  def resolveAllBattles = wrapApiCallReturnBody[WSResolveAllBattlesResult] { r =>
+    api.resolveAllBattles(ResolveAllBattlesRequest(r.user))
   }
 
   def generateErrorLog = wrapJsonApiCallReturnBody[WSDebugResult] { (js, r) =>

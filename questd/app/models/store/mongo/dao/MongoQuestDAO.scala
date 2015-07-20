@@ -6,7 +6,6 @@ import com.mongodb.casbah.commons.MongoDBObject
 import models.domain.quest.{Quest, QuestStatus}
 import models.store.dao._
 import models.store.mongo.helpers._
-import play.Logger
 
 /**
  * DOA for Quest objects
@@ -71,8 +70,6 @@ private[mongo] class MongoQuestDAO
     if (withSolutions) {
       queryBuilder += ("solutionsCount" -> MongoDBObject("$gt" -> 0))
     }
-
-    Logger.trace("DB - allWithParams - " + queryBuilder.result)
 
     findByExample(
       queryBuilder.result(),

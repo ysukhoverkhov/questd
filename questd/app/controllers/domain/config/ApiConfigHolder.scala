@@ -20,6 +20,8 @@ class _DefaultConfigParams {
   val QuestVoteTaskCountDeviation = "30 32 Quest Vote Task Count Deviation"
   val CreateQuestTaskProbability = "30 41 Create Quest Task Probability"
   val WriteCommentTaskProbability = "30 42 Write Comment Task Probability"
+  val BattleVoteTaskCountMean = "30 51 Battle Vote Task Count Mean"
+  val BattleVoteTaskCountDeviation = "30 52 Battle Vote Task Count Deviation"
 
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
@@ -47,8 +49,21 @@ class _DefaultConfigParams {
   val QuestProbabilityFollowing = "72 02 Probability of quests from Following"
   val QuestProbabilityVIP = "72 04 Probability of quests from Vips"
 
-  var TimeLineRandomQuestsDaily = "80 01 TimeLine Random Quests Daily"
-  var TimeLineRandomSolutionsDaily = "80 02 TimeLine Random Solutions Daily"
+  var TimeLineRandomQuestsDailyMean = "80 01 TimeLine Random Quests Daily Mean"
+  var TimeLineRandomQuestsDailyMeanFirstTime = "80 02 TimeLine Random Quests Daily Mean First Time"
+  var TimeLineRandomQuestsDailyDeviation = "80 03 TimeLine Random Quests Daily Deviation"
+  var TimeLineRandomQuestsDailyMin = "80 04 TimeLine Random Quests Daily Min"
+
+  var TimeLineRandomSolutionsDailyMean = "80 11 TimeLine Random Solutions Daily Mean"
+  var TimeLineRandomSolutionsDailyMeanFirstTime = "80 12 TimeLine Random Solutions Daily Mean First Time"
+  var TimeLineRandomSolutionsDailyDeviation = "80 13 TimeLine Random Solutions Daily Deviation"
+  var TimeLineRandomSolutionsDailyMin = "80 14 TimeLine Random Solutions Daily Min"
+
+  var TimeLineRandomBattlesDailyMean = "80 21 TimeLine Random Battles Daily Mean"
+  var TimeLineRandomBattlesDailyMeanFirstTime = "80 22 TimeLine Random Battles Daily Mean First Time"
+  var TimeLineRandomBattlesDailyDeviation = "80 23 TimeLine Random Battles Daily Deviation"
+  var TimeLineRandomBattlesDailyMin = "80 24 TimeLine Random Battles Daily Min"
+
   var TimeLineRandomBattlesDaily = "80 03 TimeLine Random Battles Daily"
 
   val SolutionProbabilityLevelsToGiveStartingSolutions = "91 01 Level to give starting Solutions"
@@ -71,7 +86,6 @@ class _DefaultConfigParams {
 }
 
 class _TutorialConfigParams {
-  val DailyTasksStartsFromLevel = "01 01 Daily Tasks Starts From Level"
   val TutorialQuestId = "05 01 Tutorial Quest Id"
 }
 
@@ -95,14 +109,17 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.ActiveUserDays -> "7",
             DefaultConfigParams.DefaultCultureId -> "68349b7a-20ee-4f6e-8406-f468b30be783",
 
-            DefaultConfigParams.SolutionVoteTaskCountMean -> "3",
-            DefaultConfigParams.SolutionVoteTaskCountDeviation -> "1",
+            DefaultConfigParams.SolutionVoteTaskCountMean -> "1",
+            DefaultConfigParams.SolutionVoteTaskCountDeviation -> "0.5",
             DefaultConfigParams.CreateSolutionTaskProbability -> "0.5",
             DefaultConfigParams.AddToFollowingTaskProbability -> "0.3",
             DefaultConfigParams.QuestVoteTaskCountMean -> "2",
             DefaultConfigParams.QuestVoteTaskCountDeviation -> "0.5",
             DefaultConfigParams.CreateQuestTaskProbability -> "0.3",
             DefaultConfigParams.WriteCommentTaskProbability -> "0.3",
+            DefaultConfigParams.BattleVoteTaskCountMean -> "3",
+            DefaultConfigParams.BattleVoteTaskCountDeviation -> "1",
+
 
             DefaultConfigParams.FavoriteThemesShare -> "0.2",
             DefaultConfigParams.FavoriteThemesProbability -> "0.75",
@@ -130,9 +147,20 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.QuestProbabilityFollowing -> "0.30",
             DefaultConfigParams.QuestProbabilityVIP -> "0.10",
 
-            DefaultConfigParams.TimeLineRandomQuestsDaily -> "5",
-            DefaultConfigParams.TimeLineRandomSolutionsDaily -> "5",
-            DefaultConfigParams.TimeLineRandomBattlesDaily -> "5",
+            DefaultConfigParams.TimeLineRandomQuestsDailyMean -> "5",
+            DefaultConfigParams.TimeLineRandomQuestsDailyMeanFirstTime -> "15",
+            DefaultConfigParams.TimeLineRandomQuestsDailyDeviation -> "1",
+            DefaultConfigParams.TimeLineRandomQuestsDailyMin -> "4",
+
+            DefaultConfigParams.TimeLineRandomSolutionsDailyMean -> "5",
+            DefaultConfigParams.TimeLineRandomSolutionsDailyMeanFirstTime -> "15",
+            DefaultConfigParams.TimeLineRandomSolutionsDailyDeviation -> "1",
+            DefaultConfigParams.TimeLineRandomSolutionsDailyMin -> "4",
+
+            DefaultConfigParams.TimeLineRandomBattlesDailyMean -> "3",
+            DefaultConfigParams.TimeLineRandomBattlesDailyMeanFirstTime -> "0",
+            DefaultConfigParams.TimeLineRandomBattlesDailyDeviation -> "1",
+            DefaultConfigParams.TimeLineRandomBattlesDailyMin -> "1",
 
             DefaultConfigParams.SolutionProbabilityLevelsToGiveStartingSolutions -> "5",
             DefaultConfigParams.SolutionProbabilityStartingVIPSolutions -> "0.5",
@@ -155,7 +183,6 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     "Tutorial" -> ConfigSection(
       "Tutorial",
       Map(
-        TutorialConfigParams.DailyTasksStartsFromLevel -> "3", // TODO: change the level with updating tutorial.
         TutorialConfigParams.TutorialQuestId -> "tutorial_1"
       ))
   )

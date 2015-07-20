@@ -18,7 +18,8 @@ trait SolutionDAO extends BaseDAO[Solution] {
     idsExclude: List[String] = List.empty,
     questIds: List[String] = List.empty,
     themeIds: List[String] = List.empty,
-    cultureId: Option[String] = None): Iterator[Solution]
+    cultureId: Option[String] = None,
+    withBattles: Option[Boolean] = None): Iterator[Solution]
 
   def updateStatus(
     id: String,

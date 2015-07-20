@@ -63,10 +63,10 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         idsExclude = any,
         questIds = any,
         themeIds = any,
-        cultureId = any) returns List.empty.iterator
+        cultureId = any,
+        withBattles = any) returns Iterator.empty
 
       val result = api.solveQuest(SolveQuestRequest(u, q.id, s))
-
 
       result must beAnInstanceOf[OkApiResult[SolveQuestResult]]
       result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)

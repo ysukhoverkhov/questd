@@ -99,11 +99,11 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               //                  addToMustVoteSolutions(AddToMustVoteSolutionsRequest(u, request.friendsToHelp, solution.id))
             } map { r =>
               {
-                val numberOfReviewedQuests = u.timeLine.count { te =>
+                val numberOfReviewedQuests = r.user.timeLine.count { te =>
                   ((te.objectType == TimeLineType.Quest)
-                    && (te.actorId != u.id || te.reason != TimeLineReason.Created))
+                    && (te.actorId != r.user.id || te.reason != TimeLineReason.Created))
                 }
-                val numberOfSolvedQuests = u.stats.solvedQuests.size
+                val numberOfSolvedQuests = r.user.stats.solvedQuests.size
 
                 // Updating quest points.
                 val ratio = if (numberOfSolvedQuests == 0)
@@ -114,8 +114,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                     config(DefaultConfigParams.QuestMaxTimeLinePointsForSolve).toInt)
 
                 solveQuestUpdate(SolveQuestUpdateRequest(questToSolve, ratio, newSolution.id))
-              } map {
-                tryCreateBattle(TryCreateBattleRequest(newSolution, useTutorialCompetitor = false))
               } map {
 
                 // Giving reward to author of the quest.

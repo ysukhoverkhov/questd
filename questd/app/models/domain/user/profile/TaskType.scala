@@ -10,10 +10,11 @@ object TaskType extends Enumeration {
   val AddToFollowing = Value
   val CreateQuest = Value
   val ChallengeBattle = Value
+  val PostComments = Value
+  val VoteComments = Value
 
-  val VoteReviews = Value
-  val SubmitReviewsForResults = Value
-  val SubmitReviewsForQuests = Value
+  val VoteBattle = Value
+
   val GiveRewards = Value
   val LookThroughFriendshipProposals = Value
 

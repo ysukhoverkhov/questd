@@ -4,7 +4,6 @@ import com.mongodb.casbah.commons.MongoDBObject
 import models.domain.comment.Comment
 import models.store.dao._
 import models.store.mongo.helpers._
-import play.Logger
 
 /**
  * DOA for Comments
@@ -26,8 +25,6 @@ private[mongo] class MongoCommentDAO
     if (commentedObjectId.nonEmpty) {
       queryBuilder += ("info.commentedObjectId" -> MongoDBObject("$in" -> commentedObjectId))
     }
-
-    Logger.trace("MongoCommentDAO - allWithParams - " + queryBuilder.result)
 
     findByExample(
       example = queryBuilder.result(),

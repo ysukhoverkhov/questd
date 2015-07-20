@@ -45,11 +45,6 @@ private object TutorialWSImplTypes {
 
   type WSAssignTutorialQuestResult = AssignTutorialQuestResult
 
-
-  case class WSCreateTutorialBattlesRequest(
-    platform: String)
-
-  type WSCreateTutorialBattlesResult = CreateTutorialBattlesResult
 }
 
 trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
@@ -87,12 +82,6 @@ trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSCompo
     val v = Json.read[WSAssignTutorialQuestRequest](js)
 
     api.assignTutorialQuest(AssignTutorialQuestRequest(r.user, TutorialPlatform.withNameEx(v.platform), v.questId))
-  }
-
-  def createTutorialBattles = wrapJsonApiCallReturnBody[WSCreateTutorialBattlesResult] { (js, r) =>
-    val v = Json.read[WSCreateTutorialBattlesRequest](js)
-
-    api.createTutorialBattles(CreateTutorialBattlesRequest(r.user, TutorialPlatform.withNameEx(v.platform)))
   }
 }
 
