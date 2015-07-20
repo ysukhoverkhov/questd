@@ -22,8 +22,7 @@ trait Challenges { this: UserLogic =>
     lazy val alreadyHasRequest = user.battleRequests
       .exists(br => (br.mySolutionId == mySolution.id) && (br.opponentSolutionId == opponentSolution.id))
 
-    // TODO: get the period in config.
-    lazy val battleCreationDelay = 1
+    lazy val battleCreationDelay = api.config(api.DefaultConfigParams.BattleCreationDelay).toInt
 
     if (mySolution.info.authorId == opponentSolution.info.authorId)
       OutOfContent
