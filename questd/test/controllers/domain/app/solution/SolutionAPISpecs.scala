@@ -1,10 +1,10 @@
 package controllers.domain.app.solution
 
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.user._
 import logic.SolutionLogic
-import models.domain.common.Assets
+import models.domain.battle.BattleStatus
+import models.domain.common.{ContentVote, Assets}
 import models.domain.quest.QuestStatus
 import models.domain.solution.SolutionStatus
 import models.domain.user.User
@@ -121,19 +121,59 @@ class SolutionAPISpecs extends BaseAPISpecs {
       there was one(user).removeEntryFromTimeLineByObjectId(mEq(user1.id), mEq(sol.id))
     }
 
-    "setQuestBookmark does it" in context {
-      val q = createQuestStub(id = "qid")
-      val u = User(id = "uid")
+    "Do not negative votes for solutions in battles" in context {
+      val battleId = "battleId"
+      val s = createSolutionStub(battleIds = List(battleId))
 
-      quest.readById(q.id) returns Some(q)
-      user.setQuestBookmark(any, any) returns Some(u)
+      battle.readById(battleId) returns Some(createBattleStub(
+        id = battleId,
+        status = BattleStatus.Fighting))
 
-      val result = api.bookmarkQuest(BookmarkQuestRequest(u, q.id))
+      val result = api.voteSolution(VoteSolutionRequest(solution = s, isFriend = false, vote = ContentVote.Cheating))
 
-      result must beEqualTo(OkApiResult(BookmarkQuestResult(ProfileModificationResult.OK, Some(u.profile))))
-      there was one(quest).readById(q.id)
-      there was one(user).setQuestBookmark(any, any)
+      result must beEqualTo(OkApiResult(VoteSolutionResult()))
+
+      there was one(battle).readById(battleId)
+
+      there was no(solution).updatePoints(
+        id = any,
+        timelinePointsChange = any,
+        likesChange = any,
+        votersCountChange = any,
+        cheatingChange = any,
+        spamChange = any,
+        pornChange = any)
     }
+
+    "Do like votes for solutions in battles" in context {
+      val battleId = "battleId"
+      val s = createSolutionStub(battleIds = List(battleId))
+
+      solution.updatePoints(
+        id = mEq(s.id),
+        timelinePointsChange = any,
+        likesChange = any,
+        votersCountChange = any,
+        cheatingChange = any,
+        spamChange = any,
+        pornChange = any) returns Some(s)
+
+      val result = api.voteSolution(VoteSolutionRequest(solution = s, isFriend = false, vote = ContentVote.Cool))
+
+      result must beEqualTo(OkApiResult(VoteSolutionResult()))
+
+      there was no(battle).readById(battleId)
+
+      there was one(solution).updatePoints(
+        id = mEq(s.id),
+        timelinePointsChange = any,
+        likesChange = any,
+        votersCountChange = any,
+        cheatingChange = any,
+        spamChange = any,
+        pornChange = any)
+    }
+
   }
 }
 

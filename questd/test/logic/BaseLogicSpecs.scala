@@ -77,6 +77,9 @@ private[logic] abstract class BaseLogicSpecs extends Specification
     configSection.apply(api.DefaultConfigParams.FavoriteThemesShare) returns "0.20"
     configSection.apply(api.DefaultConfigParams.FavoriteThemesProbability) returns "0.75"
 
+    configSection.apply(api.DefaultConfigParams.FavoriteThemesProbability) returns "0.75"
+    configSection.apply(api.DefaultConfigParams.BattleCreationDelay) returns "24"
+
     configSection
   }
 
@@ -93,5 +96,4 @@ private[logic] abstract class BaseLogicSpecs extends Specification
     api.configNamed("Tutorial") returns createStubTutorialConfig
   }
 }
-
 
