@@ -173,7 +173,6 @@ class SolutionAPISpecs extends BaseAPISpecs {
         spamChange = any,
         pornChange = any)
     }
-
   }
 }
 

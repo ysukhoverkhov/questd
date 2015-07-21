@@ -127,10 +127,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
     Logger.trace(s"Populating time line for user ${user.id}")
 
     def itemsCount(mean: Double, dev: Double, min: Double): Int = {
-      math.round(rand.nextGaussian(mean, dev)) match {
-        case a if a < min => min.toInt
-        case a => a.toInt
-      }
+      math.round(rand.nextGaussian(mean, dev, min)).toInt
     }
 
     def questsCount: Int = {

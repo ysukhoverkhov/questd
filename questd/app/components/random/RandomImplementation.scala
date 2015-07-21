@@ -10,6 +10,13 @@ private[random] class RandomImplementation {
 
   def nextDouble() = _rand.nextDouble()
 
-  def nextGaussian(mean: Double = 0, dev: Double = 1) = _rand.nextGaussian() * dev + mean
+  def nextGaussian(mean: Double, dev: Double) = _rand.nextGaussian() * dev + mean
+
+  def nextGaussian(mean: Double = 0, dev: Double = 1, min: Double = Double.MinValue): Double = {
+    nextGaussian(mean, dev) match {
+      case a if a < min => min
+      case a => a
+    }
+  }
 }
 

@@ -45,6 +45,10 @@ class _DefaultConfigParams {
   val SolutionMinIACVotes = "60 16 Solution min IAC Votes"
   val BattleCreationDelay = "60 21 Battle Creation Delay"
 
+  // Battles
+  val BattleMinVotesCount = "65 10 Battle Min Votes Count"
+  val BattleAdditionalVotesMean = "65 11 Battle Additional Votes Mean"
+  val BattleAdditionalVotesDeviation = "65 12 Battle Additional Votes Deviation"
 
   // Timeline
   val QuestProbabilityLevelsToGiveStartingQuests = "71 01 Level to give starting quests"
@@ -144,6 +148,10 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.SolutionIACRatio -> "0.03",
             DefaultConfigParams.SolutionMinIACVotes -> "5",
             DefaultConfigParams.BattleCreationDelay -> "24",
+
+            DefaultConfigParams.BattleMinVotesCount -> "1",
+            DefaultConfigParams.BattleAdditionalVotesMean -> "5",
+            DefaultConfigParams.BattleAdditionalVotesDeviation -> "4",
 
             DefaultConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "7",
             DefaultConfigParams.QuestProbabilityStartingVIPQuests -> "0.5",
