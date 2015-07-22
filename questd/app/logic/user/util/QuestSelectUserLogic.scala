@@ -33,27 +33,26 @@ trait QuestSelectUserLogic { this: UserLogic =>
     selectFromChain(algorithms)
   }
 
-  private[user] def getTutorialQuests: Option[Iterator[Quest]] = {
-    Logger.trace("getTutorialQuests returns None since no client side tutorial is for now")
-    None
-//    val tutorialQuestId = api.configNamed("Tutorial")(api.TutorialConfigParams.TutorialQuestId)
-//
-//    if (user.timeLine.exists(_.objectId == tutorialQuestId) || user.profile.publicProfile.level > 1) {
-//      Logger.trace("  returning None since it's already there")
-//      None
-//    } else {
-//      Logger.trace("  adding tutorial quest (if it'll be found)")
-//      val maybeQuests = checkNotEmptyIterator(
-//        Some(
-//          api.getAllQuests(
-//            GetAllQuestsRequest(
-//              user = user,
-//              status = QuestStatus.ForTutorial,
-//              cultureId = None,
-//              ids = List(tutorialQuestId))).body.get.quests))
-//      if (maybeQuests.isEmpty) Logger.error(s"Tutorial quest not found but it should be!")
-//      maybeQuests
-//    }
+  private[user] def getTutorialQuests(implicit selected: List[Quest]): Option[Iterator[Quest]] = {
+    lazy val tutorialQuestId = api.configNamed("Tutorial")(api.TutorialConfigParams.TutorialQuestId)
+    lazy val existing = selected.map(_.id) ::: user.timeLine.map(_.objectId)
+
+    if (user.profile.publicProfile.level > 1 || existing.contains(tutorialQuestId)) {
+      Logger.trace("  returning None since it's already there or level is too high")
+      None
+    } else {
+      Logger.trace("  adding tutorial quest (if it'll be found)")
+      val maybeQuests = checkNotEmptyIterator(
+        Some(
+          api.getAllQuests(
+            GetAllQuestsRequest(
+              user = user,
+              status = QuestStatus.ForTutorial,
+              cultureId = None,
+              ids = List(tutorialQuestId))).body.get.quests))
+      if (maybeQuests.isEmpty) Logger.error(s"Tutorial quest not found but it should be!")
+      maybeQuests
+    }
   }
 
   private[user] def getStartingQuests(implicit selected: List[Quest]): Option[Iterator[Quest]] = {
