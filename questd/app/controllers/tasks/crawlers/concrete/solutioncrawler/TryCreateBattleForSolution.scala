@@ -21,7 +21,6 @@ class TryCreateBattleForSolution(
 
   protected def check(solution: Solution) = {
     // Here are solutions without battles only.
-    // TODO: remove this after log will be received.
     api.tryCreateBattle(TryCreateBattleRequest(solution))
   }
 }
