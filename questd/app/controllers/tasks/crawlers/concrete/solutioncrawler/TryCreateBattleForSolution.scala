@@ -6,7 +6,6 @@ import controllers.domain._
 import controllers.domain.app.user.TryCreateBattleRequest
 import controllers.tasks.crawlers.base.BaseCrawler
 import models.domain.solution.Solution
-import play.Logger
 
 object TryCreateBattleForSolution {
   def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
@@ -22,9 +21,7 @@ class TryCreateBattleForSolution(
 
   protected def check(solution: Solution) = {
     // Here are solutions without battles only.
-    Logger.error(s"Crawler tries to create battle ${solution.id}")
     api.tryCreateBattle(TryCreateBattleRequest(solution))
-    Logger.error(s"Crawler finished tries to create battle ${solution.id}")
   }
 }
 
