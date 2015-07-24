@@ -106,7 +106,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
         OkApiResult(ExecuteServerTutorialActionResult(user))
 
       case _ @ action =>
-        Logger.error(s"unknown server tutorial action $action")
+        Logger.error(s"Unknown server tutorial action $action")
         OkApiResult(ExecuteServerTutorialActionResult(user))
 
     }

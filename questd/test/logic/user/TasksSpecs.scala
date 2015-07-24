@@ -4,7 +4,6 @@ import logic.BaseLogicSpecs
 import models.domain.user._
 import models.domain.user.friends.{Friendship, FriendshipStatus}
 import models.domain.user.profile._
-import play.api.Logger
 import testhelpers.domainstubs._
 
 class TasksSpecs extends BaseLogicSpecs {
@@ -118,7 +117,7 @@ class TasksSpecs extends BaseLogicSpecs {
 
       val u = createUser(12)
       val dailyResult = u.getTasksForTomorrow
-Logger.error(s"$dailyResult") // TODO: remove.
+
       u.canSolveQuestToday must beEqualTo(true)
 
       val t = dailyResult.tasks.find(_.taskType == TaskType.CreateQuest)

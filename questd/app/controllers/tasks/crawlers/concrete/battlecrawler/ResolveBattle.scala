@@ -7,8 +7,6 @@ import controllers.domain.app.battle.UpdateBattleStateRequest
 import controllers.tasks.crawlers.base.BaseCrawler
 import models.domain.battle.Battle
 
-//import org.joda.time.DateTime
-
 object ResolveBattle {
   def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
     Props(classOf[ResolveBattle], api, rand)

@@ -67,7 +67,7 @@ private[domain] trait UserAPI { this: DomainAPIComponent#DomainAPI with DBAccess
     val appsToAdd = request.snUser.idsInOtherApps.filter{ a =>
       request.user.auth.loginMethods.find(lp => lp.methodName == request.snUser.snName) match {
         case None =>
-          Logger.error(s"LOgin method is not present in profile but we've just logged in with it: ${request.snUser.snName}")
+          Logger.error(s"Login method is not present in profile but we've just logged in with it: ${request.snUser.snName}")
           false
         case Some(lm) =>
           !lm.crossPromotion.apps.exists(storedApp => storedApp.appName == a.appName)

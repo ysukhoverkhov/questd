@@ -22,6 +22,7 @@ class TryCreateBattleForSolution(
 
   protected def check(solution: Solution) = {
     // Here are solutions without battles only.
+    // TODO: remove this after log will be received.
     Logger.error(s"Crawler tries to create battle ${solution.id}")
     api.tryCreateBattle(TryCreateBattleRequest(solution))
     Logger.error(s"Crawler finished tries to create battle ${solution.id}")
