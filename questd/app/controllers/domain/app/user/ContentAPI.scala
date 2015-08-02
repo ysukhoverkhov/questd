@@ -160,11 +160,18 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get all quests for a user.
    */
   def getQuestsForUser(request: GetQuestsForUserRequest): ApiResult[GetQuestsForUserResult] = handleDbException {
+    import request._
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
+    val adjustedStatuses = if (request.userId == user.id) {
+      status
+    } else {
+      List(QuestStatus.InRotation)//request.status.filter(Set(QuestStatus.InRotation).contains)
+    }
+
     val questsForUser = db.quest.allWithParams(
-      status = request.status.filter(Set(QuestStatus.InRotation).contains),
+      status = adjustedStatuses,
       authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
@@ -183,11 +190,18 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get all solutions for a user.
    */
   def getSolutionsForUser(request: GetSolutionsForUserRequest): ApiResult[GetSolutionsForUserResult] = handleDbException {
+    import request._
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
+    val adjustedStatuses = if (request.userId == user.id) {
+      status
+    } else {
+      List(SolutionStatus.InRotation) //request.status.filter(Set(SolutionStatus.InRotation).contains)
+    }
+
     val solutionsForUser = db.solution.allWithParams(
-      status = request.status.filter(Set(SolutionStatus.InRotation).contains),
+      status = adjustedStatuses,
       authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
@@ -214,7 +228,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
     val solutionsForQuest = db.solution.allWithParams(
-      status = request.status.filter(Set(SolutionStatus.InRotation).contains),
+      status = List(SolutionStatus.InRotation), // request.status.filter(Set(SolutionStatus.InRotation).contains),
       questIds = List(request.questId),
       skip = pageNumber * pageSize)
 
