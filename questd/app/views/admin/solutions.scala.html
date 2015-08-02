@@ -1,0 +1,30 @@
+@(menuItems: Map[String, String], solutions: List[models.domain.solution.Solution])
+
+@import helper._
+
+@main("Solutions")(menuItems, Map.empty) {
+
+	<table border="1">
+	    	<tr>
+	    		<td>questId</td>
+	    		<td>status</td>
+	    		<td>votersCount</td>
+	    		<td>timelinePoints</td>
+	    		<td>cheating</td>
+	    		<td>content</td>
+	    	</tr>
+		@for(s <- solutions) {
+	    	<tr>
+	    		<td>@s.info.questId</td>
+	    		<td>@s.status</td>
+	    		<td>@s.rating.votersCount</td>
+	    		<td>@s.rating.timelinePoints</td>
+	    		<td>@s.rating.cheating</td>
+	    		<td><img style="max-width: 204px; height: auto; " src="@s.info.content.media.reference" alt="@s.info.content.media.reference" ></td>
+	    	</tr>
+	    }
+	</table>
+
+}
+
+
