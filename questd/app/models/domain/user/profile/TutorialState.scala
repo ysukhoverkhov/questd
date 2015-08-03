@@ -6,6 +6,6 @@ package models.domain.user.profile
 case class TutorialState(
   closedElementIds: List[String] = List.empty,
   usedTutorialTaskIds: List[String] = List.empty,
-  usedTutorialQuestIds: List[String] = List.empty,
+  usedTutorialQuestIds: List[String] = List.empty, // TODO: perhaps remove me.
   dailyTasksSuppression: Boolean = true
   )

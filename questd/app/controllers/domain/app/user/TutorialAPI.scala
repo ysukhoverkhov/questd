@@ -181,7 +181,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
   /**
    * Assigns new tutorial quest by client's request.
-   */
+   */ // TODO: perhaps remove me.
   def assignTutorialQuest(request: AssignTutorialQuestRequest): ApiResult[AssignTutorialQuestResult] = handleDbException {
     import request._
 
