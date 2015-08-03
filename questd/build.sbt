@@ -1,11 +1,11 @@
-import play.PlayScala
-import spray.http.DateTime
 
 name := """questd"""
 
-version := "0.40.09-SNAPSHOT"
+version := "0.40.10-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val root = (project in file(".")).
+  enablePlugins(PlayScala).
+  enablePlugins(BuildInfoPlugin)
 
 scalaVersion := "2.11.7"
 
@@ -46,24 +46,17 @@ libraryDependencies += "javax.mail" % "mail" % "1.4.7"
 
 // fork in run := true
 
-
-buildInfoSettings
-
-sourceGenerators in Compile <+= buildInfo
-
 buildInfoKeys := Seq[BuildInfoKey](
   name,
   version,
   buildInfoBuildNumber,
-  BuildInfoKey.action("buildTime") {
-    DateTime.now
-  },
   scalaVersion,
   sbtVersion
   )
 
-buildInfoPackage := "misc"
+buildInfoOptions += BuildInfoOption.BuildTime
 
+buildInfoPackage := "misc"
 
 
 
