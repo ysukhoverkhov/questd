@@ -1,8 +1,8 @@
-@(menuItems: Map[String, String], themes: List[models.domain.tag.Theme], cultures: List[models.domain.culture.Culture], newThemeForm: Form[controllers.web.admin.component.ThemeForm])
+@(menuItems: Map[String, String], themes: List[models.domain.tag.Theme], cultures: List[models.domain.culture.Culture], newThemeForm: Form[controllers.web.admin.component.ThemeForm])(implicit messages: Messages)
 
 @import helper._
 
-@main("Themes")(menuItems, Map.empty) {
+@body("Themes")(menuItems, Map.empty) {
 
 	<p>
 		@form(action = controllers.web.admin.routes.ThemesCRUD.createThemeCB()) {

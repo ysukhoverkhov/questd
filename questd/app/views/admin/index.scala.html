@@ -1,6 +1,6 @@
-@(menuItems: Map[String, String])
+@(menuItems: Map[String, String])(implicit messages: Messages)
 
-@main("Home")(menuItems, Map.empty) {
+@body("Home")(menuItems, Map.empty) {
     <p>
         @{misc.BuildInfo}
     </p>

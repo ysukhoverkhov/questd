@@ -2,11 +2,12 @@ package controllers.web.admin.component
 
 import controllers.domain.admin._
 import controllers.domain.{DomainAPIComponent, OkApiResult}
-import models.domain._
 import models.domain.culture.Culture
 import play.api.data.Forms._
 import play.api.data._
 import play.api.mvc._
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 case class CultureForm(
   id: String,
