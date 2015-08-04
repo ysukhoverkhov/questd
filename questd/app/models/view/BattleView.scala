@@ -3,6 +3,8 @@ package models.view
 import models.domain.battle.BattleInfo
 
 case class BattleView (
-    id: String,
-    info: BattleInfo)
+  id: String,
+  info: BattleInfo,
+  myVote: Option[String]
+  )
 

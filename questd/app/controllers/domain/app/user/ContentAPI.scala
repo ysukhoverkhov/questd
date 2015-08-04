@@ -8,7 +8,7 @@ import models.domain.battle.BattleStatus
 import models.domain.quest.QuestStatus
 import models.domain.solution.SolutionStatus
 import models.domain.user.User
-import models.view.{BattleView, QuestView, ProfileView, SolutionView}
+import models.view.{BattleView, ProfileView, QuestView, SolutionView}
 
 case class GetQuestsRequest(user: User, questIds: List[String])
 case class GetQuestsResult(
@@ -142,7 +142,12 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetBattlesResult(
       OK,
-      db.battle.readManyByIds(battleIds.take(maxPageSize)).map(b => BattleView(b.id, b.info)).toList))
+      db.battle.readManyByIds(battleIds.take(maxPageSize)).map{ b =>
+        BattleView(
+          b.id,
+          b.info,
+          user.stats.votedBattles.get(b.id))
+      }.toList))
   }
 
   /**
@@ -260,7 +265,10 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       skip = pageNumber * pageSize)
 
     val battles = battlesForUser.take(pageSize).toList.map( b => {
-      BattleView(b.id, b.info)
+      BattleView(
+        b.id,
+        b.info,
+        request.user.stats.votedBattles.get(b.id))
     })
 
     OkApiResult(GetBattlesForUserResult(
@@ -282,8 +290,11 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       solutionIds = List(request.solutionId),
       skip = pageNumber * pageSize)
 
-    val battles = battlesForSolution.take(pageSize).toList.map(s => {
-      BattleView(s.id, s.info)
+    val battles = battlesForSolution.take(pageSize).toList.map(b => {
+      BattleView(
+        b.id,
+        b.info,
+        request.user.stats.votedBattles.get(b.id))
     })
 
     OkApiResult(GetBattlesForSolutionResult(
