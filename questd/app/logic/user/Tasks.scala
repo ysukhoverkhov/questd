@@ -176,7 +176,15 @@ trait Tasks { this: UserLogic =>
    * Create tasks for challenging people.
    */
   private def createChallengeBattleTask(user: User) = ifHasRightTo(Functionality.ChallengeBattles) {
-    None
+    val taskProbability = api.config(api.DefaultConfigParams.CreateQuestTaskProbability).toDouble
+
+    if (rand.nextDouble() < taskProbability)
+      Some(Task(
+        taskType = TaskType.ChallengeBattle,
+        description = "",
+        requiredCount = 1))
+    else
+      None
   }
 
   /**
