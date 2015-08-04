@@ -5,6 +5,6 @@ import models.domain.battle.BattleInfo
 case class BattleView (
   id: String,
   info: BattleInfo,
-  myVote: Option[String]
+  myVotedSolutionId: Option[String]
   )
 
