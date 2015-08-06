@@ -217,20 +217,15 @@ trait Tasks { this: UserLogic =>
    * Algorithm for generating task for voting quests.
    */
   private def createVoteBattlesTask(user: User) = ifHasRightTo(Functionality.VoteBattles) {
-    // When we will record date of pos in timeline cap this amount by number of duels added during a day devided by 2.
-//    {
-//      val mean = api.config(api.DefaultConfigParams.SolutionVoteTaskCountMean).toDouble
-//      val dev = api.config(api.DefaultConfigParams.SolutionVoteTaskCountDeviation).toDouble
-//      math.round(rand.nextGaussian(mean, dev)).toInt
-//    } match {
-//      case likesCount if likesCount > 0 =>
-//        Some(Task(
-//          taskType = TaskType.VoteBattle,
-//          description = "",
-//          requiredCount = likesCount))
-//      case _ => None
-//    }
-    None
+    val taskProbability = api.config(api.DefaultConfigParams.BattleVoteTaskProbability).toDouble
+    if (rand.nextDouble() < taskProbability)
+      Some(Task(
+        taskType = TaskType.VoteBattle,
+        description = "",
+        requiredCount = 1))
+    else
+      None
+
   }
 
   /**

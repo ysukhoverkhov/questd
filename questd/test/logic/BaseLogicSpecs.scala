@@ -74,6 +74,7 @@ private[logic] abstract class BaseLogicSpecs extends Specification
     configSection.apply(api.DefaultConfigParams.CreateQuestTaskProbability) returns "0.3"
     configSection.apply(api.DefaultConfigParams.WriteCommentTaskProbability) returns "0.3"
     configSection.apply(api.DefaultConfigParams.ChallengeBattleTaskProbability) returns "0.3"
+    configSection.apply(api.DefaultConfigParams.BattleVoteTaskProbability) returns "0.3"
 
     configSection.apply(api.DefaultConfigParams.FavoriteThemesShare) returns "0.20"
     configSection.apply(api.DefaultConfigParams.FavoriteThemesProbability) returns "0.75"
