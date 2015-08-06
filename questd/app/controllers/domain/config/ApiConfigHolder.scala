@@ -97,7 +97,7 @@ class _DefaultConfigParams {
 }
 
 class _TutorialConfigParams {
-  val TutorialQuestId = "05 01 Tutorial Quest Id"
+  val TutorialQuestId = "05 01 Tutorial Quest Id" // TODO: remove the constant since it's not used.
 }
 
 object _DefaultConfigParams extends _DefaultConfigParams

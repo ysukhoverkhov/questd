@@ -34,24 +34,18 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private[user] def getTutorialQuests(implicit selected: List[Quest]): Option[Iterator[Quest]] = {
-    lazy val tutorialQuestId = api.configNamed("Tutorial")(api.TutorialConfigParams.TutorialQuestId)
-    lazy val existing = selected.map(_.id) ::: user.timeLine.map(_.objectId)
+    Logger.trace("  Returning tutorial quests")
 
-    if (user.profile.publicProfile.level > 1 || existing.contains(tutorialQuestId)) {
-      Logger.trace("  returning None since it's already there or level is too high")
+    if (user.profile.publicProfile.level > 10) // TODO: get it from config.
       None
-    } else {
-      Logger.trace("  adding tutorial quest (if it'll be found)")
-      val maybeQuests = checkNotEmptyIterator(
-        Some(
-          api.getAllQuests(
-            GetAllQuestsRequest(
-              user = user,
-              status = QuestStatus.ForTutorial,
-              cultureId = None,
-              ids = List(tutorialQuestId))).body.get.quests))
-      if (maybeQuests.isEmpty) Logger.error(s"Tutorial quest not found but it should be!")
-      maybeQuests
+    else {
+      checkNotEmptyIterator(Some(api.getAllQuests(
+        GetAllQuestsRequest(
+          user = user,
+          status = QuestStatus.ForTutorial,
+          cultureId = None,
+          idsExclude = questIdsToExclude,
+          levels = Some((1, user.profile.publicProfile.level)))).body.get.quests))
     }
   }
 
