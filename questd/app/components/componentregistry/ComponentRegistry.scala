@@ -1,7 +1,7 @@
 package components.componentregistry
 
+import controllers.services.devicenotifications.DeviceNotificationsComponent
 import controllers.web.rest.component.WSComponent
-import models.store.DatabaseComponent
 import controllers.domain.DomainAPIComponent
 import models.store.mongo.MongoDatabaseComponent
 import controllers.web.admin.component.AdminComponent
@@ -16,7 +16,8 @@ trait ComponentRegistry
   with DomainAPIComponent
   with AdminComponent
   with TasksComponent
-  with RandomComponent {
+  with RandomComponent
+  with DeviceNotificationsComponent {
 
   protected lazy val rand = new Random
   protected lazy val db: Database = new MongoDatabase
@@ -25,6 +26,7 @@ trait ComponentRegistry
   lazy val ws = new WS
   lazy val admin = new Admin
   protected lazy val tasks = new Tasks
+  protected lazy val deviceNotifications = new DeviceNotifications
 }
 
 

@@ -1,14 +1,13 @@
 package controllers.web.rest.component
 
-import java.util.Date
-
-import com.notnoop.apns.{APNS, ApnsService}
 import controllers.domain._
 import controllers.domain.admin.{AllQuestsRequest, AllSolutionsRequest, AllUsersRequest}
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
+import controllers.services.devicenotifications.DeviceNotificationsProtocol.IOSDevice
+import controllers.services.devicenotifications.{DeviceNotificationsProtocol, DeviceNotifications}
 import controllers.web.helpers._
 import models.domain.common.{ContentReference, ContentType, ContentVote}
 import models.domain.quest.QuestInfoContent
@@ -18,6 +17,7 @@ import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.Gender
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger
+import play.libs.Akka
 
 private object DebugWSImplTypes {
 
@@ -61,13 +61,6 @@ private object DebugWSImplTypes {
 
 trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
-  // TODO: remove after apns testing is done.
-  val service: ApnsService =
-    APNS.newService()
-      .withCert("d:/QMPushDevelop.p12", "123")
-      .withSandboxDestination()
-      .build()
-
   import controllers.web.rest.component.DebugWSImplTypes._
 
   def shiftDailyResult = wrapApiCallReturnBody[WSShiftDailyResultResult] { r =>
@@ -78,22 +71,13 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
 
-    // TODO: apns test here.
-    import com.notnoop.apns._
-    import scala.collection.JavaConversions._
-
-    val payload = APNS.newPayload().alertBody("Can't be simpler than this!").build()
-    val token = "250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"
-    val result = service.push(token, payload)
-
-    Logger.error(s"$result")
-
-    // This part is not working on sandbox, test it in production.
-    val inactiveDevices: Map[String, Date] = service.getInactiveDevices.toMap
-    for (deviceToken <- inactiveDevices.keySet) {
-      val inactiveAsOf = inactiveDevices.get(deviceToken)
-      Logger.error(s"inactive since $inactiveAsOf - $deviceToken")
-    }
+    Akka.system.actorOf(DeviceNotifications.props, name = DeviceNotifications.name) ! DeviceNotificationsProtocol.PushMessage(
+      devices = DeviceNotificationsProtocol.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
+      message = "lalala",
+      badge = None,
+      sound = None,
+      destinations = List(DeviceNotificationsProtocol.MobileDestination)
+    )
 
     OkApiResult(WSDebugResult("lalai"))
   }
