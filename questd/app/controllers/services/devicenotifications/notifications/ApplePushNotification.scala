@@ -10,13 +10,17 @@ import com.notnoop.apns.{APNS, ApnsService}
 import controllers.services.devicenotifications.notifications.ApplePushNotificationProtocol.ScreenMessage
 import play.Logger
 
+
 object ApplePushNotificationProtocol {
   case class ScreenMessage(deviceToken: String, message: String, badge: Option[Int], sound: Option[String])
 }
 
+
 object ApplePushNotification {
-  val props = Props[ApplePushNotification].withRouter(RoundRobinPool(nrOfInstances = 10)) // TODO: perhaps think about replacing it with single instance.
+  val name = "ApplePushNotification"
+  val props = Props[ApplePushNotification].withRouter(RoundRobinPool(nrOfInstances = 10))
 }
+
 
 /**
  * Notifications for apple

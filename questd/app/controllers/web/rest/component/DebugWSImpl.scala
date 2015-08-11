@@ -71,7 +71,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
 
-    Akka.system.actorOf(DeviceNotifications.props, name = DeviceNotifications.name) ! DeviceNotificationsProtocol.PushMessage(
+    Akka.system.actorSelection(s"user/${DeviceNotifications.name}") ! DeviceNotificationsProtocol.PushMessage(
       devices = DeviceNotificationsProtocol.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
       message = "lalala",
       badge = None,

@@ -26,7 +26,7 @@ trait ComponentRegistry
   lazy val ws = new WS
   lazy val admin = new Admin
   protected lazy val tasks = new Tasks
-  protected lazy val deviceNotifications = new DeviceNotifications
+  protected val deviceNotifications = new DeviceNotifications
 }
 
 
