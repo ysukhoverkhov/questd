@@ -1,7 +1,7 @@
 package controllers.domain.app.user
 
 import controllers.domain._
-import controllers.sn.client.User
+import controllers.services.socialnetworks.client.User
 import models.domain.culture.Culture
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, LoginMethod}

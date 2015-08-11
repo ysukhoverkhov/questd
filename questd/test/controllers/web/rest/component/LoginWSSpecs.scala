@@ -3,9 +3,9 @@ package controllers.web.rest.component
 import components.random.RandomComponent
 import controllers.domain._
 import controllers.domain.app.user._
-import controllers.sn.client.{SocialNetworkClient, User => SNUser}
-import controllers.sn.component.SocialNetworkComponent
-import controllers.sn.exception._
+import controllers.services.socialnetworks.client.{SocialNetworkClient, User => SNUser}
+import controllers.services.socialnetworks.component.SocialNetworkComponent
+import controllers.services.socialnetworks.exception._
 import controllers.web.rest.component.LoginWSImplTypes.WSLoginRequest
 import models.domain.user.User
 import models.store._

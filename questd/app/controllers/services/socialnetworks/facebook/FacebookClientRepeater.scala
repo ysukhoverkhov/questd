@@ -1,4 +1,4 @@
-package controllers.sn.facebook
+package controllers.services.socialnetworks.facebook
 
 import com.restfb._
 import com.restfb.exception._

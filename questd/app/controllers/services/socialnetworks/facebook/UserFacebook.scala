@@ -1,9 +1,9 @@
-package controllers.sn.facebook
+package controllers.services.socialnetworks.facebook
 
-import controllers.sn.client.{UserIdInApplication, Invitation, User}
+import controllers.services.socialnetworks.client.{UserIdInApplication, Invitation, User}
 import models.domain.user.profile.Gender
 
-private[sn] class UserFacebook(fbUser: com.restfb.types.User,
+private[socialnetworks] class UserFacebook(fbUser: com.restfb.types.User,
                                client: SocialNetworkClientFacebook,
                                token: String) extends ItemFacebook with User {
 
@@ -66,7 +66,7 @@ private[sn] class UserFacebook(fbUser: com.restfb.types.User,
 
 }
 
-private[sn] object UserFacebook {
+private[socialnetworks] object UserFacebook {
   def apply(
       u: com.restfb.types.User,
       c: SocialNetworkClientFacebook,

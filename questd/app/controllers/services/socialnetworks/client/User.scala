@@ -1,4 +1,4 @@
-package controllers.sn.client
+package controllers.services.socialnetworks.client
 
 import models.domain.user.profile.Gender
 

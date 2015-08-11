@@ -16,7 +16,8 @@ object TasksDispatcher {
 
 class TasksDispatcher(config: ConfigSection) extends Actor with EasyRestartActor {
 
-  case class WakeCrawlerUp(crawler: ActorSelection)
+  sealed trait TasksDispatcherEvents
+  case class WakeCrawlerUp(crawler: ActorSelection) extends TasksDispatcherEvents
 
   override def preStart(): Unit = {
     Logger.debug("Starting scheduled tasks")
@@ -32,11 +33,17 @@ class TasksDispatcher(config: ConfigSection) extends Actor with EasyRestartActor
       schedule(c._1, c._2)
     }
 
-    Logger.debug("Scheduled tasks:")
     printScheduledJobs()
   }
 
-  def printScheduledJobs() = {
+  def receive = {
+    case WakeCrawlerUp(c) => c ! DoTask
+    case _ => Logger.error("Unexpected message received")
+  }
+
+
+
+  private def printScheduledJobs() = {
     // http://www.mkyong.com/java/how-to-list-all-jobs-in-the-quartz-scheduler/
 
     import org.quartz.impl.StdSchedulerFactory
@@ -44,6 +51,8 @@ class TasksDispatcher(config: ConfigSection) extends Actor with EasyRestartActor
     import scala.collection.JavaConversions._
 
     Thread.sleep(1000)
+
+    Logger.debug("Scheduled tasks:")
 
     val all = (new StdSchedulerFactory).getAllSchedulers
     val scheduler = all.iterator().next()
@@ -62,13 +71,7 @@ class TasksDispatcher(config: ConfigSection) extends Actor with EasyRestartActor
           + jobGroup + " - " + nextFireTime)
 
       }
-
     }
-  }
-
-  def receive = {
-    case WakeCrawlerUp(c) => c ! DoTask
-    case _ => Logger.error("Unexpected message received")
   }
 }
 

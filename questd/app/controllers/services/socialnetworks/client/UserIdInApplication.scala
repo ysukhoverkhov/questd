@@ -1,4 +1,4 @@
-package controllers.sn.client
+package controllers.services.socialnetworks.client
 
 /**
  * Another our app user is playing in this social network.

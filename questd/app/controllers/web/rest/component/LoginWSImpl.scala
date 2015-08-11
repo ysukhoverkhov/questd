@@ -10,7 +10,7 @@ import controllers.web.helpers._
 import components._
 import org.json4s.MappingException
 import controllers.web.rest.config.WSConfigHolder
-import controllers.sn.exception._
+import controllers.services.socialnetworks.exception._
 
 private [component] object LoginWSImplTypes {
 

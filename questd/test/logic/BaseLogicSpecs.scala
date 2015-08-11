@@ -4,7 +4,7 @@ import components.{APIAccessor, RandomAccessor}
 import components.random.RandomComponent
 import controllers.domain.DomainAPIComponent
 import controllers.domain.config.{_TutorialConfigParams, _DefaultConfigParams}
-import controllers.sn.component.SocialNetworkComponent
+import controllers.services.socialnetworks.component.SocialNetworkComponent
 import models.domain.admin.ConfigSection
 import models.store.DatabaseComponent
 import org.specs2.mock.Mockito

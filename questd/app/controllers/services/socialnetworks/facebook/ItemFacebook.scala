@@ -1,6 +1,6 @@
-package controllers.sn.facebook
+package controllers.services.socialnetworks.facebook
 
-import controllers.sn.client.Item
+import controllers.services.socialnetworks.client.Item
 
 /**
  * base functionality for all facebook items.

@@ -1,4 +1,4 @@
-package controllers.sn.client
+package controllers.services.socialnetworks.client
 
 /**
  * Invitation to join a game sent and received via Social Network

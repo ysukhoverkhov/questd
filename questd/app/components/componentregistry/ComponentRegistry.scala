@@ -7,15 +7,15 @@ import models.store.mongo.MongoDatabaseComponent
 import controllers.web.admin.component.AdminComponent
 import controllers.tasks.TasksComponent
 import components.random.RandomComponent
-import controllers.sn.component.SocialNetworkComponent
+import controllers.services.socialnetworks.component.SocialNetworkComponent
 
 trait ComponentRegistry
   extends WSComponent
   with SocialNetworkComponent
   with MongoDatabaseComponent
-  with DomainAPIComponent 
-  with AdminComponent 
-  with TasksComponent 
+  with DomainAPIComponent
+  with AdminComponent
+  with TasksComponent
   with RandomComponent {
 
   protected lazy val rand = new Random

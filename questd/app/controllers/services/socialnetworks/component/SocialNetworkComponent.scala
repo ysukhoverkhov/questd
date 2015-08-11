@@ -1,6 +1,6 @@
-package controllers.sn.component
+package controllers.services.socialnetworks.component
 
-import controllers.sn.client.SocialNetworkImpl
+import controllers.services.socialnetworks.client.SocialNetworkImpl
 
 trait SocialNetworkComponent {
 

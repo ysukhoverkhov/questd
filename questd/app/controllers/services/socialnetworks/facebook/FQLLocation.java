@@ -1,4 +1,4 @@
-package controllers.sn.facebook;
+package controllers.services.socialnetworks.facebook;
 
 import com.restfb.Facebook;
 import com.restfb.types.Location;

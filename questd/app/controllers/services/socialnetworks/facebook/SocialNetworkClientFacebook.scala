@@ -1,16 +1,16 @@
-package controllers.sn.facebook
+package controllers.services.socialnetworks.facebook
 
 import com.restfb._
 import com.restfb.exception._
-import controllers.sn.client._
-import controllers.sn.exception.{AuthException, NetworkException}
-import controllers.sn.facebook.types.UserIdWithApp
+import controllers.services.socialnetworks.client._
+import controllers.services.socialnetworks.exception.{AuthException, NetworkException}
+import controllers.services.socialnetworks.facebook.types.UserIdWithApp
 import play.Logger
 
 import scala.language.implicitConversions
 
 
-private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
+private[socialnetworks] class SocialNetworkClientFacebook extends SocialNetworkClient {
 
   private val facebookClient = (x: String) => new FacebookClientRepeater(new DefaultFacebookClient(x, Version.VERSION_2_0))
 
@@ -78,7 +78,7 @@ private[sn] class SocialNetworkClientFacebook extends SocialNetworkClient {
 }
 
 
-private[sn] object SocialNetworkClientFacebook {
+private[socialnetworks] object SocialNetworkClientFacebook {
   val Name = "FB"
 
   def apply(): SocialNetworkClientFacebook = new SocialNetworkClientFacebook()

@@ -1,4 +1,4 @@
-package controllers.sn.client
+package controllers.services.socialnetworks.client
 
 /**
  * Base properties for all social network items.

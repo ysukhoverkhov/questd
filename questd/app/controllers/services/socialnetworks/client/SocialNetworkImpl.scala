@@ -1,7 +1,7 @@
-package controllers.sn.client
+package controllers.services.socialnetworks.client
 
-import controllers.sn.exception.SocialNetworkClientNotFound
-import controllers.sn.facebook.SocialNetworkClientFacebook
+import controllers.services.socialnetworks.exception.SocialNetworkClientNotFound
+import controllers.services.socialnetworks.facebook.SocialNetworkClientFacebook
 
 abstract class SocialNetworkImpl {
 

@@ -1,7 +1,7 @@
 package controllers.domain
 
 import components.random.RandomComponent
-import controllers.sn.component.SocialNetworkComponent
+import controllers.services.socialnetworks.component.SocialNetworkComponent
 import models.domain.admin.Configuration
 import models.store.DatabaseComponent
 import models.store.dao._

@@ -3,7 +3,7 @@ package controllers.domain.app.user
 import components._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
-import controllers.sn.client.{User => SNUser}
+import controllers.services.socialnetworks.client.{User => SNUser}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
 import play.Logger

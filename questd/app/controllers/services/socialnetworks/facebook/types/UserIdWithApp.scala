@@ -1,4 +1,4 @@
-package controllers.sn.facebook.types
+package controllers.services.socialnetworks.facebook.types
 
 import com.restfb.Facebook
 

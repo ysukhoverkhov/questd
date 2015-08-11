@@ -1,13 +1,13 @@
-package controllers.sn.facebook
+package controllers.services.socialnetworks.facebook
 
-import controllers.sn.client.Invitation
+import controllers.services.socialnetworks.client.Invitation
 
 /**
  * Implementation of Invitations for facebook.
  *
  * Created by Yury on 18.09.2014.
  */
-private[sn] class InvitationFacebook(appRequest: com.restfb.types.AppRequest,
+private[socialnetworks] class InvitationFacebook(appRequest: com.restfb.types.AppRequest,
                                      client: SocialNetworkClientFacebook,
                                      token: String) extends ItemFacebook with Invitation {
 
@@ -33,7 +33,7 @@ private[sn] class InvitationFacebook(appRequest: com.restfb.types.AppRequest,
 /**
  * Companion object for InvitationFacebook class
  */
-private[sn] object InvitationFacebook {
+private[socialnetworks] object InvitationFacebook {
   def apply(appRequest: com.restfb.types.AppRequest,
             client: SocialNetworkClientFacebook,
             token: String): InvitationFacebook = new InvitationFacebook(appRequest, client, token)

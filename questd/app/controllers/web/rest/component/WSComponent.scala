@@ -3,7 +3,7 @@ package controllers.web.rest.component
 import controllers.domain.DomainAPIComponent
 import components._
 import controllers.web.rest.config.WSConfigHolder
-import controllers.sn.component.SocialNetworkComponent
+import controllers.services.socialnetworks.component.SocialNetworkComponent
 
 trait WSComponent { component: DomainAPIComponent with SocialNetworkComponent =>
 
