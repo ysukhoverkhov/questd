@@ -11,6 +11,7 @@ trait TasksConfigHolder extends ConfigHolder { this: APIAccessor =>
       Map(("akka://application/user/UsersHourlyCrawler", "0 0 0/1 * * ?"),
           ("akka://application/user/UsersWeeklyCrawler", "0 0 5 ? * MON"),
           ("akka://application/user/SolutionsHourlyCrawler", "0 0 0/1 * * ?"),
+          ("akka://application/user/SolutionsWeeklyCrawler", "0 0 5 ? * MON"),
           ("akka://application/user/BattlesHourlyCrawler", "0 0 0/1 * * ?")
       )))
 }

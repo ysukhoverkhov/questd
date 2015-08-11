@@ -32,8 +32,8 @@ trait Challenges { this: UserLogic =>
       InvalidState
     else if (checkQuest && (opponentSolution.info.questId != mySolution.info.questId))
       InvalidState
-    else if (DateTime.now < (new DateTime(mySolution.creationDate) + battleCreationDelay.hour) ||
-      DateTime.now < (new DateTime(opponentSolution.creationDate) + battleCreationDelay.hour))
+    else if (DateTime.now < (new DateTime(mySolution.info.creationDate) + battleCreationDelay.hour) ||
+      DateTime.now < (new DateTime(opponentSolution.info.creationDate) + battleCreationDelay.hour))
       CoolDown
     else
       OK

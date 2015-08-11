@@ -237,13 +237,14 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       questIds = List(request.questId),
       skip = pageNumber * pageSize)
 
-    val solutions = solutionsForQuest.take(pageSize).toList.map(s => {
-      SolutionView(
-        id = s.id,
-        info = s.info,
-        rating = Some(s.rating),
-        myVote = request.user.stats.votedSolutions.get(s.id))
-    })
+    val solutions = solutionsForQuest.take(pageSize).toList.
+      map(s => {
+        SolutionView(
+          id = s.id,
+          info = s.info,
+          rating = Some(s.rating),
+          myVote = request.user.stats.votedSolutions.get(s.id))
+      })
 
     OkApiResult(GetSolutionsForQuestResult(
       allowed = OK,

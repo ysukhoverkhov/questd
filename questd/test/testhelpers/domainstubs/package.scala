@@ -108,12 +108,13 @@ package object domainstubs {
         content = createSolutionInfoContent,
         vip = vip,
         authorId = authorId,
-        questId = questId),
+        questId = questId,
+        creationDate = creationDate
+      ),
       status = status,
       rating = SolutionRating(
         timelinePoints = timelinePoints),
       lastModDate = lastModDate,
-      creationDate = creationDate,
       battleIds = battleIds)
   }
 

@@ -100,7 +100,8 @@ class SolutionDAOSpecs extends Specification
           vip = false,
           status = SolutionStatus.InRotation,
           lastModDate = new Date(5000),
-          timelinePoints = 321),
+          timelinePoints = 321,
+          battleIds = List("b1")),
         createSolutionStub(
           id = "q2",
           questId = "t2",
@@ -120,7 +121,8 @@ class SolutionDAOSpecs extends Specification
           vip = true,
           status = SolutionStatus.InRotation,
           lastModDate = new Date(4000),
-          timelinePoints = 70))
+          timelinePoints = 70,
+          battleIds = List("b2")))
 
       qs.foreach(db.solution.create)
 
@@ -178,6 +180,14 @@ class SolutionDAOSpecs extends Specification
       val excludingAuthorIds = db.solution.allWithParams(authorIdsExclude = List("q2_author id")).toList
       excludingAuthorIds.map(_.id).size must beEqualTo(2)
       excludingAuthorIds.map(_.id).sorted must beEqualTo(List(qs(0).id, qs(2).id).sorted)
+
+      val withBattles = db.solution.allWithParams(withBattles = Some(true)).toList
+      withBattles.map(_.id).size must beEqualTo(2)
+      withBattles.map(_.id).sorted must beEqualTo(List(qs(0).id, qs(2).id).sorted)
+
+      val withoutBattles = db.solution.allWithParams(withBattles = Some(false)).toList
+      withoutBattles.map(_.id).size must beEqualTo(1)
+      withoutBattles.map(_.id).sorted must beEqualTo(List(qs(1).id).sorted)
     }
 
     "updateStatus for solution works" in new WithApplication(appWithTestDatabase) {
