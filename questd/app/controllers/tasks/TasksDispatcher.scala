@@ -14,7 +14,7 @@ object TasksDispatcher {
   def name = "TasksDispatcher"
 }
 
-class TasksDispatcher(config: ConfigSection) extends EasyRestartActor {
+class TasksDispatcher(config: ConfigSection) extends Actor with EasyRestartActor {
 
   case class WakeCrawlerUp(crawler: ActorSelection)
 
