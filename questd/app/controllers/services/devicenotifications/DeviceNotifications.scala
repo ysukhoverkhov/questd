@@ -1,14 +1,16 @@
 package controllers.services.devicenotifications
 
-import akka.actor.Actor.Receive
 import akka.actor.{Actor, Props}
 import akka.routing.RoundRobinPool
-import com.vita.akka.cake.{ActorContextCreationSupport, ActorCreationSupport}
-import controllers.services.devicenotifications.DeviceNotificationsProtocol._
-import controllers.services.devicenotifications.notifications.{ApplePushNotification, ApplePushNotificationProtocol}
+import com.vita.akka.cake.ActorContextCreationSupport
+import controllers.services.devicenotifications.DeviceNotifications.{IOSDevice, MobileDestination, PushMessage, WatchDestination}
+import controllers.services.devicenotifications.apple.ApplePushNotification
 
-object DeviceNotificationsProtocol {
+object DeviceNotifications {
+  val name = "DeviceNotifications"
+  val props = Props(classOf[DeviceNotifications]).withRouter(RoundRobinPool(nrOfInstances = 1)) // FIX: perhaps think about replacing it with single instance.
 
+  // --- Protocol ---
   sealed trait Device
   case class IOSDevice(deviceToken: String) extends Device {
     override def equals(obj: scala.Any): Boolean = obj match {
@@ -35,7 +37,12 @@ object DeviceNotificationsProtocol {
 }
 
 
-trait DeviceNotificationsLogic extends ActorCreationSupport {
+/**
+ * Root notifications actor
+ *
+ * Created by Yury on 11.08.2015.
+ */
+class DeviceNotifications extends Actor with ActorContextCreationSupport {
   protected val apple = createChild(ApplePushNotification.props, ApplePushNotification.name)
 
   def receive: Receive = {
@@ -43,22 +50,10 @@ trait DeviceNotificationsLogic extends ActorCreationSupport {
       devices.foreach {
         case IOSDevice(deviceToken) =>
           destinations.foreach {
-            case MobileDestination => apple ! ApplePushNotificationProtocol.ScreenMessage(deviceToken, message, badge, sound)
+            case MobileDestination => apple ! ApplePushNotification.ScreenMessage(deviceToken, message, badge, sound)
             case WatchDestination => // noop for now
           }
       }
   }
 }
-
-/**
- * Root notifications actor
- *
- * Created by Yury on 11.08.2015.
- */
-object DeviceNotifications {
-  val name = "DeviceNotifications"
-  val props = Props(classOf[DeviceNotifications]).withRouter(RoundRobinPool(nrOfInstances = 1)) // FIX: perhaps think about replacing it with single instance.
-}
-
-class DeviceNotifications extends Actor with DeviceNotificationsLogic with ActorContextCreationSupport
 

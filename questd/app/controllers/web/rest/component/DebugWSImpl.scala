@@ -6,8 +6,8 @@ import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
-import controllers.services.devicenotifications.DeviceNotificationsProtocol.IOSDevice
-import controllers.services.devicenotifications.{DeviceNotificationsProtocol, DeviceNotifications}
+import controllers.services.devicenotifications.DeviceNotifications
+import controllers.services.devicenotifications.DeviceNotifications.IOSDevice
 import controllers.web.helpers._
 import models.domain.common.{ContentReference, ContentType, ContentVote}
 import models.domain.quest.QuestInfoContent
@@ -71,12 +71,12 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
 
-    Akka.system.actorSelection(s"user/${DeviceNotifications.name}") ! DeviceNotificationsProtocol.PushMessage(
-      devices = DeviceNotificationsProtocol.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
+    Akka.system.actorSelection(s"user/${DeviceNotifications.name}") ! DeviceNotifications.PushMessage(
+      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
       message = "lalala",
       badge = None,
       sound = None,
-      destinations = List(DeviceNotificationsProtocol.MobileDestination)
+      destinations = List(DeviceNotifications.MobileDestination)
     )
 
     OkApiResult(WSDebugResult("lalai"))
