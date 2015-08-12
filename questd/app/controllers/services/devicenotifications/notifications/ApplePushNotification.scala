@@ -43,12 +43,18 @@ class ApplePushNotification extends Actor {
   def receive: Receive = {
     case ScreenMessage(deviceToken, message, badge, sound) =>
 
-      import scala.collection.JavaConversions._
+      val payload = APNS.newPayload()
+//        .badge(3)
+//        .customField("secret", "what do you think?")
+        .localizedKey(message)
+//        .localizedArguments("Jenna", "Frank")
+//        .actionKey("Play")
+        .build()
 
-      val payload = APNS.newPayload().alertBody(message).build()
       service.push(deviceToken, payload)
 
       // TODO: remove unresponding devices periodically.
+      import scala.collection.JavaConversions._
       val inactiveDevices: Map[String, Date] = service.getInactiveDevices.toMap
       for (deviceToken <- inactiveDevices.keySet) {
         val inactiveAsOf = inactiveDevices.get(deviceToken)
