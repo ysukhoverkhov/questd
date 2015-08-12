@@ -1,14 +1,14 @@
-package controllers.sn.facebook
+package controllers.services.socialnetworks.facebook
 
-import controllers.sn.client.UserIdInApplication
-import controllers.sn.facebook.types.UserIdWithApp
+import controllers.services.socialnetworks.client.UserIdInApplication
+import controllers.services.socialnetworks.facebook.types.UserIdWithApp
 
 /**
  * Implementation of User id in app for facebook.
  *
  * Created by Yury on 18.09.2014.
  */
-private[sn] class UserIdInApplicationFacebook (
+private[socialnetworks] class UserIdInApplicationFacebook (
   idWithApp: UserIdWithApp
   ) extends ItemFacebook with UserIdInApplication {
 
@@ -26,7 +26,7 @@ private[sn] class UserIdInApplicationFacebook (
 /**
  * Companion object for UserIdInApplicationFacebook class
  */
-private[sn] object UserIdInApplicationFacebook {
+private[socialnetworks] object UserIdInApplicationFacebook {
   def apply(idWithApp: UserIdWithApp): UserIdInApplicationFacebook = new UserIdInApplicationFacebook(idWithApp)
 }
 

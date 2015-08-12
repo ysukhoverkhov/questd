@@ -32,7 +32,6 @@ object DeviceNotificationsProtocol {
   case object WatchDestination extends Destination
 
   case class PushMessage(devices: Devices, message: String, badge: Option[Int], sound: Option[String], destinations: Seq[Destination])
-
 }
 
 
@@ -56,8 +55,10 @@ trait DeviceNotificationsLogic extends ActorCreationSupport {
  *
  * Created by Yury on 11.08.2015.
  */
-class DeviceNotifications extends Actor with DeviceNotificationsLogic with ActorContextCreationSupport
 object DeviceNotifications {
   val name = "DeviceNotifications"
-  val props = Props(classOf[DeviceNotifications]).withRouter(RoundRobinPool(nrOfInstances = 1)) // TODO: perhaps think about replacing it with single instance.
+  val props = Props(classOf[DeviceNotifications]).withRouter(RoundRobinPool(nrOfInstances = 1)) // FIX: perhaps think about replacing it with single instance.
 }
+
+class DeviceNotifications extends Actor with DeviceNotificationsLogic with ActorContextCreationSupport
+

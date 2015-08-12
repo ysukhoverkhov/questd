@@ -1,4 +1,4 @@
-package controllers.services.devicenotifications.notifications
+package controllers.services.devicenotifications.inactivedevices
 
 import java.net.UnknownHostException
 import java.util.Date
