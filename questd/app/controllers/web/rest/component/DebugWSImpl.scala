@@ -1,5 +1,6 @@
 package controllers.web.rest.component
 
+import akka.actor.{Props, Actor, ActorLogging}
 import controllers.domain._
 import controllers.domain.admin.{AllQuestsRequest, AllSolutionsRequest, AllUsersRequest}
 import controllers.domain.app.protocol.ProfileModificationResult
@@ -69,15 +70,33 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     api.shiftDailyResult(ShiftDailyResultRequest(r.user))
   }
 
+
+  val actorSelection = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+  class MyActor extends Actor with ActorLogging {
+    def receive = {
+      case "test" =>
+        Logger.error("received test")
+        actorSelection ! DeviceNotifications.GetInactiveDevicesRequest
+
+      case DeviceNotifications.GetInactiveDevicesResult(IOSDevice(_), devices) =>
+        Logger.error(s"ios devices received $devices")
+
+      case a @ _      => Logger.error(s"received unknown message $a")
+    }
+  }
+  val act = Akka.system.actorOf(Props(new MyActor()), name = "asdasd")
+
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
 
-    Akka.system.actorSelection(s"user/${DeviceNotifications.name}") ! DeviceNotifications.PushMessage(
-      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
-      message = "lalala",
-      badge = None,
-      sound = None,
-      destinations = List(DeviceNotifications.MobileDestination)
-    )
+//    actorSelection ! DeviceNotifications.PushMessage(
+//      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
+//      message = "lalala",
+//      badge = None,
+//      sound = None,
+//      destinations = List(DeviceNotifications.MobileDestination)
+//    )
+
+    act ! "test"
 
     OkApiResult(WSDebugResult("lalai"))
   }

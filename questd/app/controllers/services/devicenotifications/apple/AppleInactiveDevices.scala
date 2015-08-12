@@ -5,17 +5,18 @@ import java.util.Date
 
 import akka.actor.SupervisorStrategy.Restart
 import akka.actor._
-import akka.routing.RoundRobinPool
-import controllers.services.devicenotifications.apple.AppleInactiveDevices.{GetInactiveDevicesRequest, GetInactiveDevicesResponse}
+import controllers.services.devicenotifications.apple.AppleInactiveDevices.{GetInactiveDevicesRequest, GetAppleInactiveDevicesResult}
 import controllers.services.devicenotifications.apple.helpers.APNSService
+
+import scala.concurrent.Future
 
 
 object AppleInactiveDevices {
-  val name = "ApplePushNotification"
-  val props = Props[AppleInactiveDevices].withRouter(RoundRobinPool(nrOfInstances = 10))
+  val name = "AppleInactiveDevices"
+  val props = Props[AppleInactiveDevices]
 
   case class GetInactiveDevicesRequest()
-  case class GetInactiveDevicesResponse(inactiveDevices: Map[String, Date])
+  case class GetAppleInactiveDevicesResult(inactiveDevices: Map[String, Date])
 }
 
 /**
@@ -31,7 +32,15 @@ class AppleInactiveDevices extends Actor with APNSService {
   def receive: Receive = {
 
     case GetInactiveDevicesRequest() =>
+
       import scala.collection.JavaConversions._
-      sender ! GetInactiveDevicesResponse(service.getInactiveDevices.toMap)
+      import akka.pattern.pipe
+      import context.dispatcher // get network requests dispatcher here.
+
+      // TODO: test it with exception in future.
+      Future {
+        GetAppleInactiveDevicesResult(service.getInactiveDevices.toMap)
+      } pipeTo sender
   }
 }
+// FIX: put these calls to the future and all futures should be run in proper context.
