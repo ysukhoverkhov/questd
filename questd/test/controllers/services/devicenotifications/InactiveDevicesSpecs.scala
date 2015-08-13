@@ -35,7 +35,9 @@ class InactiveDevicesSpecs
 
     "Returns empty list of devices on exception" in new AkkaTestKitSpecs2Support {
       val fakeApple = TestProbe("FakeAppleInactiveDevices")
-      val subject = system.actorOf(Props(new InactiveDevices with TestActorCreationSupport{override implicit val timeout: Timeout = Timeout(1.seconds)}))
+      val subject = system.actorOf(Props(new InactiveDevices with TestActorCreationSupport {
+        override implicit val timeout: Timeout = Timeout(1.seconds)
+      }))
       val inactiveDevices = Map("test string" -> new Date)
 
       within(2.seconds) {
