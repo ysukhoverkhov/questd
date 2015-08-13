@@ -11,7 +11,10 @@ trait DeviceNotificationsComponent { component =>
 
     // Creating parent actor for all notification actors.
     val deviceNotifications = Akka.system.actorOf(DeviceNotifications.props, name = DeviceNotifications.name)
+    val inactiveDevices = Akka.system.actorOf(InactiveDevices.props, name = InactiveDevices.name)
 
+    // TODO: move it to the good place.
+    val listener = Akka.system.actorOf(UnhandledMessagesListener.props, name = UnhandledMessagesListener.name)
   }
 }
 

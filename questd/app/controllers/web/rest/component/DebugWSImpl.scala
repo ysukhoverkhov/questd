@@ -1,14 +1,13 @@
 package controllers.web.rest.component
 
-import akka.actor.{Props, Actor, ActorLogging}
+import akka.actor.{Actor, ActorLogging, Props, UnhandledMessage}
 import controllers.domain._
 import controllers.domain.admin.{AllQuestsRequest, AllSolutionsRequest, AllUsersRequest}
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
-import controllers.services.devicenotifications.DeviceNotifications
-import controllers.services.devicenotifications.DeviceNotifications.IOSDevice
+import controllers.services.devicenotifications.{DeviceNotifications, InactiveDevices}
 import controllers.web.helpers._
 import models.domain.common.{ContentReference, ContentType, ContentVote}
 import models.domain.quest.QuestInfoContent
@@ -71,17 +70,18 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
   }
 
 
-  val actorSelection = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+  val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+  val actorSelectionInactive = Akka.system.actorSelection(s"user/${InactiveDevices.name}")
   class MyActor extends Actor with ActorLogging {
     def receive = {
       case "test" =>
         Logger.error("received test")
-        actorSelection ! DeviceNotifications.GetInactiveDevicesRequest
+        actorSelectionNotification ! InactiveDevices.GetInactiveDevicesRequest
 
-      case DeviceNotifications.GetInactiveDevicesResult(IOSDevice(_), devices) =>
+      case InactiveDevices.GetInactiveDevicesResult(InactiveDevices.IOSDevice, devices) =>
         Logger.error(s"ios devices received $devices")
 
-      case a @ _      => Logger.error(s"received unknown message $a")
+//      case a      => Logger.error(s"received unknown message $a")
     }
   }
   val act = Akka.system.actorOf(Props(new MyActor()), name = "asdasd")
@@ -96,7 +96,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
 //      destinations = List(DeviceNotifications.MobileDestination)
 //    )
 
-    act ! "test"
+    act ! "test2"
 
     OkApiResult(WSDebugResult("lalai"))
   }

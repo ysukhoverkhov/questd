@@ -7,8 +7,6 @@ import testhelpers.specs2support.AkkaTestKitSpecs2Support
 
 import scala.concurrent.duration._
 
-
-
 class DeviceNotificationsSpecs
   extends Specification
   with NoTimeConversions {
