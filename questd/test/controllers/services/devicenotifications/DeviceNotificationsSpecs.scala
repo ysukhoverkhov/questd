@@ -19,14 +19,15 @@ class DeviceNotificationsSpecs
       private val device1 = IOSDevice("token1")
       private val device2 = IOSDevice("token2")
       private val message = "message"
+      val subject = system.actorOf(Props(new DeviceNotifications with TestActorCreationSupport))
 
-      within(1.second) {
-        system.actorOf(Props(new DeviceNotifications with TestActorCreationSupport))
-      } ! DeviceNotifications.PushMessage(Devices(Set(device2, device1)), message)
+      within(100.millis) {
+        subject ! DeviceNotifications.PushMessage(Devices(Set(device2, device1)), message)
 
-      expectMsgAllOf(
-        ApplePushNotification.ScreenMessage(device1.deviceToken, message, None, None),
-        ApplePushNotification.ScreenMessage(device2.deviceToken, message, None, None))
+        expectMsgAllOf(
+          ApplePushNotification.ScreenMessage(device1.deviceToken, message, None, None),
+          ApplePushNotification.ScreenMessage(device2.deviceToken, message, None, None))
+      }
     }
   }
 }

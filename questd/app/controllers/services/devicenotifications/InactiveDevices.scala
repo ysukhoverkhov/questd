@@ -7,8 +7,8 @@ import akka.pattern.AskTimeoutException
 import akka.routing.RoundRobinPool
 import akka.util.Timeout
 import com.vita.akka.cake.ActorContextCreationSupport
-import controllers.services.devicenotifications.InactiveDevices.{IOSDevice, GetInactiveDevicesResult}
-import controllers.services.devicenotifications.apple.AppleInactiveDevices.{GetInactiveDevicesRequest, GetAppleInactiveDevicesResult}
+import controllers.services.devicenotifications.InactiveDevices.{GetInactiveDevicesRequest, IOSDevice, GetInactiveDevicesResult}
+import controllers.services.devicenotifications.apple.AppleInactiveDevices.{GetAppleInactiveDevicesRequest, GetAppleInactiveDevicesResult}
 import controllers.services.devicenotifications.apple.AppleInactiveDevices
 import play.Logger
 
@@ -38,10 +38,9 @@ class InactiveDevices extends Actor with ActorContextCreationSupport {
       import akka.pattern.{ask, pipe}
       import context.dispatcher
       import scala.concurrent.duration._
-
       implicit val timeout = Timeout(30.seconds)
 
-      (appleInactiveDevices ? GetInactiveDevicesRequest).mapTo[GetAppleInactiveDevicesResult] map { result =>
+      (appleInactiveDevices ? GetAppleInactiveDevicesRequest).mapTo[GetAppleInactiveDevicesResult] map { result =>
         GetInactiveDevicesResult(IOSDevice, result.inactiveDevices)
       } recover {
         case e: AskTimeoutException =>
@@ -50,5 +49,3 @@ class InactiveDevices extends Actor with ActorContextCreationSupport {
       } pipeTo sender
   }
 }
-
-// TODO: Actor#unhandled(Any)

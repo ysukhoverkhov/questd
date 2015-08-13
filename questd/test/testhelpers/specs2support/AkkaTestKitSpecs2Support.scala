@@ -1,7 +1,7 @@
 package testhelpers.specs2support
 
 import akka.actor.{ActorRef, Props, ActorSystem}
-import akka.testkit.{ImplicitSender, TestKit}
+import akka.testkit.{DefaultTimeout, ImplicitSender, TestKit}
 import com.vita.akka.cake.ActorCreationSupport
 import org.specs2.mutable._
 
@@ -13,11 +13,13 @@ import org.specs2.mutable._
 abstract class AkkaTestKitSpecs2Support
   extends TestKit(ActorSystem())
   with After
-  with ImplicitSender {
+  with ImplicitSender
+  with DefaultTimeout {
 
   def after = system.terminate()
 
   trait TestActorCreationSupport extends ActorCreationSupport {
-    override def createChild(props: Props, name: String): ActorRef = testActor
+    lazy val child = testActor
+    override def createChild(props: Props, name: String): ActorRef = child
   }
 }

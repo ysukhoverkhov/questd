@@ -5,7 +5,7 @@ import java.util.Date
 
 import akka.actor.SupervisorStrategy.Restart
 import akka.actor._
-import controllers.services.devicenotifications.apple.AppleInactiveDevices.{GetInactiveDevicesRequest, GetAppleInactiveDevicesResult}
+import controllers.services.devicenotifications.apple.AppleInactiveDevices.{GetAppleInactiveDevicesRequest, GetAppleInactiveDevicesResult}
 import controllers.services.devicenotifications.apple.helpers.APNSService
 
 import scala.concurrent.Future
@@ -15,7 +15,7 @@ object AppleInactiveDevices {
   val name = "AppleInactiveDevices"
   val props = Props[AppleInactiveDevices]
 
-  case class GetInactiveDevicesRequest()
+  case object GetAppleInactiveDevicesRequest
   case class GetAppleInactiveDevicesResult(inactiveDevices: Map[String, Date])
 }
 
@@ -31,13 +31,12 @@ class AppleInactiveDevices extends Actor with APNSService {
 
   def receive: Receive = {
 
-    case GetInactiveDevicesRequest() =>
+    case GetAppleInactiveDevicesRequest =>
 
       import scala.collection.JavaConversions._
       import akka.pattern.pipe
       import context.dispatcher // get network requests dispatcher here.
 
-      // TODO: test it with exception in future.
       Future {
         GetAppleInactiveDevicesResult(service.getInactiveDevices.toMap)
       } pipeTo sender
