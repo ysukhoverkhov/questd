@@ -22,6 +22,7 @@ publishArtifact in (Compile, packageDoc) := false
 
 publishArtifact in (Compile, packageSrc) := false
 
+// TODO: clenup here and sort everything.
 
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
 
@@ -44,6 +45,10 @@ libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.0.0"
 libraryDependencies += "javax.mail" % "mail" % "1.4.7"
 
 libraryDependencies += "com.notnoop.apns" % "apns" % "1.0.0.Beta6"
+
+libraryDependencies += "com.typesafe.akka" %% "akka-testkit" % "2.4-M2"
+
+
 
 // fork in run := true
 
