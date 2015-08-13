@@ -1,8 +1,7 @@
 package controllers.services.devicenotifications
 
-import akka.actor.{ActorRef, Props}
-import com.vita.akka.cake.ActorCreationSupport
-import controllers.services.devicenotifications.DeviceNotifications.{IOSDevice, Devices}
+import akka.actor.Props
+import controllers.services.devicenotifications.DeviceNotifications.{Devices, IOSDevice}
 import controllers.services.devicenotifications.apple.ApplePushNotification
 import org.specs2.mutable._
 import org.specs2.time.NoTimeConversions
@@ -22,11 +21,7 @@ class DeviceNotificationsSpecs
       private val message = "message"
 
       within(1.second) {
-        system.actorOf(Props(new DeviceNotifications with ActorCreationSupport {
-          override def createChild(props: Props, name: String): ActorRef = {
-            testActor
-          }
-        }))
+        system.actorOf(Props(new DeviceNotifications with TestActorCreationSupport))
       } ! DeviceNotifications.PushMessage(Devices(Set(device2, device1)), message)
 
       expectMsgAllOf(

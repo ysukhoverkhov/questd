@@ -1,7 +1,8 @@
 package testhelpers.specs2support
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, Props, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit}
+import com.vita.akka.cake.ActorCreationSupport
 import org.specs2.mutable._
 
 /**
@@ -14,5 +15,9 @@ abstract class AkkaTestKitSpecs2Support
   with After
   with ImplicitSender {
 
-    def after = system.terminate()
+  def after = system.terminate()
+
+  trait TestActorCreationSupport extends ActorCreationSupport {
+    override def createChild(props: Props, name: String): ActorRef = testActor
+  }
 }
