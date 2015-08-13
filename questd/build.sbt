@@ -22,8 +22,6 @@ publishArtifact in (Compile, packageDoc) := false
 
 publishArtifact in (Compile, packageSrc) := false
 
-// TODO: clenup here and sort everything.
-
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
 
 libraryDependencies += "org.json4s" %% "json4s-ext" % "3.2.11"

@@ -1,13 +1,13 @@
 package controllers.web.rest.component
 
-import akka.actor.{Actor, ActorLogging, Props, UnhandledMessage}
 import controllers.domain._
 import controllers.domain.admin.{AllQuestsRequest, AllSolutionsRequest, AllUsersRequest}
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
-import controllers.services.devicenotifications.{DeviceNotifications, InactiveDevices}
+import controllers.services.devicenotifications.DeviceNotifications
+import controllers.services.devicenotifications.DeviceNotifications.IOSDevice
 import controllers.web.helpers._
 import models.domain.common.{ContentReference, ContentType, ContentVote}
 import models.domain.quest.QuestInfoContent
@@ -70,33 +70,17 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
   }
 
 
-  val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
-  val actorSelectionInactive = Akka.system.actorSelection(s"user/${InactiveDevices.name}")
-  class MyActor extends Actor with ActorLogging {
-    def receive = {
-      case "test" =>
-        Logger.error("received test")
-        actorSelectionNotification ! InactiveDevices.GetInactiveDevicesRequest
-
-      case InactiveDevices.GetInactiveDevicesResult(InactiveDevices.IOSDevice, devices) =>
-        Logger.error(s"ios devices received $devices")
-
-//      case a      => Logger.error(s"received unknown message $a")
-    }
-  }
-  val act = Akka.system.actorOf(Props(new MyActor()), name = "asdasd")
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
+    val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
 
-//    actorSelection ! DeviceNotifications.PushMessage(
-//      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
-//      message = "lalala",
-//      badge = None,
-//      sound = None,
-//      destinations = List(DeviceNotifications.MobileDestination)
-//    )
-
-    act ! "test2"
+    actorSelectionNotification ! DeviceNotifications.PushMessage(
+      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
+      message = "lalala",
+      badge = None,
+      sound = None,
+      destinations = List(DeviceNotifications.MobileDestination)
+    )
 
     OkApiResult(WSDebugResult("lalai"))
   }

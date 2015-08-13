@@ -1,6 +1,7 @@
 package controllers.services.devicenotifications.apple.helpers
 
 import com.notnoop.apns.{APNS, ApnsService}
+import play.Play
 
 /**
  * APNS Service creator.
@@ -10,10 +11,9 @@ import com.notnoop.apns.{APNS, ApnsService}
 trait APNSService
 {
   // TODO: read password from config file.
-  // TODO: store in correct place.
   val service: ApnsService =
     APNS.newService()
-      .withCert("d:/QMPushDevelop.p12", "123")
+      .withCert("conf/QMPushDevelop.p12", Play.application().configuration().getString("application.devicenotifications.apple.certificatepass"))
       .withSandboxDestination()
       .build()
 
