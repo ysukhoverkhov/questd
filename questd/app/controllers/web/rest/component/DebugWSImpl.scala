@@ -69,8 +69,6 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
     api.shiftDailyResult(ShiftDailyResultRequest(r.user))
   }
 
-
-
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
     val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
 
