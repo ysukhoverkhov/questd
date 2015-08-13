@@ -43,4 +43,4 @@ class AppleInactiveDevices extends Actor with APNSService {
       } pipeTo sender
   }
 }
-// FIX: put these calls to the future and all futures should be run in proper context.
+// FIX: all futures should be run in proper context.

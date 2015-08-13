@@ -33,7 +33,12 @@ object DeviceNotifications {
   case object MobileDestination extends Destination
   case object WatchDestination extends Destination
 
-  case class PushMessage(devices: Devices, message: String, badge: Option[Int], sound: Option[String], destinations: Seq[Destination])
+  case class PushMessage(
+    devices: Devices,
+    message: String,
+    badge: Option[Int] = None,
+    sound: Option[String] = None,
+    destinations: Seq[Destination] = List(MobileDestination))
 }
 
 
