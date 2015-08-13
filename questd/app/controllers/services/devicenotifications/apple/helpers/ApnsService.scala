@@ -10,11 +10,9 @@ import play.Play
  */
 trait APNSService
 {
-  // TODO: read password from config file.
   val service: ApnsService =
     APNS.newService()
       .withCert("conf/QMPushDevelop.p12", Play.application().configuration().getString("application.devicenotifications.apple.certificatepass"))
       .withSandboxDestination()
       .build()
-
 }
