@@ -4,6 +4,7 @@ import java.util.Date
 
 import akka.actor.Props
 import akka.testkit.TestProbe
+import akka.util.Timeout
 import controllers.services.devicenotifications.apple.AppleInactiveDevices
 import org.specs2.mutable._
 import org.specs2.time.NoTimeConversions
@@ -29,6 +30,20 @@ class InactiveDevicesSpecs
         fakeApple.reply(AppleInactiveDevices.GetAppleInactiveDevicesResult(inactiveDevices))
 
         expectMsg(InactiveDevices.GetInactiveDevicesResult(InactiveDevices.IOSDevice, inactiveDevices))
+      }
+    }
+
+    "Returns empty list of devices on exception" in new AkkaTestKitSpecs2Support {
+      val fakeApple = TestProbe("FakeAppleInactiveDevices")
+      val subject = system.actorOf(Props(new InactiveDevices with TestActorCreationSupport{override implicit val timeout: Timeout = Timeout(1.seconds)}))
+      val inactiveDevices = Map("test string" -> new Date)
+
+      within(2.seconds) {
+        subject ! InactiveDevices.GetInactiveDevicesRequest
+
+        expectMsg(AppleInactiveDevices.GetAppleInactiveDevicesRequest)
+
+        expectMsg(InactiveDevices.GetInactiveDevicesResult(InactiveDevices.IOSDevice, Map.empty))
       }
     }
   }

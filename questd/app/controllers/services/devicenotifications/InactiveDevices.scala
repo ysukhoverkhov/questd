@@ -11,6 +11,7 @@ import controllers.services.devicenotifications.InactiveDevices.{GetInactiveDevi
 import controllers.services.devicenotifications.apple.AppleInactiveDevices.{GetAppleInactiveDevicesRequest, GetAppleInactiveDevicesResult}
 import controllers.services.devicenotifications.apple.AppleInactiveDevices
 import play.Logger
+import scala.concurrent.duration._
 
 object InactiveDevices {
   val name = "InactiveDevices"
@@ -24,21 +25,19 @@ object InactiveDevices {
   case class GetInactiveDevicesResult(deviceType: Device, inactiveDevices: Map[String, Date])
 }
 
-
 /**
- * Root notifications actor
+ * Actor for quereing all inactive devices.
  *
  * Created by Yury on 11.08.2015.
  */
 class InactiveDevices extends Actor with ActorContextCreationSupport {
   val appleInactiveDevices = createChild(AppleInactiveDevices.props, AppleInactiveDevices.name)
+  implicit val timeout = Timeout(30.seconds)
 
   def receive: Receive = {
     case GetInactiveDevicesRequest =>
       import akka.pattern.{ask, pipe}
       import context.dispatcher
-      import scala.concurrent.duration._
-      implicit val timeout = Timeout(30.seconds)
 
       (appleInactiveDevices ? GetAppleInactiveDevicesRequest).mapTo[GetAppleInactiveDevicesResult] map { result =>
         GetInactiveDevicesResult(IOSDevice, result.inactiveDevices)
