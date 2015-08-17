@@ -8,5 +8,7 @@ import play.api.mvc._
 object MessagesWS extends Controller with AccessToWSInstance {
 
   def removeMessage = ws.removeMessage
+  def addDeviceToken = ws.addDeviceToken
+  def removeDeviceToken = ws.removeDeviceToken
 }
 

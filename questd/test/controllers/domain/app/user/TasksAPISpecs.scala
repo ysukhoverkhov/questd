@@ -2,8 +2,7 @@ package controllers.domain.app.user
 
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{BaseAPISpecs, OkApiResult}
-import models.domain.common.Assets
-import models.domain.tutorial.TutorialPlatform
+import models.domain.common.{ClientPlatform, Assets}
 import models.domain.user._
 import models.domain.user.profile._
 import org.mockito.Matchers.{eq => mEq}
@@ -17,7 +16,7 @@ class TasksAPISpecs extends BaseAPISpecs {
         dailyTasks = dt,
         ratingToNextLevel = 10000000,
         rights = Rights.full,
-        tutorialStates = Map(TutorialPlatform.iPhone.toString -> TutorialState(
+        tutorialStates = Map(ClientPlatform.iPhone.toString -> TutorialState(
           usedTutorialTaskIds = assignedTutorialTaskIds))))
   }
 

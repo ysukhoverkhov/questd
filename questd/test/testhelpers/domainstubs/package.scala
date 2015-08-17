@@ -5,11 +5,10 @@ import java.util.Date
 import models.domain.base.ID
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
 import models.domain.comment.{Comment, CommentInfo}
-import models.domain.common.{Assets, ContentReference, ContentType, ContentVote}
+import models.domain.common._
 import models.domain.quest._
 import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
-import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, LoginMethod}
 import models.domain.user.battlerequests.BattleRequest
@@ -262,7 +261,7 @@ package object domainstubs {
           bio = Bio(
             gender = Gender.Male)),
         rights = rights,
-        tutorialStates = Map(TutorialPlatform.iPhone.toString -> tutorialState),
+        tutorialStates = Map(ClientPlatform.iPhone.toString -> tutorialState),
         dailyTasks = dailyTasks),
       friends = friends,
       followers = followers,

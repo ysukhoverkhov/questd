@@ -77,6 +77,8 @@ POST	/rest/removeFromFriends							controllers.web.rest.FriendsWS.removeFromFrie
 
 # Messages
 POST	/rest/removeMessage								controllers.web.rest.MessagesWS.removeMessage
+POST    /rest/addDeviceToken                            controllers.web.rest.MessagesWS.addDeviceToken
+POST    /rest/removeDeviceToken                         controllers.web.rest.MessagesWS.removeDeviceToken
 
 # Misc
 POST	/rest/getTime									controllers.web.rest.MiscWS.getTime

@@ -5,6 +5,7 @@ import models.domain.user.auth.AuthInfo
 import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults.DailyResult
 import models.domain.user.demo.UserDemographics
+import models.domain.user.devices.Device
 import models.domain.user.friends.Friendship
 import models.domain.user.profile.Profile
 import models.domain.user.schedules.UserSchedules
@@ -27,5 +28,6 @@ case class User(
   followers: List[String] = List.empty,
   friends: List[Friendship] = List.empty,
   battleRequests: List[BattleRequest] = List.empty,
+  devices: List[Device] = List.empty,
   mustVoteSolutions: List[String] = List.empty,
   payedAuthor: Boolean = false) extends ID

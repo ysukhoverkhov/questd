@@ -3,7 +3,7 @@ package controllers.web.rest.component
 import controllers.domain.app.user._
 import controllers.web.helpers._
 import com.vita.scala.extensions._
-import models.domain.tutorial.TutorialPlatform
+import models.domain.common.ClientPlatform
 
 private object TutorialWSImplTypes {
 
@@ -54,7 +54,7 @@ trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSCompo
   def getTutorial = wrapJsonApiCallReturnBody[WSGetTutorialResult] { (js, r) =>
     val v = Json.read[WSGetTutorialRequest](js)
 
-    api.getTutorial(GetTutorialRequest(r.user, TutorialPlatform.withNameEx(v.platform)))
+    api.getTutorial(GetTutorialRequest(r.user, ClientPlatform.withNameEx(v.platform)))
   }
 
   def closeTutorialElement = wrapJsonApiCallReturnBody[WSCloseTutorialElementResult] { (js, r) =>
@@ -62,14 +62,14 @@ trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSCompo
 
     api.closeTutorialElement(CloseTutorialElementRequest(
       user = r.user,
-      platform = TutorialPlatform.withNameEx(v.platform),
+      platform = ClientPlatform.withNameEx(v.platform),
       elementId = v.elementId))
   }
 
   def assignTutorialTask = wrapJsonApiCallReturnBody[WSAssignTutorialTaskResult] { (js, r) =>
     val v = Json.read[WSAssignTutorialTaskRequest](js)
 
-    api.assignTutorialTask(AssignTutorialTaskRequest(r.user, TutorialPlatform.withNameEx(v.platform), v.taskId))
+    api.assignTutorialTask(AssignTutorialTaskRequest(r.user, ClientPlatform.withNameEx(v.platform), v.taskId))
   }
 
   def incTutorialTask = wrapJsonApiCallReturnBody[WSIncTutorialTaskResult] { (js, r) =>
@@ -81,7 +81,7 @@ trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSCompo
   def assignTutorialQuest = wrapJsonApiCallReturnBody[WSAssignTutorialQuestResult] { (js, r) =>
     val v = Json.read[WSAssignTutorialQuestRequest](js)
 
-    api.assignTutorialQuest(AssignTutorialQuestRequest(r.user, TutorialPlatform.withNameEx(v.platform), v.questId))
+    api.assignTutorialQuest(AssignTutorialQuestRequest(r.user, ClientPlatform.withNameEx(v.platform), v.questId))
   }
 }
 

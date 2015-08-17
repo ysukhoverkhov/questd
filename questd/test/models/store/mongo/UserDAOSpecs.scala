@@ -4,8 +4,7 @@ package models.store.mongo
 
 import java.util.Date
 
-import models.domain.common.{Assets, ContentVote}
-import models.domain.tutorial.TutorialPlatform
+import models.domain.common.{ClientPlatform, Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
 import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
@@ -302,10 +301,10 @@ class UserDAOSpecs
       db.user.create(User(
         id = userid))
 
-      val ou = db.user.addClosedTutorialElement(userid, TutorialPlatform.iPhone.toString, elementid)
+      val ou = db.user.addClosedTutorialElement(userid, ClientPlatform.iPhone.toString, elementid)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).closedElementIds == List(elementid))
+      ou must beSome.which((u: User) => u.profile.tutorialStates(ClientPlatform.iPhone.toString).closedElementIds == List(elementid))
     }
 
     "addTutorialTaskAssigned works" in new WithApplication(appWithTestDatabase) {
@@ -316,13 +315,13 @@ class UserDAOSpecs
       db.user.create(User(
         id = userid))
 
-      db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t1")
-      db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
-      db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t3")
-      val ou = db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
+      db.user.addTutorialTaskAssigned(userid, ClientPlatform.iPhone.toString, "t1")
+      db.user.addTutorialTaskAssigned(userid, ClientPlatform.iPhone.toString, "t2")
+      db.user.addTutorialTaskAssigned(userid, ClientPlatform.iPhone.toString, "t3")
+      val ou = db.user.addTutorialTaskAssigned(userid, ClientPlatform.iPhone.toString, "t2")
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).usedTutorialTaskIds.length == 3)
+      ou must beSome.which((u: User) => u.profile.tutorialStates(ClientPlatform.iPhone.toString).usedTutorialTaskIds.length == 3)
     }
 
     "addTutorialQuestAssigned works" in new WithApplication(appWithTestDatabase) {
@@ -333,13 +332,13 @@ class UserDAOSpecs
       db.user.create(User(
         id = userid))
 
-      db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t1")
-      db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
-      db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t3")
-      val ou = db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
+      db.user.addTutorialQuestAssigned(userid, ClientPlatform.iPhone.toString, "t1")
+      db.user.addTutorialQuestAssigned(userid, ClientPlatform.iPhone.toString, "t2")
+      db.user.addTutorialQuestAssigned(userid, ClientPlatform.iPhone.toString, "t3")
+      val ou = db.user.addTutorialQuestAssigned(userid, ClientPlatform.iPhone.toString, "t2")
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).usedTutorialQuestIds.length == 3)
+      ou must beSome.which((u: User) => u.profile.tutorialStates(ClientPlatform.iPhone.toString).usedTutorialQuestIds.length == 3)
     }
 
     "updateCultureId works" in new WithApplication(appWithTestDatabase) {

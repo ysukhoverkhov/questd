@@ -2,6 +2,7 @@ package controllers.web.admin.component
 
 import controllers.domain.app.user.{GetCommonTutorialRequest, GetCommonTutorialResult}
 import controllers.domain.{DomainAPIComponent, OkApiResult}
+import models.domain.common.ClientPlatform
 import models.domain.tutorial._
 import org.json4s.ext.EnumNameSerializer
 import play.api.Logger
@@ -22,7 +23,7 @@ case class SectionNameForm(
 class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   private def leftMenu(implicit request: RequestHeader): Map[String, String] = {
-    TutorialPlatform.values.foldLeft[Map[String, String]](Map.empty) {
+    ClientPlatform.values.foldLeft[Map[String, String]](Map.empty) {
       (c, v) => c + (v.toString -> controllers.web.admin.routes.TutorialScriptsCRUD.tutorial(v.toString).absoluteURL(secure = false))
     }
   }
@@ -120,7 +121,7 @@ class TutorialScriptsCRUDImpl (val api: DomainAPIComponent#DomainAPI) extends Co
    */
   def tutorial(platform: String) = Authenticated { implicit request =>
 
-    val els = api.getCommonTutorial(GetCommonTutorialRequest(TutorialPlatform.withName(platform))) match {
+    val els = api.getCommonTutorial(GetCommonTutorialRequest(ClientPlatform.withName(platform))) match {
       case OkApiResult(GetCommonTutorialResult(elements)) =>
         elements
       case _ =>
