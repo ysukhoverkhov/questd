@@ -6,6 +6,7 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import models.domain.common.ClientPlatform
 import models.domain.user.User
+import models.domain.user.devices.Device
 import models.domain.user.message.Message
 import play.Logger
 
@@ -77,26 +78,26 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
     OkApiResult(RemoveMessageResult(OK))
   }
 
-
   /**
    * Adds new device token for user to send notifications to.
    */
   def addDeviceToken(request: AddDeviceTokenRequest): ApiResult[AddDeviceTokenResult] = handleDbException {
+    import request._
 
-//    db.user.removeMessage(user.id, messageId)
-
-    OkApiResult(AddDeviceTokenResult(OK))
+    db.user.addDevice(user.id, Device(platform, token)) ifSome { user =>
+      OkApiResult(AddDeviceTokenResult(OK))
+    }
   }
 
   /**
-   * Removes device token from list of revices to send notifications to.
+   * Removes device token from list of devices to send notifications to.
    */
   def removeDeviceToken(request: RemoveDeviceTokenRequest): ApiResult[RemoveDeviceTokenResult] = handleDbException {
+    import request._
 
-    //    db.user.removeMessage(user.id, messageId)
-
-    OkApiResult(RemoveDeviceTokenResult(OK))
+    db.user.removeDevice(user.id, token) ifSome { user =>
+      OkApiResult(RemoveDeviceTokenResult(OK))
+    }
   }
-
 }
 
