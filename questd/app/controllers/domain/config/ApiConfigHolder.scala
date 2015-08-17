@@ -22,8 +22,8 @@ class _DefaultConfigParams {
   val QuestVoteTaskCountDeviation = "30 32 Quest Vote Task Count Deviation"
   val CreateQuestTaskProbability = "30 41 Create Quest Task Probability"
   val WriteCommentTaskProbability = "30 42 Write Comment Task Probability"
-  val BattleVoteTaskCountMean = "30 51 Battle Vote Task Count Mean"
-  val BattleVoteTaskCountDeviation = "30 52 Battle Vote Task Count Deviation"
+  val ChallengeBattleTaskProbability = "30 43 Challenge Battle Task Probability"
+  val BattleVoteTaskProbability = "30 51 Battle Vote Task Probability"
 
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
@@ -96,7 +96,7 @@ class _DefaultConfigParams {
 }
 
 class _TutorialConfigParams {
-  val TutorialQuestId = "05 01 Tutorial Quest Id"
+  val TutorialQuestId = "05 01 Tutorial Quest Id" // TODO: remove the constant since it's not used.
 }
 
 object _DefaultConfigParams extends _DefaultConfigParams
@@ -125,10 +125,10 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.AddToFollowingTaskProbability -> "0.3",
             DefaultConfigParams.QuestVoteTaskCountMean -> "2",
             DefaultConfigParams.QuestVoteTaskCountDeviation -> "0.5",
-            DefaultConfigParams.CreateQuestTaskProbability -> "0.3",
+            DefaultConfigParams.CreateQuestTaskProbability -> "0.2",
             DefaultConfigParams.WriteCommentTaskProbability -> "0.3",
-            DefaultConfigParams.BattleVoteTaskCountMean -> "3",
-            DefaultConfigParams.BattleVoteTaskCountDeviation -> "1",
+            DefaultConfigParams.ChallengeBattleTaskProbability -> "0.2",
+            DefaultConfigParams.BattleVoteTaskProbability -> "0.3",
 
 
             DefaultConfigParams.FavoriteThemesShare -> "0.2",

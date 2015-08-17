@@ -6,15 +6,18 @@ import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
+import controllers.services.devicenotifications.DeviceNotifications
+import controllers.services.devicenotifications.DeviceNotifications.IOSDevice
 import controllers.web.helpers._
-import models.domain.common.{Assets, ContentVote, ContentType, ContentReference}
+import models.domain.common.{ContentReference, ContentType, ContentVote}
 import models.domain.quest.QuestInfoContent
 import models.domain.solution.SolutionInfoContent
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.Gender
-import models.domain.user.timeline.{TimeLineType, TimeLineReason}
+import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger
+import play.libs.Akka
 
 private object DebugWSImplTypes {
 
@@ -67,7 +70,15 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
   }
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
-    api.adjustAssets(AdjustAssetsRequest(r.user, change = Assets(0, 0, 1000000)))
+    val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+
+    actorSelectionNotification ! DeviceNotifications.PushMessage(
+      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
+      message = "lalala",
+      badge = None,
+      sound = None,
+      destinations = List(DeviceNotifications.MobileDestination)
+    )
 
     OkApiResult(WSDebugResult("lalai"))
   }

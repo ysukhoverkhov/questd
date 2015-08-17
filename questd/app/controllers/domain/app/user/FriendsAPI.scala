@@ -4,7 +4,7 @@ import components._
 import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
-import controllers.sn.client.{User => SNUser}
+import controllers.services.socialnetworks.client.{User => SNUser}
 import models.domain.common.Assets
 import models.domain.user._
 import models.domain.user.friends.{ReferralStatus, FriendshipStatus, Friendship}

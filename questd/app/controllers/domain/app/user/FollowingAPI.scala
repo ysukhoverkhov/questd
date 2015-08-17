@@ -5,7 +5,7 @@ import components._
 import controllers.domain._
 import controllers.domain.helpers._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.sn.client.{User => SNUser}
+import controllers.services.socialnetworks.client.{User => SNUser}
 import models.domain.common.Assets
 import models.domain.user.profile.{TaskType, Profile}
 import models.domain.user.User

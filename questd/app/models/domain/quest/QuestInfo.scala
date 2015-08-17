@@ -1,5 +1,7 @@
 package models.domain.quest
 
+import java.util.Date
+
 import models.domain.common.Assets
 
 case class QuestInfo(
@@ -10,6 +12,7 @@ case class QuestInfo(
   solveCost: Assets,
   solveReward: Assets,
   victoryReward: Assets,
-  defeatReward: Assets
+  defeatReward: Assets,
+  creationDate: Date = new Date()
   )
 

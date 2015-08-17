@@ -4,7 +4,7 @@ import components.{APIAccessor, RandomAccessor}
 import components.random.RandomComponent
 import controllers.domain.DomainAPIComponent
 import controllers.domain.config.{_TutorialConfigParams, _DefaultConfigParams}
-import controllers.sn.component.SocialNetworkComponent
+import controllers.services.socialnetworks.component.SocialNetworkComponent
 import models.domain.admin.ConfigSection
 import models.store.DatabaseComponent
 import org.specs2.mock.Mockito
@@ -73,6 +73,8 @@ private[logic] abstract class BaseLogicSpecs extends Specification
     configSection.apply(api.DefaultConfigParams.QuestVoteTaskCountDeviation) returns "1"
     configSection.apply(api.DefaultConfigParams.CreateQuestTaskProbability) returns "0.3"
     configSection.apply(api.DefaultConfigParams.WriteCommentTaskProbability) returns "0.3"
+    configSection.apply(api.DefaultConfigParams.ChallengeBattleTaskProbability) returns "0.3"
+    configSection.apply(api.DefaultConfigParams.BattleVoteTaskProbability) returns "0.3"
 
     configSection.apply(api.DefaultConfigParams.FavoriteThemesShare) returns "0.20"
     configSection.apply(api.DefaultConfigParams.FavoriteThemesProbability) returns "0.75"

@@ -5,8 +5,12 @@ import controllers.domain._
 class BattleFetchAPISpecs extends BaseAPISpecs {
 
   "Battle Fetch API" should {
+    "success all the time" in {
+      success
+    }
 
-//    "getMyQuests calls db correctly" in context {
+// TODO: test it someday.
+    //    "getMyQuests calls db correctly" in context {
 //
 //      val u = createUserStub()
 //

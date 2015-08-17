@@ -144,10 +144,19 @@ class TasksSpecs extends BaseLogicSpecs {
       val u = createUser(12)
       val dailyResult = u.getTasksForTomorrow
 
-      u.canSolveQuestToday must beEqualTo(true)
-
       val t = dailyResult.tasks.find(_.taskType == TaskType.LookThroughFriendshipProposals)
       t must beNone
+    }
+
+    "Generate tasks for challenging battles" in {
+      applyConfigMock()
+
+      val u = createUser(12)
+      val dailyResult = u.getTasksForTomorrow
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.ChallengeBattle)
+      t must beSome[Task]
+      t.get.requiredCount must beEqualTo(1)
     }
   }
 }

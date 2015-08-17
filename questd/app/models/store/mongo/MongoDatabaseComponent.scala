@@ -18,6 +18,8 @@ trait MongoDatabaseComponent extends DatabaseComponent {
     val battle = new MongoBattleDAO
     val culture = new MongoCultureDAO
     val comment = new MongoCommentDAO
+
+    val crawlerContext = new MongoCrawlerContextDAO
   }
 }
 
