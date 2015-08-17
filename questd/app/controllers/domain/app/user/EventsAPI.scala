@@ -4,11 +4,12 @@ import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
+import controllers.services.devicenotifications.DeviceNotifications
 import models.domain.common.ClientPlatform
 import models.domain.user.User
-import models.domain.user.devices.Device
-import models.domain.user.message.Message
+import models.domain.user.message.{MessageMetaInfo, Message}
 import play.Logger
+import play.libs.Akka
 
 case class SendMessageRequest(user: User, message: Message)
 case class SendMessageResult(user: User)
@@ -27,6 +28,10 @@ case class RemoveDeviceTokenResult(allowed: ProfileModificationResult)
 
 case class CheckSendNotificationsRequest(user: User)
 case class CheckSendNotificationsResult(user: User)
+
+case class NotifyWithMessageRequest(user: User, message: Message)
+case class NotifyWithMessageResult(user: User)
+
 
 private[domain] trait EventsAPI { this: DBAccessor =>
 
@@ -88,6 +93,7 @@ private[domain] trait EventsAPI { this: DBAccessor =>
    * Adds new device token for user to send notifications to.
    */
   def addDeviceToken(request: AddDeviceTokenRequest): ApiResult[AddDeviceTokenResult] = handleDbException {
+    import models.domain.user.devices.Device
     import request._
 
     db.user.addDevice(user.id, Device(platform, token)) ifSome { user =>
@@ -114,5 +120,32 @@ private[domain] trait EventsAPI { this: DBAccessor =>
 
     OkApiResult(CheckSendNotificationsResult(user))
   }
+
+  /**
+   * Notify user with a message.
+   */
+  def notifyWithMessage(request: NotifyWithMessageRequest): ApiResult[NotifyWithMessageResult] = handleDbException {
+    import controllers.services.devicenotifications.DeviceNotifications.{Device, IOSDevice}
+    import request._ // TODO: test me.
+
+    val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+
+    val devices: Set[Device] = user.devices.map {
+      case models.domain.user.devices.Device(ClientPlatform.iPhone, token) => IOSDevice(token)
+    }.toSet[Device]
+
+    val messageText = MessageMetaInfo.messageLocalizedMessage(message.messageType)
+
+    actorSelectionNotification ! DeviceNotifications.PushMessage(
+      devices = DeviceNotifications.Devices(devices.toSet),
+      message = messageText,
+      badge = None,
+      sound = None,
+      destinations = List(DeviceNotifications.MobileDestination)
+    )
+
+    OkApiResult(NotifyWithMessageResult(user))
+  }
+
 }
 
