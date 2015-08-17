@@ -1,5 +1,7 @@
 package models.domain.user.timeline
 
+import java.util.Date
+
 import models.domain.base.ID
 
 
@@ -11,11 +13,13 @@ import models.domain.base.ID
  * @param actorId Id of actor action what created the entry.
  * @param objectType Type of object entry describes.
  * @param objectId Id of object entry describes.
+ * @param entryDate Date when entry was added to the timeline.
  */
 case class TimeLineEntry  (
   id: String = ID.generateUUID(),
   reason: TimeLineReason.Value,
   actorId: String,
   objectType: TimeLineType.Value,
-  objectId: String)
+  objectId: String,
+  entryDate: Date = new Date())
 

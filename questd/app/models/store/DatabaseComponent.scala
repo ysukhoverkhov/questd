@@ -20,6 +20,7 @@ trait DatabaseComponent {
     val tutorial: TutorialDAO
     val tutorialTask: TutorialTaskDAO
     val comment: CommentDAO
+    val crawlerContext: CrawlerContextDAO
   }
 
 }

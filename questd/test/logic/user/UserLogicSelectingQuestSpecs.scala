@@ -59,8 +59,8 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       val u = createUserStub()
       val q = u.getRandomQuestsForTimeLine(1)
 
-      there was one(rand).nextDouble
       there was one(api).getAllQuests(any[GetAllQuestsRequest])
+      there was one(rand).nextDouble
 
       q.map(_.id) must beEqualTo(List(qid))
     }
@@ -141,7 +141,11 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       applyConfigMock()
       rand.nextDouble returns 0.0
 
-      api.getVIPQuests(any[GetVIPQuestsRequest]) returns OkApiResult(GetVIPQuestsResult(List(createQuestStub(qid, "author")).iterator))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns
+        OkApiResult(GetAllQuestsResult(Iterator.empty)) // TUTORIAL
+
+      api.getVIPQuests(any[GetVIPQuestsRequest]) returns
+        OkApiResult(GetVIPQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       u.getRandomQuestsForTimeLine(1)
 
@@ -164,12 +168,14 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       applyConfigMock()
       rand.nextDouble returns 1.0
 
-      api.getAllQuests(any[GetAllQuestsRequest]) returns OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
+      api.getAllQuests(any[GetAllQuestsRequest]) returns
+        OkApiResult(GetAllQuestsResult(Iterator.empty)) thenReturns // TUTORIAL
+        OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator))
 
       u.getRandomQuestsForTimeLine(1)
 
       there was one(rand).nextDouble
-      there was one(api).getAllQuests(any[GetAllQuestsRequest])
+      there were two(api).getAllQuests(any[GetAllQuestsRequest])
     }
 
     "Starting quests does not return other quests ignoring recent quests list if no quests available otherwise" in {
@@ -180,6 +186,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       rand.nextDouble returns 1.0 thenReturns 1.0
 
       api.getAllQuests(any[GetAllQuestsRequest]) returns
+        OkApiResult(GetAllQuestsResult(Iterator.empty)) thenReturns // TUTORIAL
         OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator)) thenReturns
         OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator)) thenReturns
         OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator)) thenReturns
@@ -200,6 +207,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
       rand.nextDouble returns 1.0 thenReturns 1.0
 
       api.getAllQuests(any[GetAllQuestsRequest]) returns
+        OkApiResult(GetAllQuestsResult(Iterator.empty)) thenReturns // TUTORIAL
         OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator)) thenReturns
         OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator)) thenReturns
         OkApiResult(GetAllQuestsResult(List(createQuestStub(qid, "author")).iterator)) thenReturns

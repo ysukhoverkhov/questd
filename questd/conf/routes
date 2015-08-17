@@ -99,6 +99,12 @@ POST    /rest/challengeBattle 	    					controllers.web.rest.ChallengesWS.challe
 POST	/rest/getBattleRequests						    controllers.web.rest.ChallengesWS.getBattleRequests
 POST    /rest/respondBattleRequest    					controllers.web.rest.ChallengesWS.respondBattleRequest
 
+# Chat
+#POST   /rest/createConversation
+#POST   /rest/getMyConversations
+#POST   /rest/sendChatMessage
+#POST   /rest/getChatMessages
+
 
 # Upload
 POST    /cdn/upload                                     controllers.web.rest.UploadWS.upload

@@ -5,8 +5,12 @@ import controllers.domain.BaseAPISpecs
 class VoteSolutionAPISpecs extends BaseAPISpecs {
 
   "Vote Solution API" should {
+    "success all the time" in {
+      success
+    }
 
-//    "Remove solution from list of mustVoteSolutions if it's selected" in context {
+
+    //    "Remove solution from list of mustVoteSolutions if it's selected" in context {
 //
 //      val sid = "solution id"
 //      val u = createUserStub(id = "uniqueid", mustVoteSolutions = List(sid))

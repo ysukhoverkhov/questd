@@ -22,8 +22,7 @@ trait Challenges { this: UserLogic =>
     lazy val alreadyHasRequest = user.battleRequests
       .exists(br => (br.mySolutionId == mySolution.id) && (br.opponentSolutionId == opponentSolution.id))
 
-    // TODO: get the period in config.
-    lazy val battleCreationDelay = 1
+    lazy val battleCreationDelay = api.config(api.DefaultConfigParams.BattleCreationDelay).toInt
 
     if (mySolution.info.authorId == opponentSolution.info.authorId)
       OutOfContent
@@ -33,8 +32,8 @@ trait Challenges { this: UserLogic =>
       InvalidState
     else if (checkQuest && (opponentSolution.info.questId != mySolution.info.questId))
       InvalidState
-    else if (DateTime.now < (new DateTime(mySolution.creationDate) + battleCreationDelay.hour) ||
-      DateTime.now < (new DateTime(opponentSolution.creationDate) + battleCreationDelay.hour))
+    else if (DateTime.now < (new DateTime(mySolution.info.creationDate) + battleCreationDelay.hour) ||
+      DateTime.now < (new DateTime(opponentSolution.info.creationDate) + battleCreationDelay.hour))
       CoolDown
     else
       OK

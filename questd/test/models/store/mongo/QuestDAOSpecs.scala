@@ -96,7 +96,7 @@ class QuestDAOSpecs extends Specification
         createQuestStub(
           id = "q3",
           authorId = "q3_author id",
-          status = QuestStatus.CheatingBanned,
+          status = QuestStatus.AdminBanned,
           level = 7,
           vip = true,
           cultureId = "c3",
@@ -109,7 +109,7 @@ class QuestDAOSpecs extends Specification
       all.size must beEqualTo(qs.size)
       all.map(_.id) must beEqualTo(qs.sortBy(_.rating.timelinePoints)(Ordering[Int].reverse).map(_.id))
 
-      val status = db.quest.allWithParams(status = List(QuestStatus.CheatingBanned)).toList
+      val status = db.quest.allWithParams(status = List(QuestStatus.CheatingBanned, QuestStatus.AdminBanned)).toList
       status.map(_.id).size must beEqualTo(2)
       status.map(_.id) must contain(qs(0).id) and contain(qs(2).id)
 

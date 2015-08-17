@@ -6,12 +6,14 @@ import models.domain.admin.ConfigSection
 
 class _DefaultConfigParams {
 
+  // Misc
   val DebugExpMultiplier = "01 01 Debug Exp Multiplier"
   val DebugDisableQuestCreationCoolDown = "01 02 Debug Disable Quest Creation CoolDown"
 
   val ActiveUserDays = "10 01 Active User Days"
   val DefaultCultureId = "15 01 Default Culture Id"
 
+  // Tasks
   val SolutionVoteTaskCountMean = "30 01 Solution Vote Task Count Mean"
   val SolutionVoteTaskCountDeviation = "30 02 Solution Vote Task Count Deviation"
   val CreateSolutionTaskProbability = "30 11 Create Solution Task Probability"
@@ -20,12 +22,13 @@ class _DefaultConfigParams {
   val QuestVoteTaskCountDeviation = "30 32 Quest Vote Task Count Deviation"
   val CreateQuestTaskProbability = "30 41 Create Quest Task Probability"
   val WriteCommentTaskProbability = "30 42 Write Comment Task Probability"
-  val BattleVoteTaskCountMean = "30 51 Battle Vote Task Count Mean"
-  val BattleVoteTaskCountDeviation = "30 52 Battle Vote Task Count Deviation"
+  val ChallengeBattleTaskProbability = "30 43 Challenge Battle Task Probability"
+  val BattleVoteTaskProbability = "30 51 Battle Vote Task Probability"
 
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
 
+  // Quests
   val CommentsMaxLength = "45 01 Comments Max Length"
 
   val QuestCheatingRatio = "50 12 Quest Cheating to Votes Ratio"
@@ -35,11 +38,19 @@ class _DefaultConfigParams {
   val QuestMaxDescriptionLength = "50 30 Quest Max Description Length"
   val QuestMaxTimeLinePointsForSolve = "50 40 Quest Max Time Line Points For Solve"
 
+  // Solutions
   val SolutionCheatingRatio = "60 10 Solution Cheating to Votes Ratio"
   val SolutionMinCheatingVotes = "60 11 Solution minimum votes to thing it's a cheating"
   val SolutionIACRatio = "60 15 Solution IAC to Votes Ratio"
   val SolutionMinIACVotes = "60 16 Solution min IAC Votes"
+  val BattleCreationDelay = "60 21 Battle Creation Delay"
 
+  // Battles
+  val BattleMinVotesCount = "65 10 Battle Min Votes Count"
+  val BattleAdditionalVotesMean = "65 11 Battle Additional Votes Mean"
+  val BattleAdditionalVotesDeviation = "65 12 Battle Additional Votes Deviation"
+
+  // Timeline
   val QuestProbabilityLevelsToGiveStartingQuests = "71 01 Level to give starting quests"
   val QuestProbabilityStartingVIPQuests = "71 02 Probability of selecting VIP quests in initial stage"
   val QuestProbabilityStartingFriendQuests = "71 03 Probability of selecting friend's quests in initial stage"
@@ -47,24 +58,7 @@ class _DefaultConfigParams {
 
   val QuestProbabilityFriends = "72 01 Probability of quests from friends"
   val QuestProbabilityFollowing = "72 02 Probability of quests from Following"
-  val QuestProbabilityVIP = "72 04 Probability of quests from Vips"
-
-  var TimeLineRandomQuestsDailyMean = "80 01 TimeLine Random Quests Daily Mean"
-  var TimeLineRandomQuestsDailyMeanFirstTime = "80 02 TimeLine Random Quests Daily Mean First Time"
-  var TimeLineRandomQuestsDailyDeviation = "80 03 TimeLine Random Quests Daily Deviation"
-  var TimeLineRandomQuestsDailyMin = "80 04 TimeLine Random Quests Daily Min"
-
-  var TimeLineRandomSolutionsDailyMean = "80 11 TimeLine Random Solutions Daily Mean"
-  var TimeLineRandomSolutionsDailyMeanFirstTime = "80 12 TimeLine Random Solutions Daily Mean First Time"
-  var TimeLineRandomSolutionsDailyDeviation = "80 13 TimeLine Random Solutions Daily Deviation"
-  var TimeLineRandomSolutionsDailyMin = "80 14 TimeLine Random Solutions Daily Min"
-
-  var TimeLineRandomBattlesDailyMean = "80 21 TimeLine Random Battles Daily Mean"
-  var TimeLineRandomBattlesDailyMeanFirstTime = "80 22 TimeLine Random Battles Daily Mean First Time"
-  var TimeLineRandomBattlesDailyDeviation = "80 23 TimeLine Random Battles Daily Deviation"
-  var TimeLineRandomBattlesDailyMin = "80 24 TimeLine Random Battles Daily Min"
-
-  var TimeLineRandomBattlesDaily = "80 03 TimeLine Random Battles Daily"
+  val QuestProbabilityVIP = "72 04 Probability of quests from VIPs"
 
   val SolutionProbabilityLevelsToGiveStartingSolutions = "91 01 Level to give starting Solutions"
   val SolutionProbabilityStartingVIPSolutions = "91 02 Probability of selecting VIP Solutions in initial stage"
@@ -83,10 +77,26 @@ class _DefaultConfigParams {
   val BattleProbabilityFollowing = "96 02 Probability of Battles from Following"
   val BattleProbabilityLikedSolutions = "96 03 Probability of Battles for liked Solutions"
   val BattleProbabilityVIP = "96 04 Probability of quests from VIPs"
+
+
+  var TimeLineRandomQuestsDailyMean = "80 01 TimeLine Random Quests Daily Mean"
+  var TimeLineRandomQuestsDailyMeanFirstTime = "80 02 TimeLine Random Quests Daily Mean First Time"
+  var TimeLineRandomQuestsDailyDeviation = "80 03 TimeLine Random Quests Daily Deviation"
+  var TimeLineRandomQuestsDailyMin = "80 04 TimeLine Random Quests Daily Min"
+
+  var TimeLineRandomSolutionsDailyMean = "80 11 TimeLine Random Solutions Daily Mean"
+  var TimeLineRandomSolutionsDailyMeanFirstTime = "80 12 TimeLine Random Solutions Daily Mean First Time"
+  var TimeLineRandomSolutionsDailyDeviation = "80 13 TimeLine Random Solutions Daily Deviation"
+  var TimeLineRandomSolutionsDailyMin = "80 14 TimeLine Random Solutions Daily Min"
+
+  var TimeLineRandomBattlesDailyMean = "80 21 TimeLine Random Battles Daily Mean"
+  var TimeLineRandomBattlesDailyMeanFirstTime = "80 22 TimeLine Random Battles Daily Mean First Time"
+  var TimeLineRandomBattlesDailyDeviation = "80 23 TimeLine Random Battles Daily Deviation"
+  var TimeLineRandomBattlesDailyMin = "80 24 TimeLine Random Battles Daily Min"
 }
 
 class _TutorialConfigParams {
-  val TutorialQuestId = "05 01 Tutorial Quest Id"
+  val TutorialQuestId = "05 01 Tutorial Quest Id" // TODO: remove the constant since it's not used.
 }
 
 object _DefaultConfigParams extends _DefaultConfigParams
@@ -115,10 +125,10 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.AddToFollowingTaskProbability -> "0.3",
             DefaultConfigParams.QuestVoteTaskCountMean -> "2",
             DefaultConfigParams.QuestVoteTaskCountDeviation -> "0.5",
-            DefaultConfigParams.CreateQuestTaskProbability -> "0.3",
+            DefaultConfigParams.CreateQuestTaskProbability -> "0.2",
             DefaultConfigParams.WriteCommentTaskProbability -> "0.3",
-            DefaultConfigParams.BattleVoteTaskCountMean -> "3",
-            DefaultConfigParams.BattleVoteTaskCountDeviation -> "1",
+            DefaultConfigParams.ChallengeBattleTaskProbability -> "0.2",
+            DefaultConfigParams.BattleVoteTaskProbability -> "0.3",
 
 
             DefaultConfigParams.FavoriteThemesShare -> "0.2",
@@ -137,6 +147,11 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.SolutionMinCheatingVotes -> "5",
             DefaultConfigParams.SolutionIACRatio -> "0.03",
             DefaultConfigParams.SolutionMinIACVotes -> "5",
+            DefaultConfigParams.BattleCreationDelay -> "24",
+
+            DefaultConfigParams.BattleMinVotesCount -> "1",
+            DefaultConfigParams.BattleAdditionalVotesMean -> "5",
+            DefaultConfigParams.BattleAdditionalVotesDeviation -> "4",
 
             DefaultConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "7",
             DefaultConfigParams.QuestProbabilityStartingVIPQuests -> "0.5",

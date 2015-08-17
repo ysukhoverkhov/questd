@@ -1,5 +1,6 @@
 package controllers.tasks.crawlers.base
 
+import akka.actor.Actor
 import com.vita.akka.EasyRestartActor
 import components._
 import components.random.RandomComponent
@@ -11,7 +12,7 @@ case class StartWork()
 case class Process[T](user: T)
 case class EndWork()
 
-abstract class BaseCrawler[T](apiPar: DomainAPIComponent#DomainAPI, randPar: RandomComponent#Random) extends EasyRestartActor
+abstract class BaseCrawler[T](apiPar: DomainAPIComponent#DomainAPI, randPar: RandomComponent#Random) extends Actor with EasyRestartActor
   with APIAccessor
   with RandomAccessor
   with LogicBootstrapper {

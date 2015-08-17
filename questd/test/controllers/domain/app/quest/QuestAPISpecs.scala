@@ -1,7 +1,10 @@
 package controllers.domain.app.quest
 
 import controllers.domain._
+import controllers.domain.app.protocol.ProfileModificationResult
+import controllers.domain.app.user.{BookmarkQuestResult, BookmarkQuestRequest}
 import models.domain.common.ContentVote
+import models.domain.user.User
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
@@ -61,6 +64,19 @@ class QuestAPISpecs extends BaseAPISpecs {
         pornChange = any)
     }
 
+    "setQuestBookmark does it" in context {
+      val q = createQuestStub(id = "qid")
+      val u = User(id = "uid")
+
+      quest.readById(q.id) returns Some(q)
+      user.setQuestBookmark(any, any) returns Some(u)
+
+      val result = api.bookmarkQuest(BookmarkQuestRequest(u, q.id))
+
+      result must beEqualTo(OkApiResult(BookmarkQuestResult(ProfileModificationResult.OK, Some(u.profile))))
+      there was one(quest).readById(q.id)
+      there was one(user).setQuestBookmark(any, any)
+    }
   }
 }
 

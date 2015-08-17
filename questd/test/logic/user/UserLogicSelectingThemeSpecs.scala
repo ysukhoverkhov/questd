@@ -1,7 +1,6 @@
 package logic.user
 
 import logic.BaseLogicSpecs
-import models.domain._
 import models.domain.tag.Theme
 import testhelpers.domainstubs._
 
@@ -17,6 +16,9 @@ class UserLogicSelectingThemeSpecs extends BaseLogicSpecs {
   }
 
   "User Logic" should {
+    "success all the time" in {
+      success
+    }
 
     // TODO: clean me up with tags.
 //    "Return correct theme from favorite" in {
