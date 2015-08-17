@@ -114,7 +114,7 @@ private[domain] trait EventsAPI { this: DBAccessor =>
 
   /**
    * Checks should we send notification or not and if we should sends it.
-   */ // TODO: implement me.
+   */ // TODO: implement me and test.
   def checkSendNotifications(request: CheckSendNotificationsRequest): ApiResult[CheckSendNotificationsResult] = handleDbException {
     import request._
 
@@ -126,7 +126,7 @@ private[domain] trait EventsAPI { this: DBAccessor =>
    */
   def notifyWithMessage(request: NotifyWithMessageRequest): ApiResult[NotifyWithMessageResult] = handleDbException {
     import controllers.services.devicenotifications.DeviceNotifications.{Device, IOSDevice}
-    import request._ // TODO: test me.
+    import request._
 
     val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
 
@@ -146,6 +146,5 @@ private[domain] trait EventsAPI { this: DBAccessor =>
 
     OkApiResult(NotifyWithMessageResult(user))
   }
-
 }
 
