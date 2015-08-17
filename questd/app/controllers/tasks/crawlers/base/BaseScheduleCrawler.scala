@@ -1,6 +1,6 @@
 package controllers.tasks.crawlers.base
 
-import akka.actor.Props
+import akka.actor.{Actor, Props}
 import com.vita.akka.EasyRestartActor
 import components.random.RandomComponent
 import controllers.tasks.messages.DoTask
@@ -8,7 +8,7 @@ import controllers.domain._
 import play.Logger
 
 
-abstract class BaseScheduleCrawler[T](api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) extends EasyRestartActor {
+abstract class BaseScheduleCrawler[T](api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) extends Actor with EasyRestartActor {
 
   protected val actors: List[Class[_ <: akka.actor.Actor]]
 

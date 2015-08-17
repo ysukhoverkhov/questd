@@ -54,6 +54,19 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       }
     }
 
+    def checkAddSolutionToAuthor(solution: Solution): Unit = {
+      db.user.readById(solution.info.authorId).fold(){ author =>
+        if (!author.stats.solvedQuests.contains(solution.info.questId)) {
+          db.user.recordQuestSolving(
+            id = author.id,
+            questId = solution.info.questId,
+            solutionId = solution.id,
+            removeBookmark = false)
+        }
+      }
+
+    }
+
     def rememberObjectToRemoveFromTimeline(objId: String): Unit = {
       objectsToRemove.append(objId)
     }
@@ -75,6 +88,7 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
     db.solution.all.foreach { solution =>
       val updatedSolution = checkBanSolution(solution)
 
+      checkAddSolutionToAuthor(updatedSolution)
       db.solution.update(updatedSolution)
 
       if (updatedSolution.status == SolutionStatus.AdminBanned) {

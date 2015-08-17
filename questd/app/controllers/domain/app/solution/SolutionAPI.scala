@@ -4,6 +4,7 @@ import components._
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.domain.helpers._
+import models.domain.battle.BattleStatus
 import models.domain.common.ContentVote
 import models.domain.solution.{Solution, SolutionStatus}
 import play.Logger
@@ -34,22 +35,39 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
-    {
-      db.solution.updatePoints(
-        solution.id,
-
-        votersCountChange = 1,
-        timelinePointsChange = checkInc(vote, Cool),
-        likesChange = checkInc(vote, Cool),
-
-        cheatingChange = checkInc(vote, Cheating),
-        spamChange = checkInc(vote, IASpam),
-        pornChange = checkInc(vote, IAPorn))
-    } ifSome { o =>
-
-      updateSolutionState(UpdateSolutionStateRequest(o)) map {
-        OkApiResult(VoteSolutionResult())
+    def solutionInBattle(solution: Solution) = {
+      solution.battleIds.foldLeft(false) {
+        case (true, _) => true
+        case (_, battleId) =>
+          db.battle.readById(battleId).fold {
+            Logger.error(s"unable to find battle with id $battleId for determining solution battle status")
+            false
+          } { battle =>
+            battle.info.status == BattleStatus.Fighting
+          }
       }
+    }
+
+    if (vote == Cool || !solutionInBattle(solution)) {
+      {
+        db.solution.updatePoints(
+          solution.id,
+
+          votersCountChange = 1,
+          timelinePointsChange = checkInc(vote, Cool),
+          likesChange = checkInc(vote, Cool),
+
+          cheatingChange = checkInc(vote, Cheating),
+          spamChange = checkInc(vote, IASpam),
+          pornChange = checkInc(vote, IAPorn))
+      } ifSome { o =>
+
+        updateSolutionState(UpdateSolutionStateRequest(o)) map {
+          OkApiResult(VoteSolutionResult())
+        }
+      }
+    } else {
+      OkApiResult(VoteSolutionResult())
     }
   }
 

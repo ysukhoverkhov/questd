@@ -7,6 +7,7 @@ import models.domain.battle.BattleStatus
 import models.domain.solution.SolutionStatus
 import models.domain.user.dailyresults.BattleResult
 import org.mockito.Matchers.{eq => mEq}
+import org.mockito.Mockito._
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
@@ -32,12 +33,14 @@ class BattleAPISpecs extends BaseAPISpecs {
       user.readById(any) returns Some(u)
       quest.readById(any) returns Some(q)
       user.storeBattleInDailyResult(any, any) returns Some(u)
+      doReturn(OkApiResult(TuneBattlePointsBeforeResolveResult(b))).when(api).tuneBattlePointsBeforeResolve(any)
 
       val result = api.updateBattleState(UpdateBattleStateRequest(b))
 
-      result must beEqualTo(OkApiResult(UpdateBattleStateResult()))
+      result must beAnInstanceOf[OkApiResult[UpdateBattleStateResult]]
       there was one(battle).updateStatus(any, any, any)
       there were two(user).storeBattleInDailyResult(any, any)
+      there was one(api).tuneBattlePointsBeforeResolve(any)
     }
 
     "Nominate battle side with higher points as winners " in context {
@@ -58,6 +61,7 @@ class BattleAPISpecs extends BaseAPISpecs {
         questId = q.id)
 
       battle.updateStatus(any, any, any) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
+      doReturn(OkApiResult(TuneBattlePointsBeforeResolveResult(b))).when(api).tuneBattlePointsBeforeResolve(any)
 
       quest.readById(any) returns Some(q)
       user.readById(uu(0).id) returns Some(uu(0))
@@ -66,10 +70,11 @@ class BattleAPISpecs extends BaseAPISpecs {
 
       val result = api.updateBattleState(UpdateBattleStateRequest(b))
 
-      result must beEqualTo(OkApiResult(UpdateBattleStateResult()))
+      result must beAnInstanceOf[OkApiResult[UpdateBattleStateResult]]
       there was one(battle).updateStatus(any, any, any)
       there was one(user).storeBattleInDailyResult(mEq(uu(0).id), mEq(BattleResult(b.id, q.info.victoryReward, isVictory = true)))
       there was one(user).storeBattleInDailyResult(mEq(uu(1).id), mEq(BattleResult(b.id, q.info.defeatReward, isVictory = false)))
+      there was one(api).tuneBattlePointsBeforeResolve(any)
     }
 
     "Nominate both as winners in case of equal points" in context {
@@ -90,6 +95,7 @@ class BattleAPISpecs extends BaseAPISpecs {
         questId = q.id)
 
       battle.updateStatus(any, any, any) returns Some(b.copy(info = b.info.copy(status = BattleStatus.Resolved)))
+      doReturn(OkApiResult(TuneBattlePointsBeforeResolveResult(b))).when(api).tuneBattlePointsBeforeResolve(any)
 
       quest.readById(any) returns Some(q)
       user.readById(uu(0).id) returns Some(uu(0))
@@ -98,10 +104,27 @@ class BattleAPISpecs extends BaseAPISpecs {
 
       val result = api.updateBattleState(UpdateBattleStateRequest(b))
 
-      result must beEqualTo(OkApiResult(UpdateBattleStateResult()))
+      result must beAnInstanceOf[OkApiResult[UpdateBattleStateResult]]
       there was one(battle).updateStatus(any, any, any)
       there was one(user).storeBattleInDailyResult(mEq(uu(0).id), mEq(BattleResult(b.id, q.info.victoryReward, isVictory = true)))
       there was one(user).storeBattleInDailyResult(mEq(uu(1).id), mEq(BattleResult(b.id, q.info.victoryReward, isVictory = true)))
+      there was one(api).tuneBattlePointsBeforeResolve(any)
+    }
+
+    "tuneBattlePointsBeforeResolve adds points to Battles With small amount of votes" in context {
+      val b = createBattleStub()
+
+      battle.updatePoints(
+        any,
+        any,
+        any,
+        any) returns Some(b)
+
+      val result = api.tuneBattlePointsBeforeResolve(TuneBattlePointsBeforeResolveRequest(b))
+
+      result must beAnInstanceOf[OkApiResult[TuneBattlePointsBeforeResolveResult]]
+
+      there were two(battle).updatePoints(any, any, any, any)
     }
 
     "voteBattle updates points correctly" in context {

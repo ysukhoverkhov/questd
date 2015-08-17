@@ -5,7 +5,8 @@ import akka.actor.Actor
 /**
  * Helper for akka actors.
  */
-trait EasyRestartActor extends Actor {
+// FIX: Perhaps it should be removed since it's all wrong.
+trait EasyRestartActor { this: Actor =>
 
   override def preStart(): Unit = ()
 

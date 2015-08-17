@@ -18,4 +18,6 @@ object TutorialTriggerType extends Enumeration {
   val ContentLiked = Value
   val SidePanelOpened = Value
   val OurBattleIsShown = Value
+  val FeedbackSent = Value
+  val FriendshipRequested = Value
 }

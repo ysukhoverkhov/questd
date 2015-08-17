@@ -13,7 +13,7 @@ import controllers.domain.app.misc.MiscAPI
 import logic.LogicBootstrapper
 import components.random.RandomComponent
 import controllers.domain.app.quest.QuestsFetchAPI
-import controllers.sn.component.SocialNetworkComponent
+import controllers.services.socialnetworks.component.SocialNetworkComponent
 
 trait DomainAPIComponent { component: DatabaseComponent with RandomComponent with SocialNetworkComponent =>
 

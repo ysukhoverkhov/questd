@@ -1,7 +1,7 @@
 package components
 
 import models.store._
-import controllers.sn.component.SocialNetworkComponent
+import controllers.services.socialnetworks.component.SocialNetworkComponent
 
 trait SNAccessor {
   val sn: SocialNetworkComponent#SocialNetwork
