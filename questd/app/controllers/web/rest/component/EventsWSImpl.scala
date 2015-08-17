@@ -2,11 +2,11 @@ package controllers.web.rest.component
 
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import controllers.web.rest.component.MessagesWSImplTypes._
+import controllers.web.rest.component.EventsWSImplTypes._
 import models.domain.common.ClientPlatform
 import com.vita.scala.extensions._
 
-private object MessagesWSImplTypes {
+private object EventsWSImplTypes {
 
   case class WSRemoveMessageRequest(
     /// Id of a message to remove.
@@ -30,8 +30,8 @@ private object MessagesWSImplTypes {
   type WSRemoveDeviceTokenResult = RemoveDeviceTokenResult
 }
 
-trait MessagesWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
-  import MessagesWSImplTypes.{WSRemoveMessageRequest, WSRemoveMessageResult}
+trait EventsWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+  import EventsWSImplTypes.{WSRemoveMessageRequest, WSRemoveMessageResult}
 
   /**
    * @return

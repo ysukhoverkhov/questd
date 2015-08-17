@@ -25,13 +25,17 @@ case class AddDeviceTokenResult(allowed: ProfileModificationResult)
 case class RemoveDeviceTokenRequest(user: User, token: String)
 case class RemoveDeviceTokenResult(allowed: ProfileModificationResult)
 
+case class CheckSendNotificationsRequest(user: User)
+case class CheckSendNotificationsResult(user: User)
 
-// TODO: rename me to Events API.
-private[domain] trait MessagesAPI { this: DBAccessor =>
+private[domain] trait EventsAPI { this: DBAccessor =>
 
   /**
    * Sends message to a user.
-   */ // TODO: make it "notify event what will decide should we sund push or generate message or both.
+   * This is used as entry point for all events.
+   * We here check should we ingore the message or should not and add it if should not.
+   * After that we asks to send notifications if it's required.
+   */
   def sendMessage(request: SendMessageRequest): ApiResult[SendMessageResult] = handleDbException {
     import request._
 
@@ -51,7 +55,9 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
     val u = capMessages(user)
 
     db.user.addMessage(u.id, message) ifSome { u =>
-      OkApiResult(SendMessageResult(user = u))
+      checkSendNotifications(CheckSendNotificationsRequest(u)) map { r =>
+        OkApiResult(SendMessageResult(user = r.user))
+      }
     }
   }
 
@@ -98,6 +104,15 @@ private[domain] trait MessagesAPI { this: DBAccessor =>
     db.user.removeDevice(user.id, token) ifSome { user =>
       OkApiResult(RemoveDeviceTokenResult(OK))
     }
+  }
+
+  /**
+   * Checks should we send notification or not and if we should sends it.
+   */ // TODO: implement me.
+  def checkSendNotifications(request: CheckSendNotificationsRequest): ApiResult[CheckSendNotificationsResult] = handleDbException {
+    import request._
+
+    OkApiResult(CheckSendNotificationsResult(user))
   }
 }
 

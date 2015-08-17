@@ -75,10 +75,10 @@ POST	/rest/askFriendship								controllers.web.rest.FriendsWS.askFriendship
 POST	/rest/respondFriendship							controllers.web.rest.FriendsWS.respondFriendship
 POST	/rest/removeFromFriends							controllers.web.rest.FriendsWS.removeFromFriends
 
-# Messages
-POST	/rest/removeMessage								controllers.web.rest.MessagesWS.removeMessage
-POST    /rest/addDeviceToken                            controllers.web.rest.MessagesWS.addDeviceToken
-POST    /rest/removeDeviceToken                         controllers.web.rest.MessagesWS.removeDeviceToken
+# Events
+POST	/rest/removeMessage								controllers.web.rest.EventsWS.removeMessage
+POST    /rest/addDeviceToken                            controllers.web.rest.EventsWS.addDeviceToken
+POST    /rest/removeDeviceToken                         controllers.web.rest.EventsWS.removeDeviceToken
 
 # Misc
 POST	/rest/getTime									controllers.web.rest.MiscWS.getTime
