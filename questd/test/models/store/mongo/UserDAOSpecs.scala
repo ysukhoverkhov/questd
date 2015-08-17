@@ -10,6 +10,7 @@ import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
 import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
 import models.domain.user.dailyresults.BattleResult
 import models.domain.user.demo.UserDemographics
+import models.domain.user.devices.Device
 import models.domain.user.friends.{ReferralStatus, FriendshipStatus, Friendship}
 import models.domain.user.message.MessageInformation
 import models.domain.user.profile._
@@ -712,6 +713,28 @@ class UserDAOSpecs
 
       val ou2 = db.user.readById(user.id)
       ou2 must beSome[User].which(_.profile.messages == ms.tail)
+    }
+
+    "addDevice and remove device works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val device = Device(ClientPlatform.iPhone, "token")
+
+      db.user.create(user)
+      db.user.addDevice(user.id, device)
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User].which(u => u.devices.size == 1 && u.devices.head == device)
+
+      db.user.removeDevice(user.id, device.token)
+
+      val ou2 = db.user.readById(user.id)
+      ou2 must beSome[User].which(u => u.devices.isEmpty)
+    }
+
+    "removeDevice works" in new WithApplication(appWithTestDatabase) {
+      success
     }
 
     "Setting friendship works" in new WithApplication(appWithTestDatabase) {

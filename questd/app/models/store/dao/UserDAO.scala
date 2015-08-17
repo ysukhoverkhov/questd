@@ -7,6 +7,7 @@ import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
 import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
+import models.domain.user.devices.Device
 import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
 import models.domain.user.profile.{DailyTasks, Rights, Task}
@@ -131,6 +132,8 @@ trait UserDAO extends BaseDAO[User] {
   def addMessageToEveryone(message: Message): Unit
   def removeOldestMessage(id: String): Option[User]
   def removeMessage(id: String, messageId: String): Option[User]
+  def addDevice(id: String, device: Device): Option[User]
+  def removeDevice(id: String, token: String): Option[User]
 
   def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User]
   def addTasks(id: String, newTasks: List[Task], addReward: Option[Assets] = None): Option[User]
