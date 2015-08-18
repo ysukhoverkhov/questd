@@ -15,7 +15,9 @@ import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.demo.UserDemographics
 import models.domain.user.friends.Friendship
+import models.domain.user.message.Message
 import models.domain.user.profile._
+import models.domain.user.schedules.UserSchedules
 import models.domain.user.stats.{SolutionsInBattle, UserStats}
 import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import models.view.{QuestView, ThemeInfoWithID}
@@ -236,7 +238,9 @@ package object domainstubs {
     privateDailyResults: List[DailyResult] = List(createDailyResultStub()),
     battleRequests: List[BattleRequest] = List.empty,
     tutorialState: TutorialState = TutorialState(dailyTasksSuppression = false),
-    dailyTasks: DailyTasks = DailyTasks()) = {
+    dailyTasks: DailyTasks = DailyTasks(),
+    messages: List[Message] = List.empty,
+    schedules: UserSchedules = UserSchedules()) = {
 
     User(
       id = id,
@@ -262,7 +266,8 @@ package object domainstubs {
             gender = Gender.Male)),
         rights = rights,
         tutorialStates = Map(ClientPlatform.iPhone.toString -> tutorialState),
-        dailyTasks = dailyTasks),
+        dailyTasks = dailyTasks,
+        messages = messages),
       friends = friends,
       followers = followers,
       mustVoteSolutions = mustVoteSolutions,
@@ -274,6 +279,7 @@ package object domainstubs {
         votedSolutions = votedSolutions,
         votedBattles = votedBattles,
         participatedBattles = participatedBattles.map{case (k, v) => (k, SolutionsInBattle(List(v)))}),
-      battleRequests = battleRequests)
+      battleRequests = battleRequests,
+      schedules = schedules)
   }
 }

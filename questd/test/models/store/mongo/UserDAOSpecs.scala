@@ -816,7 +816,6 @@ class UserDAOSpecs
       ou must beSome
       ou.get.schedules.lastNotificationSentAt must beEqualTo(date)
     }
-
   }
 }
 
