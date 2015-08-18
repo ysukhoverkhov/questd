@@ -814,5 +814,17 @@ private[mongo] class MongoUserDAO
         "$set" -> MongoDBObject(
           "battleRequests.$.status" -> status)))
   }
+
+  /**
+   * @inheritdoc
+   */
+  def setNotificationSentTime(id: String, time: Date): Option[User] = {
+    // TODO: test me.
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "schedules.lastNotificationSentAt" -> time)))
+  }
 }
 

@@ -9,6 +9,7 @@ import models.domain.user.devices.Device
 import models.domain.user.friends.Friendship
 import models.domain.user.profile.Profile
 import models.domain.user.schedules.UserSchedules
+import models.domain.user.settings.UserSettings
 import models.domain.user.stats.UserStats
 import models.domain.user.timeline.TimeLineEntry
 
@@ -29,5 +30,6 @@ case class User(
   friends: List[Friendship] = List.empty,
   battleRequests: List[BattleRequest] = List.empty,
   devices: List[Device] = List.empty,
+  settings: UserSettings = UserSettings(),
   mustVoteSolutions: List[String] = List.empty,
   payedAuthor: Boolean = false) extends ID

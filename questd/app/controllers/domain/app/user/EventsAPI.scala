@@ -1,5 +1,7 @@
 package controllers.domain.app.user
 
+import java.util.Date
+
 import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
@@ -7,7 +9,7 @@ import controllers.domain.helpers._
 import controllers.services.devicenotifications.DeviceNotifications
 import models.domain.common.ClientPlatform
 import models.domain.user.User
-import models.domain.user.message.{MessageMetaInfo, Message}
+import models.domain.user.message.{Message, MessageMetaInfo}
 import play.Logger
 import play.libs.Akka
 
@@ -114,11 +116,27 @@ private[domain] trait EventsAPI { this: DBAccessor =>
 
   /**
    * Checks should we send notification or not and if we should sends it.
-   */ // TODO: implement me and test.
+   */ // TODO: test me.
   def checkSendNotifications(request: CheckSendNotificationsRequest): ApiResult[CheckSendNotificationsResult] = handleDbException {
     import request._
+    import com.github.nscala_time.time.Imports._
 
-    OkApiResult(CheckSendNotificationsResult(user))
+    if (DateTime.now < new DateTime(user.schedules.lastNotificationSentAt) + user.settings.notificationsIntervalHours.hours) {
+      // Not now.
+      OkApiResult(CheckSendNotificationsResult(user))
+    } else if (user.profile.messages.isEmpty) {
+      // Nothing to send.
+      OkApiResult(CheckSendNotificationsResult(user))
+    } else {
+      db.user.setNotificationSentTime(user.id, new Date()) ifSome { user =>
+        notifyWithMessage(NotifyWithMessageRequest(
+          user = user,
+          message = user.profile.messages.sortBy[Int](m => MessageMetaInfo.messagePriority(m.messageType)).head
+        )) map { r =>
+          OkApiResult(CheckSendNotificationsResult(r.user))
+        }
+      }
+    }
   }
 
   /**
