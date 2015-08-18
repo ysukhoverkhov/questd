@@ -15,6 +15,7 @@ import models.domain.user.stats.SolutionsInBattle
 import models.domain.user.timeline.TimeLineEntry
 import models.view.QuestView
 
+// TODO: split it on several traits.
 trait UserDAO extends BaseDAO[User] {
 
   def updateSessionId(id: String, sessionId: String): Option[User]
@@ -135,6 +136,17 @@ trait UserDAO extends BaseDAO[User] {
   def addDevice(id: String, device: Device): Option[User]
   def removeDevice(id: String, token: String): Option[User]
 
+  /**
+   * Sets time of last sent notification.
+   *
+   * @param id Id of a user to set data to.
+   * @param time Time to set to.
+   * @return Updated user.
+   */
+  def setNotificationSentTime(id: String, time: Date): Option[User]
+
+
+
   def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User]
   def addTasks(id: String, newTasks: List[Task], addReward: Option[Assets] = None): Option[User]
   def incTask(id: String, taskId: String): Option[User]
@@ -204,15 +216,5 @@ trait UserDAO extends BaseDAO[User] {
    * @param status new status.
    */
   def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User]
-
-
-  /**
-   * Sets time of last sent notification.
-   *
-   * @param id Id of a user to set data to.
-   * @param time Time to set to.
-   * @return Updated user.
-   */
-  def setNotificationSentTime(id: String, time: Date): Option[User]
 
 }

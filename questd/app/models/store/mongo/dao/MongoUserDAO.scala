@@ -557,6 +557,17 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
+  def setNotificationSentTime(id: String, time: Date): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "schedules.lastNotificationSentAt" -> time)))
+  }
+
+  /**
+   * @inheritdoc
+   */
   def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User] = {
     findAndModify(
       id,
@@ -813,18 +824,6 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         "$set" -> MongoDBObject(
           "battleRequests.$.status" -> status)))
-  }
-
-  /**
-   * @inheritdoc
-   */
-  def setNotificationSentTime(id: String, time: Date): Option[User] = {
-    // TODO: test me.
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$set" -> MongoDBObject(
-          "schedules.lastNotificationSentAt" -> time)))
   }
 }
 

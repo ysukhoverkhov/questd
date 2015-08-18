@@ -22,7 +22,7 @@ import org.specs2.mutable._
 import play.api.test._
 import testhelpers.domainstubs._
 
-//noinspection ZeroIndexToHead
+// TODO: split it on several tests.
 //@RunWith(classOf[JUnitRunner])
 class UserDAOSpecs
   extends Specification
@@ -675,6 +675,7 @@ class UserDAOSpecs
 
       val u: Iterator[User] = db.user.all
       val u2 = u.toList
+      //noinspection ZeroIndexToHead
       u2(0).profile.messages.length must beEqualTo(1)
       u2(1).profile.messages.length must beEqualTo(1)
       u2(2).profile.messages.length must beEqualTo(1)
@@ -800,6 +801,22 @@ class UserDAOSpecs
       ou must beSome
       ou.get.battleRequests.head must beEqualTo(br.copy(status = BattleRequestStatus.Rejected))
     }
+
+    "setNotificationSentTime works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val date = new Date()
+
+      db.user.create(user)
+      db.user.setNotificationSentTime(user.id, date)
+
+      val ou = db.user.readById(user.id)
+
+      ou must beSome
+      ou.get.schedules.lastNotificationSentAt must beEqualTo(date)
+    }
+
   }
 }
 
