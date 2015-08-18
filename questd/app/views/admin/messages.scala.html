@@ -1,0 +1,15 @@
+@(menuItems: Map[String, String], newMessageForm: Form[controllers.web.admin.component.MessageForm], sendResult: String)
+
+@import helper._
+
+@main("Message broadcast")(menuItems, Map.empty) {
+
+	<h1>@sendResult</h1>
+
+	@form(action = controllers.web.admin.routes.Messages.send()) {
+		@inputText(newMessageForm("text"), 'size -> 80) <br />
+		@inputText(newMessageForm("url"), 'size -> 80) <br />
+		<input type="submit" value="Send">
+	}
+}
+
