@@ -7,7 +7,7 @@ import java.util.Date
  *
  * Created by Yury on 03.08.2015.
  */
-case class ChatParticipant (
+case class Participant (
   userId: String,
   hasUnreadMessages: Boolean = false,
   lastReadMessageDate: Date = new Date()
