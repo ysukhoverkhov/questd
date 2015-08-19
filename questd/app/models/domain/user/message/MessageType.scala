@@ -12,6 +12,7 @@ object MessageType extends Enumeration {
   val FriendshipAccepted = Value
   val FriendshipRejected = Value
   val FriendshipRemoved = Value
+  val DailyResultsReady = Value
 
   // user
   val Information = Value

@@ -1,7 +1,7 @@
 package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
-import models.domain.user.message.{Message, MessageFriendshipRejected, MessageFriendshipAccepted, MessageAllTasksCompleted}
+import models.domain.user.message._
 import models.domain.user.schedules.UserSchedules
 import org.mockito.Matchers.{eq => mEq}
 import org.mockito.Mockito._

@@ -12,6 +12,7 @@ object MessageMetaInfo  {
     MessageType.FriendshipAccepted -> 1,
     MessageType.FriendshipRejected -> 2,
     MessageType.FriendshipRemoved -> 3,
+    MessageType.DailyResultsReady -> 10,
 
     // user
     MessageType.Information -> 1000
@@ -25,6 +26,7 @@ object MessageMetaInfo  {
     MessageType.FriendshipAccepted ->  "TODO",
     MessageType.FriendshipRejected ->  "TODO",
     MessageType.FriendshipRemoved ->  "TODO",
+    MessageType.DailyResultsReady -> "TODO",
 
     // user
     MessageType.Information ->  "TODO"
