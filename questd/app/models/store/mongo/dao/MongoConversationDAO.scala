@@ -15,17 +15,12 @@ private[mongo] class MongoConversationDAO
   /**
    * Searches culture by containing country.
    */
-  def findByParticipant(participantId: String): Iterator[Conversation] = { // TODO: test me.
+  def findByParticipant(participantId: String): Iterator[Conversation] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
     queryBuilder += (
       "participants.userId" -> participantId)
-
-    // TODO: clean me up.
-//    (
-//        "$elemMatch" -> MongoDBObject(
-//          "solutionId" -> winnerSolutionId)))
 
     findByExample(
       queryBuilder.result())
