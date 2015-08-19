@@ -102,10 +102,10 @@ POST	/rest/getBattleRequests						    controllers.web.rest.ChallengesWS.getBattl
 POST    /rest/respondBattleRequest    					controllers.web.rest.ChallengesWS.respondBattleRequest
 
 # Chat
-#POST   /rest/createConversation
-#POST   /rest/getMyConversations
-#POST   /rest/sendChatMessage
-#POST   /rest/getChatMessages
+POST   /rest/createConversation                         controllers.web.rest.ConversationsWS.createConversation
+POST   /rest/getMyConversations                         controllers.web.rest.ConversationsWS.getMyConversations
+#POST   /rest/sendChatMessage                            controllers.web.rest.ConversationsWS.sendChatMessage
+#POST   /rest/getChatMessages                            controllers.web.rest.ConversationsWS.getChatMessages
 
 
 # Upload
