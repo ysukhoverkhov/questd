@@ -13,7 +13,7 @@ private[mongo] class MongoConversationDAO
   with ConversationDAO {
 
   /**
-   * Searches culture by containing country.
+   * @inheritdoc
    */
   def findByParticipant(participantId: String): Iterator[Conversation] = {
 
@@ -21,6 +21,21 @@ private[mongo] class MongoConversationDAO
 
     queryBuilder += (
       "participants.userId" -> participantId)
+
+    findByExample(
+      queryBuilder.result())
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def findByAllParticipants(participantIds: Seq[String]): Iterator[Conversation] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += (
+      "participants.userId" -> MongoDBObject(
+        "$all" -> participantIds
+      ))
 
     findByExample(
       queryBuilder.result())

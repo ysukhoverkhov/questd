@@ -13,7 +13,7 @@ class ConversationDAOSpecs extends Specification
 
   "Mongo Conversation DAO" should {
     "Search conversation by participant id" in new WithApplication(appWithTestDatabase) {
-      db.culture.clear()
+      db.conversation.clear()
 
       val parts: List[Participant] = List("1", "2", "3").map(Participant(_))
 
@@ -26,8 +26,10 @@ class ConversationDAOSpecs extends Specification
       convers.foreach(db.conversation.create)
 
       val convs = db.conversation.findByParticipant(parts(1).userId).toList
-
       convs must beEqualTo(List(convers(0), convers(2)))
+
+      val allConvs = db.conversation.findByAllParticipants(List(parts(1).userId, parts(0).userId)).toList
+      allConvs must beEqualTo(List(convers(0)))
     }
   }
 
