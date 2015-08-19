@@ -4,6 +4,7 @@ import java.util.Date
 
 import models.domain.base.ID
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
+import models.domain.chat.{Participant, Conversation}
 import models.domain.comment.{Comment, CommentInfo}
 import models.domain.common._
 import models.domain.quest._
@@ -213,6 +214,16 @@ package object domainstubs {
       vip = vip,
       cultureId = cultureId,
       timelinePoints = timelinePoints)
+  }
+
+  def createConversationStub(
+    id: String = ID.generateUUID(),
+    pIds: List[String] = List.empty
+    ) = {
+    Conversation(
+    id = id,
+    participants = pIds.map(Participant(_))
+    )
   }
 
   def createUserStub(
