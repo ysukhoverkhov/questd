@@ -11,6 +11,7 @@ import models.domain.quest.{QuestStatus, Quest}
 import models.domain.solution.Solution
 import models.domain.user._
 import models.domain.user.dailyresults._
+import models.domain.user.message.MessageDailyResultsReady
 import models.domain.user.profile.Profile
 import play.Logger
 import logic.constants._
@@ -71,6 +72,8 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
           r.user.id,
           DailyResult(
             user.getStartOfCurrentDailyResultPeriod)) ifSome { u =>
+
+          sendMessage(SendMessageRequest(u, MessageDailyResultsReady()))
 
           OkApiResult(ShiftDailyResultResult(u))
         }

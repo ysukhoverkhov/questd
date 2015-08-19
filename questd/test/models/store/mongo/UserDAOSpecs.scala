@@ -658,7 +658,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val m = message.MessageDailyResultReady().toMessage
+      val m = message.MessageDailyResultsReady().toMessage
 
       db.user.create(user)
       db.user.addMessage(user.id, m)
@@ -687,7 +687,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val m = message.MessageDailyResultReady().toMessage
+      val m = message.MessageDailyResultsReady().toMessage
 
       db.user.create(user)
       db.user.addMessage(user.id, m)
@@ -705,7 +705,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val ms = (1 to 5).map(n => message.MessageDailyResultReady().toMessage)
+      val ms = (1 to 5).map(n => message.MessageDailyResultsReady().toMessage)
 
       db.user.create(user)
       ms.foreach(db.user.addMessage(user.id, _))
