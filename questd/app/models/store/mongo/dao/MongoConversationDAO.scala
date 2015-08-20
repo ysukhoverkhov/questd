@@ -44,7 +44,7 @@ private[mongo] class MongoConversationDAO
   /**
    * @inheritdoc
    */
-  def setUnreadMessagesFlag(id: String, userId: String, flag: Boolean): Option[Conversation] = { // TODO: test me.
+  def setUnreadMessagesFlag(id: String, userId: String, flag: Boolean): Option[Conversation] = {
     findAndModify(
       MongoDBObject(
         "id" -> id,
