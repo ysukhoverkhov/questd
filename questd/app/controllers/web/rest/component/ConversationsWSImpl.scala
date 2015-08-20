@@ -2,10 +2,6 @@ package controllers.web.rest.component
 
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import controllers.web.rest.component.CreateQuestWSImplTypes.{WSCreateQuestResult, WSCreateQuestRequest}
-import models.domain.quest.QuestInfoContent
-import play.api.libs
-import play.api.libs.ws
 
 private object ConversationsWSImplTypes {
 
@@ -18,6 +14,13 @@ private object ConversationsWSImplTypes {
 
 
   type WSGetMyConversationsResult = GetMyConversationsResult
+
+
+  type WSSendChatMessageResult = SendChatMessageResult
+
+  case class WSSendChatMessageRequest(
+    conversationId: String,
+    message: String)
 
 }
 
@@ -34,6 +37,12 @@ trait ConversationsWSImpl extends QuestController with SecurityWSImpl with Commo
 
   def getMyConversations = wrapApiCallReturnBody[WSGetMyConversationsResult] { r =>
     api.getMyConversations(GetMyConversationsRequest(r.user))
+  }
+
+  def sendChatMessage = wrapJsonApiCallReturnBody[WSSendChatMessageResult] { (js, r) =>
+    val v = Json.read[WSSendChatMessageRequest](js)
+
+    api.sendChatMessage(SendChatMessageRequest(r.user, v.conversationId, v.message))
   }
 }
 

@@ -11,7 +11,8 @@ import models.domain.base.ID
  */
 case class ChatMessage (
   id: String = ID.generateUUID(),
-  sender: String,
+  senderId: String,
   conversationId: String,
+  message: String,
   creationDate: Date = new Date()
   ) extends ID

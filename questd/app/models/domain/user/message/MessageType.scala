@@ -16,6 +16,5 @@ object MessageType extends Enumeration {
 
   // user
   val Information = Value
+  val NewChatMessage = Value
 }
-
-// TODO: add and use message "daily results ready"

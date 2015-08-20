@@ -1,6 +1,5 @@
 package models.store.mongo.dao
 
-import models.domain._
 import models.domain.culture.Culture
 import models.store.dao._
 import models.store.mongo.helpers._

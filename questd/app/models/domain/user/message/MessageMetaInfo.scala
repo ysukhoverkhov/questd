@@ -15,7 +15,8 @@ object MessageMetaInfo  {
     MessageType.DailyResultsReady -> 10,
 
     // user
-    MessageType.Information -> 1000
+    MessageType.Information -> 1000,
+    MessageType.NewChatMessage -> 20
   )
 
   val messageLocalizedMessage: Map[MessageType.Value, String] = Map(
@@ -29,7 +30,8 @@ object MessageMetaInfo  {
     MessageType.DailyResultsReady -> "TODO",
 
     // user
-    MessageType.Information ->  "TODO"
+    MessageType.Information ->  "TODO",
+    MessageType.NewChatMessage -> "TODO"
   )
 
   require(messagePriority.size == MessageType.values.size)

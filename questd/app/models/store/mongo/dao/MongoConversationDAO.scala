@@ -41,5 +41,18 @@ private[mongo] class MongoConversationDAO
       queryBuilder.result())
   }
 
+  /**
+   * @inheritdoc
+   */
+  def setUnreadMessagesFlag(id: String, userId: String, flag: Boolean): Option[Conversation] = { // TODO: test me.
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "participants.userId" -> userId),
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "participants.$.hasUnreadMessages" -> flag)))
+  }
+
 }
 

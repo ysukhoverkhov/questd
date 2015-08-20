@@ -21,9 +21,10 @@ class ChatMessageDAOSpecs extends Specification
       private val chats = (1 to 10).map(
         n =>
           ChatMessage(
-            sender = "s",
+            senderId = "s",
             conversationId = conversationId,
-            creationDate = new Date(n)))
+            creationDate = new Date(n),
+            message = ""))
       chats.foreach(db.chat.create)
 
       val rv = db.chat.getForConversation(conversationId, new Date(5))
@@ -31,6 +32,5 @@ class ChatMessageDAOSpecs extends Specification
       rv.toList must beEqualTo(chats.drop(4))
     }
   }
-
 }
 

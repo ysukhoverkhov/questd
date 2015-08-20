@@ -13,5 +13,10 @@ trait ConversationDAO extends BaseDAO[Conversation] {
    * Searches conversation containing all participants.
    */
   def findByAllParticipants(participantIds: Seq[String]): Iterator[Conversation]
+
+  /**
+   * Sets flag for unread messages for participants.
+   */
+  def setUnreadMessagesFlag(id: String, userId: String, flag: Boolean): Option[Conversation]
 }
 
