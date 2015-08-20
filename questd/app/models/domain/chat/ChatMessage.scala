@@ -13,5 +13,5 @@ case class ChatMessage (
   id: String = ID.generateUUID(),
   sender: String,
   conversationId: String,
-  creationDate: Date
+  creationDate: Date = new Date()
   ) extends ID
