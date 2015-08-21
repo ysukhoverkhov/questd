@@ -1,8 +1,10 @@
 package controllers.domain.app.user
 
+import java.util.Date
+
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
-import models.domain.chat.{Conversation, Participant}
+import models.domain.chat.{ChatMessage, Conversation, Participant}
 import testhelpers.domainstubs._
 import org.mockito.Mockito._
 
@@ -103,6 +105,30 @@ class ConversationsAPISpecs extends BaseAPISpecs {
       there was one (api).sendMessage(any)
 
       result must beEqualTo(OkApiResult(SendChatMessageResult(ProfileModificationResult.OK)))
+    }
+
+    "getChatMessages does not return messages for not existing conversation" in context {
+      conversation.readById(any) returns None
+
+      val result = api.getChatMessages(GetChatMessagesRequest(createUserStub(), "", new Date(0), 10))
+
+      there was one (conversation).readById(any)
+      result must beEqualTo(OkApiResult(GetChatMessagesResult(ProfileModificationResult.OutOfContent)))
+    }
+
+    "getChatMessages returns messages and resets unread flag" in context {
+      val c = createConversationStub()
+
+      conversation.readById(any) returns Some(c)
+      conversation.setUnreadMessagesFlag(any, any, any) returns Some(c)
+      chat.getForConversation(any, any) returns (1 to 10).map(i => ChatMessage("", "", "", "")).iterator
+
+      val result = api.getChatMessages(GetChatMessagesRequest(createUserStub(), "", new Date(0), 10))
+
+      there was one (conversation).readById(any)
+      there was one (conversation).setUnreadMessagesFlag(any, any, any)
+      there was one (chat).getForConversation(any, any)
+      result must beAnInstanceOf[OkApiResult[GetChatMessagesResult]]
     }
   }
 }

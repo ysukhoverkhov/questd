@@ -10,5 +10,6 @@ object ConversationsWS extends Controller with AccessToWSInstance {
   def createConversation = ws.createConversation
   def getMyConversations = ws.getMyConversations
   def sendChatMessage = ws.sendChatMessage
+  def getChatMessages = ws.getChatMessages
 }
 

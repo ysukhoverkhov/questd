@@ -1,5 +1,7 @@
 package controllers.domain.app.user
 
+import java.util.Date
+
 import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
@@ -16,6 +18,9 @@ case class GetMyConversationsResult(conversations: List[Conversation])
 
 case class SendChatMessageRequest(user: User, conversationId: String, message: String)
 case class SendChatMessageResult(allowed: ProfileModificationResult)
+
+case class GetChatMessagesRequest(user: User, conversationId: String, fromDate: Date, count: Int)
+case class GetChatMessagesResult(allowed: ProfileModificationResult, messages: Option[List[ChatMessage]] = None)
 
 
 private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -92,6 +97,25 @@ private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with
 
         OkApiResult(SendChatMessageResult(OK))
       }
+    }
+  }
+
+  /**
+   * Adds new message to conversation.
+   */
+  def getChatMessages(request: GetChatMessagesRequest): ApiResult[GetChatMessagesResult] = handleDbException {
+    val count = adjustedPageSize(request.count)
+
+    db.conversation.readById(request.conversationId).fold {
+      OkApiResult(GetChatMessagesResult(
+        OutOfContent))
+    } { conversation =>
+
+      db.conversation.setUnreadMessagesFlag(conversation.id, request.user.id, flag = false)
+
+      OkApiResult(GetChatMessagesResult(
+        OK,
+        Some(db.chat.getForConversation(request.conversationId, request.fromDate).take(count).toList)))
     }
   }
 }
