@@ -32,6 +32,7 @@ private[domain] abstract class BaseAPISpecs
   val theme = mock[ThemeDAO]
   val comment = mock[CommentDAO]
   val conversation = mock[ConversationDAO]
+  val chat = mock[ChatMessageDAO]
 
   val rand = mock[Random]
 
@@ -55,6 +56,7 @@ private[domain] abstract class BaseAPISpecs
       db.theme returns theme
       db.comment returns comment
       db.conversation returns conversation
+      db.chat returns chat
 
       config.readConfig returns mockConfiguration
 

@@ -33,7 +33,7 @@ class ConversationDAOSpecs extends Specification
       allConvs must beEqualTo(List(convers(0)))
     }
 
-    "Sets unread message flad" in new WithApplication(appWithTestDatabase) {
+    "Sets unread message flag" in new WithApplication(appWithTestDatabase) {
       db.conversation.clear()
 
       val ps = List("1", "2")

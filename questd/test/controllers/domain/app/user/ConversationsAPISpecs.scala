@@ -4,6 +4,7 @@ import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.chat.{Conversation, Participant}
 import testhelpers.domainstubs._
+import org.mockito.Mockito._
 
 //noinspection ZeroIndexToHead
 class ConversationsAPISpecs extends BaseAPISpecs {
@@ -71,6 +72,38 @@ class ConversationsAPISpecs extends BaseAPISpecs {
       result must beAnInstanceOf[OkApiResult[CreateConversationResult]]
     }
 
+    "Do not accept too long messages" in context {
+      val u = createUserStub()
+
+      val result = api.sendChatMessage(SendChatMessageRequest(
+        user = u,
+        conversationId = "",
+        message = (1 to 10000).toList.mkString))
+
+      result must beEqualTo(OkApiResult(SendChatMessageResult(ProfileModificationResult.LimitExceeded)))
+    }
+
+    "Do not accept message for not existing conversation" in context {
+      val pIds = List("1", "2")
+      val u = createUserStub(id = pIds(0))
+      val conv = createConversationStub(pIds = pIds)
+
+      conversation.readById(any) returns Some(conv)
+      user.readById(any) returns Some(u)
+      doReturn(OkApiResult(SendMessageResult(u))).when(api).sendMessage(any)
+
+      val result = api.sendChatMessage(SendChatMessageRequest(
+        user = u,
+        conversationId = "",
+        message = ""))
+
+      there was one (conversation).readById(any)
+      there was one (chat).create(any)
+      there was one (conversation).setUnreadMessagesFlag(conv.id, pIds(1), flag = true)
+      there was one (api).sendMessage(any)
+
+      result must beEqualTo(OkApiResult(SendChatMessageResult(ProfileModificationResult.OK)))
+    }
   }
 }
 

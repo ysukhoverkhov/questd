@@ -119,7 +119,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
     import request._
     // 1. check is the task was already given.
     if (user.profile.tutorialStates(platform.toString).usedTutorialTaskIds.contains(taskId)) {
-      OkApiResult(AssignTutorialTaskResult(LimitExceeded))
+      OkApiResult(AssignTutorialTaskResult(AlreadyAssigned))
     } else {
       db.tutorialTask.readById(taskId) match {
         case Some(t) =>

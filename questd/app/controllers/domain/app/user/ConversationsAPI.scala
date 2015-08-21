@@ -62,16 +62,16 @@ private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with
   def sendChatMessage(request: SendChatMessageRequest): ApiResult[SendChatMessageResult] = handleDbException {
     import request._
 
-    val maxMessageLength = api.config(api.DefaultConfigParams.DefaultCultureId).toInt
+    val maxMessageLength = api.config(api.DefaultConfigParams.ChatMaxMessageLength).toInt
 
-    if (message.length > maxMessageLength) { // TODO: test this.
+    if (message.length > maxMessageLength) {
       OkApiResult(SendChatMessageResult(LimitExceeded))
     } else {
       val maybeConversation = db.conversation.readById(conversationId)
 
-      maybeConversation.fold { // TODO: test this.
+      maybeConversation.fold {
         OkApiResult(SendChatMessageResult(OutOfContent))
-      } { conversation => // TODO: test this.
+      } { conversation =>
         db.chat.create(ChatMessage(
           senderId = user.id,
           conversationId = conversation.id,
@@ -79,11 +79,11 @@ private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with
         ))
 
         conversation.participants.filterNot(_.userId == user.id).foreach { participant =>
-          if (!participant.hasUnreadMessages) { // TODO: test this.
+          if (!participant.hasUnreadMessages) {
             db.conversation.setUnreadMessagesFlag(conversation.id, participant.userId, flag = true)
           }
 
-          db.user.readById(participant.userId).fold(){ participantUser => // TODO: test this.
+          db.user.readById(participant.userId).fold(){ participantUser =>
             if (!participantUser.profile.messages.exists(_.messageType == MessageType.NewChatMessage)) {
               sendMessage(SendMessageRequest(participantUser, MessageNewChatMessage()))
             }

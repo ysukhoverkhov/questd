@@ -242,7 +242,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
       val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, ClientPlatform.iPhone, tutorialTaskId))
 
-      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.LimitExceeded)))
+      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.AlreadyAssigned)))
       there was no(db.user).setTasksCompletedFraction(any, any)
     }
 

@@ -42,5 +42,10 @@ object ProfileModificationResult extends Enumeration {
    * Used in array operators if request will result in array with size above the limit.
    */
   val LimitExceeded = Value
+
+  /**
+   * Tutorial task already assigned.
+   */
+  val AlreadyAssigned = Value
 }
 
