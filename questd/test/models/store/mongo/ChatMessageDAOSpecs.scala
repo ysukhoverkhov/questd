@@ -6,7 +6,7 @@ import java.util.Date
 
 import models.domain.chat.ChatMessage
 import org.specs2.mutable._
-import play.api.test._
+import play.test.WithApplication
 
 //noinspection ZeroIndexToHead
 class ChatMessageDAOSpecs extends Specification

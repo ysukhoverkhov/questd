@@ -20,6 +20,7 @@ import models.store._
 import models.view.QuestView
 import org.specs2.mutable._
 import play.api.test._
+import play.test.WithApplication
 import testhelpers.domainstubs._
 
 // TODO: split it on several tests.
