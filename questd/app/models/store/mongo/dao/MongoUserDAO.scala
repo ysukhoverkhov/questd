@@ -9,6 +9,7 @@ import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
 import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
+import models.domain.user.devices.Device
 import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
 import models.domain.user.profile.{DailyTasks, Rights, Task}
@@ -529,6 +530,39 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         "$pull" -> MongoDBObject(
           "profile.messages" -> MongoDBObject("id" -> messageId))))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def addDevice(id: String, device: Device): Option[User] = {  // TODO: test me.
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$push" -> MongoDBObject(
+          "devices" -> grater[Device].asDBObject(device))))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def removeDevice(id: String, token: String): Option[User] = { // TODO: test me.
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$pull" -> MongoDBObject(
+          "devices" -> MongoDBObject("token" -> token))))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def setNotificationSentTime(id: String, time: Date): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "schedules.lastNotificationSentAt" -> time)))
   }
 
   /**

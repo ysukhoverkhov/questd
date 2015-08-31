@@ -7,6 +7,7 @@ import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
 import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
+import models.domain.user.devices.Device
 import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
 import models.domain.user.profile.{DailyTasks, Rights, Task}
@@ -14,6 +15,7 @@ import models.domain.user.stats.SolutionsInBattle
 import models.domain.user.timeline.TimeLineEntry
 import models.view.QuestView
 
+// TODO: split it on several traits.
 trait UserDAO extends BaseDAO[User] {
 
   def updateSessionId(id: String, sessionId: String): Option[User]
@@ -131,6 +133,19 @@ trait UserDAO extends BaseDAO[User] {
   def addMessageToEveryone(message: Message): Unit
   def removeOldestMessage(id: String): Option[User]
   def removeMessage(id: String, messageId: String): Option[User]
+  def addDevice(id: String, device: Device): Option[User]
+  def removeDevice(id: String, token: String): Option[User]
+
+  /**
+   * Sets time of last sent notification.
+   *
+   * @param id Id of a user to set data to.
+   * @param time Time to set to.
+   * @return Updated user.
+   */
+  def setNotificationSentTime(id: String, time: Date): Option[User]
+
+
 
   def resetTasks(id: String, newTasks: DailyTasks, resetTasksTimeout: Date): Option[User]
   def addTasks(id: String, newTasks: List[Task], addReward: Option[Assets] = None): Option[User]
@@ -193,7 +208,7 @@ trait UserDAO extends BaseDAO[User] {
   def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User]
 
   /**
-   * Updates status of batle request.
+   * Updates status of battle request.
    *
    * @param id Id of user to update request for.
    * @param mySolutionId Id of user's challenged solution.
@@ -201,4 +216,5 @@ trait UserDAO extends BaseDAO[User] {
    * @param status new status.
    */
   def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User]
+
 }

@@ -3,7 +3,7 @@
 service questd stop
 
 hg pull
-hg up -r "0.40.09" --clean
+hg up -r "0.40.11" --clean
 ./stage.sh
 
 cp -f ../install/questd.conf /etc/init/

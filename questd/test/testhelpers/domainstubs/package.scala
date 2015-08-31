@@ -4,19 +4,21 @@ import java.util.Date
 
 import models.domain.base.ID
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
+import models.domain.chat.{Participant, Conversation}
 import models.domain.comment.{Comment, CommentInfo}
-import models.domain.common.{Assets, ContentReference, ContentType, ContentVote}
+import models.domain.common._
 import models.domain.quest._
 import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
-import models.domain.tutorial.TutorialPlatform
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, LoginMethod}
 import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.demo.UserDemographics
 import models.domain.user.friends.Friendship
+import models.domain.user.message.Message
 import models.domain.user.profile._
+import models.domain.user.schedules.UserSchedules
 import models.domain.user.stats.{SolutionsInBattle, UserStats}
 import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import models.view.{QuestView, ThemeInfoWithID}
@@ -214,6 +216,16 @@ package object domainstubs {
       timelinePoints = timelinePoints)
   }
 
+  def createConversationStub(
+    id: String = ID.generateUUID(),
+    pIds: List[String] = List.empty
+    ) = {
+    Conversation(
+    id = id,
+    participants = pIds.map(Participant(_))
+    )
+  }
+
   def createUserStub(
     id: String = ID.generateUUID(),
     cultureId: Option[String] = Some("cultureId"),
@@ -237,7 +249,9 @@ package object domainstubs {
     privateDailyResults: List[DailyResult] = List(createDailyResultStub()),
     battleRequests: List[BattleRequest] = List.empty,
     tutorialState: TutorialState = TutorialState(dailyTasksSuppression = false),
-    dailyTasks: DailyTasks = DailyTasks()) = {
+    dailyTasks: DailyTasks = DailyTasks(),
+    messages: List[Message] = List.empty,
+    schedules: UserSchedules = UserSchedules()) = {
 
     User(
       id = id,
@@ -262,8 +276,9 @@ package object domainstubs {
           bio = Bio(
             gender = Gender.Male)),
         rights = rights,
-        tutorialStates = Map(TutorialPlatform.iPhone.toString -> tutorialState),
-        dailyTasks = dailyTasks),
+        tutorialStates = Map(ClientPlatform.iPhone.toString -> tutorialState),
+        dailyTasks = dailyTasks,
+        messages = messages),
       friends = friends,
       followers = followers,
       mustVoteSolutions = mustVoteSolutions,
@@ -275,6 +290,7 @@ package object domainstubs {
         votedSolutions = votedSolutions,
         votedBattles = votedBattles,
         participatedBattles = participatedBattles.map{case (k, v) => (k, SolutionsInBattle(List(v)))}),
-      battleRequests = battleRequests)
+      battleRequests = battleRequests,
+      schedules = schedules)
   }
 }

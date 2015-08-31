@@ -17,12 +17,14 @@ object UnhandledMessagesListener {
  */
 class UnhandledMessagesListener extends Actor {
 
+  val system = Akka.system
+
   override def preStart() {
-    Akka.system.eventStream.subscribe(self, classOf[UnhandledMessage])
+    system.eventStream.subscribe(self, classOf[UnhandledMessage])
   }
 
   override def postStop(): Unit = {
-    Akka.system.eventStream.unsubscribe(self)
+    system.eventStream.unsubscribe(self)
   }
 
   def receive = {

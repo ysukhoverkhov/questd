@@ -5,8 +5,10 @@ import play.api.mvc._
 
 
 //noinspection EmptyParenMethodAccessedAsParameterless,MutatorLikeMethodIsParameterless
-object MessagesWS extends Controller with AccessToWSInstance {
+object EventsWS extends Controller with AccessToWSInstance {
 
   def removeMessage = ws.removeMessage
+  def addDeviceToken = ws.addDeviceToken
+  def removeDeviceToken = ws.removeDeviceToken
 }
 

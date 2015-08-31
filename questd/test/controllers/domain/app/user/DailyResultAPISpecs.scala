@@ -7,6 +7,7 @@ import models.domain.solution.SolutionStatus
 import models.domain.user.dailyresults._
 import org.mockito.Matchers.{eq => mEq}
 import org.mockito.{ArgumentMatcher, Matchers}
+import org.mockito.Mockito._
 import testhelpers.domainstubs._
 
 class DailyResultAPISpecs extends BaseAPISpecs {
@@ -30,6 +31,8 @@ class DailyResultAPISpecs extends BaseAPISpecs {
         withSolutions = any) returns List(q).iterator
       user.addPrivateDailyResult(any, any) returns Some(u)
       user.addQuestIncomeToDailyResult(any, any) returns Some(u)
+
+      doReturn(OkApiResult(SendMessageResult(u))).when(api).sendMessage(any)
 
       val result = api.shiftDailyResult(ShiftDailyResultRequest(
         user = u))
@@ -60,6 +63,8 @@ class DailyResultAPISpecs extends BaseAPISpecs {
             result.asInstanceOf[DailyResult].questsIncome == List.empty
           }
         }))
+
+      there was one(api).sendMessage(any)
 
       result must beEqualTo(OkApiResult(ShiftDailyResultResult(user = u)))
     }

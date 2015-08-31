@@ -75,8 +75,10 @@ POST	/rest/askFriendship								controllers.web.rest.FriendsWS.askFriendship
 POST	/rest/respondFriendship							controllers.web.rest.FriendsWS.respondFriendship
 POST	/rest/removeFromFriends							controllers.web.rest.FriendsWS.removeFromFriends
 
-# Messages
-POST	/rest/removeMessage								controllers.web.rest.MessagesWS.removeMessage
+# Events
+POST	/rest/removeMessage								controllers.web.rest.EventsWS.removeMessage
+POST    /rest/addDeviceToken                            controllers.web.rest.EventsWS.addDeviceToken
+POST    /rest/removeDeviceToken                         controllers.web.rest.EventsWS.removeDeviceToken
 
 # Misc
 POST	/rest/getTime									controllers.web.rest.MiscWS.getTime
@@ -100,10 +102,10 @@ POST	/rest/getBattleRequests						    controllers.web.rest.ChallengesWS.getBattl
 POST    /rest/respondBattleRequest    					controllers.web.rest.ChallengesWS.respondBattleRequest
 
 # Chat
-#POST   /rest/createConversation
-#POST   /rest/getMyConversations
-#POST   /rest/sendChatMessage
-#POST   /rest/getChatMessages
+POST   /rest/createConversation                         controllers.web.rest.ConversationsWS.createConversation
+POST   /rest/getMyConversations                         controllers.web.rest.ConversationsWS.getMyConversations
+POST   /rest/sendChatMessage                            controllers.web.rest.ConversationsWS.sendChatMessage
+POST   /rest/getChatMessages                            controllers.web.rest.ConversationsWS.getChatMessages
 
 
 # Upload

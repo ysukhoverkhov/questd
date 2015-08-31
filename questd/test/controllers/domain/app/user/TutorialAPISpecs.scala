@@ -2,7 +2,7 @@ package controllers.domain.app.user
 
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{BaseAPISpecs, OkApiResult}
-import models.domain.common.Assets
+import models.domain.common.{ClientPlatform, Assets}
 import models.domain.tutorial._
 import models.domain.tutorialtask.TutorialTask
 import models.domain.user.profile._
@@ -240,9 +240,9 @@ class TutorialAPISpecs extends BaseAPISpecs {
         rewardReceived = true,
         tasks = List.empty), List(tutorialTaskId))
 
-      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, tutorialTaskId))
+      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, ClientPlatform.iPhone, tutorialTaskId))
 
-      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.LimitExceeded)))
+      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.AlreadyAssigned)))
       there was no(db.user).setTasksCompletedFraction(any, any)
     }
 
@@ -254,7 +254,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
       db.tutorialTask.readById(s"a$tutorialTaskId") returns None
 
-      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, s"a$tutorialTaskId"))
+      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, ClientPlatform.iPhone, s"a$tutorialTaskId"))
 
       result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.OutOfContent)))
       there was one(db.tutorialTask).readById(any)
@@ -281,7 +281,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
       db.user.addTasks(any, any, any) returns Some(u)
       db.user.setTasksCompletedFraction(any, any) returns Some(u)
 
-      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, TutorialPlatform.iPhone, tutorialTaskId))
+      val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, ClientPlatform.iPhone, tutorialTaskId))
 
       result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.OK, Some(u.profile))))
       there was one(db.tutorialTask).readById(tutorialTaskId)
@@ -301,7 +301,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
     user.addTutorialQuestAssigned(any, any, any) returns Some(u)
     user.addEntryToTimeLine(any, any) returns Some(u)
 
-    val result = api.assignTutorialQuest(AssignTutorialQuestRequest(u, TutorialPlatform.iPhone, tutorialQuestId))
+    val result = api.assignTutorialQuest(AssignTutorialQuestRequest(u, ClientPlatform.iPhone, tutorialQuestId))
 
     result must beAnInstanceOf[OkApiResult[AssignTutorialQuestResult]]
 
@@ -314,7 +314,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
     val tutorialQuestId = "tqid"
     val u = createUserStub(tutorialState = TutorialState(usedTutorialQuestIds = List(tutorialQuestId)))
 
-    val result = api.assignTutorialQuest(AssignTutorialQuestRequest(u, TutorialPlatform.iPhone, tutorialQuestId))
+    val result = api.assignTutorialQuest(AssignTutorialQuestRequest(u, ClientPlatform.iPhone, tutorialQuestId))
 
     result must beEqualTo(OkApiResult(AssignTutorialQuestResult(ProfileModificationResult.LimitExceeded)))
 
@@ -327,7 +327,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
     val elementId = "elementId"
     val u = createUserStub()
     val tut = Tutorial(
-      id = TutorialPlatform.iPhone.toString,
+      id = ClientPlatform.iPhone.toString,
       elements = List(TutorialElement(
         id = elementId,
         actions = List.empty,
@@ -342,7 +342,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
     doReturn(OkApiResult(ExecuteServerTutorialActionResult(u))).when(api).executeServerTutorialAction(any)
     user.addClosedTutorialElement(any, any, any) returns Some(u)
 
-    val result = api.closeTutorialElement(CloseTutorialElementRequest(u, TutorialPlatform.iPhone, elementId))
+    val result = api.closeTutorialElement(CloseTutorialElementRequest(u, ClientPlatform.iPhone, elementId))
 
     result must beAnInstanceOf[OkApiResult[CloseTutorialElementResult]]
     there was one(api).executeServerTutorialAction(any)
@@ -356,7 +356,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
     val result = api.executeServerTutorialAction(ExecuteServerTutorialActionRequest(
       createUserStub(),
-      TutorialPlatform.iPhone,
+      ClientPlatform.iPhone,
       TutorialServerAction(actionType = TutorialServerActionType.RemoveDailyTasksSuppression)))
 
     result must beAnInstanceOf[OkApiResult[ExecuteServerTutorialActionResult]]
@@ -373,7 +373,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
     val result = api.executeServerTutorialAction(ExecuteServerTutorialActionRequest(
       createUserStub(),
-      TutorialPlatform.iPhone,
+      ClientPlatform.iPhone,
       TutorialServerAction(actionType = TutorialServerActionType.AssignDailyTasks)))
 
     result must beAnInstanceOf[OkApiResult[ExecuteServerTutorialActionResult]]
