@@ -4,35 +4,35 @@ import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
-import models.domain.common.Assets
-import models.domain.tutorial.{TutorialServerActionType, TutorialServerAction, TutorialElement, TutorialPlatform}
+import models.domain.common.{ClientPlatform, Assets}
+import models.domain.tutorial.{TutorialServerActionType, TutorialServerAction, TutorialElement}
 import models.domain.user._
 import models.domain.user.profile.{DailyTasks, Profile, Task, TutorialState}
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger
 
-case class GetCommonTutorialRequest(platform: TutorialPlatform.Value)
+case class GetCommonTutorialRequest(platform: ClientPlatform.Value)
 case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])
 
-case class GetTutorialRequest(user: User, platform: TutorialPlatform.Value)
+case class GetTutorialRequest(user: User, platform: ClientPlatform.Value)
 case class GetTutorialResult(tutorialElements: List[TutorialElement])
 
-case class CloseTutorialElementRequest(user: User, platform: TutorialPlatform.Value, elementId: String)
+case class CloseTutorialElementRequest(user: User, platform: ClientPlatform.Value, elementId: String)
 case class CloseTutorialElementResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class AssignTutorialTaskRequest(user: User, platform: TutorialPlatform.Value, taskId: String)
+case class AssignTutorialTaskRequest(user: User, platform: ClientPlatform.Value, taskId: String)
 case class AssignTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class IncTutorialTaskRequest(user: User, taskId: String)
 case class IncTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class AssignTutorialQuestRequest(user: User, platform: TutorialPlatform.Value, questId: String)
+case class AssignTutorialQuestRequest(user: User, platform: ClientPlatform.Value, questId: String)
 case class AssignTutorialQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
 case class ResetTutorialRequest(user: User)
 case class ResetTutorialResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
 
-case class ExecuteServerTutorialActionRequest(user: User, platform: TutorialPlatform.Value, serverAction: TutorialServerAction)
+case class ExecuteServerTutorialActionRequest(user: User, platform: ClientPlatform.Value, serverAction: TutorialServerAction)
 case class ExecuteServerTutorialActionResult(user: User)
 
 
@@ -119,7 +119,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
     import request._
     // 1. check is the task was already given.
     if (user.profile.tutorialStates(platform.toString).usedTutorialTaskIds.contains(taskId)) {
-      OkApiResult(AssignTutorialTaskResult(LimitExceeded))
+      OkApiResult(AssignTutorialTaskResult(AlreadyAssigned))
     } else {
       db.tutorialTask.readById(taskId) match {
         case Some(t) =>
@@ -222,7 +222,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
     db.user.update(
       user.copy(
         profile = user.profile.copy(
-          tutorialStates = TutorialPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
+          tutorialStates = ClientPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
           dailyTasks = DailyTasks()
         )
       )

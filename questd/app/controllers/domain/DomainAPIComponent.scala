@@ -39,8 +39,9 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     with ContentAPI
     with FollowingAPI
     with FriendsAPI
-    with MessagesAPI
+    with EventsAPI
     with CommentsAPI
+    with ConversationsAPI
     with ChallengesAPI
     with MiscAPI
     with TasksAPI

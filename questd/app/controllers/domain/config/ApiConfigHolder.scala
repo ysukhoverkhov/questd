@@ -13,6 +13,9 @@ class _DefaultConfigParams {
   val ActiveUserDays = "10 01 Active User Days"
   val DefaultCultureId = "15 01 Default Culture Id"
 
+  // Chat
+  val ChatMaxMessageLength = "Chat Max Message Length"
+
   // Tasks
   val SolutionVoteTaskCountMean = "30 01 Solution Vote Task Count Mean"
   val SolutionVoteTaskCountDeviation = "30 02 Solution Vote Task Count Deviation"
@@ -118,6 +121,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
 
             DefaultConfigParams.ActiveUserDays -> "7",
             DefaultConfigParams.DefaultCultureId -> "68349b7a-20ee-4f6e-8406-f468b30be783",
+
+            DefaultConfigParams.ChatMaxMessageLength -> "1024",
 
             DefaultConfigParams.SolutionVoteTaskCountMean -> "1",
             DefaultConfigParams.SolutionVoteTaskCountDeviation -> "0.5",

@@ -7,7 +7,7 @@ import models.domain.base.ID
  *
  * Created by Yury on 03.08.2015.
  */
-case class ChatConversation (
+case class Conversation (
   id: String = ID.generateUUID(),
-  participants: List[ChatParticipant]
+  participants: List[Participant]
   ) extends ID

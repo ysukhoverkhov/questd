@@ -1,9 +1,8 @@
 package models.domain.user.profile
 
 import models.domain.base.ID
-import models.domain.common.Assets
+import models.domain.common.{ClientPlatform, Assets}
 import models.domain.quest.QuestSolutionContext
-import models.domain.tutorial.TutorialPlatform
 import models.domain.user.dailyresults.DailyResult
 import models.domain.user.message.Message
 
@@ -25,6 +24,6 @@ case class Profile(
   questVoteContext: QuestVoteContext = QuestVoteContext(),
   solutionVoteContext: SolutionVoteContext = SolutionVoteContext(),
   tutorialStates: Map[String, TutorialState] = // TODO: do not split it by platforms.
-    TutorialPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
+    ClientPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
   analytics: Analytics = Analytics(),
   debug: String = "")

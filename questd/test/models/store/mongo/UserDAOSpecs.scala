@@ -4,13 +4,13 @@ package models.store.mongo
 
 import java.util.Date
 
-import models.domain.common.{Assets, ContentVote}
-import models.domain.tutorial.TutorialPlatform
+import models.domain.common.{ClientPlatform, Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
 import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
 import models.domain.user.dailyresults.BattleResult
 import models.domain.user.demo.UserDemographics
+import models.domain.user.devices.Device
 import models.domain.user.friends.{ReferralStatus, FriendshipStatus, Friendship}
 import models.domain.user.message.MessageInformation
 import models.domain.user.profile._
@@ -22,7 +22,7 @@ import org.specs2.mutable._
 import play.api.test._
 import testhelpers.domainstubs._
 
-//noinspection ZeroIndexToHead
+// TODO: split it on several tests.
 //@RunWith(classOf[JUnitRunner])
 class UserDAOSpecs
   extends Specification
@@ -302,10 +302,10 @@ class UserDAOSpecs
       db.user.create(User(
         id = userid))
 
-      val ou = db.user.addClosedTutorialElement(userid, TutorialPlatform.iPhone.toString, elementid)
+      val ou = db.user.addClosedTutorialElement(userid, ClientPlatform.iPhone.toString, elementid)
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).closedElementIds == List(elementid))
+      ou must beSome.which((u: User) => u.profile.tutorialStates(ClientPlatform.iPhone.toString).closedElementIds == List(elementid))
     }
 
     "addTutorialTaskAssigned works" in new WithApplication(appWithTestDatabase) {
@@ -316,13 +316,13 @@ class UserDAOSpecs
       db.user.create(User(
         id = userid))
 
-      db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t1")
-      db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
-      db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t3")
-      val ou = db.user.addTutorialTaskAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
+      db.user.addTutorialTaskAssigned(userid, ClientPlatform.iPhone.toString, "t1")
+      db.user.addTutorialTaskAssigned(userid, ClientPlatform.iPhone.toString, "t2")
+      db.user.addTutorialTaskAssigned(userid, ClientPlatform.iPhone.toString, "t3")
+      val ou = db.user.addTutorialTaskAssigned(userid, ClientPlatform.iPhone.toString, "t2")
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).usedTutorialTaskIds.length == 3)
+      ou must beSome.which((u: User) => u.profile.tutorialStates(ClientPlatform.iPhone.toString).usedTutorialTaskIds.length == 3)
     }
 
     "addTutorialQuestAssigned works" in new WithApplication(appWithTestDatabase) {
@@ -333,13 +333,13 @@ class UserDAOSpecs
       db.user.create(User(
         id = userid))
 
-      db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t1")
-      db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
-      db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t3")
-      val ou = db.user.addTutorialQuestAssigned(userid, TutorialPlatform.iPhone.toString, "t2")
+      db.user.addTutorialQuestAssigned(userid, ClientPlatform.iPhone.toString, "t1")
+      db.user.addTutorialQuestAssigned(userid, ClientPlatform.iPhone.toString, "t2")
+      db.user.addTutorialQuestAssigned(userid, ClientPlatform.iPhone.toString, "t3")
+      val ou = db.user.addTutorialQuestAssigned(userid, ClientPlatform.iPhone.toString, "t2")
 
       ou must beSome.which((u: User) => u.id.toString == userid)
-      ou must beSome.which((u: User) => u.profile.tutorialStates(TutorialPlatform.iPhone.toString).usedTutorialQuestIds.length == 3)
+      ou must beSome.which((u: User) => u.profile.tutorialStates(ClientPlatform.iPhone.toString).usedTutorialQuestIds.length == 3)
     }
 
     "updateCultureId works" in new WithApplication(appWithTestDatabase) {
@@ -658,7 +658,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val m = message.MessageAllTasksCompleted().toMessage
+      val m = message.MessageDailyResultsReady().toMessage
 
       db.user.create(user)
       db.user.addMessage(user.id, m)
@@ -675,6 +675,7 @@ class UserDAOSpecs
 
       val u: Iterator[User] = db.user.all
       val u2 = u.toList
+      //noinspection ZeroIndexToHead
       u2(0).profile.messages.length must beEqualTo(1)
       u2(1).profile.messages.length must beEqualTo(1)
       u2(2).profile.messages.length must beEqualTo(1)
@@ -686,7 +687,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val m = message.MessageAllTasksCompleted().toMessage
+      val m = message.MessageDailyResultsReady().toMessage
 
       db.user.create(user)
       db.user.addMessage(user.id, m)
@@ -704,7 +705,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val ms = (1 to 5).map(n => message.MessageAllTasksCompleted().toMessage)
+      val ms = (1 to 5).map(n => message.MessageDailyResultsReady().toMessage)
 
       db.user.create(user)
       ms.foreach(db.user.addMessage(user.id, _))
@@ -713,6 +714,28 @@ class UserDAOSpecs
 
       val ou2 = db.user.readById(user.id)
       ou2 must beSome[User].which(_.profile.messages == ms.tail)
+    }
+
+    "addDevice and remove device works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val device = Device(ClientPlatform.iPhone, "token")
+
+      db.user.create(user)
+      db.user.addDevice(user.id, device)
+
+      val ou1 = db.user.readById(user.id)
+      ou1 must beSome[User].which(u => u.devices.size == 1 && u.devices.head == device)
+
+      db.user.removeDevice(user.id, device.token)
+
+      val ou2 = db.user.readById(user.id)
+      ou2 must beSome[User].which(u => u.devices.isEmpty)
+    }
+
+    "removeDevice works" in new WithApplication(appWithTestDatabase) {
+      success
     }
 
     "Setting friendship works" in new WithApplication(appWithTestDatabase) {
@@ -777,6 +800,21 @@ class UserDAOSpecs
 
       ou must beSome
       ou.get.battleRequests.head must beEqualTo(br.copy(status = BattleRequestStatus.Rejected))
+    }
+
+    "setNotificationSentTime works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+      val date = new Date()
+
+      db.user.create(user)
+      db.user.setNotificationSentTime(user.id, date)
+
+      val ou = db.user.readById(user.id)
+
+      ou must beSome
+      ou.get.schedules.lastNotificationSentAt must beEqualTo(date)
     }
   }
 }

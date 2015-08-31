@@ -2,6 +2,7 @@
 
 package models.store.mongo
 
+import models.domain.common.ClientPlatform
 import models.domain.tutorial._
 import org.specs2.mutable._
 import play.api.test.WithApplication
@@ -50,7 +51,7 @@ class TutorialDAOSpecs extends Specification
         conditions = List(tc, tc),
         triggers = List(tt, tt))
 
-      private val platform = TutorialPlatform.iPhone.toString
+      private val platform = ClientPlatform.iPhone.toString
       val t = Tutorial(platform, List.empty)
       db.tutorial.create(t)
 
@@ -70,7 +71,7 @@ class TutorialDAOSpecs extends Specification
         conditions = List(tc, tc),
         triggers = List(tt, tt))
 
-      private val platform = TutorialPlatform.iPhone.toString
+      private val platform = ClientPlatform.iPhone.toString
       val t = Tutorial(platform, List(te))
       db.tutorial.create(t)
 
@@ -92,7 +93,7 @@ class TutorialDAOSpecs extends Specification
 
       val updatedElement = te.copy(actions = List(te.actions.head.copy(actionType = TutorialActionType.Message)))
 
-      private val platform = TutorialPlatform.iPhone.toString
+      private val platform = ClientPlatform.iPhone.toString
       val t = Tutorial(platform, List(te))
       db.tutorial.create(t)
 
