@@ -1,0 +1,19 @@
+workspace/\.metadata
+questd/\.cache
+questd/\.classpath
+questd/\.gitignore
+questd/\.project
+questd/\.settings
+questd/\.target
+questd/bin/*
+questd/logs/*
+questd/target/*
+questd/project/target
+questd/project/project/target
+syntax: glob
+questd/RUNNING_PID
+questd/.idea
+questd/.idea_modules
+questd/project/.sbtserver.lock
+questd/.sbtserver
+questd/project/.sbtserver
