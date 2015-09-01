@@ -816,6 +816,21 @@ class UserDAOSpecs
       ou must beSome
       ou.get.schedules.lastNotificationSentAt must beEqualTo(date)
     }
+
+    "movePrivateDailyResultsToPublic works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val results = (1 to 5).map(i => createDailyResultStub(startOfPeriod = new Date(i))).toList
+
+      val user = createUserStub(privateDailyResults = results)
+
+      db.user.create(user)
+      val ou = db.user.movePrivateDailyResultsToPublic(user.id, results.tail)
+
+      ou must beSome
+      ou.get.privateDailyResults must beEqualTo(List(results.head))
+      ou.get.profile.dailyResults must beEqualTo(results.tail)
+    }
   }
 }
 
