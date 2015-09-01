@@ -3,7 +3,7 @@ package logic.user
 import controllers.domain.app.protocol.ProfileModificationResult._
 import logic._
 import models.domain.common.Assets
-import models.domain.solution.Solution
+import models.domain.solution.{SolutionStatus, Solution}
 import models.domain.user.profile.Functionality
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
@@ -45,6 +45,8 @@ trait Challenges { this: UserLogic =>
       .exists(br => (br.mySolutionId == mySolution.id) && (br.opponentSolutionId == opponentSolution.id))
 
     if (alreadyHasRequest)
+      InvalidState
+    else if (mySolution.status != SolutionStatus.InRotation || opponentSolution.status != SolutionStatus.InRotation)
       InvalidState
     else if (!mySolutionExists)
       OutOfContent
