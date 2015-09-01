@@ -58,25 +58,27 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
   def shiftDailyResult(request: ShiftDailyResultRequest): ApiResult[ShiftDailyResultResult] = handleDbException {
     import request._
 
-    if (user.privateDailyResults.isEmpty) {
+    val userWithResults = if (user.privateDailyResults.isEmpty) {
+      Logger.error("Adding private daily result because they are empty at shifting")
+
       db.user.addPrivateDailyResult(
         user.id,
         DailyResult(
-          user.getStartOfCurrentDailyResultPeriod))
-
-      Logger.error("Adding private daily result because they are empty at shifting")
+          user.getStartOfCurrentDailyResultPeriod)).get
+    } else {
+      user
     }
 
     {
       getMyQuests(
         GetMyQuestsRequest(
-          user = user,
+          user = userWithResults,
           status = QuestStatus.InRotation
         ))
     } map { r =>
-      r.quests.foldLeft[ApiResult[AddQuestIncomeToDailyResultResult]](OkApiResult(AddQuestIncomeToDailyResultResult(user))) {
+      r.quests.foldLeft[ApiResult[AddQuestIncomeToDailyResultResult]](OkApiResult(AddQuestIncomeToDailyResultResult(userWithResults))) {
         case (OkApiResult(_), q) =>
-          addQuestIncomeToDailyResult(AddQuestIncomeToDailyResultRequest(user, q))
+          addQuestIncomeToDailyResult(AddQuestIncomeToDailyResultRequest(userWithResults, q))
         case (badResult, _) =>
           badResult
       }
@@ -84,7 +86,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       db.user.addPrivateDailyResult(
         r.user.id,
         DailyResult(
-          user.getStartOfCurrentDailyResultPeriod)) ifSome { u =>
+          userWithResults.getStartOfCurrentDailyResultPeriod)) ifSome { u =>
 
           sendMessage(SendMessageRequest(u, MessageDailyResultsReady()))
 
