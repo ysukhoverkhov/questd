@@ -246,22 +246,18 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def movePrivateDailyResultsToPublic(id: String, dailyResults: List[DailyResult]): Option[User] = {
-    for (a <- 1 to dailyResults.length) {
-      findAndModify(
-        id,
-        MongoDBObject(
-          "$pop" -> MongoDBObject(
-            "privateDailyResults" -> 1)))
-    }
-
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
-          "profile.dailyResults" -> dailyResults.map(grater[DailyResult].asDBObject))))
+          "profile.dailyResults" -> dailyResults.map(grater[DailyResult].asDBObject)),
+        "$pull" -> MongoDBObject(
+          "privateDailyResults" -> MongoDBObject("$in" -> dailyResults.map(grater[DailyResult].asDBObject)))
+      )
+    )
   }
 
   /**
