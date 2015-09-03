@@ -64,6 +64,10 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
   import controllers.web.rest.component.DebugWSImplTypes._
 
   def shiftDailyResult = wrapApiCallReturnBody[WSShiftDailyResultResult] { r =>
+    api.db.solution.readManyByIds(r.user.stats.solvedQuests.values.toList).filter(s => s.battleIds.isEmpty).foreach { solution =>
+      api.tryCreateBattle(TryCreateBattleRequest(solution))
+    }
+
     api.resetDailyTasks(ResetDailyTasksRequest(r.user))
     api.populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(r.user))
     api.shiftDailyResult(ShiftDailyResultRequest(r.user))
