@@ -53,7 +53,7 @@ class UpdateSolutionQualityCurve(
     val ratio = if (solution.rating.votersCount == 0) {
       0
     } else {
-      ((solution.rating.likesCount / solution.rating.votersCount.toDouble) * (FramesCount - 1)).toInt
+      (math.max(1, solution.rating.likesCount / solution.rating.votersCount.toDouble) * (FramesCount - 1)).toInt
     }
 
     data match {
