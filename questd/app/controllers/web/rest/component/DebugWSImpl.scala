@@ -1,5 +1,7 @@
 package controllers.web.rest.component
 
+import java.util.Date
+
 import controllers.domain._
 import controllers.domain.admin.{AllQuestsRequest, AllSolutionsRequest, AllUsersRequest}
 import controllers.domain.app.protocol.ProfileModificationResult
@@ -217,7 +219,12 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
             ContentReference(
               contentType = ContentType.Photo,
               storage = "url",
-              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
+              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg")))) map { r =>
+                val s = api.db.solution.readById(r.solutionId.get).get
+                val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))
+                api.db.solution.update(s2)
+                OkApiResult(r)
+              }
       } map { rr =>
         Logger.debug(s"Quest solved with result ${rr.allowed}")
         assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
@@ -241,7 +248,15 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
             ContentReference(
               contentType = ContentType.Photo,
               storage = "url",
-              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
+              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg")))) map { r =>
+                val s = api.db.solution.readById(r.solutionId.get).get
+                val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))
+                api.db.solution.update(s2)
+
+                api.tryCreateBattle(TryCreateBattleRequest(s2))
+
+                OkApiResult(r)
+              }
       }
     } map { rr =>
       Logger.debug(s"Quest solved by peer with result ${rr.allowed}")
