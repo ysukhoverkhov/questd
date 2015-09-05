@@ -20,18 +20,18 @@ object MessageMetaInfo  {
   )
 
   val messageLocalizedMessage: Map[MessageType.Value, String] = Map(
-    MessageType.AllTasksCompleted -> "TODO",
-    MessageType.TaskCompleted ->  "TODO",
-    MessageType.BattleRequestAccepted ->  "TODO",
-    MessageType.BattleRequestRejected ->  "TODO",
-    MessageType.FriendshipAccepted ->  "TODO",
-    MessageType.FriendshipRejected ->  "TODO",
-    MessageType.FriendshipRemoved ->  "TODO",
-    MessageType.DailyResultsReady -> "TODO",
+    MessageType.AllTasksCompleted -> "NOTIFICATION_ALL_TASKS_COMPLETED",
+    MessageType.TaskCompleted ->  "NOTIFICATION_TASK_COMPLETED",
+    MessageType.BattleRequestAccepted ->  "NOTIFICATION_BATTLE_REQUEST_ACCEPTED",
+    MessageType.BattleRequestRejected ->  "NOTIFICATION_BATTLE_REQUEST_REJECTED",
+    MessageType.FriendshipAccepted ->  "NOTIFICATION_FRIENDSHIP_ACCEPTED",
+    MessageType.FriendshipRejected ->  "NOTIFICATION_FRIENDSHIP_REJECTED",
+    MessageType.FriendshipRemoved ->  "NOTIFICATION_FRIENDSHIP_REMOVED",
+    MessageType.DailyResultsReady -> "NOTIFICATION_DAILY_RESULTS_READY",
 
     // user
-    MessageType.Information ->  "TODO",
-    MessageType.NewChatMessage -> "TODO"
+    MessageType.Information -> "NOTIFICATION_INFORMATION",
+    MessageType.NewChatMessage -> "NOTIFICATION_NEW_CHAT_MESSAGE"
   )
 
   require(messagePriority.size == MessageType.values.size)

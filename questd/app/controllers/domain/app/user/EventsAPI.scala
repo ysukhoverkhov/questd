@@ -40,7 +40,7 @@ private[domain] trait EventsAPI { this: DBAccessor =>
   /**
    * Sends message to a user.
    * This is used as entry point for all events.
-   * We here check should we ingore the message or should not and add it if should not.
+   * We here check should we ignore the message or should not and add it if should not.
    * After that we asks to send notifications if it's required.
    */
   def sendMessage(request: SendMessageRequest): ApiResult[SendMessageResult] = handleDbException {
