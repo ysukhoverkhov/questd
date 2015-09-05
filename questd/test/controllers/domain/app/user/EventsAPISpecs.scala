@@ -74,7 +74,7 @@ class EventsAPISpecs extends BaseAPISpecs {
       val result = api.checkSendNotifications(CheckSendNotificationsRequest(u))
 
       there was one(user).setNotificationSentTime(mEq(u.id), any)
-      there was one(api).notifyWithMessage(mEq(NotifyWithMessageRequest(u, messageFriendshipAccepted)))
+      there was one(api).notifyWithMessage(mEq(NotifyWithMessageRequest(u, messageFriendshipAccepted, 3)))
 
       result must beAnInstanceOf[OkApiResult[CheckSendNotificationsResult]]
     }

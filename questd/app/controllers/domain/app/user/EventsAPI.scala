@@ -31,7 +31,7 @@ case class RemoveDeviceTokenResult(allowed: ProfileModificationResult)
 case class CheckSendNotificationsRequest(user: User)
 case class CheckSendNotificationsResult(user: User)
 
-case class NotifyWithMessageRequest(user: User, message: Message)
+case class NotifyWithMessageRequest(user: User, message: Message, numberOfEvents: Int)
 case class NotifyWithMessageResult(user: User)
 
 
@@ -131,7 +131,8 @@ private[domain] trait EventsAPI { this: DBAccessor =>
       db.user.setNotificationSentTime(user.id, new Date()) ifSome { user =>
         notifyWithMessage(NotifyWithMessageRequest(
           user = user,
-          message = user.profile.messages.sortBy[Int](m => MessageMetaInfo.messagePriority(m.messageType)).head
+          message = user.profile.messages.sortBy[Int](m => MessageMetaInfo.messagePriority(m.messageType)).head,
+          numberOfEvents = user.profile.messages.length
         )) map { r =>
           OkApiResult(CheckSendNotificationsResult(r.user))
         }
@@ -157,7 +158,7 @@ private[domain] trait EventsAPI { this: DBAccessor =>
     actorSelectionNotification ! DeviceNotifications.PushMessage(
       devices = DeviceNotifications.Devices(devices.toSet),
       message = messageText,
-      badge = None,
+      badge = Some(numberOfEvents),
       sound = None,
       destinations = List(DeviceNotifications.MobileDestination)
     )
