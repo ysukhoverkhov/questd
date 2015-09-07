@@ -106,16 +106,22 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
   }
 
   /**
-   * Returns portion of time line.
+   * Returns portion of time line. Populates its with initial content if it's empty.
    */
   def getTimeLine(request: GetTimeLineRequest): ApiResult[GetTimeLineResult] = handleDbException {
 
-    val pageSize = adjustedPageSize(request.pageSize)
-    val pageNumber = adjustedPageNumber(request.pageNumber)
+    (if (request.user.timeLine.isEmpty) {
+      populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(request.user))
+    } else {
+      OkApiResult(PopulateTimeLineWithRandomThingsResult(request.user))
+    }) map { r =>
+      val pageSize = adjustedPageSize(request.pageSize)
+      val pageNumber = adjustedPageNumber(request.pageNumber)
 
-    OkApiResult(GetTimeLineResult(request.user.timeLine.iterator
-      .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
-      .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
+      OkApiResult(GetTimeLineResult(r.user.timeLine.iterator
+        .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
+        .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
+    }
   }
 
   /**

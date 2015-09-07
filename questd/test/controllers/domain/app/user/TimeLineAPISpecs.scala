@@ -1,9 +1,10 @@
 package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
-import models.domain.user.friends.{FriendshipStatus, Friendship}
+import models.domain.user.friends.{Friendship, FriendshipStatus}
 import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import org.mockito.Matchers.{eq => mockEq}
+import org.mockito.Mockito._
 import testhelpers.domainstubs._
 
 class TimeLineAPISpecs extends BaseAPISpecs {
@@ -94,6 +95,21 @@ class TimeLineAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(GetTimeLineResult(entries.slice(0,2))))
     }
+
+    "getTimeLine populates timeline if it's empty" in context {
+      val u = createUserStub()
+
+      doReturn(OkApiResult(PopulateTimeLineWithRandomThingsResult(u))).when(api).populateTimeLineWithRandomThings(any)
+
+      val result = api.getTimeLine(GetTimeLineRequest(
+        user = u,
+        pageNumber = 0,
+        pageSize = 20))
+
+      result must beAnInstanceOf[OkApiResult[PopulateTimeLineWithRandomThingsResult]]
+      there were one(api).populateTimeLineWithRandomThings(any)
+    }
+
 
 //    "populateTimeLineWithRandomThings populates it" in context {
 //      val u = createUserStub()
