@@ -48,10 +48,6 @@ class AuthAPISpecs extends BaseAPISpecs {
         any) returns u
 
       db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
-      quest.allWithParams(any, any, any, any, any, any, any, any, any, any) returns List.empty.iterator
-      solution.allWithParams(any, any, any, any, any, any, any, any, any, any, any, any) returns List.empty.iterator
-      battle.allWithParams(any, any, any, any, any, any, any, any, any, any) returns List.empty.iterator
-      user.setTimeLinePopulationTime(any, any) returns u
 
       val rv = api.login(LoginRequest("FB", userfb))
 

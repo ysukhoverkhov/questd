@@ -45,7 +45,7 @@ case class PopulateTimeLineWithRandomThingsResult(user: User)
 private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
-   * Adds entry to time line.
+   * Adds entry to time line. Does nothing is user has no culture.
    *
    */
   def addToTimeLine(request: AddToTimeLineRequest): ApiResult[AddToTimeLineResult] = handleDbException {
@@ -239,16 +239,20 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
       }
     }
 
-    {
-      addRandomBattlesToTimeLine(request.user, battlesCount)
-    } map { r =>
-      addRandomSolutionsToTimeLine(r.user, solutionsCount)
-    } map { r =>
-      addRandomQuestsToTimeLine(r.user, questsCount)
-    } map { r =>
-      db.user.setTimeLinePopulationTime(r.user.id, r.user.getPopulateTimeLineDate) ifSome { u =>
-        OkApiResult(PopulateTimeLineWithRandomThingsResult(u))
+    if (request.user.demo.cultureId.isDefined) {
+      {
+        addRandomBattlesToTimeLine(request.user, battlesCount)
+      } map { r =>
+        addRandomSolutionsToTimeLine(r.user, solutionsCount)
+      } map { r =>
+        addRandomQuestsToTimeLine(r.user, questsCount)
+      } map { r =>
+        db.user.setTimeLinePopulationTime(r.user.id, r.user.getPopulateTimeLineDate) ifSome { u =>
+          OkApiResult(PopulateTimeLineWithRandomThingsResult(u))
+        }
       }
+    } else {
+      OkApiResult(PopulateTimeLineWithRandomThingsResult(user))
     }
   }
 }

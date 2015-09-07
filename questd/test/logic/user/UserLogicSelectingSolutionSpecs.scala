@@ -3,8 +3,6 @@ package logic.user
 import controllers.domain.OkApiResult
 import controllers.domain.app.solution._
 import logic.BaseLogicSpecs
-import models.domain._
-import models.domain.user.profile.{PublicProfile, Profile}
 import models.domain.user.User
 import testhelpers.domainstubs._
 
@@ -139,9 +137,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
     "Starting solutions return vip solutions" in {
       val qid = "qid"
-      val u = User(
-        profile = Profile(
-          publicProfile = PublicProfile(level = 1)))
+      val u = createUserStub(level = 1)
 
       applyConfigMock()
       rand.nextDouble returns 0.0
@@ -157,9 +153,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
     "Starting solutions return other solutions" in {
       val qid = "qid"
-      val u = User(
-        profile = Profile(
-          publicProfile = PublicProfile(level = 1)))
+      val u = createUserStub(level = 1)
 
       applyConfigMock()
       rand.nextDouble returns 1.0
@@ -215,7 +209,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
     "Solution from must help list is returned if there is one" in {
       val qid = "qid"
-      val u = User(mustVoteSolutions = List(qid))
+      val u = createUserStub(mustVoteSolutions = List(qid))
 
       applyConfigMock()
       api.getHelpWantedSolutions(any[GetHelpWantedSolutionsRequest]) returns OkApiResult(GetHelpWantedSolutionsResult(List(createSolutionStub(id = qid)).iterator))
@@ -227,7 +221,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
     "Solutions for own quests are returned" in {
       val qid = "qid"
-      val u = User()
+      val u = createUserStub()
 
       applyConfigMock()
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List(createSolutionStub(id = qid)).iterator))

@@ -12,6 +12,8 @@ trait BattleSelectUserLogic { this: UserLogic =>
   def getRandomBattles(count: Int): List[Battle] = getRandomObjects[Battle](count, (a: List[Battle]) => getRandomBattle(a))
 
   private def getRandomBattle(implicit selected: List[Battle]): Option[Battle] = {
+    require(user.demo.cultureId.isDefined)
+
     val algorithms = List(
       () => getBattlesWithSuperAlgorithm,
       () => getBattlesWithMyTags,

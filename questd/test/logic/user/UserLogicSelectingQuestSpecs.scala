@@ -134,9 +134,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
     "Starting quests return vip quests and with solutions" in {
       val qid = "qid"
-      val u = User(
-        profile = Profile(
-          publicProfile = PublicProfile(level = 2)))
+      val u = createUserStub(level = 2)
 
       applyConfigMock()
       rand.nextDouble returns 0.0
@@ -161,9 +159,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
     "Starting quests return other quests" in {
       val qid = "qid"
-      val u = User(
-        profile = Profile(
-          publicProfile = PublicProfile(level = 2)))
+      val u = createUserStub(level = 2)
 
       applyConfigMock()
       rand.nextDouble returns 1.0

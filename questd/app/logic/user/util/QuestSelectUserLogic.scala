@@ -11,6 +11,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
   def getRandomQuests(count: Int): List[Quest] = getRandomObjects[Quest](count, (a: List[Quest]) => getRandomQuest(a))
 
   private def getRandomQuest(implicit selected: List[Quest]): Option[Quest] = {
+    require(user.demo.cultureId.isDefined)
+
     val algorithms = List(
       () => getQuestsWithSuperAlgorithm,
       () => getQuestsWithMyTags(withSolutions = false),

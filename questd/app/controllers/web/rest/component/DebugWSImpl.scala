@@ -119,7 +119,6 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
         Logger.error(s"${user.id}, ${user.profile.publicProfile.bio.name}, ${user.profile.analytics.profileCreationDate}, ${questCults.map( m => m._1 -> m._2._1 )/* - "68349b7a-20ee-4f6e-8406-f468b30be783"*/}, $friendsCults")
     }
 
-
     OkApiResult(WSDebugResult("lalai"))
   }
 

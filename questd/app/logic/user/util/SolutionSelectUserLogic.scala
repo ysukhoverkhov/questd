@@ -11,13 +11,14 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   def getRandomSolutions(count: Int): List[Solution] = getRandomObjects[Solution](count, (a: List[Solution]) => getRandomSolution(a))
 
   private[user] def getRandomSolution(implicit selected: List[Solution] = List.empty): Option[Solution] = {
+    require(user.demo.cultureId.isDefined)
+
     val algorithms = List(
       () => getSolutionsWithSuperAlgorithm,
       () => getSolutionsWithTags,
       () => getAnySolutions,
       () => getAnySolutionsIgnoringLevels,
       () => getAnySolutionsDefaultCultureIgnoringLevels)
-
 
     val it = selectFromChain(algorithms).getOrElse(Iterator.empty)
     if (it.hasNext) Some(it.next()) else None
