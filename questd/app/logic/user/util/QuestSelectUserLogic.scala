@@ -122,8 +122,8 @@ trait QuestSelectUserLogic { this: UserLogic =>
   private[user] def getQuestsWithMyTags(withSolutions: Boolean)(implicit selected: List[Quest]) = {
     Logger.trace("  Returning quests with my tags")
 
-    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
-    Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
+//    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
+//    Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
 
     checkNotEmptyIterator(Some(api.getAllQuests(GetAllQuestsRequest(
       user = user,

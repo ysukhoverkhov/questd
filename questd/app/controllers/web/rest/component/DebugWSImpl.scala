@@ -20,6 +20,7 @@ import models.domain.user.profile.Gender
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger
 import play.libs.Akka
+import views.html.admin.users
 
 private object DebugWSImplTypes {
 
@@ -76,15 +77,48 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
   }
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
-    val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+//    val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+//
+//    actorSelectionNotification ! DeviceNotifications.PushMessage(
+//      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
+//      message = "lalala",
+//      badge = None,
+//      sound = None,
+//      destinations = List(DeviceNotifications.MobileDestination)
+//    )
 
-    actorSelectionNotification ! DeviceNotifications.PushMessage(
-      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
-      message = "lalala",
-      badge = None,
-      sound = None,
-      destinations = List(DeviceNotifications.MobileDestination)
-    )
+
+    val users = api.db.user.all
+      .filter(_.demo.cultureId.contains("68349b7a-20ee-4f6e-8406-f468b30be783"))
+      .foldLeft[List[(User, Map[String, (Int, List[String])], Set[String])]](List.empty) { (r, user) =>
+      (
+        user,
+        user.timeLine
+          .take(50)
+          .filter(_.objectType == TimeLineType.Quest)
+          .filter(_.reason == TimeLineReason.Has)
+          .map{ tle =>
+            (api.db.quest.readById(tle.objectId).map(_.cultureId).getOrElse(""), tle.objectId)
+          }
+          .foldLeft(Map.empty[String, (Int, List[String])]) { (r, v) =>
+            val tuple = r.getOrElse(v._1, (0, List.empty))
+            r + (v._1 -> (tuple._1 + 1, v._2 :: tuple._2))
+          },
+        user.following.map(api.db.user.readById(_).map(_.demo.cultureId.getOrElse("")).getOrElse("")).toSet ++
+         user.friends.map(f => api.db.user.readById(f.friendId).map(_.demo.cultureId.getOrElse("")).getOrElse("")).toSet
+      ) :: r
+    }
+      .filter { case (_, cs, _) => cs.size > 1 }
+      .filter { case (_, _, cs) => !cs.contains("d406dc6d-7a84-4ef9-9c64-5e725e8df608")}
+      .sortBy { case (u, _, _) => u.profile.analytics.profileCreationDate }
+
+    Logger.error(s"${users.size}")
+
+    users.foreach {
+      case (user, questCults, friendsCults) =>
+        Logger.error(s"${user.id}, ${user.profile.publicProfile.bio.name}, ${user.profile.analytics.profileCreationDate}, ${questCults.map( m => m._1 -> m._2._1 )/* - "68349b7a-20ee-4f6e-8406-f468b30be783"*/}, $friendsCults")
+    }
+
 
     OkApiResult(WSDebugResult("lalai"))
   }

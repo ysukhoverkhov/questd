@@ -7,6 +7,7 @@ import logic.QuestLogic
 import models.domain.quest.{Quest, QuestStatus}
 import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.User
+import play.Logger
 
 case class CleanUpObjectsRequest()
 case class CleanUpObjectsResult()
@@ -108,9 +109,22 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
 
     db.tutorial.all.foreach { tutorial =>
       db.tutorial.update(tutorial)
-//      tutorial.elements.foreach{ element =>
-//        db.tutorial.updateElement(tutorial.id, element.copy(actions = List(element.action, TutorialAction(TutorialActionType.CloseTutorialElement, params = Map("elementId" -> element.id)))))
-//      }
+    }
+
+    // TODO: remove me in 0.40.13 or 0.50
+    db.quest.all.foreach { quest =>
+      if (quest.id.endsWith("_ru") && !quest.info.authorId.endsWith("_ru")) {
+        val newUserId = quest.info.authorId + "_id"
+
+        Logger.trace("Changing author")
+
+        if (db.user.readById(newUserId).isEmpty) {
+          Logger.trace("  Creating author")
+          db.user.create(db.user.readById(quest.info.authorId).get.copy(id = newUserId))
+        }
+
+        db.quest.update(quest.copy(info = quest.info.copy(authorId = newUserId)))
+      }
     }
 
     OkApiResult(CleanUpObjectsResult())
