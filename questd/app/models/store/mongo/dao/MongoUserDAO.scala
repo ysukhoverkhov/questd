@@ -2,7 +2,7 @@ package models.store.mongo.dao
 
 import java.util.Date
 
-import com.mongodb.casbah.commons._
+import com.mongodb.casbah.commons.MongoDBObject
 import com.novus.salat._
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
@@ -19,6 +19,7 @@ import models.store.dao._
 import models.store.mongo.SalatContext._
 import models.store.mongo.helpers._
 import models.view.QuestView
+import play.api.Logger
 
 /**
  * DOA for User objects
@@ -812,14 +813,19 @@ private[mongo] class MongoUserDAO
    * @inheritdoc
    */
   def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User] = {
+    Logger.error(s"  updating $id, $mySolutionId, $opponentSolutionId, $status")
+
     findAndModify(
       MongoDBObject(
         "id" -> id,
-        "battleRequests.mySolutionId" -> mySolutionId,
-        "battleRequests.opponentSolutionId" -> opponentSolutionId),
+        "battleRequests" -> MongoDBObject(
+          "$elemMatch" -> MongoDBObject(
+            "mySolutionId" -> mySolutionId,
+            "opponentSolutionId" -> opponentSolutionId))),
       MongoDBObject(
         "$set" -> MongoDBObject(
           "battleRequests.$.status" -> status)))
   }
 }
+
 

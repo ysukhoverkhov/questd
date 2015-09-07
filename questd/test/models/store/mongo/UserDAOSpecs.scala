@@ -790,16 +790,23 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val br = BattleRequest("1", "2", "3", BattleRequestStatus.Accepted)
+      val br = List(
+        BattleRequest("1", "2", "3", BattleRequestStatus.Requests),
+        BattleRequest("1", "4", "3", BattleRequestStatus.Requests),
+        BattleRequest("1", "5", "3", BattleRequestStatus.Requests),
+        BattleRequest("1", "6", "3", BattleRequestStatus.Requests),
+        BattleRequest("1", "7", "3", BattleRequestStatus.Requests),
+        BattleRequest("1", "8", "3", BattleRequestStatus.Requests)
+      )
 
       db.user.create(user)
-      db.user.addBattleRequest(user.id, br)
-      db.user.updateBattleRequest(user.id, "2", "3", BattleRequestStatus.Rejected.toString)
+      br.foreach(db.user.addBattleRequest(user.id, _))
+      db.user.updateBattleRequest(user.id, "6", "3", BattleRequestStatus.Rejected.toString)
 
       val ou = db.user.readById(user.id)
 
       ou must beSome
-      ou.get.battleRequests.head must beEqualTo(br.copy(status = BattleRequestStatus.Rejected))
+      ou.get.battleRequests must beEqualTo(br.take(3) ::: List(BattleRequest("1", "6", "3", BattleRequestStatus.Rejected)) ::: br.drop(4))
     }
 
     "setNotificationSentTime works" in new WithApplication(appWithTestDatabase) {

@@ -98,6 +98,15 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
       val newStatus = if (accept) BattleRequestStatus.Accepted else BattleRequestStatus.Rejected
 
       db.user.updateBattleRequest(user.id, br.mySolutionId, br.opponentSolutionId, newStatus.toString) ifSome { user =>
+
+        Logger.error(s"${user.battleRequests.filter( // TODO: remove
+          br =>
+
+            br.opponentSolutionId == opponentSolutionId
+        )}")
+
+
+
         db.user.updateBattleRequest(
           br.opponentId, br.opponentSolutionId, br.mySolutionId, newStatus.toString) ifSome { opponent =>
           if (accept) {
@@ -123,7 +132,12 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
         }
       }
     }
+//Logger.error(s"${user.battleRequests.size}")
+Logger.error(s"${user.battleRequests.filter( // TODO: remove
+  br =>
 
+      br.opponentSolutionId == opponentSolutionId
+)}")
     user.battleRequests.find(
       br =>
         (br.status == BattleRequestStatus.Requests) &&
