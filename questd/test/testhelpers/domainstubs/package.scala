@@ -232,6 +232,7 @@ package object domainstubs {
     vip: Boolean = false,
     friends: List[Friendship] = List.empty,
     followers: List[String] = List.empty,
+    following: List[String] = List.empty,
     assets: Assets = Assets(100000, 100000, 100000),
     mustVoteSolutions: List[String] = List.empty,
     level: Int = 18,
@@ -281,6 +282,7 @@ package object domainstubs {
         messages = messages),
       friends = friends,
       followers = followers,
+      following = following,
       mustVoteSolutions = mustVoteSolutions,
       timeLine = timeLine,
       stats = UserStats(

@@ -1,142 +1,232 @@
 package controllers.domain.app.battle
 
 import controllers.domain._
+import models.domain.battle.BattleStatus
+import models.domain.common.ContentVote
+import models.domain.user.friends.{Friendship, FriendshipStatus}
+import org.mockito.Matchers.{eq => mEq}
+import testhelpers.domainstubs._
 
 class BattleFetchAPISpecs extends BaseAPISpecs {
 
   "Battle Fetch API" should {
-    "success all the time" in {
-      success
+    "getFriendsBattles return battles for confirmed friends only" in context {
+      val f1 = createUserStub(id = "f1")
+      val f2 = createUserStub(id = "f2")
+
+      val u = createUserStub(friends = List(Friendship(f1.id, FriendshipStatus.Accepted), Friendship(f2.id, FriendshipStatus.Invited)))
+      val excludeAuthors = List("aex1", "aex2")
+      val levels = Some(1, 2)
+      val idsExclude = List("idex1", "idex2")
+
+      db.battle.allWithParams(
+        status = any,
+        authorIds = any,
+        authorIdsExclude = any,
+        solutionIds = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        cultureId = any
+      ) returns Iterator.empty
+
+      val result = api.getFriendsBattles(
+        GetFriendsBattlesRequest(
+          user = u,
+          statuses = List(BattleStatus.Fighting),
+          idsExclude = idsExclude,
+          authorsExclude = excludeAuthors,
+          levels = levels))
+
+      there was one(battle).allWithParams(
+        status = mEq(List(BattleStatus.Fighting)),
+        authorIds = mEq(List(f1.id)),
+        authorIdsExclude = mEq(excludeAuthors),
+        solutionIds = any,
+        levels = mEq(levels),
+        skip = mEq(0),
+        vip = any,
+        ids = any,
+        idsExclude = mEq(idsExclude),
+        cultureId = mEq(u.demo.cultureId))
+
+      result must beAnInstanceOf[OkApiResult[GetFriendsBattlesResult]]
     }
 
-// TODO: test it someday.
-    //    "getMyQuests calls db correctly" in context {
-//
-//      val u = createUserStub()
-//
-//      db.quest.allWithParams(
-//        status = List(QuestStatus.InRotation),
-//        authorIds = List(u.id),
-//        levels = None,
-//        skip = 0,
-//        vip = Some(false),
-//        ids = List.empty,
-//        cultureId = None) returns List.empty.iterator
-//
-//      val result = api.getMyQuests(GetMyQuestsRequest(u, QuestStatus.InRotation))
-//
-//      result must beAnInstanceOf[OkApiResult[GetMyQuestsResult]]
-//      there was one(quest).allWithParams(
-//        status = List(QuestStatus.InRotation),
-//        authorIds = List(u.id),
-//        levels = null,
-//        skip = 0,
-//        vip = null,
-//        ids = null,
-//        cultureId = null)
-//    }
-//
-//    "getFriendsQuests return quests for confirmed friends only" in context {
-//
-//      def createUser(friends: List[Friendship]) = {
-//        User(friends = friends)
-//      }
-//
-//      def createFriend(newid: String) = {
-//        User(id = newid)
-//      }
-//
-//      val f1 = createFriend("f1")
-//      val f2 = createFriend("f2")
-//
-//      val u = createUser(List(Friendship(f1.id, FriendshipStatus.Accepted), Friendship(f2.id, FriendshipStatus.Invited)))
-//
-//      db.quest.allWithParams(List(QuestStatus.InRotation), List(f1.id), Some(1, 2), 0, None, List.empty) returns List.empty.iterator
-//      db.quest.allWithParams(List(QuestStatus.InRotation), List(f1.id, f2.id), Some(1, 2), 0, None, List.empty) returns List.empty.iterator
-//
-//      val result = api.getFriendsQuests(GetFriendsQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
-//
-//      there was one(quest).allWithParams(
-//        List(QuestStatus.InRotation),
-//        List(f1.id),
-//        Some(1, 2),
-//        0,
-//        null,
-//        null,
-//        u.demo.cultureId)
-//
-//      there was no(quest).allWithParams(
-//        List(QuestStatus.InRotation),
-//        List.empty,
-//        Some(1, 2),
-//        0,
-//        null,
-//        null,
-//        u.demo.cultureId)
-//
-//      there was no(quest).allWithParams(
-//        List(QuestStatus.InRotation),
-//        List(f1.id, f2.id),
-//        Some(1, 2),
-//        0,
-//        null,
-//        null,
-//        u.demo.cultureId)
-//    }
-//
-//    "getLikedQuests calls db correctly" in context {
-//      db.quest.allWithParams(List(QuestStatus.InRotation), List.empty, Some(1, 2), 0, Some(false), List("1", "2", "3", "4")) returns List.empty.iterator
-//
-//      val liked = List("1", "2", "3", "4")
-//      val u = createUserStub(
-//        timeLine = liked.map(id => createTimeLineEntryStub(objectId = id, objectType = TimeLineType.Quest, ourVote = Some(ContentVote.Cool)))
-//      )
-//
-//      val result = api.getLikedQuests(GetLikedQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
-//
-//      result must beAnInstanceOf[OkApiResult[GetLikedQuestsResult]]
-//      there was one(quest).allWithParams(
-//        List(QuestStatus.InRotation),
-//        null,
-//        Some(1, 2),
-//        0,
-//        null,
-//        List("1", "2", "3", "4"),
-//        u.demo.cultureId)
-//    }
-//
-//    "getVIPQuests calls db correctly" in context {
-//
-//      db.quest.allWithParams(List(QuestStatus.InRotation), List.empty, Some(1, 2), 0, Some(true), List.empty) returns List.empty.iterator
-//
-//      val u = createUserStub()
-//      val result = api.getVIPQuests(GetVIPQuestsRequest(u, QuestStatus.InRotation, Some(1, 2)))
-//
-//      there was one(quest).allWithParams(
-//        List(QuestStatus.InRotation),
-//        null,
-//        Some(1, 2),
-//        0,
-//        Some(true),
-//        null,
-//        u.demo.cultureId)
-//    }
-//
-//    "getAllQuests calls db correctly" in context {
-//
-//      db.quest.allWithParams(List(QuestStatus.InRotation), List.empty, Some(1, 2), 0, None, List.empty) returns List.empty.iterator
-//
-//      val result = api.getAllQuests(GetAllQuestsRequest(createUserStub(cultureId = "cid"), QuestStatus.InRotation, Some(1, 2)))
-//
-//      there was one(quest).allWithParams(
-//        List(QuestStatus.InRotation),
-//        null,
-//        Some(1, 2),
-//        0,
-//        null,
-//        null,
-//        Some("cid"))
-//    }
+    "getFollowingBattles return battles for following only" in context {
+      val following = List("f1", "f2")
+      val u = createUserStub(following = following)
+      val excludeAuthors = List("aex1", "aex2")
+      val levels = Some(1, 2)
+      val idsExclude = List("idex1", "idex2")
+
+      db.battle.allWithParams(
+        status = any,
+        authorIds = any,
+        authorIdsExclude = any,
+        solutionIds = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        cultureId = any
+      ) returns Iterator.empty
+
+      val result = api.getFollowingBattles(
+        GetFollowingBattlesRequest(
+          user = u,
+          statuses = List(BattleStatus.Fighting),
+          idsExclude = idsExclude,
+          authorsExclude = excludeAuthors,
+          levels = levels))
+
+      there was one(battle).allWithParams(
+        status = mEq(List(BattleStatus.Fighting)),
+        authorIds = mEq(following),
+        authorIdsExclude = mEq(excludeAuthors),
+        solutionIds = any,
+        levels = mEq(levels),
+        skip = mEq(0),
+        vip = any,
+        ids = any,
+        idsExclude = mEq(idsExclude),
+        cultureId = mEq(u.demo.cultureId))
+
+      result must beAnInstanceOf[OkApiResult[GetFollowingBattlesResult]]
+    }
+
+
+    "getVIPBattles return battles for vips only" in context {
+      val u = createUserStub()
+      val excludeAuthors = List("aex1", "aex2")
+      val levels = Some(1, 2)
+      val idsExclude = List("idex1", "idex2")
+
+      db.battle.allWithParams(
+        status = any,
+        authorIds = any,
+        authorIdsExclude = any,
+        solutionIds = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        cultureId = any
+      ) returns Iterator.empty
+
+      val result = api.getVIPBattles(
+        GetVIPBattlesRequest(
+          user = u,
+          statuses = List(BattleStatus.Fighting),
+          idsExclude = idsExclude,
+          authorsExclude = excludeAuthors,
+          levels = levels))
+
+      there was one(battle).allWithParams(
+        status = mEq(List(BattleStatus.Fighting)),
+        authorIds = any,
+        authorIdsExclude = mEq(excludeAuthors),
+        solutionIds = any,
+        levels = mEq(levels),
+        skip = mEq(0),
+        vip = mEq(Some(true)),
+        ids = any,
+        idsExclude = mEq(idsExclude),
+        cultureId = mEq(u.demo.cultureId))
+
+      result must beAnInstanceOf[OkApiResult[GetVIPBattlesResult]]
+    }
+
+    "getLikedSolutionBattles calls db correctly" in context {
+      val votedSolutions = Map(
+        "s1" -> ContentVote.Cheating,
+        "s2" -> ContentVote.Cool)
+      val u = createUserStub(votedSolutions = votedSolutions)
+      val excludeAuthors = List("aex1", "aex2")
+      val levels = Some(1, 2)
+      val idsExclude = List("idex1", "idex2")
+
+      db.battle.allWithParams(
+        status = any,
+        authorIds = any,
+        authorIdsExclude = any,
+        solutionIds = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        cultureId = any
+      ) returns Iterator.empty
+
+      val result = api.getLikedSolutionBattles(
+        GetLikedSolutionBattlesRequest(
+          user = u,
+          statuses = List(BattleStatus.Fighting),
+          idsExclude = idsExclude,
+          authorsExclude = excludeAuthors,
+          levels = levels))
+
+      there was one(battle).allWithParams(
+        status = mEq(List(BattleStatus.Fighting)),
+        authorIds = any,
+        authorIdsExclude = mEq(excludeAuthors),
+        solutionIds = mEq(List("s2")),
+        levels = mEq(levels),
+        skip = mEq(0),
+        vip = any,
+        ids = any,
+        idsExclude = mEq(idsExclude),
+        cultureId = mEq(u.demo.cultureId))
+
+      result must beAnInstanceOf[OkApiResult[GetLikedSolutionBattlesResult]]
+    }
+
+    "getAllBattles calls db correctly" in context {
+      val u = createUserStub()
+      val excludeAuthors = List("aex1", "aex2")
+      val levels = Some(1, 2)
+      val idsExclude = List("idex1", "idex2")
+
+      db.battle.allWithParams(
+        status = any,
+        authorIds = any,
+        authorIdsExclude = any,
+        solutionIds = any,
+        levels = any,
+        skip = any,
+        vip = any,
+        ids = any,
+        idsExclude = any,
+        cultureId = any
+      ) returns Iterator.empty
+
+      val result = api.getAllBattles(
+        GetAllBattlesRequest(
+          user = u,
+          statuses = List(BattleStatus.Fighting),
+          idsExclude = idsExclude,
+          authorIdsExclude = excludeAuthors,
+          levels = levels))
+
+      there was one(battle).allWithParams(
+        status = mEq(List(BattleStatus.Fighting)),
+        authorIds = any,
+        authorIdsExclude = mEq(excludeAuthors),
+        solutionIds = any,
+        levels = mEq(levels),
+        skip = mEq(0),
+        vip = any,
+        ids = any,
+        idsExclude = mEq(idsExclude),
+        cultureId = mEq(u.demo.cultureId))
+
+      result must beAnInstanceOf[OkApiResult[GetAllBattlesResult]]
+    }
   }
 }
 
