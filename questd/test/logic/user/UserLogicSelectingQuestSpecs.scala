@@ -5,8 +5,6 @@ import controllers.domain.app.quest._
 import logic.BaseLogicSpecs
 import models.domain.common.ContentVote
 import models.domain.quest.QuestStatus
-import models.domain.user.User
-import models.domain.user.profile.{Profile, PublicProfile}
 import testhelpers.domainstubs._
 
 class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
@@ -154,7 +152,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
         authorsExclude = List(u.id),
         status = QuestStatus.InRotation,
         levels = Some((1, 1)),
-        withSolutions = true))
+        withSolutions = Some(true)))
     }
 
     "Starting quests return other quests" in {

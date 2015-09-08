@@ -531,7 +531,7 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def addDevice(id: String, device: Device): Option[User] = {  // TODO: test me.
+  def addDevice(id: String, device: Device): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
@@ -542,7 +542,7 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def removeDevice(id: String, token: String): Option[User] = { // TODO: test me.
+  def removeDevice(id: String, token: String): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
@@ -710,7 +710,7 @@ private[mongo] class MongoUserDAO
 
   /**
    * @inheritdoc
-   */ // TODO: test me.
+   */
   def setDailyTasksSuppressed(id: String, platform: String, suppressed: Boolean): Option[User] = {
     findAndModify(
       id,

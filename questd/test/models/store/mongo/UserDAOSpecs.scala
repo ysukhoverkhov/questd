@@ -838,6 +838,44 @@ class UserDAOSpecs
       ou.get.privateDailyResults must beEqualTo(List(results.head))
       ou.get.profile.dailyResults must beEqualTo(results.tail)
     }
+
+    "setDailyTasksSuppressed works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub(tutorialState = TutorialState(dailyTasksSuppression = true))
+      user.profile.tutorialStates(ClientPlatform.iPhone.toString).dailyTasksSuppression must beEqualTo(true)
+
+      db.user.create(user)
+      val ou = db.user.setDailyTasksSuppressed(
+        id = user.id,
+        platform = ClientPlatform.iPhone.toString,
+        suppressed = false)
+
+      ou must beSome
+      ou.get.profile.tutorialStates(ClientPlatform.iPhone.toString).dailyTasksSuppression must beEqualTo(false)
+    }
+
+    "Devices are added and removed" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val d1 = Device(ClientPlatform.iPhone, "d1")
+      val d2 = Device(ClientPlatform.iPhone, "d2")
+
+      val user = createUserStub()
+      user.devices must beEqualTo(List.empty)
+
+      db.user.create(user)
+
+      val ou1 = db.user.addDevice(user.id, d1)
+      ou1.get.devices must beEqualTo(List(d1))
+
+      val ou2 = db.user.addDevice(user.id, d2)
+      ou2.get.devices must beEqualTo(List(d1, d2))
+
+      val ou3 = db.user.removeDevice(user.id, d2.token)
+      ou3.get.devices must beEqualTo(List(d1))
+    }
+
   }
 }
 

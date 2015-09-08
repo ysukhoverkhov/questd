@@ -72,7 +72,7 @@ private[mongo] class MongoSolutionDAO
       queryBuilder += ("cultureId" -> cultureId.get)
     }
 
-    if (withBattles.isDefined) { // TODO: test both branches.
+    if (withBattles.isDefined) {
       if (withBattles.get) {
         queryBuilder += ("battleIds" -> MongoDBObject(
           "$exists" -> true,

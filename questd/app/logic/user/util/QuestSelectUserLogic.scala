@@ -15,7 +15,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
 
     val algorithms = List(
       () => getQuestsWithSuperAlgorithm,
-      () => getQuestsWithMyTags(withSolutions = false),
+      () => getQuestsWithMyTags(withSolutions = None),
       () => getAnyQuests,
       () => getAnyQuestsIgnoringLevels,
       () => getAnyQuestsDefaultCultureIgnoringLevels)
@@ -60,10 +60,10 @@ trait QuestSelectUserLogic { this: UserLogic =>
     } else {
 
       val algorithms = List(
-        (api.config(api.DefaultConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests(withSolutions = true)),
-        (api.config(api.DefaultConfigParams.QuestProbabilityStartingFriendQuests).toDouble, () => getFriendsQuests(withSolutions = true)),
-        (api.config(api.DefaultConfigParams.QuestProbabilityStartingFollowingQuests).toDouble, () => getFollowingQuests(withSolutions = true)),
-        (1.00, () => getQuestsWithMyTags(withSolutions = true)) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
+        (api.config(api.DefaultConfigParams.QuestProbabilityStartingVIPQuests).toDouble, () => getVIPQuests(withSolutions = Some(true))),
+        (api.config(api.DefaultConfigParams.QuestProbabilityStartingFriendQuests).toDouble, () => getFriendsQuests(withSolutions = Some(true))),
+        (api.config(api.DefaultConfigParams.QuestProbabilityStartingFollowingQuests).toDouble, () => getFollowingQuests(withSolutions = Some(true))),
+        (1.00, () => getQuestsWithMyTags(withSolutions = Some(true))) // 1.00 - Last one in the list is 1 to ensure solution will be selected.
         )
 
       selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
@@ -74,16 +74,16 @@ trait QuestSelectUserLogic { this: UserLogic =>
     Logger.trace("getDefaultQuests")
 
     val algorithms = List(
-      (api.config(api.DefaultConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests(withSolutions = false)),
-      (api.config(api.DefaultConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests(withSolutions = false)),
-      (api.config(api.DefaultConfigParams.QuestProbabilityVIP).toDouble, () => getVIPQuests(withSolutions = false)),
-      (1.00, () => getQuestsWithMyTags(withSolutions = false)) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
+      (api.config(api.DefaultConfigParams.QuestProbabilityFriends).toDouble, () => getFriendsQuests(withSolutions = None)),
+      (api.config(api.DefaultConfigParams.QuestProbabilityFollowing).toDouble, () => getFollowingQuests(withSolutions = None)),
+      (api.config(api.DefaultConfigParams.QuestProbabilityVIP).toDouble, () => getVIPQuests(withSolutions = None)),
+      (1.00, () => getQuestsWithMyTags(withSolutions = None)) // 1.00 - Last one in the list is 1 to ensure quest will be selected.
       )
 
     selectNonEmptyIteratorFromRandomAlgorithm(algorithms, dice = rand.nextDouble())
   }
 
-  private[user] def getFriendsQuests(withSolutions: Boolean)(implicit selected: List[Quest]) = {
+  private[user] def getFriendsQuests(withSolutions: Option[Boolean])(implicit selected: List[Quest]) = {
     Logger.trace("  Returning quest from friends")
     checkNotEmptyIterator(Some(api.getFriendsQuests(GetFriendsQuestsRequest(
       user = user,
@@ -94,7 +94,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
       withSolutions = withSolutions)).body.get.quests))
   }
 
-  private[user] def getFollowingQuests(withSolutions: Boolean)(implicit selected: List[Quest]) = {
+  private[user] def getFollowingQuests(withSolutions: Option[Boolean])(implicit selected: List[Quest]) = {
     Logger.trace("  Returning quest from Following")
     checkNotEmptyIterator(Some(api.getFollowingQuests(GetFollowingQuestsRequest(
       user = user,
@@ -106,7 +106,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
     )).body.get.quests))
   }
 
-  private[user] def getVIPQuests(withSolutions: Boolean)(implicit selected: List[Quest]) = {
+  private[user] def getVIPQuests(withSolutions: Option[Boolean])(implicit selected: List[Quest]) = {
     Logger.trace("  Returning VIP quests")
 
     val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPQuests)
@@ -121,7 +121,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
       withSolutions = withSolutions)).body.get.quests))
   }
 
-  private[user] def getQuestsWithMyTags(withSolutions: Boolean)(implicit selected: List[Quest]) = {
+  private[user] def getQuestsWithMyTags(withSolutions: Option[Boolean])(implicit selected: List[Quest]) = {
     Logger.trace("  Returning quests with my tags")
 
 //    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)

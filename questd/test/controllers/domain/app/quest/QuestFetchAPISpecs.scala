@@ -2,10 +2,9 @@ package controllers.domain.app.quest
 
 import controllers.domain._
 import models.domain.quest.QuestStatus
-import models.domain.user.User
 import models.domain.user.friends.{Friendship, FriendshipStatus}
-import testhelpers.domainstubs._
 import org.mockito.Matchers.{eq => mEq}
+import testhelpers.domainstubs._
 
 class QuestFetchAPISpecs extends BaseAPISpecs {
 
@@ -27,7 +26,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         ids = mEq(List.empty),
         idsExclude = mEq(List.empty),
         cultureId = any,
-        withSolutions = mEq(false)
+        withSolutions = mEq(None)
       ) returns Iterator.empty
       db.quest.allWithParams(
         status = mEq(List(QuestStatus.InRotation)),
@@ -39,7 +38,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         ids = mEq(List.empty),
         idsExclude = mEq(List.empty),
         cultureId = any,
-        withSolutions = mEq(false)
+        withSolutions = mEq(None)
       ) returns Iterator.empty
 
       val result = api.getFriendsQuests(GetFriendsQuestsRequest(
@@ -59,7 +58,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         ids = any,
         idsExclude = mEq(List.empty),
         cultureId = mEq(u.demo.cultureId),
-        withSolutions = mEq(false))
+        withSolutions = mEq(None))
 
       there was no(quest).allWithParams(
         status = mEq(List(QuestStatus.InRotation)),
@@ -71,7 +70,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         ids = any,
         idsExclude = mEq(List.empty),
         cultureId = mEq(u.demo.cultureId),
-        withSolutions = mEq(false))
+        withSolutions = mEq(None))
 
       there was no(quest).allWithParams(
         status = mEq(List(QuestStatus.InRotation)),
@@ -83,7 +82,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
         ids = any,
         idsExclude = mEq(List.empty),
         cultureId = mEq(u.demo.cultureId),
-        withSolutions = mEq(false))
+        withSolutions = mEq(None))
     }
 
     "getVIPQuests calls db correctly" in context {
