@@ -116,7 +116,7 @@ private[domain] trait EventsAPI { this: DBAccessor =>
 
   /**
    * Checks should we send notification or not and if we should sends it.
-   */ // TODO: test me.
+   */
   def checkSendNotifications(request: CheckSendNotificationsRequest): ApiResult[CheckSendNotificationsResult] = handleDbException {
     import request._
     import com.github.nscala_time.time.Imports._

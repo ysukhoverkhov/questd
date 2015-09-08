@@ -99,7 +99,6 @@ class _DefaultConfigParams {
 }
 
 class _TutorialConfigParams {
-  val TutorialQuestId = "05 01 Tutorial Quest Id" // TODO: remove the constant since it's not used.
 }
 
 object _DefaultConfigParams extends _DefaultConfigParams
@@ -203,7 +202,6 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     "Tutorial" -> ConfigSection(
       "Tutorial",
       Map(
-        TutorialConfigParams.TutorialQuestId -> "tutorial_1"
       ))
   )
 }
