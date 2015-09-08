@@ -813,8 +813,6 @@ private[mongo] class MongoUserDAO
    * @inheritdoc
    */
   def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User] = {
-    Logger.error(s"  updating $id, $mySolutionId, $opponentSolutionId, $status")
-
     findAndModify(
       MongoDBObject(
         "id" -> id,
