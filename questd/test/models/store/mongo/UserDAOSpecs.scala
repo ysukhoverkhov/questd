@@ -651,7 +651,7 @@ class UserDAOSpecs
       val ou1 = db.user.readById(user.id)
       ou1 must beSome[User]
       val u = ou1.get
-      u.schedules.timeLine must beEqualTo(time)
+      u.schedules.nextTimeLineAt must beEqualTo(time)
     }
 
     "addMessage adds a message" in new WithApplication(appWithTestDatabase) {

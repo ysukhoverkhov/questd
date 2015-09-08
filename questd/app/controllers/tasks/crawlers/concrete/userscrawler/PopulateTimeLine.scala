@@ -23,7 +23,7 @@ class PopulateTimeLine(
     randPar: RandomComponent#Random) extends BaseCrawler[User](apiPar, randPar)  {
 
   protected def check(user: User) = {
-    if (user.schedules.timeLine.before(new Date())) {
+    if (user.schedules.nextTimeLineAt.before(new Date())) {
       api.populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user))
     }
   }

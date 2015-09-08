@@ -19,7 +19,7 @@ trait Tasks { this: UserLogic =>
 
   def shouldAssignDailyTasks = {
 
-    if (user.schedules.dailyTasks.after(new Date())) {
+    if (user.schedules.nextDailyTasksAt.after(new Date())) {
       false
     } else if (user.profile.tutorialStates.valuesIterator.foldLeft(true){
       case (false, _) => false

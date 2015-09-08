@@ -19,7 +19,6 @@ import models.store.dao._
 import models.store.mongo.SalatContext._
 import models.store.mongo.helpers._
 import models.view.QuestView
-import play.api.Logger
 
 /**
  * DOA for User objects
@@ -571,7 +570,7 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         "$set" -> MongoDBObject(
           "profile.dailyTasks" -> grater[DailyTasks].asDBObject(newTasks),
-          "schedules.dailyTasks" -> resetTasksTimeout)))
+          "schedules.nextDailyTasksAt" -> resetTasksTimeout)))
   }
 
   /**
@@ -752,7 +751,7 @@ private[mongo] class MongoUserDAO
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
-          "schedules.timeLine" -> time)))
+          "schedules.nextTimeLineAt" -> time)))
   }
 
   /**
