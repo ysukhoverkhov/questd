@@ -10,7 +10,7 @@ import models.domain.user.message.Message
  * This can be given to client as is, thus contains only public information.
  */
 case class Profile(
-  profileId: String = ID.generateUUID(),
+  profileId: String = ID.generate,
   profileVersion: Int = 1,
   publicProfile: PublicProfile = PublicProfile(),
   ratingToNextLevel: Int = 0,

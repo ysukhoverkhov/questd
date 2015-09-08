@@ -8,7 +8,7 @@ import models.domain.base.ID
  * Quest created by users.
  */
 case class Quest(
-  id: String = ID.generateUUID(),
+  id: String = ID.generate,
   cultureId: String,
   lastModDate: Date = new Date(),
   info: QuestInfo,

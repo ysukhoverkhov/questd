@@ -32,7 +32,7 @@ package object domainstubs {
     reference = "")
 
   def createThemeStub(
-    id: String = ID.generateUUID(),
+    id: String = ID.generate,
     cultureId: String = "cultureId",
     name: String = "name",
     desc: String = "desc") =
@@ -89,7 +89,7 @@ package object domainstubs {
 
   // TODO: TAGS: replace themeId with tags.
   def createSolutionStub(
-    id: String = ID.generateUUID(),
+    id: String = ID.generate,
     cultureId: String = "cultureId",
     authorId: String = "uid",
     questId: String = "qid",
@@ -121,7 +121,7 @@ package object domainstubs {
   }
 
   def createTimeLineEntryStub(
-    id: String = ID.generateUUID(),
+    id: String = ID.generate,
     reason: TimeLineReason.Value = TimeLineReason.Created,
     actorId: String = "authorId",
     objectType: TimeLineType.Value = TimeLineType.Quest,
@@ -169,21 +169,21 @@ package object domainstubs {
   }
 
   def createCommentStub(
-    id: String = ID.generateUUID(),
+    id: String = ID.generate,
     message: String = "the message") = {
     Comment(
       id = id,
       info = CommentInfo(
-        commentedObjectId = ID.generateUUID(),
-        authorId = ID.generateUUID(),
-        respondedCommentId = Some(ID.generateUUID()),
+        commentedObjectId = ID.generate,
+        authorId = ID.generate,
+        respondedCommentId = Some(ID.generate),
         postingDate = new Date(),
         message = message
       ))
   }
 
   def createBattleStub(
-    id: String = ID.generateUUID(),
+    id: String = ID.generate,
     questId: String = "questId",
     solutionIds: List[String] = List("1", "2"),
     authorIds: List[String] = List("a1", "a2"),
@@ -217,7 +217,7 @@ package object domainstubs {
   }
 
   def createConversationStub(
-    id: String = ID.generateUUID(),
+    id: String = ID.generate,
     pIds: List[String] = List.empty
     ) = {
     Conversation(
@@ -227,7 +227,7 @@ package object domainstubs {
   }
 
   def createUserStub(
-    id: String = ID.generateUUID(),
+    id: String = ID.generate,
     cultureId: Option[String] = Some("cultureId"),
     vip: Boolean = false,
     friends: List[Friendship] = List.empty,

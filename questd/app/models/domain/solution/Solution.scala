@@ -8,7 +8,7 @@ import models.domain.base.ID
  * Solution itself.
  */
 case class Solution(
-  id: String = ID.generateUUID(),
+  id: String = ID.generate,
   cultureId: String,
   lastModDate: Date = new Date(),
   battleIds: List[String] = List.empty,

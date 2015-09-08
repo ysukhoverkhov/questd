@@ -5,5 +5,5 @@ abstract class ID {
 }
 
 object ID {
-  def generateUUID(): String = java.util.UUID.randomUUID().toString // TODO: it should be renamed to "generate"
+  def generate: String = java.util.UUID.randomUUID().toString
 }

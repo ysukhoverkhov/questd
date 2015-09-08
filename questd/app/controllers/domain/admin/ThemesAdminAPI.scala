@@ -49,7 +49,7 @@ private[domain] trait ThemesAdminAPI {
 
     Logger.debug("Admin request for create new theme.")
 
-    db.theme.create(request.theme.copy(id = ID.generateUUID()))
+    db.theme.create(request.theme.copy(id = ID.generate))
 
     OkApiResult(CreateThemeResult())
   }

@@ -49,7 +49,7 @@ private[domain] trait TutorialTasksAdminAPI { this: DBAccessor =>
 
     Logger.debug("Admin request for create tutoral task.")
 
-    db.tutorialTask.create(request.task.copy(id = ID.generateUUID()))
+    db.tutorialTask.create(request.task.copy(id = ID.generate))
 
     OkApiResult(CreateTutorialTaskAdminResult())
   }

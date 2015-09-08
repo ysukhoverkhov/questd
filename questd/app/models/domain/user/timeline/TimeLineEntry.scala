@@ -16,7 +16,7 @@ import models.domain.base.ID
  * @param entryDate Date when entry was added to the timeline.
  */
 case class TimeLineEntry  (
-  id: String = ID.generateUUID(),
+  id: String = ID.generate,
   reason: TimeLineReason.Value,
   actorId: String,
   objectType: TimeLineType.Value,

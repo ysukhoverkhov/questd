@@ -38,9 +38,9 @@ trait QuestSelectUserLogic { this: UserLogic =>
   private[user] def getTutorialQuests(implicit selected: List[Quest]): Option[Iterator[Quest]] = {
     Logger.trace("  Returning tutorial quests")
 
-    if (user.profile.publicProfile.level > 10) // TODO: get it from config.
+    if (user.profile.publicProfile.level > api.config(api.DefaultConfigParams.QuestProbabilityLevelsToGiveTutorialQuests).toInt) {
       None
-    else {
+    } else {
       checkNotEmptyIterator(Some(api.getAllQuests(
         GetAllQuestsRequest(
           user = user,

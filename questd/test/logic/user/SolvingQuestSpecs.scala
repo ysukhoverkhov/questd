@@ -33,18 +33,6 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.NotEnoughAssets)
     }
 
-    // TODO: fix in 0.40 - Cost of solvin quests not in our timeline should be higher.
-//    "Do not allow solving of quests not in our time line" in {
-//      api.config returns createStubConfig
-//
-//      val user = createUserStub()
-//      val q = createQuestStub()
-//
-//      val rv = user.canSolveQuest(ContentType.Photo, q)
-//
-//      rv must beEqualTo(ProfileModificationResult.OutOfContent)
-//    }
-
     "Do not allow solving of own quests" in {
       applyConfigMock()
 
