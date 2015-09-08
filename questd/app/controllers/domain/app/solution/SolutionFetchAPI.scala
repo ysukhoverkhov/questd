@@ -77,8 +77,7 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
    * Get all battles in fighting state. used internally.
    */
   def getAllSolutionsInternal(request: GetAllSolutionsInternalRequest): ApiResult[GetAllSolutionsInternalResult] = handleDbException {
-    OkApiResult(GetAllSolutionsInternalResult(db.solution.allWithParams(
-      withBattles = Some(false))))
+    OkApiResult(GetAllSolutionsInternalResult(db.solution.allWithParams()))
   }
 
   def getFriendsSolutions(request: GetFriendsSolutionsRequest): ApiResult[GetFriendsSolutionsResult] = handleDbException {

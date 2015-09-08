@@ -5,7 +5,7 @@ import models.domain.solution.Solution
 
 
 class SolutionLogic(
-  val qs: Solution,
+  val solution: Solution,
   val api: DomainAPIComponent#DomainAPI) {
 
   /**
@@ -13,10 +13,10 @@ class SolutionLogic(
    */
   def shouldBanCheating = {
     val votesToThreatAsCheating = Math.max(
-      api.config(api.DefaultConfigParams.SolutionCheatingRatio).toDouble * qs.rating.votersCount,
+      api.config(api.DefaultConfigParams.SolutionCheatingRatio).toDouble * solution.rating.votersCount,
       api.config(api.DefaultConfigParams.SolutionMinCheatingVotes).toLong)
 
-    qs.rating.cheating > votesToThreatAsCheating
+    solution.rating.cheating > votesToThreatAsCheating
   }
 
   /**
@@ -24,15 +24,21 @@ class SolutionLogic(
    */
   def shouldBanIAC = {
     val pointsToBan = Math.max(
-      api.config(api.DefaultConfigParams.SolutionIACRatio).toDouble * qs.rating.votersCount,
+      api.config(api.DefaultConfigParams.SolutionIACRatio).toDouble * solution.rating.votersCount,
       api.config(api.DefaultConfigParams.SolutionMinIACVotes).toLong)
 
     val maxPoints = List(
-      qs.rating.iacpoints.porn,
-      qs.rating.iacpoints.spam).max
+      solution.rating.iacpoints.porn,
+      solution.rating.iacpoints.spam).max
 
     maxPoints > pointsToBan
   }
 
+  /**
+   * Is the solution can be used in autobattles.
+   */
+  def canParticipateAutoBattle = {
+    solution.battleIds.isEmpty
+  }
 }
 

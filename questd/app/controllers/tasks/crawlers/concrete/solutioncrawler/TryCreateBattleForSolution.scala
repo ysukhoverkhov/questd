@@ -20,7 +20,6 @@ class TryCreateBattleForSolution(
     randPar: RandomComponent#Random) extends BaseCrawler[Solution](apiPar, randPar)  {
 
   protected def check(solution: Solution) = {
-    // Here are solutions without battles only.
     api.tryCreateBattle(TryCreateBattleRequest(solution))
   }
 }
