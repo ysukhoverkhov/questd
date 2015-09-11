@@ -24,7 +24,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
     "Do not allow cheating for quests without rights" in {
       applyConfigMock()
 
-      val user = createUserStub(rights = Rights(unlockedFunctionality = Set(Functionality.VoteQuests)))
+      val user = createUserStub(rights = Rights(unlockedFunctionality = Set(Functionality.VoteQuests), 10))
       val q = createQuestStub()
 
       val rv = user.canVoteQuest(q.id, ContentVote.Cheating)
