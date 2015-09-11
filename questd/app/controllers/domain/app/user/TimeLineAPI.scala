@@ -245,7 +245,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
       }
     }
 
-    if (request.user.demo.cultureId.isDefined) {
+    if (request.user.bioComplete) {
       {
         addRandomBattlesToTimeLine(request.user, battlesCount)
       } map { r =>

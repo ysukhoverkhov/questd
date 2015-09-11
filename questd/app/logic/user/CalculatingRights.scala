@@ -11,10 +11,13 @@ import models.domain.user.profile.{Functionality, Rights}
 trait CalculatingRights { this: UserLogic =>
 
   def calculateRights: Rights = {
-    Rights(
-      unlockedFunctionality = restrictions.foldLeft(Set[Functionality.Value]()) { case (c, (right, level)) => if (level <= user.profile.publicProfile.level) c + right else c },
-      maxFriendsCount = maxNumberOfFriendsOnLevel(user.profile.publicProfile.level))
+    if (user.profile.publicProfile.vip) {
+      Rights.full
+    } else {
+      Rights(
+        unlockedFunctionality = restrictions.foldLeft(Set[Functionality.Value]()) { case (c, (right, level)) => if (level <= user.profile.publicProfile.level) c + right else c },
+        maxFriendsCount = maxNumberOfFriendsOnLevel(user.profile.publicProfile.level))
+    }
   }
-
 }
 
