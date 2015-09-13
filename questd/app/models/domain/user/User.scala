@@ -31,5 +31,4 @@ case class User(
   battleRequests: List[BattleRequest] = List.empty,
   devices: List[Device] = List.empty,
   settings: UserSettings = UserSettings(),
-  mustVoteSolutions: List[String] = List.empty,
-  payedAuthor: Boolean = false) extends ID
+  mustVoteSolutions: List[String] = List.empty) extends ID
