@@ -3,7 +3,7 @@ package logic.user
 import logic.BaseLogicSpecs
 import models.domain.common.Assets
 import models.domain.user._
-import models.domain.user.profile.{Rights, PublicProfile, Profile, Bio}
+import models.domain.user.profile.{Bio, Profile, PublicProfile, Rights}
 import testhelpers.domainstubs._
 
 class UserLogicSpecs extends BaseLogicSpecs {
@@ -33,9 +33,9 @@ class UserLogicSpecs extends BaseLogicSpecs {
     }
 
     "Calculate correct quest level" in {
-      createUserStub(level = 7).calculateQuestLevel must beOneOf(1, 2)
-      createUserStub(level = 9).calculateQuestLevel must beOneOf(4, 5)
-      createUserStub(level = 13).calculateQuestLevel must beOneOf(9, 10)
+      createUserStub(level = 6).calculateQuestLevel must beOneOf(1, 2)
+      createUserStub(level = 9).calculateQuestLevel must beOneOf(5, 6)
+      createUserStub(level = 13).calculateQuestLevel must beOneOf(10, 11)
       createUserStub(level = 17).calculateQuestLevel must beOneOf(15, 16)
       createUserStub(level = 20).calculateQuestLevel must beEqualTo(20)
     }

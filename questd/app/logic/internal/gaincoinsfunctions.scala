@@ -1,18 +1,16 @@
 package logic.internal
 
 import logic.constants._
-import basefunctions._
-import models.domain.user.profile.Functionality
-import Functionality._
-import models.domain.user.profile.Functionality
+import logic.internal.basefunctions._
+import models.domain.user.profile.Functionality._
 
 object gaincoinsfunctions {
 
   def coinForTasks(level: Int): Double = {
-    val k = 162.15924
-    val d = 4.593018
-    val b = -150.641173
-    val y = 4.989512E-9
+    val k = 144.97295
+    val d = 4.479141
+    val b = -81.236775
+    val y = 7.542141E-6
 
     def coinForTasksInt(level: Int, k: Double, d: Double, b: Double, y: Double): Double = {
       level match {

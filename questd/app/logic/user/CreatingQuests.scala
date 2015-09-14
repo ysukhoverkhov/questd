@@ -52,7 +52,7 @@ trait CreatingQuests { this: UserLogic =>
     val k = MaxLevel / (MaxLevel - levelFor(Functionality.SubmitPhotoQuests) + 1).toDouble
     val fractionalLevel: Double = (user.profile.publicProfile.level - levelFor(Functionality.SubmitPhotoQuests) + 1) * k
 
-    if (rand.nextDouble() > 0)
+    if (rand.nextDouble() > 0.5)
       fractionalLevel.floor.toInt
     else
       fractionalLevel.ceil.toInt

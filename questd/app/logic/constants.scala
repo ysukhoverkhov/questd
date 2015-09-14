@@ -17,11 +17,11 @@ object constants {
     Functionality.ChallengeBattles -> 3,
     Functionality.Report -> 4,
     Functionality.PostComments -> 4,
-    Functionality.SubmitVideoSolutions -> 5,
-    Functionality.InviteFriends -> 6,
-    Functionality.SubmitPhotoQuests -> 7,
-    Functionality.AssignQuests -> 8,
-    Functionality.SubmitVideoQuests -> 10,
+    Functionality.InviteFriends -> 5,
+    Functionality.AssignQuests -> 5,
+    Functionality.SubmitPhotoQuests -> 6,
+    Functionality.SubmitVideoSolutions -> 7,
+    Functionality.SubmitVideoQuests -> 8,
 
     Functionality.GiveRewards -> 20)
 

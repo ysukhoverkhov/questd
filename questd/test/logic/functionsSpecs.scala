@@ -60,11 +60,11 @@ class functionsSpecs extends Specification {
     }
 
     "dailyTasksCoinsSalary" in {
-      dailyTasksCoinsSalary(1) must beEqualTo(12)
-      dailyTasksCoinsSalary(6) must beEqualTo(331)
-      dailyTasksCoinsSalary(10) must beEqualTo(398)
-      dailyTasksCoinsSalary(16) must beEqualTo(708)
-      dailyTasksCoinsSalary(20) must beEqualTo(1298)
+      dailyTasksCoinsSalary(1) must beEqualTo(64)
+      dailyTasksCoinsSalary(6) must beEqualTo(282)
+      dailyTasksCoinsSalary(10) must beEqualTo(346)
+      dailyTasksCoinsSalary(16) must beEqualTo(650)
+      dailyTasksCoinsSalary(20) must beEqualTo(1246)
     }
 
     "ratToGainLevel" in {
