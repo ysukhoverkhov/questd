@@ -7,7 +7,6 @@ import logic.QuestLogic
 import models.domain.quest.{Quest, QuestStatus}
 import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.User
-import play.Logger
 
 case class CleanUpObjectsRequest()
 case class CleanUpObjectsResult()
@@ -105,6 +104,14 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       db.user.update(
         removeObjectsFromTimeline(user.initialized, objectsToRemove)
       )
+
+      if (user.id.endsWith("_id_id_id")) {
+        db.user.update(user.copy(id = user.id.take(user.id.length - "_id_id_id".length) + "_ru"))
+      } else if (user.id.endsWith("_id_id")) {
+        db.user.delete(user.id)
+      } else if (user.id.endsWith("_id")) {
+        db.user.delete(user.id)
+      }
     }
 
     db.tutorial.all.foreach { tutorial =>
@@ -113,8 +120,13 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
 
     // TODO: remove me in 0.40.13 or 0.50
     db.quest.all.foreach { quest =>
-      if (quest.id.endsWith("_ru") && !quest.info.authorId.endsWith("_ru")) {
-        val newUserId = quest.info.authorId + "_id"
+      if (quest.id.endsWith("_ru") && !quest.info.authorId.endsWith("_id_id_id")) {
+        val newUserId = quest.info.authorId.take(quest.info.authorId.length - "_id_id_id".length) + "_ru"
+        db.quest.update(quest.copy(info = quest.info.copy(authorId = newUserId)))
+      }
+
+/*      if (quest.id.endsWith("_ru") && !quest.info.authorId.endsWith("_ru")) {
+        val newUserId = quest.info.authorId + "_ru"
 
         Logger.trace("Changing author")
 
@@ -125,7 +137,11 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
 
         db.quest.update(quest.copy(info = quest.info.copy(authorId = newUserId)))
       }
+      */
     }
+
+
+
 
     OkApiResult(CleanUpObjectsResult())
   }
