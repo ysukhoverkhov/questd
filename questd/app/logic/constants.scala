@@ -34,6 +34,8 @@ object constants {
    */
 
   val FlipHour = 5
+  val DayStartHour = 12
+  val DayEndHour = 21
 
   /**
    * Time line

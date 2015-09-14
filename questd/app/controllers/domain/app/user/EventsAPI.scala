@@ -35,7 +35,7 @@ case class NotifyWithMessageRequest(user: User, message: Message, numberOfEvents
 case class NotifyWithMessageResult(user: User)
 
 
-private[domain] trait EventsAPI { this: DBAccessor =>
+private[domain] trait EventsAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Sends message to a user.
@@ -119,9 +119,8 @@ private[domain] trait EventsAPI { this: DBAccessor =>
    */
   def checkSendNotifications(request: CheckSendNotificationsRequest): ApiResult[CheckSendNotificationsResult] = handleDbException {
     import request._
-    import com.github.nscala_time.time.Imports._
 
-    if (DateTime.now < new DateTime(user.schedules.lastNotificationSentAt) + user.settings.notificationsIntervalHours.hours) {
+    if (!user.shouldSendNotification) {
       // Not now.
       OkApiResult(CheckSendNotificationsResult(user))
     } else if (user.profile.messages.isEmpty) {

@@ -1,10 +1,10 @@
 package logic.user
 
 import com.github.nscala_time.time.Imports._
+import logic.{constants, UserLogic, functions}
 import models.domain.user.dailyresults.DailyResult
 import models.domain.user.profile.Gender
 import org.joda.time.DateTime
-import logic.{functions, UserLogic}
 
 
 /**
@@ -51,5 +51,23 @@ trait MiscUserLogic { this: UserLogic =>
       privateDailyResults = List(DailyResult(
         getStartOfCurrentDailyResultPeriod)
       ))
+  }
+
+  /**
+   * Calculates time of next flip hour Date for user.
+   */
+  private[user] def nextFlipHourDate = {
+    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
+    (DateTime.now(tz) + 1.day).hour(constants.FlipHour).minute(0).second(0) toDate ()
+  }
+
+  /**
+   * Is the user has night now.
+   */
+  def hasNightHoursNow = {
+    val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
+    val userLocalTime = DateTime.now(tz)
+
+    (userLocalTime.hourOfDay().get > constants.DayStartHour) && (userLocalTime.hourOfDay().get < constants.DayEndHour)
   }
 }
