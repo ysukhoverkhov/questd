@@ -9,6 +9,7 @@ import controllers.services.socialnetworks.client.{User => SNUser}
 import models.domain.common.Assets
 import models.domain.user.profile.{TaskType, Profile}
 import models.domain.user.User
+import play.Logger
 
 case class GetFollowingRequest(
   user: User)
@@ -46,10 +47,17 @@ case class GetSuggestsForFollowingRequest(
   user: User,
   // keys - SN names, values - tokens for them.
   tokens: Map[String, String])
-
 case class GetSuggestsForFollowingResult(
   allowed: ProfileModificationResult,
-  userIds: Option[List[String]] = None)
+  userIds: List[String] = List.empty)
+
+case class GetSNFriendsInGameRequest(
+  user: User,
+  // keys - SN names, values - tokens for them.
+  tokens: Map[String, String])
+case class GetSNFriendsInGameResult(
+  allowed: ProfileModificationResult,
+  userIds: List[String] = List.empty)
 
 private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#DomainAPI with SNAccessor =>
 
@@ -126,6 +134,13 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
    * Returns list of users we would like to follow (theoretically).
    */
   def getSuggestsForFollowing(request: GetSuggestsForFollowingRequest): ApiResult[GetSuggestsForFollowingResult] = handleDbException {
+    OkApiResult(GetSuggestsForFollowingResult(OK))
+  }
+
+  /**
+   * Returns list of our friends who is already in the game.
+   */
+  def getSNFriendsInGame(request: GetSNFriendsInGameRequest): ApiResult[GetSNFriendsInGameResult] = handleDbException {
     request.user.canFollow match {
       case OK =>
 
@@ -146,8 +161,8 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
           db.user.readBySNid(i.snName, i.snId)
         }).filter(_.isDefined).map(_.get).map(_.id).filter(!request.user.friends.map(_.friendId).contains(_)).filter(!request.user.following.contains(_))
 
-        OkApiResult(GetSuggestsForFollowingResult(OK, Some(friends)))
-      case a => OkApiResult(GetSuggestsForFollowingResult(a))
+        OkApiResult(GetSNFriendsInGameResult(OK, friends))
+      case a => OkApiResult(GetSNFriendsInGameResult(a))
     }
   }
 }

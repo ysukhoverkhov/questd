@@ -11,5 +11,6 @@ object FollowingWS extends Controller with AccessToWSInstance {
   def addToFollowing() = ws.addToFollowing()
   def removeFromFollowing() = ws.removeFromFollowing()
   def getSuggestsForFollowing = ws.getSuggestsForFollowing
+  def getSNFriendsInGame = ws.getSNFriendsInGame
 }
 
