@@ -44,6 +44,7 @@ class LoginWSSpecs extends Specification
       val user = mock[SNUser]
       val fbsn = mock[SocialNetworkClient]
       sn.clientForName("FB") returns fbsn
+      fbsn.isValidUserToken(facebookToken) returns true
       fbsn.fetchUserByToken(facebookToken) returns user
       api.login(LoginRequest("FB", user)) returns OkApiResult(LoginResult  (sessid, userId))
 
@@ -70,6 +71,7 @@ class LoginWSSpecs extends Specification
       val user = mock[User]
       val fbsn = mock[SocialNetworkClient]
       sn.clientForName("FB") returns fbsn
+      fbsn.isValidUserToken(facebookToken) returns true
       fbsn.fetchUserByToken(facebookToken) throws new AuthException()
 
 
@@ -86,13 +88,14 @@ class LoginWSSpecs extends Specification
       status(r) must equalTo(UNAUTHORIZED)
     }
 
-    "Report about unaccessable FB in case of unavailable Facebook" in new WithApplication {
+    "Report about unaddressable FB in case of unavailable Facebook" in new WithApplication {
 
       val facebookToken = "Facebook token"
 
       val user = mock[User]
       val fbsn = mock[SocialNetworkClient]
       sn.clientForName("FB") returns fbsn
+      fbsn.isValidUserToken(facebookToken) returns true
       fbsn.fetchUserByToken(facebookToken) throws new NetworkException()
 
       val data = AnyContentAsJson(Json.parse(controllers.web.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
@@ -108,7 +111,31 @@ class LoginWSSpecs extends Specification
       status(r) must equalTo(SERVICE_UNAVAILABLE)
     }
 
-    "Workout incorect SN name" in new WithApplication {
+    "Report about token from another app or outdated token" in new WithApplication {
+
+      val facebookToken = "Facebook token"
+
+      val user = mock[SNUser]
+      val fbsn = mock[SocialNetworkClient]
+      sn.clientForName("FB") returns fbsn
+      fbsn.isValidUserToken(facebookToken) returns false
+      fbsn.fetchUserByToken(facebookToken) returns user
+
+      val data = AnyContentAsJson(Json.parse(controllers.web.helpers.Json.write[WSLoginRequest](WSLoginRequest("FB", facebookToken, 1))))
+
+      val fakeRequest = FakeRequest(
+        Helpers.POST,
+        "",
+        FakeHeaders(),
+        data)
+
+      val r = ws.login()(fakeRequest)
+
+      status(r) must equalTo(BAD_REQUEST)
+    }
+
+
+    "Workout incorrect SN name" in new WithApplication {
 
       val facebookToken = "Facebook token"
 

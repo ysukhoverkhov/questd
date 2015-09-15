@@ -1,11 +1,11 @@
 package logic.user
 
+import controllers.domain.app.protocol.ProfileModificationResult._
 import logic._
 import logic.functions._
-import controllers.domain.app.protocol.ProfileModificationResult._
-import models.domain._
 import models.domain.common.Assets
 import models.domain.user.User
+import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.Functionality
 
 /**
@@ -37,21 +37,43 @@ trait Friends { this: UserLogic =>
     Assets(coins = costToFollowPerson(user.profile.publicProfile.level))
   }
 
-  def canAddFriend(potentialFriend: User) = {
+  private def commonFriendshipCheck(potentialFriend: User) = {
     if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
       NotEnoughAssets
-    else if (user.friends.length >= user.profile.rights.maxFriendsCount)
-      LimitExceeded
     else if (potentialFriend.id == user.id)
       InvalidState
     else
       OK
   }
 
+  def canAddFriend(potentialFriend: User) = {
+    commonFriendshipCheck(potentialFriend) match {
+      case OK =>
+        if (user.friends.length >= user.profile.rights.maxFriendsCount) {
+          LimitExceeded
+        } else {
+          OK
+        }
+      case a => a
+    }
+  }
+
+  def canAcceptFriendship(potentialFriend: User) = {
+    commonFriendshipCheck(potentialFriend) match {
+      case OK =>
+        if (user.friends.filterNot(_.status == FriendshipStatus.Invites).length >= user.profile.rights.maxFriendsCount) {
+          LimitExceeded
+        } else {
+          OK
+        }
+      case a => a
+    }
+  }
+
   def costToAddFriend(potentialFriend: User) = {
     Assets(coins = costToInviteFriend(potentialFriend.profile.publicProfile.level))
   }
-
 }
+

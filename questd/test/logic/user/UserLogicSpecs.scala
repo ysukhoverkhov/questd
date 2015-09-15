@@ -1,8 +1,10 @@
 package logic.user
 
+import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
 import models.domain.common.Assets
 import models.domain.user._
+import models.domain.user.friends.{FriendshipStatus, Friendship}
 import models.domain.user.profile.{Bio, Profile, PublicProfile, Rights}
 import testhelpers.domainstubs._
 
@@ -38,6 +40,19 @@ class UserLogicSpecs extends BaseLogicSpecs {
       createUserStub(level = 13).calculateQuestLevel must beOneOf(10, 11)
       createUserStub(level = 17).calculateQuestLevel must beOneOf(15, 16)
       createUserStub(level = 20).calculateQuestLevel must beEqualTo(20)
+    }
+
+    "Do not count requests to us in accepting friendship" in {
+      val uid = "asdasd"
+      val fid = "adasda"
+
+      val friendships = (1 to 10000).map(i => Friendship(friendId = fid, status = FriendshipStatus.Invites)).toList
+
+      val u = createUserStub(id = uid, level = 10, friends = friendships)
+      val f = createUserStub(id = fid, level = 10, friends = friendships)
+
+      u.canAcceptFriendship(f) must beEqualTo(ProfileModificationResult.OK)
+      u.canAddFriend(f) must beEqualTo(ProfileModificationResult.LimitExceeded)
     }
   }
 }

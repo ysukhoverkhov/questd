@@ -1,6 +1,7 @@
 package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
+import logic.UserLogic
 import models.domain.user.message._
 import models.domain.user.schedules.UserSchedules
 import org.mockito.Matchers.{eq => mEq}
@@ -20,6 +21,9 @@ class EventsAPISpecs extends BaseAPISpecs {
     "Send notification if there is a notification to send" in context {
       val u = createUserStub(messages = List(MessageAllTasksCompleted()))
 
+      val userLogicMoc = mock[UserLogic]
+      userLogicMoc.shouldSendNotification returns true
+      api.user2Logic(any) returns userLogicMoc
       user.setNotificationSentTime(mEq(u.id), any) returns Some(u)
       doReturn(OkApiResult(NotifyWithMessageResult(u))).when(api).notifyWithMessage(any)
 
@@ -68,6 +72,9 @@ class EventsAPISpecs extends BaseAPISpecs {
       val u = createUserStub(
         messages = List(messageAllTasksCompleted, messageFriendshipAccepted, messageFriendshipRejected))
 
+      val userLogicMoc = mock[UserLogic]
+      userLogicMoc.shouldSendNotification returns true
+      api.user2Logic(any) returns userLogicMoc
       user.setNotificationSentTime(mEq(u.id), any) returns Some(u)
       doReturn(OkApiResult(NotifyWithMessageResult(u))).when(api).notifyWithMessage(any)
 
