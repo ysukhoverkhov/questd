@@ -6,7 +6,7 @@ import com.restfb.json.JsonObject
 import controllers.services.socialnetworks.client._
 import controllers.services.socialnetworks.exception.{AuthException, NetworkException}
 import controllers.services.socialnetworks.facebook.types.UserIdWithApp
-import play.Logger
+import play.{Play, Logger}
 
 import scala.language.implicitConversions
 
@@ -31,16 +31,17 @@ private[socialnetworks] class SocialNetworkClientFacebook extends SocialNetworkC
    * @inheritdoc
    */
   def isValidUserToken(token: String): Boolean = handleExceptions {
-    val client = facebookClient("971303889546582|9vp9yrm76V-8-TlIYlxjFTKQWKg")
+    val appId = Play.application().configuration().getString("application.socialnetworks.facebook.appid")
+    val secret = Play.application().configuration().getString("application.socialnetworks.facebook.secret")
+
+    val client = facebookClient(s"$appId|$secret")
 
     val rv = client.fetchObject("debug_token", classOf[JsonObject], Parameter.`with`("input_token", token))
-
-    Logger.error(s"$rv")
     if (rv.has("error")) {
       false
     } else {
       val data = rv.getJsonObject("data")
-      (data.getString("app_id") == "971303889546582") && data.getBoolean("is_valid") // TODO: get app id and secret from config.
+      (data.getString("app_id") == appId) && data.getBoolean("is_valid")
     }
   }
 
