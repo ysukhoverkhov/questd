@@ -1,16 +1,17 @@
 package controllers.web.rest.component
 
+import controllers.domain.OkApiResult
+import controllers.domain.app.user.{LoginResult, LoginRequest}
+import controllers.services.socialnetworks.exception.{SocialNetworkClientNotFound, NetworkException, AuthException}
+import controllers.web.helpers._
+import controllers.web.rest.config.WSConfigHolder
+
 import scala.concurrent.Future
 import play.api._
 import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import controllers.domain._
-import controllers.domain.app.user._
-import controllers.web.helpers._
 import components._
 import org.json4s.MappingException
-import controllers.web.rest.config.WSConfigHolder
-import controllers.services.socialnetworks.exception._
 
 private [component] object LoginWSImplTypes {
 
@@ -70,7 +71,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
   def login = Action.async { implicit request =>
 
     request.body.asJson.fold {
-      Future.successful { BadRequest("Detected error: Empty request") }
+      Future.successful { BadRequest("Empty request") }
     } { js =>
 
       Future {
@@ -86,9 +87,15 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
 
             // Login with SN.
             try {
-              Left(LoginRequest(
-                loginRequest.snName,
-                sn.clientForName(loginRequest.snName).fetchUserByToken(loginRequest.token)))
+              val socialNetworkClient = sn.clientForName(loginRequest.snName)
+
+              if(socialNetworkClient.isValidUserToken(loginRequest.token)) {
+                Left(LoginRequest(
+                  loginRequest.snName,
+                  socialNetworkClient.fetchUserByToken(loginRequest.token)))
+              } else {
+                Right(BadRequest("Invalid user token"))
+              }
             } catch {
               case ex: AuthException =>
                 Logger.debug("Facebook auth failed")
@@ -98,7 +105,7 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
                 Logger.debug("Unable to connect to facebook")
                 Right(ServiceUnavailable("Unable to connect to Facebook"))
               case ex: SocialNetworkClientNotFound =>
-                Logger.debug("Request to unexisting social network.")
+                Logger.debug("Request to unknown social network.")
                 Right(BadRequest("Social network with provided name not found"))
             }
           } : Either[LoginRequest, Result]

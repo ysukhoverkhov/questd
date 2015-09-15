@@ -30,13 +30,7 @@ private[domain] trait AuthAPI {
         } map {
           updateUserCulture(UpdateUserCultureRequest(u))
         } map {
-          api.processFriendshipInvitationsFromSN(
-            ProcessFriendshipInvitationsFromSNRequest(u, request.snuser)) match {
-            case InternalErrorApiResult(a) =>
-              InternalErrorApiResult[LoginResult](a)
-            case _ =>
-              OkApiResult(LoginResult(uuid, u.id))
-          }
+          OkApiResult(LoginResult(uuid, u.id))
         }
       }
     }

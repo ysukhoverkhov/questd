@@ -2,8 +2,28 @@ package controllers.services.socialnetworks.client
 
 trait SocialNetworkClient {
 
+  /**
+   * Checks is the token valid and not expired
+   *
+   * @param token user's token
+   * @return True if valid and false otherwise.
+   */
+  def isValidUserToken(token: String): Boolean
+
+  /**
+   * Fetches user's info from SN with his token.
+   *
+   * @param token User's token.
+   * @return
+   */
   def fetchUserByToken(token: String): User
 
+  /**
+   * Returns user's friends playing the game with user's token.
+   *
+   * @param token User's token.
+   * @return
+   */
   def fetchFriendsByToken(token: String): List[User]
 
   /**
