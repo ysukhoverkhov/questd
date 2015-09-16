@@ -9,7 +9,6 @@ import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
 import models.domain.challenge.{ChallengeStatus, Challenge}
 import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.User
-import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.stats.SolutionsInBattle
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger

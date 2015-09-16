@@ -59,7 +59,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       user.addEntryToTimeLine(any, any) returns Some(u1)
       user.addMessage(any, any) returns Some(u1)
 
-      val result = api.respondBattleRequest(RespondBattleRequestRequest(
+      val result = api.respondChallenge(RespondChallengeRequest(
         user = u1,
         opponentSolutionId = opponentSolutionId,
         accept = true))
@@ -67,7 +67,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       there were two(user).updateBattleRequest(any, any, any, any)
       there was one(battle).create(any)
 
-      result must beEqualTo(OkApiResult(RespondBattleRequestResult(ProfileModificationResult.OK, Some(u1.profile))))
+      result must beEqualTo(OkApiResult(RespondChallengeResult(ProfileModificationResult.OK, Some(u1.profile))))
     }
   }
 }

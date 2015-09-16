@@ -7,7 +7,6 @@ import controllers.domain.helpers._
 import models.domain.challenge.{ChallengeStatus, Challenge}
 import models.domain.solution.Solution
 import models.domain.user.User
-import models.domain.user.battlerequests.BattleRequestStatus
 import models.domain.user.message.{MessageBattleRequestRejected, MessageBattleRequestAccepted}
 import models.domain.user.profile.{TaskType, Profile}
 import play.Logger
@@ -20,17 +19,17 @@ case class MakeChallengeResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None)
 
-case class GetBattleRequestsRequest(
+case class GetMyChallengesRequest(
   user: User)
 case class GetBattleRequestsResult(
   allowed: ProfileModificationResult,
   requests: List[Challenge])
 
-case class RespondBattleRequestRequest(
+case class RespondChallengeRequest(
   user: User,
   opponentSolutionId: String,
   accept: Boolean)
-case class RespondBattleRequestResult(
+case class RespondChallengeResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None)
 
@@ -90,7 +89,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
   /**
    * Get all battle requests we have.
    */
-  def getBattleRequests(request: GetBattleRequestsRequest): ApiResult[GetBattleRequestsResult] = handleDbException {
+  def getMyChallenges(request: GetMyChallengesRequest): ApiResult[GetBattleRequestsResult] = handleDbException {
     OkApiResult(GetBattleRequestsResult(
       allowed = OK,
       requests = request.user.battleRequests))
@@ -99,10 +98,10 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
   /**
    * Respond on battle request.
    */
-  def respondBattleRequest(request: RespondBattleRequestRequest): ApiResult[RespondBattleRequestResult] = handleDbException {
+  def respondChallenge(request: RespondChallengeRequest): ApiResult[RespondChallengeResult] = handleDbException {
     import request._
 
-    def createBattleForRequest(br: Challenge): ApiResult[RespondBattleRequestResult] = {
+    def createBattleForRequest(br: Challenge): ApiResult[RespondChallengeResult] = {
       val newStatus = if (accept) ChallengeStatus.Accepted else ChallengeStatus.Rejected
 
       db.user.updateBattleRequest(user.id, br.mySolutionId, br.opponentSolutionId, newStatus.toString) ifSome { user =>
@@ -110,15 +109,15 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
         db.user.updateBattleRequest(
           br.opponentId, br.opponentSolutionId, br.mySolutionId, newStatus.toString) ifSome { opponent =>
           if (accept) {
-            db.solution.readById(br.mySolutionId).fold[ApiResult[RespondBattleRequestResult]](
-              OkApiResult(RespondBattleRequestResult(OutOfContent))) { mySolution =>
-              db.solution.readById(br.opponentSolutionId).fold[ApiResult[RespondBattleRequestResult]](
-                OkApiResult(RespondBattleRequestResult(OutOfContent))) { opponentSolution =>
+            db.solution.readById(br.mySolutionId).fold[ApiResult[RespondChallengeResult]](
+              OkApiResult(RespondChallengeResult(OutOfContent))) { mySolution =>
+              db.solution.readById(br.opponentSolutionId).fold[ApiResult[RespondChallengeResult]](
+                OkApiResult(RespondChallengeResult(OutOfContent))) { opponentSolution =>
                 createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
                   sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(
                     challengeId = br.mySolutionId)))
                 } map {
-                  OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
+                  OkApiResult(RespondChallengeResult(OK, Some(user.profile)))
                 }
               }
             }
@@ -126,7 +125,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
             // TODO: return money back.
             // TODO: test me.
             sendMessage(SendMessageRequest(opponent, MessageBattleRequestRejected(br.mySolutionId))) map {
-              OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
+              OkApiResult(RespondChallengeResult(OK, Some(user.profile)))
             }
           }
         }
@@ -137,9 +136,9 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
       br =>
         (br.status == ChallengeStatus.Requests) &&
           (br.opponentSolutionId == opponentSolutionId)
-    ).fold[ApiResult[RespondBattleRequestResult]] {
+    ).fold[ApiResult[RespondChallengeResult]] {
       Logger.trace(s"Unable to find battle request with status Requests and opponentSolutionId equal to $opponentSolutionId")
-      OkApiResult(RespondBattleRequestResult(OutOfContent))
+      OkApiResult(RespondChallengeResult(OutOfContent))
     } { br =>
       createBattleForRequest(br)
     }
