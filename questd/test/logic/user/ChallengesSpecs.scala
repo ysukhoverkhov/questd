@@ -4,8 +4,9 @@ import java.util.Date
 
 import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
+import models.domain.challenge.{ChallengeStatus, Challenge}
 import models.domain.solution.SolutionStatus
-import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
+import models.domain.user.battlerequests.BattleRequest
 import testhelpers.domainstubs._
 
 class ChallengesSpecs extends BaseLogicSpecs {
@@ -103,7 +104,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val sol2Id = "s2id"
 
       val opponent = createUserStub()
-      val me = createUserStub(battleRequests = List(BattleRequest(opponent.id, sol1Id, sol2Id, BattleRequestStatus.Requests)))
+      val me = createUserStub(battleRequests = List(Challenge(opponent.id, sol1Id, sol2Id, ChallengeStatus.Requests)))
       val mySolution = createSolutionStub(id = sol1Id, authorId = me.id)
       val opponentSolution = createSolutionStub(id = sol2Id, authorId = opponent.id)
 

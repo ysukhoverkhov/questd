@@ -4,6 +4,7 @@ import java.util.Date
 
 import models.domain.base.ID
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
+import models.domain.challenge.Challenge
 import models.domain.chat.{Participant, Conversation}
 import models.domain.comment.{Comment, CommentInfo}
 import models.domain.common._
@@ -12,7 +13,6 @@ import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, LoginMethod}
-import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.demo.UserDemographics
 import models.domain.user.friends.Friendship
@@ -248,7 +248,7 @@ package object domainstubs {
     timeLine: List[TimeLineEntry] = List.empty,
     questBookmark: Option[String] = None,
     privateDailyResults: List[DailyResult] = List(createDailyResultStub()),
-    battleRequests: List[BattleRequest] = List.empty,
+    battleRequests: List[Challenge] = List.empty,
     tutorialState: TutorialState = TutorialState(dailyTasksSuppression = false),
     dailyTasks: DailyTasks = DailyTasks(),
     messages: List[Message] = List.empty,

@@ -4,9 +4,10 @@ import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
+import models.domain.challenge.{ChallengeStatus, Challenge}
 import models.domain.solution.Solution
 import models.domain.user.User
-import models.domain.user.battlerequests.{BattleRequest, BattleRequestStatus}
+import models.domain.user.battlerequests.BattleRequestStatus
 import models.domain.user.message.{MessageBattleRequestRejected, MessageBattleRequestAccepted}
 import models.domain.user.profile.{TaskType, Profile}
 import play.Logger
@@ -23,7 +24,7 @@ case class GetBattleRequestsRequest(
   user: User)
 case class GetBattleRequestsResult(
   allowed: ProfileModificationResult,
-  requests: List[BattleRequest])
+  requests: List[Challenge])
 
 case class RespondBattleRequestRequest(
   user: User,
@@ -45,13 +46,20 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
     def makeChallenge(mySolution: Solution, opponentSolution: Solution): ApiResult[ChallengeBattleResult] = {
       db.user.addBattleRequest(
         opponentSolution.info.authorId,
-        BattleRequest(user.id, opponentSolution.id, mySolution.id, BattleRequestStatus.Requests)) ifSome { opponent =>
+        Challenge(
+          opponentId = user.id,
+          mySolutionId = Some(opponentSolution.id),
+          opponentSolutionId = Some(mySolution.id),
+          status = ChallengeStatus.Requests)) ifSome { opponent =>
 
         runWhileSome(user) ( { user =>
           db.user.addBattleRequest(
             user.id,
-            BattleRequest(
-              opponent.id, mySolution.id, opponentSolution.id, BattleRequestStatus.Requested))
+            Challenge(
+              opponentId = opponent.id,
+              mySolutionId = Some(mySolution.id),
+              opponentSolutionId = Some(opponentSolution.id),
+              status = ChallengeStatus.Requested))
         }, { user =>
           // TODO: substract assets for invitation.
           // TODO: test it calls db correctly.
@@ -94,8 +102,8 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
   def respondBattleRequest(request: RespondBattleRequestRequest): ApiResult[RespondBattleRequestResult] = handleDbException {
     import request._
 
-    def createBattleForRequest(br: BattleRequest): ApiResult[RespondBattleRequestResult] = {
-      val newStatus = if (accept) BattleRequestStatus.Accepted else BattleRequestStatus.Rejected
+    def createBattleForRequest(br: Challenge): ApiResult[RespondBattleRequestResult] = {
+      val newStatus = if (accept) ChallengeStatus.Accepted else ChallengeStatus.Rejected
 
       db.user.updateBattleRequest(user.id, br.mySolutionId, br.opponentSolutionId, newStatus.toString) ifSome { user =>
 
@@ -108,7 +116,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
                 OkApiResult(RespondBattleRequestResult(OutOfContent))) { opponentSolution =>
                 createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
                   sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(
-                    opponentSolutionId = br.mySolutionId)))
+                    challengeId = br.mySolutionId)))
                 } map {
                   OkApiResult(RespondBattleRequestResult(OK, Some(user.profile)))
                 }
@@ -127,7 +135,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
 
     user.battleRequests.find(
       br =>
-        (br.status == BattleRequestStatus.Requests) &&
+        (br.status == ChallengeStatus.Requests) &&
           (br.opponentSolutionId == opponentSolutionId)
     ).fold[ApiResult[RespondBattleRequestResult]] {
       Logger.trace(s"Unable to find battle request with status Requests and opponentSolutionId equal to $opponentSolutionId")

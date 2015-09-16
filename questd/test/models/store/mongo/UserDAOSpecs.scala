@@ -4,10 +4,11 @@ package models.store.mongo
 
 import java.util.Date
 
+import models.domain.challenge.{Challenge, ChallengeStatus}
 import models.domain.common.{ClientPlatform, Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
-import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
+import models.domain.user.battlerequests.BattleRequestStatus
 import models.domain.user.dailyresults.BattleResult
 import models.domain.user.demo.UserDemographics
 import models.domain.user.devices.Device
@@ -775,7 +776,7 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val br = BattleRequest("1", "2", "3", BattleRequestStatus.Accepted)
+      val br = Challenge("1", "2", "3", ChallengeStatus.Accepted)
 
       db.user.create(user)
       db.user.addBattleRequest(user.id, br)
@@ -791,22 +792,22 @@ class UserDAOSpecs
 
       val user = createUserStub()
       val br = List(
-        BattleRequest("1", "2", "3", BattleRequestStatus.Requests),
-        BattleRequest("1", "4", "3", BattleRequestStatus.Requests),
-        BattleRequest("1", "5", "3", BattleRequestStatus.Requests),
-        BattleRequest("1", "6", "3", BattleRequestStatus.Requests),
-        BattleRequest("1", "7", "3", BattleRequestStatus.Requests),
-        BattleRequest("1", "8", "3", BattleRequestStatus.Requests)
+        Challenge("1", "2", "3", ChallengeStatus.Requests),
+        Challenge("1", "4", "3", ChallengeStatus.Requests),
+        Challenge("1", "5", "3", ChallengeStatus.Requests),
+        Challenge("1", "6", "3", ChallengeStatus.Requests),
+        Challenge("1", "7", "3", ChallengeStatus.Requests),
+        Challenge("1", "8", "3", ChallengeStatus.Requests)
       )
 
       db.user.create(user)
       br.foreach(db.user.addBattleRequest(user.id, _))
-      db.user.updateBattleRequest(user.id, "6", "3", BattleRequestStatus.Rejected.toString)
+      db.user.updateBattleRequest(user.id, "6", "3", ChallengeStatus.Rejected.toString)
 
       val ou = db.user.readById(user.id)
 
       ou must beSome
-      ou.get.battleRequests must beEqualTo(br.take(3) ::: List(BattleRequest("1", "6", "3", BattleRequestStatus.Rejected)) ::: br.drop(4))
+      ou.get.battleRequests must beEqualTo(br.take(3) ::: List(Challenge("1", "6", "3", ChallengeStatus.Rejected)) ::: br.drop(4))
     }
 
     "setNotificationSentTime works" in new WithApplication(appWithTestDatabase) {

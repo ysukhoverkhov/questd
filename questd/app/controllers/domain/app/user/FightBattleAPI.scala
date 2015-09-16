@@ -6,9 +6,10 @@ import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.helpers._
 import logic.BattleLogic
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
+import models.domain.challenge.{ChallengeStatus, Challenge}
 import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.User
-import models.domain.user.battlerequests.{BattleRequest, BattleRequestStatus}
+import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.stats.SolutionsInBattle
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger
@@ -141,12 +142,12 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
 
       db.user.addBattleRequest(
         opponentId,
-        BattleRequest(myId, opponentSolution.id, mySolution.id, BattleRequestStatus.AutoCreated)) ifSome { op =>
+        Challenge(myId, opponentSolution.id, mySolution.id, ChallengeStatus.AutoCreated)) ifSome { op =>
 
         db.user.addBattleRequest(
           myId,
-          BattleRequest(
-            opponentId, mySolution.id, opponentSolution.id, BattleRequestStatus.AutoCreated)) ifSome { op =>
+          Challenge(
+            opponentId, mySolution.id, opponentSolution.id, ChallengeStatus.AutoCreated)) ifSome { op =>
           OkApiResult(TryCreateBattleResult())
         }
       }

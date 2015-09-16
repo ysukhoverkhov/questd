@@ -1,8 +1,8 @@
-package models.domain.user.battlerequests
+package models.domain.challenge
 
 /**
  * Status of battle request.
  */
-object BattleRequestStatus extends Enumeration {
+object ChallengeStatus extends Enumeration {
   val Requested, Requests, Accepted, Rejected, AutoCreated = Value
 }

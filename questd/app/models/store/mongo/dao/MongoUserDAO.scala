@@ -4,10 +4,10 @@ import java.util.Date
 
 import com.mongodb.casbah.commons.MongoDBObject
 import com.novus.salat._
+import models.domain.challenge.Challenge
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
-import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.devices.Device
 import models.domain.user.friends.Friendship
@@ -800,12 +800,12 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User] = {
+  def addBattleRequest(id: String, battleRequest: Challenge): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
         "$push" -> MongoDBObject(
-          "battleRequests" -> grater[BattleRequest].asDBObject(battleRequest))))
+          "battleRequests" -> grater[Challenge].asDBObject(battleRequest))))
   }
 
   /**

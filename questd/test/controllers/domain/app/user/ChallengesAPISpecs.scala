@@ -2,7 +2,8 @@ package controllers.domain.app.user
 
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
-import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
+import models.domain.challenge.{ChallengeStatus, Challenge}
+import models.domain.user.battlerequests.BattleRequest
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
@@ -43,11 +44,11 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       val sol2 = createSolutionStub(id = opponentSolutionId, questId = q.id)
       val opponent = createUserStub()
       val u1 = createUserStub(solvedQuests = Map(q.id -> sol1.id), battleRequests = List(
-        BattleRequest(
+        Challenge(
           opponentId = opponent.id,
           mySolutionId = sol1.id,
           opponentSolutionId = sol2.id,
-          status = BattleRequestStatus.Requests
+          status = ChallengeStatus.Requests
         )))
 
       user.updateBattleRequest(any, any, any, any) returns Some(u1)

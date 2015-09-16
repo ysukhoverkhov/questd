@@ -2,10 +2,10 @@ package models.store.dao
 
 import java.util.Date
 
+import models.domain.challenge.Challenge
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
-import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.devices.Device
 import models.domain.user.friends.Friendship
@@ -205,7 +205,7 @@ trait UserDAO extends BaseDAO[User] {
    * @param battleRequest Request to add.
    * @return Modified user.
    */
-  def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User]
+  def addBattleRequest(id: String, battleRequest: Challenge): Option[User]
 
   /**
    * Updates status of battle request.
