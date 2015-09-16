@@ -5,39 +5,44 @@ import controllers.web.helpers._
 
 private object ChallengesWSImplTypes {
 
-  case class WSChallengeBattleRequest(
+  case class WSMakeChallengeRequest(
     /// id of my solution to participate in battle.
     mySolutionId: String,
 
     /// id of opponent solution to participate in battle.
     opponentSolutionId: String
     )
-  type WSChallengeBattleResult = ChallengeBattleResult
+  type WSMakeChallengeResult = MakeChallengeResult
 
-
-  type WSGetBattleRequestsResult = GetBattleRequestsResult
-
-
-  case class WSRespondBattleRequestRequest(
-    /// Id of solution we were challenged with.
-    opponentSolutionId: String,
-
-    /// Are we accept the challenge.
-    accepted: Boolean)
-  type WSRespondBattleRequestResult = RespondBattleRequestResult
+//
+//  type WSGetBattleRequestsResult = GetBattleRequestsResult
+//
+//
+//  case class WSRespondBattleRequestRequest(
+//    /// Id of solution we were challenged with.
+//    opponentSolutionId: String,
+//
+//    /// Are we accept the challenge.
+//    accepted: Boolean)
+//  type WSRespondBattleRequestResult = RespondBattleRequestResult
 }
 
 trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
 
   import ChallengesWSImplTypes._
 
-  /**
-   * Challenge someone to a battle.
-   */
-  def challengeBattle = wrapJsonApiCallReturnBody[WSChallengeBattleResult] { (js, r) =>
-    val v = Json.read[WSChallengeBattleRequest](js.toString)
+//  def getChallenge = ws.getChallenge
+//  def getMyChallenges = ws.getMyChallenges
+//  def getChallengesToMe = ws.getChallengesToMe
+//  def respondChallenge = ws.respondChallenge
 
-    api.challengeBattle(ChallengeBattleRequest(r.user, v.mySolutionId, v.opponentSolutionId))
+  /**
+   * Challenge someone.
+   */
+  def makeChallenge = wrapJsonApiCallReturnBody[WSMakeChallengeResult] { (js, r) =>
+    val v = Json.read[WSMakeChallengeRequest](js.toString)
+
+    api.makeChallenge(MakeChallengeRequest(r.user, v.mySolutionId, v.opponentSolutionId))
   }
 
   /**

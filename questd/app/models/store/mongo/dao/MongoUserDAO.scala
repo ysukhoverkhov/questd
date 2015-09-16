@@ -4,7 +4,6 @@ import java.util.Date
 
 import com.mongodb.casbah.commons.MongoDBObject
 import com.novus.salat._
-import models.domain.challenge.Challenge
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
@@ -797,32 +796,6 @@ private[mongo] class MongoUserDAO
           "objectId" -> objectId))))
   }
 
-  /**
-   * @inheritdoc
-   */
-  def addBattleRequest(id: String, battleRequest: Challenge): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$push" -> MongoDBObject(
-          "battleRequests" -> grater[Challenge].asDBObject(battleRequest))))
-  }
-
-  /**
-   * @inheritdoc
-   */
-  def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User] = {
-    findAndModify(
-      MongoDBObject(
-        "id" -> id,
-        "battleRequests" -> MongoDBObject(
-          "$elemMatch" -> MongoDBObject(
-            "mySolutionId" -> mySolutionId,
-            "opponentSolutionId" -> opponentSolutionId))),
-      MongoDBObject(
-        "$set" -> MongoDBObject(
-          "battleRequests.$.status" -> status)))
-  }
 }
 
 

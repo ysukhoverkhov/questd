@@ -23,12 +23,12 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       solution.readById(opponentSolutionId) returns Some(sol2)
       user.addBattleRequest(any, any) returns Some(u1)
 
-      val result = api.challengeBattle(ChallengeBattleRequest(
+      val result = api.makeChallenge(MakeChallengeRequest(
         user = u1,
         mySolutionId = mySolutionId,
         opponentSolutionId = opponentSolutionId))
 
-      result must beEqualTo(OkApiResult(ChallengeBattleResult(ProfileModificationResult.OK, Some(u1.profile))))
+      result must beEqualTo(OkApiResult(MakeChallengeResult(ProfileModificationResult.OK, Some(u1.profile))))
 
       there was one(solution).readById(mySolutionId)
       there was one(solution).readById(opponentSolutionId)

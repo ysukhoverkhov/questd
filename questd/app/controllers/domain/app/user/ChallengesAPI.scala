@@ -12,11 +12,11 @@ import models.domain.user.message.{MessageBattleRequestRejected, MessageBattleRe
 import models.domain.user.profile.{TaskType, Profile}
 import play.Logger
 
-case class ChallengeBattleRequest(
+case class MakeChallengeRequest(
   user: User,
   mySolutionId: String,
   opponentSolutionId: String)
-case class ChallengeBattleResult(
+case class MakeChallengeResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None)
 
@@ -39,11 +39,11 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
 
   /**
    * Challenge someone to jon a battle.
-   */
-  def challengeBattle(request: ChallengeBattleRequest): ApiResult[ChallengeBattleResult] = handleDbException {
+   */ // TODO: Move it out of user's API
+  def makeChallenge(request: MakeChallengeRequest): ApiResult[MakeChallengeResult] = handleDbException {
     import request._
 
-    def makeChallenge(mySolution: Solution, opponentSolution: Solution): ApiResult[ChallengeBattleResult] = {
+    def makeChallenge(mySolution: Solution, opponentSolution: Solution): ApiResult[MakeChallengeResult] = {
       db.user.addBattleRequest(
         opponentSolution.info.authorId,
         Challenge(
@@ -69,19 +69,19 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
           {
             makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
           } map { r =>
-            OkApiResult(ChallengeBattleResult(OK, Some(r.user.profile)))
+            OkApiResult(MakeChallengeResult(OK, Some(r.user.profile)))
           }
         }
       }
     }
 
-    db.solution.readById(mySolutionId).fold[ApiResult[ChallengeBattleResult]](OkApiResult(ChallengeBattleResult(OutOfContent))) { mySolution =>
-      db.solution.readById(opponentSolutionId).fold[ApiResult[ChallengeBattleResult]](OkApiResult(ChallengeBattleResult(OutOfContent))) { opponentSolution =>
+    db.solution.readById(mySolutionId).fold[ApiResult[MakeChallengeResult]](OkApiResult(MakeChallengeResult(OutOfContent))) { mySolution =>
+      db.solution.readById(opponentSolutionId).fold[ApiResult[MakeChallengeResult]](OkApiResult(MakeChallengeResult(OutOfContent))) { opponentSolution =>
         user.canChallengeBattle(mySolution, opponentSolution) match {
           case OK =>
             makeChallenge(mySolution, opponentSolution)
           case reason =>
-            OkApiResult(ChallengeBattleResult(reason))
+            OkApiResult(MakeChallengeResult(reason))
         }
       }
     }

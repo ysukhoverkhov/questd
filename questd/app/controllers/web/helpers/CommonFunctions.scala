@@ -1,6 +1,9 @@
 package controllers.web.helpers
 
+import controllers.domain.{OkApiResult, ApiResult}
+import controllers.web.rest.component.SecurityWSImpl
 import play.api._
+import play.api.mvc.Security.AuthenticatedRequest
 import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
@@ -12,7 +15,7 @@ private[web] trait CommonFunctions { this: QuestController with SecurityWSImpl =
 
   def wrapApiCallReturnBody[T <: AnyRef](apiCall: AuthenticatedRequest[AnyContent] => ApiResult[T]) = apiCallToResult(apiCall)(writeAnyInResponse)
 
-  def wrapJsonApiCallReturnBody[T <: AnyRef](jsonApiCall: (String, AuthenticatedRequest[AnyContent]) => ApiResult[T]) = apiCallToResult { r =>
+  def wrapJsonApiCallReturnBody[T <: AnyRef](jsonApiCall: (String, Security.AuthenticatedRequest[AnyContent]) => ApiResult[T]) = apiCallToResult { r =>
 
     r.body.asJson.fold {
       throw new org.json4s.ParserUtil$ParseException("Empty request", null)

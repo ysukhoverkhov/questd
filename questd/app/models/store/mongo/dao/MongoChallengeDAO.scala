@@ -31,5 +31,34 @@ private[mongo] class MongoChallengeDAO
 //        "info.postingDate" -> -1),
 //      skip = skip)
 //  }
+
+
+//  /**
+//   * @inheritdoc
+//   */
+//  def addBattleRequest(id: String, battleRequest: Challenge): Option[User] = {
+//    findAndModify(
+//      id,
+//      MongoDBObject(
+//        "$push" -> MongoDBObject(
+//          "battleRequests" -> grater[Challenge].asDBObject(battleRequest))))
+//  }
+//
+//  /**
+//   * @inheritdoc
+//   */
+//  def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User] = {
+//    findAndModify(
+//      MongoDBObject(
+//        "id" -> id,
+//        "battleRequests" -> MongoDBObject(
+//          "$elemMatch" -> MongoDBObject(
+//            "mySolutionId" -> mySolutionId,
+//            "opponentSolutionId" -> opponentSolutionId))),
+//      MongoDBObject(
+//        "$set" -> MongoDBObject(
+//          "battleRequests.$.status" -> status)))
+//  }
+
 }
 
