@@ -1,14 +1,12 @@
 package controllers.web.helpers
 
-import controllers.domain.{OkApiResult, ApiResult}
+import controllers.domain.{InternalErrorApiResult, OkApiResult, ApiResult}
 import controllers.web.rest.component.SecurityWSImpl
 import play.api._
 import play.api.mvc.Security.AuthenticatedRequest
 import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
-import controllers.web.rest.component._
-import controllers.domain._
 import org.json4s._
 
 private[web] trait CommonFunctions { this: QuestController with SecurityWSImpl =>
