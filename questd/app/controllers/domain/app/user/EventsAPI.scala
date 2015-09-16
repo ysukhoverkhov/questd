@@ -127,14 +127,15 @@ private[domain] trait EventsAPI { this: DomainAPIComponent#DomainAPI with DBAcce
       // Nothing to send.
       OkApiResult(CheckSendNotificationsResult(user))
     } else {
-      db.user.setNotificationSentTime(user.id, new Date()) ifSome { user =>
-        notifyWithMessage(NotifyWithMessageRequest(
-          user = user,
-          message = user.profile.messages.sortBy[Int](m => MessageMetaInfo.messagePriority(m.messageType)).head,
-          numberOfEvents = user.profile.messages.length
-        )) map { r =>
-          OkApiResult(CheckSendNotificationsResult(r.user))
-        }
+      notifyWithMessage(NotifyWithMessageRequest(
+        user = user,
+        message = user.profile.messages
+          .dropWhile(_.generatedAt.before(user.schedules.lastNotificationSentAt))
+          .sortBy[Int](m => MessageMetaInfo.messagePriority(m.messageType))
+          .head,
+        numberOfEvents = user.profile.messages.length
+      )) map { r =>
+        OkApiResult(CheckSendNotificationsResult(r.user))
       }
     }
   }
@@ -146,23 +147,25 @@ private[domain] trait EventsAPI { this: DomainAPIComponent#DomainAPI with DBAcce
     import controllers.services.devicenotifications.DeviceNotifications.{Device, IOSDevice}
     import request._
 
-    val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+    db.user.setNotificationSentTime(user.id, new Date()) ifSome { user =>
+      val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
 
-    val devices: Set[Device] = user.devices.map {
-      case models.domain.user.devices.Device(ClientPlatform.iPhone, token) => IOSDevice(token)
-    }.toSet[Device]
+      val devices: Set[Device] = user.devices.map {
+        case models.domain.user.devices.Device(ClientPlatform.iPhone, token) => IOSDevice(token)
+      }.toSet[Device]
 
-    val messageText = MessageMetaInfo.messageLocalizedMessage(message.messageType)
+      val messageText = MessageMetaInfo.messageLocalizedMessage(message.messageType)
 
-    actorSelectionNotification ! DeviceNotifications.PushMessage(
-      devices = DeviceNotifications.Devices(devices.toSet),
-      message = messageText,
-      badge = Some(numberOfEvents),
-      sound = None,
-      destinations = List(DeviceNotifications.MobileDestination)
-    )
+      actorSelectionNotification ! DeviceNotifications.PushMessage(
+        devices = DeviceNotifications.Devices(devices.toSet),
+        message = messageText,
+        badge = Some(numberOfEvents),
+        sound = None,
+        destinations = List(DeviceNotifications.MobileDestination)
+      )
 
-    OkApiResult(NotifyWithMessageResult(user))
+      OkApiResult(NotifyWithMessageResult(user))
+    }
   }
 }
 

@@ -1,5 +1,7 @@
 package models.domain.user.message
 
+import java.util.Date
+
 import models.domain.base.ID
 
 /**
@@ -9,4 +11,5 @@ import models.domain.base.ID
 case class Message (
   id: String = ID.generate,
   messageType: MessageType.Value,
-  data: Map[String, String] = Map.empty) extends ID
+  data: Map[String, String] = Map.empty,
+  generatedAt: Date = new Date) extends ID
