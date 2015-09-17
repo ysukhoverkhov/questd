@@ -14,23 +14,44 @@ import play.Logger
 
 case class MakeChallengeRequest(
   user: User,
-  mySolutionId: String,
-  opponentSolutionId: String)
+  opponentId: String,
+  myQuestId: Option[String],
+  mySolutionId: Option[String])
 case class MakeChallengeResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
   opponentSolution: Option[SolutionView] = None)
 
+case class GetChallengeRequest(
+  user: User,
+  challengeId: String)
+case class GetChallengeResult(
+  allowed: ProfileModificationResult,
+  challenge: Option[Challenge] = None)
+
 case class GetMyChallengesRequest(
-  user: User)
-case class GetBattleRequestsResult(
+  user: User,
+  statuses: List[String],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetMyChallengesResult(
+  allowed: ProfileModificationResult,
+  requests: List[Challenge])
+
+case class GetChallengesToMeRequest(
+  user: User,
+  statuses: List[String],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetChallengesToMeResult(
   allowed: ProfileModificationResult,
   requests: List[Challenge])
 
 case class RespondChallengeRequest(
   user: User,
-  opponentSolutionId: String,
-  accept: Boolean)
+  challengeId: String,
+  accepted: Boolean,
+  solutionId: Option[String] = None)
 case class RespondChallengeResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
@@ -93,10 +114,26 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
   }
 
   /**
-   * Get all battle requests we have.
+   * Returns challenge by id if we are its participant.
    */
-  def getMyChallenges(request: GetMyChallengesRequest): ApiResult[GetBattleRequestsResult] = handleDbException {
-    OkApiResult(GetBattleRequestsResult(
+  def getChallenge(request: GetChallengeRequest): ApiResult[GetChallengeResult] = handleDbException {
+
+  }
+
+  /**
+   * Get all battle requests we've made.
+   */
+  def getMyChallenges(request: GetMyChallengesRequest): ApiResult[GetMyChallengesResult] = handleDbException {
+    OkApiResult(GetMyChallengesResult(
+      allowed = OK,
+      requests = request.user.battleRequests))
+  }
+
+  /**
+   * Get challenges made to us.
+   */
+  def getChallengesToMe(request: GetChallengesToMeRequest): ApiResult[GetChallengesToMeResult] = handleDbException {
+    OkApiResult(GetMyChallengesResult(
       allowed = OK,
       requests = request.user.battleRequests))
   }

@@ -27,7 +27,6 @@ private object ChallengesWSImplTypes {
     challengeId: String)
   type WSGetChallengeResult = GetChallengeResult
 
-
   /**
    * Request for challenges our user created.
    *
@@ -84,7 +83,7 @@ trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSCom
   }
 
   /**
-   * Get all our and to us battle requests.
+   * Get challenge by id if we are its part.
    */
   def getChallenge = wrapJsonApiCallReturnBody[WSGetChallengeResult] { (js, r) =>
     val v = Json.read[WSGetChallengeRequest](js.toString)
