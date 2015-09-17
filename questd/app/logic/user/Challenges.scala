@@ -13,14 +13,16 @@ import com.github.nscala_time.time.Imports._
  */
 trait Challenges { this: UserLogic =>
 
+  private def alreadyHasChallengeForSolutions(mySoution: Solution, opponentSolution: Solution): Boolean = {
+    lazy val alreadyHasRequest = user.battleRequests
+      .exists(br => (br.mySolutionId == mySolution.id) && (br.opponentSolutionId == opponentSolution.id))
+  }
+
   def canAutoCreatedBattle(
     mySolution: Solution,
     opponentSolution: Solution,
     opponentShouldNotHaveBattles: Boolean,
     checkQuest: Boolean) = {
-
-    lazy val alreadyHasRequest = user.battleRequests
-      .exists(br => (br.mySolutionId == mySolution.id) && (br.opponentSolutionId == opponentSolution.id))
 
     lazy val battleCreationDelay = api.config(api.DefaultConfigParams.BattleCreationDelay).toInt
 
@@ -28,7 +30,7 @@ trait Challenges { this: UserLogic =>
       OutOfContent
     else if (opponentSolution.battleIds.nonEmpty && opponentShouldNotHaveBattles)
       InvalidState
-    else if (alreadyHasRequest)
+    else if (alreadyHasChallengeForSolutions(mySolution, opponentSolution))
       InvalidState
     else if (checkQuest && (opponentSolution.info.questId != mySolution.info.questId))
       InvalidState
@@ -41,10 +43,8 @@ trait Challenges { this: UserLogic =>
 
   def canChallengeBattle(mySolution: Solution, opponentSolution: Solution) = {
     lazy val mySolutionExists = user.stats.solvedQuests.values.exists(_ == mySolution.id)
-    lazy val alreadyHasRequest = user.battleRequests
-      .exists(br => (br.mySolutionId == mySolution.id) && (br.opponentSolutionId == opponentSolution.id))
 
-    if (alreadyHasRequest)
+    if (alreadyHasChallengeForSolutions(mySolution, opponentSolution))
       InvalidState
     else if (mySolution.status != SolutionStatus.InRotation || opponentSolution.status != SolutionStatus.InRotation)
       InvalidState

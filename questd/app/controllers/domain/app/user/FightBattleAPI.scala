@@ -132,24 +132,19 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         cultureId = Some(solution.cultureId),
         withBattles = withBattles)
     }
-
-    def makeChallenge(solutions: List[Solution]): ApiResult[TryCreateBattleResult] = {
+// TODO: test new version of makeChallenge is working.
+    def makeChallenge(solutions: List[Solution]): Unit = {
       val mySolution = solutions.head
       val opponentSolution = solutions(1)
       val myId = mySolution.info.authorId
       val opponentId = opponentSolution.info.authorId
 
-      db.user.addBattleRequest(
-        opponentId,
-        Challenge(myId, opponentSolution.id, mySolution.id, ChallengeStatus.AutoCreated)) ifSome { op =>
-
-        db.user.addBattleRequest(
-          myId,
-          Challenge(
-            opponentId, mySolution.id, opponentSolution.id, ChallengeStatus.AutoCreated)) ifSome { op =>
-          OkApiResult(TryCreateBattleResult())
-        }
-      }
+      db.challenge.create(Challenge(
+        myId = myId,
+        opponentId = opponentId,
+        mySolutionId = Some(mySolution.id),
+        opponentSolutionId = Some(opponentSolution.id),
+        status = ChallengeStatus.AutoCreated))
     }
 
     if (solution.canParticipateAutoBattle) {
@@ -172,7 +167,8 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         if (solutions.isEmpty) {
           OkApiResult(TryCreateBattleResult())
         } else {
-          makeChallenge(solutions) map createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
+          makeChallenge(solutions)
+          createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
         }
       }
     } else {
