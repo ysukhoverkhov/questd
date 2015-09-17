@@ -7,7 +7,7 @@ import models.domain.user.User
 case class SolutionView (
   id: String,
   info: SolutionInfo,
-  rating: Option[SolutionRating],
+  rating: SolutionRating,
   myVote: Option[ContentVote.Value])
 
 
@@ -19,7 +19,7 @@ object SolutionView {
     SolutionView(
       id = s.id,
       info = s.info,
-      rating = Some(s.rating),
+      rating = s.rating,
       myVote = u.stats.votedSolutions.get(s.id))
   }
 }
