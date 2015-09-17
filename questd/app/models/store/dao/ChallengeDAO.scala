@@ -4,7 +4,21 @@ import models.domain.challenge.Challenge
 
 trait ChallengeDAO extends BaseDAO[Challenge] {
 
-//  def allWithParams(
+  /**
+   * Returns challenges what contains both these solutions in any combination
+   *
+   * @param solutionIds Solutions to search.
+   * @return Iterator with found solutions.
+   */
+  def readForSolutions(solutionIds: (String, String)): Iterator[Challenge]
+    { "$or" : [
+    { "$and" : [ {"timelinePoints" : -17 }, {"level" : 0 } ] },
+    { "$and" : [ {"timelinePoints" : -16 }, {"level" : 8 } ] }
+      ] }
+
+
+
+  //  def allWithParams(
 //    commentedObjectId: List[String] = List.empty,
 //    skip: Int = 0
 //  ): Iterator[Challenge]

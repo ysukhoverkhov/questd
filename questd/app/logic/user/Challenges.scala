@@ -13,9 +13,13 @@ import com.github.nscala_time.time.Imports._
  */
 trait Challenges { this: UserLogic =>
 
-  private def alreadyHasChallengeForSolutions(mySoution: Solution, opponentSolution: Solution): Boolean = {
-    lazy val alreadyHasRequest = user.battleRequests
-      .exists(br => (br.mySolutionId == mySolution.id) && (br.opponentSolutionId == opponentSolution.id))
+  // TODO: perhaps we should store in stats challenges for all our solutions?
+  private def alreadyHasChallengeForSolutions(mySolution: Solution, opponentSolution: Solution): Boolean = {
+//    { "$or" : [
+//      { "$and" : [ {"timelinePoints" : -17 }, {"level" : 0 } ] },
+//      { "$and" : [ {"timelinePoints" : -16 }, {"level" : 8 } ] }
+//      ] }
+    api.db.challenge.readForSolutions(mySolution.id, opponentSolution.id).exists
   }
 
   def canAutoCreatedBattle(
