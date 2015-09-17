@@ -573,6 +573,7 @@ class UserDAOSpecs
         questId,
         createQuestStub(id = questId).info,
         QuestRating(),
+        None,
         None)
       val user = createUserStub(questBookmark = None)
       db.user.create(user)

@@ -8,7 +8,8 @@ case class QuestView (
   id: String,
   info: QuestInfo,
   rating: QuestRating,
-  myVote: Option[ContentVote.Value])
+  myVote: Option[ContentVote.Value],
+  mySolutionId: Option[String])
 
 /**
  * Companion.
@@ -19,6 +20,7 @@ object QuestView {
       id = q.id,
       info = q.info,
       rating = q.rating,
-      myVote = u.stats.votedQuests.get(q.id))
+      myVote = u.stats.votedQuests.get(q.id),
+      mySolutionId = u.stats.solvedQuests.get(q.id))
   }
 }

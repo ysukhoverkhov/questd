@@ -1,8 +1,7 @@
 package controllers.domain.app.user
 
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult
-import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
+import models.domain.user.battlerequests.{BattleRequest, BattleRequestStatus}
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
@@ -27,7 +26,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
         mySolutionId = mySolutionId,
         opponentSolutionId = opponentSolutionId))
 
-      result must beEqualTo(OkApiResult(ChallengeBattleResult(ProfileModificationResult.OK, Some(u1.profile))))
+      result must beAnInstanceOf[OkApiResult[ChallengeBattleResult]]
 
       there was one(solution).readById(mySolutionId)
       there was one(solution).readById(opponentSolutionId)
@@ -66,7 +65,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       there were two(user).updateBattleRequest(any, any, any, any)
       there was one(battle).create(any)
 
-      result must beEqualTo(OkApiResult(RespondBattleRequestResult(ProfileModificationResult.OK, Some(u1.profile))))
+      result must beAnInstanceOf[OkApiResult[RespondBattleRequestResult]]
     }
   }
 }
