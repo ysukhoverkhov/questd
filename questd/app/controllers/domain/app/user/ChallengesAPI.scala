@@ -64,7 +64,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
           {
             makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
           } map { r =>
-            OkApiResult(ChallengeBattleResult(OK, Some(r.user.profile), Some(SolutionView.make(opponentSolution, user))))
+            OkApiResult(ChallengeBattleResult(OK, Some(r.user.profile), Some(SolutionView(opponentSolution, user))))
           }
         }
       }
@@ -112,7 +112,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
                 createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
                   sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(opponentSolutionId = br.mySolutionId)))
                 } map {
-                  OkApiResult(RespondBattleRequestResult(OK, Some(user.profile), Some(SolutionView.make(opponentSolution, user))))
+                  OkApiResult(RespondBattleRequestResult(OK, Some(user.profile), Some(SolutionView(opponentSolution, user))))
                 }
               }
             }

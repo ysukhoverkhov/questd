@@ -62,7 +62,7 @@ private[domain] trait VoteSolutionAPI {
                 OkApiResult(VoteSolutionByUserResult(
                   allowed = OK,
                   profile = Some(r.user.profile),
-                  solution = Some(SolutionView.make(s, r.user))))
+                  solution = Some(SolutionView(s, r.user))))
               }
             }
           }

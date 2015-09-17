@@ -17,7 +17,7 @@ case class SolutionView (
  * Companion.
  */
 object SolutionView {
-  def make(s: Solution, u: User): SolutionView = {
+  def apply(s: Solution, u: User): SolutionView = {
     SolutionView(
       id = s.id,
       info = s.info,
