@@ -55,7 +55,7 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
                 OkApiResult(VoteQuestByUserResult(
                   allowed = OK,
                   profile = Some(r.user.profile),
-                  quest = Some(QuestView.make(q, r.user))))
+                  quest = Some(QuestView(q, r.user))))
               }
             }
           }

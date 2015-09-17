@@ -12,7 +12,7 @@ case class BattleView (
  * Companion.
  */
 object BattleView {
-  def make(b: Battle, u: User): BattleView = {
+  def apply(b: Battle, u: User): BattleView = {
     BattleView(
       b.id,
       b.info,

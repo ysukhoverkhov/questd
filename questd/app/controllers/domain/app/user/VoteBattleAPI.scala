@@ -53,7 +53,7 @@ private[domain] trait VoteBattleAPI {
                     OkApiResult(VoteBattleByUserResult(
                       allowed = OK,
                       profile = Some(r.user.profile),
-                      battle = Some(BattleView.make(b, user))))
+                      battle = Some(BattleView(b, user))))
                   }
                 }
 

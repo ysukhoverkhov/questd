@@ -128,8 +128,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 OkApiResult(SolveQuestResult(
                   allowed = OK,
                   profile = Some(r.user.profile),
-                  quest = Some(QuestView.make(questToSolve, r.user)),
-                  solution = Some(SolutionView.make(newSolution, r.user))))
+                  quest = Some(QuestView(questToSolve, r.user)),
+                  solution = Some(SolutionView(newSolution, r.user))))
               }
             }
 
@@ -197,7 +197,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     db.quest.readById(questId) ifSome { quest =>
       db.user.setQuestBookmark(
         id = user.id,
-        questId = QuestView.make(quest, user)) ifSome { updatedUser =>
+        questId = QuestView(quest, user)) ifSome { updatedUser =>
         OkApiResult(BookmarkQuestResult(OK, Some(updatedUser.profile)))
       }
     }

@@ -15,7 +15,7 @@ case class QuestView (
  * Companion.
  */
 object QuestView {
-  def make(q: Quest, u: User): QuestView = {
+  def apply(q: Quest, u: User): QuestView = {
     QuestView(
       id = q.id,
       info = q.info,
