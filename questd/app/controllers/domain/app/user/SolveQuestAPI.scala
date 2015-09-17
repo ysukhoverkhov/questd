@@ -9,7 +9,7 @@ import models.domain.solution.{Solution, SolutionInfo, SolutionInfoContent, Solu
 import models.domain.user._
 import models.domain.user.profile.{TaskType, Profile}
 import models.domain.user.timeline.{TimeLineType, TimeLineReason}
-import models.view.QuestView
+import models.view.{SolutionView, QuestView}
 import play.Logger
 
 import scala.language.postfixOps
@@ -18,7 +18,11 @@ case class SolveQuestRequest(
   user: User,
   questId: String,
   solution: SolutionInfoContent)
-case class SolveQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None, solutionId: Option[String] = None)
+case class SolveQuestResult(
+  allowed: ProfileModificationResult,
+  profile: Option[Profile] = None,
+  quest: Option[QuestView] = None,
+  solution: Option[SolutionView] = None)
 
 case class RewardSolutionAuthorRequest(solution: Solution, author: User)
 case class RewardSolutionAuthorResult()
@@ -124,7 +128,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 OkApiResult(SolveQuestResult(
                   allowed = OK,
                   profile = Some(r.user.profile),
-                  solutionId = Some(newSolution.id)))
+                  quest = Some(QuestView.make(questToSolve, r.user)),
+                  solution = Some(SolutionView.make(newSolution, r.user))))
               }
             }
 
@@ -192,11 +197,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     db.quest.readById(questId) ifSome { quest =>
       db.user.setQuestBookmark(
         id = user.id,
-        questId = QuestView(
-          id = quest.id,
-          info = quest.info,
-          rating = Some(quest.rating),
-          myVote = user.stats.votedQuests.get(quest.id))) ifSome { updatedUser =>
+        questId = QuestView.make(quest, user)) ifSome { updatedUser =>
         OkApiResult(BookmarkQuestResult(OK, Some(updatedUser.profile)))
       }
     }

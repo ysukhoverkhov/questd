@@ -9,6 +9,7 @@ import models.domain.solution.Solution
 import models.domain.user.User
 import models.domain.user.message.{MessageBattleRequestRejected, MessageBattleRequestAccepted}
 import models.domain.user.profile.{TaskType, Profile}
+import models.view.SolutionView
 import play.Logger
 
 case class MakeChallengeRequest(
@@ -17,7 +18,8 @@ case class MakeChallengeRequest(
   opponentSolutionId: String)
 case class MakeChallengeResult(
   allowed: ProfileModificationResult,
-  profile: Option[Profile] = None)
+  profile: Option[Profile] = None,
+  opponentSolution: Option[SolutionView] = None)
 
 case class GetMyChallengesRequest(
   user: User)
@@ -31,7 +33,8 @@ case class RespondChallengeRequest(
   accept: Boolean)
 case class RespondChallengeResult(
   allowed: ProfileModificationResult,
-  profile: Option[Profile] = None)
+  profile: Option[Profile] = None,
+  opponentSolution: Option[SolutionView] = None)
 
 
 private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -68,7 +71,10 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
           {
             makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
           } map { r =>
-            OkApiResult(MakeChallengeResult(OK, Some(r.user.profile)))
+            OkApiResult(MakeChallengeResult(
+              OK,
+              Some(r.user.profile),
+              Some(SolutionView.make(opponentSolution, user))))
           }
         }
       }
@@ -114,10 +120,14 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
               db.solution.readById(br.opponentSolutionId).fold[ApiResult[RespondChallengeResult]](
                 OkApiResult(RespondChallengeResult(OutOfContent))) { opponentSolution =>
                 createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
-                  sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(
+                  sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(opponentSolutionId = br.mySolutionId)))
+                    opponentSolutionId = br.mySolutionId)))
                     challengeId = br.mySolutionId)))
                 } map {
-                  OkApiResult(RespondChallengeResult(OK, Some(user.profile)))
+                  OkApiResult(RespondChallengeResult(
+                    OK,
+                    Some(user.profile),
+                    Some(SolutionView.make(opponentSolution, user))))
                 }
               }
             }
@@ -125,7 +135,10 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
             // TODO: return money back.
             // TODO: test me.
             sendMessage(SendMessageRequest(opponent, MessageBattleRequestRejected(br.mySolutionId))) map {
-              OkApiResult(RespondChallengeResult(OK, Some(user.profile)))
+              OkApiResult(RespondChallengeResult(
+                OK,
+                Some(user.profile),
+                None))
             }
           }
         }

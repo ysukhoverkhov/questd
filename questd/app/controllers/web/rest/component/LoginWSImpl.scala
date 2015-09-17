@@ -18,7 +18,9 @@ private [component] object LoginWSImplTypes {
   /**
    * Payload in case of 401 error.
    */
-  case class WSUnauthorisedResult(code: UnauthorisedReason.Value)
+  case class WSUnauthorisedResult(
+    code: UnauthorisedReason.Value,
+    supportedProtocolVersions: List[String] = List())
 
   /**
    *  Reasons of Unauthorised results.
@@ -80,9 +82,10 @@ trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor
           val loginRequest = Json.read[WSLoginRequest](js.toString())
 
           // Check app version.
-          if (config.values(ConfigParams.MinAppVersion).toInt > loginRequest.appVersion) {
+          val protocolVersion = config.values(ConfigParams.ProtocolVersion)
+          if (protocolVersion.toInt != loginRequest.appVersion) {
             Right(Unauthorized(
-              Json.write(WSUnauthorisedResult(UnauthorisedReason.UnsupportedAppVersion))).as(JSON))
+              Json.write(WSUnauthorisedResult(UnauthorisedReason.UnsupportedAppVersion, List(protocolVersion)))).as(JSON))
           } else {
 
             // Login with SN.

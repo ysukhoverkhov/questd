@@ -35,7 +35,7 @@ case class UserStats (
   votedSolutions: Map[String, ContentVote.Value] = Map.empty,
 
   /**
-   * Ids of battles we participated in. Key is competitor solution id.
+   * Ids of battles we participated in. Key is battle id.
    */
   participatedBattles: Map[String, SolutionsInBattle] = Map.empty,
 

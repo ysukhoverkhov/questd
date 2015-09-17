@@ -6,6 +6,7 @@ import java.util.Date
 
 import models.domain.challenge.{Challenge, ChallengeStatus}
 import models.domain.common.{ClientPlatform, Assets, ContentVote}
+import models.domain.quest.QuestRating
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
 import models.domain.user.battlerequests.BattleRequestStatus
@@ -572,6 +573,7 @@ class UserDAOSpecs
       val qi = QuestView(
         questId,
         createQuestStub(id = questId).info,
+        QuestRating(),
         None,
         None)
       val user = createUserStub(questBookmark = None)
