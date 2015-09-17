@@ -120,9 +120,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
               db.solution.readById(br.opponentSolutionId).fold[ApiResult[RespondChallengeResult]](
                 OkApiResult(RespondChallengeResult(OutOfContent))) { opponentSolution =>
                 createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
-                  sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(opponentSolutionId = br.mySolutionId)))
-                    opponentSolutionId = br.mySolutionId)))
-                    challengeId = br.mySolutionId)))
+                  sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(challengeId = br.mySolutionId))) // TODO fix it.
                 } map {
                   OkApiResult(RespondChallengeResult(
                     OK,
