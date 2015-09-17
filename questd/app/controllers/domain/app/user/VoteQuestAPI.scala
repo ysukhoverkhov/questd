@@ -9,6 +9,7 @@ import models.domain.common.ContentVote
 import models.domain.user._
 import models.domain.user.profile.{Profile, TaskType}
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
+import models.view.QuestView
 
 case class VoteQuestByUserRequest(
   user: User,
@@ -16,7 +17,8 @@ case class VoteQuestByUserRequest(
   vote: ContentVote.Value)
 case class VoteQuestByUserResult(
   allowed: ProfileModificationResult,
-  profile: Option[Profile] = None)
+  profile: Option[Profile] = None,
+  quest: Option[QuestView] = None)
 
 private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -50,7 +52,10 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
                 removeFromTimeLine(RemoveFromTimeLineRequest(user = u, objectId = q.id)) map {r =>
                   OkApiResult(UserInternalResult(r.user))}
               }) map { r =>
-                OkApiResult(VoteQuestByUserResult(OK, Some(r.user.profile)))
+                OkApiResult(VoteQuestByUserResult(
+                  allowed = OK,
+                  profile = Some(r.user.profile),
+                  quest = Some(QuestView.make(q, r.user))))
               }
             }
           }

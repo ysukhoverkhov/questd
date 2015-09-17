@@ -8,8 +8,6 @@ import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
-import controllers.services.devicenotifications.DeviceNotifications
-import controllers.services.devicenotifications.DeviceNotifications.IOSDevice
 import controllers.web.helpers._
 import models.domain.common.{ContentReference, ContentType, ContentVote}
 import models.domain.quest.QuestInfoContent
@@ -19,8 +17,6 @@ import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.Gender
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger
-import play.libs.Akka
-import views.html.admin.users
 
 private object DebugWSImplTypes {
 
@@ -253,7 +249,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
               contentType = ContentType.Photo,
               storage = "url",
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg")))) map { r =>
-                val s = api.db.solution.readById(r.solutionId.get).get
+                val s = api.db.solution.readById(r.solution.get.id).get
                 val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))
                 api.db.solution.update(s2)
                 OkApiResult(r)
@@ -282,7 +278,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
               contentType = ContentType.Photo,
               storage = "url",
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg")))) map { r =>
-                val s = api.db.solution.readById(r.solutionId.get).get
+                val s = api.db.solution.readById(r.solution.get.id).get
                 val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))
                 api.db.solution.update(s2)
 
