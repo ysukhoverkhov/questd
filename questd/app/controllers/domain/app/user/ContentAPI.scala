@@ -104,13 +104,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetQuestsResult(
       OK,
-      db.quest.readManyByIds(questIds.take(maxPageSize)).map{ q =>
-        QuestView(
-          id = q.id,
-          info = q.info,
-          rating = Some(q.rating),
-          myVote = user.stats.votedQuests.get(q.id))
-      }.toList))
+      db.quest.readManyByIds(questIds.take(maxPageSize)).map(QuestView.make(_, user)).toList))
   }
 
   /**
@@ -182,11 +176,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetQuestsForUserResult(
       allowed = OK,
-      quests = questsForUser.take(pageSize).toList.map(q => QuestView(
-        id = q.id,
-        info = q.info,
-        rating = Some(q.rating),
-        myVote = request.user.stats.votedQuests.get(q.id))),
+      quests = questsForUser.take(pageSize).toList.map(QuestView.make(_, user)),
       pageSize,
       questsForUser.hasNext))
   }

@@ -8,14 +8,12 @@ import logic.QuestLogic
 import models.domain.quest.{Quest, QuestInfo, QuestInfoContent, QuestStatus}
 import models.domain.user._
 import models.domain.user.profile.{Profile, TaskType}
-import models.domain.user.stats.UserStats
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 
 case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List.empty)
 case class CreateQuestResult(
   allowed: ProfileModificationResult,
-  profile: Option[Profile] = None,
-  stats: Option[UserStats] = None)
+  profile: Option[Profile] = None)
 
 case class RewardQuestAuthorRequest(quest: Quest, author: User)
 case class RewardQuestAuthorResult()
@@ -86,8 +84,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
           } map { r =>
             OkApiResult(CreateQuestResult(
               allowed = OK,
-              profile = Some(r.user.profile),
-              stats = Some(r.user.stats)))
+              profile = Some(r.user.profile)))
           }
         }
 

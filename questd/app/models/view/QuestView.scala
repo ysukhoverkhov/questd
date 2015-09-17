@@ -1,11 +1,24 @@
 package models.view
 
-import models.domain._
 import models.domain.common.ContentVote
-import models.domain.quest.{QuestRating, QuestInfo}
+import models.domain.quest.{Quest, QuestInfo, QuestRating}
+import models.domain.user.User
 
 case class QuestView (
-    id: String,
-    info: QuestInfo,
-    rating: Option[QuestRating],
-    myVote: Option[ContentVote.Value])
+  id: String,
+  info: QuestInfo,
+  rating: QuestRating,
+  myVote: Option[ContentVote.Value])
+
+/**
+ * Companion.
+ */
+object QuestView {
+  def make(q: Quest, u: User): QuestView = {
+    QuestView(
+      id = q.id,
+      info = q.info,
+      rating = q.rating,
+      myVote = u.stats.votedQuests.get(q.id))
+  }
+}

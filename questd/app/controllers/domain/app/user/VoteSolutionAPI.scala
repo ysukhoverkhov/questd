@@ -9,7 +9,6 @@ import models.domain.common.ContentVote
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.{Profile, TaskType}
-import models.domain.user.stats.UserStats
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import models.view.SolutionView
 
@@ -18,8 +17,7 @@ case class VoteSolutionByUserRequest(user: User, solutionId: String, vote: Conte
 case class VoteSolutionByUserResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
-  solution: Option[SolutionView] = None,
-  stats: Option[UserStats] = None)
+  solution: Option[SolutionView] = None)
 
 private[domain] trait VoteSolutionAPI {
   this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -64,12 +62,7 @@ private[domain] trait VoteSolutionAPI {
                 OkApiResult(VoteSolutionByUserResult(
                   allowed = OK,
                   profile = Some(r.user.profile),
-                  solution = Some(SolutionView(
-                    id = s.id,
-                    info = s.info,
-                    rating = Some(s.rating),
-                    myVote = r.user.stats.votedSolutions.get(s.id))),
-                  stats = Some(r.user.stats)))
+                  solution = Some(SolutionView.make(s, r.user))))
               }
             }
           }

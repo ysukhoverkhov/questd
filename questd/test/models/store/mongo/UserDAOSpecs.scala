@@ -5,6 +5,7 @@ package models.store.mongo
 import java.util.Date
 
 import models.domain.common.{ClientPlatform, Assets, ContentVote}
+import models.domain.quest.QuestRating
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
 import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
@@ -571,7 +572,7 @@ class UserDAOSpecs
       val qi = QuestView(
         questId,
         createQuestStub(id = questId).info,
-        None,
+        QuestRating(),
         None)
       val user = createUserStub(questBookmark = None)
       db.user.create(user)

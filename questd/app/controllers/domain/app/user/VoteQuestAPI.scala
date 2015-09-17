@@ -8,7 +8,6 @@ import controllers.domain.helpers._
 import models.domain.common.ContentVote
 import models.domain.user._
 import models.domain.user.profile.{Profile, TaskType}
-import models.domain.user.stats.UserStats
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import models.view.QuestView
 
@@ -19,8 +18,7 @@ case class VoteQuestByUserRequest(
 case class VoteQuestByUserResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
-  quest: Option[QuestView] = None,
-  stats: Option[UserStats] = None)
+  quest: Option[QuestView] = None)
 
 private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -57,12 +55,7 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
                 OkApiResult(VoteQuestByUserResult(
                   allowed = OK,
                   profile = Some(r.user.profile),
-                  quest = Some(QuestView(
-                    id = q.id,
-                    info = q.info,
-                    rating = Some(q.rating),
-                    myVote = r.user.stats.votedQuests.get(q.id))),
-                  stats = Some(r.user.stats)))
+                  quest = Some(QuestView.make(q, r.user))))
               }
             }
           }
