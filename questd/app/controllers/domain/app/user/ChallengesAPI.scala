@@ -19,7 +19,7 @@ case class ChallengeBattleRequest(
 case class ChallengeBattleResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
-  opponentSolution: Option[SolutionView] = None)
+  modifiedSolutions: List[SolutionView] = List.empty)
 
 case class GetBattleRequestsRequest(
   user: User)
@@ -34,7 +34,7 @@ case class RespondBattleRequestRequest(
 case class RespondBattleRequestResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
-  opponentSolution: Option[SolutionView] = None)
+  modifiedSolutions: List[SolutionView] = List.empty)
 
 
 private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -64,7 +64,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
           {
             makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
           } map { r =>
-            OkApiResult(ChallengeBattleResult(OK, Some(r.user.profile), Some(SolutionView(opponentSolution, user))))
+            OkApiResult(ChallengeBattleResult(OK, Some(r.user.profile), List(SolutionView(opponentSolution, user))))
           }
         }
       }
@@ -112,7 +112,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
                 createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
                   sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(opponentSolutionId = br.mySolutionId)))
                 } map {
-                  OkApiResult(RespondBattleRequestResult(OK, Some(user.profile), Some(SolutionView(opponentSolution, user))))
+                  OkApiResult(RespondBattleRequestResult(OK, Some(user.profile), List(SolutionView(opponentSolution, user))))
                 }
               }
             }
@@ -120,7 +120,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
             // TODO: return money back.
             // TODO: test me.
             sendMessage(SendMessageRequest(opponent, MessageBattleRequestRejected(br.mySolutionId))) map {
-              OkApiResult(RespondBattleRequestResult(OK, Some(user.profile), None))
+              OkApiResult(RespondBattleRequestResult(OK, Some(user.profile), List.empty))
             }
           }
         }

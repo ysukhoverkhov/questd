@@ -13,11 +13,10 @@ import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import models.view.SolutionView
 
 case class VoteSolutionByUserRequest(user: User, solutionId: String, vote: ContentVote.Value)
-
 case class VoteSolutionByUserResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
-  solution: Option[SolutionView] = None)
+  modifiedSolutions: List[SolutionView] = List.empty)
 
 private[domain] trait VoteSolutionAPI {
   this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -62,7 +61,7 @@ private[domain] trait VoteSolutionAPI {
                 OkApiResult(VoteSolutionByUserResult(
                   allowed = OK,
                   profile = Some(r.user.profile),
-                  solution = Some(SolutionView(s, r.user))))
+                  modifiedSolutions = List(SolutionView(s, r.user))))
               }
             }
           }

@@ -18,7 +18,7 @@ case class VoteQuestByUserRequest(
 case class VoteQuestByUserResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
-  quest: Option[QuestView] = None)
+  modifiedQuests: List[QuestView] = List.empty)
 
 private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -59,7 +59,7 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
                     VoteQuestByUserResult(
                       allowed = OK,
                       profile = Some(r.user.profile),
-                      quest = Some(QuestView(voteQuestResult.quest, r.user))))
+                      modifiedQuests = List(QuestView(voteQuestResult.quest, r.user))))
                 }
               }
             }
