@@ -17,7 +17,7 @@ case class MakeChallengeRequest(
 case class MakeChallengeResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
-  opponentSolution: Option[SolutionView] = None)
+  modifiedSolutions: List[SolutionView] = List.empty)
 
 case class GetChallengeRequest(
   user: User,
@@ -52,7 +52,7 @@ case class RespondChallengeRequest(
 case class RespondChallengeResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
-  opponentSolution: Option[SolutionView] = None)
+  modifiedSolutions: List[SolutionView] = List.empty)
 
 
 // TODO: Move it out of user's API
@@ -108,6 +108,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
 //    }
 
     OkApiResult(MakeChallengeResult(OK))
+            OkApiResult(ChallengeBattleResult(OK, Some(r.user.profile), List(SolutionView(opponentSolution, user))))
   }
 
   /**
@@ -141,6 +142,8 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
     OkApiResult(GetChallengesToMeResult(
       allowed = OK/*,
       challenges = request.user.battleRequests*/))
+                  OkApiResult(RespondBattleRequestResult(OK, Some(user.profile), List(SolutionView(opponentSolution, user))))
+              OkApiResult(RespondBattleRequestResult(OK, Some(user.profile), List.empty))
   }
 
   /**

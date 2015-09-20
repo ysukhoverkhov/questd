@@ -13,7 +13,7 @@ case class VoteSolutionRequest(
   solution: Solution,
   isFriend: Boolean,
   vote: ContentVote.Value)
-case class VoteSolutionResult()
+case class VoteSolutionResult(solution: Solution)
 
 case class UpdateSolutionStateRequest(solution: Solution)
 case class UpdateSolutionStateResult(solution: Solution)
@@ -60,14 +60,14 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
           cheatingChange = checkInc(vote, Cheating),
           spamChange = checkInc(vote, IASpam),
           pornChange = checkInc(vote, IAPorn))
-      } ifSome { o =>
+      } ifSome { s =>
 
-        updateSolutionState(UpdateSolutionStateRequest(o)) map {
-          OkApiResult(VoteSolutionResult())
+        updateSolutionState(UpdateSolutionStateRequest(s)) map { r =>
+          OkApiResult(VoteSolutionResult(s.solution))
         }
       }
     } else {
-      OkApiResult(VoteSolutionResult())
+      OkApiResult(VoteSolutionResult(solution))
     }
   }
 

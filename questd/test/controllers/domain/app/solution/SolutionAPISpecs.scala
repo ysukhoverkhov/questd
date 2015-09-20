@@ -131,7 +131,7 @@ class SolutionAPISpecs extends BaseAPISpecs {
 
       val result = api.voteSolution(VoteSolutionRequest(solution = s, isFriend = false, vote = ContentVote.Cheating))
 
-      result must beEqualTo(OkApiResult(VoteSolutionResult()))
+      result must beAnInstanceOf[OkApiResult[VoteSolutionResult]]
 
       there was one(battle).readById(battleId)
 
@@ -160,7 +160,7 @@ class SolutionAPISpecs extends BaseAPISpecs {
 
       val result = api.voteSolution(VoteSolutionRequest(solution = s, isFriend = false, vote = ContentVote.Cool))
 
-      result must beEqualTo(OkApiResult(VoteSolutionResult()))
+      result must beAnInstanceOf[OkApiResult[VoteSolutionResult]]
 
       there was no(battle).readById(battleId)
 

@@ -18,7 +18,7 @@ case class VoteQuestByUserRequest(
 case class VoteQuestByUserResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
-  quest: Option[QuestView] = None)
+  modifiedQuests: List[QuestView] = List.empty)
 
 private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -32,30 +32,35 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
         db.quest.readById(request.questId) ifSome { q =>
           {
             voteQuest(VoteQuestRequest(q, request.vote))
-          } map { r =>
-            if (request.vote == ContentVote.Cool)
-              makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LikeQuests)))
-            else
-              OkApiResult(MakeTaskResult(request.user))
-          } map { r =>
-            db.user.recordQuestVote(r.user.id, q.id, request.vote) ifSome { u =>
-
-              (if (request.vote == ContentVote.Cool) {
-                addToWatchersTimeLine(AddToWatchersTimeLineRequest(
-                  user = u,
-                  reason = TimeLineReason.Liked,
-                  objectType = TimeLineType.Quest,
-                  objectId = q.id
-                )) map {r =>
-                  OkApiResult(UserInternalResult(r.user))}
-              } else {
-                removeFromTimeLine(RemoveFromTimeLineRequest(user = u, objectId = q.id)) map {r =>
-                  OkApiResult(UserInternalResult(r.user))}
-              }) map { r =>
-                OkApiResult(VoteQuestByUserResult(
-                  allowed = OK,
-                  profile = Some(r.user.profile),
-                  quest = Some(QuestView(q, r.user))))
+          } map { voteQuestResult =>
+            {
+              if (request.vote == ContentVote.Cool)
+                makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LikeQuests)))
+              else
+                OkApiResult(MakeTaskResult(request.user))
+            } map { r =>
+              db.user.recordQuestVote(r.user.id, q.id, request.vote) ifSome { u =>
+                (if (request.vote == ContentVote.Cool) {
+                  addToWatchersTimeLine(
+                    AddToWatchersTimeLineRequest(
+                      user = u,
+                      reason = TimeLineReason.Liked,
+                      objectType = TimeLineType.Quest,
+                      objectId = q.id
+                    )) map { r =>
+                    OkApiResult(UserInternalResult(r.user))
+                  }
+                } else {
+                  removeFromTimeLine(RemoveFromTimeLineRequest(user = u, objectId = q.id)) map { r =>
+                    OkApiResult(UserInternalResult(r.user))
+                  }
+                }) map { r =>
+                  OkApiResult(
+                    VoteQuestByUserResult(
+                      allowed = OK,
+                      profile = Some(r.user.profile),
+                      modifiedQuests = List(QuestView(voteQuestResult.quest, r.user))))
+                }
               }
             }
           }

@@ -10,7 +10,7 @@ import models.domain.quest.{QuestStatus, Quest}
 import play.Logger
 
 case class UpdateQuestStatusRequest(quest: Quest)
-case class UpdateQuestStatusResult()
+case class UpdateQuestStatusResult(quest: Quest)
 
 case class SelectQuestToTimeLineRequest(quest: Quest)
 case class SelectQuestToTimeLineResult()
@@ -21,7 +21,7 @@ case class SolveQuestUpdateResult()
 case class VoteQuestRequest(
   quest: Quest,
   vote: ContentVote.Value)
-case class VoteQuestResult()
+case class VoteQuestResult(quest: Quest)
 
 private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -73,7 +73,7 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         }
       }
 
-      OkApiResult(UpdateQuestStatusResult())
+      OkApiResult(UpdateQuestStatusResult(q))
     }
   }
 
@@ -122,19 +122,18 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
 
     def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
 
-    val q = db.quest.updatePoints(
+    db.quest.updatePoints(
       id = quest.id,
       timelinePointsChange = checkInc(vote, Cool),
       likesChange = checkInc(vote, Cool),
       votersCountChange = 1,
       cheatingChange = checkInc(vote, Cheating),
       spamChange = checkInc(vote, IASpam),
-      pornChange = checkInc(vote, IAPorn))
-
-    q ifSome { v =>
-      updateQuestStatus(UpdateQuestStatusRequest(v))
-    } map {
-      OkApiResult(VoteQuestResult())
+      pornChange = checkInc(vote, IAPorn)) ifSome
+    { q =>
+      updateQuestStatus(UpdateQuestStatusRequest(q))
+    } map { r =>
+      OkApiResult(VoteQuestResult(r.quest))
     }
   }
 }

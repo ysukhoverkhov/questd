@@ -249,7 +249,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
               contentType = ContentType.Photo,
               storage = "url",
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg")))) map { r =>
-                val s = api.db.solution.readById(r.solution.get.id).get
+                val s = api.db.solution.readById(r.modifiedSolutions.head.id).get
                 val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))
                 api.db.solution.update(s2)
                 OkApiResult(r)
@@ -278,7 +278,7 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
               contentType = ContentType.Photo,
               storage = "url",
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg")))) map { r =>
-                val s = api.db.solution.readById(r.solution.get.id).get
+                val s = api.db.solution.readById(r.modifiedSolutions.head.id).get
                 val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))
                 api.db.solution.update(s2)
 

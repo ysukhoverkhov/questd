@@ -15,7 +15,7 @@ case class VoteBattleByUserRequest(user: User, battleId: String, solutionId: Str
 case class VoteBattleByUserResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
-  battle: Option[BattleView] = None)
+  modifiedBattles: List[BattleView] = List.empty)
 
 private[domain] trait VoteBattleAPI {
   this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -53,7 +53,7 @@ private[domain] trait VoteBattleAPI {
                     OkApiResult(VoteBattleByUserResult(
                       allowed = OK,
                       profile = Some(r.user.profile),
-                      battle = Some(BattleView(b, user))))
+                      modifiedBattles = List(BattleView(b, user))))
                   }
                 }
 

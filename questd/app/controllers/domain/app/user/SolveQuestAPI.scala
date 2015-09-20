@@ -21,8 +21,8 @@ case class SolveQuestRequest(
 case class SolveQuestResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
-  quest: Option[QuestView] = None,
-  solution: Option[SolutionView] = None)
+  modifiedQuests: List[QuestView] = List.empty,
+  modifiedSolutions: List[SolutionView] = List.empty)
 
 case class RewardSolutionAuthorRequest(solution: Solution, author: User)
 case class RewardSolutionAuthorResult()
@@ -128,8 +128,8 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
                 OkApiResult(SolveQuestResult(
                   allowed = OK,
                   profile = Some(r.user.profile),
-                  quest = Some(QuestView(questToSolve, r.user)),
-                  solution = Some(SolutionView(newSolution, r.user))))
+                  modifiedQuests = List(QuestView(questToSolve, r.user)),
+                  modifiedSolutions = List(SolutionView(newSolution, r.user))))
               }
             }
 
