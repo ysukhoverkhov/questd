@@ -15,7 +15,7 @@ trait Challenges { this: UserLogic =>
 
   // TODO: perhaps we should store in stats challenges for all our solutions?
   private def alreadyHasChallengeForSolutions(mySolution: Solution, opponentSolution: Solution): Boolean = {
-    api.db.challenge.readBySolutions(mySolution.id, opponentSolution.id).nonEmpty
+    api.db.challenge.findBySolutions(mySolution.id, opponentSolution.id).nonEmpty
   }
 
   def canAutoCreatedBattle(

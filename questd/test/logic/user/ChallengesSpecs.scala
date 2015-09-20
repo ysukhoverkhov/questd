@@ -46,7 +46,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val mySolution = createSolutionStub(authorId = me.id)
       val opponentSolution = createSolutionStub(authorId = opponent.id, battleIds = List("1"))
 
-      challenge.readBySolutions(any) returns Iterator.empty
+      challenge.findBySolutions(any) returns Iterator.empty
 
       val rv = me.canAutoCreatedBattle(
         mySolution = mySolution,
@@ -63,7 +63,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val mySolution = createSolutionStub(authorId = me.id, questId = "qid1")
       val opponentSolution = createSolutionStub(authorId = opponent.id, questId = "qid2")
 
-      challenge.readBySolutions(any) returns Iterator(createChallengeStub())
+      challenge.findBySolutions(any) returns Iterator(createChallengeStub())
 
       val rv = me.canAutoCreatedBattle(
         mySolution = mySolution,
@@ -80,7 +80,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val mySolution = createSolutionStub(authorId = me.id, questId = "qid1")
       val opponentSolution = createSolutionStub(authorId = opponent.id, questId = "qid2")
 
-      challenge.readBySolutions(any) returns Iterator.empty
+      challenge.findBySolutions(any) returns Iterator.empty
 
       val rv = me.canAutoCreatedBattle(
         mySolution = mySolution,
@@ -100,7 +100,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val mySolution = createSolutionStub(id = sol1Id, authorId = me.id)
       val opponentSolution = createSolutionStub(id = sol2Id, authorId = opponent.id)
 
-      db.challenge.readBySolutions(any) returns List(createChallengeStub()).iterator
+      db.challenge.findBySolutions(any) returns List(createChallengeStub()).iterator
 
       val rv = me.canAutoCreatedBattle(
         mySolution = mySolution,
@@ -120,7 +120,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val mySolution = createSolutionStub(id = sol1Id, authorId = me.id, creationDate = new Date())
       val opponentSolution = createSolutionStub(id = sol2Id, authorId = opponent.id)
 
-      challenge.readBySolutions(any) returns Iterator.empty
+      challenge.findBySolutions(any) returns Iterator.empty
 
       val rv = me.canAutoCreatedBattle(
         mySolution = mySolution,
@@ -136,7 +136,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val mySolution = createSolutionStub(status = SolutionStatus.CheatingBanned)
       val opponentSolution = createSolutionStub()
 
-      challenge.readBySolutions(any) returns Iterator(createChallengeStub())
+      challenge.findBySolutions(any) returns Iterator(createChallengeStub())
 
       val rv = me.canChallengeBattle(mySolution, opponentSolution)
 

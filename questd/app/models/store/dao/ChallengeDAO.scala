@@ -10,7 +10,7 @@ trait ChallengeDAO extends BaseDAO[Challenge] {
    * @param solutionIds Solutions to search.
    * @return Iterator with found solutions.
    */
-  def readBySolutions(solutionIds: (String, String)): Iterator[Challenge]
+  def findBySolutions(solutionIds: (String, String)): Iterator[Challenge]
 
 
   //  def allWithParams(

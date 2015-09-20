@@ -14,8 +14,8 @@ private[mongo] class MongoChallengeDAO
 
   /**
    * @inheritdoc
-   */ // TODO: test me.
-  def readBySolutions(solutionIds: (String, String)): Iterator[Challenge] = {
+   */
+  def findBySolutions(solutionIds: (String, String)): Iterator[Challenge] = {
     val queryBuilder = MongoDBObject.newBuilder
 
     queryBuilder += ("$or" -> List(
