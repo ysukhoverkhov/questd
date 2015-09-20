@@ -108,7 +108,6 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
 //    }
 
     OkApiResult(MakeChallengeResult(OK))
-            OkApiResult(ChallengeBattleResult(OK, Some(r.user.profile), List(SolutionView(opponentSolution, user))))
   }
 
   /**
@@ -142,8 +141,6 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
     OkApiResult(GetChallengesToMeResult(
       allowed = OK/*,
       challenges = request.user.battleRequests*/))
-                  OkApiResult(RespondBattleRequestResult(OK, Some(user.profile), List(SolutionView(opponentSolution, user))))
-              OkApiResult(RespondBattleRequestResult(OK, Some(user.profile), List.empty))
   }
 
   /**

@@ -86,8 +86,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       user.addEntryToTimeLine(mEq(uu(1).id), any) returns Some(uu(1))
       user.recordBattleParticipation(mEq(uu(0).id), any, any) returns Some(uu(0))
       user.recordBattleParticipation(mEq(uu(1).id), any, any) returns Some(uu(1))
-      user.addBattleRequest(mEq(uu(0).id), any) returns Some(uu(0))
-      user.addBattleRequest(mEq(uu(1).id), any) returns Some(uu(1))
+      challenge.readBySolutions(any) returns Iterator.empty
 
       val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
 
@@ -111,8 +110,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       there was one(user).recordBattleParticipation(mEq(uu(1).id), any, mEq(SolutionsInBattle(ss.map(_.id))))
       there were two(user).addEntryToTimeLine(any, any)
 //      there were two(user).addEntryToTimeLineMulti(any, any)
-      there was one(user).addBattleRequest(mEq(uu(0).id), any)
-      there was one(user).addBattleRequest(mEq(uu(1).id), any)
+      there was one(challenge).create(any)
 
       result must beAnInstanceOf[OkApiResult[TryCreateBattleRequest]]
     }

@@ -10,12 +10,7 @@ trait ChallengeDAO extends BaseDAO[Challenge] {
    * @param solutionIds Solutions to search.
    * @return Iterator with found solutions.
    */
-  def readForSolutions(solutionIds: (String, String)): Iterator[Challenge]
-    { "$or" : [
-    { "$and" : [ {"timelinePoints" : -17 }, {"level" : 0 } ] },
-    { "$and" : [ {"timelinePoints" : -16 }, {"level" : 8 } ] }
-      ] }
-
+  def readBySolutions(solutionIds: (String, String)): Iterator[Challenge]
 
 
   //  def allWithParams(

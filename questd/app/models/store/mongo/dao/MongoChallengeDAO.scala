@@ -1,5 +1,6 @@
 package models.store.mongo.dao
 
+import com.mongodb.casbah.commons.MongoDBObject
 import models.domain.challenge.Challenge
 import models.store.dao._
 import models.store.mongo.helpers._
@@ -10,6 +11,28 @@ import models.store.mongo.helpers._
 private[mongo] class MongoChallengeDAO
   extends BaseMongoDAO[Challenge](collectionName = "challenges")
   with ChallengeDAO {
+
+  /**
+   * @inheritdoc
+   */ // TODO: test me.
+  def readBySolutions(solutionIds: (String, String)): Iterator[Challenge] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$or" -> List(
+      MongoDBObject("$and" -> List(
+        MongoDBObject("mySolutionId" -> solutionIds._1 ),
+        MongoDBObject("opponentSolutionId" -> solutionIds._2)
+      )),
+      MongoDBObject("$and" -> List(
+        MongoDBObject("mySolutionId" -> solutionIds._2 ),
+        MongoDBObject("opponentSolutionId" -> solutionIds._1)
+      ))
+    ))
+
+    findByExample(
+      example = queryBuilder.result(),
+      skip = 0)
+  }
 
   /**
    * @inheritdoc
