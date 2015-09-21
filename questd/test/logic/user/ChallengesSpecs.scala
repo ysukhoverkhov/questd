@@ -145,7 +145,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       challenge.findBySolutions(any) returns Iterator(createChallengeStub())
       challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
 
-      val rv = me.canChallengeBattleWithSolution(opponentSolution.info.authorId, mySolution)
+      val rv = me.canChallengeWithSolution(opponentSolution.info.authorId, mySolution)
 
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
@@ -158,7 +158,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       challenge.findBySolutions(any) returns Iterator(createChallengeStub())
       challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
 
-      val rv = me.canChallengeBattleWithQuest(opponentSolution.info.authorId, myQuest)
+      val rv = me.canChallengeWithQuest(opponentSolution.info.authorId, myQuest)
 
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }

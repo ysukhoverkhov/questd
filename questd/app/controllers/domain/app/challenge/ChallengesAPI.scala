@@ -1,23 +1,34 @@
 package controllers.domain.app.challenge
 
+import com.vita.scala.extensions._
 import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.user.{MakeTaskResult, MakeTaskRequest}
 import controllers.domain.helpers._
 import models.domain.challenge.{Challenge, ChallengeStatus}
 import models.domain.user.User
-import models.domain.user.profile.Profile
-import models.view.SolutionView
+import models.domain.user.profile.{TaskType, Profile}
+import models.view.{QuestView, SolutionView}
 
-case class MakeChallengeRequest(
+case class MakeQuestChallengeRequest(
   user: User,
   opponentId: String,
-  myQuestId: Option[String],
-  mySolutionId: Option[String])
-case class MakeChallengeResult(
+  myQuestId: String)
+case class MakeQuestChallengeResult(
+  allowed: ProfileModificationResult,
+  profile: Option[Profile] = None,
+  modifiedQuests: List[QuestView] = List.empty)
+
+case class MakeSolutionChallengeRequest(
+  user: User,
+  opponentId: String,
+  mySolutionId: String)
+case class MakeSolutionChallengeResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None,
   modifiedSolutions: List[SolutionView] = List.empty)
+
 
 case class GetChallengeRequest(
   user: User,
@@ -58,67 +69,70 @@ case class RespondChallengeResult(
 private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
-   * Challenge someone to jon a battle.
+   * Challenge someone to solve my quest.
    */
-  def makeChallenge(request: MakeChallengeRequest): ApiResult[MakeChallengeResult] = handleDbException {
+  def makeQuestChallenge(request: MakeQuestChallengeRequest): ApiResult[MakeQuestChallengeResult] = handleDbException {
+    import request._
 
-//    def makeChallenge(mySolution: Solution, opponentSolution: Solution): ApiResult[MakeChallengeResult] = {
-//      db.user.addBattleRequest(
-//        opponentSolution.info.authorId,
-//        Challenge(
-//          opponentId = user.id,
-//          mySolutionId = Some(opponentSolution.id),
-//          opponentSolutionId = Some(mySolution.id),
-//          status = ChallengeStatus.Requests)) ifSome { opponent =>
-//
-//        runWhileSome(user) ( { user =>
-//          db.user.addBattleRequest(
-//            user.id,
-//            Challenge(
-//              opponentId = opponent.id,
-//              mySolutionId = Some(mySolution.id),
-//              opponentSolutionId = Some(opponentSolution.id),
-//              status = ChallengeStatus.Requested))
-//        }, { user =>
-//          // TODO: substract assets for invitation.
-//          // TODO: test it calls db correctly.
-//          Some(user)
-//        }
-//        ) ifSome { user =>
-//          {
-//            makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
-//          } map { r =>
-//            OkApiResult(MakeChallengeResult(OK, Some(r.user.profile), Some(SolutionView(opponentSolution, user))))
-//          }
-//        }
-//      }
-//    }
+    db.quest.readById(myQuestId).fold[ApiResult[MakeQuestChallengeResult]] {
+      OkApiResult(MakeQuestChallengeResult(OutOfContent))
+    } { myQuest =>
+      user.canChallengeWithQuest(opponentId = opponentId, myQuest = myQuest) match {
+        case OK =>
+          val challenge = Challenge(
+            myId = user.id,
+            opponentId = opponentId,
+            questId = myQuestId,
+            status = ChallengeStatus.Requested)
 
+          db.challenge.create(challenge)
 
-//    if (!(mySolutionId.nonEmpty ^^ myQuestId.nonEmpty)) {
-//      OkApiResult(MakeChallengeResult(allowed = InvalidState))
-//    } else {
-//      val contentExists =
-//        myQuestId.fold(true){ myQuestId =>
-//          db.quest.readById(myQuestId).nonEmpty
-//        } && mySolutionId.fold(true) { mySolutionId =>
-//          db.solution.readById(mySolutionId).nonEmpty
-//        }
-//      if(!contentExists) {
-//        OkApiResult(MakeChallengeResult(OutOfContent))
-//      } else {
-//        user.canChallengeBattle(mySolution, opponentSolution) match {
-//          case OK =>
-//            makeChallenge(mySolution, opponentSolution)
-//          case reason =>
-//            OkApiResult(MakeChallengeResult(reason))
-//        }
-//      }
-//    }
+          {
+            makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
+          } map { r =>
+            OkApiResult(MakeQuestChallengeResult(OK, Some(r.user.profile), List(QuestView(myQuest, user))))
+          }
 
-
-            OkApiResult(MakeChallengeResult(OK))
+        case reason =>
+          OkApiResult(MakeQuestChallengeResult(reason))
+      }
+    }
   }
+
+
+  /**
+   * Challenge someone to solve quest I've solved.
+   */
+  def makeSolutionChallenge(request: MakeSolutionChallengeRequest): ApiResult[MakeSolutionChallengeResult] = handleDbException {
+    import request._
+
+    db.solution.readById(mySolutionId).fold[OkApiResult[MakeSolutionChallengeResult]] {
+      OkApiResult(MakeSolutionChallengeResult(OutOfContent))
+    } { myQuest =>
+      user.canChallengeWithSolution(opponentId = opponentId, mySolution = mySolution) match {
+        case OK =>
+          val challenge = Challenge(
+            myId = user.id,
+            opponentId = opponentId,
+            questId = myQuestId,
+            status = ChallengeStatus.Requested)
+
+          db.challenge.create(challenge)
+
+          {
+            makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
+          } map { r =>
+            OkApiResult(MakeSolutionChallengeResult(OK, Some(r.user.profile), List(QuestView(myQuest, user))))
+          }
+
+        // TODO: substract assets for invitation.
+        // TODO: test it calls db correctly.
+        case reason =>
+          OkApiResult(MakeSolutionChallengeResult(reason))
+      }
+    }
+  }
+
 
   /**
    * Returns challenge by id if we are its participant.

@@ -45,7 +45,8 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-  def canChallengeBattleWithSolution(opponentId: String, mySolution: Solution) = {
+  // TODO: we should check if rival does not have solution he should be a friend. and test it.
+  def canChallengeWithSolution(opponentId: String, mySolution: Solution) = {
     lazy val mySolutionExists = user.stats.solvedQuests.values.exists(_ == mySolution.id)
 
     if (hasChallengeForQuest(user.id, opponentId: String, mySolution.info.questId))
@@ -62,7 +63,8 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-  def canChallengeBattleWithQuest(opponentId: String, myQuest: Quest) = {
+  // TODO: check he is my friend and test it.
+  def canChallengeWithQuest(opponentId: String, myQuest: Quest) = {
     lazy val myQuestExists = user.stats.createdQuests.contains(myQuest.id)
 
     if (hasChallengeForQuest(user.id, opponentId: String, myQuest.id))
