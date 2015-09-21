@@ -8,17 +8,22 @@ import models.domain.challenge.ChallengeStatus
 private object ChallengesWSImplTypes {
 
   /**
-   * Challenges are possible with Quest or Solution, not both.
-   *
    * @param opponentId id of opponent to participate in battle.
    * @param myQuestId id of my quest to challenge opponent with.
+   */
+  case class WSMakeQuestChallengeRequest(
+    opponentId: String,
+    myQuestId: String)
+  type WSMakeQuestChallengeResult = MakeQuestChallengeResult
+
+  /**
+   * @param opponentId id of opponent to participate in battle.
    * @param mySolutionId id of my solution to challenge opponent with.
    */
-  case class WSMakeChallengeRequest(
+  case class WSMakeSolutionChallengeRequest(
     opponentId: String,
-    myQuestId: Option[String] = None,
-    mySolutionId: Option[String] = None)
-  type WSMakeChallengeResult = MakeChallengeResult
+    mySolutionId: String)
+  type WSMakeSolutionChallengeResult = MakeSolutionChallengeResult
 
   /**
    * We should be owner or opponent in the challenge.
@@ -76,12 +81,21 @@ trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSCom
 
 
   /**
-   * Challenge someone.
+   * Challenge someone with quest.
    */
-  def makeChallenge = wrapJsonApiCallReturnBody[WSMakeChallengeResult] { (js, r) =>
-    val v = Json.read[WSMakeChallengeRequest](js.toString)
+  def makeQuestChallenge = wrapJsonApiCallReturnBody[WSMakeQuestChallengeResult] { (js, r) =>
+    val v = Json.read[WSMakeQuestChallengeRequest](js.toString)
 
-    api.makeChallenge(MakeChallengeRequest(r.user, v.opponentId, v.myQuestId, v.mySolutionId))
+    api.makeQuestChallenge(MakeQuestChallengeRequest(r.user, v.opponentId, v.myQuestId))
+  }
+
+  /**
+   * Challenge someone with solution.
+   */
+  def makeSolutionChallenge = wrapJsonApiCallReturnBody[WSMakeSolutionChallengeResult] { (js, r) =>
+    val v = Json.read[WSMakeSolutionChallengeRequest](js.toString)
+
+    api.makeSolutionChallenge(MakeSolutionChallengeRequest(r.user, v.opponentId, v.mySolutionId))
   }
 
   /**

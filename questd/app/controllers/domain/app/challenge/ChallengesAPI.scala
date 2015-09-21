@@ -1,14 +1,13 @@
 package controllers.domain.app.challenge
 
-import com.vita.scala.extensions._
 import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.domain.app.user.{MakeTaskResult, MakeTaskRequest}
+import controllers.domain.app.user.MakeTaskRequest
 import controllers.domain.helpers._
 import models.domain.challenge.{Challenge, ChallengeStatus}
 import models.domain.user.User
-import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.profile.{Profile, TaskType}
 import models.view.{QuestView, SolutionView}
 
 case class MakeQuestChallengeRequest(
@@ -106,27 +105,29 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
   def makeSolutionChallenge(request: MakeSolutionChallengeRequest): ApiResult[MakeSolutionChallengeResult] = handleDbException {
     import request._
 
-    db.solution.readById(mySolutionId).fold[OkApiResult[MakeSolutionChallengeResult]] {
+    db.solution.readById(mySolutionId).fold[ApiResult[MakeSolutionChallengeResult]] {
       OkApiResult(MakeSolutionChallengeResult(OutOfContent))
-    } { myQuest =>
+    } { mySolution =>
       user.canChallengeWithSolution(opponentId = opponentId, mySolution = mySolution) match {
         case OK =>
           val challenge = Challenge(
             myId = user.id,
             opponentId = opponentId,
-            questId = myQuestId,
+            questId = mySolution.info.questId,
+            mySolutionId = Some(mySolutionId),
             status = ChallengeStatus.Requested)
 
           db.challenge.create(challenge)
 
+        // TODO: substract assets for invitation.
+        // TODO: test it calls db correctly.
+
           {
             makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
           } map { r =>
-            OkApiResult(MakeSolutionChallengeResult(OK, Some(r.user.profile), List(QuestView(myQuest, user))))
+            OkApiResult(MakeSolutionChallengeResult(OK, Some(r.user.profile), List(SolutionView(mySolution, user))))
           }
 
-        // TODO: substract assets for invitation.
-        // TODO: test it calls db correctly.
         case reason =>
           OkApiResult(MakeSolutionChallengeResult(reason))
       }
