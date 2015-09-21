@@ -4,7 +4,7 @@ import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
-import models.domain.challenge.Challenge
+import models.domain.challenge.{ChallengeStatus, Challenge}
 import models.domain.user.User
 import models.domain.user.profile.Profile
 import models.view.SolutionView
@@ -28,7 +28,7 @@ case class GetChallengeResult(
 
 case class GetMyChallengesRequest(
   user: User,
-  statuses: List[String],
+  statuses: List[ChallengeStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetMyChallengesResult(
@@ -37,7 +37,7 @@ case class GetMyChallengesResult(
 
 case class GetChallengesToMeRequest(
   user: User,
-  statuses: List[String],
+  statuses: List[ChallengeStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetChallengesToMeResult(
@@ -128,18 +128,34 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
    * Get all battle requests we've made.
    */
   def getMyChallenges(request: GetMyChallengesRequest): ApiResult[GetMyChallengesResult] = handleDbException {
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
     OkApiResult(GetMyChallengesResult(
-      allowed = OK/*,
-      challenges = request.user.battleRequests*/))
+      allowed = OK,
+      db.challenge.allWithParams(
+        myId = Some(request.user.id),
+        statuses = request.statuses,
+        skip = pageSize * pageNumber)
+        .take(pageSize)
+        .toList))
   }
 
   /**
    * Get challenges made to us.
    */
   def getChallengesToMe(request: GetChallengesToMeRequest): ApiResult[GetChallengesToMeResult] = handleDbException {
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
     OkApiResult(GetChallengesToMeResult(
-      allowed = OK/*,
-      challenges = request.user.battleRequests*/))
+      allowed = OK,
+      db.challenge.allWithParams(
+        opponentId = Some(request.user.id),
+        statuses = request.statuses,
+        skip = pageSize * pageNumber)
+        .take(pageSize)
+        .toList))
   }
 
   /**

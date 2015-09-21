@@ -97,9 +97,7 @@ class ChallengeDAOSpecs extends Specification
       myOpponentIds.map(_.id) must beEqualTo(
         challenges.slice(1, 2).sortBy(_.creationDate.getTime)(Ordering[Long].reverse).map(_.id)
       )
-
     }
-
   }
 }
 

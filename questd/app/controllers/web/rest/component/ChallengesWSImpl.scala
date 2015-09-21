@@ -1,7 +1,9 @@
 package controllers.web.rest.component
 
+import com.vita.scala.extensions._
 import controllers.domain.app.challenge._
 import controllers.web.helpers._
+import models.domain.challenge.ChallengeStatus
 
 private object ChallengesWSImplTypes {
 
@@ -97,7 +99,7 @@ trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSCom
   def getMyChallenges = wrapJsonApiCallReturnBody[WSGetMyChallengesResult] { (js, r) =>
     val v = Json.read[WSGetMyChallengesRequest](js.toString)
 
-    api.getMyChallenges(GetMyChallengesRequest(r.user, v.statuses, v.pageNumber, v.pageSize))
+    api.getMyChallenges(GetMyChallengesRequest(r.user, v.statuses.map(ChallengeStatus.withNameEx), v.pageNumber, v.pageSize))
   }
 
   /**
@@ -106,7 +108,7 @@ trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSCom
   def getChallengesToMe = wrapJsonApiCallReturnBody[WSGetChallengesToMeResult] { (js, r) =>
     val v = Json.read[WSGetChallengesToMeRequest](js.toString)
 
-    api.getChallengesToMe(GetChallengesToMeRequest(r.user, v.statuses, v.pageNumber, v.pageSize))
+    api.getChallengesToMe(GetChallengesToMeRequest(r.user, v.statuses.map(ChallengeStatus.withNameEx), v.pageNumber, v.pageSize))
   }
 
   /**
