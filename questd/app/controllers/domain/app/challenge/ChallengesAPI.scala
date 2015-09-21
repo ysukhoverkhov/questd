@@ -3,12 +3,12 @@ package controllers.domain.app.challenge
 import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.domain.app.user.{SendMessageRequest, CreateBattleResult, CreateBattleRequest, MakeTaskRequest}
+import controllers.domain.app.user.{CreateBattleRequest, MakeTaskRequest, SendMessageRequest}
 import controllers.domain.helpers._
 import models.domain.challenge.{Challenge, ChallengeStatus}
 import models.domain.solution.Solution
 import models.domain.user.User
-import models.domain.user.message.MessageChallengeAccepted
+import models.domain.user.message.{MessageChallengeAccepted, MessageChallengeRejected}
 import models.domain.user.profile.{Profile, TaskType}
 import models.view.{QuestView, SolutionView}
 
@@ -191,135 +191,82 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
 
   /**
    * Respond on battle request.
-   */ // Test each and every branch.
+   */ // TODO: Test each and every branch.
   def acceptChallenge(request: AcceptChallengeRequest): ApiResult[AcceptChallengeResult] = handleDbException {
     import request._
 
     db.challenge.readById(challengeId).fold[ApiResult[AcceptChallengeResult]] {
       OkApiResult(AcceptChallengeResult(OutOfContent))
     } { challenge: Challenge =>
-        db.solution.readById(solutionId).fold[ApiResult[AcceptChallengeResult]] {
-          OkApiResult(AcceptChallengeResult(OutOfContent))
-        } { solution: Solution =>
-          user.canAcceptChallengeWithSolution(challenge, solution) match {
-            case OK =>
-              db.challenge.updateChallenge(challenge.id, ChallengeStatus.Accepted, Some(solution.id)) ifSome { updatedChallenge =>
-                db.user.readById(challenge.myId) ifSome { challenger =>
-                  sendMessage(
-                    SendMessageRequest(
-                      challenger, MessageChallengeAccepted(challengeId = challenge.id)))
-                }
+      db.solution.readById(solutionId).fold[ApiResult[AcceptChallengeResult]] {
+        OkApiResult(AcceptChallengeResult(OutOfContent))
+      } { solution: Solution =>
+        user.canAcceptChallengeWithSolution(challenge, solution) match {
+          case OK =>
+            db.challenge.updateChallenge(challenge.id, ChallengeStatus.Accepted, Some(solution.id)) ifSome { updatedChallenge =>
+              db.user.readById(challenge.myId) ifSome { challenger =>
+                sendMessage(
+                  SendMessageRequest(
+                    challenger, MessageChallengeAccepted(challengeId = challenge.id)))
+              }
 
-                updatedChallenge.mySolutionId.fold {
-                  OkApiResult(
-                    AcceptChallengeResult(
-                      allowed = OK,
-                      profile = Some(user.profile),
-                      modifiedSolutions = List(SolutionView(solution, user))
-                    ))
-                } { mySolutionId =>
-                  db.solution.readById(mySolutionId) ifSome { mySolution =>
-                    createBattle(CreateBattleRequest(List(mySolution, solution))) map {
-                      db.user.readById(user.id) ifSome { updatedUser =>
-                        OkApiResult(
-                          AcceptChallengeResult(
-                            allowed = OK,
-                            profile = Some(updatedUser.profile),
-                            modifiedSolutions = List(
-                              SolutionView(mySolution, updatedUser), SolutionView(solution, updatedUser))
-                          ))
-                      }
+              updatedChallenge.mySolutionId.fold[ApiResult[AcceptChallengeResult]] {
+                OkApiResult(
+                  AcceptChallengeResult(
+                    allowed = OK,
+                    profile = Some(user.profile),
+                    modifiedSolutions = List(SolutionView(solution, user))
+                  ))
+              } { mySolutionId =>
+                db.solution.readById(mySolutionId) ifSome { mySolution =>
+                  createBattle(CreateBattleRequest(List(mySolution, solution))) map {
+                    db.user.readById(user.id) ifSome { updatedUser =>
+                      OkApiResult(
+                        AcceptChallengeResult(
+                          allowed = OK,
+                          profile = Some(updatedUser.profile),
+                          modifiedSolutions = List(
+                            SolutionView(mySolution, updatedUser), SolutionView(solution, updatedUser))
+                        ))
                     }
                   }
                 }
               }
-
-            case result =>
-              OkApiResult(AcceptChallengeResult(result))
-          }
-        }
-      }
-    }
-
-
-    /**
-     * Respond on battle request.
-     */
-    def rejectChallenge(request: AcceptChallengeRequest): ApiResult[AcceptChallengeResult] = handleDbException {
-      import request._
-
-      //    def createBattleForRequest(br: Challenge): ApiResult[RespondChallengeResult] = {
-      //      val newStatus = if (accept) ChallengeStatus.Accepted else ChallengeStatus.Rejected
-      //
-      //      db.user.updateBattleRequest(user.id, br.mySolutionId, br.opponentSolutionId, newStatus.toString) ifSome { user =>
-      //
-      //        db.user.updateBattleRequest(
-      //          br.opponentId, br.opponentSolutionId, br.mySolutionId, newStatus.toString) ifSome { opponent =>
-      //          if (accept) {
-      //            db.solution.readById(br.mySolutionId).fold[ApiResult[RespondChallengeResult]](
-      //              OkApiResult(RespondChallengeResult(OutOfContent))) { mySolution =>
-      //              db.solution.readById(br.opponentSolutionId).fold[ApiResult[RespondChallengeResult]](
-      //                OkApiResult(RespondChallengeResult(OutOfContent))) { opponentSolution =>
-      //                createBattle(CreateBattleRequest(List(mySolution, opponentSolution))) map {
-      //                  sendMessage(SendMessageRequest(opponent, MessageBattleRequestAccepted(challengeId = br.mySolutionId))) // TODO fix it.
-      //                } map {
-      //                  OkApiResult(RespondChallengeResult(OK, Some(user.profile), Some(SolutionView(opponentSolution, user))))
-      //                }
-      //              }
-      //            }
-      //          } else {
-      //            // TODO: return money back.
-      //            // TODO: test me.
-      //            sendMessage(SendMessageRequest(opponent, MessageBattleRequestRejected(br.mySolutionId))) map {
-      //              OkApiResult(RespondChallengeResult(
-      //                OK,
-      //                Some(user.profile),
-      //                None))
-      //            }
-      //          }
-      //        }
-      //      }
-      //    }
-      //
-      db.challenge.readById(challengeId).fold {
-        OkApiResult(AcceptChallengeResult(OutOfContent))
-      } { challenge =>
-        user.canRespondChallenge(challenge) match {
-          case OK =>
-            if (accepted) {
-              solutionId.fold {
-                OkApiResult(AcceptChallengeResult(OutOfContent))
-              } {
-              }
-
-
-
-              db.solution.readById(solutionId).fold {
-                OkApiResult(AcceptChallengeResult(OutOfContent))
-              } { solution =>
-              }
-              user.canAcceptChallengeWithSolution(challenge) match {
-              } else {
-
-              }
-
-              OkApiResult(AcceptChallengeResult(OK))
-              case result =>
-                OkApiResult(AcceptChallengeResult(result))
             }
+
+          case result =>
+            OkApiResult(AcceptChallengeResult(result))
         }
-        user.battleRequests.find(
-      br =>
-        (br.status == ChallengeStatus.Requests) &&
-          (br.opponentSolutionId == opponentSolutionId)
-    ).fold[ApiResult[AcceptChallengeResult]] {
-      Logger.trace(s"Unable to find battle request with status Requests and opponentSolutionId equal to $opponentSolutionId")
-      OkApiResult(AcceptChallengeResult(OutOfContent))
-    } { br =>
-      createBattleForRequest(br)
-    }
-
       }
+    }
+  }
 
+
+  /**
+   * Respond on battle request.
+   */
+  def rejectChallenge(request: RejectChallengeRequest): ApiResult[RejectChallengeResult] = handleDbException {
+    import request._
+
+    db.challenge.readById(challengeId).fold[ApiResult[RejectChallengeResult]] {
+      OkApiResult(RejectChallengeResult(OutOfContent))
+    } { challenge: Challenge =>
+      user.canRejectChallenge(challenge) match {
+        case OK =>
+          db.challenge.updateChallenge(challenge.id, ChallengeStatus.Rejected, None) ifSome { updatedChallenge =>
+            db.user.readById(challenge.myId) ifSome { challenger =>
+              sendMessage(
+                SendMessageRequest(
+                  challenger, MessageChallengeRejected(challengeId = challenge.id)))
+            }
+
+            OkApiResult(RejectChallengeResult(OK, Some(request.user.profile)))
+          }
+
+        case result =>
+          OkApiResult(RejectChallengeResult(result))
+      }
+    }
+  }
 }
 

@@ -62,17 +62,24 @@ private object ChallengesWSImplTypes {
 
 
   /**
-   * Response to challenge
+   * Response to challenge with accept
    *
    * @param challengeId Id of challenge to responding user he response on.
-   * @param accepted Is the challenge accepted.
    * @param solutionId Id of solution user has/made to accept the challenge.
    */
-  case class WSRespondChallengeRequest(
+  case class WSAcceptChallengeRequest(
     challengeId: String,
-    accepted: Boolean,
-    solutionId: Option[String] = None)
-  type WSRespondChallengeResult = AcceptChallengeResult
+    solutionId: String)
+  type WSAcceptChallengeResult = AcceptChallengeResult
+
+  /**
+   * Response to challenge with rejection.
+   *
+   * @param challengeId Id of challenge to responding user he response on.
+   */
+  case class WSRejectChallengeRequest(
+    challengeId: String)
+  type WSRejectChallengeResult = RejectChallengeResult
 }
 
 trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
@@ -126,12 +133,21 @@ trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSCom
   }
 
   /**
+   * Accept challenge.
+   */
+  def acceptChallenge = wrapJsonApiCallReturnBody[WSAcceptChallengeResult] { (js, r) =>
+    val v = Json.read[WSAcceptChallengeRequest](js.toString)
+
+    api.acceptChallenge(AcceptChallengeRequest(r.user, v.challengeId, v.solutionId))
+  }
+
+  /**
    * Give a response on battle request.
    */
-  def respondChallenge = wrapJsonApiCallReturnBody[WSRespondChallengeResult] { (js, r) =>
-    val v = Json.read[WSRespondChallengeRequest](js.toString)
+  def rejectChallenge = wrapJsonApiCallReturnBody[WSRejectChallengeResult] { (js, r) =>
+    val v = Json.read[WSRejectChallengeRequest](js.toString)
 
-    api.respondChallenge(AcceptChallengeRequest(r.user, v.challengeId, v.accepted, v.solutionId))
+    api.rejectChallenge(RejectChallengeRequest(r.user, v.challengeId))
   }
 }
 

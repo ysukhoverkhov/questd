@@ -103,7 +103,8 @@ POST    /rest/makeSolutionChallenge                     controllers.web.rest.Cha
 POST	/rest/getChallenge  						    controllers.web.rest.ChallengesWS.getChallenge
 POST	/rest/getMyChallenges						    controllers.web.rest.ChallengesWS.getMyChallenges
 POST	/rest/getChallengesToMe						    controllers.web.rest.ChallengesWS.getChallengesToMe
-POST    /rest/respondChallenge    					    controllers.web.rest.ChallengesWS.respondChallenge
+POST    /rest/acceptChallenge    					    controllers.web.rest.ChallengesWS.acceptChallenge
+POST    /rest/rejectChallenge    					    controllers.web.rest.ChallengesWS.rejectChallenge
 
 # Chat
 POST   /rest/createConversation                         controllers.web.rest.ConversationsWS.createConversation

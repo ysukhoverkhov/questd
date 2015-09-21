@@ -94,6 +94,15 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
+  def canRejectChallenge(challenge: Challenge) = {
+    if (challenge.opponentId != user.id)
+      InvalidState
+    else if (challenge.status != ChallengeStatus.Requested)
+      InvalidState
+    else
+      OK
+  }
+
   // TODO: check cost here.
   def costToChallengeBattle = {
     Assets()
