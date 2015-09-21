@@ -38,11 +38,7 @@ trait Friends { this: UserLogic =>
   }
 
   private def commonFriendshipCheck(potentialFriend: User) = {
-    if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends))
-      NotEnoughRights
-    else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
-      NotEnoughAssets
-    else if (potentialFriend.id == user.id)
+    if (potentialFriend.id == user.id)
       InvalidState
     else
       OK
@@ -51,11 +47,14 @@ trait Friends { this: UserLogic =>
   def canAddFriend(potentialFriend: User) = {
     commonFriendshipCheck(potentialFriend) match {
       case OK =>
-        if (user.friends.length >= user.profile.rights.maxFriendsCount) {
+        if (user.friends.length >= user.profile.rights.maxFriendsCount)
           LimitExceeded
-        } else {
+        else if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends))
+          NotEnoughRights
+        else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
+          NotEnoughAssets
+        else
           OK
-        }
       case a => a
     }
   }
