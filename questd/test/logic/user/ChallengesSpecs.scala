@@ -4,6 +4,7 @@ import java.util.Date
 
 import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
+import models.domain.quest.QuestStatus
 import models.domain.solution.SolutionStatus
 import testhelpers.domainstubs._
 
@@ -148,6 +149,20 @@ class ChallengesSpecs extends BaseLogicSpecs {
 
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
+
+    "Do not allow challenging battles for quests not in rotation" in context {
+      val me = createUserStub()
+      val myQuest = createQuestStub(status = QuestStatus.CheatingBanned)
+      val opponentSolution = createSolutionStub()
+
+      challenge.findBySolutions(any) returns Iterator(createChallengeStub())
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
+
+      val rv = me.canChallengeBattleWithQuest(opponentSolution.info.authorId, myQuest)
+
+      rv must beEqualTo(ProfileModificationResult.InvalidState)
+    }
+
   }
 }
 

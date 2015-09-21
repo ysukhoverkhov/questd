@@ -45,7 +45,6 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-  // TODO: test me.
   def canChallengeBattleWithSolution(opponentId: String, mySolution: Solution) = {
     lazy val mySolutionExists = user.stats.solvedQuests.values.exists(_ == mySolution.id)
 
@@ -63,7 +62,6 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-  // TODO: test me.
   def canChallengeBattleWithQuest(opponentId: String, myQuest: Quest) = {
     lazy val myQuestExists = user.stats.createdQuests.contains(myQuest.id)
 
