@@ -37,6 +37,30 @@ private[mongo] class MongoChallengeDAO
   /**
    * @inheritdoc
    */
+  def findByParticipantsAndQuest(participantIds: (String, String), questId: String): Iterator[Challenge] = {
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder += ("$or" -> List(
+      MongoDBObject("$and" -> List(
+        MongoDBObject("myId" -> participantIds._1 ),
+        MongoDBObject("opponentId" -> participantIds._2)
+      )),
+      MongoDBObject("$and" -> List(
+        MongoDBObject("myId" -> participantIds._2 ),
+        MongoDBObject("opponentId" -> participantIds._1)
+      ))
+    ))
+
+    queryBuilder += ("questId" -> questId)
+
+    findByExample(
+      example = queryBuilder.result(),
+      skip = 0)
+  }
+
+  /**
+   * @inheritdoc
+   */
   def allWithParams(
     myId: Option[String] = None,
     opponentId: Option[String] = None,

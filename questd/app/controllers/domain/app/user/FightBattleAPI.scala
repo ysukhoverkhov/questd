@@ -142,6 +142,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
       db.challenge.create(Challenge(
         myId = myId,
         opponentId = opponentId,
+        questId = mySolution.info.questId,
         mySolutionId = Some(mySolution.id),
         opponentSolutionId = Some(opponentSolution.id),
         status = ChallengeStatus.AutoCreated))

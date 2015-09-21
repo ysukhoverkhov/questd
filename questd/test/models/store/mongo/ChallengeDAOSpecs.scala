@@ -22,9 +22,27 @@ class ChallengeDAOSpecs extends Specification
       val opponentSolutionId = "opponentId"
 
       val challenges: List[Challenge] = List(
-        Challenge(mySolutionId = Some(mySolutionId), opponentSolutionId = Some(opponentSolutionId), myId = "", opponentId = "", status = ChallengeStatus.Accepted),
-        Challenge(mySolutionId = None, opponentSolutionId = Some(opponentSolutionId), myId = "", opponentId = "", status = ChallengeStatus.Accepted),
-        Challenge(mySolutionId = Some(mySolutionId), opponentSolutionId = None, myId = "", opponentId = "", status = ChallengeStatus.Accepted)
+        Challenge(
+          mySolutionId = Some(mySolutionId),
+          opponentSolutionId = Some(opponentSolutionId),
+          myId = "",
+          questId = "",
+          opponentId = "",
+          status = ChallengeStatus.Accepted),
+        Challenge(
+          mySolutionId = None,
+          opponentSolutionId = Some(opponentSolutionId),
+          myId = "",
+          questId = "",
+          opponentId = "",
+          status = ChallengeStatus.Accepted),
+        Challenge(
+          mySolutionId = Some(mySolutionId),
+          opponentSolutionId = None,
+          myId = "",
+          questId = "",
+          opponentId = "",
+          status = ChallengeStatus.Accepted)
       )
 
       challenges.foreach(db.challenge.create)
@@ -32,6 +50,46 @@ class ChallengeDAOSpecs extends Specification
       db.challenge.findBySolutions((mySolutionId, opponentSolutionId)).toList must beEqualTo(List(challenges.head))
       db.challenge.findBySolutions((opponentSolutionId, mySolutionId)).toList must beEqualTo(List(challenges.head))
     }
+
+    "Reads by participants and quest" in new WithApplication(appWithTestDatabase) {
+      db.challenge.clear()
+
+      val questId = "questId"
+      val myId = "myId"
+      val opponentId = "opponentId"
+      val mySolutionId = "myId123"
+      val opponentSolutionId = "opponentId123"
+
+      val challenges: List[Challenge] = List(
+        Challenge(
+          mySolutionId = Some(mySolutionId),
+          opponentSolutionId = Some(opponentSolutionId),
+          myId = myId,
+          questId = questId,
+          opponentId = opponentId,
+          status = ChallengeStatus.Accepted),
+        Challenge(
+          mySolutionId = None,
+          opponentSolutionId = Some(opponentSolutionId),
+          myId = "",
+          questId = questId,
+          opponentId = opponentId,
+          status = ChallengeStatus.Accepted),
+        Challenge(
+          mySolutionId = Some(mySolutionId),
+          opponentSolutionId = None,
+          myId = myId,
+          questId = questId,
+          opponentId = "",
+          status = ChallengeStatus.Accepted)
+      )
+
+      challenges.foreach(db.challenge.create)
+
+      db.challenge.findByParticipantsAndQuest((myId, opponentId), questId).toList must beEqualTo(List(challenges.head))
+      db.challenge.findByParticipantsAndQuest((opponentId, myId), questId).toList must beEqualTo(List(challenges.head))
+    }
+
 
     "Get all challenges" in new WithApplication(appWithTestDatabase) {
       db.challenge.clear()

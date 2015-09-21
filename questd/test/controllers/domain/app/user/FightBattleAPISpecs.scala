@@ -87,6 +87,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       user.recordBattleParticipation(mEq(uu(0).id), any, any) returns Some(uu(0))
       user.recordBattleParticipation(mEq(uu(1).id), any, any) returns Some(uu(1))
       challenge.findBySolutions(any) returns Iterator.empty
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator.empty
 
       val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
 

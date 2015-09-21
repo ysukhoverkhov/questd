@@ -8,10 +8,18 @@ trait ChallengeDAO extends BaseDAO[Challenge] {
    * Returns challenges what contains both these solutions in any combination
    *
    * @param solutionIds Solutions to search.
-   * @return Iterator with found solutions.
+   * @return Iterator with found challenges.
    */
   def findBySolutions(solutionIds: (String, String)): Iterator[Challenge]
 
+  /**
+   * Returns challenges what are between both users and for the quest.
+   *
+   * @param participantIds Ids of users participating in challenges in any roles.
+   * @param questId Id of quest there is a challenge for.
+   * @return Iterator with found challenges.
+   */
+  def findByParticipantsAndQuest(participantIds: (String, String), questId: String): Iterator[Challenge]
 
   /**
    * @param myId Return challenges where myId is equal to this.

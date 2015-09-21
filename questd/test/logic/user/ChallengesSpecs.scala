@@ -47,6 +47,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val opponentSolution = createSolutionStub(authorId = opponent.id, battleIds = List("1"))
 
       challenge.findBySolutions(any) returns Iterator.empty
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator.empty
 
       val rv = me.canAutoCreatedBattle(
         mySolution = mySolution,
@@ -64,6 +65,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val opponentSolution = createSolutionStub(authorId = opponent.id, questId = "qid2")
 
       challenge.findBySolutions(any) returns Iterator(createChallengeStub())
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
 
       val rv = me.canAutoCreatedBattle(
         mySolution = mySolution,
@@ -81,6 +83,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val opponentSolution = createSolutionStub(authorId = opponent.id, questId = "qid2")
 
       challenge.findBySolutions(any) returns Iterator.empty
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator.empty
 
       val rv = me.canAutoCreatedBattle(
         mySolution = mySolution,
@@ -100,7 +103,8 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val mySolution = createSolutionStub(id = sol1Id, authorId = me.id)
       val opponentSolution = createSolutionStub(id = sol2Id, authorId = opponent.id)
 
-      db.challenge.findBySolutions(any) returns List(createChallengeStub()).iterator
+      challenge.findBySolutions(any) returns Iterator(createChallengeStub())
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
 
       val rv = me.canAutoCreatedBattle(
         mySolution = mySolution,
@@ -121,6 +125,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val opponentSolution = createSolutionStub(id = sol2Id, authorId = opponent.id)
 
       challenge.findBySolutions(any) returns Iterator.empty
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator.empty
 
       val rv = me.canAutoCreatedBattle(
         mySolution = mySolution,
@@ -137,8 +142,9 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val opponentSolution = createSolutionStub()
 
       challenge.findBySolutions(any) returns Iterator(createChallengeStub())
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
 
-      val rv = me.canChallengeBattle(mySolution, opponentSolution)
+      val rv = me.canChallengeBattleWithSolution(opponentSolution.info.authorId, mySolution)
 
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }

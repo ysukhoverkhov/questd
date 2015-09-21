@@ -11,7 +11,7 @@ case class Challenge (
   id: String = ID.generate,
   myId: String,
   opponentId: String,
-  myQuestId: Option[String] = None,
+  questId: String,
   mySolutionId: Option[String] = None,
   opponentSolutionId: Option[String] = None,
   creationDate: Date = new Date(),

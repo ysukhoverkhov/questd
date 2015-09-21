@@ -4,7 +4,7 @@ import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
-import models.domain.challenge.{ChallengeStatus, Challenge}
+import models.domain.challenge.{Challenge, ChallengeStatus}
 import models.domain.user.User
 import models.domain.user.profile.Profile
 import models.view.SolutionView
@@ -61,8 +61,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
    * Challenge someone to jon a battle.
    */
   def makeChallenge(request: MakeChallengeRequest): ApiResult[MakeChallengeResult] = handleDbException {
-//    import request._
-//
+
 //    def makeChallenge(mySolution: Solution, opponentSolution: Solution): ApiResult[MakeChallengeResult] = {
 //      db.user.addBattleRequest(
 //        opponentSolution.info.authorId,
@@ -94,9 +93,20 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
 //        }
 //      }
 //    }
-//
-//    db.solution.readById(mySolutionId).fold[ApiResult[MakeChallengeResult]](OkApiResult(MakeChallengeResult(OutOfContent))) { mySolution =>
-//      db.solution.readById(opponentSolutionId).fold[ApiResult[MakeChallengeResult]](OkApiResult(MakeChallengeResult(OutOfContent))) { opponentSolution =>
+
+
+//    if (!(mySolutionId.nonEmpty ^^ myQuestId.nonEmpty)) {
+//      OkApiResult(MakeChallengeResult(allowed = InvalidState))
+//    } else {
+//      val contentExists =
+//        myQuestId.fold(true){ myQuestId =>
+//          db.quest.readById(myQuestId).nonEmpty
+//        } && mySolutionId.fold(true) { mySolutionId =>
+//          db.solution.readById(mySolutionId).nonEmpty
+//        }
+//      if(!contentExists) {
+//        OkApiResult(MakeChallengeResult(OutOfContent))
+//      } else {
 //        user.canChallengeBattle(mySolution, opponentSolution) match {
 //          case OK =>
 //            makeChallenge(mySolution, opponentSolution)
@@ -106,7 +116,8 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
 //      }
 //    }
 
-    OkApiResult(MakeChallengeResult(OK))
+
+            OkApiResult(MakeChallengeResult(OK))
   }
 
   /**
