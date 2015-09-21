@@ -132,7 +132,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         cultureId = Some(solution.cultureId),
         withBattles = withBattles)
     }
-// TODO: test new version of makeChallenge is working.
+
     def makeChallenge(solutions: List[Solution]): Unit = {
       val mySolution = solutions.head
       val opponentSolution = solutions(1)

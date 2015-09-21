@@ -1,6 +1,6 @@
 package controllers.domain.app.user
 
-import controllers.domain.{OkApiResult, BaseAPISpecs}
+import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain.battle.BattleStatus
 import models.domain.solution.SolutionStatus
 import models.domain.user.stats.SolutionsInBattle
@@ -51,6 +51,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         withBattles = mEq(Some(false)))
 
       there was no(battle).create(any)
+      there was no(challenge).create(any)
       there was no(solution).update(any)
     }
 
@@ -160,6 +161,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         withBattles = mEq(Some(false)))
 
       there was no(battle).create(any)
+      there was no(challenge).create(any)
       there was no(solution).addParticipatedBattle(any, any)
     }
 
