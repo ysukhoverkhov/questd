@@ -1,6 +1,7 @@
 package controllers.domain
 
 import controllers.domain.app.battle.{BattleFetchAPI, BattleAPI}
+import controllers.domain.app.challenge.ChallengesAPI
 import controllers.domain.app.theme.ThemeFetchAPI
 import models.store._
 import components._

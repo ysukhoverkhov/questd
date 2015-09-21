@@ -1,4 +1,4 @@
-package controllers.domain.app.user
+package controllers.domain.app.challenge
 
 import components._
 import controllers.domain._
@@ -55,7 +55,6 @@ case class RespondChallengeResult(
   modifiedSolutions: List[SolutionView] = List.empty)
 
 
-// TODO: Move it out of user's API
 private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
