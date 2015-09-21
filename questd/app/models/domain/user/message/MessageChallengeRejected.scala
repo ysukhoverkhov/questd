@@ -6,15 +6,15 @@ import scala.language.implicitConversions
  * A message about rejected battle challenge.
  * @param challengeId id of a solution we do not want to battle with.
  */
-case class MessageBattleRequestRejected (challengeId: String)
+case class MessageChallengeRejected (challengeId: String)
 
 /**
  * Companion object
  */
-object MessageBattleRequestRejected {
-  implicit def toMessage(a: MessageBattleRequestRejected): Message = {
+object MessageChallengeRejected {
+  implicit def toMessage(a: MessageChallengeRejected): Message = {
     Message(
-      messageType = MessageType.BattleRequestRejected,
+      messageType = MessageType.ChallengeRejected,
       data = Map("challengeId" -> a.challengeId))
   }
 }

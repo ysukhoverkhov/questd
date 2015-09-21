@@ -72,7 +72,7 @@ private object ChallengesWSImplTypes {
     challengeId: String,
     accepted: Boolean,
     solutionId: Option[String] = None)
-  type WSRespondChallengeResult = RespondChallengeResult
+  type WSRespondChallengeResult = AcceptChallengeResult
 }
 
 trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
@@ -131,7 +131,7 @@ trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSCom
   def respondChallenge = wrapJsonApiCallReturnBody[WSRespondChallengeResult] { (js, r) =>
     val v = Json.read[WSRespondChallengeRequest](js.toString)
 
-    api.respondChallenge(RespondChallengeRequest(r.user, v.challengeId, v.accepted, v.solutionId))
+    api.respondChallenge(AcceptChallengeRequest(r.user, v.challengeId, v.accepted, v.solutionId))
   }
 }
 

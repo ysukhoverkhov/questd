@@ -2,6 +2,7 @@ package logic.user
 
 import controllers.domain.app.protocol.ProfileModificationResult._
 import logic._
+import models.domain.challenge.{ChallengeStatus, Challenge}
 import models.domain.common.Assets
 import models.domain.quest.{QuestStatus, Quest}
 import models.domain.solution.{SolutionStatus, Solution}
@@ -81,14 +82,17 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-
-  // TODO: check for can respond
-  /*
-    else if (opponentSolution.info.authorId == user.id)
-      OutOfContent
-    else if (opponentSolution.info.questId != mySolution.info.questId)
+  // TODO: test
+  def canAcceptChallengeWithSolution(challenge: Challenge, solution: Solution) = {
+    if (challenge.questId != solution.info.questId)
       InvalidState
-   */
+    else if (challenge.opponentId != user.id)
+      InvalidState
+    else if (challenge.status != ChallengeStatus.Requested)
+      InvalidState
+    else
+      OK
+  }
 
   // TODO: check cost here.
   def costToChallengeBattle = {

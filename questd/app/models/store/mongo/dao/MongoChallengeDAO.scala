@@ -86,7 +86,31 @@ private[mongo] class MongoChallengeDAO
       sort = MongoDBObject(
         "creationDate" -> -1),
       skip = skip)
+  }
 
+  /**
+   * @inheritdoc
+   */ // TODO: test me.
+  def updateChallenge(
+    id: String,
+    newStatus: ChallengeStatus.Value,
+    opponentSolutionId: Option[String]): Option[Challenge] = {
+
+    val queryBuilder = MongoDBObject.newBuilder
+
+    queryBuilder +=
+      ("$set" -> MongoDBObject(
+        "status" -> newStatus.toString))
+
+    if (opponentSolutionId.nonEmpty) {
+      queryBuilder +=
+        ("$set" -> MongoDBObject(
+          "opponentSolutionId" -> opponentSolutionId.get))
+    }
+
+    findAndModify(
+      id,
+      queryBuilder.result())
   }
 
 
