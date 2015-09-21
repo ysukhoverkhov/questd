@@ -111,7 +111,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
 
   /**
    * Returns challenge by id if we are its participant.
-   */ // TODO: test me (all three branches).
+   */
   def getChallenge(request: GetChallengeRequest): ApiResult[GetChallengeResult] = handleDbException {
     db.challenge.readById(request.challengeId).fold {
       OkApiResult(GetChallengeResult(OutOfContent))

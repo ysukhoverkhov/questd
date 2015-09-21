@@ -295,11 +295,17 @@ package object domainstubs {
   }
 
   def createChallengeStub(
-    myId: String = "myId"
-    ) = {
+    id: String = ID.generate,
+    myId: String = "myId",
+    opponentId: String = "opponentId",
+    creationDate: Date = new Date(),
+    status: ChallengeStatus.Value = ChallengeStatus.Accepted) = {
+
     Challenge(
+      id = id,
       myId = myId,
-      opponentId = "opponentId",
-      status = ChallengeStatus.Accepted)
+      opponentId = opponentId,
+      status = status,
+      creationDate = creationDate)
   }
 }

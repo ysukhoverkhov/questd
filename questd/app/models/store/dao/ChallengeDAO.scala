@@ -1,6 +1,6 @@
 package models.store.dao
 
-import models.domain.challenge.Challenge
+import models.domain.challenge.{ChallengeStatus, Challenge}
 
 trait ChallengeDAO extends BaseDAO[Challenge] {
 
@@ -13,10 +13,18 @@ trait ChallengeDAO extends BaseDAO[Challenge] {
   def findBySolutions(solutionIds: (String, String)): Iterator[Challenge]
 
 
-  //  def allWithParams(
-//    commentedObjectId: List[String] = List.empty,
-//    skip: Int = 0
-//  ): Iterator[Challenge]
+  /**
+   * @param myId Return challenges where myId is equal to this.
+   * @param opponentId Return challenges where opponentId is equal to this.
+   * @param statuses Return challenges with htese statuses only.
+   * @param skip Skip this number of challenges.
+   * @return Iterator with filtered challenges.
+   */
+  def allWithParams(
+    myId: Option[String] = None,
+    opponentId: Option[String] = None,
+    statuses: List[ChallengeStatus.Value] = List.empty,
+    skip: Int = 0): Iterator[Challenge]
 
 
 //  /**
