@@ -134,7 +134,6 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
     }
   }
 
-
   /**
    * Returns challenge by id if we are its participant.
    */
