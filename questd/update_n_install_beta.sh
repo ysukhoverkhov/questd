@@ -1,9 +1,9 @@
 #!/bin/bash
 
-service questd stop
+service questd_beta stop
 
 hg pull
-hg up -r "0.40.12" --clean
+hg up -r "0.40.13" --clean
 ./stage.sh
 
 cp -f ../install/questd_beta.conf /etc/init/
