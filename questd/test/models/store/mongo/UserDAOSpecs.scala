@@ -5,6 +5,7 @@ package models.store.mongo
 import java.util.Date
 
 import models.domain.common.{ClientPlatform, Assets, ContentVote}
+import models.domain.quest.QuestRating
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, CrossPromotedApp, LoginMethod}
 import models.domain.user.battlerequests.{BattleRequestStatus, BattleRequest}
@@ -572,6 +573,7 @@ class UserDAOSpecs
       val qi = QuestView(
         questId,
         createQuestStub(id = questId).info,
+        QuestRating(),
         None,
         None)
       val user = createUserStub(questBookmark = None)
@@ -652,7 +654,7 @@ class UserDAOSpecs
       val ou1 = db.user.readById(user.id)
       ou1 must beSome[User]
       val u = ou1.get
-      u.schedules.timeLine must beEqualTo(time)
+      u.schedules.nextTimeLineAt must beEqualTo(time)
     }
 
     "addMessage adds a message" in new WithApplication(appWithTestDatabase) {
@@ -791,16 +793,23 @@ class UserDAOSpecs
       db.user.clear()
 
       val user = createUserStub()
-      val br = BattleRequest("1", "2", "3", BattleRequestStatus.Accepted)
+      val br = List(
+        BattleRequest("1", "2", "3", BattleRequestStatus.Requests),
+        BattleRequest("1", "4", "3", BattleRequestStatus.Requests),
+        BattleRequest("1", "5", "3", BattleRequestStatus.Requests),
+        BattleRequest("1", "6", "3", BattleRequestStatus.Requests),
+        BattleRequest("1", "7", "3", BattleRequestStatus.Requests),
+        BattleRequest("1", "8", "3", BattleRequestStatus.Requests)
+      )
 
       db.user.create(user)
-      db.user.addBattleRequest(user.id, br)
-      db.user.updateBattleRequest(user.id, "2", "3", BattleRequestStatus.Rejected.toString)
+      br.foreach(db.user.addBattleRequest(user.id, _))
+      db.user.updateBattleRequest(user.id, "6", "3", BattleRequestStatus.Rejected.toString)
 
       val ou = db.user.readById(user.id)
 
       ou must beSome
-      ou.get.battleRequests.head must beEqualTo(br.copy(status = BattleRequestStatus.Rejected))
+      ou.get.battleRequests must beEqualTo(br.take(3) ::: List(BattleRequest("1", "6", "3", BattleRequestStatus.Rejected)) ::: br.drop(4))
     }
 
     "setNotificationSentTime works" in new WithApplication(appWithTestDatabase) {
@@ -817,6 +826,59 @@ class UserDAOSpecs
       ou must beSome
       ou.get.schedules.lastNotificationSentAt must beEqualTo(date)
     }
+
+    "movePrivateDailyResultsToPublic works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val results = (1 to 5).map(i => createDailyResultStub(startOfPeriod = new Date(i))).toList
+
+      val user = createUserStub(privateDailyResults = results)
+
+      db.user.create(user)
+      val ou = db.user.movePrivateDailyResultsToPublic(user.id, results.tail)
+
+      ou must beSome
+      ou.get.privateDailyResults must beEqualTo(List(results.head))
+      ou.get.profile.dailyResults must beEqualTo(results.tail)
+    }
+
+    "setDailyTasksSuppressed works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub(tutorialState = TutorialState(dailyTasksSuppression = true))
+      user.profile.tutorialStates(ClientPlatform.iPhone.toString).dailyTasksSuppression must beEqualTo(true)
+
+      db.user.create(user)
+      val ou = db.user.setDailyTasksSuppressed(
+        id = user.id,
+        platform = ClientPlatform.iPhone.toString,
+        suppressed = false)
+
+      ou must beSome
+      ou.get.profile.tutorialStates(ClientPlatform.iPhone.toString).dailyTasksSuppression must beEqualTo(false)
+    }
+
+    "Devices are added and removed" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val d1 = Device(ClientPlatform.iPhone, "d1")
+      val d2 = Device(ClientPlatform.iPhone, "d2")
+
+      val user = createUserStub()
+      user.devices must beEqualTo(List.empty)
+
+      db.user.create(user)
+
+      val ou1 = db.user.addDevice(user.id, d1)
+      ou1.get.devices must beEqualTo(List(d1))
+
+      val ou2 = db.user.addDevice(user.id, d2)
+      ou2.get.devices must beEqualTo(List(d1, d2))
+
+      val ou3 = db.user.removeDevice(user.id, d2.token)
+      ou3.get.devices must beEqualTo(List(d1))
+    }
+
   }
 }
 

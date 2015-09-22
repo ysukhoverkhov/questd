@@ -227,7 +227,7 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         ids = any[List[String]],
         idsExclude = any[List[String]],
         cultureId = any[Option[String]],
-        withSolutions = any[Boolean]
+        withSolutions = any[Option[Boolean]]
       ) returns List(qu).iterator
 
       db.solution.allWithParams(
@@ -258,7 +258,7 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         ids = any[List[String]],
         idsExclude = any[List[String]],
         cultureId = any[Option[String]],
-        withSolutions = any[Boolean])
+        withSolutions = any[Option[Boolean]])
 
       there was one(solution).allWithParams(
         status = mEq(List(SolutionStatus.InRotation)),

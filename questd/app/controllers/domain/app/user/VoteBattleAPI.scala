@@ -8,10 +8,14 @@ import controllers.domain.helpers._
 import models.domain.battle.BattleStatus
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
-import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.profile.{Profile, TaskType}
+import models.view.BattleView
 
 case class VoteBattleByUserRequest(user: User, battleId: String, solutionId: String)
-case class VoteBattleByUserResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class VoteBattleByUserResult(
+  allowed: ProfileModificationResult,
+  profile: Option[Profile] = None,
+  modifiedBattles: List[BattleView] = List.empty)
 
 private[domain] trait VoteBattleAPI {
   this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -46,7 +50,10 @@ private[domain] trait VoteBattleAPI {
                   } map { r =>
                     makeTask(MakeTaskRequest(u, taskType = Some(TaskType.VoteBattle)))
                   } map { r =>
-                    OkApiResult(VoteBattleByUserResult(OK, Some(r.user.profile)))
+                    OkApiResult(VoteBattleByUserResult(
+                      allowed = OK,
+                      profile = Some(r.user.profile),
+                      modifiedBattles = List(BattleView(b, user))))
                   }
                 }
 

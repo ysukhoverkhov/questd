@@ -17,7 +17,7 @@ import models.domain.user.timeline.TimeLineEntry
  * Structure representing beloved user.
  */
 case class User(
-  id: String = ID.generateUUID(),
+  id: String = ID.generate,
   auth: AuthInfo = AuthInfo(),
   demo: UserDemographics = UserDemographics(),
   profile: Profile = Profile(),
@@ -31,5 +31,4 @@ case class User(
   battleRequests: List[BattleRequest] = List.empty,
   devices: List[Device] = List.empty,
   settings: UserSettings = UserSettings(),
-  mustVoteSolutions: List[String] = List.empty,
-  payedAuthor: Boolean = false) extends ID
+  mustVoteSolutions: List[String] = List.empty) extends ID

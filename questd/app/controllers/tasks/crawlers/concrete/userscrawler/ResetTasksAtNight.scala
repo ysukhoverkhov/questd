@@ -22,7 +22,7 @@ class ResetTasksAtNight(
     randPar: RandomComponent#Random) extends BaseCrawler[User](apiPar, randPar)  {
 
   protected def check(user: User) = {
-    if (user.schedules.dailyTasks.before(new Date())) {
+    if (user.schedules.nextDailyTasksAt.before(new Date())) {
       api.resetDailyTasks(ResetDailyTasksRequest(user))
     }
   }

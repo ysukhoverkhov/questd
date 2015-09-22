@@ -10,12 +10,12 @@ import models.domain.user.message.Message
  * This can be given to client as is, thus contains only public information.
  */
 case class Profile(
-  profileId: String = ID.generateUUID(),
+  profileId: String = ID.generate,
   profileVersion: Int = 1,
   publicProfile: PublicProfile = PublicProfile(),
   ratingToNextLevel: Int = 0,
   assets: Assets = Assets(0, 0, 0),
-  rights: Rights = Rights(),
+  rights: Rights = Rights.none,
   dailyResults: List[DailyResult] = List.empty,
   dailyTasks: DailyTasks = DailyTasks(),
   messages: List[Message] = List.empty,
@@ -23,7 +23,7 @@ case class Profile(
   questSolutionContext: QuestSolutionContext = QuestSolutionContext(),
   questVoteContext: QuestVoteContext = QuestVoteContext(),
   solutionVoteContext: SolutionVoteContext = SolutionVoteContext(),
-  tutorialStates: Map[String, TutorialState] = // TODO: do not split it by platforms.
+  tutorialStates: Map[String, TutorialState] =
     ClientPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
   analytics: Analytics = Analytics(),
   debug: String = "")

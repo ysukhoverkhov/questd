@@ -26,17 +26,11 @@ private[domain] trait AuthAPI {
 
       db.user.updateSessionId(user.id, uuid) ifSome { u =>
         {
-          updateCrossPromotion(UpdateCrossPromotionRequest(user, request.snuser))
+          updateCrossPromotion(UpdateCrossPromotionRequest(u, request.snuser))
         } map {
-          updateUserCulture(UpdateUserCultureRequest(user))
+          updateUserCulture(UpdateUserCultureRequest(u))
         } map {
-          api.processFriendshipInvitationsFromSN(
-            ProcessFriendshipInvitationsFromSNRequest(user, request.snuser)) match {
-            case InternalErrorApiResult(a) =>
-              InternalErrorApiResult[LoginResult](a)
-            case _ =>
-              OkApiResult(LoginResult(uuid, user.id))
-          }
+          OkApiResult(LoginResult(uuid, u.id))
         }
       }
     }
@@ -62,8 +56,6 @@ private[domain] trait AuthAPI {
 
       {
         createUser(CreateUserRequest(newUser))
-      } map { r =>
-        populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(r.user))
       } map { r =>
         Logger.debug(s"New user created with FB: ${r.user.id} / ${r.user.profile.publicProfile.bio.name}")
         loginUser(r.user)

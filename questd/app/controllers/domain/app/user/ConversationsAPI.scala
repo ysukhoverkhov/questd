@@ -30,10 +30,8 @@ private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with
    */
   def createConversation(request: CreateConversationRequest): ApiResult[CreateConversationResult] = handleDbException {
     import request._
-    // TODO: test me - it reuses if finds existing or creates new one in other case.
 
     db.conversation.findByAllParticipants(List(user.id, peerId)).toList.headOption.fold {
-      // TODO: check here peer exists. // TODO: test it.
       db.user.readById(peerId).fold {
         OkApiResult(CreateConversationResult(OutOfContent))
       } {

@@ -5,8 +5,6 @@ import controllers.domain.app.quest._
 import logic.BaseLogicSpecs
 import models.domain.common.ContentVote
 import models.domain.quest.QuestStatus
-import models.domain.user.User
-import models.domain.user.profile.{Profile, PublicProfile}
 import testhelpers.domainstubs._
 
 class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
@@ -134,9 +132,7 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
 
     "Starting quests return vip quests and with solutions" in {
       val qid = "qid"
-      val u = User(
-        profile = Profile(
-          publicProfile = PublicProfile(level = 2)))
+      val u = createUserStub(level = 2)
 
       applyConfigMock()
       rand.nextDouble returns 0.0
@@ -156,14 +152,12 @@ class UserLogicSelectingQuestSpecs extends BaseLogicSpecs {
         authorsExclude = List(u.id),
         status = QuestStatus.InRotation,
         levels = Some((1, 1)),
-        withSolutions = true))
+        withSolutions = Some(true)))
     }
 
     "Starting quests return other quests" in {
       val qid = "qid"
-      val u = User(
-        profile = Profile(
-          publicProfile = PublicProfile(level = 2)))
+      val u = createUserStub(level = 2)
 
       applyConfigMock()
       rand.nextDouble returns 1.0

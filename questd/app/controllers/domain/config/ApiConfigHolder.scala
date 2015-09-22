@@ -54,6 +54,7 @@ class _DefaultConfigParams {
   val BattleAdditionalVotesDeviation = "65 12 Battle Additional Votes Deviation"
 
   // Timeline
+  val QuestProbabilityLevelsToGiveTutorialQuests = "71 00 Level to give tutorial quests"
   val QuestProbabilityLevelsToGiveStartingQuests = "71 01 Level to give starting quests"
   val QuestProbabilityStartingVIPQuests = "71 02 Probability of selecting VIP quests in initial stage"
   val QuestProbabilityStartingFriendQuests = "71 03 Probability of selecting friend's quests in initial stage"
@@ -99,7 +100,6 @@ class _DefaultConfigParams {
 }
 
 class _TutorialConfigParams {
-  val TutorialQuestId = "05 01 Tutorial Quest Id" // TODO: remove the constant since it's not used.
 }
 
 object _DefaultConfigParams extends _DefaultConfigParams
@@ -158,6 +158,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.BattleAdditionalVotesMean -> "5",
             DefaultConfigParams.BattleAdditionalVotesDeviation -> "4",
 
+            DefaultConfigParams.QuestProbabilityLevelsToGiveTutorialQuests -> "5",
             DefaultConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "7",
             DefaultConfigParams.QuestProbabilityStartingVIPQuests -> "0.5",
             DefaultConfigParams.QuestProbabilityStartingFriendQuests -> "0.2",
@@ -203,7 +204,6 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
     "Tutorial" -> ConfigSection(
       "Tutorial",
       Map(
-        TutorialConfigParams.TutorialQuestId -> "tutorial_1"
       ))
   )
 }

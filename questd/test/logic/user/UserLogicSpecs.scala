@@ -1,9 +1,11 @@
 package logic.user
 
+import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
 import models.domain.common.Assets
 import models.domain.user._
-import models.domain.user.profile.{Rights, PublicProfile, Profile, Bio}
+import models.domain.user.friends.{FriendshipStatus, Friendship}
+import models.domain.user.profile.{Bio, Profile, PublicProfile, Rights}
 import testhelpers.domainstubs._
 
 class UserLogicSpecs extends BaseLogicSpecs {
@@ -33,11 +35,28 @@ class UserLogicSpecs extends BaseLogicSpecs {
     }
 
     "Calculate correct quest level" in {
-      createUserStub(level = 7).calculateQuestLevel must beOneOf(1, 2)
-      createUserStub(level = 9).calculateQuestLevel must beOneOf(4, 5)
-      createUserStub(level = 13).calculateQuestLevel must beOneOf(9, 10)
+      createUserStub(level = 6).calculateQuestLevel must beOneOf(1, 2)
+      createUserStub(level = 9).calculateQuestLevel must beOneOf(5, 6)
+      createUserStub(level = 13).calculateQuestLevel must beOneOf(10, 11)
       createUserStub(level = 17).calculateQuestLevel must beOneOf(15, 16)
       createUserStub(level = 20).calculateQuestLevel must beEqualTo(20)
+    }
+
+    "Do not count requests in accepting friendship" in {
+      val uid = "asdasd"
+      val fid = "adasda"
+
+      def generateRequests(friendId: String, status: FriendshipStatus.Value): List[Friendship] = {
+        (1 to 10000).map(i => Friendship(friendId = fid, status = status)).toList
+      }
+      val friendships =
+        generateRequests(fid, FriendshipStatus.Invites) ::: generateRequests(fid, FriendshipStatus.Invited)
+
+      val u = createUserStub(id = uid, level = 10, friends = friendships)
+      val f = createUserStub(id = fid, level = 10, friends = friendships)
+
+      u.canAcceptFriendship(f) must beEqualTo(ProfileModificationResult.OK)
+      u.canAddFriend(f) must beEqualTo(ProfileModificationResult.LimitExceeded)
     }
   }
 }

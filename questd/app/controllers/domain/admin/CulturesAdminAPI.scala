@@ -43,7 +43,7 @@ private[domain] trait CulturesAdminAPI { this: DBAccessor =>
 
     Logger.debug("Admin request for create new Culture.")
 
-    db.culture.create(request.culture.copy(id = ID.generateUUID()))
+    db.culture.create(request.culture.copy(id = ID.generate))
 
     OkApiResult(CreateCultureResult())
   }

@@ -104,13 +104,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetQuestsResult(
       OK,
-      db.quest.readManyByIds(questIds.take(maxPageSize)).map{ q =>
-        QuestView(
-          id = q.id,
-          info = q.info,
-          rating = Some(q.rating),
-          myVote = user.stats.votedQuests.get(q.id))
-      }.toList))
+      db.quest.readManyByIds(questIds.take(maxPageSize)).map(QuestView(_, user)).toList))
   }
 
   /**
@@ -122,13 +116,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetSolutionsResult(
       OK,
-      db.solution.readManyByIds(solutionIds.take(maxPageSize)).map{ s =>
-        SolutionView(
-          id = s.id,
-          info = s.info,
-          rating = Some(s.rating),
-          myVote = user.stats.votedSolutions.get(s.id))
-      }.toList))
+      db.solution.readManyByIds(solutionIds.take(maxPageSize)).map(SolutionView(_, user)).toList))
   }
 
   /**
@@ -182,11 +170,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
 
     OkApiResult(GetQuestsForUserResult(
       allowed = OK,
-      quests = questsForUser.take(pageSize).toList.map(q => QuestView(
-        id = q.id,
-        info = q.info,
-        rating = Some(q.rating),
-        myVote = request.user.stats.votedQuests.get(q.id))),
+      quests = questsForUser.take(pageSize).toList.map(QuestView(_, user)),
       pageSize,
       questsForUser.hasNext))
   }
@@ -210,13 +194,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       authorIds = List(request.userId),
       skip = pageNumber * pageSize)
 
-    val solutions = solutionsForUser.take(pageSize).toList.map(s => {
-      SolutionView(
-        id = s.id,
-        info = s.info,
-        rating = Some(s.rating),
-        myVote = request.user.stats.votedSolutions.get(s.id))
-    })
+    val solutions = solutionsForUser.take(pageSize).toList.map(SolutionView(_, user))
 
     OkApiResult(GetSolutionsForUserResult(
       allowed = OK,
@@ -237,14 +215,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       questIds = List(request.questId),
       skip = pageNumber * pageSize)
 
-    val solutions = solutionsForQuest.take(pageSize).toList.
-      map(s => {
-        SolutionView(
-          id = s.id,
-          info = s.info,
-          rating = Some(s.rating),
-          myVote = request.user.stats.votedSolutions.get(s.id))
-      })
+    val solutions = solutionsForQuest.take(pageSize).toList.map(SolutionView(_, request.user))
 
     OkApiResult(GetSolutionsForQuestResult(
       allowed = OK,

@@ -8,7 +8,7 @@ import models.domain.base.ID
  * A battle our solution participated to.
  */
 case class Battle(
-  id: String = ID.generateUUID(),
+  id: String = ID.generate,
   info: BattleInfo,
   lastModDate: Date = new Date(),
   timelinePoints: Int = 0,

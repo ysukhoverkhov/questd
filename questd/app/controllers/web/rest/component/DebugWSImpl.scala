@@ -1,13 +1,13 @@
 package controllers.web.rest.component
 
+import java.util.Date
+
 import controllers.domain._
 import controllers.domain.admin.{AllQuestsRequest, AllSolutionsRequest, AllUsersRequest}
 import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
-import controllers.services.devicenotifications.DeviceNotifications
-import controllers.services.devicenotifications.DeviceNotifications.IOSDevice
 import controllers.web.helpers._
 import models.domain.common.{ContentReference, ContentType, ContentVote}
 import models.domain.quest.QuestInfoContent
@@ -17,7 +17,6 @@ import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.Gender
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger
-import play.libs.Akka
 
 private object DebugWSImplTypes {
 
@@ -64,21 +63,57 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
   import controllers.web.rest.component.DebugWSImplTypes._
 
   def shiftDailyResult = wrapApiCallReturnBody[WSShiftDailyResultResult] { r =>
+    api.db.solution.readManyByIds(r.user.stats.solvedQuests.values.toList).filter(s => s.battleIds.isEmpty).foreach { solution =>
+      api.tryCreateBattle(TryCreateBattleRequest(solution))
+    }
+
     api.resetDailyTasks(ResetDailyTasksRequest(r.user))
     api.populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(r.user))
     api.shiftDailyResult(ShiftDailyResultRequest(r.user))
   }
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
-    val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+//    val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+//
+//    actorSelectionNotification ! DeviceNotifications.PushMessage(
+//      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
+//      message = "lalala",
+//      badge = None,
+//      sound = None,
+//      destinations = List(DeviceNotifications.MobileDestination)
+//    )
 
-    actorSelectionNotification ! DeviceNotifications.PushMessage(
-      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
-      message = "lalala",
-      badge = None,
-      sound = None,
-      destinations = List(DeviceNotifications.MobileDestination)
-    )
+
+    val users = api.db.user.all
+      .filter(_.demo.cultureId.contains("68349b7a-20ee-4f6e-8406-f468b30be783"))
+      .foldLeft[List[(User, Map[String, (Int, List[String])], Set[String])]](List.empty) { (r, user) =>
+      (
+        user,
+        user.timeLine
+          .take(50)
+          .filter(_.objectType == TimeLineType.Quest)
+          .filter(_.reason == TimeLineReason.Has)
+          .map{ tle =>
+            (api.db.quest.readById(tle.objectId).map(_.cultureId).getOrElse(""), tle.objectId)
+          }
+          .foldLeft(Map.empty[String, (Int, List[String])]) { (r, v) =>
+            val tuple = r.getOrElse(v._1, (0, List.empty))
+            r + (v._1 -> (tuple._1 + 1, v._2 :: tuple._2))
+          },
+        user.following.map(api.db.user.readById(_).map(_.demo.cultureId.getOrElse("")).getOrElse("")).toSet ++
+         user.friends.map(f => api.db.user.readById(f.friendId).map(_.demo.cultureId.getOrElse("")).getOrElse("")).toSet
+      ) :: r
+    }
+      .filter { case (_, cs, _) => cs.size > 1 }
+      .filter { case (_, _, cs) => !cs.contains("d406dc6d-7a84-4ef9-9c64-5e725e8df608")}
+      .sortBy { case (u, _, _) => u.profile.analytics.profileCreationDate }
+
+    Logger.error(s"${users.size}")
+
+    users.foreach {
+      case (user, questCults, friendsCults) =>
+        Logger.error(s"${user.id}, ${user.profile.publicProfile.bio.name}, ${user.profile.analytics.profileCreationDate}, ${questCults.map( m => m._1 -> m._2._1 )/* - "68349b7a-20ee-4f6e-8406-f468b30be783"*/}, $friendsCults")
+    }
 
     OkApiResult(WSDebugResult("lalai"))
   }
@@ -213,7 +248,12 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
             ContentReference(
               contentType = ContentType.Photo,
               storage = "url",
-              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
+              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg")))) map { r =>
+                val s = api.db.solution.readById(r.modifiedSolutions.head.id).get
+                val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))
+                api.db.solution.update(s2)
+                OkApiResult(r)
+              }
       } map { rr =>
         Logger.debug(s"Quest solved with result ${rr.allowed}")
         assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
@@ -237,7 +277,15 @@ trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctio
             ContentReference(
               contentType = ContentType.Photo,
               storage = "url",
-              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"))))
+              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg")))) map { r =>
+                val s = api.db.solution.readById(r.modifiedSolutions.head.id).get
+                val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))
+                api.db.solution.update(s2)
+
+                api.tryCreateBattle(TryCreateBattleRequest(s2))
+
+                OkApiResult(r)
+              }
       }
     } map { rr =>
       Logger.debug(s"Quest solved by peer with result ${rr.allowed}")

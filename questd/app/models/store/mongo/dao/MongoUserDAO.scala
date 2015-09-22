@@ -2,7 +2,7 @@ package models.store.mongo.dao
 
 import java.util.Date
 
-import com.mongodb.casbah.commons._
+import com.mongodb.casbah.commons.MongoDBObject
 import com.novus.salat._
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
@@ -246,22 +246,18 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def movePrivateDailyResultsToPublic(id: String, dailyResults: List[DailyResult]): Option[User] = {
-    for (a <- 1 to dailyResults.length) {
-      findAndModify(
-        id,
-        MongoDBObject(
-          "$pop" -> MongoDBObject(
-            "privateDailyResults" -> 1)))
-    }
-
     findAndModify(
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
-          "profile.dailyResults" -> dailyResults.map(grater[DailyResult].asDBObject))))
+          "profile.dailyResults" -> dailyResults.map(grater[DailyResult].asDBObject)),
+        "$pull" -> MongoDBObject(
+          "privateDailyResults" -> MongoDBObject("$in" -> dailyResults.map(grater[DailyResult].asDBObject)))
+      )
+    )
   }
 
   /**
@@ -535,7 +531,7 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def addDevice(id: String, device: Device): Option[User] = {  // TODO: test me.
+  def addDevice(id: String, device: Device): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
@@ -546,7 +542,7 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
-  def removeDevice(id: String, token: String): Option[User] = { // TODO: test me.
+  def removeDevice(id: String, token: String): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
@@ -574,7 +570,7 @@ private[mongo] class MongoUserDAO
       MongoDBObject(
         "$set" -> MongoDBObject(
           "profile.dailyTasks" -> grater[DailyTasks].asDBObject(newTasks),
-          "schedules.dailyTasks" -> resetTasksTimeout)))
+          "schedules.nextDailyTasksAt" -> resetTasksTimeout)))
   }
 
   /**
@@ -714,7 +710,7 @@ private[mongo] class MongoUserDAO
 
   /**
    * @inheritdoc
-   */ // TODO: test me.
+   */
   def setDailyTasksSuppressed(id: String, platform: String, suppressed: Boolean): Option[User] = {
     findAndModify(
       id,
@@ -755,7 +751,7 @@ private[mongo] class MongoUserDAO
       id,
       MongoDBObject(
         "$set" -> MongoDBObject(
-          "schedules.timeLine" -> time)))
+          "schedules.nextTimeLineAt" -> time)))
   }
 
   /**
@@ -819,11 +815,14 @@ private[mongo] class MongoUserDAO
     findAndModify(
       MongoDBObject(
         "id" -> id,
-        "battleRequests.mySolutionId" -> mySolutionId,
-        "battleRequests.opponentSolutionId" -> opponentSolutionId),
+        "battleRequests" -> MongoDBObject(
+          "$elemMatch" -> MongoDBObject(
+            "mySolutionId" -> mySolutionId,
+            "opponentSolutionId" -> opponentSolutionId))),
       MongoDBObject(
         "$set" -> MongoDBObject(
           "battleRequests.$.status" -> status)))
   }
 }
+
 

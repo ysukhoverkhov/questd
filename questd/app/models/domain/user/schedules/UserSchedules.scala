@@ -6,7 +6,8 @@ import java.util.Date
  * Schedules for periodic actions with user's profile.
  */
 case class UserSchedules (
-  dailyTasks: Date = new Date(0), // TODO: rename to "nextDailyTasksAt" and do not forget in DAO
-  timeLine: Date = new Date(0), // TODO: rename to "nextTimeLineAt" and do not forget in DAO
+  nextDailyTasksAt: Date = new Date(0),
+  nextTimeLineAt: Date = new Date(0),
   lastNotificationSentAt: Date = new Date(0)
   )
+

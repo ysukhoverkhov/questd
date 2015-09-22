@@ -18,7 +18,7 @@ case class GetFriendsQuestsRequest(
   idsExclude: List[String] = List.empty,
   authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None,
-  withSolutions: Boolean = false)
+  withSolutions: Option[Boolean] = None)
 case class GetFriendsQuestsResult(quests: Iterator[Quest])
 
 case class GetFollowingQuestsRequest(
@@ -27,7 +27,7 @@ case class GetFollowingQuestsRequest(
   authorsExclude: List[String] = List.empty,
   status: QuestStatus.Value,
   levels: Option[(Int, Int)] = None,
-  withSolutions: Boolean = false)
+  withSolutions: Option[Boolean] = None)
 case class GetFollowingQuestsResult(quests: Iterator[Quest])
 
 case class GetVIPQuestsRequest(
@@ -36,7 +36,7 @@ case class GetVIPQuestsRequest(
   authorsExclude: List[String] = List.empty,
   status: QuestStatus.Value,
   levels: Option[(Int, Int)] = None,
-  withSolutions: Boolean = false)
+  withSolutions: Option[Boolean] = None)
 case class GetVIPQuestsResult(quests: Iterator[Quest])
 
 case class GetAllQuestsRequest(
@@ -47,7 +47,7 @@ case class GetAllQuestsRequest(
   status: QuestStatus.Value,
   levels: Option[(Int, Int)] = None,
   cultureId: Option[String],
-  withSolutions: Boolean = false)
+  withSolutions: Option[Boolean] = None)
 case class GetAllQuestsResult(quests: Iterator[Quest])
 
 private[domain] trait QuestsFetchAPI { this: DBAccessor =>

@@ -45,7 +45,7 @@ case class PopulateTimeLineWithRandomThingsResult(user: User)
 private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
-   * Adds entry to time line.
+   * Adds entry to time line. Does nothing is user has no culture.
    *
    */
   def addToTimeLine(request: AddToTimeLineRequest): ApiResult[AddToTimeLineResult] = handleDbException {
@@ -106,16 +106,22 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
   }
 
   /**
-   * Returns portion of time line.
+   * Returns portion of time line. Populates its with initial content if it's empty.
    */
   def getTimeLine(request: GetTimeLineRequest): ApiResult[GetTimeLineResult] = handleDbException {
 
-    val pageSize = adjustedPageSize(request.pageSize)
-    val pageNumber = adjustedPageNumber(request.pageNumber)
+    (if (request.user.timeLine.isEmpty) {
+      populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(request.user))
+    } else {
+      OkApiResult(PopulateTimeLineWithRandomThingsResult(request.user))
+    }) map { r =>
+      val pageSize = adjustedPageSize(request.pageSize)
+      val pageNumber = adjustedPageNumber(request.pageNumber)
 
-    OkApiResult(GetTimeLineResult(request.user.timeLine.iterator
-      .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
-      .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
+      OkApiResult(GetTimeLineResult(r.user.timeLine.iterator
+        .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
+        .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
+    }
   }
 
   /**
@@ -239,16 +245,20 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
       }
     }
 
-    {
-      addRandomBattlesToTimeLine(request.user, battlesCount)
-    } map { r =>
-      addRandomSolutionsToTimeLine(r.user, solutionsCount)
-    } map { r =>
-      addRandomQuestsToTimeLine(r.user, questsCount)
-    } map { r =>
-      db.user.setTimeLinePopulationTime(r.user.id, r.user.getPopulateTimeLineDate) ifSome { u =>
-        OkApiResult(PopulateTimeLineWithRandomThingsResult(u))
+    if (request.user.bioComplete) {
+      {
+        addRandomBattlesToTimeLine(request.user, battlesCount)
+      } map { r =>
+        addRandomSolutionsToTimeLine(r.user, solutionsCount)
+      } map { r =>
+        addRandomQuestsToTimeLine(r.user, questsCount)
+      } map { r =>
+        db.user.setTimeLinePopulationTime(r.user.id, r.user.getPopulateTimeLineDate) ifSome { u =>
+          OkApiResult(PopulateTimeLineWithRandomThingsResult(u))
+        }
       }
+    } else {
+      OkApiResult(PopulateTimeLineWithRandomThingsResult(user))
     }
   }
 }

@@ -7,7 +7,6 @@ import components.random.RandomComponent
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.tasks.crawlers.base.BaseCrawler
-import models.domain._
 import models.domain.user.User
 
 object PopulateTimeLine {
@@ -23,7 +22,7 @@ class PopulateTimeLine(
     randPar: RandomComponent#Random) extends BaseCrawler[User](apiPar, randPar)  {
 
   protected def check(user: User) = {
-    if (user.schedules.timeLine.before(new Date())) {
+    if (user.schedules.nextTimeLineAt.before(new Date()) && user.isActive) {
       api.populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(user))
     }
   }

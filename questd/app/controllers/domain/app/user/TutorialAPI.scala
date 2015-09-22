@@ -181,14 +181,12 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
   /**
    * Assigns new tutorial quest by client's request.
-   */ // TODO: perhaps remove me.
+   */
   def assignTutorialQuest(request: AssignTutorialQuestRequest): ApiResult[AssignTutorialQuestResult] = handleDbException {
     import request._
 
     if (user.profile.tutorialStates(platform.toString).usedTutorialQuestIds.contains(questId)) {
       OkApiResult(AssignTutorialQuestResult(LimitExceeded))
-    } else if (api.configNamed("Tutorial")(api.TutorialConfigParams.TutorialQuestId) != questId) {
-      OkApiResult(AssignTutorialQuestResult(OutOfContent))
     } else {
       db.quest.readById(questId) match {
         case Some(q) =>

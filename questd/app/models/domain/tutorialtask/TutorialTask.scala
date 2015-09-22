@@ -8,7 +8,7 @@ import models.domain.user.profile.{TaskType, Task}
  * Task created by tutorial script.
  */
 case class TutorialTask(
-  id: String = ID.generateUUID(),
+  id: String = ID.generate,
   taskType: TaskType.Value,
   description: String,
   requiredCount: Int,

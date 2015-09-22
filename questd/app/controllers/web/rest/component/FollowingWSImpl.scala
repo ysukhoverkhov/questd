@@ -23,11 +23,14 @@ private object FollowingWSImplTypes {
 
   type WSRemoveFromFollowingResult = RemoveFromFollowingResult
 
+
   case class WSGetSuggestsForFollowingRequest(
     tokens: Map[String, String])
-
   type WSGetSuggestsForFollowingResult = GetSuggestsForFollowingResult
 
+  case class WSGetSNFriendsInGameRequest(
+    tokens: Map[String, String])
+  type WSGetSNFriendsInGameResult = GetSNFriendsInGameResult
 }
 
 trait FollowingWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
@@ -63,6 +66,14 @@ trait FollowingWSImpl extends QuestController with SecurityWSImpl { this: WSComp
 
     api.getSuggestsForFollowing(GetSuggestsForFollowingRequest(r.user, v.tokens))
   }
+
+  def getSNFriendsInGame = wrapJsonApiCallReturnBody[WSGetSNFriendsInGameResult] { (js, r) =>
+    val v = Json.read[WSGetSNFriendsInGameRequest](js.toString)
+
+    api.getSNFriendsInGame(GetSNFriendsInGameRequest(r.user, v.tokens))
+  }
+
+
 
 }
 

@@ -135,32 +135,37 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
       OkApiResult(RespondFriendshipResult(allowed = OutOfContent))
     } else {
       if (request.accept) {
-        db.user.updateFriendship(
-          request.user.id,
-          request.friendId,
-          FriendshipStatus.Accepted.toString,
-          FriendshipStatus.Accepted.toString)
+        db.user.readById(request.friendId) ifSome { friend =>
+          request.user.canAcceptFriendship(friend) match {
+            case OK =>
+              db.user.updateFriendship(
+                request.user.id,
+                request.friendId,
+                FriendshipStatus.Accepted.toString,
+                FriendshipStatus.Accepted.toString)
 
-        // Sending message about good response on friendship.
-        db.user.readById(request.friendId) ifSome { f =>
-          sendMessage(SendMessageRequest(f, MessageFriendshipAccepted(request.user.id)))
+              // Sending message about good response on friendship.
+              sendMessage(SendMessageRequest(friend, MessageFriendshipAccepted(request.user.id)))
+
+              // Removing each other from following.
+              db.user.removeFromFollowing(request.user.id, request.friendId)
+              db.user.removeFromFollowing(request.friendId, request.user.id)
+
+              OkApiResult(RespondFriendshipResult(OK))
+            case a =>
+              OkApiResult(RespondFriendshipResult(a))
+          }
         }
-
-        // Removing each other from following.
-        db.user.removeFromFollowing(request.user.id, request.friendId)
-        db.user.removeFromFollowing(request.friendId, request.user.id)
-
       } else {
-
         db.user.removeFriendship(request.user.id, request.friendId)
 
         // sending message for rejected response.
         db.user.readById(request.friendId) ifSome { f =>
           sendMessage(SendMessageRequest(f, message.MessageFriendshipRejected(request.user.id)))
         }
-      }
 
-      OkApiResult(RespondFriendshipResult(OK))
+        OkApiResult(RespondFriendshipResult(OK))
+      }
     }
   }
 

@@ -24,7 +24,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
     "Do not allow cheating for solutions without rights" in {
       applyConfigMock()
 
-      val user = createUserStub(rights = Rights(unlockedFunctionality = Set(Functionality.VoteSolutions)))
+      val user = createUserStub(rights = Rights(unlockedFunctionality = Set(Functionality.VoteSolutions), 10))
       val s = createSolutionStub()
 
       val rv = user.canVoteSolution(s.id, ContentVote.Cheating)
@@ -35,7 +35,7 @@ class VotingSolutionsSpecs extends BaseLogicSpecs {
     "Do allow cheating for solutions without rights" in {
       applyConfigMock()
 
-      val user = createUserStub(rights = Rights(unlockedFunctionality = Set(Functionality.VoteSolutions, Functionality.Report)))
+      val user = createUserStub(rights = Rights(unlockedFunctionality = Set(Functionality.VoteSolutions, Functionality.Report), 10))
       val s = createSolutionStub()
 
       val rv = user.canVoteSolution(s.id, ContentVote.Cheating)

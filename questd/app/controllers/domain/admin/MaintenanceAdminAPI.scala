@@ -108,9 +108,6 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
 
     db.tutorial.all.foreach { tutorial =>
       db.tutorial.update(tutorial)
-//      tutorial.elements.foreach{ element =>
-//        db.tutorial.updateElement(tutorial.id, element.copy(actions = List(element.action, TutorialAction(TutorialActionType.CloseTutorialElement, params = Map("elementId" -> element.id)))))
-//      }
     }
 
     OkApiResult(CleanUpObjectsResult())

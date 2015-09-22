@@ -67,6 +67,7 @@ POST	/rest/costToFollow	    						controllers.web.rest.FollowingWS.costToFollow
 POST	/rest/addToFollowing							controllers.web.rest.FollowingWS.addToFollowing
 POST	/rest/removeFromFollowing						controllers.web.rest.FollowingWS.removeFromFollowing
 POST	/rest/getSuggestsForFollowing					controllers.web.rest.FollowingWS.getSuggestsForFollowing
+POST	/rest/getSNFriendsInGame      					controllers.web.rest.FollowingWS.getSNFriendsInGame
 
 # Friends requests
 POST	/rest/getFriends								controllers.web.rest.FriendsWS.getFriends

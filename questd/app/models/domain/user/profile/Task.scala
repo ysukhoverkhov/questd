@@ -5,7 +5,7 @@ import models.domain.common.Assets
 
 
 case class Task(
-  id: String = ID.generateUUID(),
+  id: String = ID.generate,
   taskType: TaskType.Value,
   description: String,
   reward: Assets = Assets(),

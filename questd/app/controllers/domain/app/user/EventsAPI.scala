@@ -31,16 +31,16 @@ case class RemoveDeviceTokenResult(allowed: ProfileModificationResult)
 case class CheckSendNotificationsRequest(user: User)
 case class CheckSendNotificationsResult(user: User)
 
-case class NotifyWithMessageRequest(user: User, message: Message)
+case class NotifyWithMessageRequest(user: User, message: Message, numberOfEvents: Int)
 case class NotifyWithMessageResult(user: User)
 
 
-private[domain] trait EventsAPI { this: DBAccessor =>
+private[domain] trait EventsAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
    * Sends message to a user.
    * This is used as entry point for all events.
-   * We here check should we ingore the message or should not and add it if should not.
+   * We here check should we ignore the message or should not and add it if should not.
    * After that we asks to send notifications if it's required.
    */
   def sendMessage(request: SendMessageRequest): ApiResult[SendMessageResult] = handleDbException {
@@ -116,25 +116,26 @@ private[domain] trait EventsAPI { this: DBAccessor =>
 
   /**
    * Checks should we send notification or not and if we should sends it.
-   */ // TODO: test me.
+   */
   def checkSendNotifications(request: CheckSendNotificationsRequest): ApiResult[CheckSendNotificationsResult] = handleDbException {
     import request._
-    import com.github.nscala_time.time.Imports._
 
-    if (DateTime.now < new DateTime(user.schedules.lastNotificationSentAt) + user.settings.notificationsIntervalHours.hours) {
+    if (!user.shouldSendNotification) {
       // Not now.
       OkApiResult(CheckSendNotificationsResult(user))
     } else if (user.profile.messages.isEmpty) {
       // Nothing to send.
       OkApiResult(CheckSendNotificationsResult(user))
     } else {
-      db.user.setNotificationSentTime(user.id, new Date()) ifSome { user =>
-        notifyWithMessage(NotifyWithMessageRequest(
-          user = user,
-          message = user.profile.messages.sortBy[Int](m => MessageMetaInfo.messagePriority(m.messageType)).head
-        )) map { r =>
-          OkApiResult(CheckSendNotificationsResult(r.user))
-        }
+      notifyWithMessage(NotifyWithMessageRequest(
+        user = user,
+        message = user.profile.messages
+          .dropWhile(_.generatedAt.before(user.schedules.lastNotificationSentAt))
+          .sortBy[Int](m => MessageMetaInfo.messagePriority(m.messageType))
+          .head,
+        numberOfEvents = user.profile.messages.length
+      )) map { r =>
+        OkApiResult(CheckSendNotificationsResult(r.user))
       }
     }
   }
@@ -146,23 +147,25 @@ private[domain] trait EventsAPI { this: DBAccessor =>
     import controllers.services.devicenotifications.DeviceNotifications.{Device, IOSDevice}
     import request._
 
-    val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+    db.user.setNotificationSentTime(user.id, new Date()) ifSome { user =>
+      val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
 
-    val devices: Set[Device] = user.devices.map {
-      case models.domain.user.devices.Device(ClientPlatform.iPhone, token) => IOSDevice(token)
-    }.toSet[Device]
+      val devices: Set[Device] = user.devices.map {
+        case models.domain.user.devices.Device(ClientPlatform.iPhone, token) => IOSDevice(token)
+      }.toSet[Device]
 
-    val messageText = MessageMetaInfo.messageLocalizedMessage(message.messageType)
+      val messageText = MessageMetaInfo.messageLocalizedMessage(message.messageType)
 
-    actorSelectionNotification ! DeviceNotifications.PushMessage(
-      devices = DeviceNotifications.Devices(devices.toSet),
-      message = messageText,
-      badge = None,
-      sound = None,
-      destinations = List(DeviceNotifications.MobileDestination)
-    )
+      actorSelectionNotification ! DeviceNotifications.PushMessage(
+        devices = DeviceNotifications.Devices(devices.toSet),
+        message = messageText,
+        badge = Some(numberOfEvents),
+        sound = None,
+        destinations = List(DeviceNotifications.MobileDestination)
+      )
 
-    OkApiResult(NotifyWithMessageResult(user))
+      OkApiResult(NotifyWithMessageResult(user))
+    }
   }
 }
 

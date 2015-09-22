@@ -29,7 +29,7 @@ private[mongo] class MongoQuestDAO
     ids: List[String] = List.empty,
     idsExclude: List[String] = List.empty,
     cultureId: Option[String] = None,
-    withSolutions: Boolean = false): Iterator[Quest] = {
+    withSolutions: Option[Boolean] = None): Iterator[Quest] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
@@ -67,8 +67,11 @@ private[mongo] class MongoQuestDAO
       queryBuilder += ("cultureId" -> cultureId.get)
     }
 
-    if (withSolutions) {
-      queryBuilder += ("solutionsCount" -> MongoDBObject("$gt" -> 0))
+    if (withSolutions.isDefined) {
+      if (withSolutions.get)
+        queryBuilder += ("solutionsCount" -> MongoDBObject("$gt" -> 0))
+      else
+        queryBuilder += ("solutionsCount" -> MongoDBObject("$eq" -> 0))
     }
 
     findByExample(

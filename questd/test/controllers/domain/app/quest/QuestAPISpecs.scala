@@ -52,7 +52,7 @@ class QuestAPISpecs extends BaseAPISpecs {
 
       val result = api.voteQuest(VoteQuestRequest(q, ContentVote.Cool))
 
-      result must beEqualTo(OkApiResult(VoteQuestResult()))
+      result must beAnInstanceOf[OkApiResult[VoteQuestResult]]
 
       there was one(quest).updatePoints(
         id = mEq(q.id),

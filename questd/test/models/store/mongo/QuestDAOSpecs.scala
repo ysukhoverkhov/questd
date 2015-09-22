@@ -148,7 +148,7 @@ class QuestDAOSpecs extends Specification
       excludingAuthorIds.map(_.id).size must beEqualTo(2)
       excludingAuthorIds.map(_.id).sorted must beEqualTo(List(qs(0).id, qs(2).id).sorted)
 
-      val withSolutions = db.quest.allWithParams(withSolutions = true).toList
+      val withSolutions = db.quest.allWithParams(withSolutions = Some(true)).toList
       withSolutions.map(_.id).size must beEqualTo(1)
       withSolutions.map(_.id).sorted must beEqualTo(List(qs(1).id).sorted)
     }

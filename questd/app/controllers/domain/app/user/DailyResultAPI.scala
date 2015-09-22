@@ -54,22 +54,31 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
 
   /**
    * Shifts daily result.
-   */ // TODO: bug here. daily result is added for each created quest, should create only one private daily result.
-  // TODO: bug here - this function should work if no daily results present.
-  // TODO: write test to confirm this bug and fix it after that (there is a chance I'm wrong and there is on such bug).
+   */
   def shiftDailyResult(request: ShiftDailyResultRequest): ApiResult[ShiftDailyResultResult] = handleDbException {
     import request._
+
+    val userWithResults = if (user.privateDailyResults.isEmpty) {
+      Logger.error("Adding private daily result because they are empty at shifting")
+
+      db.user.addPrivateDailyResult(
+        user.id,
+        DailyResult(
+          user.getStartOfCurrentDailyResultPeriod)).get
+    } else {
+      user
+    }
 
     {
       getMyQuests(
         GetMyQuestsRequest(
-          user = user,
+          user = userWithResults,
           status = QuestStatus.InRotation
         ))
     } map { r =>
-      r.quests.foldLeft[ApiResult[AddQuestIncomeToDailyResultResult]](OkApiResult(AddQuestIncomeToDailyResultResult(user))) {
+      r.quests.foldLeft[ApiResult[AddQuestIncomeToDailyResultResult]](OkApiResult(AddQuestIncomeToDailyResultResult(userWithResults))) {
         case (OkApiResult(_), q) =>
-          addQuestIncomeToDailyResult(AddQuestIncomeToDailyResultRequest(user, q))
+          addQuestIncomeToDailyResult(AddQuestIncomeToDailyResultRequest(userWithResults, q))
         case (badResult, _) =>
           badResult
       }
@@ -77,7 +86,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
       db.user.addPrivateDailyResult(
         r.user.id,
         DailyResult(
-          user.getStartOfCurrentDailyResultPeriod)) ifSome { u =>
+          userWithResults.getStartOfCurrentDailyResultPeriod)) ifSome { u =>
 
           sendMessage(SendMessageRequest(u, MessageDailyResultsReady()))
 
@@ -120,7 +129,7 @@ private[domain] trait DailyResultAPI { this: DomainAPIComponent#DomainAPI with D
     val (u, newOne, internalError) = if (request.user.privateDailyResults.length > 1) {
       db.user.movePrivateDailyResultsToPublic(request.user.id, request.user.privateDailyResults.tail) match {
         case Some(us) =>
-          if (us.privateDailyResults.length < 1) {
+          if (us.privateDailyResults.isEmpty) {
             Logger.error(s"Zero private daily results for user ${us.id}")
             Logger.error(s"Was moving ${request.user.privateDailyResults.tail}")
             Logger.error(s"Was before moving ${request.user.privateDailyResults}")

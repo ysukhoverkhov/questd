@@ -24,10 +24,11 @@ class UserLogic(
   with Challenges
   with TimeLineLogic
   with MiscUserLogic
-  with CommonUserLogic
+  with EventsUserLogic
   with QuestSelectUserLogic
   with SolutionSelectUserLogic
   with BattleSelectUserLogic
+
 
   with SelectionHelpers {
 }

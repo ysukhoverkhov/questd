@@ -10,7 +10,7 @@ import models.domain.base.ID
  * Created by Yury on 03.08.2015.
  */
 case class ChatMessage (
-  id: String = ID.generateUUID(),
+  id: String = ID.generate,
   senderId: String,
   conversationId: String,
   message: String,

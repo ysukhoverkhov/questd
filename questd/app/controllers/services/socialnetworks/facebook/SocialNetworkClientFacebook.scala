@@ -2,10 +2,11 @@ package controllers.services.socialnetworks.facebook
 
 import com.restfb._
 import com.restfb.exception._
+import com.restfb.json.JsonObject
 import controllers.services.socialnetworks.client._
 import controllers.services.socialnetworks.exception.{AuthException, NetworkException}
 import controllers.services.socialnetworks.facebook.types.UserIdWithApp
-import play.Logger
+import play.{Play, Logger}
 
 import scala.language.implicitConversions
 
@@ -19,18 +20,36 @@ private[socialnetworks] class SocialNetworkClientFacebook extends SocialNetworkC
     f
   } catch {
     case ex: FacebookOAuthException =>
-      Logger.debug("Facebook auth failed")
+      Logger.debug("Facebook call failed")
       throw new AuthException
     case ex: FacebookNetworkException =>
-      Logger.debug("Unable to connect to facebook")
+      Logger.debug("Unable to connect to Facebook")
       throw new NetworkException
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def isValidUserToken(token: String): Boolean = handleExceptions {
+    val appId = Play.application().configuration().getString("application.socialnetworks.facebook.appid")
+    val secret = Play.application().configuration().getString("application.socialnetworks.facebook.secret")
+
+    val client = facebookClient(s"$appId|$secret")
+
+    val rv = client.fetchObject("debug_token", classOf[JsonObject], Parameter.`with`("input_token", token))
+    if (rv.has("error")) {
+      false
+    } else {
+      val data = rv.getJsonObject("data")
+      (data.getString("app_id") == appId) && data.getBoolean("is_valid")
+    }
   }
 
   /// Get user of social network.
   def fetchUserByToken(token: String): User = handleExceptions {
 
     val client = facebookClient(token)
-    return UserFacebook(
+    UserFacebook(
       client.fetchObject("me", classOf[com.restfb.types.User]),
       this,
       token)

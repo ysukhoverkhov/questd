@@ -1,6 +1,9 @@
 package controllers.domain.app.user
 
+import java.util.Date
+
 import controllers.domain.{BaseAPISpecs, OkApiResult}
+import logic.UserLogic
 import models.domain.user.message._
 import models.domain.user.schedules.UserSchedules
 import org.mockito.Matchers.{eq => mEq}
@@ -20,12 +23,14 @@ class EventsAPISpecs extends BaseAPISpecs {
     "Send notification if there is a notification to send" in context {
       val u = createUserStub(messages = List(MessageAllTasksCompleted()))
 
+      val userLogicMoc = mock[UserLogic]
+      userLogicMoc.shouldSendNotification returns true
+      api.user2Logic(any) returns userLogicMoc
       user.setNotificationSentTime(mEq(u.id), any) returns Some(u)
       doReturn(OkApiResult(NotifyWithMessageResult(u))).when(api).notifyWithMessage(any)
 
       val result = api.checkSendNotifications(CheckSendNotificationsRequest(u))
 
-      there was one(user).setNotificationSentTime(mEq(u.id), any)
       there was one(api).notifyWithMessage(any)
 
       result must beAnInstanceOf[OkApiResult[CheckSendNotificationsResult]]
@@ -68,13 +73,37 @@ class EventsAPISpecs extends BaseAPISpecs {
       val u = createUserStub(
         messages = List(messageAllTasksCompleted, messageFriendshipAccepted, messageFriendshipRejected))
 
+      val userLogicMoc = mock[UserLogic]
+      userLogicMoc.shouldSendNotification returns true
+      api.user2Logic(any) returns userLogicMoc
       user.setNotificationSentTime(mEq(u.id), any) returns Some(u)
       doReturn(OkApiResult(NotifyWithMessageResult(u))).when(api).notifyWithMessage(any)
 
       val result = api.checkSendNotifications(CheckSendNotificationsRequest(u))
 
-      there was one(user).setNotificationSentTime(mEq(u.id), any)
-      there was one(api).notifyWithMessage(mEq(NotifyWithMessageRequest(u, messageFriendshipAccepted)))
+      there was one(api).notifyWithMessage(mEq(NotifyWithMessageRequest(u, messageFriendshipAccepted, 3)))
+
+      result must beAnInstanceOf[OkApiResult[CheckSendNotificationsResult]]
+    }
+
+    "Do not resend notifications what already were sent" in context {
+      val messageAllTasksCompleted: Message = (MessageAllTasksCompleted(): Message).copy(generatedAt = new Date(0))
+      val messageFriendshipAccepted: Message = (MessageFriendshipAccepted("fid"): Message).copy(generatedAt = new Date(0))
+      val messageFriendshipRejected: Message = (MessageFriendshipRejected("fid"): Message).copy(generatedAt = new Date(Long.MaxValue))
+
+      val u = createUserStub(
+        messages = List(messageAllTasksCompleted, messageFriendshipAccepted, messageFriendshipRejected),
+        schedules = UserSchedules(lastNotificationSentAt = new Date()))
+
+      val userLogicMoc = mock[UserLogic]
+      userLogicMoc.shouldSendNotification returns true
+      api.user2Logic(any) returns userLogicMoc
+      user.setNotificationSentTime(mEq(u.id), any) returns Some(u)
+      doReturn(OkApiResult(NotifyWithMessageResult(u))).when(api).notifyWithMessage(any)
+
+      val result = api.checkSendNotifications(CheckSendNotificationsRequest(u))
+
+      there was one(api).notifyWithMessage(mEq(NotifyWithMessageRequest(u, messageFriendshipRejected, 3)))
 
       result must beAnInstanceOf[OkApiResult[CheckSendNotificationsResult]]
     }

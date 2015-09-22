@@ -24,7 +24,7 @@ trait QuestDAO extends BaseDAO[Quest] {
     ids: List[String] = List.empty,
     idsExclude: List[String] = List.empty,
     cultureId: Option[String] = None,
-    withSolutions: Boolean = false): Iterator[Quest] // TODO: last param should be Option and check for true and false both.
+    withSolutions: Option[Boolean] = None): Iterator[Quest]
 
   /**
    * Update quest's points.

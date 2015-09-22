@@ -13,7 +13,7 @@ trait DeviceNotificationsComponent { component =>
     val deviceNotifications = Akka.system.actorOf(DeviceNotifications.props, name = DeviceNotifications.name)
     val inactiveDevices = Akka.system.actorOf(InactiveDevices.props, name = InactiveDevices.name)
 
-    // TODO: move it to the good place.
+    // TODO: move it to the good place after creating parallel root pie for actor system.
     val listener = Akka.system.actorOf(UnhandledMessagesListener.props, name = UnhandledMessagesListener.name)
   }
 }
