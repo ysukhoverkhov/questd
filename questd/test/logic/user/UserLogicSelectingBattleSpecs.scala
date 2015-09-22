@@ -9,9 +9,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 
   "User Logic" should {
 
-    "Return battle from friends if dice rolls so" in {
-
-      applyConfigMock()
+    "Return battle from friends if dice rolls so" in context {
       rand.nextDouble returns 0.13
 
       val bid = "qid"
@@ -27,8 +25,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
       q.map(_.id) must beEqualTo(List(bid))
     }
 
-    "Return battles from following if dice rolls so" in {
-      applyConfigMock()
+    "Return battles from following if dice rolls so" in context {
       rand.nextDouble returns 0.38
 
       val bid = "qid"
@@ -44,7 +41,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
       q.map(_.id) must beEqualTo(List(bid))
     }
 
-//    "Return liked quest if dice rolls so for solving" in {
+//    "Return liked quest if dice rolls so for solving" in context {
 //      api.config returns createStubConfig
 //      rand.nextDouble returns 0.58
 //
@@ -61,7 +58,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //      q.map(_.id) must beEqualTo(List(qid))
 //    }
 
-//    "Do not return liked quest if dice rolls so for voting" in {
+//    "Do not return liked quest if dice rolls so for voting" in context {
 //      api.config returns createStubConfig
 //      rand.nextDouble returns 0.98
 //
@@ -79,8 +76,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //      q.map(_.id) must beEqualTo(List(qid))
 //    }
 
-    "Return VIP battles if dice rolls so" in {
-      applyConfigMock()
+    "Return VIP battles if dice rolls so" in context {
       rand.nextDouble returns 0.75
 
       val bid = "qid"
@@ -97,7 +93,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
     }
 
     // TODO: implement me when tags will be impelemented.
-//    "Return VIP quest with favorite theme ids if dice rolls so" in {
+//    "Return VIP quest with favorite theme ids if dice rolls so" in context {
 //      val qid = "qid"
 //      val u = User(
 //        profile = Profile(
@@ -121,7 +117,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //    }
 
     // TODO: uncomment with tags.
-//    "Return All quest with favorite theme ids if dice rolls so" in {
+//    "Return All quest with favorite theme ids if dice rolls so" in context {
 //      val qid = "qid"
 //      val u = User(
 //        history = UserHistory(
@@ -146,7 +142,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //      q must beSome.which(q => q.id == qid)
 //    }
 
-//    "Starting quests return vip quests" in {
+//    "Starting quests return vip quests" in context {
 //      val qid = "qid"
 //      val u = User(
 //        profile = Profile(
@@ -163,7 +159,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //      there was one(api).getVIPQuests(any[GetVIPQuestsRequest])
 //    }
 
-//    "Starting quests return other quests" in {
+//    "Starting quests return other quests" in context {
 //      val qid = "qid"
 //      val u = User(
 //        profile = Profile(
@@ -180,7 +176,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //      there was one(api).getAllQuests(any[GetAllQuestsRequest])
 //    }
 
-//    "Starting quests does not return other quests ignoring recent quests list if no quests available otherwise" in {
+//    "Starting quests does not return other quests ignoring recent quests list if no quests available otherwise" in context {
 //      val qid = "qid"
 //      val u = createUserStub(level = 1, timeLine = List(createTimeLineEntryStub(objectId = qid)))
 //
@@ -200,7 +196,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //      q.length must beEqualTo(1)
 //    }
 
-//    "Other quests are used if vip quests are unavailable" in {
+//    "Other quests are used if vip quests are unavailable" in context {
 //      val qid = "qid"
 //      val u = User()
 //
@@ -217,11 +213,10 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //      there was one(api).getAllQuests(any[GetAllQuestsRequest])
 //    }
 
-    "All battles are used if vip and Other battles are unavailable" in {
+    "All battles are used if vip and Other battles are unavailable" in context {
       val qid = "qid"
       val u = createUserStub()
 
-      applyConfigMock()
       rand.nextDouble returns 0.75
 
       api.getVIPBattles(any[GetVIPBattlesRequest]) returns OkApiResult(GetVIPBattlesResult(List.empty.iterator))

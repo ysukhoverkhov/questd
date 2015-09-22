@@ -98,9 +98,13 @@ POST	/rest/getCommentsForObject 						controllers.web.rest.CommentsWS.getComment
 
 # Challenges
 #POST	/rest/costToChallenge							controllers.web.rest.ChallengesWS.costToChallenge
-POST    /rest/challengeBattle 	    					controllers.web.rest.ChallengesWS.challengeBattle
-POST	/rest/getBattleRequests						    controllers.web.rest.ChallengesWS.getBattleRequests
-POST    /rest/respondBattleRequest    					controllers.web.rest.ChallengesWS.respondBattleRequest
+POST    /rest/makeQuestChallenge                    	controllers.web.rest.ChallengesWS.makeQuestChallenge
+POST    /rest/makeSolutionChallenge                     controllers.web.rest.ChallengesWS.makeSolutionChallenge
+POST	/rest/getChallenge  						    controllers.web.rest.ChallengesWS.getChallenge
+POST	/rest/getMyChallenges						    controllers.web.rest.ChallengesWS.getMyChallenges
+POST	/rest/getChallengesToMe						    controllers.web.rest.ChallengesWS.getChallengesToMe
+POST    /rest/acceptChallenge    					    controllers.web.rest.ChallengesWS.acceptChallenge
+POST    /rest/rejectChallenge    					    controllers.web.rest.ChallengesWS.rejectChallenge
 
 # Chat
 POST   /rest/createConversation                         controllers.web.rest.ConversationsWS.createConversation

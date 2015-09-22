@@ -7,8 +7,12 @@ import play.api.mvc._
 //noinspection EmptyParenMethodAccessedAsParameterless,MutatorLikeMethodIsParameterless
 object ChallengesWS extends Controller with AccessToWSInstance {
 
-  def challengeBattle = ws.challengeBattle
-  def getBattleRequests = ws.getBattleRequests
-  def respondBattleRequest = ws.respondBattleRequest
+  def makeQuestChallenge = ws.makeQuestChallenge
+  def makeSolutionChallenge = ws.makeSolutionChallenge
+  def getChallenge = ws.getChallenge
+  def getMyChallenges = ws.getMyChallenges
+  def getChallengesToMe = ws.getChallengesToMe
+  def acceptChallenge = ws.acceptChallenge
+  def rejectChallenge = ws.rejectChallenge
 }
 

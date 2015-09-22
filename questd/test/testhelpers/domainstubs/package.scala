@@ -4,7 +4,8 @@ import java.util.Date
 
 import models.domain.base.ID
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
-import models.domain.chat.{Participant, Conversation}
+import models.domain.challenge.{ChallengeStatus, Challenge}
+import models.domain.chat.{Conversation, Participant}
 import models.domain.comment.{Comment, CommentInfo}
 import models.domain.common._
 import models.domain.quest._
@@ -12,7 +13,6 @@ import models.domain.solution._
 import models.domain.tag.{Theme, ThemeInfo}
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, LoginMethod}
-import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.demo.UserDemographics
 import models.domain.user.friends.Friendship
@@ -248,7 +248,6 @@ package object domainstubs {
     timeLine: List[TimeLineEntry] = List.empty,
     questBookmark: Option[String] = None,
     privateDailyResults: List[DailyResult] = List(createDailyResultStub()),
-    battleRequests: List[BattleRequest] = List.empty,
     tutorialState: TutorialState = TutorialState(dailyTasksSuppression = false),
     dailyTasks: DailyTasks = DailyTasks(),
     messages: List[Message] = List.empty,
@@ -292,7 +291,23 @@ package object domainstubs {
         votedSolutions = votedSolutions,
         votedBattles = votedBattles,
         participatedBattles = participatedBattles.map{case (k, v) => (k, SolutionsInBattle(List(v)))}),
-      battleRequests = battleRequests,
       schedules = schedules)
+  }
+
+  def createChallengeStub(
+    id: String = ID.generate,
+    myId: String = "myId",
+    opponentId: String = "opponentId",
+    questId: String = "questId",
+    creationDate: Date = new Date(),
+    status: ChallengeStatus.Value = ChallengeStatus.Accepted) = {
+
+    Challenge(
+      id = id,
+      myId = myId,
+      opponentId = opponentId,
+      questId = questId,
+      status = status,
+      creationDate = creationDate)
   }
 }
