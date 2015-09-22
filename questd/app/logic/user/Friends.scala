@@ -62,7 +62,7 @@ trait Friends { this: UserLogic =>
   def canAcceptFriendship(potentialFriend: User) = {
     commonFriendshipCheck(potentialFriend) match {
       case OK =>
-        if (user.friends.filterNot(_.status == FriendshipStatus.Invites).length >= user.profile.rights.maxFriendsCount) {
+        if (user.friends.count(_.status == FriendshipStatus.Accepted) >= user.profile.rights.maxFriendsCount) {
           LimitExceeded
         } else {
           OK

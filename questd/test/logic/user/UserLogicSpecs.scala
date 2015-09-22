@@ -42,11 +42,15 @@ class UserLogicSpecs extends BaseLogicSpecs {
       createUserStub(level = 20).calculateQuestLevel must beEqualTo(20)
     }
 
-    "Do not count requests to us in accepting friendship" in {
+    "Do not count requests in accepting friendship" in {
       val uid = "asdasd"
       val fid = "adasda"
 
-      val friendships = (1 to 10000).map(i => Friendship(friendId = fid, status = FriendshipStatus.Invites)).toList
+      def generateRequests(friendId: String, status: FriendshipStatus.Value): List[Friendship] = {
+        (1 to 10000).map(i => Friendship(friendId = fid, status = status)).toList
+      }
+      val friendships =
+        generateRequests(fid, FriendshipStatus.Invites) ::: generateRequests(fid, FriendshipStatus.Invited)
 
       val u = createUserStub(id = uid, level = 10, friends = friendships)
       val f = createUserStub(id = fid, level = 10, friends = friendships)
