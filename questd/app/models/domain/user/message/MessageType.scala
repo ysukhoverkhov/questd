@@ -7,8 +7,8 @@ object MessageType extends Enumeration {
   // system
   val AllTasksCompleted = Value
   val TaskCompleted = Value
-  val BattleRequestAccepted = Value
-  val BattleRequestRejected = Value
+  val ChallengeAccepted = Value
+  val ChallengeRejected = Value
   val FriendshipAccepted = Value
   val FriendshipRejected = Value
   val FriendshipRemoved = Value

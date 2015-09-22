@@ -6,9 +6,9 @@ import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.helpers._
 import logic.BattleLogic
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
+import models.domain.challenge.{ChallengeStatus, Challenge}
 import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.User
-import models.domain.user.battlerequests.{BattleRequest, BattleRequestStatus}
 import models.domain.user.stats.SolutionsInBattle
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import play.Logger
@@ -133,23 +133,19 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         withBattles = withBattles)
     }
 
-    def makeChallenge(solutions: List[Solution]): ApiResult[TryCreateBattleResult] = {
+    def makeChallenge(solutions: List[Solution]): Unit = {
       val mySolution = solutions.head
       val opponentSolution = solutions(1)
       val myId = mySolution.info.authorId
       val opponentId = opponentSolution.info.authorId
 
-      db.user.addBattleRequest(
-        opponentId,
-        BattleRequest(myId, opponentSolution.id, mySolution.id, BattleRequestStatus.AutoCreated)) ifSome { op =>
-
-        db.user.addBattleRequest(
-          myId,
-          BattleRequest(
-            opponentId, mySolution.id, opponentSolution.id, BattleRequestStatus.AutoCreated)) ifSome { op =>
-          OkApiResult(TryCreateBattleResult())
-        }
-      }
+      db.challenge.create(Challenge(
+        myId = myId,
+        opponentId = opponentId,
+        questId = mySolution.info.questId,
+        mySolutionId = Some(mySolution.id),
+        opponentSolutionId = Some(opponentSolution.id),
+        status = ChallengeStatus.AutoCreated))
     }
 
     if (solution.canParticipateAutoBattle) {
@@ -172,7 +168,8 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         if (solutions.isEmpty) {
           OkApiResult(TryCreateBattleResult())
         } else {
-          makeChallenge(solutions) map createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
+          makeChallenge(solutions)
+          createBattle(CreateBattleRequest(solutions)) map OkApiResult(TryCreateBattleResult())
         }
       }
     } else {

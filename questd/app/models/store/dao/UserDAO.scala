@@ -5,7 +5,6 @@ import java.util.Date
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
 import models.domain.user.auth.CrossPromotedApp
-import models.domain.user.battlerequests.BattleRequest
 import models.domain.user.dailyresults._
 import models.domain.user.devices.Device
 import models.domain.user.friends.Friendship
@@ -197,24 +196,5 @@ trait UserDAO extends BaseDAO[User] {
    * @return user after modifications.
    */
   def removeEntryFromTimeLineByObjectId(id: String, entryId: String): Option[User]
-
-  /**
-   * Adds battle request to user.
-   *
-   * @param id Id of user to add request to.
-   * @param battleRequest Request to add.
-   * @return Modified user.
-   */
-  def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User]
-
-  /**
-   * Updates status of battle request.
-   *
-   * @param id Id of user to update request for.
-   * @param mySolutionId Id of user's challenged solution.
-   * @param opponentSolutionId Id of opponent's sopution.
-   * @param status new status.
-   */
-  def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User]
 
 }
