@@ -126,7 +126,6 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
           db.challenge.create(challenge)
 
         // TODO: substract assets for invitation.
-        // TODO: test it calls db correctly.
 
           {
             makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))

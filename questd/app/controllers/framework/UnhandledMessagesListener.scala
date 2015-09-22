@@ -12,7 +12,6 @@ object UnhandledMessagesListener {
 
 /**
  * Listener for unhandled messages.
- * TODO: move it to hierarchy of infrastructure actors.
  * Created by Yury on 11.08.2015.
  */
 class UnhandledMessagesListener extends Actor {
