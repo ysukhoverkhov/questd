@@ -227,4 +227,12 @@ trait UserDAO extends BaseDAO[User] {
    */
   def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User]
 
+  /**
+   * Adds user to banned list.
+   *
+   * @param id Our id.
+   * @param bannedUserId Id of banned user.
+   * @return Updated user structure.
+   */
+  def addBannedUser(id: String, bannedUserId: String): Option[User]
 }

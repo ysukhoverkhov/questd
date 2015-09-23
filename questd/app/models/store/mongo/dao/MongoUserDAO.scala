@@ -836,6 +836,18 @@ private[mongo] class MongoUserDAO
         "$set" -> MongoDBObject(
           "battleRequests.$.status" -> status)))
   }
+
+
+  /**
+   * @inheritdoc
+   */
+  def addBannedUser(id: String, bannedUserId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$addToSet" -> MongoDBObject(
+          "banned" -> bannedUserId)))
+  }
 }
 
 

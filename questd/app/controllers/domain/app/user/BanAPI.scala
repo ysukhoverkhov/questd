@@ -34,7 +34,21 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
    * Bans user and removes his content for us.
    */
   def banUser(request: BanUserRequest): ApiResult[BanUserResult] = handleDbException {
-    OkApiResult(BanUserResult(OK))
+    import request._
+
+    // TODO: check user exists in db.
+
+    // TODO: test db is called.
+    db.user.addBannedUser(user.id, userId) ifSome { u =>
+      OkApiResult(BanUserResult(OK))
+    }
+
+    // TODO: hide all timeline entries with this user.
+
+    // TODO: remove user from following.
+
+    // TODO: reject friendship.
+
   }
 
   /**
