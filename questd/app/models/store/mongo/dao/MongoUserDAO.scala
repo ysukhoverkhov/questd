@@ -848,6 +848,17 @@ private[mongo] class MongoUserDAO
         "$addToSet" -> MongoDBObject(
           "banned" -> bannedUserId)))
   }
-}
 
+  /**
+   * @inheritdoc
+   */
+  def removeBannedUser(id: String, bannedUserId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$pull" -> MongoDBObject(
+          "banned" -> bannedUserId)))
+  }
+
+}
 

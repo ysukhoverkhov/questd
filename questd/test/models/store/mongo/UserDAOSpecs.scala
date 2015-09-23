@@ -897,7 +897,7 @@ class UserDAOSpecs
       ou3.get.devices must beEqualTo(List(d1))
     }
 
-    "Adds banned user correctly" in new WithApplication(appWithTestDatabase) {
+    "Adds and removes banned user correctly" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
 
       val bannedId = "bannedId"
@@ -910,6 +910,9 @@ class UserDAOSpecs
 
       val ou2 = db.user.addBannedUser(user.id, bannedId)
       ou2.get.banned must beEqualTo(List(bannedId))
+
+      val ou3 = db.user.removeBannedUser(user.id, bannedId)
+      ou3.get.banned must beEqualTo(List.empty)
     }
 
   }
