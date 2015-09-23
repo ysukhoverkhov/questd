@@ -121,7 +121,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
   /**
    * Returns portion of time line. Populates its with initial content if it's empty.
    */
-  // TODO: test hidden is not returned and implement it.
+  // TODO: test hidden is not returned.
   def getTimeLine(request: GetTimeLineRequest): ApiResult[GetTimeLineResult] = handleDbException {
 
     (if (request.user.timeLine.isEmpty) {
@@ -132,9 +132,12 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
       val pageSize = adjustedPageSize(request.pageSize)
       val pageNumber = adjustedPageNumber(request.pageNumber)
 
-      OkApiResult(GetTimeLineResult(r.user.timeLine.iterator
-        .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
-        .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
+      OkApiResult(
+        GetTimeLineResult(
+          r.user.timeLine.iterator
+            .filter(_.reason != TimeLineReason.Hidden)
+            .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
+            .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
     }
   }
 
