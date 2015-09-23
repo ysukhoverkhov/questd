@@ -1,5 +1,6 @@
 package controllers.domain.app.user
 
+import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain.user.friends.{Friendship, FriendshipStatus}
 import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
@@ -58,6 +59,34 @@ class TimeLineAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(RemoveFromTimeLineResult(user = u)))
       there was one(user).removeEntryFromTimeLineByObjectId(mockEq(u.id), mockEq(entryId))
+    }
+
+    "Hides item in timeline when requested" in context {
+      val entryId = "lala"
+      val tle = createTimeLineEntryStub(id = entryId)
+      val u = createUserStub(timeLine = List(tle))
+
+      user.updateTimeLineEntry(mockEq(u.id), mockEq(entryId), mockEq(TimeLineReason.Hidden)) returns Some(u)
+
+      val result = api.hideFromTimeLine(HideFromTimeLineRequest(
+        user = u,
+        entryId = entryId))
+
+      result must beEqualTo(OkApiResult(HideFromTimeLineResult(ProfileModificationResult.OK, Some(u.profile))))
+      there was one(user).updateTimeLineEntry(mockEq(u.id), mockEq(entryId), mockEq(TimeLineReason.Hidden))
+    }
+
+    "Do not hide unexisting items from timeline" in context {
+      val u = createUserStub()
+
+      user.updateTimeLineEntry(any, any, any) returns Some(u)
+
+      val result = api.hideFromTimeLine(HideFromTimeLineRequest(
+        user = u,
+        entryId = "asd"))
+
+      result must beEqualTo(OkApiResult(HideFromTimeLineResult(ProfileModificationResult.OutOfContent, None)))
+      there was no(user).updateTimeLineEntry(any, any, any)
     }
 
     "Add item to friends' and followers' time line when requested" in context {

@@ -90,9 +90,21 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
   /**
    * Hides entry from timeline. It's still on the server but is not returned in timeline requests.
    */
-  // TODO: test me.
   def hideFromTimeLine(request: HideFromTimeLineRequest): ApiResult[HideFromTimeLineResult] = handleDbException {
-    OkApiResult(HideFromTimeLineResult(OK))
+    import request._
+
+    if (user.timeLine.exists(_.id == entryId)) {
+
+      db.user.updateTimeLineEntry(
+        id = request.user.id,
+        entryId = request.entryId,
+        reason = TimeLineReason.Hidden) ifSome { u =>
+
+        OkApiResult(HideFromTimeLineResult(OK, Some(u.profile)))
+      }
+    } else {
+      OkApiResult(HideFromTimeLineResult(OutOfContent))
+    }
   }
 
   /**
