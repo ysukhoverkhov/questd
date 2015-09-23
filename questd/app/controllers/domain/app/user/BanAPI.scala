@@ -36,6 +36,7 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
   def banUser(request: BanUserRequest): ApiResult[BanUserResult] = handleDbException {
     import request._
 
+    // TODO: make task to optimize existence calls.
     // TODO: check user exists in db.
 
     // TODO: test db is called.
@@ -55,7 +56,11 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
    * Unban user we've banned.
    */
   def unbanUser(request: UnbanUserRequest): ApiResult[UnbanUserResult] = handleDbException {
-    OkApiResult(UnbanUserResult(OK))
+    import request._
+
+    db.user.removeBannedUser(user.id, userId) ifSome { u =>
+      OkApiResult(UnbanUserResult(OK))
+    }
   }
 
   /**

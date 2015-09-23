@@ -1,15 +1,13 @@
 package controllers.domain.app.user
 
-import controllers.domain.DomainAPIComponent
 import components._
-import controllers.domain._
-import controllers.domain.helpers._
+import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.helpers._
 import controllers.services.socialnetworks.client.{User => SNUser}
 import models.domain.common.Assets
-import models.domain.user.profile.{TaskType, Profile}
 import models.domain.user.User
-import play.Logger
+import models.domain.user.profile.{Profile, TaskType}
 
 case class GetFollowingRequest(
   user: User)
@@ -93,8 +91,8 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
    */
   def addToFollowing(request: AddToFollowingRequest): ApiResult[AddToFollowingResult] = handleDbException {
 
-    val maxFollowingSize = 1000
-
+    val maxFollowingSize = 1024
+// TODO: check the user exists.
     if (request.user.following.length >= maxFollowingSize) {
       OkApiResult(AddToFollowingResult(LimitExceeded))
     } else {
