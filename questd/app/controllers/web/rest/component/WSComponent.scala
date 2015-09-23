@@ -22,6 +22,7 @@ trait WSComponent { component: DomainAPIComponent with SocialNetworkComponent =>
     with ContentWSImpl
     with FollowingWSImpl
     with FriendsWSImpl
+    with BanWSImpl
     with EventsWSImpl
     with MiscWSImpl
     with TutorialWSImpl

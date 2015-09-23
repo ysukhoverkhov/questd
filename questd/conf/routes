@@ -77,6 +77,11 @@ POST	/rest/askFriendship								controllers.web.rest.FriendsWS.askFriendship
 POST	/rest/respondFriendship							controllers.web.rest.FriendsWS.respondFriendship
 POST	/rest/removeFromFriends							controllers.web.rest.FriendsWS.removeFromFriends
 
+# Banning
+POST	/rest/banUser								    controllers.web.rest.BanWS.banUser
+POST	/rest/unbanUser								    controllers.web.rest.BanWS.unbanUser
+POST    /rest/getBannedUsers                            controllers.web.rest.BanWS.getBannedUsers
+
 # Events
 POST	/rest/removeMessage								controllers.web.rest.EventsWS.removeMessage
 POST    /rest/addDeviceToken                            controllers.web.rest.EventsWS.addDeviceToken
