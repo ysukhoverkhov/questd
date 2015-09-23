@@ -1,8 +1,6 @@
 package controllers.web.rest.component
 
-import controllers.domain.app.user._
 import controllers.web.helpers._
-import controllers.web.rest.component.FriendsWSImplTypes.WSGetFriendsResult
 
 private object BanWSImplTypes {
 
@@ -33,17 +31,19 @@ trait BanWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#
   def banUser = wrapJsonApiCallReturnBody[WSBanUserResult] { (js, r) =>
     val v = Json.read[WSBanUserRequest](js.toString)
 
-    api.costToRequestFriendship(CostToRequestFriendshipRequest(r.user, v.id))
+    api.banUser(BanUserRequest(r.user, v.userId))
   }
 
   def unbanUser = wrapJsonApiCallReturnBody[WSUnbanUserResult] { (js, r) =>
     val v = Json.read[WSUnbanUserRequest](js.toString)
 
-    api.askFriendship(AskFriendshipRequest(r.user, v.id))
+    api.unbanUser(UnbanUserRequest(r.user, v.userId))
   }
 
   def getBannedUsers = wrapJsonApiCallReturnBody[WSGetBannedUsersResult] { (js, r) =>
-    api.getFriends(GetFriendsRequest(r.user))
+    val v = Json.read[WSGetBannedUsersRequest](js.toString)
+
+    api.getBannedUsers(GetBannedUsersRequest(r.user, v.pageNumber, v.pageSize))
   }
 }
 
