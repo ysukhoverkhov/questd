@@ -1,5 +1,6 @@
 package controllers.web.rest.component
 
+import controllers.domain.app.user._
 import controllers.web.helpers._
 
 private object BanWSImplTypes {
