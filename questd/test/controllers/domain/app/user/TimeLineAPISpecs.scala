@@ -96,6 +96,24 @@ class TimeLineAPISpecs extends BaseAPISpecs {
       result must beEqualTo(OkApiResult(GetTimeLineResult(entries.slice(0,2))))
     }
 
+    "getTimeLine filters out hidden" in context {
+      val entries = List(
+        createTimeLineEntryStub(id = "1"),
+        createTimeLineEntryStub(id = "2"),
+        createTimeLineEntryStub(id = "3", reason = TimeLineReason.Hidden),
+        createTimeLineEntryStub(id = "4")
+      )
+
+      val u = createUserStub(timeLine = entries)
+
+      val result = api.getTimeLine(GetTimeLineRequest(
+        user = u,
+        pageNumber = 0,
+        pageSize = 20))
+
+      result must beEqualTo(OkApiResult(GetTimeLineResult(entries.filter(_.reason != TimeLineReason.Hidden))))
+    }
+
     "getTimeLine populates timeline if it's empty" in context {
       val u = createUserStub()
 

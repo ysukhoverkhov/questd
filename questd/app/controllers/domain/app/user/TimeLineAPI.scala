@@ -121,7 +121,6 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
   /**
    * Returns portion of time line. Populates its with initial content if it's empty.
    */
-  // TODO: test hidden is not returned.
   def getTimeLine(request: GetTimeLineRequest): ApiResult[GetTimeLineResult] = handleDbException {
 
     (if (request.user.timeLine.isEmpty) {
