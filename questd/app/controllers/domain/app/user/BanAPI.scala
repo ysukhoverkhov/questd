@@ -3,8 +3,9 @@ package controllers.domain.app.user
 import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
-import controllers.domain.{DomainAPIComponent, _}
+import controllers.domain._
 import models.domain.user._
+import models.domain.user.friends.FriendshipStatus
 
 
 case class BanUserRequest(
@@ -37,19 +38,31 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
     import request._
 
     // TODO: make task to optimize existence calls.
-    // TODO: check user exists in db.
+    db.user.readById(userId).fold[ApiResult[BanUserResult]] {
+      OkApiResult(BanUserResult(OutOfContent))
+    } { userToBan =>
+      // TODO: hide all timeline entries with this user.
 
-    // TODO: test db is called.
-    db.user.addBannedUser(user.id, userId) ifSome { u =>
-      OkApiResult(BanUserResult(OK))
+      // TODO: test remove user from following.
+      if (user.following.contains(userId)) {
+        removeFromFollowing(RemoveFromFollowingRequest(user, userId))
+      }
+
+      // TODO: test reject friendship.
+      user.friends.find(_.friendId == userId).fold() { friendship =>
+
+        if (friendship.status == FriendshipStatus.Invites) {
+          respondFriendship(RespondFriendshipRequest(user = user, friendId = userId, accept = false))
+        } else {
+          removeFromFriends(RemoveFromFriendsRequest(user = user, friendId = userId))
+        }
+      }
+
+      // TODO: test db is called.
+      db.user.addBannedUser(user.id, userId) ifSome { u: User =>
+        OkApiResult(BanUserResult(OK))
+      }
     }
-
-    // TODO: hide all timeline entries with this user.
-
-    // TODO: remove user from following.
-
-    // TODO: reject friendship.
-
   }
 
   /**

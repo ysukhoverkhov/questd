@@ -36,7 +36,7 @@ case class AddToFollowingResult(
 
 case class RemoveFromFollowingRequest(
   user: User,
-  userIdToAdd: String)
+  userIdToRemove: String)
 case class RemoveFromFollowingResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None)
@@ -123,7 +123,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
    */
   def removeFromFollowing(request: RemoveFromFollowingRequest): ApiResult[RemoveFromFollowingResult] = handleDbException {
 
-    db.user.removeFromFollowing(request.user.id, request.userIdToAdd) ifSome { r =>
+    db.user.removeFromFollowing(request.user.id, request.userIdToRemove) ifSome { r =>
       OkApiResult(RemoveFromFollowingResult(OK, Some(r.profile)))
     }
   }
