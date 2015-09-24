@@ -125,7 +125,6 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
             allowed = OutOfContent))
       }
     }
-
   }
 
   /**
