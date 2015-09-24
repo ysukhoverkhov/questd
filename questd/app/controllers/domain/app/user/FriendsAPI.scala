@@ -97,11 +97,11 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
         allowed = OutOfContent))
     } else {
       db.user.readById(request.friendId) match {
-        case Some(u) =>
-          request.user.canAddFriend(u) match {
+        case Some(potentialFriend) =>
+          request.user.canAddFriend(potentialFriend) match {
             case OK =>
 
-              val cost = request.user.costToAddFriend(u)
+              val cost = request.user.costToAddFriend(potentialFriend)
               adjustAssets(AdjustAssetsRequest(user = request.user, change = -cost)) map { r =>
 
                 db.user.askFriendship(
@@ -109,6 +109,11 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
                   request.friendId,
                   Friendship(request.friendId, FriendshipStatus.Invited),
                   Friendship(r.user.id, FriendshipStatus.Invites))
+
+                // TODO: remove this soplia whn check in logic will be implemented.
+                if (potentialFriend.banned.contains(r.user.id)) {
+                  respondFriendship(RespondFriendshipRequest(potentialFriend, r.user.id, accept = false))
+                }
 
                 OkApiResult(AskFriendshipResult(OK, Some(r.user.profile)))
               }
