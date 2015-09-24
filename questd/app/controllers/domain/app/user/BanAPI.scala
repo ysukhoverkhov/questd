@@ -27,8 +27,7 @@ case class GetBannedUsersRequest(
   pageSize: Int)
 case class GetBannedUsersResult(
   userIds: List[String],
-  pageSize: Int,
-  hasMore: Boolean)
+  pageSize: Int)
 
 private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAPI =>
 
@@ -80,10 +79,14 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
    * Ask person to become our friend.
    */
   def getBannedUsers(request: GetBannedUsersRequest): ApiResult[GetBannedUsersResult] = handleDbException {
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
     OkApiResult(GetBannedUsersResult(
-      userIds = List.empty,
-      pageSize = request.pageSize,
-      hasMore = false))
+      userIds = request.user.banned
+        .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
+        .take(pageSize),
+      pageSize = pageSize))
   }
 }
 
