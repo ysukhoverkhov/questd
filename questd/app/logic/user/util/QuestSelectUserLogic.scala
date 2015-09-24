@@ -187,7 +187,7 @@ trait QuestSelectUserLogic { this: UserLogic =>
   }
 
   private def questAuthorIdsToExclude = {
-    List(user.id)
+    user.id :: user.banned
   }
 
   // FIX: change it to tags when they will be ready.

@@ -164,7 +164,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
   }
 
   private def battleParticipantsIdsToExclude = {
-    List(user.id)
+    user.id :: user.banned
   }
 
   // FIX: change it to tags when they will be ready.
