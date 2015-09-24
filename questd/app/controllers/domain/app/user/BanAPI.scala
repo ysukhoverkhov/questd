@@ -1,11 +1,12 @@
 package controllers.domain.app.user
 
 import components._
+import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
-import controllers.domain._
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
+import models.domain.user.timeline.TimeLineReason
 
 
 case class BanUserRequest(
@@ -41,16 +42,16 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
     db.user.readById(userId).fold[ApiResult[BanUserResult]] {
       OkApiResult(BanUserResult(OutOfContent))
     } { userToBan =>
-      // TODO: hide all timeline entries with this user.
 
-      // TODO: test remove user from following.
+      user.timeLine.filter(_.actorId == userId).foreach( e =>
+        db.user.updateTimeLineEntry(user.id, e.id, TimeLineReason.Hidden)
+      )
+
       if (user.following.contains(userId)) {
         removeFromFollowing(RemoveFromFollowingRequest(user, userId))
       }
 
-      // TODO: test reject friendship.
       user.friends.find(_.friendId == userId).fold() { friendship =>
-
         if (friendship.status == FriendshipStatus.Invites) {
           respondFriendship(RespondFriendshipRequest(user = user, friendId = userId, accept = false))
         } else {
@@ -58,7 +59,6 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
         }
       }
 
-      // TODO: test db is called.
       db.user.addBannedUser(user.id, userId) ifSome { u: User =>
         OkApiResult(BanUserResult(OK))
       }
