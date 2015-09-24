@@ -1,4 +1,4 @@
-package controllers.services.devicenotifications
+package controllers.framework
 
 import akka.actor.{Actor, Props, UnhandledMessage}
 import play.Logger
