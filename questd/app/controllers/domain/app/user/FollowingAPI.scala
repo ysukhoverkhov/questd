@@ -92,27 +92,32 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
   def addToFollowing(request: AddToFollowingRequest): ApiResult[AddToFollowingResult] = handleDbException {
 
     val maxFollowingSize = 1024
-// TODO: check the user exists.
+
     if (request.user.following.length >= maxFollowingSize) {
       OkApiResult(AddToFollowingResult(LimitExceeded))
     } else {
-      request.user.canFollowUser(request.userIdToAdd) match {
-        case OK => {
+      db.user.readById(request.userIdToAdd).fold[ApiResult[AddToFollowingResult]] {
+        OkApiResult(AddToFollowingResult(OutOfContent))
+      } { userToFollow =>
 
-          makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.AddToFollowing)))
+        request.user.canFollowUser(request.userIdToAdd) match {
+          case OK => {
 
-        } map { r =>
+            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.AddToFollowing)))
 
-          val cost = request.user.costToFollowing
-          adjustAssets(AdjustAssetsRequest(user = r.user, change = -cost))
+          } map { r =>
 
-        } map { r =>
+            val cost = request.user.costToFollowing
+            adjustAssets(AdjustAssetsRequest(user = r.user, change = -cost))
 
-          db.user.addToFollowing(r.user.id, request.userIdToAdd)
-          OkApiResult(AddToFollowingResult(OK, Some(r.user.profile)))
+          } map { r =>
 
+            db.user.addToFollowing(r.user.id, request.userIdToAdd)
+            OkApiResult(AddToFollowingResult(OK, Some(r.user.profile)))
+
+          }
+          case a => OkApiResult(AddToFollowingResult(a))
         }
-        case a => OkApiResult(AddToFollowingResult(a))
       }
     }
 

@@ -37,7 +37,7 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
   def banUser(request: BanUserRequest): ApiResult[BanUserResult] = handleDbException {
     import request._
 
-    // TODO: make task to optimize existence calls.
+    // make task to optimize existence calls.
     db.user.readById(userId).fold[ApiResult[BanUserResult]] {
       OkApiResult(BanUserResult(OutOfContent))
     } { userToBan =>
