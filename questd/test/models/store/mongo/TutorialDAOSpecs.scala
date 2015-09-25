@@ -8,9 +8,7 @@ import org.specs2.mutable._
 import play.api.test.WithApplication
 
 //@RunWith(classOf[JUnitRunner])
-class TutorialDAOSpecs extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class TutorialDAOSpecs extends BaseDAOSpecs {
 
   private[this] def clearDB() = {
     db.tutorial.clear()

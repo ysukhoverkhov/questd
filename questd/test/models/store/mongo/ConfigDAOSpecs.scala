@@ -8,9 +8,7 @@ import org.specs2.mutable._
 import play.api.test._
 
 //@RunWith(classOf[JUnitRunner])
-class ConfigDAOSpecs extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class ConfigDAOSpecs extends BaseDAOSpecs {
 
   "Mongo Config DAO" should {
     "Return empty configuration" in new WithApplication(appWithTestDatabase) {

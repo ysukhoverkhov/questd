@@ -10,9 +10,7 @@ import play.api.test._
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
-class ChallengeDAOSpecs extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class ChallengeDAOSpecs extends BaseDAOSpecs {
 
   "Mongo Challenge DAO" should {
     "Reads by solutions in any ways" in new WithApplication(appWithTestDatabase) {
