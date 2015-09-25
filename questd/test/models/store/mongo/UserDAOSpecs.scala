@@ -23,12 +23,9 @@ import org.specs2.mutable._
 import play.api.test._
 import testhelpers.domainstubs._
 
-// TODO: split it on several tests.
+// split it on several tests.
 //@RunWith(classOf[JUnitRunner])
-class UserDAOSpecs
-  extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class UserDAOSpecs extends BaseDAOSpecs {
 
   "Mongo User DAO" should {
     "Create new User in DB and find it by userId" in new WithApplication(appWithTestDatabase) {
@@ -135,7 +132,7 @@ class UserDAOSpecs
     }
 
 
-    // TODO: TAGS: clean me up.
+    // TAGS: clean me up.
 //    "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {
 //      val userId = "takeQuest2"
 //      val themeId = "tid"
@@ -253,7 +250,7 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.questCreationContext.questCreationCoolDown == dateNew)
     }
 
-    // TODO: TAGS: clean me up.
+    // TAGS: clean me up.
 //    "resetTodayReviewedThemes do its work" in new WithApplication(appWithTestDatabase) {
 //      val userId = "resetTodayReviewedThemes"
 //      val date = new Date(1000)

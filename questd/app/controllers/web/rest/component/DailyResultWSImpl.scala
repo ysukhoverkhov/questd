@@ -24,7 +24,7 @@ private object DailyResultWSImplTypes {
     functionality: List[String])
 }
 
-trait DailyResultWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+trait DailyResultWSImpl extends BaseController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
   import controllers.web.rest.component.DailyResultWSImplTypes._
 

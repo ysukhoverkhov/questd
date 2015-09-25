@@ -47,7 +47,7 @@ private object TutorialWSImplTypes {
 
 }
 
-trait TutorialWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait TutorialWSImpl extends BaseController with SecurityWSImpl { this: WSComponent#WS =>
 
   import controllers.web.rest.component.TutorialWSImplTypes._
 

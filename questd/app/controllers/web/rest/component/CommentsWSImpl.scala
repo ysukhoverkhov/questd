@@ -31,7 +31,7 @@ private object CommentsWSImplTypes {
   type WSGetCommentsForObjectResult = GetCommentsForObjectResult
 }
 
-trait CommentsWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait CommentsWSImpl extends BaseController with SecurityWSImpl { this: WSComponent#WS =>
 
   import CommentsWSImplTypes._
 

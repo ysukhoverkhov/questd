@@ -8,7 +8,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import org.json4s._
 
-private[web] trait CommonFunctions { this: QuestController with SecurityWSImpl =>
+private[web] trait CommonFunctions { this: BaseController with SecurityWSImpl =>
 
   def wrapApiCallReturnBody[T <: AnyRef](apiCall: AuthenticatedRequest[AnyContent] => ApiResult[T]) = apiCallToResult(apiCall)(writeAnyInResponse)
 

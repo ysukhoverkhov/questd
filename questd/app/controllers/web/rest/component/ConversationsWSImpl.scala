@@ -34,7 +34,7 @@ private object ConversationsWSImplTypes {
 
 }
 
-trait ConversationsWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+trait ConversationsWSImpl extends BaseController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
   import controllers.web.rest.component.ConversationsWSImplTypes._
 

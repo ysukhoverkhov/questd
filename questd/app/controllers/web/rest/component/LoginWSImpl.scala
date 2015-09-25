@@ -56,7 +56,7 @@ private [component] object LoginWSImplTypes {
 }
 
 
-trait LoginWSImpl extends QuestController with SecurityWSImpl { this: SNAccessor with APIAccessor with WSConfigHolder =>
+trait LoginWSImpl extends BaseController with SecurityWSImpl { this: SNAccessor with APIAccessor with WSConfigHolder =>
 
   import LoginWSImplTypes._
 

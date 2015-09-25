@@ -27,7 +27,7 @@ private object ChallengesWSImplTypes {
   type WSRespondBattleRequestResult = RespondBattleRequestResult
 }
 
-trait ChallengesWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait ChallengesWSImpl extends BaseController with SecurityWSImpl { this: WSComponent#WS =>
 
   import ChallengesWSImplTypes._
 

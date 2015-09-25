@@ -87,7 +87,7 @@ package object domainstubs {
       None)
   }
 
-  // TODO: TAGS: replace themeId with tags.
+  // TAGS: replace themeId with tags.
   def createSolutionStub(
     id: String = ID.generate,
     cultureId: String = "cultureId",

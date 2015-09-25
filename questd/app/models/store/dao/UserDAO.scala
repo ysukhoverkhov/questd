@@ -15,7 +15,7 @@ import models.domain.user.stats.SolutionsInBattle
 import models.domain.user.timeline.{TimeLineReason, TimeLineEntry}
 import models.view.QuestView
 
-// TODO: split it on several traits.
+// TODO: split it on several traits in 0.50.
 trait UserDAO extends BaseDAO[User] {
 
   def updateSessionId(id: String, sessionId: String): Option[User]

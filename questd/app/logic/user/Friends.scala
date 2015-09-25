@@ -44,7 +44,7 @@ trait Friends { this: UserLogic =>
       OK
   }
 
-  // TODO: check here we are not banned and return status if we are.
+  // check here we are not banned and return status if we are.
   def canAddFriend(potentialFriend: User) = {
     commonFriendshipCheck(potentialFriend) match {
       case OK =>

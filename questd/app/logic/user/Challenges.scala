@@ -62,7 +62,7 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-  // TODO: check cost here.
+  // check cost here.
   def costToChallengeBattle = {
     Assets()
   }

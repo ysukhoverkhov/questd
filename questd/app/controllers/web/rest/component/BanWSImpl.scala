@@ -25,7 +25,7 @@ private object BanWSImplTypes {
   type WSGetBannedUsersResult = GetBannedUsersResult
 }
 
-trait BanWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait BanWSImpl extends BaseController with SecurityWSImpl { this: WSComponent#WS =>
 
   import BanWSImplTypes._
 

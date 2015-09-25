@@ -33,7 +33,7 @@ private object FollowingWSImplTypes {
   type WSGetSNFriendsInGameResult = GetSNFriendsInGameResult
 }
 
-trait FollowingWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait FollowingWSImpl extends BaseController with SecurityWSImpl { this: WSComponent#WS =>
 
   import controllers.web.rest.component.FollowingWSImplTypes._
 
