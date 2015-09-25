@@ -125,7 +125,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
 
           db.challenge.create(challenge)
 
-        // TODO: substract assets for invitation.
+        // substract assets for invitation.
 
           {
             makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
@@ -257,6 +257,8 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
               sendMessage(
                 SendMessageRequest(
                   challenger, MessageChallengeRejected(challengeId = challenge.id)))
+
+            // return money back.
             }
 
             OkApiResult(RejectChallengeResult(OK, Some(request.user.profile)))
