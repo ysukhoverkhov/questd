@@ -2,7 +2,6 @@ package controllers.domain.app.comment
 
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
-import controllers.domain.app.user.{GetCommentsForObjectResult, GetCommentsForObjectRequest, PostCommentRequest, PostCommentResult}
 import models.view.CommentView
 import testhelpers.domainstubs._
 
@@ -95,7 +94,7 @@ class CommentAPISpecs extends BaseAPISpecs {
       val cs = List(createCommentStub())
       val u = createUserStub()
 
-      comment.allWithParams(any, any) returns cs.iterator
+      comment.allWithParams(any, any, any) returns cs.iterator
 
       val result = api.getCommentsForObject(GetCommentsForObjectRequest(
         user = u,
@@ -103,7 +102,7 @@ class CommentAPISpecs extends BaseAPISpecs {
         pageNumber = 0,
         pageSize = 10))
 
-      there was one(comment).allWithParams(any, any)
+      there was one(comment).allWithParams(any, any, any)
 
       result must beEqualTo(OkApiResult(GetCommentsForObjectResult(
         allowed = ProfileModificationResult.OK,

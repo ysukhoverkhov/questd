@@ -17,6 +17,7 @@ private[mongo] class MongoCommentDAO
    */
   def allWithParams(
     commentedObjectId: List[String] = List.empty,
+    authorIdsExclude: List[String] = List.empty,
     skip: Int = 0
     ): Iterator[Comment] = {
 
@@ -24,6 +25,10 @@ private[mongo] class MongoCommentDAO
 
     if (commentedObjectId.nonEmpty) {
       queryBuilder += ("info.commentedObjectId" -> MongoDBObject("$in" -> commentedObjectId))
+    }
+
+    if (authorIdsExclude.nonEmpty) {
+      queryBuilder += ("info.authorId" -> MongoDBObject("$nin" -> authorIdsExclude))
     }
 
     findByExample(
