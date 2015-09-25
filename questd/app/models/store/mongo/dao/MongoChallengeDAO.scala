@@ -90,7 +90,7 @@ private[mongo] class MongoChallengeDAO
 
   /**
    * @inheritdoc
-   */ // TODO: test me.
+   */
   def updateChallenge(
     id: String,
     newStatus: ChallengeStatus.Value,
@@ -99,20 +99,16 @@ private[mongo] class MongoChallengeDAO
     val queryBuilder = MongoDBObject.newBuilder
 
     queryBuilder +=
-      ("$set" -> MongoDBObject(
-        "status" -> newStatus.toString))
+      ("status" -> newStatus.toString)
 
     if (opponentSolutionId.nonEmpty) {
       queryBuilder +=
-        ("$set" -> MongoDBObject(
-          "opponentSolutionId" -> opponentSolutionId.get))
+        ("opponentSolutionId" -> opponentSolutionId.get)
     }
 
     findAndModify(
       id,
-      queryBuilder.result())
+      MongoDBObject("$set" -> queryBuilder.result()))
   }
-
-
 }
 

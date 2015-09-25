@@ -788,45 +788,6 @@ class UserDAOSpecs extends BaseDAOSpecs {
       ou.get.privateDailyResults.head.decidedBattles.head must beEqualTo(br)
     }
 
-    // TODO: move me to ChallengeDAO specs
-//    "addBattleRequest adds it" in new WithApplication(appWithTestDatabase) {
-//      db.user.clear()
-//
-//      val user = createUserStub()
-//      val br = Challenge("1", "2", "3", ChallengeStatus.Accepted)
-//
-//      db.user.create(user)
-//      db.user.addBattleRequest(user.id, br)
-//
-//      val ou = db.user.readById(user.id)
-//
-//      ou must beSome
-//      ou.get.battleRequests.head must beEqualTo(br)
-//    }
-//
-//    "updateBattleRequest works" in new WithApplication(appWithTestDatabase) {
-//      db.user.clear()
-//
-//      val user = createUserStub()
-//      val br = List(
-//        Challenge("1", "2", "3", ChallengeStatus.Requests),
-//        Challenge("1", "4", "3", ChallengeStatus.Requests),
-//        Challenge("1", "5", "3", ChallengeStatus.Requests),
-//        Challenge("1", "6", "3", ChallengeStatus.Requests),
-//        Challenge("1", "7", "3", ChallengeStatus.Requests),
-//        Challenge("1", "8", "3", ChallengeStatus.Requests)
-//      )
-//
-//      db.user.create(user)
-//      br.foreach(db.user.addBattleRequest(user.id, _))
-//      db.user.updateBattleRequest(user.id, "6", "3", ChallengeStatus.Rejected.toString)
-//
-//      val ou = db.user.readById(user.id)
-//
-//      ou must beSome
-//      ou.get.battleRequests must beEqualTo(br.take(3) ::: List(Challenge("1", "6", "3", ChallengeStatus.Rejected)) ::: br.drop(4))
-//    }
-
     "setNotificationSentTime works" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
 
