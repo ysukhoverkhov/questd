@@ -51,6 +51,23 @@ class BanAPISpecs extends BaseAPISpecs {
           Friendship(friendId = bannedUserId, status = FriendshipStatus.Invited)
         ))
       val banned = createUserStub(id = bannedUserId)
+      solution.readById(mySolutionId) returns Some(sol)
+      challenge.findByParticipantsAndQuest((u1.id, opponent.id), questId) returns Iterator.empty
+
+      val result = api.makeSolutionChallenge(MakeSolutionChallengeRequest(
+        user = u1,
+        opponentId = opponent.id,
+        mySolutionId = mySolutionId))
+
+      Logger.error(s"$result")
+
+      result must beAnInstanceOf[OkApiResult[MakeSolutionChallengeResult]]
+
+      there was one(challenge).create(any)
+      there was one(api).makeTask(any)
+    }
+
+    "respondBattleRequest creates battle" in context {
 
       db.user.readById(banned.id) returns Some(banned)
       doReturn(OkApiResult(RespondFriendshipResult(ProfileModificationResult.OK))).when(api).respondFriendship(any)
