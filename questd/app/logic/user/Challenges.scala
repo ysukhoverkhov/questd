@@ -85,7 +85,6 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-  // TODO: test
   def canAcceptChallengeWithSolution(challenge: Challenge, solution: Solution) = {
     if (challenge.questId != solution.info.questId)
       InvalidState

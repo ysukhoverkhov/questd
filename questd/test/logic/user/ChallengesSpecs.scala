@@ -4,9 +4,10 @@ import java.util.Date
 
 import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
+import models.domain.challenge.ChallengeStatus
 import models.domain.quest.QuestStatus
 import models.domain.solution.SolutionStatus
-import models.domain.user.friends.{FriendshipStatus, Friendship}
+import models.domain.user.friends.{Friendship, FriendshipStatus}
 import testhelpers.domainstubs._
 
 class ChallengesSpecs extends BaseLogicSpecs {
@@ -164,7 +165,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
 
-    "Do not allow challenging for quests if opponent ot our friend" in context {
+    "Do not allow challenging for quests if opponent not our friend" in context {
       val me = createUserStub()
       val myQuest = createQuestStub(status = QuestStatus.InRotation)
       val opponentSolution = createSolutionStub()
@@ -175,6 +176,18 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val rv = me.canChallengeWithQuest(opponentSolution.info.authorId, myQuest)
 
       rv must beEqualTo(ProfileModificationResult.InvalidState)
+    }
+
+
+    "Accept correct challenges" in context {
+      val questId = "questId"
+      val me = createUserStub()
+      val challenge = createChallengeStub(questId = questId, opponentId = me.id, status = ChallengeStatus.Requested)
+      val solution = createSolutionStub(questId = questId)
+
+      val rv = me.canAcceptChallengeWithSolution(challenge, solution)
+
+      rv must beEqualTo(ProfileModificationResult.OK)
     }
   }
 }
