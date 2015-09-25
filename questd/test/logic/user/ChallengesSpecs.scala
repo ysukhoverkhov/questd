@@ -140,14 +140,15 @@ class ChallengesSpecs extends BaseLogicSpecs {
     }
 
     "Do not allow challenging battles for solutions not in rotation" in context {
-      val me = createUserStub()
-      val mySolution = createSolutionStub(status = SolutionStatus.CheatingBanned)
       val opponentSolution = createSolutionStub()
+      val me = createUserStub()
+      val opponent = createUserStub(id = opponentSolution.info.authorId)
+      val mySolution = createSolutionStub(status = SolutionStatus.CheatingBanned)
 
       challenge.findBySolutions(any) returns Iterator(createChallengeStub())
       challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
 
-      val rv = me.canChallengeWithSolution(opponentSolution.info.authorId, mySolution)
+      val rv = me.canChallengeWithSolution(opponent, mySolution)
 
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }

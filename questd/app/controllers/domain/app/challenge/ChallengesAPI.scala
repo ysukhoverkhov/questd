@@ -114,27 +114,31 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
     db.solution.readById(mySolutionId).fold[ApiResult[MakeSolutionChallengeResult]] {
       OkApiResult(MakeSolutionChallengeResult(OutOfContent))
     } { mySolution =>
-      user.canChallengeWithSolution(opponentId = opponentId, mySolution = mySolution) match {
-        case OK =>
-          val challenge = Challenge(
-            myId = user.id,
-            opponentId = opponentId,
-            questId = mySolution.info.questId,
-            mySolutionId = Some(mySolutionId),
-            status = ChallengeStatus.Requested)
+      db.user.readById(opponentId).fold[ApiResult[MakeSolutionChallengeResult]] {
+        OkApiResult(MakeSolutionChallengeResult(OutOfContent))
+      } { opponent =>
+        user.canChallengeWithSolution(opponent = opponent, mySolution = mySolution) match {
+          case OK =>
+            val challenge = Challenge(
+              myId = user.id,
+              opponentId = opponentId,
+              questId = mySolution.info.questId,
+              mySolutionId = Some(mySolutionId),
+              status = ChallengeStatus.Requested)
 
-          db.challenge.create(challenge)
+            db.challenge.create(challenge)
 
-        // substract assets for invitation.
+          // substract assets for invitation.
 
-          {
-            makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
-          } map { r =>
-            OkApiResult(MakeSolutionChallengeResult(OK, Some(r.user.profile), List(SolutionView(mySolution, user))))
-          }
+            {
+              makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
+            } map { r =>
+              OkApiResult(MakeSolutionChallengeResult(OK, Some(r.user.profile), List(SolutionView(mySolution, user))))
+            }
 
-        case reason =>
-          OkApiResult(MakeSolutionChallengeResult(reason))
+          case reason =>
+            OkApiResult(MakeSolutionChallengeResult(reason))
+        }
       }
     }
   }

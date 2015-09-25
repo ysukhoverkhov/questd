@@ -48,8 +48,6 @@ class ChallengesAPISpecs extends BaseAPISpecs {
         opponentId = opponent.id,
         mySolutionId = mySolutionId))
 
-      Logger.error(s"$result")
-
       result must beAnInstanceOf[OkApiResult[MakeSolutionChallengeResult]]
 
       there was one(challenge).create(any)

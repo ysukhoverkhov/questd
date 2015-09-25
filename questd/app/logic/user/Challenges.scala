@@ -6,6 +6,7 @@ import models.domain.challenge.{ChallengeStatus, Challenge}
 import models.domain.common.Assets
 import models.domain.quest.{QuestStatus, Quest}
 import models.domain.solution.{SolutionStatus, Solution}
+import models.domain.user.User
 import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.Functionality
 import org.joda.time.DateTime
@@ -47,13 +48,16 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-  // TODO: we should check if rival does not have solution he should be a friend. and test it.
-  def canChallengeWithSolution(opponentId: String, mySolution: Solution) = {
+  def canChallengeWithSolution(opponent: User, mySolution: Solution) = {
     lazy val mySolutionExists = user.stats.solvedQuests.values.exists(_ == mySolution.id)
+    lazy val isMyFriend = user.friends.exists(f => f.friendId == opponent.id && f.status == FriendshipStatus.Accepted)
+    lazy val solvedSameQuest = opponent.stats.solvedQuests.contains(mySolution.info.questId)
 
-    if (hasChallengeForQuest(user.id, opponentId: String, mySolution.info.questId))
+    if (hasChallengeForQuest(user.id, opponent.id: String, mySolution.info.questId))
       InvalidState
     else if (mySolution.status != SolutionStatus.InRotation)
+      InvalidState
+    else if (!(isMyFriend || solvedSameQuest)) // TODO: test it.
       InvalidState
     else if (!mySolutionExists)
       OutOfContent
