@@ -9,9 +9,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
 
   "User Logic for battle voting" should {
 
-    "Do not allow voting for battles without rights" in {
-      applyConfigMock()
-
+    "Do not allow voting for battles without rights" in context {
       val user = createUserStub(rights = Rights.none)
       val battle = createBattleStub()
 
@@ -20,9 +18,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.NotEnoughRights)
     }
 
-    "Do allow voting for battles not in time line" in {
-      applyConfigMock()
-
+    "Do allow voting for battles not in time line" in context {
       val user = createUserStub()
       val battle = createBattleStub()
 
@@ -31,9 +27,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.OK)
     }
 
-    "Do not allow voting for battles in time line but we already voted for" in {
-      applyConfigMock()
-
+    "Do not allow voting for battles in time line but we already voted for" in context {
       val battle = createBattleStub()
       val user = createUserStub(
         votedBattles = Map(battle.id -> ""))
@@ -43,9 +37,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
 
-    "Do not allow voting for battle we are participating in" in {
-      applyConfigMock()
-
+    "Do not allow voting for battle we are participating in" in context {
       val uid = "uid"
       val battle = createBattleStub()
       val user = createUserStub(
@@ -56,9 +48,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
 
-    "Do not allow voting battles with incomplete bio" in {
-      applyConfigMock()
-
+    "Do not allow voting battles with incomplete bio" in context {
       val battle = createBattleStub()
       val user = createUserStub(cultureId = None)
 
