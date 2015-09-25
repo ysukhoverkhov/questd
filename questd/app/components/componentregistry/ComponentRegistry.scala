@@ -1,13 +1,12 @@
 package components.componentregistry
 
-import controllers.services.devicenotifications.DeviceNotificationsComponent
-import controllers.web.rest.component.WSComponent
-import controllers.domain.DomainAPIComponent
-import models.store.mongo.MongoDatabaseComponent
-import controllers.web.admin.component.AdminComponent
-import controllers.tasks.TasksComponent
 import components.random.RandomComponent
+import controllers.domain.DomainAPIComponent
 import controllers.services.socialnetworks.component.SocialNetworkComponent
+import controllers.tasks.TasksComponent
+import controllers.web.admin.component.AdminComponent
+import controllers.web.rest.component.WSComponent
+import models.store.mongo.MongoDatabaseComponent
 
 trait ComponentRegistry
   extends WSComponent
@@ -16,8 +15,7 @@ trait ComponentRegistry
   with DomainAPIComponent
   with AdminComponent
   with TasksComponent
-  with RandomComponent
-  with DeviceNotificationsComponent {
+  with RandomComponent {
 
   protected lazy val rand = new Random
   protected lazy val db: Database = new MongoDatabase
@@ -26,7 +24,6 @@ trait ComponentRegistry
   lazy val ws = new WS
   lazy val admin = new Admin
   protected lazy val tasks = new Tasks
-  protected val deviceNotifications = new DeviceNotifications
 }
 
 

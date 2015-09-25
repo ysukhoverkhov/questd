@@ -37,29 +37,35 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
   def banUser(request: BanUserRequest): ApiResult[BanUserResult] = handleDbException {
     import request._
 
-    // make task to optimize existence calls.
-    db.user.readById(userId).fold[ApiResult[BanUserResult]] {
-      OkApiResult(BanUserResult(OutOfContent))
-    } { userToBan =>
+    val maxBannedSize = 1024
 
-      user.timeLine.filter(_.actorId == userId).foreach( e =>
-        db.user.updateTimeLineEntry(user.id, e.id, TimeLineReason.Hidden)
-      )
+    if (request.user.following.length >= maxBannedSize) {
+      OkApiResult(BanUserResult(LimitExceeded))
+    } else {
+      // make task to optimize existence calls.
+      db.user.readById(userId).fold[ApiResult[BanUserResult]] {
+        OkApiResult(BanUserResult(OutOfContent))
+      } { userToBan =>
 
-      if (user.following.contains(userId)) {
-        removeFromFollowing(RemoveFromFollowingRequest(user, userId))
-      }
+        user.timeLine.filter(_.actorId == userId).foreach( e =>
+          db.user.updateTimeLineEntry(user.id, e.id, TimeLineReason.Hidden)
+        )
 
-      user.friends.find(_.friendId == userId).fold() { friendship =>
-        if (friendship.status == FriendshipStatus.Invites) {
-          respondFriendship(RespondFriendshipRequest(user = user, friendId = userId, accept = false))
-        } else {
-          removeFromFriends(RemoveFromFriendsRequest(user = user, friendId = userId))
+        if (user.following.contains(userId)) {
+          removeFromFollowing(RemoveFromFollowingRequest(user, userId))
         }
-      }
 
-      db.user.addBannedUser(user.id, userId) ifSome { u: User =>
-        OkApiResult(BanUserResult(OK))
+        user.friends.find(_.friendId == userId).fold() { friendship =>
+          if (friendship.status == FriendshipStatus.Invites) {
+            respondFriendship(RespondFriendshipRequest(user = user, friendId = userId, accept = false))
+          } else {
+            removeFromFriends(RemoveFromFriendsRequest(user = user, friendId = userId))
+          }
+        }
+
+        db.user.addBannedUser(user.id, userId) ifSome { u: User =>
+          OkApiResult(BanUserResult(OK))
+        }
       }
     }
   }
