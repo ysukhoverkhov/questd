@@ -57,7 +57,7 @@ trait Challenges { this: UserLogic =>
       InvalidState
     else if (mySolution.status != SolutionStatus.InRotation)
       InvalidState
-    else if (!(isMyFriend || solvedSameQuest)) // TODO: test it.
+    else if (!(isMyFriend || solvedSameQuest))
       InvalidState
     else if (!mySolutionExists)
       OutOfContent
