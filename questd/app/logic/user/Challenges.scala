@@ -6,6 +6,7 @@ import models.domain.challenge.{ChallengeStatus, Challenge}
 import models.domain.common.Assets
 import models.domain.quest.{QuestStatus, Quest}
 import models.domain.solution.{SolutionStatus, Solution}
+import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.Functionality
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
@@ -64,9 +65,9 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-  // TODO: check he is my friend and test it.
   def canChallengeWithQuest(opponentId: String, myQuest: Quest) = {
     lazy val myQuestExists = user.stats.createdQuests.contains(myQuest.id)
+    lazy val isMyFriend = user.friends.exists(f => f.friendId == opponentId && f.status == FriendshipStatus.Accepted)
 
     if (hasChallengeForQuest(user.id, opponentId: String, myQuest.id))
       InvalidState
@@ -74,6 +75,8 @@ trait Challenges { this: UserLogic =>
       InvalidState
     else if (!myQuestExists)
       OutOfContent
+    else if (!isMyFriend)
+      InvalidState
     else if (!user.profile.rights.unlockedFunctionality.contains(Functionality.ChallengeBattles))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costToChallengeBattle))

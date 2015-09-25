@@ -2,6 +2,7 @@ package controllers.domain.app.user
 
 import controllers.domain._
 import controllers.domain.app.challenge.{MakeQuestChallengeRequest, MakeQuestChallengeResult, MakeSolutionChallengeRequest, MakeSolutionChallengeResult}
+import models.domain.user.friends.{FriendshipStatus, Friendship}
 import play.api.Logger
 import testhelpers.domainstubs._
 
@@ -13,8 +14,10 @@ class ChallengesAPISpecs extends BaseAPISpecs {
     "makeQuestChallenge works" in context {
       val myQuestId = "mysolid"
       val q = createQuestStub(id = myQuestId)
-      val u1 = createUserStub(createdQuests = List(myQuestId))
       val opponent = createUserStub()
+      val u1 = createUserStub(
+        createdQuests = List(myQuestId),
+        friends = List(Friendship(friendId = opponent.id, status = FriendshipStatus.Accepted)))
 
       quest.readById(myQuestId) returns Some(q)
       challenge.findByParticipantsAndQuest((u1.id, opponent.id), myQuestId) returns Iterator.empty

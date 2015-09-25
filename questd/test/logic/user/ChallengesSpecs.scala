@@ -6,6 +6,7 @@ import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
 import models.domain.quest.QuestStatus
 import models.domain.solution.SolutionStatus
+import models.domain.user.friends.{FriendshipStatus, Friendship}
 import testhelpers.domainstubs._
 
 class ChallengesSpecs extends BaseLogicSpecs {
@@ -150,10 +151,10 @@ class ChallengesSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
 
-    "Do not allow challenging battles for quests not in rotation" in context {
-      val me = createUserStub()
-      val myQuest = createQuestStub(status = QuestStatus.CheatingBanned)
+    "Do not allow challenging for quests not in rotation" in context {
       val opponentSolution = createSolutionStub()
+      val me = createUserStub(friends = List(Friendship(friendId = opponentSolution.info.authorId, status = FriendshipStatus.Accepted)))
+      val myQuest = createQuestStub(status = QuestStatus.CheatingBanned)
 
       challenge.findBySolutions(any) returns Iterator(createChallengeStub())
       challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
@@ -163,6 +164,18 @@ class ChallengesSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
 
+    "Do not allow challenging for quests if opponent ot our friend" in context {
+      val me = createUserStub()
+      val myQuest = createQuestStub(status = QuestStatus.InRotation)
+      val opponentSolution = createSolutionStub()
+
+      challenge.findBySolutions(any) returns Iterator(createChallengeStub())
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
+
+      val rv = me.canChallengeWithQuest(opponentSolution.info.authorId, myQuest)
+
+      rv must beEqualTo(ProfileModificationResult.InvalidState)
+    }
   }
 }
 
