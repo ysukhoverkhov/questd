@@ -194,7 +194,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
 
   /**
    * Respond on battle request.
-   */ // TODO: Test each and every branch.
+   */
   def acceptChallenge(request: AcceptChallengeRequest): ApiResult[AcceptChallengeResult] = handleDbException {
     import request._
 

@@ -62,7 +62,7 @@ private[domain] abstract class BaseAPISpecs
 
       config.readConfig returns mockConfiguration
 
-      api.user2Logic(any)
+//      api.user2Logic(any)
     }
   }
 }

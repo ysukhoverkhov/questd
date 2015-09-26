@@ -1,9 +1,11 @@
 package controllers.domain.app.user
 
 import controllers.domain._
-import controllers.domain.app.challenge.{MakeQuestChallengeRequest, MakeQuestChallengeResult, MakeSolutionChallengeRequest, MakeSolutionChallengeResult}
+import controllers.domain.app.challenge._
+import controllers.domain.app.protocol.ProfileModificationResult
+import models.domain.challenge.ChallengeStatus
 import models.domain.user.friends.{Friendship, FriendshipStatus}
-import play.Logger
+import org.mockito.Mockito._
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
@@ -49,49 +51,129 @@ class ChallengesAPISpecs extends BaseAPISpecs {
         opponentId = opponent.id,
         mySolutionId = mySolutionId))
 
-      Logger.error(s"$result")
-
       result must beAnInstanceOf[OkApiResult[MakeSolutionChallengeResult]]
 
       there was one(challenge).create(any)
       there was one(api).makeTask(any)
     }
 
-    "acceptChallenge creates battle" in context {
-      val mySolutionId = "mysolid"
-      val opponentSolutionId = "opsolid"
-      val q = createQuestStub()
-      val sol1 = createSolutionStub(id = mySolutionId, questId = q.id)
-      val sol2 = createSolutionStub(id = opponentSolutionId, questId = q.id)
-      val opponent = createUserStub()
-      val u1 = createUserStub(solvedQuests = Map(q.id -> sol1.id))
+    "Do not accept not existing challenges" in context {
+      val me = createUserStub()
+      val challengeId = "challengeId"
+      val solutionId = "solutionId"
 
-//      , battleRequests = List(
-//        Challenge(
-//          opponentId = opponent.id,
-//          mySolutionId = sol1.id,
-//          opponentSolutionId = sol2.id,
-//          status = ChallengeStatus.Requests
-//        ))
+      db.challenge.readById(challengeId) returns None
 
-//      user.updateBattleRequest(any, any, any, any) returns Some(u1)
-      solution.readById(sol1.id) returns Some(sol1)
-      solution.readById(sol2.id) returns Some(sol2)
-      user.readById(any) returns Some(u1)
-      user.recordBattleParticipation(any, any, any) returns Some(u1)
-      user.addEntryToTimeLine(any, any) returns Some(u1)
-      user.addMessage(any, any) returns Some(u1)
+      val result = api.acceptChallenge(AcceptChallengeRequest(me, challengeId, solutionId))
 
-      val result = api.respondChallenge(RespondChallengeRequest(
-        user = u1,
-        opponentSolutionId = opponentSolutionId,
-        accept = true))
-
-      there were two(user).updateBattleRequest(any, any, any, any)
-      there was one(battle).create(any)
-
-      result must beAnInstanceOf[OkApiResult[RespondChallengeResult]]
+      result must beEqualTo(OkApiResult(AcceptChallengeResult(ProfileModificationResult.OutOfContent)))
     }
+
+    "Do not accept not existing solutions" in context {
+      val me = createUserStub()
+      val challengeId = "challengeId"
+      val challenge = createChallengeStub(id = challengeId)
+      val mySolutionId = "mySolutionId"
+
+      db.challenge.readById(challengeId) returns Some(challenge)
+      db.solution.readById(mySolutionId) returns None
+
+      val result = api.acceptChallenge(AcceptChallengeRequest(me, challengeId, mySolutionId))
+
+      result must beEqualTo(OkApiResult(AcceptChallengeResult(ProfileModificationResult.OutOfContent)))
+    }
+
+    "Do not accept challenge if logic forbids" in context {
+      val me = createUserStub()
+      val challengeId = "challengeId"
+      val challenge = createChallengeStub(id = challengeId)
+      val mySolutionId = "mySolutionId"
+      val mySolution = createSolutionStub(id = mySolutionId)
+
+      db.challenge.readById(challengeId) returns Some(challenge)
+      db.solution.readById(mySolutionId) returns Some(mySolution)
+
+      val result = api.acceptChallenge(AcceptChallengeRequest(me, challengeId, mySolutionId))
+
+      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK).not
+    }
+
+    "Do accept challenge if everything is ok" in context {
+      val me = createUserStub()
+      val opponent = createUserStub()
+      val questId = "questId"
+      val challengeId = "challengeId"
+      val mySolutionId = "mySolutionId"
+      val mySolution = createSolutionStub(
+        id = mySolutionId,
+        questId = questId)
+      val opponentSolutionId = "opponentSolutionId"
+      val opponentSolution = createSolutionStub(
+        id = opponentSolutionId,
+        questId = questId)
+      val challenge = createChallengeStub(
+        id = challengeId,
+        status = ChallengeStatus.Requested,
+        opponentId = me.id,
+        questId = questId,
+        myId = opponent.id,
+        mySolutionId = Some(opponentSolutionId))
+
+      db.challenge.readById(challengeId) returns Some(challenge)
+      db.solution.readById(mySolutionId) returns Some(mySolution)
+      db.challenge.updateChallenge(challenge.id, ChallengeStatus.Accepted, Some(mySolution.id)) returns Some(challenge)
+      db.user.readById(opponent.id) returns Some(opponent)
+      doReturn(OkApiResult(SendMessageResult(opponent))).when(api).sendMessage(any)
+      db.solution.readById(opponentSolutionId) returns Some(opponentSolution)
+      doReturn(OkApiResult(CreateBattleResult())).when(api).createBattle(any)
+      db.user.readById(me.id) returns Some(me)
+
+      val result = api.acceptChallenge(AcceptChallengeRequest(me, challengeId, mySolutionId))
+
+      result must beAnInstanceOf[OkApiResult[AcceptChallengeResult]]
+      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
+
+      there was one(db.challenge).updateChallenge(challenge.id, ChallengeStatus.Accepted, Some(mySolution.id))
+      there was one(api).sendMessage(any)
+      there was one(api).createBattle(any)
+    }
+
+
+//    "acceptChallenge creates battle" in context {
+//      val mySolutionId = "mysolid"
+//      val opponentSolutionId = "opsolid"
+//      val q = createQuestStub()
+//      val sol1 = createSolutionStub(id = mySolutionId, questId = q.id)
+//      val sol2 = createSolutionStub(id = opponentSolutionId, questId = q.id)
+//      val opponent = createUserStub()
+//      val u1 = createUserStub(solvedQuests = Map(q.id -> sol1.id))
+//
+////      , battleRequests = List(
+////        Challenge(
+////          opponentId = opponent.id,
+////          mySolutionId = sol1.id,
+////          opponentSolutionId = sol2.id,
+////          status = ChallengeStatus.Requests
+////        ))
+//
+////      user.updateBattleRequest(any, any, any, any) returns Some(u1)
+//      solution.readById(sol1.id) returns Some(sol1)
+//      solution.readById(sol2.id) returns Some(sol2)
+//      user.readById(any) returns Some(u1)
+//      user.recordBattleParticipation(any, any, any) returns Some(u1)
+//      user.addEntryToTimeLine(any, any) returns Some(u1)
+//      user.addMessage(any, any) returns Some(u1)
+//
+//      val result = api.respondChallenge(RespondChallengeRequest(
+//        user = u1,
+//        opponentSolutionId = opponentSolutionId,
+//        accept = true))
+//
+//      there were two(user).updateBattleRequest(any, any, any, any)
+//      there was one(battle).create(any)
+//
+//      result must beAnInstanceOf[OkApiResult[RespondChallengeResult]]
+//    }
   }
 }
 
