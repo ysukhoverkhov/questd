@@ -10,7 +10,11 @@ import models.domain.user.auth.{AuthInfo, LoginMethod}
 import models.domain.user.profile.{PublicProfile, Profile, Bio}
 import play.Logger
 
-case class LoginRequest(snName: String, snuser: SNUser)
+case class LoginRequest(
+  snName: String,
+  snuser: SNUser,
+  referrerId: Option[String] = None,
+  invitedWithContentId: Option[String] = None)
 case class LoginResult(sessionId: String, userId: String)
 
 private[domain] trait AuthAPI {
@@ -56,6 +60,11 @@ private[domain] trait AuthAPI {
 
       {
         createUser(CreateUserRequest(newUser))
+
+        // TODO: Become friends
+
+        // TODO: Add content to tutorial.
+
       } map { r =>
         Logger.debug(s"New user created with FB: ${r.user.id} / ${r.user.profile.publicProfile.bio.name}")
         loginUser(r.user)
