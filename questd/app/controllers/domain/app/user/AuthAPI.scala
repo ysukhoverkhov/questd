@@ -62,7 +62,7 @@ private[domain] trait AuthAPI {
         createUser(CreateUserRequest(newUser))
       } map { r =>
         request.referrerId.fold() { referrerId =>
-          api.createFriendship(
+          api.createFriendship( // TODO: test this is called.
             CreateFriendshipRequest(
               user = r.user,
               friendId = referrerId,

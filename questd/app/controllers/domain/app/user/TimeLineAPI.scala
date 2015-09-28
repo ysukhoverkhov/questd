@@ -11,7 +11,7 @@ import controllers.domain.helpers._
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.Profile
-import models.domain.user.timeline.{TimeLineType, TimeLineReason, TimeLineEntry}
+import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import play.Logger
 
 case class AddToTimeLineRequest(
@@ -157,10 +157,32 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
   /**
    * Internal call to populate timeline with initial things.
-   */
+   */ // TODO: test it calls addToTimeline.
   def populateTimeLineInitially(request: PupulateTimeLineInitiallyRequest): ApiResult[PupulateTimeLineInitiallyResult] = handleDbException {
     populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(request.user)) map { r =>
-      // TODO: make a call here: populate with a thing we were invited with
+
+      // Now adding to the top things we were invited with.
+      r.user.friends.filter(_.referredWithContentId.nonEmpty).foreach { f =>
+        db.quest.readById(f.referredWithContentId.get).fold[Option[TimeLineType.Value]] {
+          db.solution.readById(f.referredWithContentId.get).fold[Option[TimeLineType.Value]] {
+            None
+          } { solution =>
+            Some(TimeLineType.Solution)
+          }
+        } { quest =>
+          Some(TimeLineType.Quest)
+        }.fold() { contentType =>
+          addToTimeLine(
+            AddToTimeLineRequest(
+              user = r.user,
+              reason = TimeLineReason.Has,
+              objectType = contentType,
+              objectId = f.referredWithContentId.get,
+              actorId = Some(f.friendId)
+            ))
+        }
+      }
+
       OkApiResult(PupulateTimeLineInitiallyResult(r.user))
     }
   }

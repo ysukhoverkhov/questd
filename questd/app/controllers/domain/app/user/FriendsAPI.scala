@@ -221,7 +221,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
         Friendship(
           user.id,
           FriendshipStatus.Accepted,
-          referralStatus = ReferralStatus.Refers
+          referralStatus = if (request.isReferredBy) ReferralStatus.Refers else ReferralStatus.None
         ))
 
       db.user.addFriendship(
@@ -229,7 +229,8 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
         Friendship(
           referrer.id,
           FriendshipStatus.Accepted,
-          referralStatus = ReferralStatus.ReferredBy
+          referralStatus = if (request.isReferredBy) ReferralStatus.ReferredBy else ReferralStatus.None,
+          referredWithContentId = referredWithContent
         ))
     }
 
