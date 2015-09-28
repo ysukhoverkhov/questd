@@ -40,7 +40,7 @@ private object ProfileWSImplTypes {
 
 }
 
-trait ProfileWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait ProfileWSImpl extends BaseController with SecurityWSImpl { this: WSComponent#WS =>
 
   import controllers.web.rest.component.ProfileWSImplTypes._
 

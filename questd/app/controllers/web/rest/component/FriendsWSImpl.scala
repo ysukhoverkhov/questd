@@ -28,7 +28,7 @@ private object FriendsWSImplTypes {
   type WSRemoveFromFriendsResult = RemoveFromFriendsResult
 }
 
-trait FriendsWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait FriendsWSImpl extends BaseController with SecurityWSImpl { this: WSComponent#WS =>
 
   import FriendsWSImplTypes._
 

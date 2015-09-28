@@ -38,7 +38,7 @@ private object UploadWSImplTypes {
   }
 }
 
-trait UploadWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait UploadWSImpl extends BaseController with SecurityWSImpl { this: WSComponent#WS =>
 
   import controllers.web.rest.component.UploadWSImplTypes._
 

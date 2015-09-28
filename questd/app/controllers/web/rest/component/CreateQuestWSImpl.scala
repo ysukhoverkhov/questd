@@ -24,7 +24,7 @@ private object CreateQuestWSImplTypes {
   }
 }
 
-trait CreateQuestWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+trait CreateQuestWSImpl extends BaseController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
   import controllers.web.rest.component.CreateQuestWSImplTypes._
 

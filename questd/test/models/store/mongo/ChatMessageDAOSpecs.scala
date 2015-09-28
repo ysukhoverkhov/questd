@@ -5,13 +5,10 @@ package models.store.mongo
 import java.util.Date
 
 import models.domain.chat.ChatMessage
-import org.specs2.mutable._
 import play.test.WithApplication
 
 //noinspection ZeroIndexToHead
-class ChatMessageDAOSpecs extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class ChatMessageDAOSpecs extends BaseDAOSpecs {
 
   "Mongo Chat Message DAO" should {
     "Dive me chat messages ordered by date and starting from particular one" in new WithApplication(appWithTestDatabase) {

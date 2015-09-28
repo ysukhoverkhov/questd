@@ -3,13 +3,10 @@
 package models.store.mongo
 
 import models.domain.culture.Culture
-import org.specs2.mutable._
 import play.api.test._
 
 //@RunWith(classOf[JUnitRunner])
-class CultureDAOSpecs extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class CultureDAOSpecs extends BaseDAOSpecs {
 
   private[this] def clearDB() = {
     db.culture.clear()

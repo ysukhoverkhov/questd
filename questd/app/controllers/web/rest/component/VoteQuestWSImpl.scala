@@ -14,7 +14,7 @@ private object VoteQuestWSImplTypes {
   type WSVoteQuestResult = VoteQuestByUserResult
 }
 
-trait VoteQuestWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+trait VoteQuestWSImpl extends BaseController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
   import controllers.web.rest.component.VoteQuestWSImplTypes._
 

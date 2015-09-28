@@ -56,7 +56,7 @@ object constants {
   /**
    * Quest resolving.
    */
-  // TODO: clean me up with tags.
+  // TAGS: clean me up with tags.
   val NumberOfFavoriteThemesForVIPQuests = 3
   val NumberOfFavoriteThemesForOtherQuests = 1
 
@@ -85,7 +85,7 @@ object constants {
 
   val FriendsVoteMult = 2
 
-  // TODO: clean me up with tags.
+  // TAGS: clean me up with tags.
   val NumberOfFavoriteThemesForVIPSolutions = 3
   val NumberOfFavoriteThemesForOtherSolutions = 1
 

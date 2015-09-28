@@ -4,15 +4,12 @@ package models.store.mongo
 
 import models.domain.common.{ContentReference, ContentType}
 import models.domain.quest.{Quest, QuestStatus}
-import org.specs2.mutable._
 import play.api.test._
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
 //@RunWith(classOf[JUnitRunner])
-class QuestDAOSpecs extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class QuestDAOSpecs extends BaseDAOSpecs {
 
   private[this] def clearDB() = {
     db.quest.clear()

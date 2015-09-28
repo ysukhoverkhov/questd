@@ -47,7 +47,7 @@ class UpdateSolutionQualityCurve(
     }
   }
 
-  // TODO: instead of voters count use here times it was selected to timeline and we are lack of this data for now so it should be added. It'll be also helpful for debugging.
+  // instead of voters count use here times it was selected to timeline and we are lack of this data for now so it should be added. It'll be also helpful for debugging.
   protected def check(solution: Solution) = {
     val ratio = if (solution.rating.votersCount == 0) {
       0

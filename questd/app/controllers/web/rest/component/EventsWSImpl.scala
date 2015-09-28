@@ -30,7 +30,7 @@ private object EventsWSImplTypes {
   type WSRemoveDeviceTokenResult = RemoveDeviceTokenResult
 }
 
-trait EventsWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait EventsWSImpl extends BaseController with SecurityWSImpl { this: WSComponent#WS =>
   import EventsWSImplTypes.{WSRemoveMessageRequest, WSRemoveMessageResult}
 
   /**

@@ -24,12 +24,9 @@ import play.api.test._
 import play.test.WithApplication
 import testhelpers.domainstubs._
 
-// TODO: split it on several tests.
+// split it on several tests.
 //@RunWith(classOf[JUnitRunner])
-class UserDAOSpecs
-  extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class UserDAOSpecs extends BaseDAOSpecs {
 
   "Mongo User DAO" should {
     "Create new User in DB and find it by userId" in new WithApplication(appWithTestDatabase) {
@@ -136,7 +133,7 @@ class UserDAOSpecs
     }
 
 
-    // TODO: TAGS: clean me up.
+    // TAGS: clean me up.
 //    "takeQuest must remember quest's theme in history" in new WithApplication(appWithTestDatabase) {
 //      val userId = "takeQuest2"
 //      val themeId = "tid"
@@ -254,7 +251,7 @@ class UserDAOSpecs
       ou must beSome.which((u: User) => u.profile.questCreationContext.questCreationCoolDown == dateNew)
     }
 
-    // TODO: TAGS: clean me up.
+    // TAGS: clean me up.
 //    "resetTodayReviewedThemes do its work" in new WithApplication(appWithTestDatabase) {
 //      val userId = "resetTodayReviewedThemes"
 //      val date = new Date(1000)
@@ -549,6 +546,25 @@ class UserDAOSpecs
       ou1.get.timeLine must beEqualTo(List.empty)
     }
 
+    "Update entry in time line" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val userId = "userId"
+      val tle1 = TimeLineEntry(
+        id = "idqwe",
+        reason = TimeLineReason.Created,
+        actorId = userId,
+        TimeLineType.Quest,
+        objectId = "oid")
+      val u = User(id = userId, timeLine = List(tle1))
+
+      db.user.create(u)
+      db.user.updateTimeLineEntry(u.id, tle1.id, TimeLineReason.Hidden)
+
+      val ou1 = db.user.readById(u.id)
+      ou1 must beSome[User]
+      ou1.get.timeLine must beEqualTo(List(tle1.copy(reason = TimeLineReason.Hidden)))
+    }
 
     "recordQuestSolving do its work" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
@@ -877,6 +893,24 @@ class UserDAOSpecs
 
       val ou3 = db.user.removeDevice(user.id, d2.token)
       ou3.get.devices must beEqualTo(List(d1))
+    }
+
+    "Adds and removes banned user correctly" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val bannedId = "bannedId"
+      val user = createUserStub()
+
+      db.user.create(user)
+
+      val ou1 = db.user.addBannedUser(user.id, bannedId)
+      ou1.get.banned must beEqualTo(List(bannedId))
+
+      val ou2 = db.user.addBannedUser(user.id, bannedId)
+      ou2.get.banned must beEqualTo(List(bannedId))
+
+      val ou3 = db.user.removeBannedUser(user.id, bannedId)
+      ou3.get.banned must beEqualTo(List.empty)
     }
 
   }

@@ -39,6 +39,7 @@ POST    /rest/voteBattle						    	controllers.web.rest.VoteBattleWS.voteBattle
 
 # Time line
 POST	/rest/getTimeLine	    						controllers.web.rest.TimeLineWS.getTimeLine
+POST    /rest/hideFromTimeLine                          controllers.web.rest.TimeLineWS.hideFromTimeLine
 
 # Daily result
 POST	/rest/getDailyResult							controllers.web.rest.DailyResultWS.getDailyResult
@@ -76,6 +77,11 @@ POST	/rest/askFriendship								controllers.web.rest.FriendsWS.askFriendship
 POST	/rest/respondFriendship							controllers.web.rest.FriendsWS.respondFriendship
 POST	/rest/removeFromFriends							controllers.web.rest.FriendsWS.removeFromFriends
 
+# Banning
+POST	/rest/banUser								    controllers.web.rest.BanWS.banUser
+POST	/rest/unbanUser								    controllers.web.rest.BanWS.unbanUser
+POST    /rest/getBannedUsers                            controllers.web.rest.BanWS.getBannedUsers
+
 # Events
 POST	/rest/removeMessage								controllers.web.rest.EventsWS.removeMessage
 POST    /rest/addDeviceToken                            controllers.web.rest.EventsWS.addDeviceToken
@@ -90,7 +96,6 @@ POST	/rest/closeTutorialElement						controllers.web.rest.TutorialWS.closeTutori
 POST	/rest/assignTutorialTask						controllers.web.rest.TutorialWS.assignTutorialTask
 POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
 POST	/rest/assignTutorialQuest						controllers.web.rest.TutorialWS.assignTutorialQuest
-
 
 # Comments
 POST	/rest/postComment	    						controllers.web.rest.CommentsWS.postComment

@@ -213,6 +213,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val solutionsForQuest = db.solution.allWithParams(
       status = List(SolutionStatus.InRotation), // request.status.filter(Set(SolutionStatus.InRotation).contains),
       questIds = List(request.questId),
+      authorIdsExclude = request.user.banned,
       skip = pageNumber * pageSize)
 
     val solutions = solutionsForQuest.take(pageSize).toList.map(SolutionView(_, request.user))
@@ -234,6 +235,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val battlesForUser = db.battle.allWithParams(
       status = request.status,
       authorIds = List(request.userId),
+      authorIdsExclude = request.user.banned,
       skip = pageNumber * pageSize)
 
     val battles = battlesForUser.take(pageSize).toList.map( b => {
@@ -260,6 +262,7 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val battlesForSolution = db.battle.allWithParams(
       status = request.status,
       solutionIds = List(request.solutionId),
+      authorIdsExclude = request.user.banned,
       skip = pageNumber * pageSize)
 
     val battles = battlesForSolution.take(pageSize).toList.map(b => {

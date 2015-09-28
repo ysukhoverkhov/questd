@@ -1,10 +1,11 @@
-package controllers.domain.app.user
+package controllers.domain.app.comment
 
 import java.util.Date
 
 import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.user.MakeTaskRequest
 import controllers.domain.helpers._
 import models.domain.comment.{Comment, CommentInfo}
 import models.domain.user.profile.{TaskType, Profile}
@@ -82,6 +83,7 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
     val commentsForObject = db.comment.allWithParams(
       commentedObjectId = List(request.commentedObjectId),
+      authorIdsExclude = request.user.banned,
       skip = pageNumber * pageSize)
 
     val comments = commentsForObject.take(pageSize).toList.map(c => {

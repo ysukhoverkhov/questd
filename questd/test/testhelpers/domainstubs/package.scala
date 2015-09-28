@@ -87,7 +87,7 @@ package object domainstubs {
       None)
   }
 
-  // TODO: TAGS: replace themeId with tags.
+  // TAGS: replace themeId with tags.
   def createSolutionStub(
     id: String = ID.generate,
     cultureId: String = "cultureId",
@@ -252,7 +252,8 @@ package object domainstubs {
     tutorialState: TutorialState = TutorialState(dailyTasksSuppression = false),
     dailyTasks: DailyTasks = DailyTasks(),
     messages: List[Message] = List.empty,
-    schedules: UserSchedules = UserSchedules()) = {
+    schedules: UserSchedules = UserSchedules(),
+    banned: List[String] = List.empty) = {
 
     User(
       id = id,
@@ -283,6 +284,7 @@ package object domainstubs {
       friends = friends,
       followers = followers,
       following = following,
+      banned = banned,
       mustVoteSolutions = mustVoteSolutions,
       timeLine = timeLine,
       stats = UserStats(

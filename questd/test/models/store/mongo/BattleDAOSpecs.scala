@@ -8,9 +8,7 @@ import play.test.WithApplication
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
-class BattleDAOSpecs extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class BattleDAOSpecs extends BaseDAOSpecs {
 
   private[this] def clearDB() = {
     db.battle.clear()

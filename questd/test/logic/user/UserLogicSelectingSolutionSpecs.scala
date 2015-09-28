@@ -87,7 +87,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
-    // TODO: uncomment it for tags.
+    // TAGS: uncomment it for tags.
 //    "Return VIP solutions with favorite theme ids if dice rolls so" in {
 //      val qid = "qid"
 //      val u = User(
@@ -112,7 +112,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 //      q must beSome.which(q => q.id == qid)
 //    }
 
-    // TODO: uncomment it for tags.
+    // TAGS: uncomment it for tags.
 //    "Return All solutions with favorite theme ids if dice rolls so" in {
 //      val qid = "qid"
 //      val u = User(

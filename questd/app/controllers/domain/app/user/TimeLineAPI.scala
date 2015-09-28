@@ -3,14 +3,16 @@ package controllers.domain.app.user
 import components._
 import controllers.domain._
 import controllers.domain.app.battle.SelectBattleToTimeLineRequest
+import controllers.domain.app.protocol.ProfileModificationResult
+import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.quest.SelectQuestToTimeLineRequest
 import controllers.domain.app.solution.SelectSolutionToTimeLineRequest
 import controllers.domain.helpers._
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
-import models.domain.user.timeline.{TimeLineType, TimeLineReason, TimeLineEntry}
+import models.domain.user.profile.Profile
+import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import play.Logger
-
 
 case class AddToTimeLineRequest(
   user: User,
@@ -24,6 +26,11 @@ case class RemoveFromTimeLineRequest(
   user: User,
   objectId: String)
 case class RemoveFromTimeLineResult(user: User)
+
+case class HideFromTimeLineRequest(
+  user: User,
+  entryId: String)
+case class HideFromTimeLineResult(allowed: ProfileModificationResult.Value, profile: Option[Profile] = None)
 
 case class AddToWatchersTimeLineRequest(
   user: User,
@@ -39,6 +46,9 @@ case class GetTimeLineRequest(
   untilEntryId: Option[String] = None)
 case class GetTimeLineResult(timeLine: List[TimeLineEntry])
 
+case class PupulateTimeLineInitiallyRequest(user: User)
+case class PupulateTimeLineInitiallyResult(user: User)
+
 case class PopulateTimeLineWithRandomThingsRequest(user: User)
 case class PopulateTimeLineWithRandomThingsResult(user: User)
 
@@ -46,7 +56,6 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
   /**
    * Adds entry to time line. Does nothing is user has no culture.
-   *
    */
   def addToTimeLine(request: AddToTimeLineRequest): ApiResult[AddToTimeLineResult] = handleDbException {
     import request._
@@ -70,7 +79,6 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
   /**
    * Removes entry from time line.
-   *
    */
   def removeFromTimeLine(request: RemoveFromTimeLineRequest): ApiResult[RemoveFromTimeLineResult] = handleDbException {
     import request._
@@ -79,6 +87,26 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
       user.id,
       objectId) ifSome { u =>
       OkApiResult(RemoveFromTimeLineResult(u))
+    }
+  }
+
+  /**
+   * Hides entry from timeline. It's still on the server but is not returned in timeline requests.
+   */
+  def hideFromTimeLine(request: HideFromTimeLineRequest): ApiResult[HideFromTimeLineResult] = handleDbException {
+    import request._
+
+    if (user.timeLine.exists(_.id == entryId)) {
+
+      db.user.updateTimeLineEntry(
+        id = request.user.id,
+        entryId = request.entryId,
+        reason = TimeLineReason.Hidden) ifSome { u =>
+
+        OkApiResult(HideFromTimeLineResult(OK, Some(u.profile)))
+      }
+    } else {
+      OkApiResult(HideFromTimeLineResult(OutOfContent))
     }
   }
 
@@ -111,16 +139,51 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def getTimeLine(request: GetTimeLineRequest): ApiResult[GetTimeLineResult] = handleDbException {
 
     (if (request.user.timeLine.isEmpty) {
-      populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(request.user))
+      populateTimeLineInitially(PupulateTimeLineInitiallyRequest(request.user))
     } else {
-      OkApiResult(PopulateTimeLineWithRandomThingsResult(request.user))
+      OkApiResult(PupulateTimeLineInitiallyResult(request.user))
     }) map { r =>
       val pageSize = adjustedPageSize(request.pageSize)
       val pageNumber = adjustedPageNumber(request.pageNumber)
 
-      OkApiResult(GetTimeLineResult(r.user.timeLine.iterator
-        .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
-        .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
+      OkApiResult(
+        GetTimeLineResult(
+          r.user.timeLine.iterator
+            .filter(_.reason != TimeLineReason.Hidden)
+            .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
+            .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
+    }
+  }
+
+  /**
+   * Internal call to populate timeline with initial things.
+   */
+  def populateTimeLineInitially(request: PupulateTimeLineInitiallyRequest): ApiResult[PupulateTimeLineInitiallyResult] = handleDbException {
+    populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(request.user)) map { r =>
+
+      // Now adding to the top things we were invited with.
+      r.user.friends.filter(_.referredWithContentId.nonEmpty).foreach { f =>
+        db.quest.readById(f.referredWithContentId.get).fold[Option[TimeLineType.Value]] {
+          db.solution.readById(f.referredWithContentId.get).fold[Option[TimeLineType.Value]] {
+            None
+          } { solution =>
+            Some(TimeLineType.Solution)
+          }
+        } { quest =>
+          Some(TimeLineType.Quest)
+        }.fold() { contentType =>
+          addToTimeLine(
+            AddToTimeLineRequest(
+              user = r.user,
+              reason = TimeLineReason.Has,
+              objectType = contentType,
+              objectId = f.referredWithContentId.get,
+              actorId = Some(f.friendId)
+            ))
+        }
+      }
+
+      OkApiResult(PupulateTimeLineInitiallyResult(r.user))
     }
   }
 

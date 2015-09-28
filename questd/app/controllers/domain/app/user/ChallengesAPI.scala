@@ -56,8 +56,8 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
             BattleRequest(
               opponent.id, mySolution.id, opponentSolution.id, BattleRequestStatus.Requested))
         }, { user =>
-          // TODO: substract assets for invitation.
-          // TODO: test it calls db correctly.
+          // substract assets for invitation.
+          // test it calls db correctly.
           Some(user)
         }
         ) ifSome { user =>
@@ -117,8 +117,8 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
               }
             }
           } else {
-            // TODO: return money back.
-            // TODO: test me.
+            // return money back.
+            // test me.
             sendMessage(SendMessageRequest(opponent, MessageBattleRequestRejected(br.mySolutionId))) map {
               OkApiResult(RespondBattleRequestResult(OK, Some(user.profile), List.empty))
             }

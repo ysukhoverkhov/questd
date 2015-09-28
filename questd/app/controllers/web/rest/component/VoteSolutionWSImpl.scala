@@ -21,7 +21,7 @@ private object VoteSolutionWSImplTypes {
   type WSVoteSolutionResult = VoteSolutionByUserResult
 }
 
-trait VoteSolutionWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+trait VoteSolutionWSImpl extends BaseController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
   import controllers.web.rest.component.VoteSolutionWSImplTypes._
 

@@ -105,7 +105,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
   private[user] def getVIPBattles(implicit selected: List[Battle]) = {
     Logger.trace("  Returning VIP Battles")
 
-    // TODO: TAGS: implement me (perhaps remove tags).
+    // TAGS: implement me (perhaps remove tags).
 //    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForVIPQuests)
 //    Logger.trace("    Selected themes of vip's quests: " + themeIds.mkString(", "))
 //
@@ -119,7 +119,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
 
   private[user] def getBattlesWithMyTags(implicit selected: List[Battle]) = {
     Logger.trace("  Returning Battles with my tags")
-// TODO: TAGS: implement me with tags.
+// TAGS: implement me with tags.
 //    val themeIds = selectRandomThemes(NumberOfFavoriteThemesForOtherQuests)
 //    Logger.trace("    Selected themes of other quests: " + themeIds.mkString(", "))
 //
@@ -164,7 +164,7 @@ trait BattleSelectUserLogic { this: UserLogic =>
   }
 
   private def battleParticipantsIdsToExclude = {
-    List(user.id)
+    user.id :: user.banned
   }
 
   // FIX: change it to tags when they will be ready.

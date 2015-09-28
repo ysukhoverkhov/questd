@@ -7,7 +7,7 @@ private object MiscWSImplTypes {
   type WSGetTimeResult = GetTimeResult
 }
 
-trait MiscWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait MiscWSImpl extends BaseController with SecurityWSImpl { this: WSComponent#WS =>
 
   import MiscWSImplTypes._
 

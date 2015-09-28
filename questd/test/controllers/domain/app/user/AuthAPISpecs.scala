@@ -9,6 +9,7 @@ import models.domain.user.demo.UserDemographics
 import models.domain.user.profile.{PublicProfile, Profile, Bio}
 import models.store
 import org.mockito.Matchers.{eq => mockEq}
+import testhelpers.domainstubs._
 
 class AuthAPISpecs extends BaseAPISpecs {
 
@@ -184,6 +185,47 @@ class AuthAPISpecs extends BaseAPISpecs {
 
       rv must beAnInstanceOf[OkApiResult[LoginResult]]
       rv.body must beSome[LoginResult]
+    }
+
+    "Creates friendship if referrer id is present" in context {
+
+      val countryName = "country_name"
+      val userfb = userFBStub
+      val referrerId = "referrerId"
+      val contentId = "contentId"
+
+      val u = Some(User(
+        id = "userid",
+        auth = AuthInfo(loginMethods = List(LoginMethod("FB", userfb.snId))),
+        demo = UserDemographics(cultureId = Some(countryName)),
+        profile = Profile(
+          publicProfile = PublicProfile(
+            bio = Bio(
+              country = Some(countryName))))))
+
+      db.user.updateSessionId(any, any) returns u
+      db.user.readBySNid("FB", userfb.snId) returns None thenReturns u
+      db.user.levelUp(anyString, anyInt) returns u
+      db.user.setNextLevelRatingAndRights(
+        anyString,
+        anyInt,
+        any) returns u
+
+      db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
+
+      val rv = api.login(
+        LoginRequest(
+          "FB",
+          userfb,
+          referrerId = Some(referrerId),
+          invitedWithContentId = Some(contentId)))
+
+      rv must beAnInstanceOf[OkApiResult[LoginResult]]
+
+      // Update allowed.
+      there was one(user).readBySNid("FB", userfb.snId)
+      there was one(user).create(any)
+      there was one(api).createFriendship(any)
     }
   }
 }

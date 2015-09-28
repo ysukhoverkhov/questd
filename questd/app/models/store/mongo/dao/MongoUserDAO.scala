@@ -14,7 +14,7 @@ import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
 import models.domain.user.profile.{DailyTasks, Rights, Task}
 import models.domain.user.stats.SolutionsInBattle
-import models.domain.user.timeline.TimeLineEntry
+import models.domain.user.timeline.{TimeLineReason, TimeLineEntry}
 import models.store.dao._
 import models.store.mongo.SalatContext._
 import models.store.mongo.helpers._
@@ -361,7 +361,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def addToFollowing(id: String, idToAdd: String): Option[User] = {
     findAndModify(
@@ -378,7 +378,7 @@ private[mongo] class MongoUserDAO
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def removeFromFollowing(id: String, idToRemove: String): Option[User] = {
     findAndModify(
@@ -800,6 +800,19 @@ private[mongo] class MongoUserDAO
   /**
    * @inheritdoc
    */
+  def updateTimeLineEntry(id: String, entryId: String, reason: TimeLineReason.Value): Option[User] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id,
+        "timeLine.id" -> entryId),
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "timeLine.$.reason" -> reason.toString)))
+  }
+
+  /**
+   * @inheritdoc
+   */
   def addBattleRequest(id: String, battleRequest: BattleRequest): Option[User] = {
     findAndModify(
       id,
@@ -823,6 +836,29 @@ private[mongo] class MongoUserDAO
         "$set" -> MongoDBObject(
           "battleRequests.$.status" -> status)))
   }
-}
 
+
+  /**
+   * @inheritdoc
+   */
+  def addBannedUser(id: String, bannedUserId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$addToSet" -> MongoDBObject(
+          "banned" -> bannedUserId)))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def removeBannedUser(id: String, bannedUserId: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$pull" -> MongoDBObject(
+          "banned" -> bannedUserId)))
+  }
+
+}
 

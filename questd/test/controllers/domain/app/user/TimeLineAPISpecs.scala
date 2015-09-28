@@ -1,7 +1,8 @@
 package controllers.domain.app.user
 
+import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{BaseAPISpecs, OkApiResult}
-import models.domain.user.friends.{Friendship, FriendshipStatus}
+import models.domain.user.friends.{ReferralStatus, Friendship, FriendshipStatus}
 import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import org.mockito.Matchers.{eq => mockEq}
 import org.mockito.Mockito._
@@ -60,6 +61,34 @@ class TimeLineAPISpecs extends BaseAPISpecs {
       there was one(user).removeEntryFromTimeLineByObjectId(mockEq(u.id), mockEq(entryId))
     }
 
+    "Hides item in timeline when requested" in context {
+      val entryId = "lala"
+      val tle = createTimeLineEntryStub(id = entryId)
+      val u = createUserStub(timeLine = List(tle))
+
+      user.updateTimeLineEntry(mockEq(u.id), mockEq(entryId), mockEq(TimeLineReason.Hidden)) returns Some(u)
+
+      val result = api.hideFromTimeLine(HideFromTimeLineRequest(
+        user = u,
+        entryId = entryId))
+
+      result must beEqualTo(OkApiResult(HideFromTimeLineResult(ProfileModificationResult.OK, Some(u.profile))))
+      there was one(user).updateTimeLineEntry(mockEq(u.id), mockEq(entryId), mockEq(TimeLineReason.Hidden))
+    }
+
+    "Do not hide unexisting items from timeline" in context {
+      val u = createUserStub()
+
+      user.updateTimeLineEntry(any, any, any) returns Some(u)
+
+      val result = api.hideFromTimeLine(HideFromTimeLineRequest(
+        user = u,
+        entryId = "asd"))
+
+      result must beEqualTo(OkApiResult(HideFromTimeLineResult(ProfileModificationResult.OutOfContent, None)))
+      there was no(user).updateTimeLineEntry(any, any, any)
+    }
+
     "Add item to friends' and followers' time line when requested" in context {
       val friends = List(Friendship("fid1", FriendshipStatus.Accepted), Friendship("fid2", FriendshipStatus.Invited))
       val u = createUserStub(friends = friends, followers = List("1"))
@@ -96,10 +125,28 @@ class TimeLineAPISpecs extends BaseAPISpecs {
       result must beEqualTo(OkApiResult(GetTimeLineResult(entries.slice(0,2))))
     }
 
+    "getTimeLine filters out hidden" in context {
+      val entries = List(
+        createTimeLineEntryStub(id = "1"),
+        createTimeLineEntryStub(id = "2"),
+        createTimeLineEntryStub(id = "3", reason = TimeLineReason.Hidden),
+        createTimeLineEntryStub(id = "4")
+      )
+
+      val u = createUserStub(timeLine = entries)
+
+      val result = api.getTimeLine(GetTimeLineRequest(
+        user = u,
+        pageNumber = 0,
+        pageSize = 20))
+
+      result must beEqualTo(OkApiResult(GetTimeLineResult(entries.filter(_.reason != TimeLineReason.Hidden))))
+    }
+
     "getTimeLine populates timeline if it's empty" in context {
       val u = createUserStub()
 
-      doReturn(OkApiResult(PopulateTimeLineWithRandomThingsResult(u))).when(api).populateTimeLineWithRandomThings(any)
+      doReturn(OkApiResult(PupulateTimeLineInitiallyResult(u))).when(api).populateTimeLineInitially(any)
 
       val result = api.getTimeLine(GetTimeLineRequest(
         user = u,
@@ -107,9 +154,30 @@ class TimeLineAPISpecs extends BaseAPISpecs {
         pageSize = 20))
 
       result must beAnInstanceOf[OkApiResult[PopulateTimeLineWithRandomThingsResult]]
-      there were one(api).populateTimeLineWithRandomThings(any)
+      there were one(api).populateTimeLineInitially(any)
     }
 
+    "populateTimeLineInitially populates timeline with random things and invited quests" in context {
+      val contentId = "contentId"
+      val u = createUserStub(
+        friends = List(
+          Friendship(
+            friendId = "fid",
+            status = FriendshipStatus.Accepted,
+            referralStatus = ReferralStatus.ReferredBy,
+            referredWithContentId = Some(contentId)
+          )))
+
+      doReturn(OkApiResult(PupulateTimeLineInitiallyResult(u))).when(api).populateTimeLineInitially(any)
+
+      val result = api.getTimeLine(GetTimeLineRequest(
+        user = u,
+        pageNumber = 0,
+        pageSize = 20))
+
+      result must beAnInstanceOf[OkApiResult[PopulateTimeLineWithRandomThingsResult]]
+      there were one(api).populateTimeLineInitially(any)
+    }
 
 //    "populateTimeLineWithRandomThings populates it" in context {
 //      val u = createUserStub()

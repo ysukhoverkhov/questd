@@ -45,6 +45,14 @@ case class RemoveFromFriendsRequest(
 case class RemoveFromFriendsResult(
   allowed: ProfileModificationResult)
 
+case class CreateFriendshipRequest(
+  user: User,
+  friendId: String,
+  isReferredBy: Boolean = false,
+  referredWithContentId: Option[String] = None)
+case class CreateFriendshipResult(
+  user: User)
+
 case class ProcessFriendshipInvitationsFromSNRequest(
   user: User,
   snUser: SNUser)
@@ -70,7 +78,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
   }
 
   /**
-   * How much it'll take invite persone to become a friend.
+   * How much it'll take invite person to become a friend.
    */
   def costToRequestFriendship(request: CostToRequestFriendshipRequest): ApiResult[CostToRequestFriendshipResult] = handleDbException {
 
@@ -97,11 +105,11 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
         allowed = OutOfContent))
     } else {
       db.user.readById(request.friendId) match {
-        case Some(u) =>
-          request.user.canAddFriend(u) match {
+        case Some(potentialFriend) =>
+          request.user.canAddFriend(potentialFriend) match {
             case OK =>
 
-              val cost = request.user.costToAddFriend(u)
+              val cost = request.user.costToAddFriend(potentialFriend)
               adjustAssets(AdjustAssetsRequest(user = request.user, change = -cost)) map { r =>
 
                 db.user.askFriendship(
@@ -109,6 +117,11 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
                   request.friendId,
                   Friendship(request.friendId, FriendshipStatus.Invited),
                   Friendship(r.user.id, FriendshipStatus.Invites))
+
+                // remove this soplia whn check in logic will be implemented.
+                if (potentialFriend.banned.contains(r.user.id)) {
+                  respondFriendship(RespondFriendshipRequest(potentialFriend, r.user.id, accept = false))
+                }
 
                 OkApiResult(AskFriendshipResult(OK, Some(r.user.profile)))
               }
@@ -120,7 +133,6 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
             allowed = OutOfContent))
       }
     }
-
   }
 
   /**
@@ -197,6 +209,33 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
     }
   }
 
+  /**
+   * Creates already accepted friendship between two people.
+   */
+  def createFriendship(request: CreateFriendshipRequest): ApiResult[CreateFriendshipResult] = handleDbException {
+    import request._
+
+    db.user.readById(friendId).fold() { referrer =>
+      db.user.addFriendship(
+        referrer.id,
+        Friendship(
+          user.id,
+          FriendshipStatus.Accepted,
+          referralStatus = if (request.isReferredBy) ReferralStatus.Refers else ReferralStatus.None
+        ))
+
+      db.user.addFriendship(
+        user.id,
+        Friendship(
+          referrer.id,
+          FriendshipStatus.Accepted,
+          referralStatus = if (request.isReferredBy) ReferralStatus.ReferredBy else ReferralStatus.None,
+          referredWithContentId = referredWithContentId
+        ))
+    }
+
+    OkApiResult(CreateFriendshipResult(user))
+  }
 
   /**
    * Create friendships for invitation requests for given SN user.

@@ -3,7 +3,6 @@ package controllers.web.rest.component
 import com.vita.scala.extensions._
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import models.domain._
 import models.domain.battle.BattleStatus
 import models.domain.quest.QuestStatus
 import models.domain.solution.SolutionStatus
@@ -103,7 +102,7 @@ private object ContentWSImplTypes
 }
 
 
-trait ContentWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+trait ContentWSImpl extends BaseController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
   import controllers.web.rest.component.ContentWSImplTypes._
 

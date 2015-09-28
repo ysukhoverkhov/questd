@@ -12,10 +12,10 @@ import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
 import models.domain.user.profile.{DailyTasks, Rights, Task}
 import models.domain.user.stats.SolutionsInBattle
-import models.domain.user.timeline.TimeLineEntry
+import models.domain.user.timeline.{TimeLineReason, TimeLineEntry}
 import models.view.QuestView
 
-// TODO: split it on several traits.
+// TODO: split it on several traits in 0.50.
 trait UserDAO extends BaseDAO[User] {
 
   def updateSessionId(id: String, sessionId: String): Option[User]
@@ -193,10 +193,20 @@ trait UserDAO extends BaseDAO[User] {
   /**
    * Removes entry from time line.
    * @param id Id of a user to add to.
-   * @param entryId Entry to remove.
+   * @param objectId Object to remove.
    * @return user after modifications.
    */
-  def removeEntryFromTimeLineByObjectId(id: String, entryId: String): Option[User]
+  def removeEntryFromTimeLineByObjectId(id: String, objectId: String): Option[User]
+
+  /**
+   * Updates status of timeline entry.
+   *
+   * @param id Id of user to update timeline entry at.
+   * @param entryId Id of timeline entry to update.
+   * @param reason New reason of entry.
+   * @return Updated user.
+   */
+  def updateTimeLineEntry(id: String, entryId: String, reason: TimeLineReason.Value): Option[User]
 
   /**
    * Adds battle request to user.
@@ -216,5 +226,23 @@ trait UserDAO extends BaseDAO[User] {
    * @param status new status.
    */
   def updateBattleRequest(id: String, mySolutionId: String, opponentSolutionId: String, status: String): Option[User]
+
+  /**
+   * Adds user to banned list.
+   *
+   * @param id Our id.
+   * @param bannedUserId Id of banned user.
+   * @return Updated user structure.
+   */
+  def addBannedUser(id: String, bannedUserId: String): Option[User]
+
+  /**
+   * Removes user from banned list.
+   *
+   * @param id Our id.
+   * @param bannedUserId Id of banned user.
+   * @return Updated user structure.
+   */
+  def removeBannedUser(id: String, bannedUserId: String): Option[User]
 
 }

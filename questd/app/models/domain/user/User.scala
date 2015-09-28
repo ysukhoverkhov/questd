@@ -27,6 +27,7 @@ case class User(
   stats: UserStats = UserStats(),
   following: List[String] = List.empty,
   followers: List[String] = List.empty,
+  banned: List[String] = List.empty,
   friends: List[Friendship] = List.empty,
   battleRequests: List[BattleRequest] = List.empty,
   devices: List[Device] = List.empty,

@@ -202,7 +202,7 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   }
 
   private def solutionAuthorIdsToExclude = {
-    List(user.id)
+    user.id :: user.banned
   }
 
   /**

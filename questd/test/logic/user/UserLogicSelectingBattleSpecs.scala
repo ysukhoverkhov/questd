@@ -96,7 +96,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
       q.map(_.id) must beEqualTo(List(bid))
     }
 
-    // TODO: implement me when tags will be impelemented.
+    // TAGS: implement me when tags will be impelemented.
 //    "Return VIP quest with favorite theme ids if dice rolls so" in {
 //      val qid = "qid"
 //      val u = User(
@@ -120,7 +120,7 @@ class UserLogicSelectingBattleSpecs extends BaseLogicSpecs {
 //      q must beSome.which(q => q.id == qid)
 //    }
 
-    // TODO: uncomment with tags.
+    // TAGS: uncomment with tags.
 //    "Return All quest with favorite theme ids if dice rolls so" in {
 //      val qid = "qid"
 //      val u = User(

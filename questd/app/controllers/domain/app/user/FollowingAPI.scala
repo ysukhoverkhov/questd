@@ -1,15 +1,13 @@
 package controllers.domain.app.user
 
-import controllers.domain.DomainAPIComponent
 import components._
-import controllers.domain._
-import controllers.domain.helpers._
+import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.helpers._
 import controllers.services.socialnetworks.client.{User => SNUser}
 import models.domain.common.Assets
-import models.domain.user.profile.{TaskType, Profile}
 import models.domain.user.User
-import play.Logger
+import models.domain.user.profile.{Profile, TaskType}
 
 case class GetFollowingRequest(
   user: User)
@@ -38,7 +36,7 @@ case class AddToFollowingResult(
 
 case class RemoveFromFollowingRequest(
   user: User,
-  userIdToAdd: String)
+  userIdToRemove: String)
 case class RemoveFromFollowingResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None)
@@ -76,7 +74,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
   def getFollowers(request: GetFollowersRequest): ApiResult[GetFollowersResult] = handleDbException {
         OkApiResult(GetFollowersResult(
           allowed = OK,
-          userIds = Some(request.user.followers)))
+          userIds = Some(request.user.followers.filterNot(request.user.banned.toSet))))
   }
 
   /**
@@ -93,28 +91,33 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
    */
   def addToFollowing(request: AddToFollowingRequest): ApiResult[AddToFollowingResult] = handleDbException {
 
-    val maxFollowingSize = 1000
+    val maxFollowingSize = 1024
 
     if (request.user.following.length >= maxFollowingSize) {
       OkApiResult(AddToFollowingResult(LimitExceeded))
     } else {
-      request.user.canFollowUser(request.userIdToAdd) match {
-        case OK => {
+      db.user.readById(request.userIdToAdd).fold[ApiResult[AddToFollowingResult]] {
+        OkApiResult(AddToFollowingResult(OutOfContent))
+      } { userToFollow =>
 
-          makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.AddToFollowing)))
+        request.user.canFollowUser(request.userIdToAdd) match {
+          case OK => {
 
-        } map { r =>
+            makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.AddToFollowing)))
 
-          val cost = request.user.costToFollowing
-          adjustAssets(AdjustAssetsRequest(user = r.user, change = -cost))
+          } map { r =>
 
-        } map { r =>
+            val cost = request.user.costToFollowing
+            adjustAssets(AdjustAssetsRequest(user = r.user, change = -cost))
 
-          db.user.addToFollowing(r.user.id, request.userIdToAdd)
-          OkApiResult(AddToFollowingResult(OK, Some(r.user.profile)))
+          } map { r =>
 
+            db.user.addToFollowing(r.user.id, request.userIdToAdd)
+            OkApiResult(AddToFollowingResult(OK, Some(r.user.profile)))
+
+          }
+          case a => OkApiResult(AddToFollowingResult(a))
         }
-        case a => OkApiResult(AddToFollowingResult(a))
       }
     }
 
@@ -125,7 +128,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
    */
   def removeFromFollowing(request: RemoveFromFollowingRequest): ApiResult[RemoveFromFollowingResult] = handleDbException {
 
-    db.user.removeFromFollowing(request.user.id, request.userIdToAdd) ifSome { r =>
+    db.user.removeFromFollowing(request.user.id, request.userIdToRemove) ifSome { r =>
       OkApiResult(RemoveFromFollowingResult(OK, Some(r.profile)))
     }
   }

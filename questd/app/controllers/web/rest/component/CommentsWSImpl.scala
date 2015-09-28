@@ -1,6 +1,6 @@
 package controllers.web.rest.component
 
-import controllers.domain.app.user.{GetCommentsForObjectResult, GetCommentsForObjectRequest, PostCommentResult, PostCommentRequest}
+import controllers.domain.app.comment.{GetCommentsForObjectRequest, PostCommentRequest, GetCommentsForObjectResult, PostCommentResult}
 import controllers.web.helpers._
 
 private object CommentsWSImplTypes {
@@ -31,7 +31,7 @@ private object CommentsWSImplTypes {
   type WSGetCommentsForObjectResult = GetCommentsForObjectResult
 }
 
-trait CommentsWSImpl extends QuestController with SecurityWSImpl { this: WSComponent#WS =>
+trait CommentsWSImpl extends BaseController with SecurityWSImpl { this: WSComponent#WS =>
 
   import CommentsWSImplTypes._
 

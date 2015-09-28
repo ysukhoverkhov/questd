@@ -20,7 +20,7 @@ class UserLogicSelectingThemeSpecs extends BaseLogicSpecs {
       success
     }
 
-    // TODO: clean me up with tags.
+    // TAGS: clean me up with tags.
 //    "Return correct theme from favorite" in {
 //
 //      val themes = createStubThemes

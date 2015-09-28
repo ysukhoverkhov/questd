@@ -58,7 +58,7 @@ private object DebugWSImplTypes {
   type WSResetTutorialResult = ResetTutorialResult
 }
 
-trait DebugWSImpl extends QuestController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
+trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunctions { this: WSComponent#WS =>
 
   import controllers.web.rest.component.DebugWSImplTypes._
 
