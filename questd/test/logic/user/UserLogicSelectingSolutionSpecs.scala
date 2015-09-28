@@ -14,9 +14,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 
   "User Logic solution selector" should {
 
-    "Return solution from friends if dice rolls so" in {
-
-      applyConfigMock()
+    "Return solution from friends if dice rolls so" in context {
       rand.nextDouble returns 0.13
 
       val qid = "qid"
@@ -33,8 +31,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
-    "Return solution from following if dice rolls so" in {
-      applyConfigMock()
+    "Return solution from following if dice rolls so" in context {
       rand.nextDouble returns 0.38
 
       val qid = "qid"
@@ -51,8 +48,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
-    "Return liked quest if dice rolls so" in {
-      applyConfigMock()
+    "Return liked quest if dice rolls so" in context {
       rand.nextDouble returns 0.58
 
       val qid = "qid"
@@ -69,8 +65,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       q must beSome.which(q => q.id == qid)
     }
 
-    "Return VIP solutions if dice rolls so" in {
-      applyConfigMock()
+    "Return VIP solutions if dice rolls so" in context {
       rand.nextDouble returns 0.75
 
       val qid = "qid"
@@ -88,7 +83,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
     }
 
     // TAGS: uncomment it for tags.
-//    "Return VIP solutions with favorite theme ids if dice rolls so" in {
+//    "Return VIP solutions with favorite theme ids if dice rolls so" in context {
 //      val qid = "qid"
 //      val u = User(
 //        profile = Profile(
@@ -113,7 +108,7 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 //    }
 
     // TAGS: uncomment it for tags.
-//    "Return All solutions with favorite theme ids if dice rolls so" in {
+//    "Return All solutions with favorite theme ids if dice rolls so" in context {
 //      val qid = "qid"
 //      val u = User(
 //        history = UserHistory(
@@ -135,11 +130,10 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
 //      q must beSome.which(q => q.id == qid)
 //    }
 
-    "Starting solutions return vip solutions" in {
+    "Starting solutions return vip solutions" in context {
       val qid = "qid"
       val u = createUserStub(level = 1)
 
-      applyConfigMock()
       rand.nextDouble returns 0.0
 
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
@@ -151,11 +145,10 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       there was one(api).getVIPSolutions(any[GetVIPSolutionsRequest])
     }
 
-    "Starting solutions return other solutions" in {
+    "Starting solutions return other solutions" in context {
       val qid = "qid"
       val u = createUserStub(level = 1)
 
-      applyConfigMock()
       rand.nextDouble returns 1.0
 
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
@@ -167,11 +160,10 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       there was one(api).getAllSolutions(any[GetAllSolutionsRequest])
     }
 
-    "Other quests are used if vip quests are unavailable" in {
+    "Other quests are used if vip quests are unavailable" in context {
       val qid = "qid"
       val u = createUserStub()
 
-      applyConfigMock()
       rand.nextDouble returns 0.75
 
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
@@ -185,12 +177,11 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       there was one(api).getAllSolutions(any[GetAllSolutionsRequest])
     }
 
-    "All solutions are used if vip and Other solutions are unavailable" in {
+    "All solutions are used if vip and Other solutions are unavailable" in context {
       val qid = "qid"
       val u = createUserStub()
       val s = createSolutionStub(id = qid, authorId = "author")
 
-      applyConfigMock()
       rand.nextDouble returns 0.75
 
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List.empty.iterator))
@@ -207,11 +198,10 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       there were two(api).getAllSolutions(any[GetAllSolutionsRequest])
     }
 
-    "Solution from must help list is returned if there is one" in {
+    "Solution from must help list is returned if there is one" in context {
       val qid = "qid"
       val u = createUserStub(mustVoteSolutions = List(qid))
 
-      applyConfigMock()
       api.getHelpWantedSolutions(any[GetHelpWantedSolutionsRequest]) returns OkApiResult(GetHelpWantedSolutionsResult(List(createSolutionStub(id = qid)).iterator))
 
       u.getRandomSolution
@@ -219,11 +209,10 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       there was one(api).getHelpWantedSolutions(any[GetHelpWantedSolutionsRequest])
     }
 
-    "Solutions for own quests are returned" in {
+    "Solutions for own quests are returned" in context {
       val qid = "qid"
       val u = createUserStub()
 
-      applyConfigMock()
       api.getSolutionsForOwnQuests(any[GetSolutionsForOwnQuestsRequest]) returns OkApiResult(GetSolutionsForOwnQuestsResult(List(createSolutionStub(id = qid)).iterator))
 
       u.getRandomSolution
