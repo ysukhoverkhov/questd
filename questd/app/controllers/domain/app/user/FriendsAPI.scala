@@ -49,7 +49,7 @@ case class CreateFriendshipRequest(
   user: User,
   friendId: String,
   isReferredBy: Boolean = false,
-  referredWithContent: Option[String] = None)
+  referredWithContentId: Option[String] = None)
 case class CreateFriendshipResult(
   user: User)
 
@@ -230,7 +230,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
           referrer.id,
           FriendshipStatus.Accepted,
           referralStatus = if (request.isReferredBy) ReferralStatus.ReferredBy else ReferralStatus.None,
-          referredWithContentId = referredWithContent
+          referredWithContentId = referredWithContentId
         ))
     }
 

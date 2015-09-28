@@ -67,7 +67,7 @@ private[domain] trait AuthAPI {
               user = r.user,
               friendId = referrerId,
               isReferredBy = true,
-              referredWithContent = request.invitedWithContentId
+              referredWithContentId = request.invitedWithContentId
             ))
         }
 
