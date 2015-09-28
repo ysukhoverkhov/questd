@@ -7,10 +7,14 @@ import controllers.services.socialnetworks.client.{User => SNUser}
 import models.domain.common.{ContentReference, ContentType}
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, LoginMethod}
-import models.domain.user.profile.{PublicProfile, Profile, Bio}
+import models.domain.user.profile.{Bio, Profile, PublicProfile}
 import play.Logger
 
-case class LoginRequest(snName: String, snuser: SNUser)
+case class LoginRequest(
+  snName: String,
+  snuser: SNUser,
+  referrerId: Option[String] = None,
+  invitedWithContentId: Option[String] = None)
 case class LoginResult(sessionId: String, userId: String)
 
 private[domain] trait AuthAPI {
@@ -57,6 +61,16 @@ private[domain] trait AuthAPI {
       {
         createUser(CreateUserRequest(newUser))
       } map { r =>
+        request.referrerId.fold() { referrerId =>
+          api.createFriendship(
+            CreateFriendshipRequest(
+              user = r.user,
+              friendId = referrerId,
+              isReferredBy = true,
+              referredWithContentId = request.invitedWithContentId
+            ))
+        }
+
         Logger.debug(s"New user created with FB: ${r.user.id} / ${r.user.profile.publicProfile.bio.name}")
         loginUser(r.user)
       }

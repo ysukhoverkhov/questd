@@ -6,4 +6,5 @@ package models.domain.user.friends
 case class Friendship(
   friendId: String,
   status: FriendshipStatus.Value,
-  referralStatus: ReferralStatus.Value = ReferralStatus.None)
+  referralStatus: ReferralStatus.Value = ReferralStatus.None,
+  referredWithContentId: Option[String] = None)
