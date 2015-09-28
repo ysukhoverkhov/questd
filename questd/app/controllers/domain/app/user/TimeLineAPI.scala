@@ -135,7 +135,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
   /**
    * Returns portion of time line. Populates its with initial content if it's empty.
-   */ // TODO: test populateTimeLineInitially is called.
+   */
   def getTimeLine(request: GetTimeLineRequest): ApiResult[GetTimeLineResult] = handleDbException {
 
     (if (request.user.timeLine.isEmpty) {
@@ -157,7 +157,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
   /**
    * Internal call to populate timeline with initial things.
-   */ // TODO: test it calls addToTimeline.
+   */
   def populateTimeLineInitially(request: PupulateTimeLineInitiallyRequest): ApiResult[PupulateTimeLineInitiallyResult] = handleDbException {
     populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(request.user)) map { r =>
 
