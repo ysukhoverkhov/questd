@@ -46,6 +46,9 @@ case class GetTimeLineRequest(
   untilEntryId: Option[String] = None)
 case class GetTimeLineResult(timeLine: List[TimeLineEntry])
 
+case class PupulateTimeLineInitiallyRequest(user: User)
+case class PupulateTimeLineInitiallyResult(user: User)
+
 case class PopulateTimeLineWithRandomThingsRequest(user: User)
 case class PopulateTimeLineWithRandomThingsResult(user: User)
 
@@ -132,13 +135,13 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
   /**
    * Returns portion of time line. Populates its with initial content if it's empty.
-   */
+   */ // TODO: test populateTimeLineInitially is called.
   def getTimeLine(request: GetTimeLineRequest): ApiResult[GetTimeLineResult] = handleDbException {
 
     (if (request.user.timeLine.isEmpty) {
-      populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(request.user))
+      populateTimeLineInitially(PupulateTimeLineInitiallyRequest(request.user))
     } else {
-      OkApiResult(PopulateTimeLineWithRandomThingsResult(request.user))
+      OkApiResult(PupulateTimeLineInitiallyResult(request.user))
     }) map { r =>
       val pageSize = adjustedPageSize(request.pageSize)
       val pageNumber = adjustedPageNumber(request.pageNumber)
@@ -149,6 +152,16 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
             .filter(_.reason != TimeLineReason.Hidden)
             .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
             .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
+    }
+  }
+
+  /**
+   * Internal call to populate timeline with initial things.
+   */
+  def populateTimeLineInitially(request: PupulateTimeLineInitiallyRequest): ApiResult[PupulateTimeLineInitiallyResult] = handleDbException {
+    populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(request.user)) map { r =>
+      // TODO: make a call here: populate with a thing we were invited with
+      OkApiResult(PupulateTimeLineInitiallyResult(r.user))
     }
   }
 
