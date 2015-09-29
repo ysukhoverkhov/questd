@@ -11,6 +11,7 @@ import models.domain.user.User
 import models.domain.user.message.{MessageChallengeAccepted, MessageChallengeRejected}
 import models.domain.user.profile.{Profile, TaskType}
 import models.view.{QuestView, SolutionView}
+import play.Logger
 
 case class MakeQuestChallengeRequest(
   user: User,
@@ -73,6 +74,9 @@ case class RejectChallengeResult(
 
 case class GetAllChallengesForCrawlerRequest()
 case class GetAllChallengesForCrawlerResult(challenges: Iterator[Challenge])
+
+case class AutoRejectChallengeRequest(challenge: Challenge)
+case class AutoRejectChallengeResult()
 
 private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -277,12 +281,29 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
   }
 
   /**
+   * Automatically reject challenge
+   */
+  def autoRejectChallenge(request: AutoRejectChallengeRequest): ApiResult[AutoRejectChallengeResult] = handleDbException {
+    import request.challenge
+
+    db.user.readById(challenge.opponentId).fold[ApiResult[AutoRejectChallengeResult]] {
+      Logger.error(s"No opponent for challenge in db. challengeId ${challenge.id}")
+      OkApiResult(AutoRejectChallengeResult())
+    } { opponent =>
+      rejectChallenge(RejectChallengeRequest(opponent, challenge.id)) map OkApiResult(AutoRejectChallengeResult())
+    }
+
+
+    // TODO: test me.
+    // TODO: test it's called with crawler leaving error log here.
+  }
+
+  /**
    * Returns all challenges what should be crawled.
    */
   def getAllChallengesForCrawler(request: GetAllChallengesForCrawlerRequest): ApiResult[GetAllChallengesForCrawlerResult] = handleDbException {
     OkApiResult(GetAllChallengesForCrawlerResult(db.challenge.allWithParams(
       statuses = List(ChallengeStatus.Requested))))
-
   }
 }
 

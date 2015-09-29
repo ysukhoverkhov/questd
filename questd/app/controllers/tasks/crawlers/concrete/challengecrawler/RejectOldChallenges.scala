@@ -3,6 +3,7 @@ package controllers.tasks.crawlers.concrete.challengecrawler
 import akka.actor.Props
 import components.random.RandomComponent
 import controllers.domain._
+import controllers.domain.app.challenge.AutoRejectChallengeRequest
 import controllers.tasks.crawlers.base.BaseCrawler
 import models.domain.challenge.Challenge
 
@@ -18,9 +19,9 @@ class RejectOldChallenges(
     apiPar: DomainAPIComponent#DomainAPI,
     randPar: RandomComponent#Random) extends BaseCrawler[Challenge](apiPar, randPar)  {
 
-  protected def check(challenge: Challenge) = { // TODO: implement me.
-    // it gives us only battles in fighting state so no need in checking the state.
-//    api.updateBattleState(UpdateBattleStateRequest(battle))
+  protected def check(challenge: Challenge) = {
+    if (challenge.shouldBeAutoRejected)
+      api.autoRejectChallenge(AutoRejectChallengeRequest(challenge))
   }
 }
 

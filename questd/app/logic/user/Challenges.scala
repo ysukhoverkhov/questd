@@ -13,7 +13,7 @@ import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 
 /**
- * All battle challenges related logic.
+ * All challenges related logic.
  */
 trait Challenges { this: UserLogic =>
 
