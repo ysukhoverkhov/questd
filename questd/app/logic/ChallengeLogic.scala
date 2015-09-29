@@ -10,7 +10,7 @@ class ChallengeLogic(
   /**
    * Should the challenge be auto rejected
    */
-  def shouldBeAutoRejected = { // TODO: test me.
+  def shouldBeAutoRejected = {
     import com.github.nscala_time.time.Imports._
     import org.joda.time.DateTime
 

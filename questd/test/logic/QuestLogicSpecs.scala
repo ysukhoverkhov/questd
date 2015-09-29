@@ -4,7 +4,7 @@ import models.domain.common.Assets
 
 class QuestLogicSpecs extends BaseLogicSpecs {
 
-  "Quest logic should" should {
+  "Quest logic" should {
 
     "Calculate correct cost of quest to solve" in context {
       QuestLogic.costOfSolvingQuest(3) must beEqualTo(Assets(coins = 100))
