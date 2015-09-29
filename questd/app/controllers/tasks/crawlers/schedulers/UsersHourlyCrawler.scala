@@ -20,5 +20,6 @@ class UsersHourlyCrawler(api: DomainAPIComponent#DomainAPI, rand: RandomComponen
   protected val actors = List(
       classOf[ResetTasksAtNight],
       classOf[ShiftDailyResult],
-      classOf[PopulateTimeLine])
+      classOf[PopulateTimeLine],
+      classOf[RejectOldFriendshipRequests])
 }
