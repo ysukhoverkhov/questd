@@ -61,9 +61,7 @@ class UserLogicSpecs extends BaseLogicSpecs {
       u.canAddFriend(f) must beEqualTo(ProfileModificationResult.LimitExceeded)
     }
 
-    "Take correct decision on auto rejecting friendships" in {
-      applyConfigMock()
-
+    "Take correct decision on auto rejecting friendships" in context {
       val u = createUserStub()
       val goodFriendship = Friendship(friendId = "", status = FriendshipStatus.Invites)
       val lateFriendship = Friendship(friendId = "", status = FriendshipStatus.Invites, creationDate = new Date(0))
