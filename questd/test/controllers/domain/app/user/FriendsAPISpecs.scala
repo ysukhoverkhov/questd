@@ -1,8 +1,12 @@
 package controllers.domain.app.user
 
+import java.util.Date
+
 import controllers.domain.app.protocol.ProfileModificationResult
-import controllers.domain.{OkApiResult, BaseAPISpecs}
-import models.domain.user.friends.{ReferralStatus, FriendshipStatus, Friendship}
+import controllers.domain.{BaseAPISpecs, OkApiResult}
+import models.domain.user.friends.{Friendship, FriendshipStatus, ReferralStatus}
+import org.mockito.Matchers.{eq => mEq}
+import org.specs2.matcher.Matcher
 import testhelpers.domainstubs._
 
 class FriendsAPISpecs extends BaseAPISpecs {
@@ -43,20 +47,26 @@ class FriendsAPISpecs extends BaseAPISpecs {
 
       result must beAnInstanceOf[OkApiResult[CreateFriendshipResult]]
 
+
+      def beEqualIgnoringDate(a: Friendship): Matcher[Friendship] = {
+        beEqualTo(a.copy(creationDate = new Date(0))) ^^ ((_:Friendship).copy(creationDate = new Date(0)))
+      }
+
       there was one (user).addFriendship(
-        friend.id,
-        Friendship(
-          u.id,
-          FriendshipStatus.Accepted,
-          ReferralStatus.Refers
+        mEq(friend.id),
+        beEqualIgnoringDate(Friendship(
+          friendId = u.id,
+          status = FriendshipStatus.Accepted,
+          referralStatus = ReferralStatus.Refers,
+          referredWithContentId = None)
         ))
       there was one (user).addFriendship(
-        u.id,
-        Friendship(
-          friend.id,
-          FriendshipStatus.Accepted,
-          ReferralStatus.ReferredBy,
-          Some(contentId)
+        mEq(u.id),
+        beEqualIgnoringDate(Friendship(
+          friendId = friend.id,
+          status = FriendshipStatus.Accepted,
+          referralStatus = ReferralStatus.ReferredBy,
+          referredWithContentId = Some(contentId))
         ))
     }
   }

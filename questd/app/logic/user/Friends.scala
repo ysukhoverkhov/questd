@@ -5,7 +5,7 @@ import logic._
 import logic.functions._
 import models.domain.common.Assets
 import models.domain.user.User
-import models.domain.user.friends.FriendshipStatus
+import models.domain.user.friends.{Friendship, FriendshipStatus}
 import models.domain.user.profile.Functionality
 
 /**
@@ -74,6 +74,16 @@ trait Friends { this: UserLogic =>
 
   def costToAddFriend(potentialFriend: User) = {
     Assets(coins = costToInviteFriend(potentialFriend.profile.publicProfile.level))
+  }
+
+  def shouldAutoRejectFriendship(friendship: Friendship) = {
+    import com.github.nscala_time.time.Imports._
+    import org.joda.time.DateTime
+
+    val daysToWait = api.config(api.DefaultConfigParams.RequestsAutoRejectDays).toInt
+
+    (friendship.status == FriendshipStatus.Invites) &&
+      (new DateTime(friendship.creationDate) + daysToWait.days < DateTime.now)
   }
 }
 

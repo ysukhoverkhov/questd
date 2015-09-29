@@ -31,10 +31,12 @@ private[logic] abstract class BaseLogicSpecs extends Specification
   /**
    * Creates stub config for our tests.
    */
-  protected final def createStubDefaultConfig = {
+  private final def createStubDefaultConfig = {
     api.DefaultConfigParams returns _DefaultConfigParams
 
     val configSection = mock[ConfigSection]
+
+    configSection.apply(api.DefaultConfigParams.RequestsAutoRejectDays) returns "7"
 
     configSection.apply(api.DefaultConfigParams.QuestProbabilityLevelsToGiveStartingQuests) returns "5"
     configSection.apply(api.DefaultConfigParams.QuestProbabilityStartingVIPQuests) returns "0.50"
@@ -86,7 +88,7 @@ private[logic] abstract class BaseLogicSpecs extends Specification
     configSection
   }
 
-  protected final def createStubTutorialConfig = {
+  private final def createStubTutorialConfig = {
     api.TutorialConfigParams returns _TutorialConfigParams
 
     val configSection = mock[ConfigSection]
