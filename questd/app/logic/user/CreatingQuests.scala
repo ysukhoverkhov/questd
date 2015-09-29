@@ -68,7 +68,7 @@ trait CreatingQuests { this: UserLogic =>
     val daysToSkip = questCreationPeriod(user.profile.publicProfile.level)
 
     val tz = DateTimeZone.forOffsetHours(user.profile.publicProfile.bio.timezone)
-    (DateTime.now(tz) + daysToSkip.days).hour(constants.FlipHour).minute(0).second(0) toDate ()
+    (DateTime.now(tz) + daysToSkip.days).hour(constants.FlipHour).minute(0).second(0).toDate
   }
 
   def penaltyForCheatingQuest = {
