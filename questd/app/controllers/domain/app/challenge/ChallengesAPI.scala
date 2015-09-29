@@ -292,8 +292,6 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
     } { opponent =>
       rejectChallenge(RejectChallengeRequest(opponent, challenge.id)) map OkApiResult(AutoRejectChallengeResult())
     }
-
-    // TODO: test it's called with crawler leaving error log here.
   }
 
   /**

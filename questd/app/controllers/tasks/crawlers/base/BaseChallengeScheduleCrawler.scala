@@ -12,6 +12,7 @@ abstract class BaseChallengeScheduleCrawler(
   rand: RandomComponent#Random) extends BaseScheduleCrawler[Challenge](api, rand) {
 
     override def allObjects: Iterator[Challenge] = {
+
       api.getAllChallengesForCrawler(GetAllChallengesForCrawlerRequest()) match {
         case OkApiResult(r: GetAllChallengesForCrawlerResult) =>
           r.challenges
