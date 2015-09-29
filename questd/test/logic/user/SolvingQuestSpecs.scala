@@ -10,9 +10,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
 
   "User Logic for solving quests" should {
 
-    "Do not allow solving of quests without rights" in {
-      applyConfigMock()
-
+    "Do not allow solving of quests without rights" in context {
       val user = createUserStub(rights = Rights.none)
       val q = createQuestStub()
 
@@ -21,9 +19,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.NotEnoughRights)
     }
 
-    "Do not allow solving of quests without money" in {
-      applyConfigMock()
-
+    "Do not allow solving of quests without money" in context {
       val q = createQuestStub(solveCost = Assets(100, 0, 0))
       val tl = List(createTimeLineEntryStub(objectId = q.id))
       val user = createUserStub(assets = Assets(), timeLine = tl)
@@ -33,9 +29,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.NotEnoughAssets)
     }
 
-    "Do not allow solving of own quests" in {
-      applyConfigMock()
-
+    "Do not allow solving of own quests" in context {
       val questId = "qid"
       val tl = List(createTimeLineEntryStub(objectId = questId))
       val user = createUserStub(timeLine = tl)
@@ -46,9 +40,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
 
-    "Do not allow solving of quests already solved" in {
-      applyConfigMock()
-
+    "Do not allow solving of quests already solved" in context {
       val questId = "qid"
       val tl = List(createTimeLineEntryStub(objectId = questId))
       val user = createUserStub(timeLine = tl, solvedQuests = Map(questId -> "sid"))
@@ -59,9 +51,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       rv must beEqualTo(ProfileModificationResult.InvalidState)
     }
 
-    "Allow creating of quests in normal situations" in {
-      applyConfigMock()
-
+    "Allow creating of quests in normal situations" in context {
       val q = createQuestStub(solveCost = Assets(100, 0, 0))
       val tl = List(createTimeLineEntryStub(objectId = q.id))
       val user = createUserStub(assets = Assets(100, 0, 0), timeLine = tl)
