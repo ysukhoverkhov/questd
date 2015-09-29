@@ -138,6 +138,19 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       there was one(api).createBattle(any)
     }
 
+    "Auto rejecting of a challenge is working" in context {
+      val u = createUserStub()
+      val c = createChallengeStub(opponentId = u.id)
+
+      db.user.readById(u.id) returns Some(u)
+      doReturn(OkApiResult(RejectChallengeResult(ProfileModificationResult.OK))).when(api).rejectChallenge(any)
+
+      val result = api.autoRejectChallenge(AutoRejectChallengeRequest(c))
+
+      result must beEqualTo(OkApiResult(AutoRejectChallengeResult()))
+
+      there was one(api).rejectChallenge(any)
+    }
 
 //    "acceptChallenge creates battle" in context {
 //      val mySolutionId = "mysolid"
