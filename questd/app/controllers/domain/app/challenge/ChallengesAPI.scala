@@ -71,6 +71,9 @@ case class RejectChallengeResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None)
 
+case class GetAllChallengesForCrawlerRequest()
+case class GetAllChallengesForCrawlerResult(challenges: Iterator[Challenge])
+
 private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
@@ -244,7 +247,6 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
     }
   }
 
-
   /**
    * Respond on battle request.
    */
@@ -272,6 +274,15 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
           OkApiResult(RejectChallengeResult(result))
       }
     }
+  }
+
+  /**
+   * Returns all challenges what should be crawled.
+   */
+  def getAllChallengesForCrawler(request: GetAllChallengesForCrawlerRequest): ApiResult[GetAllChallengesForCrawlerResult] = handleDbException {
+    OkApiResult(GetAllChallengesForCrawlerResult(db.challenge.allWithParams(
+      statuses = List(ChallengeStatus.Requested))))
+
   }
 }
 

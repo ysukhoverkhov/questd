@@ -25,6 +25,7 @@ trait TasksComponent { component: DomainAPIComponent with RandomComponent =>
     val solutionsHourlyCrawler = Akka.system.actorOf(SolutionsHourlyCrawler.props(api, rand), name = SolutionsHourlyCrawler.name)
     val solutionsWeeklyCrawler = Akka.system.actorOf(SolutionsWeeklyCrawler.props(api, rand), name = SolutionsWeeklyCrawler.name)
     val battlesHourlyCrawler = Akka.system.actorOf(BattlesHourlyCrawler.props(api, rand), name = BattlesHourlyCrawler.name)
+    val challengesHourlyCrawler = Akka.system.actorOf(ChallengesHourlyCrawler.props(api, rand), name = ChallengesHourlyCrawler.name)
 
     // Creating main tasks dispatcher.
     val dispatcher = Akka.system.actorOf(TasksDispatcher.props(config), name = TasksDispatcher.name)
