@@ -2,15 +2,12 @@
 
 package models.store.mongo
 
-import models.domain.chat.{Participant, Conversation}
-import org.specs2.mutable._
+import models.domain.chat.{Conversation, Participant}
 import play.api.test._
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
-class ConversationDAOSpecs extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class ConversationDAOSpecs extends BaseDAOSpecs {
 
   "Mongo Conversation DAO" should {
     "Search conversation by participant id" in new WithApplication(appWithTestDatabase) {

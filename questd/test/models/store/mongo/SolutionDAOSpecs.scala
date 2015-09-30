@@ -12,9 +12,7 @@ import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
 //@RunWith(classOf[JUnitRunner])
-class SolutionDAOSpecs extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class SolutionDAOSpecs extends BaseDAOSpecs {
 
   private[this] def clearDB() = {
     db.solution.clear()

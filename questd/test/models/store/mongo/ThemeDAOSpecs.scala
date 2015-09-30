@@ -6,10 +6,7 @@ import play.api.test.WithApplication
 import testhelpers.domainstubs._
 
 //@RunWith(classOf[JUnitRunner])
-class ThemeDAOSpecs
-  extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class ThemeDAOSpecs extends BaseDAOSpecs {
 
   private[this] def clearDB() = {
     db.theme.clear()

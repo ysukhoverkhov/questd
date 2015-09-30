@@ -25,10 +25,7 @@ import testhelpers.domainstubs._
 
 // split it on several tests.
 //@RunWith(classOf[JUnitRunner])
-class UserDAOSpecs
-  extends Specification
-  with MongoDatabaseComponent
-  with BaseDAOSpecs {
+class UserDAOSpecs extends BaseDAOSpecs {
 
   "Mongo User DAO" should {
     "Create new User in DB and find it by userId" in new WithApplication(appWithTestDatabase) {

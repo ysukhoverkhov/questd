@@ -11,7 +11,7 @@ import controllers.domain.helpers._
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.Profile
-import models.domain.user.timeline.{TimeLineType, TimeLineReason, TimeLineEntry}
+import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import play.Logger
 
 case class AddToTimeLineRequest(
@@ -45,6 +45,9 @@ case class GetTimeLineRequest(
   pageSize: Int,
   untilEntryId: Option[String] = None)
 case class GetTimeLineResult(timeLine: List[TimeLineEntry])
+
+case class PupulateTimeLineInitiallyRequest(user: User)
+case class PupulateTimeLineInitiallyResult(user: User)
 
 case class PopulateTimeLineWithRandomThingsRequest(user: User)
 case class PopulateTimeLineWithRandomThingsResult(user: User)
@@ -136,9 +139,9 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
   def getTimeLine(request: GetTimeLineRequest): ApiResult[GetTimeLineResult] = handleDbException {
 
     (if (request.user.timeLine.isEmpty) {
-      populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(request.user))
+      populateTimeLineInitially(PupulateTimeLineInitiallyRequest(request.user))
     } else {
-      OkApiResult(PopulateTimeLineWithRandomThingsResult(request.user))
+      OkApiResult(PupulateTimeLineInitiallyResult(request.user))
     }) map { r =>
       val pageSize = adjustedPageSize(request.pageSize)
       val pageNumber = adjustedPageNumber(request.pageNumber)
@@ -149,6 +152,38 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
             .filter(_.reason != TimeLineReason.Hidden)
             .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
             .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
+    }
+  }
+
+  /**
+   * Internal call to populate timeline with initial things.
+   */
+  def populateTimeLineInitially(request: PupulateTimeLineInitiallyRequest): ApiResult[PupulateTimeLineInitiallyResult] = handleDbException {
+    populateTimeLineWithRandomThings(PopulateTimeLineWithRandomThingsRequest(request.user)) map { r =>
+
+      // Now adding to the top things we were invited with.
+      r.user.friends.filter(_.referredWithContentId.nonEmpty).foreach { f =>
+        db.quest.readById(f.referredWithContentId.get).fold[Option[TimeLineType.Value]] {
+          db.solution.readById(f.referredWithContentId.get).fold[Option[TimeLineType.Value]] {
+            None
+          } { solution =>
+            Some(TimeLineType.Solution)
+          }
+        } { quest =>
+          Some(TimeLineType.Quest)
+        }.fold() { contentType =>
+          addToTimeLine(
+            AddToTimeLineRequest(
+              user = r.user,
+              reason = TimeLineReason.Has,
+              objectType = contentType,
+              objectId = f.referredWithContentId.get,
+              actorId = Some(f.friendId)
+            ))
+        }
+      }
+
+      OkApiResult(PupulateTimeLineInitiallyResult(r.user))
     }
   }
 

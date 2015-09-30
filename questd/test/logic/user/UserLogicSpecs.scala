@@ -1,5 +1,7 @@
 package logic.user
 
+import java.util.Date
+
 import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
 import models.domain.common.Assets
@@ -57,6 +59,17 @@ class UserLogicSpecs extends BaseLogicSpecs {
 
       u.canAcceptFriendship(f) must beEqualTo(ProfileModificationResult.OK)
       u.canAddFriend(f) must beEqualTo(ProfileModificationResult.LimitExceeded)
+    }
+
+    "Take correct decision on auto rejecting friendships" in {
+      applyConfigMock()
+
+      val u = createUserStub()
+      val goodFriendship = Friendship(friendId = "", status = FriendshipStatus.Invites)
+      val lateFriendship = Friendship(friendId = "", status = FriendshipStatus.Invites, creationDate = new Date(0))
+
+      u.shouldAutoRejectFriendship(goodFriendship) must beEqualTo(false)
+      u.shouldAutoRejectFriendship(lateFriendship) must beEqualTo(true)
     }
   }
 }
