@@ -11,16 +11,22 @@ scalaVersion := "2.11.7"
 
 scalacOptions += "-feature"
 
-libraryDependencies ++= Seq(
-  cache,
-  ws
-)
-
 sources in (Compile,doc) := Seq.empty
 
 publishArtifact in (Compile, packageDoc) := false
 
 publishArtifact in (Compile, packageSrc) := false
+
+
+
+libraryDependencies ++= Seq(
+  cache,
+  ws
+)
+
+resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
+
+libraryDependencies += specs2 % Test
 
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
 
