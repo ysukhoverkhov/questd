@@ -16,7 +16,7 @@ abstract class AkkaTestKitSpecs2Support
   with ImplicitSender
   with DefaultTimeout {
 
-  def after = system.terminate()
+  def after = system.shutdown()
 
   trait TestActorCreationSupport extends ActorCreationSupport {
     lazy val child = testActor

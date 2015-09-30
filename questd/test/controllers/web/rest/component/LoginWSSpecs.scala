@@ -15,7 +15,7 @@ import play.api.libs.json._
 import play.api.mvc._
 import play.api.test.Helpers._
 import play.api.test._
-import play.test.WithApplication
+import play.api.test.WithApplication
 
 import scala.concurrent.Future
 
