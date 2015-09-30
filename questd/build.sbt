@@ -11,6 +11,9 @@ scalaVersion := "2.11.7"
 
 scalacOptions += "-feature"
 
+scalacOptions in Test += "-Yrangepos"
+
+
 sources in (Compile,doc) := Seq.empty
 
 publishArtifact in (Compile, packageDoc) := false
@@ -18,15 +21,24 @@ publishArtifact in (Compile, packageDoc) := false
 publishArtifact in (Compile, packageSrc) := false
 
 
+testOptions in Test += Tests.Argument("xonly", "console")
+
 
 libraryDependencies ++= Seq(
   cache,
   ws
 )
 
-resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
+// resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 libraryDependencies += specs2 % Test
+
+// libraryDependencies += "org.specs2" %% "specs2-core" % "3.6.4" % "test"
+
+// libraryDependencies += "org.specs2" %% "specs2-mock" % "3.6.4" % "test"
+
+// libraryDependencies += "org.specs2" %% "specs2-junit" % "3.6.4" % "test"
+
 
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
 
@@ -65,6 +77,4 @@ buildInfoKeys := Seq[BuildInfoKey](
 buildInfoOptions += BuildInfoOption.BuildTime
 
 buildInfoPackage := "misc"
-
-
 

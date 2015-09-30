@@ -2,6 +2,7 @@ package logic.user
 
 import logic.BaseLogicSpecs
 import models.domain.tag.Theme
+import play.Logger
 import testhelpers.domainstubs._
 
 class UserLogicSelectingThemeSpecs extends BaseLogicSpecs {
@@ -17,7 +18,12 @@ class UserLogicSelectingThemeSpecs extends BaseLogicSpecs {
 
   "User Logic" should {
     "success all the time" in {
-      success
+      Logger.error("error")
+      Logger.warn("warn")
+      Logger.info("info")
+      Logger.debug("debug")
+      Logger.trace("trace")
+      failure
     }
 
     // TAGS: clean me up with tags.
