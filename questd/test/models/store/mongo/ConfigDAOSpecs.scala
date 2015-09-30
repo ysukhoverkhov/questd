@@ -2,7 +2,6 @@
 
 package models.store.mongo
 
-import com.mongodb.casbah.commons.MongoDBObject
 import models.domain.admin._
 import play.api.test._
 
@@ -23,8 +22,6 @@ class ConfigDAOSpecs extends BaseDAOSpecs {
       db.config.upsert(cs1)
       db.config.upsert(cs2)
 
-      db.config.dao.collection.ensureIndex(MongoDBObject("id" -> 1), "id_index", unique = true)
-
       val c = db.config.readConfig
       c("sec1") must beSome.which((s: ConfigSection) => s.id == cs1.id)
       c("sec1") must beSome.which((s: ConfigSection) => s.values("k1") == cs1.values("k1"))
@@ -40,7 +37,6 @@ class ConfigDAOSpecs extends BaseDAOSpecs {
       val cs1 = ConfigSection("sec1", Map("k1" -> "v1", "k2" -> "v2"))
       val cs2 = ConfigSection("sec1", Map("k3" -> "v3", "k4" -> "v4", "k5" -> "v5"))
       db.config.upsert(cs1)
-      db.config.dao.collection.ensureIndex(MongoDBObject("id" -> 1), "id_index", unique = true)
 
       val c = db.config.readConfig
       c("sec1") must beSome.which((s: ConfigSection) => s.id == cs1.id)

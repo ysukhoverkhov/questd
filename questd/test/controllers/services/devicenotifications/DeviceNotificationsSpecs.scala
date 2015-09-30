@@ -4,14 +4,12 @@ import akka.actor.Props
 import controllers.services.devicenotifications.DeviceNotifications.{Devices, IOSDevice}
 import controllers.services.devicenotifications.apple.ApplePushNotification
 import org.specs2.mutable._
-import org.specs2.time.NoTimeConversions
 import testhelpers.specs2support.AkkaTestKitSpecs2Support
 
 import scala.concurrent.duration._
 
 class DeviceNotificationsSpecs
-  extends Specification
-  with NoTimeConversions {
+  extends Specification {
 
   "DeviceNotifications" should {
 
