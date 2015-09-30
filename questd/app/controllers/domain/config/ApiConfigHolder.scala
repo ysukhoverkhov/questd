@@ -13,8 +13,10 @@ class _DefaultConfigParams {
   val ActiveUserDays = "10 01 Active User Days"
   val DefaultCultureId = "15 01 Default Culture Id"
 
+  val RequestsAutoRejectDays = "16 01 Default Culture Id"
+
   // Chat
-  val ChatMaxMessageLength = "Chat Max Message Length"
+  val ChatMaxMessageLength = "20 01 Chat Max Message Length"
 
   // Tasks
   val SolutionVoteTaskCountMean = "30 01 Solution Vote Task Count Mean"
@@ -122,6 +124,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.ActiveUserDays -> "7",
             DefaultConfigParams.DefaultCultureId -> "68349b7a-20ee-4f6e-8406-f468b30be783",
 
+            DefaultConfigParams.RequestsAutoRejectDays -> "7",
+
             DefaultConfigParams.ChatMaxMessageLength -> "1024",
 
             DefaultConfigParams.SolutionVoteTaskCountMean -> "1",
@@ -154,9 +158,9 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.SolutionMinIACVotes -> "5",
             DefaultConfigParams.BattleCreationDelay -> "24",
 
-            DefaultConfigParams.BattleMinVotesCount -> "1",
-            DefaultConfigParams.BattleAdditionalVotesMean -> "5",
-            DefaultConfigParams.BattleAdditionalVotesDeviation -> "4",
+            DefaultConfigParams.BattleMinVotesCount -> "0",
+            DefaultConfigParams.BattleAdditionalVotesMean -> "2",
+            DefaultConfigParams.BattleAdditionalVotesDeviation -> "2",
 
             DefaultConfigParams.QuestProbabilityLevelsToGiveTutorialQuests -> "5",
             DefaultConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "7",
