@@ -4,7 +4,7 @@ import org.specs2.mutable.Specification
 
 class RichEnumerationSpecs extends Specification {
 
-  "RichEnumeration should" should {
+  "RichEnumeration" should {
 
     "Have correct withNameOption" in {
 
