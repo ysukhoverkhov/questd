@@ -6,10 +6,9 @@ import models.domain.culture.Culture
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, LoginMethod}
 import models.domain.user.demo.UserDemographics
-import models.domain.user.profile.{PublicProfile, Profile, Bio}
+import models.domain.user.profile.{Bio, Profile, PublicProfile}
 import models.store
 import org.mockito.Matchers.{eq => mockEq}
-import testhelpers.domainstubs._
 
 class AuthAPISpecs extends BaseAPISpecs {
 
@@ -187,7 +186,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       rv.body must beSome[LoginResult]
     }
 
-    "Creates friendship if referrer id is present" in context {
+    "Creates friendship if referrer id is present" in context { // TODO: it throws null pointer.
 
       val countryName = "country_name"
       val userfb = userFBStub

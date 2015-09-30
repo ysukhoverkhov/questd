@@ -29,15 +29,6 @@ libraryDependencies ++= Seq(
   ws
 )
 
-// resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
-
-libraryDependencies += specs2 % Test
-
-// libraryDependencies += "org.specs2" %% "specs2-core" % "3.6.4" % "test"
-
-// libraryDependencies += "org.specs2" %% "specs2-mock" % "3.6.4" % "test"
-
-// libraryDependencies += "org.specs2" %% "specs2-junit" % "3.6.4" % "test"
 
 
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
@@ -50,8 +41,6 @@ libraryDependencies += "us.theatr" %% "akka-quartz" % "0.3.0-SNAPSHOT"
 
 libraryDependencies += "com.restfb" % "restfb" % "1.14.1"
 
-libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19"
-
 libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.2.0"
 
 // libraryDependencies += "javax.mail" % "javax.mail-api" % "1.5.4"
@@ -62,6 +51,10 @@ libraryDependencies += "com.notnoop.apns" % "apns" % "1.0.0.Beta6"
 
 libraryDependencies += "com.typesafe.akka" %% "akka-testkit" % "2.3.13"
 
+
+libraryDependencies += specs2 % Test
+
+libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19" % "test"
 
 
 // fork in run := true
