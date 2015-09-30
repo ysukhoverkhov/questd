@@ -186,7 +186,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       rv.body must beSome[LoginResult]
     }
 
-    "Creates friendship if referrer id is present" in context { // TODO: it throws null pointer.
+    "Creates friendship if referrer id is present" in context {
 
       val countryName = "country_name"
       val userfb = userFBStub
@@ -209,8 +209,8 @@ class AuthAPISpecs extends BaseAPISpecs {
         anyString,
         anyInt,
         any) returns u
-
       db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
+      doReturn(OkApiResult(CreateFriendshipResult(u.get))).when(api).createFriendship(any)
 
       val rv = api.login(
         LoginRequest(

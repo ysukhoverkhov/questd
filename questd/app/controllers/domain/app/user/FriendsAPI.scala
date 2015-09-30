@@ -215,7 +215,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
   def createFriendship(request: CreateFriendshipRequest): ApiResult[CreateFriendshipResult] = handleDbException {
     import request._
 
-    db.user.readById(friendId).fold() { referrer => // TODO: null pointer exception here in one of tests.
+    db.user.readById(friendId).fold() { referrer =>
       db.user.addFriendship(
         referrer.id,
         Friendship(
