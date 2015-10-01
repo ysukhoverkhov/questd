@@ -31,8 +31,8 @@ private[socialnetworks] class SocialNetworkClientFacebook extends SocialNetworkC
    * @inheritdoc
    */
   def isValidUserToken(token: String): Boolean = handleExceptions {
-    val appId = Play.application().configuration().getString("application.socialnetworks.facebook.appid")
-    val secret = Play.application().configuration().getString("application.socialnetworks.facebook.secret")
+    val appId = Play.application().configuration().getString("questd.socialnetworks.facebook.appid")
+    val secret = Play.application().configuration().getString("questd.socialnetworks.facebook.secret")
 
     val client = facebookClient(s"$appId|$secret")
 
