@@ -13,7 +13,7 @@ import se.radley.plugin.salat._
 /** ****************************
   * This should be a part of salat.
   */
-
+// TODO: This should be a part of salat.
 trait QDAOMethods[ObjectType <: AnyRef, ID <: Any] {
   /** Returns a single object from this collection.
     * @param q object for which to search

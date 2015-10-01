@@ -19,7 +19,7 @@ class DeviceNotificationsSpecs
       private val message = "message"
       val subject = system.actorOf(Props(new DeviceNotifications with TestActorCreationSupport))
 
-      within(100.millis) {
+      within(1000.millis) {
         subject ! DeviceNotifications.PushMessage(Devices(Set(device2, device1)), message)
 
         expectMsgAllOf(

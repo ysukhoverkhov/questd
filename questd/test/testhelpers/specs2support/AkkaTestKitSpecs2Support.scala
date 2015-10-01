@@ -20,6 +20,6 @@ abstract class AkkaTestKitSpecs2Support
 
   trait TestActorCreationSupport extends ActorCreationSupport {
     lazy val child = testActor
-    override def createChild(props: Props, name: String): ActorRef = child
+    protected override def createActor(props: Props, name: String): ActorRef = child
   }
 }

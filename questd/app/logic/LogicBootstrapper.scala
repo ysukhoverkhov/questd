@@ -1,7 +1,6 @@
 package logic
 
 import components._
-import models.domain._
 import models.domain.battle.Battle
 import models.domain.quest.Quest
 import models.domain.solution.Solution
