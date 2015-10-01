@@ -1,6 +1,6 @@
 package com.vita.akka.component
 
-import akka.actor.{Actor, ActorSystem}
+import akka.actor.{ActorRef, ActorSystem}
 
 /**
  * Generic interface for actor components.
@@ -16,5 +16,5 @@ abstract class ActorsComponent(
    *
    * @return Actor to workout all requests.
    */
-  def actor: Actor
+  def actor: ActorRef
 }

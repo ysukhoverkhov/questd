@@ -11,7 +11,6 @@ import models.domain.common.ClientPlatform
 import models.domain.user.User
 import models.domain.user.message.{Message, MessageMetaInfo}
 import play.Logger
-import play.libs.Akka
 
 case class SendMessageRequest(user: User, message: Message)
 case class SendMessageResult(user: User)
@@ -148,15 +147,13 @@ private[domain] trait EventsAPI { this: DomainAPIComponent#DomainAPI with DBAcce
     import request._
 
     db.user.setNotificationSentTime(user.id, new Date()) ifSome { user =>
-      val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}") // TODO: get it from component.
-
       val devices: Set[Device] = user.devices.map {
         case models.domain.user.devices.Device(ClientPlatform.iPhone, token) => IOSDevice(token)
       }.toSet[Device]
 
       val messageText = MessageMetaInfo.messageLocalizedMessage(message.messageType)
 
-      actorSelectionNotification ! DeviceNotifications.PushMessage(
+      deviceNotifications.actor ! DeviceNotifications.PushMessage(
         devices = DeviceNotifications.Devices(devices.toSet),
         message = messageText,
         badge = Some(numberOfEvents),

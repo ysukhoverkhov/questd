@@ -1,14 +1,18 @@
 package com.vita.akka.component
 
-import akka.actor.Actor
-import com.vita.akka.cake.ActorContextCreationSupport
+import akka.actor.{ActorRef, ActorSystem}
+import com.vita.akka.component.impl.SimpleRouter
 
 /**
  * Support for creating routers for messages.
  *
  * Created by Yury on 01.10.2015.
  */
-trait ComponentRouterSimpleCreationSupport extends ActorContextCreationSupport{
+trait ComponentRouterSimpleCreationSupport extends ComponentRouterCreationSupport {
 
-  protected def createRouter(routes: Map[Any , Actor]): Actor
+  protected val system: ActorSystem
+
+  protected def createRouter(routes: Map[Class[_] , ActorRef]): ActorRef = {
+    system.actorOf(SimpleRouter.props(routes), SimpleRouter.name)
+  }
 }

@@ -1,6 +1,6 @@
 package com.vita.akka.component
 
-import akka.actor.Actor
+import akka.actor.ActorRef
 
 /**
  * Support for creating routers for messages.
@@ -9,5 +9,5 @@ import akka.actor.Actor
  */
 trait ComponentRouterCreationSupport {
 
-  protected def createRouter(routes: Map[Any , Actor]): Actor
+  protected def createRouter(routes: Map[Class[_] , ActorRef]): ActorRef
 }

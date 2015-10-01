@@ -1,6 +1,6 @@
 package com.vita.akka.component
 
-import akka.actor.{Actor, ActorSystem}
+import akka.actor.{ActorRef, ActorSystem}
 
 /**
  * Generic interface for actor components.
@@ -10,8 +10,7 @@ import akka.actor.{Actor, ActorSystem}
 abstract class RoutedActorsComponent(
   private val system: ActorSystem) extends ActorsComponent(system) with ComponentRouterCreationSupport {
 
-  def routes: Map[Any, Actor]
+  def routes: Map[Class[_], ActorRef]
 
-  val actor = createRouter(routes)
-
+  lazy val actor = createRouter(routes)
 }
