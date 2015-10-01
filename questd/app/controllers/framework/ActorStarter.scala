@@ -6,7 +6,7 @@ import play.libs.Akka
 /**
  * Starts all actors for now.
  */
-class ActorStarter {
+class ActorStarter { // TODO: replace it with device notifications component.
 
   // Creating parent actor for all notification actors.
   val deviceNotifications = Akka.system.actorOf(DeviceNotifications.props, name = DeviceNotifications.name)

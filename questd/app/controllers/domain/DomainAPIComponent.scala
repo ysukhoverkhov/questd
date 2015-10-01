@@ -78,7 +78,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     lazy val api = component.api // This is lazy since it references to his parent which creates us during initialization.
     lazy val rand = component.rand
 
+    // TODO: put here reference to component of device notifications.
   }
-
 }
 

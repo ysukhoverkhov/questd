@@ -148,7 +148,7 @@ private[domain] trait EventsAPI { this: DomainAPIComponent#DomainAPI with DBAcce
     import request._
 
     db.user.setNotificationSentTime(user.id, new Date()) ifSome { user =>
-      val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
+      val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}") // TODO: get it from component.
 
       val devices: Set[Device] = user.devices.map {
         case models.domain.user.devices.Device(ClientPlatform.iPhone, token) => IOSDevice(token)
