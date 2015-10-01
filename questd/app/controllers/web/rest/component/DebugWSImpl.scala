@@ -8,8 +8,7 @@ import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
-import controllers.services.devicenotifications.DeviceNotifications.IOSDevice
-import controllers.services.devicenotifications.{DeviceNotifications, DeviceNotificationsComponent}
+import controllers.services.devicenotifications.{DeviceNotificationsComponent, InactiveDevices}
 import controllers.web.helpers._
 import models.domain.common.{ContentReference, ContentType, ContentVote}
 import models.domain.quest.QuestInfoContent
@@ -75,18 +74,19 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
     api.shiftDailyResult(ShiftDailyResultRequest(r.user))
   }
 
+  lazy val c = new DeviceNotificationsComponent(Akka.system)
+
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
 
+//    c.actor ! DeviceNotifications.PushMessage(
+//      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
+//      message = "lalala",
+//      badge = None,
+//      sound = None,
+//      destinations = List(DeviceNotifications.MobileDestination)
+//    )
 
-    val c = new DeviceNotificationsComponent(Akka.system)
-
-    c.actor ! DeviceNotifications.PushMessage(
-      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
-      message = "lalala",
-      badge = None,
-      sound = None,
-      destinations = List(DeviceNotifications.MobileDestination)
-    )
+  c.actor ! InactiveDevices.GetInactiveDevicesRequest
 
 //    val actorSelectionNotification = Akka.system.actorSelection(s"user/${DeviceNotifications.name}")
 //

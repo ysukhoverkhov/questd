@@ -21,6 +21,5 @@ class SimpleRouter(routes: Map[Class[_], ActorRef]) extends Actor {
           if (message.getClass == messageType)
             actor forward message
       }
-
   }
 }

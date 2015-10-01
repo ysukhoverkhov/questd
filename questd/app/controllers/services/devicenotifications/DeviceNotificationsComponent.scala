@@ -17,7 +17,7 @@ class DeviceNotificationsComponent(protected val system: ActorSystem)
   // Creating parent actor for all notification actors.
   def routes: Map[Class[_], ActorRef] =
     Map(
-      DeviceNotifications.PushMessage.getClass ->
+      classOf[DeviceNotifications.PushMessage] ->
         createActor(DeviceNotifications.props, name = DeviceNotifications.name),
 
       InactiveDevices.GetInactiveDevicesRequest.getClass ->
