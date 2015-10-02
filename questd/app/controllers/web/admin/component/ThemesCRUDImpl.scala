@@ -7,7 +7,8 @@ import models.domain.tag.{ThemeInfo, Theme}
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
-import models.domain._
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 case class ThemeForm(
   id: String,

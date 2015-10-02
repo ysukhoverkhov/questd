@@ -31,7 +31,7 @@ object InactiveDevices {
  * Created by Yury on 11.08.2015.
  */
 class InactiveDevices extends Actor with ActorContextCreationSupport {
-  val appleInactiveDevices = createChild(AppleInactiveDevices.props, AppleInactiveDevices.name)
+  val appleInactiveDevices = createActor(AppleInactiveDevices.props, AppleInactiveDevices.name)
   implicit val timeout = Timeout(30.seconds)
 
   def receive: Receive = {

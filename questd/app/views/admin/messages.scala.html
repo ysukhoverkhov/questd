@@ -1,8 +1,8 @@
-@(menuItems: Map[String, String], newMessageForm: Form[controllers.web.admin.component.MessageForm], sendResult: String)
+@(menuItems: Map[String, String], newMessageForm: Form[controllers.web.admin.component.MessageForm], sendResult: String)(implicit messages: Messages)
 
 @import helper._
 
-@main("Message broadcast")(menuItems, Map.empty) {
+@body("Message broadcast")(menuItems, Map.empty) {
 
 	<h1>@sendResult</h1>
 

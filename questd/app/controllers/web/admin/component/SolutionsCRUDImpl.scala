@@ -3,6 +3,8 @@ package controllers.web.admin.component
 import controllers.domain.admin.{AllSolutionsRequest, AllSolutionsResult}
 import controllers.domain.{DomainAPIComponent, OkApiResult}
 import play.api.mvc._
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 class SolutionsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 

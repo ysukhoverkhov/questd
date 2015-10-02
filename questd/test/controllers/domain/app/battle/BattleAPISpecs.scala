@@ -127,6 +127,22 @@ class BattleAPISpecs extends BaseAPISpecs {
       there were two(battle).updatePoints(any, any, any, any)
     }
 
+    "tuneBattlePointsBeforeResolve does not add points if there were at least one vote" in context {
+      val b = createBattleStub(points = List(0, 1))
+
+      battle.updatePoints(
+        any,
+        any,
+        any,
+        any) returns Some(b)
+
+      val result = api.tuneBattlePointsBeforeResolve(TuneBattlePointsBeforeResolveRequest(b))
+
+      result must beAnInstanceOf[OkApiResult[TuneBattlePointsBeforeResolveResult]]
+
+      there were no(battle).updatePoints(any, any, any, any)
+    }
+
     "voteBattle updates points correctly" in context {
       val ss = List(
         createSolutionStub(id = "sid1", status = SolutionStatus.InRotation),

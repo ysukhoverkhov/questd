@@ -1,8 +1,8 @@
-@(menuItems: Map[String, String], solutions: List[models.domain.solution.Solution])
+@(menuItems: Map[String, String], solutions: List[models.domain.solution.Solution])(implicit messages: Messages)
 
 @import helper._
 
-@main("Solutions")(menuItems, Map.empty) {
+@body("Solutions")(menuItems, Map.empty) {
 
 	<table border="1">
 	    	<tr>

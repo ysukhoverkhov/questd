@@ -158,9 +158,9 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.SolutionMinIACVotes -> "5",
             DefaultConfigParams.BattleCreationDelay -> "24",
 
-            DefaultConfigParams.BattleMinVotesCount -> "1",
-            DefaultConfigParams.BattleAdditionalVotesMean -> "5",
-            DefaultConfigParams.BattleAdditionalVotesDeviation -> "4",
+            DefaultConfigParams.BattleMinVotesCount -> "0",
+            DefaultConfigParams.BattleAdditionalVotesMean -> "2",
+            DefaultConfigParams.BattleAdditionalVotesDeviation -> "2",
 
             DefaultConfigParams.QuestProbabilityLevelsToGiveTutorialQuests -> "5",
             DefaultConfigParams.QuestProbabilityLevelsToGiveStartingQuests -> "7",

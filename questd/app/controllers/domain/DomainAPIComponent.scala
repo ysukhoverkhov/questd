@@ -4,6 +4,7 @@ import controllers.domain.app.battle.{BattleFetchAPI, BattleAPI}
 import controllers.domain.app.challenge.ChallengesAPI
 import controllers.domain.app.comment.CommentsAPI
 import controllers.domain.app.theme.ThemeFetchAPI
+import controllers.services.devicenotifications.DeviceNotificationsComponent
 import models.store._
 import components._
 import controllers.domain.app.user._
@@ -16,6 +17,7 @@ import logic.LogicBootstrapper
 import components.random.RandomComponent
 import controllers.domain.app.quest.QuestsFetchAPI
 import controllers.services.socialnetworks.component.SocialNetworkComponent
+import play.libs.Akka
 
 trait DomainAPIComponent { component: DatabaseComponent with RandomComponent with SocialNetworkComponent =>
 
@@ -79,7 +81,7 @@ trait DomainAPIComponent { component: DatabaseComponent with RandomComponent wit
     lazy val api = component.api // This is lazy since it references to his parent which creates us during initialization.
     lazy val rand = component.rand
 
+    lazy val deviceNotifications  = new DeviceNotificationsComponent(Akka.system)
   }
-
 }
 

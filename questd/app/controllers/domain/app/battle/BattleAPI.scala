@@ -91,10 +91,9 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
     val mean = api.config(DefaultConfigParams.BattleAdditionalVotesMean).toInt
     val dev = api.config(DefaultConfigParams.BattleAdditionalVotesDeviation).toInt
 
-    val shouldAddRandomPoints = battle.info.battleSides.foldLeft(false) {
-      case (true, _) => true
-      case (_, side) => side.pointsRandom + side.pointsFriends < mean
-    }
+    val shouldAddRandomPoints = battle.info.battleSides.foldLeft(0) {
+      case (total, side) => side.pointsRandom + side.pointsFriends + total
+    } == 0
 
     if (shouldAddRandomPoints) {
       battle.info.battleSides.foldLeft[Option[Battle]](Some(battle)) {

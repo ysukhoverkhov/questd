@@ -48,7 +48,7 @@ object DeviceNotifications {
  * Created by Yury on 11.08.2015.
  */
 class DeviceNotifications extends Actor with ActorContextCreationSupport {
-  val appleNotifications = createChild(ApplePushNotification.props, ApplePushNotification.name)
+  val appleNotifications = createActor(ApplePushNotification.props, ApplePushNotification.name)
 
   def receive: Receive = {
     case PushMessage(devices, message, badge, sound, destinations) =>

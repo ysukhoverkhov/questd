@@ -5,7 +5,7 @@ package models.store.mongo
 import java.util.Date
 
 import models.domain.chat.ChatMessage
-import play.api.test._
+import play.api.test.WithApplication
 
 //noinspection ZeroIndexToHead
 class ChatMessageDAOSpecs extends BaseDAOSpecs {

@@ -6,10 +6,9 @@ import models.domain.culture.Culture
 import models.domain.user._
 import models.domain.user.auth.{AuthInfo, LoginMethod}
 import models.domain.user.demo.UserDemographics
-import models.domain.user.profile.{PublicProfile, Profile, Bio}
+import models.domain.user.profile.{Bio, Profile, PublicProfile}
 import models.store
 import org.mockito.Matchers.{eq => mockEq}
-import testhelpers.domainstubs._
 
 class AuthAPISpecs extends BaseAPISpecs {
 
@@ -210,8 +209,8 @@ class AuthAPISpecs extends BaseAPISpecs {
         anyString,
         anyInt,
         any) returns u
-
       db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
+      doReturn(OkApiResult(CreateFriendshipResult(u.get))).when(api).createFriendship(any)
 
       val rv = api.login(
         LoginRequest(
