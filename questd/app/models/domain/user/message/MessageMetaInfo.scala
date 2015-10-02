@@ -16,7 +16,10 @@ object MessageMetaInfo  {
 
     // user
     MessageType.Information -> 1000,
-    MessageType.NewChatMessage -> 20
+    MessageType.NewChatMessage -> 20,
+
+    MessageType.BattleRequestAccepted -> 1000,
+    MessageType.BattleRequestRejected -> 1000
   )
 
   val messageLocalizedMessage: Map[MessageType.Value, String] = Map(
@@ -31,7 +34,11 @@ object MessageMetaInfo  {
 
     // user
     MessageType.Information -> "NOTIFICATION_INFORMATION",
-    MessageType.NewChatMessage -> "NOTIFICATION_NEW_CHAT_MESSAGE"
+    MessageType.NewChatMessage -> "NOTIFICATION_NEW_CHAT_MESSAGE",
+
+    MessageType.BattleRequestAccepted -> "",
+    MessageType.BattleRequestRejected -> ""
+
   )
 
   require(messagePriority.size == MessageType.values.size)
