@@ -8,6 +8,6 @@ import akka.actor.{ActorContext, ActorRef, Props}
  * Created by Yury on 11.08.2015.
  */
 trait ActorContextCreationSupport extends ActorCreationSupport {
-  def context: ActorContext
-  def createChild(props: Props, name: String): ActorRef = context.actorOf(props, name)
+  protected def context: ActorContext
+  protected def createActor(props: Props, name: String): ActorRef = context.actorOf(props, name)
 }

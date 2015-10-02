@@ -1,6 +1,6 @@
 package com.vita.scala.extensions
 
-import org.specs2.mutable._
+import org.specs2.mutable.Specification
 
 class RichBooleanSpecs extends Specification {
 

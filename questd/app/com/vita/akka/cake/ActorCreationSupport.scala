@@ -8,5 +8,5 @@ import akka.actor.{ActorRef, Props}
  * Created by Yury on 11.08.2015.
  */
 trait ActorCreationSupport {
-  def createChild(props: Props, name: String): ActorRef
+  protected def createActor(props: Props, name: String): ActorRef
 }

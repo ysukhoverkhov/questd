@@ -1,8 +1,8 @@
-@(menuItems: Map[String, String], cultures: List[models.domain.culture.Culture], newForm: Form[controllers.web.admin.component.CultureForm])
+@(menuItems: Map[String, String], cultures: List[models.domain.culture.Culture], newForm: Form[controllers.web.admin.component.CultureForm])(implicit messages: Messages)
 
 @import helper._
 
-@main("Cultures")(menuItems, Map.empty) {
+@body("Cultures")(menuItems, Map.empty) {
 
 	<p>
 		@form(action = controllers.web.admin.routes.CulturesCRUD.createCultureCB()) {

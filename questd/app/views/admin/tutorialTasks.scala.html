@@ -1,9 +1,9 @@
-@(menuItems: Map[String, String], tasks: List[models.domain.tutorialtask.TutorialTask], newTaskForm: Form[controllers.web.admin.component.TutorialTaskForm])
+@(menuItems: Map[String, String], tasks: List[models.domain.tutorialtask.TutorialTask], newTaskForm: Form[controllers.web.admin.component.TutorialTaskForm])(implicit messages: Messages)
 
 @import helper._
 @import models.domain.user.profile.TaskType
 
-@main("Tutorial Tasks")(menuItems, Map.empty) {
+@body("Tutorial Tasks")(menuItems, Map.empty) {
 
     <a href="@controllers.web.admin.routes.TutorialTasksCRUD.exportTutorialTasks">Export</a>
     @helper.form(action = controllers.web.admin.routes.TutorialTasksCRUD.importTutorialTasks, 'enctype -> "multipart/form-data") {

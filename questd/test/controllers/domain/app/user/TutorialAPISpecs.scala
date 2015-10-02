@@ -7,7 +7,6 @@ import models.domain.tutorial._
 import models.domain.tutorialtask.TutorialTask
 import models.domain.user.profile._
 import org.mockito.Matchers.{eq => mEq}
-import org.mockito.Mockito._
 import testhelpers.domainstubs._
 
 class TutorialAPISpecs extends BaseAPISpecs {

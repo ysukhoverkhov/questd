@@ -3,7 +3,7 @@ menuItems: Map[String, String],
 leftMenuItems: Map[String, String],
 currentPlatform: String,
 elements: List[models.domain.tutorial.TutorialElement],
-allSections: List[String])
+allSections: List[String])(implicit messages: Messages)
 
 @import helper._
 
@@ -22,7 +22,7 @@ allSections: List[String])
     TutorialTriggerType.values.map(_.toString).toList
 }
 
-@main(s"Tutorial script for: $currentPlatform")(menuItems, leftMenuItems) {
+@body(s"Tutorial script for: $currentPlatform")(menuItems, leftMenuItems) {
 
 <a href="@controllers.web.admin.routes.TutorialScriptsCRUD.exportTutorialScript(currentPlatform)">Export</a>
 
