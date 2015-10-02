@@ -83,7 +83,7 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
 
   /**
    * Tune points for battle (cheating).
-   */ // TODO: test me.
+   */
   def tuneBattlePointsBeforeResolve(request: TuneBattlePointsBeforeResolveRequest): ApiResult[TuneBattlePointsBeforeResolveResult] = handleDbException {
     import request._
 
