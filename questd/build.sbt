@@ -24,12 +24,13 @@ publishArtifact in (Compile, packageSrc) := false
 testOptions in Test += Tests.Argument("xonly", "console")
 
 
+resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
+
+
 libraryDependencies ++= Seq(
   cache,
   ws
 )
-
-
 
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
 
