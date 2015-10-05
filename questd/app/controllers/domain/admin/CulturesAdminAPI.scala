@@ -24,6 +24,9 @@ case class DeleteCultureResult()
 case class GetCultureRequest(id: String)
 case class GetCultureResult(culture: Culture)
 
+case class ExtractCountryRequest(country: String)
+case class ExtractCountryResult()
+
 private[domain] trait CulturesAdminAPI { this: DBAccessor =>
 
   /**
@@ -32,7 +35,7 @@ private[domain] trait CulturesAdminAPI { this: DBAccessor =>
   def allCultures(request: AllCulturesRequest): ApiResult[AllCulturesResult] = handleDbException {
     Logger.debug("Admin request for all Cultures.")
 
-      OkApiResult(AllCulturesResult(db.culture.all))
+    OkApiResult(AllCulturesResult(db.culture.all))
   }
 
   /**
@@ -115,6 +118,19 @@ private[domain] trait CulturesAdminAPI { this: DBAccessor =>
     OkApiResult(DeleteCultureResult())
   }
 
-}
+  /**
+   * Extracts country from culture and creates new culture with the country
+   */
+  def extractCountry(request: ExtractCountryRequest): ApiResult[ExtractCountryResult] = handleDbException {
+    import request._
 
+    db.culture.all.toSeq.find(_.countries.contains(country)).fold() { culture: Culture =>
+      db.culture.update(culture.copy(countries = culture.countries.filterNot(_ == country)))
+
+      createCulture(CreateCultureRequest(Culture(name = request.country, countries = List(request.country))))
+    }
+
+    OkApiResult(ExtractCountryResult())
+  }
+}
 

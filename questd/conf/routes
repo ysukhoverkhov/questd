@@ -156,6 +156,7 @@ GET		/admin/cultures									controllers.web.admin.CulturesCRUD.cultures(id = ""
 GET		/admin/cultures/byid/:id						controllers.web.admin.CulturesCRUD.cultures(id)
 GET		/admin/cultures/deleteCulture/:id				controllers.web.admin.CulturesCRUD.deleteCultureCB(id: String)
 POST	/admin/cultures/createCulture					controllers.web.admin.CulturesCRUD.createCultureCB
+GET     /admin/cultures/extractCountry/:country         controllers.web.admin.CulturesCRUD.extractCountry(country: String)
 
 GET		/admin/quests									controllers.web.admin.QuestsCRUD.quests(id = "")
 GET		/admin/quests/byid/:id							controllers.web.admin.QuestsCRUD.quests(id)
