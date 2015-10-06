@@ -160,6 +160,19 @@ class ConversationsAPISpecs extends BaseAPISpecs {
       there was one (chat).getForConversation(any, any)
       result must beAnInstanceOf[OkApiResult[GetChatMessagesResult]]
     }
+
+    "give ability to leave conversation" in context {
+      val c = createConversationStub()
+
+      db.conversation.readById(any) returns Some(c)
+      db.conversation.removeParticipant(any, any)
+
+      val result = api.leaveConversation(LeaveConversationRequest(createUserStub(), c.id))
+
+      there was one (conversation).readById(any)
+      there was one (conversation).removeParticipant(any, any)
+      result must beAnInstanceOf[OkApiResult[GetChatMessagesResult]]
+    }
   }
 }
 

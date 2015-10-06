@@ -9,7 +9,7 @@ import models.domain.user.User
  */
 trait Conversations { this: UserLogic =>
 
-  def canCreateConversationWith(peer: User) = {
+  def canConversateWith(peer: User) = {
     if (user.banned.contains(peer.id)) {
       InvalidState
     } else if (peer.banned.contains(user.id)) {
@@ -18,4 +18,5 @@ trait Conversations { this: UserLogic =>
       OK
     }
   }
+
 }

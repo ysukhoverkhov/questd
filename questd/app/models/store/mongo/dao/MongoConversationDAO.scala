@@ -54,5 +54,16 @@ private[mongo] class MongoConversationDAO
           "participants.$.hasUnreadMessages" -> flag)))
   }
 
+  /**
+   * @inheritdoc
+   */
+  def removeParticipant(id: String, userId: String): Option[Conversation] = {
+    findAndModify(
+      MongoDBObject(
+        "id" -> id),
+      MongoDBObject(
+        "$pull" -> MongoDBObject(
+          "participants" -> MongoDBObject("userId" -> userId))))
+  }
 }
 
