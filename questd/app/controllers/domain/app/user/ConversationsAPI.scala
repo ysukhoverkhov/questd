@@ -36,12 +36,18 @@ private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with
         OkApiResult(CreateConversationResult(OutOfContent))
       } {
         peer =>
-          val newConversation = Conversation(
-            participants = List(user.id, peer.id).map(Participant(_))
-          )
-          db.conversation.create(newConversation)
+          user.canCreateConversationWith(peer) match {
+            case OK =>
+              val newConversation = Conversation(
+                participants = List(user.id, peer.id).map(Participant(_))
+              )
+              db.conversation.create(newConversation)
 
-          OkApiResult(CreateConversationResult(OK,  Some(newConversation.id)))
+              OkApiResult(CreateConversationResult(OK,  Some(newConversation.id)))
+
+            case result =>
+              OkApiResult(CreateConversationResult(result))
+          }
       }
     } { c =>
       OkApiResult(CreateConversationResult(OK,  Some(c.id)))
