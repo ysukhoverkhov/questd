@@ -27,11 +27,11 @@ case class GetCommentsForObjectRequest(
   user: User,
   commentedObjectId: String,
   pageNumber: Int,
-  pageSize: Int)
+  pageSize: Int,
+  untilCommentId: Option[String])
 case class GetCommentsForObjectResult(
   allowed: ProfileModificationResult,
   comments: List[CommentView],
-  pageSize: Int,
   hasMore: Boolean)
 
 
@@ -86,16 +86,18 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
       authorIdsExclude = request.user.banned,
       skip = pageNumber * pageSize)
 
-    val comments = commentsForObject.take(pageSize).toList.map(c => {
+    val comments = commentsForObject
+      .take(pageSize)
+      .takeWhile(c => request.untilCommentId.fold(true)(_ != c.id))
+      .toList
+      .map(c => {
       CommentView(c.id, c.info)
     })
 
     OkApiResult(GetCommentsForObjectResult(
       allowed = OK,
       comments = comments,
-      pageSize,
       commentsForObject.hasNext))
   }
-
 }
 
