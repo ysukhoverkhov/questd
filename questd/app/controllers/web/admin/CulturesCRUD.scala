@@ -10,10 +10,12 @@ object CulturesCRUD extends Controller {
   val admin: AdminComponent#Admin = ComponentRegistrySingleton.admin
 
   def cultures(id: String) = admin.cultures.objects(id)
-  
+
   def deleteCultureCB(id: String) = admin.cultures.deleteObjectCB(id)
 
   def createCultureCB = admin.cultures.createObjectCB
+
+  def extractCountry(country: String) = admin.cultures.extractCountry(country)
 
 }
 

@@ -170,6 +170,20 @@ class ChallengeDAOSpecs extends BaseDAOSpecs {
       maybeChallenge.get.status must beEqualTo(newStatus)
       maybeChallenge.get.opponentSolutionId must beEqualTo(Some(newOpponentSolutionId))
     }
+
+    "Removes participant" in new WithApplication(appWithTestDatabase) {
+      db.conversation.clear()
+
+      val ps = List("1", "2")
+      val conv = createConversationStub(pIds = ps)
+      db.conversation.create(conv)
+
+      db.conversation.removeParticipant(conv.id, ps(0))
+
+      val c = db.conversation.readById(conv.id).get
+
+      c.participants.size must beEqualTo(1)
+    }
   }
 }
 

@@ -11,6 +11,7 @@ trait BattleDAO extends BaseDAO[Battle] {
     status: List[BattleStatus.Value] = List.empty,
     authorIds: List[String] = List.empty,
     authorIdsExclude: List[String] = List.empty,
+    questId: Option[String] = None,
     solutionIds: List[String] = List.empty,
     levels: Option[(Int, Int)] = None,
     skip: Int = 0,

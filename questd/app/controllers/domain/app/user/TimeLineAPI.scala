@@ -151,7 +151,8 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
           r.user.timeLine.iterator
             .filter(_.reason != TimeLineReason.Hidden)
             .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
-            .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id)).toList))
+            .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id))
+            .toList))
     }
   }
 

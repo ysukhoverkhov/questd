@@ -60,6 +60,7 @@ POST	/rest/getSolutionsForQuest						controllers.web.rest.ContentWS.getSolutions
 
 POST	/rest/getBattlesForUser 						controllers.web.rest.ContentWS.getBattlesForUser
 POST	/rest/getBattlesForSolution						controllers.web.rest.ContentWS.getBattlesForSolution
+POST	/rest/getBattlesForQuest						controllers.web.rest.ContentWS.getBattlesForQuest
 
 # Following requests
 POST	/rest/getFollowing								controllers.web.rest.FollowingWS.getFollowing
@@ -113,6 +114,7 @@ POST    /rest/rejectChallenge    					    controllers.web.rest.ChallengesWS.reje
 
 # Chat
 POST   /rest/createConversation                         controllers.web.rest.ConversationsWS.createConversation
+POST   /rest/leaveConversation                          controllers.web.rest.ConversationsWS.leaveConversation
 POST   /rest/getMyConversations                         controllers.web.rest.ConversationsWS.getMyConversations
 POST   /rest/sendChatMessage                            controllers.web.rest.ConversationsWS.sendChatMessage
 POST   /rest/getChatMessages                            controllers.web.rest.ConversationsWS.getChatMessages
@@ -160,6 +162,7 @@ GET		/admin/cultures									controllers.web.admin.CulturesCRUD.cultures(id = ""
 GET		/admin/cultures/byid/:id						controllers.web.admin.CulturesCRUD.cultures(id)
 GET		/admin/cultures/deleteCulture/:id				controllers.web.admin.CulturesCRUD.deleteCultureCB(id: String)
 POST	/admin/cultures/createCulture					controllers.web.admin.CulturesCRUD.createCultureCB
+GET     /admin/cultures/extractCountry/:country         controllers.web.admin.CulturesCRUD.extractCountry(country: String)
 
 GET		/admin/quests									controllers.web.admin.QuestsCRUD.quests(id = "")
 GET		/admin/quests/byid/:id							controllers.web.admin.QuestsCRUD.quests(id)

@@ -88,9 +88,10 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       import scala.concurrent.Future
 
       if (myIdInFishing != Missing) {
+        val fishingReward = user.profile.publicProfile.level * 5
         val data = Json.obj(
           "userId" -> s"fbk:$myIdInFishing",
-          "shinersReward" -> s"${user.profile.publicProfile.level * 10}",
+          "shinersReward" -> s"$fishingReward",
           "appName" -> "QuestMe",
           "appIconUrl" -> "https://web1.fishingparadise3d.com/www_promo_images/i/questme-1.jpg"
         )
@@ -105,7 +106,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
             sendMessage(SendMessageRequest(
               user,
               MessageInformation(
-                s"Your Fishing Paradise 3D account has been credited with ${user.profile.publicProfile.level * 10} shiners.",
+                s"Your Fishing Paradise 3D account has been credited with $fishingReward shiners.",
                 None)))
 
           case v =>

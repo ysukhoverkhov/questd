@@ -15,8 +15,10 @@ class _DefaultConfigParams {
 
   val RequestsAutoRejectDays = "16 01 Default Culture Id"
 
-  // Chat
+  // Limits
   val ChatMaxMessageLength = "20 01 Chat Max Message Length"
+  val BannedUsersMaxLength = "20 02 Banned Users Max Length"
+  val FollowingUsersMaxLength = "20 03 Following Users Max Length"
 
   // Tasks
   val SolutionVoteTaskCountMean = "30 01 Solution Vote Task Count Mean"
@@ -127,6 +129,8 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.RequestsAutoRejectDays -> "7",
 
             DefaultConfigParams.ChatMaxMessageLength -> "1024",
+            DefaultConfigParams.BannedUsersMaxLength -> "1024",
+            DefaultConfigParams.FollowingUsersMaxLength -> "1024",
 
             DefaultConfigParams.SolutionVoteTaskCountMean -> "1",
             DefaultConfigParams.SolutionVoteTaskCountDeviation -> "0.5",

@@ -18,16 +18,17 @@ private object CommentsWSImplTypes {
   type WSPostCommentResult = PostCommentResult
 
 
+  /**
+   * @param commentedObjectId Id of object o get comments for.
+   * @param pageNumber Number of page in result, zero based.
+   * @param pageSize Number of items on a page.
+   * @param untilCommentId Fetches until meats the entry. The entry is excluded from result set.
+   */
   case class WSGetCommentsForObjectRequest(
-    // Id of object o get comments for.
     commentedObjectId: String,
-
-    // Number of page in result, zero based.
     pageNumber: Int,
-
-    // Number of items on a page.
-    pageSize: Int
-    )
+    pageSize: Int,
+    untilCommentId: Option[String] = None)
   type WSGetCommentsForObjectResult = GetCommentsForObjectResult
 }
 
@@ -54,7 +55,13 @@ trait CommentsWSImpl extends BaseController with SecurityWSImpl { this: WSCompon
   def getCommentsForObject = wrapJsonApiCallReturnBody[WSGetCommentsForObjectResult] { (js, r) =>
     val v = Json.read[WSGetCommentsForObjectRequest](js.toString)
 
-    api.getCommentsForObject(GetCommentsForObjectRequest(r.user, v.commentedObjectId, v.pageNumber, v.pageSize))
+    api.getCommentsForObject(
+      GetCommentsForObjectRequest(
+        r.user,
+        v.commentedObjectId,
+        v.pageNumber,
+        v.pageSize,
+        v.untilCommentId))
   }
 }
 

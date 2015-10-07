@@ -39,8 +39,31 @@ class ChallengeAPISpecs extends BaseAPISpecs {
       api.getChallenge(GetChallengeRequest(
         user = u,
         challengeId = idMy)) must beEqualTo(OkApiResult(GetChallengeResult(ProfileModificationResult.OutOfContent)))
+        pageSize = 10,
+        untilCommentId = None))
 
       there was one(challenge).readById(any)
+    }
+
+    "Comments fetching works with limit" in context {
+      val cs = (1 to 10).map(i => createCommentStub()).toList
+      val u = createUserStub()
+
+      comment.allWithParams(any, any, any) returns cs.iterator
+
+      val result = api.getCommentsForObject(GetCommentsForObjectRequest(
+        user = u,
+        commentedObjectId = cs.head.info.commentedObjectId,
+        pageNumber = 0,
+        pageSize = 10,
+        untilCommentId = Some(cs(5).id)))
+
+      there was one(comment).allWithParams(any, any, any)
+
+      result must beEqualTo(OkApiResult(GetCommentsForObjectResult(
+        allowed = ProfileModificationResult.OK,
+        comments = cs.take(5).map(c => CommentView(c.id, c.info)),
+        hasMore = true)))
     }
   }
 }
