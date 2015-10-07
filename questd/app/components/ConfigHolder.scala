@@ -31,8 +31,9 @@ trait ConfigHolder { this: APIAccessor =>
         if (c.values.keySet == defaultConfiguration(sectionName).values.keySet)
           c
         else {
-          resetConfigSection(sectionName)
-          defaultConfiguration(sectionName)
+          val updatedConfigSection = updateConfigSectionWithDefaults(sectionName, c)
+          updateConfig(updatedConfigSection)
+          updatedConfigSection
         }
       case _ =>
         resetConfigSection(sectionName)
@@ -48,10 +49,28 @@ trait ConfigHolder { this: APIAccessor =>
   }
 
   /**
+   * Updates the whole configuration section.
+   */
+  def updateConfig(configSection: ConfigSection): Unit = {
+    api.setConfigSection(SetConfigSectionRequest(configSection))
+  }
+
+  /**
    * Resets component's configuration to default one.
    */
   private def resetConfigSection(sectionName: String): Unit = {
     api.setConfigSection(SetConfigSectionRequest(defaultConfiguration(sectionName)))
+  }
+
+  /**
+   * @return
+   */
+  private def updateConfigSectionWithDefaults(sectionName: String, configSection: ConfigSection): ConfigSection = {
+    val defaultSectionMap = defaultConfiguration(sectionName).values
+
+    val inBoth = configSection.values.filterKeys(defaultSectionMap.contains)
+
+    defaultConfiguration(sectionName).copy(values = defaultSectionMap ++ inBoth)
   }
 }
 
