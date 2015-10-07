@@ -109,6 +109,7 @@ POST    /rest/respondBattleRequest    					controllers.web.rest.ChallengesWS.res
 
 # Chat
 POST   /rest/createConversation                         controllers.web.rest.ConversationsWS.createConversation
+POST   /rest/leaveConversation                          controllers.web.rest.ConversationsWS.leaveConversation
 POST   /rest/getMyConversations                         controllers.web.rest.ConversationsWS.getMyConversations
 POST   /rest/sendChatMessage                            controllers.web.rest.ConversationsWS.sendChatMessage
 POST   /rest/getChatMessages                            controllers.web.rest.ConversationsWS.getChatMessages

@@ -9,28 +9,29 @@ private object ConversationsWSImplTypes {
 
   import scala.language.implicitConversions
 
-  type WSCreateConversationResult = CreateConversationResult
-
   case class WSCreateConversationRequest(
     peerId: String)
+  type WSCreateConversationResult = CreateConversationResult
+
+  case class WSLeaveConversationRequest(
+    conversationId: String)
+  type WSLeaveConversationResult = LeaveConversationResult
 
 
   type WSGetMyConversationsResult = GetMyConversationsResult
 
 
-  type WSSendChatMessageResult = SendChatMessageResult
-
   case class WSSendChatMessageRequest(
     conversationId: String,
     message: String)
+  type WSSendChatMessageResult = SendChatMessageResult
 
-
-  type WSGetChatMessagesResult = GetChatMessagesResult
 
   case class WSGetChatMessagesRequest(
     conversationId: String,
     fromDate: Date,
     count: Int)
+  type WSGetChatMessagesResult = GetChatMessagesResult
 
 }
 
@@ -38,11 +39,16 @@ trait ConversationsWSImpl extends BaseController with SecurityWSImpl with Common
 
   import controllers.web.rest.component.ConversationsWSImplTypes._
 
-
   def createConversation = wrapJsonApiCallReturnBody[WSCreateConversationResult] { (js, r) =>
     val v = Json.read[WSCreateConversationRequest](js)
 
     api.createConversation(CreateConversationRequest(r.user, v.peerId))
+  }
+
+  def leaveConversation = wrapJsonApiCallReturnBody[WSLeaveConversationResult] { (js, r) =>
+    val v = Json.read[WSLeaveConversationRequest](js)
+
+    api.leaveConversation(LeaveConversationRequest(r.user, v.conversationId))
   }
 
   def getMyConversations = wrapApiCallReturnBody[WSGetMyConversationsResult] { r =>
