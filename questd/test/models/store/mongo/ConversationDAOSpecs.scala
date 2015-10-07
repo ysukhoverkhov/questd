@@ -45,6 +45,20 @@ class ConversationDAOSpecs extends BaseDAOSpecs {
       c.participants(0).hasUnreadMessages must beEqualTo(true)
       c.participants(1).hasUnreadMessages must beEqualTo(false)
     }
+
+    "Removes participant" in new WithApplication(appWithTestDatabase) {
+      db.conversation.clear()
+
+      val ps = List("1", "2")
+      val conv = createConversationStub(pIds = ps)
+      db.conversation.create(conv)
+
+      db.conversation.removeParticipant(conv.id, ps(0))
+
+      val c = db.conversation.readById(conv.id).get
+
+      c.participants.size must beEqualTo(1)
+    }
   }
 }
 

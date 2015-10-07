@@ -8,6 +8,7 @@ import play.api.mvc._
 object ConversationsWS extends Controller with AccessToWSInstance {
 
   def createConversation = ws.createConversation
+  def leaveConversation = ws.leaveConversation
   def getMyConversations = ws.getMyConversations
   def sendChatMessage = ws.sendChatMessage
   def getChatMessages = ws.getChatMessages

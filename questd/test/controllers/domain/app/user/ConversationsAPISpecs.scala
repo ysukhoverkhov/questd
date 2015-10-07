@@ -6,7 +6,6 @@ import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.chat.{ChatMessage, Conversation, Participant}
 import testhelpers.domainstubs._
-import org.mockito.Mockito._
 
 //noinspection ZeroIndexToHead
 class ConversationsAPISpecs extends BaseAPISpecs {
@@ -60,7 +59,6 @@ class ConversationsAPISpecs extends BaseAPISpecs {
     "createConversation creates new conversation" in context {
       val u = createUserStub()
       val peer = createUserStub()
-      val c = createConversationStub(pIds = List(u.id, peer.id))
 
       db.conversation.findByAllParticipants(any) returns Iterator.empty
       db.user.readById(any) returns Some(peer)
@@ -70,6 +68,38 @@ class ConversationsAPISpecs extends BaseAPISpecs {
       there was one(conversation).findByAllParticipants(any)
       there was one(user).readById(any)
       there was one(conversation).create(any)
+
+      result must beAnInstanceOf[OkApiResult[CreateConversationResult]]
+    }
+
+    "createConversation does not create conversation with banned peer" in context {
+      val peer = createUserStub()
+      val u = createUserStub(banned = List(peer.id))
+
+      db.conversation.findByAllParticipants(any) returns Iterator.empty
+      db.user.readById(any) returns Some(peer)
+
+      val result = api.createConversation(CreateConversationRequest(u, "1"))
+
+      there was one(conversation).findByAllParticipants(any)
+      there was one(user).readById(any)
+      there was no(conversation).create(any)
+
+      result must beAnInstanceOf[OkApiResult[CreateConversationResult]]
+    }
+
+    "createConversation does not create conversation if we are banned" in context {
+      val u = createUserStub()
+      val peer = createUserStub(banned = List(u.id))
+
+      db.conversation.findByAllParticipants(any) returns Iterator.empty
+      db.user.readById(any) returns Some(peer)
+
+      val result = api.createConversation(CreateConversationRequest(u, "1"))
+
+      there was one(conversation).findByAllParticipants(any)
+      there was one(user).readById(any)
+      there was no(conversation).create(any)
 
       result must beAnInstanceOf[OkApiResult[CreateConversationResult]]
     }
@@ -128,6 +158,19 @@ class ConversationsAPISpecs extends BaseAPISpecs {
       there was one (conversation).readById(any)
       there was one (conversation).setUnreadMessagesFlag(any, any, any)
       there was one (chat).getForConversation(any, any)
+      result must beAnInstanceOf[OkApiResult[GetChatMessagesResult]]
+    }
+
+    "give ability to leave conversation" in context {
+      val c = createConversationStub()
+
+      db.conversation.readById(any) returns Some(c)
+      db.conversation.removeParticipant(any, any)
+
+      val result = api.leaveConversation(LeaveConversationRequest(createUserStub(), c.id))
+
+      there was one (conversation).readById(any)
+      there was one (conversation).removeParticipant(any, any)
       result must beAnInstanceOf[OkApiResult[GetChatMessagesResult]]
     }
   }

@@ -3,6 +3,7 @@ package controllers.web.admin.component
 import controllers.domain.admin._
 import controllers.domain.{DomainAPIComponent, OkApiResult}
 import models.domain.culture.Culture
+import play.Logger
 import play.api.data.Forms._
 import play.api.data._
 import play.api.mvc._
@@ -92,6 +93,15 @@ class CulturesCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller
         api.updateCulture(UpdateCultureRequest(culture.copy(name = form.name)))
       }
     }
+  }
+
+  /**
+   * Extracts a country from culture it belongs to.
+   */
+  def extractCountry(country: String) = Authenticated {
+    api.extractCountry(ExtractCountryRequest(country))
+
+    Redirect(callToHomePage)
   }
 }
 

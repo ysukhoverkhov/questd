@@ -37,7 +37,7 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
   def banUser(request: BanUserRequest): ApiResult[BanUserResult] = handleDbException {
     import request._
 
-    val maxBannedSize = 1024
+    val maxBannedSize = api.config(api.DefaultConfigParams.BannedUsersMaxLength).toInt
 
     if (request.user.following.length >= maxBannedSize) {
       OkApiResult(BanUserResult(LimitExceeded))

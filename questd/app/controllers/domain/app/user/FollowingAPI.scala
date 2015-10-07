@@ -91,7 +91,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
    */
   def addToFollowing(request: AddToFollowingRequest): ApiResult[AddToFollowingResult] = handleDbException {
 
-    val maxFollowingSize = 1024
+    val maxFollowingSize = api.config(api.DefaultConfigParams.FollowingUsersMaxLength).toInt
 
     if (request.user.following.length >= maxFollowingSize) {
       OkApiResult(AddToFollowingResult(LimitExceeded))

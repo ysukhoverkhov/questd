@@ -1,7 +1,7 @@
 package controllers.web.admin.component
 
-import play.api.mvc._
 import play.api.data._
+import play.api.mvc._
 import play.twirl.api.HtmlFormat.Appendable
 
 trait BaseCRUDImpl[DT, FT] extends SecurityAdminImpl {
@@ -61,6 +61,5 @@ trait BaseCRUDImpl[DT, FT] extends SecurityAdminImpl {
         Redirect(callToHomePage)
       })
   }
-
 }
 

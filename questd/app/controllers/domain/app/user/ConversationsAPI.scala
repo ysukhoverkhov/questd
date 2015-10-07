@@ -13,6 +13,9 @@ import models.domain.user.message.{MessageNewChatMessage, MessageType}
 case class CreateConversationRequest(user: User, peerId: String)
 case class CreateConversationResult(allowed: ProfileModificationResult, conversationId: Option[String] = None)
 
+case class LeaveConversationRequest(user: User, conversationId: String)
+case class LeaveConversationResult(allowed: ProfileModificationResult)
+
 case class GetMyConversationsRequest(user: User)
 case class GetMyConversationsResult(conversations: List[Conversation])
 
@@ -36,15 +39,40 @@ private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with
         OkApiResult(CreateConversationResult(OutOfContent))
       } {
         peer =>
-          val newConversation = Conversation(
-            participants = List(user.id, peer.id).map(Participant(_))
-          )
-          db.conversation.create(newConversation)
+          user.canConversateWith(peer) match {
+            case OK =>
+              val newConversation = Conversation(
+                participants = List(user.id, peer.id).map(Participant(_))
+              )
+              db.conversation.create(newConversation)
 
-          OkApiResult(CreateConversationResult(OK,  Some(newConversation.id)))
+              OkApiResult(CreateConversationResult(OK,  Some(newConversation.id)))
+
+            case result =>
+              OkApiResult(CreateConversationResult(result))
+          }
       }
     } { c =>
       OkApiResult(CreateConversationResult(OK,  Some(c.id)))
+    }
+  }
+
+  /**
+   * Leaves a conversation. If conversation has no participants destroys it.
+   */
+  def leaveConversation(request: LeaveConversationRequest): ApiResult[LeaveConversationResult] = handleDbException {
+    import request._
+
+    db.conversation.readById(conversationId).fold {
+      OkApiResult(LeaveConversationResult(OutOfContent))
+    } { conversation =>
+
+      if (conversation.participants.exists(_.userId == user.id)) {
+        db.conversation.removeParticipant(conversation.id, user.id)
+        OkApiResult(LeaveConversationResult(OK))
+      } else {
+        OkApiResult(LeaveConversationResult(OutOfContent))
+      }
     }
   }
 
@@ -70,9 +98,8 @@ private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with
     if (message.length > maxMessageLength) {
       OkApiResult(SendChatMessageResult(LimitExceeded))
     } else {
-      val maybeConversation = db.conversation.readById(conversationId)
 
-      maybeConversation.fold {
+      db.conversation.readById(conversationId).fold {
         OkApiResult(SendChatMessageResult(OutOfContent))
       } { conversation =>
         db.chat.create(ChatMessage(

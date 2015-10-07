@@ -22,6 +22,7 @@ class UserLogic(
   with Friends
   with Tasks
   with Challenges
+  with Conversations
   with TimeLineLogic
   with MiscUserLogic
   with EventsUserLogic

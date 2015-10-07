@@ -44,6 +44,7 @@ class BattleDAOSpecs extends BaseDAOSpecs {
       val bs = List(
         createBattleStub(
           id = "b1",
+          questId = "q1_id",
           solutionIds = List("s1_id", "s2_id"),
           authorIds = List("a1_id", "a2_id"),
           status = BattleStatus.Fighting,
@@ -54,6 +55,7 @@ class BattleDAOSpecs extends BaseDAOSpecs {
 
         createBattleStub(
           id = "b2",
+          questId = "q1_id",
           solutionIds = List("s1_id", "s3_id"),
           authorIds = List("a1_id", "a3_id"),
           status = BattleStatus.Resolved,
@@ -64,6 +66,7 @@ class BattleDAOSpecs extends BaseDAOSpecs {
 
         createBattleStub(
           id = "b3",
+          questId = "q2_id",
           solutionIds = List("s1_id", "s2_id"),
           authorIds = List("a1_id", "a2_id"),
           status = BattleStatus.Fighting,
@@ -119,6 +122,10 @@ class BattleDAOSpecs extends BaseDAOSpecs {
       val excludingAuthorIds = db.battle.allWithParams(authorIdsExclude = List("a2_id")).toList
       excludingAuthorIds.map(_.id).size must beEqualTo(1)
       excludingAuthorIds.map(_.id).sorted must beEqualTo(List(bs(1).id).sorted)
+
+      val questId = db.battle.allWithParams(questId = Some("q1_id")).toList
+      questId.map(_.id).size must beEqualTo(2)
+      questId.map(_.id).sorted must beEqualTo(List(bs(0).id, bs(1).id).sorted)
 
       val solutionIds = db.battle.allWithParams(solutionIds = List("s1_id")).toList
       solutionIds.map(_.id).size must beEqualTo(3)
