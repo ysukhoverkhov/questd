@@ -99,6 +99,18 @@ private object ContentWSImplTypes
     pageSize: Int)
   type WSGetBattlesForSolutionResult = GetBattlesForSolutionResult
 
+  /**
+   * @param questId Id of quest to return battles for.
+   * @param status Statuses of battles to return.
+   * @param pageNumber Number of page in result, zero based.
+   * @param pageSize Number of items on a page.
+   */
+  case class WSGetBattlesForQuestRequest(
+    questId: String,
+    status: List[String] = List.empty,
+    pageNumber: Int,
+    pageSize: Int)
+  type WSGetBattlesForQuestResult = GetBattlesForQuestResult
 }
 
 
@@ -212,5 +224,20 @@ trait ContentWSImpl extends BaseController with SecurityWSImpl with CommonFuncti
       v.pageNumber,
       v.pageSize))
   }
+
+  /**
+   * Returns battles of a quest.
+   */
+  def getBattlesForQuest = wrapJsonApiCallReturnBody[WSGetBattlesForQuestResult] { (js, r) =>
+    val v = Json.read[WSGetBattlesForQuestRequest](js)
+
+    api.getBattlesForQuest(GetBattlesForQuestRequest(
+      r.user,
+      v.questId,
+      v.status.map(BattleStatus.withNameEx),
+      v.pageNumber,
+      v.pageSize))
+  }
+
 }
 

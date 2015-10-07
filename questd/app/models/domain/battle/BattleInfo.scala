@@ -9,5 +9,4 @@ case class BattleInfo(
   status: BattleStatus.Value = BattleStatus.Fighting,
   battleSides: List[BattleSide],
   questId: String,
-  voteEndDate: Date
-  )
+  voteEndDate: Date)

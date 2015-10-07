@@ -60,6 +60,7 @@ POST	/rest/getSolutionsForQuest						controllers.web.rest.ContentWS.getSolutions
 
 POST	/rest/getBattlesForUser 						controllers.web.rest.ContentWS.getBattlesForUser
 POST	/rest/getBattlesForSolution						controllers.web.rest.ContentWS.getBattlesForSolution
+POST	/rest/getBattlesForQuest						controllers.web.rest.ContentWS.getBattlesForQuest
 
 # Following requests
 POST	/rest/getFollowing								controllers.web.rest.FollowingWS.getFollowing

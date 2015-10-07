@@ -92,6 +92,18 @@ case class GetBattlesForSolutionResult(
   pageSize: Int,
   hasMore: Boolean)
 
+case class GetBattlesForQuestRequest(
+  user: User,
+  questId: String,
+  status: List[BattleStatus.Value],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetBattlesForQuestResult(
+  allowed: ProfileModificationResult,
+  battles: List[BattleView],
+  pageSize: Int,
+  hasMore: Boolean)
+
 
 private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -277,6 +289,34 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       battles = battles,
       pageSize,
       battlesForSolution.hasNext))
+  }
+
+
+  /**
+   * Returns duels people made for the quest.
+   */
+  def getBattlesForQuest(request: GetBattlesForQuestRequest): ApiResult[GetBattlesForQuestResult] = handleDbException {
+    val pageSize = adjustedPageSize(request.pageSize)
+    val pageNumber = adjustedPageNumber(request.pageNumber)
+
+    val battlesForQuest = db.battle.allWithParams(
+      status = request.status,
+      questId = Some(request.questId),
+      authorIdsExclude = request.user.banned,
+      skip = pageNumber * pageSize)
+
+    val battles = battlesForQuest.take(pageSize).toList.map(b => {
+      BattleView(
+        b.id,
+        b.info,
+        request.user.stats.votedBattles.get(b.id))
+    })
+
+    OkApiResult(GetBattlesForQuestResult(
+      allowed = OK,
+      battles = battles,
+      pageSize,
+      battlesForQuest.hasNext))
   }
 
 }
