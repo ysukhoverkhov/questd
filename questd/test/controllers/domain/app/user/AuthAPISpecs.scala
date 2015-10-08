@@ -46,8 +46,8 @@ class AuthAPISpecs extends BaseAPISpecs {
         anyString,
         anyInt,
         any) returns u
-
       db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
+      doReturn(OkApiResult(NotifySNFriendsAboutLoginResult(u.get))).when(api).notifySNFriendsAboutLogin(any)
 
       val rv = api.login(LoginRequest("FB", userfb))
 
@@ -76,6 +76,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       db.user.updateSessionId(any, any) returns u
       db.user.readBySNid("FB", userfb.snId) returns u
       db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
+      doReturn(OkApiResult(NotifySNFriendsAboutLoginResult(u.get))).when(api).notifySNFriendsAboutLogin(any)
 
       val rv = api.login(LoginRequest("FB", userfb))
 
@@ -143,6 +144,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       db.user.readBySNid("FB", userfb.snId) returns u
       db.culture.findByCountry(currentCulture) returns Some(Culture(id = actualCulture, name = actualCulture))
       db.user.updateCultureId(userid, actualCulture) returns u
+      doReturn(OkApiResult(NotifySNFriendsAboutLoginResult(u.get))).when(api).notifySNFriendsAboutLogin(any)
 
       val rv = api.login(LoginRequest("FB", userfb))
 
@@ -173,8 +175,8 @@ class AuthAPISpecs extends BaseAPISpecs {
       db.user.updateSessionId(any, any) returns u
       db.user.readBySNid("FB", userfb.snId) returns u
       db.culture.findByCountry(currentCulture) returns None
-
       db.user.updateCultureId(userid, currentCulture) returns u
+      doReturn(OkApiResult(NotifySNFriendsAboutLoginResult(u.get))).when(api).notifySNFriendsAboutLogin(any)
 
       val rv = api.login(LoginRequest("FB", userfb))
 
@@ -211,6 +213,7 @@ class AuthAPISpecs extends BaseAPISpecs {
         any) returns u
       db.culture.findByCountry(countryName) returns Some(Culture(id = countryName, name = countryName))
       doReturn(OkApiResult(CreateFriendshipResult(u.get))).when(api).createFriendship(any)
+      doReturn(OkApiResult(NotifySNFriendsAboutLoginResult(u.get))).when(api).notifySNFriendsAboutLogin(any)
 
       val rv = api.login(
         LoginRequest(
