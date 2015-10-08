@@ -862,7 +862,7 @@ private[mongo] class MongoUserDAO
 
   /**
    * @inheritdoc
-   */ // TODO: test me.
+   */
   def setFriendsNotifiedAboutRegistrationFlag(id: String, flag: Boolean): Option[User] = {
     findAndModify(
       id,
