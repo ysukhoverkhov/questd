@@ -4,7 +4,7 @@ import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
-import controllers.services.socialnetworks.client.{User => SNUser}
+import controllers.services.socialnetworks.client.{User => SNUser, Permission}
 import models.domain.common.Assets
 import models.domain.user.User
 import models.domain.user.message.MessageFriendRegistered
@@ -188,18 +188,22 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
     if (request.user.stats.friendsNotifiedAboutRegistration) {
       OkApiResult(NotifySNFriendsAboutLoginResult(user))
     } else {
-      snUser.friends.foreach { snFriend =>
-        db.user.readBySNid(snFriend.snName, snFriend.snId).fold {
-          Logger.error(s"unable to find user for notification of friends about registration $snFriend")
-        } { snFriend: User =>
-          sendMessage(SendMessageRequest(snFriend, MessageFriendRegistered(user.id)))
+      if (snUser.permissions.contains(Permission.Friends)) {
+        Logger.error(s"YES permission!") // TODO: remove me.
+        snUser.friends.foreach { snFriend =>
+          db.user.readBySNid(snFriend.snName, snFriend.snId).fold {
+            Logger.error(s"unable to find user for notification of friends about registration $snFriend")
+          } { snFriend: User =>
+            sendMessage(SendMessageRequest(snFriend, MessageFriendRegistered(user.id)))
+          }
         }
-      }
 
-      // TODO: do not set the flag if user didn't gave us rights to get list of friends.
-
-      db.user.setFriendsNotifiedAboutRegistrationFlag(id = user.id, flag = true) ifSome { u =>
-        OkApiResult(NotifySNFriendsAboutLoginResult(u))
+        db.user.setFriendsNotifiedAboutRegistrationFlag(id = user.id, flag = true) ifSome { u =>
+          OkApiResult(NotifySNFriendsAboutLoginResult(u))
+        }
+      } else {
+        Logger.error(s"NO permission!") // TODO: remove me.
+        OkApiResult(NotifySNFriendsAboutLoginResult(user))
       }
     }
   }

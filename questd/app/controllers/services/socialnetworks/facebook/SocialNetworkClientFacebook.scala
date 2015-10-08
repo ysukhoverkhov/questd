@@ -5,7 +5,7 @@ import com.restfb.exception._
 import com.restfb.json.JsonObject
 import controllers.services.socialnetworks.client._
 import controllers.services.socialnetworks.exception.{AuthException, NetworkException}
-import controllers.services.socialnetworks.facebook.types.UserIdWithApp
+import controllers.services.socialnetworks.facebook.types.{AppPermission, UserIdWithApp}
 import play.{Play, Logger}
 
 import scala.language.implicitConversions
@@ -93,6 +93,16 @@ private[socialnetworks] class SocialNetworkClientFacebook extends SocialNetworkC
 
     facebookClient(token).fetchConnection(
       "me/ids_for_business", classOf[UserIdWithApp]).getData.toList.map(UserIdInApplicationFacebook(_))
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def fetchPermissions(token: String): List[Permission.Value] = {
+    import collection.JavaConversions._
+
+    facebookClient(token).fetchConnection(
+      "me/permissions", classOf[AppPermission]).getData.toList.map(PermissionMapper(_)).filterNot(_ == Permission.Invalid)
   }
 }
 

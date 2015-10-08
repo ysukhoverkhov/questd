@@ -34,5 +34,10 @@ trait User extends Item {
    * @return List of the user ids in all other applications.
    */
   def idsInOtherApps: List[UserIdInApplication]
-}
+
+  /**
+   * @return Permissions user gave to the app.
+   */
+  def permissions: List[Permission.Value]
+  }
 

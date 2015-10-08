@@ -1,6 +1,6 @@
 package controllers.services.socialnetworks.facebook
 
-import controllers.services.socialnetworks.client.{UserIdInApplication, Invitation, User}
+import controllers.services.socialnetworks.client.{Permission, UserIdInApplication, Invitation, User}
 import models.domain.user.profile.Gender
 
 private[socialnetworks] class UserFacebook(
@@ -70,6 +70,13 @@ private[socialnetworks] class UserFacebook(
    */
   def idsInOtherApps: List[UserIdInApplication] = {
     client.fetchIdsInOtherApps(token)
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def permissions: List[Permission.Value] = {
+    client.fetchPermissions(token)
   }
 
 }
