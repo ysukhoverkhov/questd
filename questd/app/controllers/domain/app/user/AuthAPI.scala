@@ -34,6 +34,8 @@ private[domain] trait AuthAPI {
         } map {
           updateUserCulture(UpdateUserCultureRequest(u))
         } map {
+          notifySNFriendsAboutLogin(NotifySNFriendsAboutLoginRequest(u, request.snuser)) // TODO: est it's called.
+        } map {
           OkApiResult(LoginResult(uuid, u.id))
         }
       }
@@ -62,7 +64,6 @@ private[domain] trait AuthAPI {
         createUser(CreateUserRequest(newUser))
       } map { r =>
         request.referrerId.fold() { referrerId =>
-
 
           api.createFriendship(
             CreateFriendshipRequest(

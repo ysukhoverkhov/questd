@@ -20,6 +20,11 @@ trait User extends Item {
   def city: Option[String]
 
   /**
+   * @return friends of a user who plays the game as well.
+   */
+  def friends: List[User]
+
+  /**
    * All user invitations.
    * @return All current invitations
    */

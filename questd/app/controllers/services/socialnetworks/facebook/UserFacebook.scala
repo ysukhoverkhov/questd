@@ -3,9 +3,10 @@ package controllers.services.socialnetworks.facebook
 import controllers.services.socialnetworks.client.{UserIdInApplication, Invitation, User}
 import models.domain.user.profile.Gender
 
-private[socialnetworks] class UserFacebook(fbUser: com.restfb.types.User,
-                               client: SocialNetworkClientFacebook,
-                               token: String) extends ItemFacebook with User {
+private[socialnetworks] class UserFacebook(
+  fbUser: com.restfb.types.User,
+  client: SocialNetworkClientFacebook,
+  token: String) extends ItemFacebook with User {
 
 
   private var location: Option[FQLLocation] = None
@@ -48,6 +49,13 @@ private[socialnetworks] class UserFacebook(fbUser: com.restfb.types.User,
   def city: Option[String] = {
     checkUpdateUserLocation()
     None
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def friends: List[User] = {
+    client.fetchFriendsByToken(token)
   }
 
   /**

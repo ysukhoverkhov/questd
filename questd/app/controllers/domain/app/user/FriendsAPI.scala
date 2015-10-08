@@ -285,5 +285,6 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
     OkApiResult(ProcessFriendshipInvitationsFromSNResult(rv))
   }
+
 }
 

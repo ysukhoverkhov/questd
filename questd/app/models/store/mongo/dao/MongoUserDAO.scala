@@ -860,5 +860,15 @@ private[mongo] class MongoUserDAO
           "banned" -> bannedUserId)))
   }
 
+  /**
+   * @inheritdoc
+   */ // TODO: test me.
+  def setFriendsNotifiedAboutRegistrationFlag(id: String, flag: Boolean): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "stats.friendsNotifiedAboutRegistration" -> flag)))
+  }
 }
 

@@ -17,4 +17,5 @@ object MessageType extends Enumeration {
   // user
   val Information = Value
   val NewChatMessage = Value
+  val FriendRegistered = Value
 }
