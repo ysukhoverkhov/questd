@@ -181,7 +181,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
   /**
    * Decides should we notify friends about or login and notifies them.
    * @return
-   */ // TODO: test me.
+   */
   def notifySNFriendsAboutLogin(request: NotifySNFriendsAboutLoginRequest): ApiResult[NotifySNFriendsAboutLoginResult] = handleDbException {
     import request._
 
@@ -189,7 +189,6 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
       OkApiResult(NotifySNFriendsAboutLoginResult(user))
     } else {
       if (snUser.permissions.contains(Permission.Friends)) {
-        Logger.error(s"YES permission!") // TODO: remove me.
         snUser.friends.foreach { snFriend =>
           db.user.readBySNid(snFriend.snName, snFriend.snId).fold {
             Logger.error(s"unable to find user for notification of friends about registration $snFriend")
@@ -202,7 +201,6 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
           OkApiResult(NotifySNFriendsAboutLoginResult(u))
         }
       } else {
-        Logger.error(s"NO permission!") // TODO: remove me.
         OkApiResult(NotifySNFriendsAboutLoginResult(user))
       }
     }

@@ -101,8 +101,9 @@ private[socialnetworks] class SocialNetworkClientFacebook extends SocialNetworkC
   def fetchPermissions(token: String): List[Permission.Value] = {
     import collection.JavaConversions._
 
-    facebookClient(token).fetchConnection(
-      "me/permissions", classOf[AppPermission]).getData.toList.map(PermissionMapper(_)).filterNot(_ == Permission.Invalid)
+    val appPermissions = facebookClient(token).fetchConnection(
+      "me/permissions", classOf[AppPermission]).getData.toList
+    appPermissions.map(PermissionMapper(_)).filterNot(_ == Permission.Invalid)
   }
 }
 

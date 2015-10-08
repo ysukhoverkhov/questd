@@ -8,7 +8,7 @@ import controllers.services.socialnetworks.facebook.types.AppPermission
  */
 private[facebook] object PermissionMapper {
   def apply(appPermission: AppPermission): Permission.Value = {
-    if (appPermission.status != "granted") {
+    if (appPermission.status == "granted") {
       appPermission.permission match {
         case "user_friends" => Permission.Friends
         case _ => Permission.Invalid
