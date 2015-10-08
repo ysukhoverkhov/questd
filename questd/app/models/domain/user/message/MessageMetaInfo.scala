@@ -7,16 +7,17 @@ object MessageMetaInfo  {
   val messagePriority: Map[MessageType.Value, Int] = Map(
     MessageType.AllTasksCompleted -> 1000,
     MessageType.TaskCompleted -> 1000,
-    MessageType.BattleRequestAccepted -> 4,
-    MessageType.BattleRequestRejected -> 5,
+    MessageType.BattleRequestAccepted -> 10,
+    MessageType.BattleRequestRejected -> 11,
     MessageType.FriendshipAccepted -> 1,
     MessageType.FriendshipRejected -> 2,
     MessageType.FriendshipRemoved -> 3,
-    MessageType.DailyResultsReady -> 10,
+    MessageType.DailyResultsReady -> 20,
 
     // user
     MessageType.Information -> 1000,
-    MessageType.NewChatMessage -> 20
+    MessageType.NewChatMessage -> 20,
+    MessageType.FriendRegistered -> 5
   )
 
   val messageLocalizedMessage: Map[MessageType.Value, String] = Map(
@@ -31,7 +32,8 @@ object MessageMetaInfo  {
 
     // user
     MessageType.Information -> "NOTIFICATION_INFORMATION",
-    MessageType.NewChatMessage -> "NOTIFICATION_NEW_CHAT_MESSAGE"
+    MessageType.NewChatMessage -> "NOTIFICATION_NEW_CHAT_MESSAGE",
+    MessageType.FriendRegistered -> "NOTIFICATION_FRIEND_REGISTERED"
   )
 
   require(messagePriority.size == MessageType.values.size)

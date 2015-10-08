@@ -7,7 +7,6 @@ import logic.UserLogic
 import models.domain.user.message._
 import models.domain.user.schedules.UserSchedules
 import org.mockito.Matchers.{eq => mEq}
-import org.mockito.Mockito._
 import testhelpers.domainstubs._
 
 
