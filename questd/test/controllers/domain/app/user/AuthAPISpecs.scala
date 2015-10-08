@@ -54,6 +54,7 @@ class AuthAPISpecs extends BaseAPISpecs {
       // Update allowed.
       there was one(user).readBySNid("FB", userfb.snId)
       there was one(user).create(any)
+      there was one(api).notifySNFriendsAboutLogin(any)
 
       rv must beAnInstanceOf[OkApiResult[LoginResult]]
       rv.body must beSome[LoginResult]

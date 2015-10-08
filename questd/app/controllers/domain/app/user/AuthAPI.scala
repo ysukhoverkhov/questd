@@ -34,7 +34,7 @@ private[domain] trait AuthAPI {
         } map {
           updateUserCulture(UpdateUserCultureRequest(u))
         } map {
-          notifySNFriendsAboutLogin(NotifySNFriendsAboutLoginRequest(u, request.snuser)) // TODO: est it's called.
+          notifySNFriendsAboutLogin(NotifySNFriendsAboutLoginRequest(u, request.snuser))
         } map {
           OkApiResult(LoginResult(uuid, u.id))
         }
