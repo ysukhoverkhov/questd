@@ -1,6 +1,7 @@
 package models.store.dao
 
 import java.util.Date
+import javax.mail.Flags.Flag
 
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
@@ -225,4 +226,11 @@ trait UserDAO extends BaseDAO[User] {
    */
   def removeBannedUser(id: String, bannedUserId: String): Option[User]
 
+  /**
+   * Sets friends notification flag.
+   *
+   * @param id our id
+   * @param flag new flag state
+   */
+  def setFriendsNotifiedAboutRegistrationFlag(id: String, flag: Boolean): Option[User]
 }

@@ -17,6 +17,7 @@ object MessageType extends Enumeration {
   // user
   val Information = Value
   val NewChatMessage = Value
+  val FriendRegistered = Value
 
   // TODO: remove in 0.50.02
   // TODO: add removing of these messages to cleanup.

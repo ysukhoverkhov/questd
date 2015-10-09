@@ -1,11 +1,12 @@
 package controllers.services.socialnetworks.facebook
 
-import controllers.services.socialnetworks.client.{UserIdInApplication, Invitation, User}
+import controllers.services.socialnetworks.client.{Permission, UserIdInApplication, Invitation, User}
 import models.domain.user.profile.Gender
 
-private[socialnetworks] class UserFacebook(fbUser: com.restfb.types.User,
-                               client: SocialNetworkClientFacebook,
-                               token: String) extends ItemFacebook with User {
+private[socialnetworks] class UserFacebook(
+  fbUser: com.restfb.types.User,
+  client: SocialNetworkClientFacebook,
+  token: String) extends ItemFacebook with User {
 
 
   private var location: Option[FQLLocation] = None
@@ -53,6 +54,13 @@ private[socialnetworks] class UserFacebook(fbUser: com.restfb.types.User,
   /**
    * @inheritdoc
    */
+  def friends: List[User] = {
+    client.fetchFriendsByToken(token)
+  }
+
+  /**
+   * @inheritdoc
+   */
   def invitations: List[Invitation] = {
     client.fetchInvitations(token)
   }
@@ -62,6 +70,13 @@ private[socialnetworks] class UserFacebook(fbUser: com.restfb.types.User,
    */
   def idsInOtherApps: List[UserIdInApplication] = {
     client.fetchIdsInOtherApps(token)
+  }
+
+  /**
+   * @inheritdoc
+   */
+  def permissions: List[Permission.Value] = {
+    client.fetchPermissions(token)
   }
 
 }

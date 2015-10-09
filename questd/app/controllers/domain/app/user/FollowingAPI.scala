@@ -1,13 +1,15 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
-import controllers.services.socialnetworks.client.{User => SNUser}
+import controllers.domain.{DomainAPIComponent, _}
+import controllers.services.socialnetworks.client.{User => SNUser, Permission}
 import models.domain.common.Assets
 import models.domain.user.User
+import models.domain.user.message.MessageFriendRegistered
 import models.domain.user.profile.{Profile, TaskType}
+import play.Logger
 
 case class GetFollowingRequest(
   user: User)
@@ -56,6 +58,12 @@ case class GetSNFriendsInGameRequest(
 case class GetSNFriendsInGameResult(
   allowed: ProfileModificationResult,
   userIds: List[String] = List.empty)
+
+case class NotifySNFriendsAboutLoginRequest(
+  user: User,
+  snUser: SNUser)
+case class NotifySNFriendsAboutLoginResult(user: User)
+
 
 private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#DomainAPI with SNAccessor =>
 
@@ -166,6 +174,35 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
 
         OkApiResult(GetSNFriendsInGameResult(OK, friends))
       case a => OkApiResult(GetSNFriendsInGameResult(a))
+    }
+  }
+
+
+  /**
+   * Decides should we notify friends about or login and notifies them.
+   * @return
+   */
+  def notifySNFriendsAboutLogin(request: NotifySNFriendsAboutLoginRequest): ApiResult[NotifySNFriendsAboutLoginResult] = handleDbException {
+    import request._
+
+    if (request.user.stats.friendsNotifiedAboutRegistration) {
+      OkApiResult(NotifySNFriendsAboutLoginResult(user))
+    } else {
+      if (snUser.permissions.contains(Permission.Friends)) {
+        snUser.friends.foreach { snFriend =>
+          db.user.readBySNid(snFriend.snName, snFriend.snId).fold {
+            Logger.error(s"unable to find user for notification of friends about registration $snFriend")
+          } { snFriend: User =>
+            sendMessage(SendMessageRequest(snFriend, MessageFriendRegistered(user.id)))
+          }
+        }
+
+        db.user.setFriendsNotifiedAboutRegistrationFlag(id = user.id, flag = true) ifSome { u =>
+          OkApiResult(NotifySNFriendsAboutLoginResult(u))
+        }
+      } else {
+        OkApiResult(NotifySNFriendsAboutLoginResult(user))
+      }
     }
   }
 }

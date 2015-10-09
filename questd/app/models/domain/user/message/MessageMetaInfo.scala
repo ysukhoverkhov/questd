@@ -7,17 +7,18 @@ object MessageMetaInfo  {
   val messagePriority: Map[MessageType.Value, Int] = Map(
     MessageType.AllTasksCompleted -> 1000,
     MessageType.TaskCompleted -> 1000,
-    MessageType.ChallengeAccepted -> 4,
-    MessageType.ChallengeRejected -> 5,
+    MessageType.ChallengeAccepted -> 10,
+    MessageType.ChallengeRejected -> 11,
     MessageType.FriendshipAccepted -> 1,
     MessageType.FriendshipRejected -> 2,
     MessageType.FriendshipRemoved -> 3,
-    MessageType.DailyResultsReady -> 10,
+    MessageType.DailyResultsReady -> 20,
 
     // user
     MessageType.Information -> 1000,
     MessageType.NewChatMessage -> 20,
-
+    MessageType.FriendRegistered -> 5
+    
     MessageType.BattleRequestAccepted -> 1000,
     MessageType.BattleRequestRejected -> 1000
   )
@@ -35,6 +36,7 @@ object MessageMetaInfo  {
     // user
     MessageType.Information -> "NOTIFICATION_INFORMATION",
     MessageType.NewChatMessage -> "NOTIFICATION_NEW_CHAT_MESSAGE",
+    MessageType.FriendRegistered -> "NOTIFICATION_FRIEND_REGISTERED"
 
     MessageType.BattleRequestAccepted -> "",
     MessageType.BattleRequestRejected -> ""

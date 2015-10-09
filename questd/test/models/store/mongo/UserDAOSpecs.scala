@@ -873,6 +873,17 @@ class UserDAOSpecs extends BaseDAOSpecs {
       ou3.get.banned must beEqualTo(List.empty)
     }
 
+    "Setting notification about registration flag works correctly" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val user = createUserStub()
+
+      db.user.create(user)
+
+      user.stats.friendsNotifiedAboutRegistration must beEqualTo(false)
+      val ou1 = db.user.setFriendsNotifiedAboutRegistrationFlag(user.id, flag = true)
+      ou1.get.stats.friendsNotifiedAboutRegistration must beEqualTo(true)
+    }
   }
 }
 
