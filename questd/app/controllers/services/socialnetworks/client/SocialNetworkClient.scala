@@ -46,4 +46,11 @@ trait SocialNetworkClient {
    * @return List of ids in other apps.
    */
   def fetchIdsInOtherApps(token: String): List[UserIdInApplication]
-}
+
+
+  /**
+   * @param token Token we use for auth.
+   * @return List of permissions user has gave us.
+   */
+  def fetchPermissions(token: String): List[Permission.Value]
+ }

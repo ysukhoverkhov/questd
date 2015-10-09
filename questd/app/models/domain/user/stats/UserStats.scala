@@ -42,5 +42,10 @@ case class UserStats (
   /**
    * All voted battles. Value is id of solution in battle we voted for.
    */
-  votedBattles: Map[String, String] = Map.empty
+  votedBattles: Map[String, String] = Map.empty,
+
+  /**
+   * Are friends notified about our join to the game.
+   */
+  friendsNotifiedAboutRegistration: Boolean = false
   )
