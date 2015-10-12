@@ -30,7 +30,6 @@ class FriendsAPISpecs extends BaseAPISpecs {
       there was one (user).removeFromFollowing(requester.id, responder.id)
     }
 
-
     "createFriendship creates friendship with correct references" in context {
       val u = createUserStub()
       val friend = createUserStub()
@@ -69,5 +68,24 @@ class FriendsAPISpecs extends BaseAPISpecs {
           referredWithContentId = Some(contentId))
         ))
     }
+
+    "Asking friendship generates reject if we are banned" in context {
+
+      val we = createUserStub()
+      val friend = createUserStub(banned = List(we.id), friends = List(Friendship(we.id, FriendshipStatus.Invites)))
+
+      db.user.readById(friend.id) returns Some(friend)
+      db.user.readById(we.id) returns Some(we)
+      doReturn(OkApiResult(AdjustAssetsResult(we))).when(api).adjustAssets(any)
+      doReturn(OkApiResult(SendMessageResult(we))).when(api).sendMessage(any)
+
+      val result = api.askFriendship(AskFriendshipRequest(we, friend.id))
+
+      result must beAnInstanceOf[OkApiResult[AskFriendshipResult]]
+
+      there was one (user).removeFriendship(any, any)
+      there was one (api).sendMessage(any)
+    }
+
   }
 }
