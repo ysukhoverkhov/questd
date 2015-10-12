@@ -11,7 +11,7 @@ trait MongoUserTutorialDAO extends UserTutorialDAO {
   this: BaseMongoDAO[User] =>
 
   /**
-   *
+   * @inheritdoc
    */
   def addClosedTutorialElement(id: String, platform: String, elementId: String): Option[User] = {
     findAndModify(
@@ -22,7 +22,7 @@ trait MongoUserTutorialDAO extends UserTutorialDAO {
   }
 
   /**
-   *
+   * @inheritdoc
    */
   def addTutorialTaskAssigned(id: String, platform: String, taskId: String): Option[User] = {
     findAndModify(
