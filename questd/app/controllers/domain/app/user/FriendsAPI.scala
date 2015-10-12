@@ -120,7 +120,9 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
                 // remove this soplia whn check in logic will be implemented.
                 if (potentialFriend.banned.contains(r.user.id)) {
-                  respondFriendship(RespondFriendshipRequest(potentialFriend, r.user.id, accept = false))
+                  db.user.readById(potentialFriend.id).fold() { updatedFriend =>
+                    respondFriendship(RespondFriendshipRequest(updatedFriend, r.user.id, accept = false))
+                  }
                 }
 
                 OkApiResult(AskFriendshipResult(OK, Some(r.user.profile)))
