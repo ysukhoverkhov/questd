@@ -4,6 +4,7 @@ import models.domain.user.User
 import models.domain.user.demo.UserDemographics
 import models.store.mongo.BaseDAOSpecs
 import play.api.test.WithApplication
+import testhelpers.domainstubs._
 
 /**
  * MongoUserProfileDAO specs
@@ -66,6 +67,19 @@ trait MongoUserProfileDAOSpecs { this: BaseDAOSpecs =>
       val ou3 = db.user.readById(userid3)
       ou3 must beSome.which((u: User) => u.id.toString == userid3)
       ou3 must beSome.which((u: User) => u.demo.cultureId.contains(oldC + "1"))
+    }
+
+    "setUserSource works" in new WithApplication(appWithTestDatabase) {
+      db.user.clear()
+
+      val source = "source!"
+
+      val userStub = createUserStub()
+      db.user.create(userStub)
+
+      val ou = db.user.setUserSource(userStub.id, source)
+
+      ou must beSome.which((u: User) => u.profile.analytics.source.contains(source))
     }
   }
 }
