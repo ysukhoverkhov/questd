@@ -7,8 +7,8 @@ import controllers.domain.helpers._
 import models.domain.solution.Solution
 import models.domain.user.User
 import models.domain.user.battlerequests.{BattleRequest, BattleRequestStatus}
-import models.domain.user.message.{MessageBattleRequestRejected, MessageBattleRequestAccepted}
-import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.message.{MessageBattleRequestAccepted, MessageBattleRequestRejected}
+import models.domain.user.profile.{Profile, TaskType}
 import models.view.SolutionView
 import play.Logger
 

@@ -1,9 +1,9 @@
 package controllers.domain.admin
 
-import models.domain.admin._
+import components._
 import controllers.domain._
 import controllers.domain.helpers._
-import components._
+import models.domain.admin._
 
 case class GetConfigSectionRequest(name: String)
 case class GetConfigSectionResult(section: Option[ConfigSection])

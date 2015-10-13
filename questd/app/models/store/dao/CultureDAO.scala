@@ -1,6 +1,5 @@
 package models.store.dao
 
-import models.domain._
 import models.domain.culture.Culture
 
 trait CultureDAO extends BaseDAO[Culture] {

@@ -3,7 +3,6 @@ package controllers.domain.admin
 import components.DBAccessor
 import controllers.domain._
 import controllers.domain.helpers._
-import models.domain._
 import models.domain.battle.Battle
 import play.Logger
 

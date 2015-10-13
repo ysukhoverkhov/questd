@@ -1,15 +1,15 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
+import controllers.domain.{DomainAPIComponent, _}
 import controllers.services.socialnetworks.client.{User => SNUser}
 import models.domain.common.Assets
 import models.domain.user._
-import models.domain.user.friends.{ReferralStatus, FriendshipStatus, Friendship}
+import models.domain.user.friends.{Friendship, FriendshipStatus, ReferralStatus}
 import models.domain.user.message.{MessageFriendshipAccepted, MessageFriendshipRemoved}
-import models.domain.user.profile.{TaskType, Profile}
+import models.domain.user.profile.{Profile, TaskType}
 import play.Logger
 
 case class GetFriendsRequest(

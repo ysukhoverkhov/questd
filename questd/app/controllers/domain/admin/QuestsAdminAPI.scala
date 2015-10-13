@@ -1,10 +1,10 @@
 package controllers.domain.admin
 
-import models.domain.quest.{QuestStatus, Quest}
-import play.Logger
 import components.DBAccessor
-import controllers.domain.helpers._
 import controllers.domain._
+import controllers.domain.helpers._
+import models.domain.quest.{Quest, QuestStatus}
+import play.Logger
 
 case class AllQuestsRequest()
 case class AllQuestsResult(quests: Iterator[Quest])

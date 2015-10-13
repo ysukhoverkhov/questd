@@ -1,9 +1,8 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.helpers._
-import models.domain._
+import controllers.domain.{DomainAPIComponent, _}
 import models.domain.user.User
 
 case class ShiftStatsRequest(user: User)

@@ -6,11 +6,11 @@ import models.domain.common.ClientPlatform
 import models.domain.tutorial._
 import org.json4s.ext.EnumNameSerializer
 import play.api.Logger
+import play.api.Play.current
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc._
-import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import play.api.mvc._
 
 case class TutorialEntityTypeForm(
   entityType: String)

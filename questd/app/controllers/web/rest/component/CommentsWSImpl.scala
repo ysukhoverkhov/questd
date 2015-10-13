@@ -1,6 +1,6 @@
 package controllers.web.rest.component
 
-import controllers.domain.app.comment.{GetCommentsForObjectRequest, PostCommentRequest, GetCommentsForObjectResult, PostCommentResult}
+import controllers.domain.app.comment.{GetCommentsForObjectRequest, GetCommentsForObjectResult, PostCommentRequest, PostCommentResult}
 import controllers.web.helpers._
 
 private object CommentsWSImplTypes {

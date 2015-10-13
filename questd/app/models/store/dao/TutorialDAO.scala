@@ -1,7 +1,6 @@
 package models.store.dao
 
-import models.domain._
-import models.domain.tutorial.{TutorialElement, Tutorial}
+import models.domain.tutorial.{Tutorial, TutorialElement}
 
 trait TutorialDAO extends BaseDAO[Tutorial] {
 

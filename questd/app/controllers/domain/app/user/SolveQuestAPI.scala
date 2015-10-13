@@ -7,9 +7,9 @@ import controllers.domain.app.quest.SolveQuestUpdateRequest
 import controllers.domain.helpers._
 import models.domain.solution.{Solution, SolutionInfo, SolutionInfoContent, SolutionStatus}
 import models.domain.user._
-import models.domain.user.profile.{TaskType, Profile}
-import models.domain.user.timeline.{TimeLineType, TimeLineReason}
-import models.view.{SolutionView, QuestView}
+import models.domain.user.profile.{Profile, TaskType}
+import models.domain.user.timeline.{TimeLineReason, TimeLineType}
+import models.view.{QuestView, SolutionView}
 import play.Logger
 
 import scala.language.postfixOps

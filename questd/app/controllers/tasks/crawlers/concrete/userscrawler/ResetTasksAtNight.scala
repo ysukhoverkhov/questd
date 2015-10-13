@@ -1,12 +1,12 @@
 package controllers.tasks.crawlers.concrete.userscrawler
 
+import java.util.Date
+
 import akka.actor.Props
+import components.random.RandomComponent
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.tasks.crawlers.base.BaseCrawler
-import models.domain._
-import java.util.Date
-import components.random.RandomComponent
 import models.domain.user.User
 
 object ResetTasksAtNight {

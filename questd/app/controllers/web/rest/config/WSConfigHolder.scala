@@ -1,7 +1,6 @@
 package controllers.web.rest.config
 
-import components.ConfigHolder
-import components.APIAccessor
+import components.{APIAccessor, ConfigHolder}
 import models.domain.admin.ConfigSection
 
 trait WSConfigHolder extends ConfigHolder { this: APIAccessor =>

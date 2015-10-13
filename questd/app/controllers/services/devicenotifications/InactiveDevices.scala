@@ -7,10 +7,11 @@ import akka.pattern.AskTimeoutException
 import akka.routing.RoundRobinPool
 import akka.util.Timeout
 import com.vita.akka.cake.ActorContextCreationSupport
-import controllers.services.devicenotifications.InactiveDevices.{GetInactiveDevicesRequest, IOSDevice, GetInactiveDevicesResult}
-import controllers.services.devicenotifications.apple.AppleInactiveDevices.{GetAppleInactiveDevicesRequest, GetAppleInactiveDevicesResult}
+import controllers.services.devicenotifications.InactiveDevices.{GetInactiveDevicesRequest, GetInactiveDevicesResult, IOSDevice}
 import controllers.services.devicenotifications.apple.AppleInactiveDevices
+import controllers.services.devicenotifications.apple.AppleInactiveDevices.{GetAppleInactiveDevicesRequest, GetAppleInactiveDevicesResult}
 import play.Logger
+
 import scala.concurrent.duration._
 
 object InactiveDevices {

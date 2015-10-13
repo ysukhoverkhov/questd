@@ -4,8 +4,8 @@ import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
-import models.domain.common.{ClientPlatform, Assets}
-import models.domain.tutorial.{TutorialServerActionType, TutorialServerAction, TutorialElement}
+import models.domain.common.{Assets, ClientPlatform}
+import models.domain.tutorial.{TutorialElement, TutorialServerAction, TutorialServerActionType}
 import models.domain.user._
 import models.domain.user.profile.{DailyTasks, Profile, Task, TutorialState}
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}

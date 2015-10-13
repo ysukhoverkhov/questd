@@ -8,8 +8,8 @@ import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.user.MakeTaskRequest
 import controllers.domain.helpers._
 import models.domain.comment.{Comment, CommentInfo}
-import models.domain.user.profile.{TaskType, Profile}
 import models.domain.user.User
+import models.domain.user.profile.{Profile, TaskType}
 import models.view.CommentView
 
 

@@ -1,7 +1,7 @@
 package models.store.mongo
 
 import models.store._
-import dao._
+import models.store.mongo.dao._
 
 trait MongoDatabaseComponent extends DatabaseComponent {
 

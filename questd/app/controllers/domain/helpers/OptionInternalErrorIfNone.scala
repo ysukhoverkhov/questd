@@ -1,7 +1,6 @@
 package controllers.domain.helpers
 
-import controllers.domain.InternalErrorApiResult
-import controllers.domain.ApiResult
+import controllers.domain.{ApiResult, InternalErrorApiResult}
 
 
 class OptionInternalErrorIfNone [T] (val option: Option[T]) {

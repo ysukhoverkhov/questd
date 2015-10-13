@@ -4,7 +4,7 @@ import components._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
-import controllers.services.socialnetworks.client.{User => SNUser, Permission}
+import controllers.services.socialnetworks.client.{Permission, User => SNUser}
 import models.domain.common.Assets
 import models.domain.user.User
 import models.domain.user.message.MessageFriendRegistered

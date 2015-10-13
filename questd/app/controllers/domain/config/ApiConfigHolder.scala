@@ -1,7 +1,6 @@
 package controllers.domain.config
 
-import components.ConfigHolder
-import components.APIAccessor
+import components.{APIAccessor, ConfigHolder}
 import models.domain.admin.ConfigSection
 
 class _DefaultConfigParams {

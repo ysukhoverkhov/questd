@@ -53,7 +53,7 @@ private[domain] trait VoteBattleAPI {
                     OkApiResult(VoteBattleByUserResult(
                       allowed = OK,
                       profile = Some(r.user.profile),
-                      modifiedBattles = List(BattleView(b, user)))) // TODO: replace with "u" after tests.
+                      modifiedBattles = List(BattleView(b, r.user))))
                   }
                 }
 

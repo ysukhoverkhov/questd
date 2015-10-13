@@ -1,12 +1,12 @@
 package logic.user
 
+import com.github.nscala_time.time.Imports._
 import controllers.domain.app.protocol.ProfileModificationResult._
 import logic._
 import models.domain.common.Assets
-import models.domain.solution.{SolutionStatus, Solution}
+import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.profile.Functionality
 import org.joda.time.DateTime
-import com.github.nscala_time.time.Imports._
 
 /**
  * All battle challenges related logic.

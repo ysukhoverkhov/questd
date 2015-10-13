@@ -33,9 +33,10 @@ class AppleInactiveDevices extends Actor with APNSService {
 
     case GetAppleInactiveDevicesRequest =>
 
-      import scala.collection.JavaConversions._
       import akka.pattern.pipe
-      import context.dispatcher // get network requests dispatcher here.
+      import context.dispatcher
+
+      import scala.collection.JavaConversions._ // get network requests dispatcher here.
 
       Future {
         GetAppleInactiveDevicesResult(service.getInactiveDevices.toMap)

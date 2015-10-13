@@ -1,11 +1,10 @@
 package controllers.tasks.crawlers.concrete.userscrawler
 
 import akka.actor.Props
+import components.random.RandomComponent
 import controllers.domain._
 import controllers.domain.app.user._
 import controllers.tasks.crawlers.base.BaseCrawler
-import models.domain._
-import components.random.RandomComponent
 import models.domain.user.User
 
 object ShiftUserStats {

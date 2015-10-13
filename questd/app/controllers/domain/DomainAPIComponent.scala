@@ -1,21 +1,20 @@
 package controllers.domain
 
-import controllers.domain.app.battle.{BattleFetchAPI, BattleAPI}
-import controllers.domain.app.comment.CommentsAPI
-import controllers.domain.app.theme.ThemeFetchAPI
-import controllers.services.devicenotifications.DeviceNotificationsComponent
-import models.store._
 import components._
-import controllers.domain.app.user._
-import controllers.domain.app.quest._
-import controllers.domain.app.solution._
-import controllers.domain.admin._
-import controllers.domain.config.ApiConfigHolder
-import controllers.domain.app.misc.MiscAPI
-import logic.LogicBootstrapper
 import components.random.RandomComponent
-import controllers.domain.app.quest.QuestsFetchAPI
+import controllers.domain.admin._
+import controllers.domain.app.battle.{BattleAPI, BattleFetchAPI}
+import controllers.domain.app.comment.CommentsAPI
+import controllers.domain.app.misc.MiscAPI
+import controllers.domain.app.quest.{QuestsFetchAPI, _}
+import controllers.domain.app.solution._
+import controllers.domain.app.theme.ThemeFetchAPI
+import controllers.domain.app.user._
+import controllers.domain.config.ApiConfigHolder
+import controllers.services.devicenotifications.DeviceNotificationsComponent
 import controllers.services.socialnetworks.component.SocialNetworkComponent
+import logic.LogicBootstrapper
+import models.store._
 import play.libs.Akka
 
 trait DomainAPIComponent { component: DatabaseComponent with RandomComponent with SocialNetworkComponent =>

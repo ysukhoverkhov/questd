@@ -1,9 +1,8 @@
 package models.store.mongo.dao
 
 import models.domain.tutorialtask.TutorialTask
-import models.store.mongo.helpers._
 import models.store.dao._
-import models.domain._
+import models.store.mongo.helpers._
 
 /**
  * DOA for Tutorial tasks objects
