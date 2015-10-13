@@ -1,8 +1,8 @@
 package models.store.mongo
 
 import com.novus.salat._
-import play.api._
 import play.api.Play.current
+import play.api._
 
 private[mongo] object SalatContext {
   implicit val ctx = {

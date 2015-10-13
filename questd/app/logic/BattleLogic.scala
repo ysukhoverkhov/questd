@@ -4,7 +4,7 @@ import java.util.Date
 
 import com.github.nscala_time.time.Imports._
 import controllers.domain.DomainAPIComponent
-import models.domain.battle.{BattleSide, Battle}
+import models.domain.battle.{Battle, BattleSide}
 import org.joda.time.DateTime
 
 class BattleLogic(

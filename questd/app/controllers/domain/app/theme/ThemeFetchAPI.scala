@@ -3,7 +3,6 @@ package controllers.domain.app.theme
 import components.DBAccessor
 import controllers.domain._
 import controllers.domain.helpers._
-import models.domain._
 import models.domain.tag.Theme
 
 

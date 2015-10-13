@@ -1,9 +1,9 @@
 package controllers.web.admin.component
 
-import controllers.domain.{OkApiResult, DomainAPIComponent}
 import controllers.domain.admin._
-import play.api.mvc._
+import controllers.domain.{DomainAPIComponent, OkApiResult}
 import models.domain.admin._
+import play.api.mvc._
 
 class ConfigImpl (val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 

@@ -1,6 +1,6 @@
 package controllers.services.socialnetworks.facebook
 
-import controllers.services.socialnetworks.client.{Permission, UserIdInApplication, Invitation, User}
+import controllers.services.socialnetworks.client.{Invitation, Permission, User, UserIdInApplication}
 import models.domain.user.profile.Gender
 
 private[socialnetworks] class UserFacebook(

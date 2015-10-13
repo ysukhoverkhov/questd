@@ -1,18 +1,18 @@
 package controllers.web.rest.component
 
+import components._
 import controllers.domain.OkApiResult
-import controllers.domain.app.user.{LoginResult, LoginRequest}
-import controllers.services.socialnetworks.exception.{SocialNetworkClientNotFound, NetworkException, AuthException}
+import controllers.domain.app.user.{LoginRequest, LoginResult}
+import controllers.services.socialnetworks.exception.{AuthException, NetworkException, SocialNetworkClientNotFound}
 import controllers.web.helpers._
 import controllers.web.rest.config.WSConfigHolder
+import org.json4s.MappingException
+import play.api._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
+import play.api.mvc._
 
 import scala.concurrent.Future
-import play.api._
-import play.api.mvc._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import components._
-import org.json4s.MappingException
 
 private [component] object LoginWSImplTypes {
 

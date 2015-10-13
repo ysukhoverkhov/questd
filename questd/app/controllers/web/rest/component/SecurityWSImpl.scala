@@ -19,8 +19,8 @@ private object SecurityWSImplTypes {
 
 trait SecurityWSImpl extends InternalErrorLogger { this: APIAccessor =>
 
-  import controllers.web.rest.component.LoginWSImplTypes._
   import SecurityWSImplTypes._
+  import controllers.web.rest.component.LoginWSImplTypes._
 
   // Store Auth Info
   def storeAuthInfoInResult(result: Result, session: String) = {

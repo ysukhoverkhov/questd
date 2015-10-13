@@ -1,20 +1,19 @@
 package controllers.domain.app.user
 
-import controllers.domain.app.quest.GetMyQuestsRequest
-import controllers.domain.DomainAPIComponent
 import components._
-import controllers.domain._
+import controllers.domain.{DomainAPIComponent, _}
+import controllers.domain.app.quest.GetMyQuestsRequest
 import controllers.domain.helpers._
+import logic.constants._
 import models.domain.battle.Battle
 import models.domain.common.Assets
-import models.domain.quest.{QuestStatus, Quest}
+import models.domain.quest.{Quest, QuestStatus}
 import models.domain.solution.Solution
 import models.domain.user._
 import models.domain.user.dailyresults._
 import models.domain.user.message.MessageDailyResultsReady
 import models.domain.user.profile.Profile
 import play.Logger
-import logic.constants._
 
 case class ShiftDailyResultRequest(user: User)
 case class ShiftDailyResultResult(user: User)

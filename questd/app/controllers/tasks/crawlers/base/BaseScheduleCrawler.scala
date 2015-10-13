@@ -3,8 +3,8 @@ package controllers.tasks.crawlers.base
 import akka.actor.{Actor, Props}
 import com.vita.akka.EasyRestartActor
 import components.random.RandomComponent
-import controllers.tasks.messages.DoTask
 import controllers.domain._
+import controllers.tasks.messages.DoTask
 import play.Logger
 
 

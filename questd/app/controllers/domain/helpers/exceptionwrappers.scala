@@ -1,8 +1,8 @@
 package controllers.domain.helpers
 
+import controllers.domain._
 import models.store._
 import play.Logger
-import controllers.domain._
 
 object exceptionwrappers {
 

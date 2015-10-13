@@ -1,7 +1,7 @@
 package controllers.web.rest.component
 
+import controllers.domain.app.misc.{GetTimeRequest, GetTimeResult}
 import controllers.web.helpers._
-import controllers.domain.app.misc.{GetTimeResult, GetTimeRequest}
 
 private object MiscWSImplTypes {
   type WSGetTimeResult = GetTimeResult

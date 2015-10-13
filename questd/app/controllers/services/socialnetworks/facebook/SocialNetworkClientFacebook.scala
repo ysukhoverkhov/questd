@@ -6,7 +6,7 @@ import com.restfb.json.JsonObject
 import controllers.services.socialnetworks.client._
 import controllers.services.socialnetworks.exception.{AuthException, NetworkException}
 import controllers.services.socialnetworks.facebook.types.{AppPermission, UserIdWithApp}
-import play.{Play, Logger}
+import play.{Logger, Play}
 
 import scala.language.implicitConversions
 

@@ -2,8 +2,8 @@ package logic
 
 import logic.constants._
 import logic.internal.basefunctions._
-import logic.internal.gainratingfunctions._
 import logic.internal.gaincoinsfunctions._
+import logic.internal.gainratingfunctions._
 import logic.internal.spendcoinsfunctions._
 
 object functions {

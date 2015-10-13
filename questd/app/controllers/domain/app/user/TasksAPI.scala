@@ -1,11 +1,11 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.{DomainAPIComponent, _}
 import controllers.domain.helpers._
+import controllers.domain.{DomainAPIComponent, _}
 import models.domain.user._
 import models.domain.user.message.MessageTaskCompleted
-import models.domain.user.profile.{TaskType, Task, DailyTasks}
+import models.domain.user.profile.{DailyTasks, Task, TaskType}
 import play.Logger
 
 case class ResetDailyTasksRequest(user: User)

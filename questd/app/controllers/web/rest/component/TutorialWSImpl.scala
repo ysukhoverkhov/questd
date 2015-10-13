@@ -1,8 +1,8 @@
 package controllers.web.rest.component
 
+import com.vita.scala.extensions._
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import com.vita.scala.extensions._
 import models.domain.common.ClientPlatform
 
 private object TutorialWSImplTypes {

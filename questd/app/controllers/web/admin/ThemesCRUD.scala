@@ -1,10 +1,8 @@
 package controllers.web.admin
 
-import play.api._
-import play.api.mvc._
-
-import controllers.web.admin.component.AdminComponent
 import components.componentregistry.ComponentRegistrySingleton
+import controllers.web.admin.component.AdminComponent
+import play.api.mvc._
 
 object ThemesCRUD extends Controller {
 

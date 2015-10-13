@@ -1,6 +1,6 @@
 package logic.internal
 
-import basefunctions._
+import logic.internal.basefunctions._
 
 object gainratingfunctions {
 

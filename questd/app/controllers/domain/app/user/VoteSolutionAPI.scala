@@ -3,7 +3,7 @@ package controllers.domain.app.user
 import components._
 import controllers.domain._
 import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.domain.app.solution.{VoteSolutionResult, VoteSolutionRequest}
+import controllers.domain.app.solution.{VoteSolutionRequest, VoteSolutionResult}
 import controllers.domain.helpers._
 import models.domain.common.ContentVote
 import models.domain.user._

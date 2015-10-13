@@ -1,7 +1,7 @@
 package logic.user
 
 import com.github.nscala_time.time.Imports._
-import logic.{constants, UserLogic, functions}
+import logic.{UserLogic, constants, functions}
 import models.domain.user.dailyresults.DailyResult
 import models.domain.user.profile.Gender
 import org.joda.time.DateTime

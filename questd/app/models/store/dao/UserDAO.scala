@@ -1,7 +1,6 @@
 package models.store.dao
 
 import java.util.Date
-import javax.mail.Flags.Flag
 
 import models.domain.common.{Assets, ContentVote}
 import models.domain.user._
@@ -13,7 +12,7 @@ import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
 import models.domain.user.profile.{DailyTasks, Rights, Task}
 import models.domain.user.stats.SolutionsInBattle
-import models.domain.user.timeline.{TimeLineReason, TimeLineEntry}
+import models.domain.user.timeline.{TimeLineEntry, TimeLineReason}
 import models.view.QuestView
 
 // TODO: split it on several traits in 0.50.

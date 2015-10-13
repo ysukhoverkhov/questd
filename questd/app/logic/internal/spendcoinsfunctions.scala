@@ -1,10 +1,9 @@
 package logic.internal
 
 import logic.constants._
-import basefunctions._
+import logic.internal.basefunctions._
 import models.domain.user.profile.Functionality
-import Functionality._
-import models.domain.user.profile.Functionality
+import models.domain.user.profile.Functionality._
 
 object spendcoinsfunctions {
 

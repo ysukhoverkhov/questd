@@ -2,7 +2,7 @@ package models.domain.tutorialtask
 
 import models.domain.base.ID
 import models.domain.common.Assets
-import models.domain.user.profile.{TaskType, Task}
+import models.domain.user.profile.{Task, TaskType}
 
 /**
  * Task created by tutorial script.

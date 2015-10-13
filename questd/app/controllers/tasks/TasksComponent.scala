@@ -1,12 +1,12 @@
 package controllers.tasks
 
-import controllers.tasks.crawlers.schedulers._
-import play.api.libs.concurrent.Akka
-import play.api.Play.current
-import controllers.domain.DomainAPIComponent
 import components._
-import controllers.tasks.config.TasksConfigHolder
 import components.random.RandomComponent
+import controllers.domain.DomainAPIComponent
+import controllers.tasks.config.TasksConfigHolder
+import controllers.tasks.crawlers.schedulers._
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
 
 trait TasksComponent { component: DomainAPIComponent with RandomComponent =>
 

@@ -4,8 +4,8 @@ import java.util.Date
 
 import controllers.domain.app.protocol.ProfileModificationResult._
 import logic._
-import logic.functions._
 import logic.constants._
+import logic.functions._
 import models.domain.common.Assets
 import models.domain.common.ContentType._
 import models.domain.quest.QuestInfoContent

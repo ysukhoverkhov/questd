@@ -1,7 +1,6 @@
 package controllers.tasks.config
 
-import components.ConfigHolder
-import components.APIAccessor
+import components.{APIAccessor, ConfigHolder}
 import models.domain.admin.ConfigSection
 
 trait TasksConfigHolder extends ConfigHolder { this: APIAccessor =>

@@ -1,9 +1,9 @@
 package controllers.web.rest.component
 
-import controllers.domain.DomainAPIComponent
 import components._
-import controllers.web.rest.config.WSConfigHolder
+import controllers.domain.DomainAPIComponent
 import controllers.services.socialnetworks.component.SocialNetworkComponent
+import controllers.web.rest.config.WSConfigHolder
 
 trait WSComponent { component: DomainAPIComponent with SocialNetworkComponent =>
 

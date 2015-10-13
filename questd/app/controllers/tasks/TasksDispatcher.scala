@@ -48,6 +48,7 @@ class TasksDispatcher(config: ConfigSection) extends Actor with EasyRestartActor
 
     import org.quartz.impl.StdSchedulerFactory
     import org.quartz.impl.matchers.GroupMatcher
+
     import scala.collection.JavaConversions._
 
     Thread.sleep(1000)

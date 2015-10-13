@@ -14,7 +14,7 @@ import models.domain.user.friends.Friendship
 import models.domain.user.message.Message
 import models.domain.user.profile.{DailyTasks, Rights, Task}
 import models.domain.user.stats.SolutionsInBattle
-import models.domain.user.timeline.{TimeLineReason, TimeLineEntry}
+import models.domain.user.timeline.{TimeLineEntry, TimeLineReason}
 import models.store.dao._
 import models.store.mongo.SalatContext._
 import models.store.mongo.helpers._
