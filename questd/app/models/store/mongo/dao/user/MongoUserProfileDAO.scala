@@ -118,4 +118,15 @@ trait MongoUserProfileDAO extends UserProfileDAO {
           "demo.cultureId" -> newCultureId)),
       multi = true)
   }
+
+  /**
+   * @inheritdoc
+   */
+  def setUserSource(id: String, userSource: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "profile.analytics.source" -> userSource)))
+  }
 }

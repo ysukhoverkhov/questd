@@ -2,14 +2,6 @@ package models.store.dao
 
 import models.domain.user._
 import models.store.dao.user._
-  /**
-   * Set user source for analytics
-   *
-   * @param id Id if user to set source to.
-   * @param userSource Sourece of a user.
-   */
-  def setUserSource(id: String, userSource: String): Option[User]
-
 
 trait UserDAO
   extends BaseDAO[User]

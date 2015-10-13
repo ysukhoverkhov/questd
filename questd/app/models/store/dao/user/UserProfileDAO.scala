@@ -26,4 +26,12 @@ trait UserProfileDAO {
   def setCountry(id: String, country: String): Option[User]
 
   def replaceCultureIds(oldCultureId: String, newCultureId: String): Unit
+
+  /**
+   * Set user source for analytics
+   *
+   * @param id Id if user to set source to.
+   * @param userSource Sourece of a user.
+   */
+  def setUserSource(id: String, userSource: String): Option[User]
 }

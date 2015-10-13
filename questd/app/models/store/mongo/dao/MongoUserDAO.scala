@@ -27,16 +27,5 @@ private[mongo] class MongoUserDAO
   with MongoUserAuthDAO
   with MongoUserProfileDAO
 
-    /**
-   * @inheritdoc
-   */
-  def setUserSource(id: String, userSource: String): Option[User] = {
-    findAndModify(
-      id,
-      MongoDBObject(
-        "$set" -> MongoDBObject(
-          "profile.analytics.source" -> userSource)))
-  }
-
 
 
