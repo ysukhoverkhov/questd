@@ -128,7 +128,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
           user.ratingToNextLevel,
           user.calculateRights) ifSome { user =>
 
-          rewardForFishingCrossPromotion(user)
+//          rewardForFishingCrossPromotion(user)
 
           OkApiResult(CheckIncreaseLevelResult(user))
         }

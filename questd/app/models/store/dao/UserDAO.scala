@@ -19,6 +19,14 @@ import models.view.QuestView
 // TODO: split it on several traits in 0.50.
 trait UserDAO extends BaseDAO[User] {
 
+  /**
+   * Set user source for analytics
+   *
+   * @param id Id if user to set source to.
+   * @param userSource Sourece of a user.
+   */
+  def setUserSource(id: String, userSource: String): Option[User]
+
   def updateSessionId(id: String, sessionId: String): Option[User]
 
   /**

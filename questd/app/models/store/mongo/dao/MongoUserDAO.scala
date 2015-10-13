@@ -28,6 +28,17 @@ private[mongo] class MongoUserDAO
   with UserDAO {
 
   /**
+   * @inheritdoc
+   */
+  def setUserSource(id: String, userSource: String): Option[User] = {
+    findAndModify(
+      id,
+      MongoDBObject(
+        "$set" -> MongoDBObject(
+          "profile.analytics.source" -> userSource)))
+  }
+
+  /**
    * Read by session id
    */
   def readBySessionId(sessionId: String): Option[User] = {

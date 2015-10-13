@@ -14,8 +14,8 @@ case class BattleView (
 object BattleView {
   def apply(b: Battle, u: User): BattleView = {
     BattleView(
-      b.id,
-      b.info,
-      u.stats.votedBattles.get(b.id))
+      id = b.id,
+      info = b.info,
+      myVotedSolutionId = u.stats.votedBattles.get(b.id))
   }
 }
