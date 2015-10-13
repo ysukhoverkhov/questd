@@ -22,6 +22,7 @@ trait DatabaseComponent {
     val comment: CommentDAO
     val conversation: ConversationDAO
     val chat: ChatMessageDAO
+    val challenge: ChallengeDAO
 
     val crawlerContext: CrawlerContextDAO
   }

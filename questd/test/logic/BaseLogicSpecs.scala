@@ -1,12 +1,13 @@
 package logic
 
-import components.{APIAccessor, RandomAccessor}
 import components.random.RandomComponent
+import components.{APIAccessor, RandomAccessor}
 import controllers.domain.DomainAPIComponent
-import controllers.domain.config.{_TutorialConfigParams, _DefaultConfigParams}
+import controllers.domain.config.{_DefaultConfigParams, _TutorialConfigParams}
 import controllers.services.socialnetworks.component.SocialNetworkComponent
 import models.domain.admin.ConfigSection
 import models.store.DatabaseComponent
+import models.store.dao.ChallengeDAO
 import org.specs2.mock.Mockito
 import org.specs2.mutable._
 
@@ -27,6 +28,8 @@ private[logic] abstract class BaseLogicSpecs extends Specification
   val db = mock[Database]
   val api = mock[DomainAPI]
   val rand = mock[Random]
+
+  val challenge = mock[ChallengeDAO]
 
   /**
    * Creates stub config for our tests.
@@ -96,9 +99,20 @@ private[logic] abstract class BaseLogicSpecs extends Specification
     configSection
   }
 
-  protected final def applyConfigMock(): Unit = {
+  private final def applyConfigMock(): Unit = {
     api.config returns createStubDefaultConfig
     api.configNamed("Tutorial") returns createStubTutorialConfig
+  }
+
+  object context extends org.specs2.mutable.Before {
+    def before = {
+      applyConfigMock()
+
+      api.db returns db
+      db.challenge returns challenge
+
+      api.user2Logic(any)
+    }
   }
 }
 
