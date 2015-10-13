@@ -39,7 +39,7 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
 
     val maxBannedSize = api.config(api.DefaultConfigParams.BannedUsersMaxLength).toInt
 
-    if (request.user.following.length >= maxBannedSize) {
+    if (user.banned.length >= maxBannedSize) {
       OkApiResult(BanUserResult(LimitExceeded))
     } else {
       // make task to optimize existence calls.
