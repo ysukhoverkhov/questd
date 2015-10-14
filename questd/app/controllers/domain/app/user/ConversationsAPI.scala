@@ -4,26 +4,45 @@ import java.util.Date
 
 import components._
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.helpers._
 import models.domain.chat.{ChatMessage, Conversation, Participant}
 import models.domain.user._
 import models.domain.user.message.{MessageNewChatMessage, MessageType}
 
+object CreateConversationCode extends Enumeration {
+  val OK = Value
+  val PeerNotFount = Value
+  val PeerBanned = Value
+  val UserBanned = Value
+}
 case class CreateConversationRequest(user: User, peerId: String)
-case class CreateConversationResult(allowed: ProfileModificationResult, conversationId: Option[String] = None)
+case class CreateConversationResult(allowed: CreateConversationCode.Value, conversationId: Option[String] = None)
 
+object LeaveConversationCode extends Enumeration {
+  val OK = Value
+  val ConversationNotFound = Value
+  val NotInConversation = Value
+}
 case class LeaveConversationRequest(user: User, conversationId: String)
-case class LeaveConversationResult(allowed: ProfileModificationResult)
+case class LeaveConversationResult(allowed: LeaveConversationCode.Value)
 
 case class GetMyConversationsRequest(user: User)
 case class GetMyConversationsResult(conversations: List[Conversation])
 
+object SendChatMessageCode extends Enumeration {
+  val OK = Value
+  val ConversationNotFound = Value
+  val MessageLengthLimitExceeded = Value
+}
 case class SendChatMessageRequest(user: User, conversationId: String, message: String)
-case class SendChatMessageResult(allowed: ProfileModificationResult)
+case class SendChatMessageResult(allowed: SendChatMessageCode.Value)
 
+object GetChatMessagesCode extends Enumeration {
+  val OK = Value
+  val ConversationNotFound = Value
+}
 case class GetChatMessagesRequest(user: User, conversationId: String, fromDate: Date, count: Int)
-case class GetChatMessagesResult(allowed: ProfileModificationResult, messages: Option[List[ChatMessage]] = None)
+case class GetChatMessagesResult(allowed: GetChatMessagesCode.Value, messages: Option[List[ChatMessage]] = None)
 
 
 private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -32,11 +51,12 @@ private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with
    * Creates or reuses conversation with a user.
    */
   def createConversation(request: CreateConversationRequest): ApiResult[CreateConversationResult] = handleDbException {
+    import CreateConversationCode._
     import request._
 
     db.conversation.findByAllParticipants(List(user.id, peerId)).toList.headOption.fold {
       db.user.readById(peerId).fold {
-        OkApiResult(CreateConversationResult(OutOfContent))
+        OkApiResult(CreateConversationResult(PeerNotFount))
       } {
         peer =>
           user.canConversateWith(peer) match {
@@ -61,17 +81,18 @@ private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with
    * Leaves a conversation. If conversation has no participants destroys it.
    */
   def leaveConversation(request: LeaveConversationRequest): ApiResult[LeaveConversationResult] = handleDbException {
+    import LeaveConversationCode._
     import request._
 
     db.conversation.readById(conversationId).fold {
-      OkApiResult(LeaveConversationResult(OutOfContent))
+      OkApiResult(LeaveConversationResult(ConversationNotFound))
     } { conversation =>
 
       if (conversation.participants.exists(_.userId == user.id)) {
         db.conversation.removeParticipant(conversation.id, user.id)
         OkApiResult(LeaveConversationResult(OK))
       } else {
-        OkApiResult(LeaveConversationResult(OutOfContent))
+        OkApiResult(LeaveConversationResult(NotInConversation))
       }
     }
   }
@@ -91,16 +112,17 @@ private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with
    * Adds new message to conversation.
    */
   def sendChatMessage(request: SendChatMessageRequest): ApiResult[SendChatMessageResult] = handleDbException {
+    import SendChatMessageCode._
     import request._
 
     val maxMessageLength = api.config(api.DefaultConfigParams.ChatMaxMessageLength).toInt
 
     if (message.length > maxMessageLength) {
-      OkApiResult(SendChatMessageResult(LimitExceeded))
+      OkApiResult(SendChatMessageResult(MessageLengthLimitExceeded))
     } else {
 
       db.conversation.readById(conversationId).fold {
-        OkApiResult(SendChatMessageResult(OutOfContent))
+        OkApiResult(SendChatMessageResult(ConversationNotFound))
       } { conversation =>
         db.chat.create(ChatMessage(
           senderId = user.id,
@@ -129,11 +151,12 @@ private[domain] trait ConversationsAPI { this: DomainAPIComponent#DomainAPI with
    * Adds new message to conversation.
    */
   def getChatMessages(request: GetChatMessagesRequest): ApiResult[GetChatMessagesResult] = handleDbException {
+    import GetChatMessagesCode._
+
     val count = adjustedPageSize(request.count)
 
     db.conversation.readById(request.conversationId).fold {
-      OkApiResult(GetChatMessagesResult(
-        OutOfContent))
+      OkApiResult(GetChatMessagesResult(ConversationNotFound))
     } { conversation =>
 
       db.conversation.setUnreadMessagesFlag(conversation.id, request.user.id, flag = false)
