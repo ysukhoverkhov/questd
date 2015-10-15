@@ -4,13 +4,13 @@ import java.util.Date
 
 import components._
 import controllers.domain._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import models.domain.chat.{ChatMessage, Conversation, Participant}
 import models.domain.user._
 import models.domain.user.message.{MessageNewChatMessage, MessageType}
 
-object CreateConversationCode extends Enumeration {
-  val OK = Value
+object CreateConversationCode extends Enumeration  with CommonCode {
   val PeerNotFount = Value
   val PeerBanned = Value
   val UserBanned = Value
@@ -18,8 +18,7 @@ object CreateConversationCode extends Enumeration {
 case class CreateConversationRequest(user: User, peerId: String)
 case class CreateConversationResult(allowed: CreateConversationCode.Value, conversationId: Option[String] = None)
 
-object LeaveConversationCode extends Enumeration {
-  val OK = Value
+object LeaveConversationCode extends Enumeration with CommonCode {
   val ConversationNotFound = Value
   val NotInConversation = Value
 }
@@ -29,16 +28,14 @@ case class LeaveConversationResult(allowed: LeaveConversationCode.Value)
 case class GetMyConversationsRequest(user: User)
 case class GetMyConversationsResult(conversations: List[Conversation])
 
-object SendChatMessageCode extends Enumeration {
-  val OK = Value
+object SendChatMessageCode extends Enumeration with CommonCode  {
   val ConversationNotFound = Value
   val MessageLengthLimitExceeded = Value
 }
 case class SendChatMessageRequest(user: User, conversationId: String, message: String)
 case class SendChatMessageResult(allowed: SendChatMessageCode.Value)
 
-object GetChatMessagesCode extends Enumeration {
-  val OK = Value
+object GetChatMessagesCode extends Enumeration with CommonCode  {
   val ConversationNotFound = Value
 }
 case class GetChatMessagesRequest(user: User, conversationId: String, fromDate: Date, count: Int)

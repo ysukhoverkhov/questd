@@ -2,6 +2,7 @@ package controllers.domain.app.challenge
 
 import components._
 import controllers.domain._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.user.{CreateBattleRequest, MakeTaskRequest, SendMessageRequest}
 import controllers.domain.helpers._
@@ -13,12 +14,19 @@ import models.domain.user.profile.{Profile, TaskType}
 import models.view.{QuestView, SolutionView}
 import play.Logger
 
+
+object MakeQuestChallengeCode extends Enumeration with CommonCode {
+  val QuestNotFound = Value
+  val OpponentAlreadyChallenged = Value
+  val QuestNotInRotation = Value
+  val OpponentNotAFriend = Value
+}
 case class MakeQuestChallengeRequest(
   user: User,
   opponentId: String,
   myQuestId: String)
 case class MakeQuestChallengeResult(
-  allowed: ProfileModificationResult,
+  allowed: MakeQuestChallengeCode.Value,
   profile: Option[Profile] = None,
   modifiedQuests: List[QuestView] = List.empty)
 
@@ -85,9 +93,10 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
    */
   def makeQuestChallenge(request: MakeQuestChallengeRequest): ApiResult[MakeQuestChallengeResult] = handleDbException {
     import request._
+    import MakeQuestChallengeCode._
 
     db.quest.readById(myQuestId).fold[ApiResult[MakeQuestChallengeResult]] {
-      OkApiResult(MakeQuestChallengeResult(OutOfContent))
+      OkApiResult(MakeQuestChallengeResult(QuestNotFound))
     } { myQuest =>
       user.canChallengeWithQuest(opponentId = opponentId, myQuest = myQuest) match {
         case OK =>

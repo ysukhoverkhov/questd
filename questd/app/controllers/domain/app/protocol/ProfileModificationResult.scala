@@ -1,17 +1,11 @@
 package controllers.domain.app.protocol
 
-object ProfileModificationResult extends Enumeration {
-  type ProfileModificationResult = Value
 
+trait CommonCode { this: Enumeration =>
   /**
    * Modification has been made.
    */
   val OK = Value
-
-  /**
-   * Profile is incomplete and this call is not allowed because of this.
-   */
-  val IncompleteBio = Value
 
   /**
    * We do not have rights to perform this actions.
@@ -22,6 +16,16 @@ object ProfileModificationResult extends Enumeration {
    * Not enough assets to perform the action (not enough money or coins)
    */
   val NotEnoughAssets = Value
+
+  /**
+   * Profile is incomplete and this call is not allowed because of this.
+   */
+  val IncompleteBio = Value
+}
+
+// TODO: remove me and rename file.
+object ProfileModificationResult extends Enumeration with CommonCode {
+  type ProfileModificationResult = Value
 
   /**
    * This actions can't be performed since to little time has passed since last one.

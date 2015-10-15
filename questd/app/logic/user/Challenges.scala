@@ -1,6 +1,7 @@
 package logic.user
 
 import com.github.nscala_time.time.Imports._
+import controllers.domain.app.challenge.MakeQuestChallengeCode
 import controllers.domain.app.protocol.ProfileModificationResult._
 import logic._
 import models.domain.challenge.{ChallengeStatus, Challenge}
@@ -69,18 +70,20 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-  def canChallengeWithQuest(opponentId: String, myQuest: Quest) = {
+  def canChallengeWithQuest(opponentId: String, myQuest: Quest): MakeQuestChallengeCode.Value = {
+    import MakeQuestChallengeCode._
+
     lazy val myQuestExists = user.stats.createdQuests.contains(myQuest.id)
     lazy val isMyFriend = user.friends.exists(f => f.friendId == opponentId && f.status == FriendshipStatus.Accepted)
 
     if (hasChallengeForQuest(user.id, opponentId: String, myQuest.id))
-      InvalidState
+      OpponentAlreadyChallenged
     else if (myQuest.status != QuestStatus.InRotation)
-      InvalidState
+      QuestNotInRotation
     else if (!myQuestExists)
-      OutOfContent
+      QuestNotFound
     else if (!isMyFriend)
-      InvalidState
+      OpponentNotAFriend
     else if (!user.profile.rights.unlockedFunctionality.contains(Functionality.ChallengeBattles))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costToChallengeBattle))
