@@ -4,7 +4,7 @@ import java.util.Date
 
 import components._
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.app.user.MakeTaskRequest
 import controllers.domain.helpers._
 import models.domain.comment.{Comment, CommentInfo}
@@ -12,17 +12,24 @@ import models.domain.user.User
 import models.domain.user.profile.{Profile, TaskType}
 import models.view.CommentView
 
-
+object PostCommentCode extends Enumeration with CommonCode {
+  val CommentLengthLimitExceeded = Value
+  val CommentToRespondNotFound = Value
+  val ObjectNotFound = Value
+}
 case class PostCommentRequest(
   user: User,
   commentedObjectId: String,
   respondedCommentId: Option[String],
   message: String)
 case class PostCommentResult(
-  allowed: ProfileModificationResult,
+  allowed: PostCommentCode.Value,
   profile: Option[Profile] = None)
 
 
+object GetCommentsForObjectCode extends Enumeration with CommonCode {
+
+}
 case class GetCommentsForObjectRequest(
   user: User,
   commentedObjectId: String,
@@ -30,7 +37,7 @@ case class GetCommentsForObjectRequest(
   pageSize: Int,
   untilCommentId: Option[String])
 case class GetCommentsForObjectResult(
-  allowed: ProfileModificationResult,
+  allowed: GetCommentsForObjectCode.Value,
   comments: List[CommentView],
   hasMore: Boolean)
 
@@ -41,6 +48,8 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
    * Post a comment to an object.
    */
   def postComment(request: PostCommentRequest): ApiResult[PostCommentResult] = handleDbException {
+
+    import PostCommentCode._
 
     lazy val charLimitExceeded = request.message.length > config(api.DefaultConfigParams.CommentsMaxLength).toInt
 
@@ -56,9 +65,11 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
     }
 
     if (charLimitExceeded)
-      OkApiResult(PostCommentResult(LimitExceeded))
-    else if (respondNotFound || objectNotFound)
-      OkApiResult(PostCommentResult(OutOfContent))
+      OkApiResult(PostCommentResult(CommentLengthLimitExceeded))
+    else if (respondNotFound)
+      OkApiResult(PostCommentResult(CommentToRespondNotFound))
+    else if (objectNotFound)
+      OkApiResult(PostCommentResult(ObjectNotFound))
     else {
       db.comment.create(Comment(info = CommentInfo(
         commentedObjectId = request.commentedObjectId,
@@ -78,6 +89,8 @@ private[domain] trait CommentsAPI { this: DomainAPIComponent#DomainAPI with DBAc
    * Get comments for objects.
    */
   def getCommentsForObject(request: GetCommentsForObjectRequest): ApiResult[GetCommentsForObjectResult] = handleDbException {
+    import GetCommentsForObjectCode._
+
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
