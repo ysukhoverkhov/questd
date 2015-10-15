@@ -5,7 +5,6 @@ import controllers.domain.app.challenge._
 import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.challenge.ChallengeStatus
 import models.domain.user.friends.{Friendship, FriendshipStatus}
-import org.mockito.Mockito._
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
@@ -66,7 +65,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
 
       val result = api.acceptChallenge(AcceptChallengeRequest(me, challengeId, solutionId))
 
-      result must beEqualTo(OkApiResult(AcceptChallengeResult(ProfileModificationResult.OutOfContent)))
+      result must beEqualTo(OkApiResult(AcceptChallengeResult(AcceptChallengeCode.ChallengeNotFound)))
     }
 
     "Do not accept not existing solutions" in context {
@@ -80,7 +79,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
 
       val result = api.acceptChallenge(AcceptChallengeRequest(me, challengeId, mySolutionId))
 
-      result must beEqualTo(OkApiResult(AcceptChallengeResult(ProfileModificationResult.OutOfContent)))
+      result must beEqualTo(OkApiResult(AcceptChallengeResult(AcceptChallengeCode.SolutionNotFound)))
     }
 
     "Do not accept challenge if logic forbids" in context {
@@ -131,7 +130,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       val result = api.acceptChallenge(AcceptChallengeRequest(me, challengeId, mySolutionId))
 
       result must beAnInstanceOf[OkApiResult[AcceptChallengeResult]]
-      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
+      result.body.get.allowed must beEqualTo(AcceptChallengeCode.OK)
 
       there was one(db.challenge).updateChallenge(challenge.id, ChallengeStatus.Accepted, Some(mySolution.id))
       there was one(api).sendMessage(any)
@@ -143,7 +142,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       val c = createChallengeStub(opponentId = u.id)
 
       db.user.readById(u.id) returns Some(u)
-      doReturn(OkApiResult(RejectChallengeResult(ProfileModificationResult.OK))).when(api).rejectChallenge(any)
+      doReturn(OkApiResult(RejectChallengeResult(RejectChallengeCode.OK))).when(api).rejectChallenge(any)
 
       val result = api.autoRejectChallenge(AutoRejectChallengeRequest(c))
 

@@ -2,6 +2,7 @@ package logic.user
 
 import java.util.Date
 
+import controllers.domain.app.challenge.{AcceptChallengeCode, MakeQuestChallengeCode, MakeSolutionChallengeCode}
 import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
 import models.domain.challenge.ChallengeStatus
@@ -145,12 +146,12 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val opponent = createUserStub(id = opponentSolution.info.authorId)
       val mySolution = createSolutionStub(status = SolutionStatus.CheatingBanned)
 
-      challenge.findBySolutions(any) returns Iterator(createChallengeStub())
-      challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
+      challenge.findBySolutions(any) returns Iterator.empty
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator.empty
 
       val rv = me.canChallengeWithSolution(opponent, mySolution)
 
-      rv must beEqualTo(ProfileModificationResult.InvalidState)
+      rv must beEqualTo(MakeSolutionChallengeCode.SolutionNotInRotation)
     }
 
     "Do not allow challenging for quests not in rotation" in context {
@@ -158,25 +159,25 @@ class ChallengesSpecs extends BaseLogicSpecs {
       val me = createUserStub(friends = List(Friendship(friendId = opponentSolution.info.authorId, status = FriendshipStatus.Accepted)))
       val myQuest = createQuestStub(status = QuestStatus.CheatingBanned)
 
-      challenge.findBySolutions(any) returns Iterator(createChallengeStub())
-      challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
+      challenge.findBySolutions(any) returns Iterator.empty
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator.empty
 
       val rv = me.canChallengeWithQuest(opponentSolution.info.authorId, myQuest)
 
-      rv must beEqualTo(ProfileModificationResult.InvalidState)
+      rv must beEqualTo(MakeQuestChallengeCode.QuestNotInRotation)
     }
 
     "Do not allow challenging for quests if opponent not our friend" in context {
-      val me = createUserStub()
       val myQuest = createQuestStub(status = QuestStatus.InRotation)
+      val me = createUserStub(createdQuests = List(myQuest.id))
       val opponentSolution = createSolutionStub()
 
-      challenge.findBySolutions(any) returns Iterator(createChallengeStub())
-      challenge.findByParticipantsAndQuest(any, any) returns Iterator(createChallengeStub())
+      challenge.findBySolutions(any) returns Iterator.empty
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator.empty
 
       val rv = me.canChallengeWithQuest(opponentSolution.info.authorId, myQuest)
 
-      rv must beEqualTo(ProfileModificationResult.InvalidState)
+      rv must beEqualTo(MakeQuestChallengeCode.OpponentNotAFriend)
     }
 
 
@@ -188,7 +189,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
 
       val rv = me.canAcceptChallengeWithSolution(challenge, solution)
 
-      rv must beEqualTo(ProfileModificationResult.OK)
+      rv must beEqualTo(AcceptChallengeCode.OK)
     }
   }
 }

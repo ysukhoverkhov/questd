@@ -3,7 +3,6 @@ package controllers.domain.app.challenge
 import components._
 import controllers.domain._
 import controllers.domain.app.protocol.CommonCode
-import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.user.{CreateBattleRequest, MakeTaskRequest, SendMessageRequest}
 import controllers.domain.helpers._
 import models.domain.challenge.{Challenge, ChallengeStatus}
@@ -30,61 +29,96 @@ case class MakeQuestChallengeResult(
   profile: Option[Profile] = None,
   modifiedQuests: List[QuestView] = List.empty)
 
+
+object MakeSolutionChallengeCode extends Enumeration with CommonCode {
+  val SolutionNotFound = Value
+  val OpponentNotFound = Value
+  val OpponentAlreadyChallenged = Value
+  val SolutionNotInRotation = Value
+  val OpponentNotAFriendAndDoesNotHaveSolution = Value
+}
 case class MakeSolutionChallengeRequest(
   user: User,
   opponentId: String,
   mySolutionId: String)
 case class MakeSolutionChallengeResult(
-  allowed: ProfileModificationResult,
+  allowed: MakeSolutionChallengeCode.Value,
   profile: Option[Profile] = None,
   modifiedSolutions: List[SolutionView] = List.empty)
 
+
+object GetChallengeCode extends Enumeration with CommonCode {
+  val ChallengeNotFound = Value
+  val UserNotParticipant = Value
+}
 case class GetChallengeRequest(
   user: User,
   challengeId: String)
 case class GetChallengeResult(
-  allowed: ProfileModificationResult,
+  allowed: GetChallengeCode.Value,
   challenge: Option[Challenge] = None)
 
+
+object GetMyChallengesCode extends Enumeration with CommonCode
 case class GetMyChallengesRequest(
   user: User,
   statuses: List[ChallengeStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetMyChallengesResult(
-  allowed: ProfileModificationResult,
+  allowed: GetMyChallengesCode.Value,
   challenges: List[Challenge] = List.empty)
 
+
+object GetChallengesToMeCode extends Enumeration with CommonCode
 case class GetChallengesToMeRequest(
   user: User,
   statuses: List[ChallengeStatus.Value],
   pageNumber: Int,
   pageSize: Int)
 case class GetChallengesToMeResult(
-  allowed: ProfileModificationResult,
+  allowed: GetChallengesToMeCode.Value,
   challenges: List[Challenge] = List.empty)
 
+
+object AcceptChallengeCode extends Enumeration with CommonCode {
+  val ChallengeNotFound = Value
+  val SolutionNotFound = Value
+  val SolutionNotForTheQuest = Value
+  val CannotAcceptOwnChallenge = Value
+  val WrongChallengeState = Value
+}
 case class AcceptChallengeRequest(
   user: User,
   challengeId: String,
   solutionId: String)
 case class AcceptChallengeResult(
-  allowed: ProfileModificationResult,
+  allowed: AcceptChallengeCode.Value,
   profile: Option[Profile] = None,
   modifiedSolutions: List[SolutionView] = List.empty)
 
+
+object RejectChallengeCode extends Enumeration with CommonCode {
+  val ChallengeNotFound = Value
+  val CannotAcceptOwnChallenge = Value
+  val WrongChallengeState = Value
+}
 case class RejectChallengeRequest(
   user: User,
   challengeId: String)
 case class RejectChallengeResult(
-  allowed: ProfileModificationResult,
+  allowed: RejectChallengeCode.Value,
   profile: Option[Profile] = None)
+
 
 case class GetAllChallengesForCrawlerRequest()
 case class GetAllChallengesForCrawlerResult(challenges: Iterator[Challenge])
 
+
 case class AutoRejectChallengeRequest(challenge: Challenge)
 case class AutoRejectChallengeResult()
+
+
 
 private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -92,8 +126,8 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
    * Challenge someone to solve my quest.
    */
   def makeQuestChallenge(request: MakeQuestChallengeRequest): ApiResult[MakeQuestChallengeResult] = handleDbException {
-    import request._
     import MakeQuestChallengeCode._
+    import request._
 
     db.quest.readById(myQuestId).fold[ApiResult[MakeQuestChallengeResult]] {
       OkApiResult(MakeQuestChallengeResult(QuestNotFound))
@@ -125,13 +159,14 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
    * Challenge someone to solve quest I've solved.
    */
   def makeSolutionChallenge(request: MakeSolutionChallengeRequest): ApiResult[MakeSolutionChallengeResult] = handleDbException {
+    import MakeSolutionChallengeCode._
     import request._
 
     db.solution.readById(mySolutionId).fold[ApiResult[MakeSolutionChallengeResult]] {
-      OkApiResult(MakeSolutionChallengeResult(OutOfContent))
+      OkApiResult(MakeSolutionChallengeResult(SolutionNotFound))
     } { mySolution =>
       db.user.readById(opponentId).fold[ApiResult[MakeSolutionChallengeResult]] {
-        OkApiResult(MakeSolutionChallengeResult(OutOfContent))
+        OkApiResult(MakeSolutionChallengeResult(OpponentNotFound))
       } { opponent =>
         user.canChallengeWithSolution(opponent = opponent, mySolution = mySolution) match {
           case OK =>
@@ -144,7 +179,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
 
             db.challenge.create(challenge)
 
-          // substract assets for invitation.
+            // substract assets for invitation.
 
             {
               makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
@@ -163,13 +198,15 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
    * Returns challenge by id if we are its participant.
    */
   def getChallenge(request: GetChallengeRequest): ApiResult[GetChallengeResult] = handleDbException {
+    import GetChallengeCode._
+
     db.challenge.readById(request.challengeId).fold {
-      OkApiResult(GetChallengeResult(OutOfContent))
+      OkApiResult(GetChallengeResult(ChallengeNotFound))
     } { c =>
       if (List(c.myId, c.opponentId).contains(request.user.id)) {
         OkApiResult(GetChallengeResult(OK, Some(c)))
       } else {
-        OkApiResult(GetChallengeResult(OutOfContent))
+        OkApiResult(GetChallengeResult(UserNotParticipant))
       }
     }
   }
@@ -178,6 +215,8 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
    * Get all battle requests we've made.
    */
   def getMyChallenges(request: GetMyChallengesRequest): ApiResult[GetMyChallengesResult] = handleDbException {
+    import GetMyChallengesCode._
+
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
@@ -195,6 +234,8 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
    * Get challenges made to us.
    */
   def getChallengesToMe(request: GetChallengesToMeRequest): ApiResult[GetChallengesToMeResult] = handleDbException {
+    import GetChallengesToMeCode._
+
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
@@ -212,13 +253,14 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
    * Respond on battle request.
    */
   def acceptChallenge(request: AcceptChallengeRequest): ApiResult[AcceptChallengeResult] = handleDbException {
+    import AcceptChallengeCode._
     import request._
 
     db.challenge.readById(challengeId).fold[ApiResult[AcceptChallengeResult]] {
-      OkApiResult(AcceptChallengeResult(OutOfContent))
+      OkApiResult(AcceptChallengeResult(ChallengeNotFound))
     } { challenge: Challenge =>
       db.solution.readById(solutionId).fold[ApiResult[AcceptChallengeResult]] {
-        OkApiResult(AcceptChallengeResult(OutOfContent))
+        OkApiResult(AcceptChallengeResult(SolutionNotFound))
       } { solution: Solution =>
         user.canAcceptChallengeWithSolution(challenge, solution) match {
           case OK =>
@@ -264,10 +306,11 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
    * Respond on battle request.
    */
   def rejectChallenge(request: RejectChallengeRequest): ApiResult[RejectChallengeResult] = handleDbException {
+    import RejectChallengeCode._
     import request._
 
     db.challenge.readById(challengeId).fold[ApiResult[RejectChallengeResult]] {
-      OkApiResult(RejectChallengeResult(OutOfContent))
+      OkApiResult(RejectChallengeResult(ChallengeNotFound))
     } { challenge: Challenge =>
       user.canRejectChallenge(challenge) match {
         case OK =>

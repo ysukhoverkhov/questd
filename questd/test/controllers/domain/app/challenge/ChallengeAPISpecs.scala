@@ -1,7 +1,6 @@
 package controllers.domain.app.challenge
 
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
@@ -21,11 +20,11 @@ class ChallengeAPISpecs extends BaseAPISpecs {
 
       api.getChallenge(GetChallengeRequest(
         user = u,
-        challengeId = idMy)) must beEqualTo(OkApiResult(GetChallengeResult(ProfileModificationResult.OK, Some(challengeStub))))
+        challengeId = idMy)) must beEqualTo(OkApiResult(GetChallengeResult(GetChallengeCode.OK, Some(challengeStub))))
 
       api.getChallenge(GetChallengeRequest(
         user = u,
-        challengeId = idOther)) must beEqualTo(OkApiResult(GetChallengeResult(ProfileModificationResult.OutOfContent)))
+        challengeId = idOther)) must beEqualTo(OkApiResult(GetChallengeResult(GetChallengeCode.UserNotParticipant)))
 
       there were two(challenge).readById(any)
     }
@@ -38,7 +37,7 @@ class ChallengeAPISpecs extends BaseAPISpecs {
 
       api.getChallenge(GetChallengeRequest(
         user = u,
-        challengeId = idMy)) must beEqualTo(OkApiResult(GetChallengeResult(ProfileModificationResult.OutOfContent)))
+        challengeId = idMy)) must beEqualTo(OkApiResult(GetChallengeResult(GetChallengeCode.ChallengeNotFound)))
 
       there was one(challenge).readById(any)
     }

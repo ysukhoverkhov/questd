@@ -1,7 +1,7 @@
 package logic.user
 
 import com.github.nscala_time.time.Imports._
-import controllers.domain.app.challenge.MakeQuestChallengeCode
+import controllers.domain.app.challenge.{RejectChallengeCode, AcceptChallengeCode, MakeSolutionChallengeCode, MakeQuestChallengeCode}
 import controllers.domain.app.protocol.ProfileModificationResult._
 import logic._
 import models.domain.challenge.{ChallengeStatus, Challenge}
@@ -49,19 +49,21 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-  def canChallengeWithSolution(opponent: User, mySolution: Solution) = {
+  def canChallengeWithSolution(opponent: User, mySolution: Solution): MakeSolutionChallengeCode.Value = {
+    import MakeSolutionChallengeCode._
+
     lazy val mySolutionExists = user.stats.solvedQuests.values.exists(_ == mySolution.id)
     lazy val isMyFriend = user.friends.exists(f => f.friendId == opponent.id && f.status == FriendshipStatus.Accepted)
     lazy val solvedSameQuest = opponent.stats.solvedQuests.contains(mySolution.info.questId)
 
     if (hasChallengeForQuest(user.id, opponent.id: String, mySolution.info.questId))
-      InvalidState
+      OpponentAlreadyChallenged
     else if (mySolution.status != SolutionStatus.InRotation)
-      InvalidState
+      SolutionNotInRotation
     else if (!(isMyFriend || solvedSameQuest))
-      InvalidState
+      OpponentNotAFriendAndDoesNotHaveSolution
     else if (!mySolutionExists)
-      OutOfContent
+      SolutionNotFound
     else if (!user.profile.rights.unlockedFunctionality.contains(Functionality.ChallengeBattles))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costToChallengeBattle))
@@ -92,22 +94,26 @@ trait Challenges { this: UserLogic =>
       OK
   }
 
-  def canAcceptChallengeWithSolution(challenge: Challenge, solution: Solution) = {
+  def canAcceptChallengeWithSolution(challenge: Challenge, solution: Solution): AcceptChallengeCode.Value = {
+    import AcceptChallengeCode._
+
     if (challenge.questId != solution.info.questId)
-      InvalidState
+      SolutionNotForTheQuest
     else if (challenge.opponentId != user.id)
-      InvalidState
+      CannotAcceptOwnChallenge
     else if (challenge.status != ChallengeStatus.Requested)
-      InvalidState
+      WrongChallengeState
     else
       OK
   }
 
-  def canRejectChallenge(challenge: Challenge) = {
+  def canRejectChallenge(challenge: Challenge): RejectChallengeCode.Value = {
+    import RejectChallengeCode._
+
     if (challenge.opponentId != user.id)
-      InvalidState
+      CannotAcceptOwnChallenge
     else if (challenge.status != ChallengeStatus.Requested)
-      InvalidState
+      WrongChallengeState
     else
       OK
   }
