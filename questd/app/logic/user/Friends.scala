@@ -1,6 +1,7 @@
 package logic.user
 
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.user.AddToFollowingCode
 import logic._
 import logic.functions._
 import models.domain.common.Assets
@@ -13,7 +14,9 @@ import models.domain.user.profile.Functionality
  */
 trait Friends { this: UserLogic =>
 
-  def canFollow = {
+  def canFollow: AddToFollowingCode.Value = {
+    import AddToFollowingCode._
+
     if (!user.profile.rights.unlockedFunctionality.contains(Functionality.AddToFollowing))
       NotEnoughRights
     else if (!(user.profile.assets canAfford costToFollowing))
@@ -22,11 +25,13 @@ trait Friends { this: UserLogic =>
       OK
   }
 
-  def canFollowUser(potentialFollowingUserId: String) = {
+  def canFollowUser(potentialFollowingUserId: String): AddToFollowingCode.Value = {
+    import AddToFollowingCode._
+
     canFollow match {
       case OK =>
         if (potentialFollowingUserId == user.id)
-          InvalidState
+          CantFollowMySelf
         else
           OK
       case a => a
