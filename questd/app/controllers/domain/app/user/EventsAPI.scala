@@ -4,7 +4,7 @@ import java.util.Date
 
 import components._
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import controllers.services.devicenotifications.DeviceNotifications
 import models.domain.common.ClientPlatform
@@ -12,23 +12,33 @@ import models.domain.user.User
 import models.domain.user.message.{Message, MessageMetaInfo}
 import play.Logger
 
+
 case class SendMessageRequest(user: User, message: Message)
 case class SendMessageResult(user: User)
+
 
 case class BroadcastMessageRequest(message: Message)
 case class BroadcastMessageResult()
 
+
+object RemoveMessageCode extends Enumeration with CommonCode
 case class RemoveMessageRequest(user: User, messageId: String)
-case class RemoveMessageResult(allowed: ProfileModificationResult)
+case class RemoveMessageResult(allowed: RemoveMessageCode.Value)
 
+
+object AddDeviceTokenCode extends Enumeration with CommonCode
 case class AddDeviceTokenRequest(user: User, platform: ClientPlatform.Value, token: String)
-case class AddDeviceTokenResult(allowed: ProfileModificationResult)
+case class AddDeviceTokenResult(allowed: AddDeviceTokenCode.Value)
 
+
+object RemoveDeviceTokenCode extends Enumeration with CommonCode
 case class RemoveDeviceTokenRequest(user: User, token: String)
-case class RemoveDeviceTokenResult(allowed: ProfileModificationResult)
+case class RemoveDeviceTokenResult(allowed: RemoveDeviceTokenCode.Value)
+
 
 case class CheckSendNotificationsRequest(user: User)
 case class CheckSendNotificationsResult(user: User)
+
 
 case class NotifyWithMessageRequest(user: User, message: Message, numberOfEvents: Int)
 case class NotifyWithMessageResult(user: User)
@@ -83,6 +93,7 @@ private[domain] trait EventsAPI { this: DomainAPIComponent#DomainAPI with DBAcce
    * Remove message from user's list of messages by message's id.
    */
   def removeMessage(request: RemoveMessageRequest): ApiResult[RemoveMessageResult] = handleDbException {
+    import RemoveMessageCode._
     import request._
 
     db.user.removeMessage(user.id, messageId)
@@ -94,6 +105,7 @@ private[domain] trait EventsAPI { this: DomainAPIComponent#DomainAPI with DBAcce
    * Adds new device token for user to send notifications to.
    */
   def addDeviceToken(request: AddDeviceTokenRequest): ApiResult[AddDeviceTokenResult] = handleDbException {
+    import AddDeviceTokenCode._
     import models.domain.user.devices.Device
     import request._
 
@@ -106,6 +118,7 @@ private[domain] trait EventsAPI { this: DomainAPIComponent#DomainAPI with DBAcce
    * Removes device token from list of devices to send notifications to.
    */
   def removeDeviceToken(request: RemoveDeviceTokenRequest): ApiResult[RemoveDeviceTokenResult] = handleDbException {
+    import RemoveDeviceTokenCode._
     import request._
 
     db.user.removeDevice(user.id, token) ifSome { user =>
