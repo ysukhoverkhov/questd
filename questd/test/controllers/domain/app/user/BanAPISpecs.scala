@@ -1,10 +1,8 @@
 package controllers.domain.app.user
 
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.user.friends.{Friendship, FriendshipStatus}
 import models.domain.user.timeline.TimeLineReason
-import org.mockito.Mockito._
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead
@@ -26,8 +24,8 @@ class BanAPISpecs extends BaseAPISpecs {
 
       db.user.readById(banned.id) returns Some(banned)
       db.user.updateTimeLineEntry(me.id, timeLineEntry.id, TimeLineReason.Hidden) returns Some(me)
-      doReturn(OkApiResult(RemoveFromFollowingResult(ProfileModificationResult.OK, Some(me.profile)))).when(api).removeFromFollowing(any)
-      doReturn(OkApiResult(RemoveFromFriendsResult(ProfileModificationResult.OK))).when(api).removeFromFriends(any)
+      doReturn(OkApiResult(RemoveFromFollowingResult(RemoveFromFollowingCode.OK, Some(me.profile)))).when(api).removeFromFollowing(any)
+      doReturn(OkApiResult(RemoveFromFriendsResult(RemoveFromFriendsCode.OK))).when(api).removeFromFriends(any)
       db.user.addBannedUser(me.id, banned.id) returns Some(me)
 
       val result = api.banUser(
@@ -53,7 +51,7 @@ class BanAPISpecs extends BaseAPISpecs {
       val banned = createUserStub(id = bannedUserId)
 
       db.user.readById(banned.id) returns Some(banned)
-      doReturn(OkApiResult(RespondFriendshipResult(ProfileModificationResult.OK))).when(api).respondFriendship(any)
+      doReturn(OkApiResult(RespondFriendshipResult(RespondFriendshipCode.OK))).when(api).respondFriendship(any)
 
       db.user.addBannedUser(me.id, banned.id) returns Some(me)
 
@@ -79,7 +77,7 @@ class BanAPISpecs extends BaseAPISpecs {
       val banned = createUserStub(id = bannedUserId)
 
       db.user.readById(banned.id) returns Some(banned)
-      doReturn(OkApiResult(RespondFriendshipResult(ProfileModificationResult.OK))).when(api).respondFriendship(any)
+      doReturn(OkApiResult(RespondFriendshipResult(RespondFriendshipCode.OK))).when(api).respondFriendship(any)
 
       db.user.addBannedUser(me.id, banned.id) returns Some(me)
 

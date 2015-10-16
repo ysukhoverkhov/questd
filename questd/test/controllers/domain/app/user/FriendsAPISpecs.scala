@@ -24,7 +24,7 @@ class FriendsAPISpecs extends BaseAPISpecs {
 
       val result = api.respondFriendship(RespondFriendshipRequest(responder, requester.id, accept = true))
 
-      result must beEqualTo(OkApiResult(RespondFriendshipResult(ProfileModificationResult.OK)))
+      result must beEqualTo(OkApiResult(RespondFriendshipResult(RespondFriendshipCode.OK)))
 
       there was one (user).removeFromFollowing(responder.id, requester.id)
       there was one (user).removeFromFollowing(requester.id, responder.id)

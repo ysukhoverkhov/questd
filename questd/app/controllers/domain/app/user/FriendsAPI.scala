@@ -1,7 +1,7 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import controllers.services.socialnetworks.client.{User => SNUser}
@@ -12,38 +12,63 @@ import models.domain.user.message.{MessageFriendshipAccepted, MessageFriendshipR
 import models.domain.user.profile.{Profile, TaskType}
 import play.Logger
 
+
+object GetFriendsCode extends Enumeration with CommonCode {
+}
 case class GetFriendsRequest(
   user: User)
 case class GetFriendsResult(
-  allowed: ProfileModificationResult,
+  allowed: GetFriendsCode.Value,
   users: List[Friendship])
 
+
+object CostToRequestFriendshipCode extends Enumeration with CommonCode {
+  val UserNotFound = Value
+}
 case class CostToRequestFriendshipRequest(
   user: User,
   friendId: String)
 case class CostToRequestFriendshipResult(
-  allowed: ProfileModificationResult,
+  allowed: CostToRequestFriendshipCode.Value,
   cost: Option[Assets] = None)
 
+
+object AskFriendshipCode extends Enumeration with CommonCode {
+  val UserNotFound = Value
+  val AlreadyRequested = Value
+  val MaxFriendsCountLimitReached = Value
+  val CantFriendMyself = Value
+}
 case class AskFriendshipRequest(
   user: User,
   friendId: String)
 case class AskFriendshipResult(
-  allowed: ProfileModificationResult,
+  allowed: AskFriendshipCode.Value,
   profile: Option[Profile] = None)
 
+
+object RespondFriendshipCode extends Enumeration with CommonCode {
+  val FriendshipRequestNotFound = Value
+  val MaxFriendsCountLimitReached = Value
+  val CantFriendMyself = Value
+}
 case class RespondFriendshipRequest(
   user: User,
   friendId: String,
   accept: Boolean)
 case class RespondFriendshipResult(
-  allowed: ProfileModificationResult)
+  allowed: RespondFriendshipCode.Value)
 
+
+object RemoveFromFriendsCode extends Enumeration with CommonCode {
+  val FriendNotFound = Value
+}
 case class RemoveFromFriendsRequest(
   user: User,
   friendId: String)
 case class RemoveFromFriendsResult(
-  allowed: ProfileModificationResult)
+  allowed: RemoveFromFriendsCode.Value)
+
 
 case class CreateFriendshipRequest(
   user: User,
@@ -52,6 +77,7 @@ case class CreateFriendshipRequest(
   referredWithContentId: Option[String] = None)
 case class CreateFriendshipResult(
   user: User)
+
 
 case class ProcessFriendshipInvitationsFromSNRequest(
   user: User,
@@ -64,7 +90,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
    * Get ids of users from our friends list.
    */
   def getFriends(request: GetFriendsRequest): ApiResult[GetFriendsResult] = handleDbException {
-
+    import GetFriendsCode._
     {
       makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LookThroughFriendshipProposals)))
     } map { r =>
@@ -72,15 +98,14 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
       OkApiResult(GetFriendsResult(
         allowed = OK,
         users = r.user.friends))
-
     }
-
   }
 
   /**
    * How much it'll take invite person to become a friend.
    */
   def costToRequestFriendship(request: CostToRequestFriendshipRequest): ApiResult[CostToRequestFriendshipResult] = handleDbException {
+    import CostToRequestFriendshipCode._
 
     db.user.readById(request.friendId) match {
       case Some(u) =>
@@ -90,7 +115,7 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
       case None =>
         OkApiResult(CostToRequestFriendshipResult(
-          allowed = OutOfContent))
+          allowed = UserNotFound))
     }
   }
 
@@ -98,11 +123,12 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
    * Ask person to become our friend.
    */
   def askFriendship(request: AskFriendshipRequest): ApiResult[AskFriendshipResult] = handleDbException {
+    import AskFriendshipCode._
 
     if (request.friendId == request.user.id ||
       request.user.friends.map(_.friendId).contains(request.friendId)) {
       OkApiResult(AskFriendshipResult(
-        allowed = OutOfContent))
+        allowed = AlreadyRequested))
     } else {
       db.user.readById(request.friendId) match {
         case Some(potentialFriend) =>
@@ -127,12 +153,11 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
 
                 OkApiResult(AskFriendshipResult(OK, Some(r.user.profile)))
               }
-            case a => OkApiResult(AskFriendshipResult(a))
+            case result => OkApiResult(AskFriendshipResult(result))
           }
 
         case None =>
-          OkApiResult(AskFriendshipResult(
-            allowed = OutOfContent))
+          OkApiResult(AskFriendshipResult(allowed = UserNotFound))
       }
     }
   }
@@ -141,12 +166,12 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
    * Respond from a person to friendship request
    */
   def respondFriendship(request: RespondFriendshipRequest): ApiResult[RespondFriendshipResult] = handleDbException {
+    import RespondFriendshipCode._
 
-    if (request.friendId == request.user.id ||
-      !request.user.friends.exists {
+    if (!request.user.friends.exists {
         x => (x.friendId == request.friendId) && (x.status == FriendshipStatus.Invites)
       }) {
-      OkApiResult(RespondFriendshipResult(allowed = OutOfContent))
+      OkApiResult(RespondFriendshipResult(allowed = FriendshipRequestNotFound))
     } else {
       if (request.accept) {
         db.user.readById(request.friendId) ifSome { friend =>
@@ -166,8 +191,9 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
               db.user.removeFromFollowing(request.friendId, request.user.id)
 
               OkApiResult(RespondFriendshipResult(OK))
-            case a =>
-              OkApiResult(RespondFriendshipResult(a))
+
+            case result =>
+              OkApiResult(RespondFriendshipResult(result))
           }
         }
       } else {
@@ -187,13 +213,14 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
    * Respond from a person to friendship request
    */
   def removeFromFriends(request: RemoveFromFriendsRequest): ApiResult[RemoveFromFriendsResult] = handleDbException {
-    if (request.friendId == request.user.id
-      || !request.user.friends.exists {
+    import RemoveFromFriendsCode._
+
+    if (!request.user.friends.exists {
       x => (x.friendId == request.friendId) && (x.status == FriendshipStatus.Accepted || x.status == FriendshipStatus
         .Invited)
     }) {
       OkApiResult(RemoveFromFriendsResult(
-        allowed = OutOfContent))
+        allowed = FriendNotFound))
     } else {
 
       db.user.removeFriendship(request.user.id, request.friendId)

@@ -1,7 +1,6 @@
 package logic.user
 
-import controllers.domain.app.protocol.ProfileModificationResult._
-import controllers.domain.app.user.AddToFollowingCode
+import controllers.domain.app.user.{AddToFollowingCode, AskFriendshipCode, RespondFriendshipCode}
 import logic._
 import logic.functions._
 import models.domain.common.Assets
@@ -42,39 +41,31 @@ trait Friends { this: UserLogic =>
     Assets(coins = costToFollowPerson(user.profile.publicProfile.level))
   }
 
-  private def commonFriendshipCheck(potentialFriend: User) = {
-    if (potentialFriend.id == user.id)
-      InvalidState
+  // check here we are not banned and return status if we are.
+  def canAddFriend(potentialFriend: User): AskFriendshipCode.Value = {
+    import AskFriendshipCode._
+
+    if (user.friends.length >= user.profile.rights.maxFriendsCount)
+      MaxFriendsCountLimitReached
+    else if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends))
+      NotEnoughRights
+    else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
+      NotEnoughAssets
+    else if (potentialFriend.id == user.id)
+      CantFriendMyself
     else
       OK
   }
 
-  // check here we are not banned and return status if we are.
-  def canAddFriend(potentialFriend: User) = {
-    commonFriendshipCheck(potentialFriend) match {
-      case OK =>
-        if (user.friends.length >= user.profile.rights.maxFriendsCount)
-          LimitExceeded
-        else if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends))
-          NotEnoughRights
-        else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
-          NotEnoughAssets
-        else
-          OK
-      case a => a
-    }
-  }
+  def canAcceptFriendship(potentialFriend: User): RespondFriendshipCode.Value = {
+    import RespondFriendshipCode._
 
-  def canAcceptFriendship(potentialFriend: User) = {
-    commonFriendshipCheck(potentialFriend) match {
-      case OK =>
-        if (user.friends.count(_.status == FriendshipStatus.Accepted) >= user.profile.rights.maxFriendsCount) {
-          LimitExceeded
-        } else {
-          OK
-        }
-      case a => a
-    }
+    if (user.friends.count(_.status == FriendshipStatus.Accepted) >= user.profile.rights.maxFriendsCount)
+      MaxFriendsCountLimitReached
+    else if (potentialFriend.id == user.id)
+      CantFriendMyself
+    else
+      OK
   }
 
   def costToAddFriend(potentialFriend: User) = {
