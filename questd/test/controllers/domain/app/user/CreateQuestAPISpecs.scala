@@ -23,7 +23,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
 
       val result = api.createQuest(CreateQuestRequest(u, q.info.content))
 
-      result.body must beSome[CreateQuestResult].which(r => r.allowed == ProfileModificationResult.OK)
+      result.body must beSome[CreateQuestResult].which(r => r.allowed == CreateQuestCode.OK)
 
       there was one(user).addEntryToTimeLine(any, any)
 //      there was one(user).addEntryToTimeLineMulti(any, any)
@@ -42,7 +42,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
 
       val result = api.createQuest(CreateQuestRequest(u, q.info.content))
 
-      result.body must beSome[CreateQuestResult].which(r => r.allowed == ProfileModificationResult.OK)
+      result.body must beSome[CreateQuestResult].which(r => r.allowed == CreateQuestCode.OK)
 
       there was one(user).addEntryToTimeLine(any, any)
 //      there was one(user).addEntryToTimeLineMulti(any, any)
