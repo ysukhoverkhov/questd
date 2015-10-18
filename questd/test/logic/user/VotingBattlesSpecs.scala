@@ -1,6 +1,6 @@
 package logic.user
 
-import controllers.domain.app.protocol.ProfileModificationResult
+import controllers.domain.app.user.VoteBattleByUserCode
 import logic.BaseLogicSpecs
 import models.domain.user.profile.Rights
 import testhelpers.domainstubs._
@@ -15,7 +15,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteBattle(battle.id)
 
-      rv must beEqualTo(ProfileModificationResult.NotEnoughRights)
+      rv must beEqualTo(VoteBattleByUserCode.NotEnoughRights)
     }
 
     "Do allow voting for battles not in time line" in context {
@@ -24,7 +24,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteBattle(battle.id)
 
-      rv must beEqualTo(ProfileModificationResult.OK)
+      rv must beEqualTo(VoteBattleByUserCode.OK)
     }
 
     "Do not allow voting for battles in time line but we already voted for" in context {
@@ -34,7 +34,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteBattle(battle.id)
 
-      rv must beEqualTo(ProfileModificationResult.InvalidState)
+      rv must beEqualTo(VoteBattleByUserCode.BattleAlreadyVoted)
     }
 
     "Do not allow voting for battle we are participating in" in context {
@@ -45,7 +45,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteBattle(battle.id)
 
-      rv must beEqualTo(ProfileModificationResult.InvalidState)
+      rv must beEqualTo(VoteBattleByUserCode.ParticipantsCantVote)
     }
 
     "Do not allow voting battles with incomplete bio" in context {
@@ -54,7 +54,7 @@ class VotingBattlesSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteBattle(battle.id)
 
-      rv must beEqualTo(ProfileModificationResult.IncompleteBio)
+      rv must beEqualTo(VoteBattleByUserCode.IncompleteBio)
     }
   }
 }

@@ -77,7 +77,7 @@ class TasksAPISpecs extends BaseAPISpecs {
 
       val result = api.incTutorialTask(IncTutorialTaskRequest(u, taskId = taskId))
 
-      result must beEqualTo(OkApiResult(IncTutorialTaskResult(ProfileModificationResult.OK, Some(u.profile))))
+      result must beEqualTo(OkApiResult(IncTutorialTaskResult(IncTutorialTaskCode.OK, Some(u.profile))))
     }
 
     "Calculate completed percent correctly" in context {
