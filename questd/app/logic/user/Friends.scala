@@ -41,7 +41,6 @@ trait Friends { this: UserLogic =>
     Assets(coins = costToFollowPerson(user.profile.publicProfile.level))
   }
 
-  // check here we are not banned and return status if we are.
   def canAddFriend(potentialFriend: User): AskFriendshipCode.Value = {
     import AskFriendshipCode._
 
@@ -52,7 +51,9 @@ trait Friends { this: UserLogic =>
     else if (!(user.profile.assets canAfford costToAddFriend(potentialFriend)))
       NotEnoughAssets
     else if (potentialFriend.id == user.id)
-      CantFriendMyself
+      CantFriendHimself
+    else if (potentialFriend.banned.contains(user.id))
+      UserBannedByPotentialFriend
     else
       OK
   }

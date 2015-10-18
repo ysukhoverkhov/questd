@@ -37,7 +37,8 @@ object AskFriendshipCode extends Enumeration with CommonCode {
   val UserNotFound = Value
   val AlreadyRequested = Value
   val MaxFriendsCountLimitReached = Value
-  val CantFriendMyself = Value
+  val CantFriendHimself = Value
+  val UserBannedByPotentialFriend = Value
 }
 case class AskFriendshipRequest(
   user: User,
@@ -143,13 +144,6 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
                   request.friendId,
                   Friendship(request.friendId, FriendshipStatus.Invited),
                   Friendship(r.user.id, FriendshipStatus.Invites))
-
-                // remove this soplia whn check in logic will be implemented.
-                if (potentialFriend.banned.contains(r.user.id)) {
-                  db.user.readById(potentialFriend.id).fold() { updatedFriend =>
-                    respondFriendship(RespondFriendshipRequest(updatedFriend, r.user.id, accept = false))
-                  }
-                }
 
                 OkApiResult(AskFriendshipResult(OK, Some(r.user.profile)))
               }

@@ -2,7 +2,6 @@ package controllers.domain.app.user
 
 import java.util.Date
 
-import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain.user.friends.{Friendship, FriendshipStatus, ReferralStatus}
 import org.mockito.Matchers.{eq => mEq}
@@ -69,7 +68,7 @@ class FriendsAPISpecs extends BaseAPISpecs {
         ))
     }
 
-    "Asking friendship generates reject if we are banned" in context {
+    "Asking friendship generates correct error if we are banned" in context {
 
       val we = createUserStub()
       val friend = createUserStub(banned = List(we.id), friends = List(Friendship(we.id, FriendshipStatus.Invites)))
@@ -81,10 +80,7 @@ class FriendsAPISpecs extends BaseAPISpecs {
 
       val result = api.askFriendship(AskFriendshipRequest(we, friend.id))
 
-      result must beAnInstanceOf[OkApiResult[AskFriendshipResult]]
-
-      there was one (user).removeFriendship(any, any)
-      there was one (api).sendMessage(any)
+      result must beEqualTo(OkApiResult(AskFriendshipResult(AskFriendshipCode.UserBannedByPotentialFriend)))
     }
 
   }
