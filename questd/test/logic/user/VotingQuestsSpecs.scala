@@ -1,6 +1,6 @@
 package logic.user
 
-import controllers.domain.app.protocol.ProfileModificationResult
+import controllers.domain.app.user.VoteQuestByUserCode
 import logic.BaseLogicSpecs
 import models.domain.common.ContentVote
 import models.domain.user.profile.{Functionality, Rights}
@@ -16,7 +16,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteQuest(q.id, ContentVote.Cool)
 
-      rv must beEqualTo(ProfileModificationResult.NotEnoughRights)
+      rv must beEqualTo(VoteQuestByUserCode.NotEnoughRights)
     }
 
     "Do not allow cheating for quests without rights" in context {
@@ -25,7 +25,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteQuest(q.id, ContentVote.Cheating)
 
-      rv must beEqualTo(ProfileModificationResult.NotEnoughRights)
+      rv must beEqualTo(VoteQuestByUserCode.NotEnoughRights)
     }
 
     "Do allow voting for quests not in time line" in context {
@@ -34,7 +34,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteQuest(q.id, ContentVote.Cheating)
 
-      rv must beEqualTo(ProfileModificationResult.OK)
+      rv must beEqualTo(VoteQuestByUserCode.OK)
     }
 
     "Do not allow voting for quests in time line but we already voted for" in context {
@@ -45,7 +45,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteQuest(q.id, ContentVote.Cheating)
 
-      rv must beEqualTo(ProfileModificationResult.InvalidState)
+      rv must beEqualTo(VoteQuestByUserCode.QuestAlreadyVoted)
     }
 
     "Do not allow voting for own quests" in context {
@@ -57,7 +57,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteQuest(q.id, ContentVote.Cheating)
 
-      rv must beEqualTo(ProfileModificationResult.OutOfContent)
+      rv must beEqualTo(VoteQuestByUserCode.CantVoteOwnQuest)
     }
 
     "Allow voting for quests in normal situations" in context {
@@ -66,7 +66,7 @@ class VotingQuestsSpecs extends BaseLogicSpecs {
 
       val rv = user.canVoteQuest(q.id, ContentVote.Cool)
 
-      rv must beEqualTo(ProfileModificationResult.OK)
+      rv must beEqualTo(VoteQuestByUserCode.OK)
     }
   }
 }
