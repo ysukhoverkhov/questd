@@ -3,7 +3,6 @@ package logic.user
 import java.util.Date
 
 import controllers.domain.app.challenge.{AcceptChallengeCode, MakeQuestChallengeCode, MakeSolutionChallengeCode}
-import controllers.domain.app.protocol.ProfileModificationResult
 import logic.BaseLogicSpecs
 import models.domain.challenge.ChallengeStatus
 import models.domain.quest.QuestStatus
@@ -26,7 +25,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
         opponentShouldNotHaveBattles = false,
         checkQuest = true)
 
-      rv must beEqualTo(ProfileModificationResult.OutOfContent)
+      rv must beEqualTo(false)
     }
 
     "Do not allow auto battles with opponent with battles" in context {
@@ -41,7 +40,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
         opponentShouldNotHaveBattles = true,
         checkQuest = true)
 
-      rv must beEqualTo(ProfileModificationResult.InvalidState)
+      rv must beEqualTo(false)
     }
 
     "Do allow auto battles with opponent with battles if allowed" in context {
@@ -59,7 +58,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
         opponentShouldNotHaveBattles = false,
         checkQuest = true)
 
-      rv must beEqualTo(ProfileModificationResult.OK)
+      rv must beEqualTo(true)
     }
 
     "Do not allow battles for solutions from different quests" in context {
@@ -77,7 +76,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
         opponentShouldNotHaveBattles = true,
         checkQuest = true)
 
-      rv must beEqualTo(ProfileModificationResult.InvalidState)
+      rv must beEqualTo(false)
     }
 
     "Do allow battles for solutions from different quests if allowed" in context {
@@ -95,7 +94,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
         opponentShouldNotHaveBattles = true,
         checkQuest = false)
 
-      rv must beEqualTo(ProfileModificationResult.OK)
+      rv must beEqualTo(true)
     }
 
     "Do not allow battles for solutions with active challenge" in context {
@@ -116,7 +115,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
         opponentShouldNotHaveBattles = true,
         checkQuest = true)
 
-      rv must beEqualTo(ProfileModificationResult.InvalidState)
+      rv must beEqualTo(false)
     }
 
     "Do not allow battles for solutions created too early" in context {
@@ -137,7 +136,7 @@ class ChallengesSpecs extends BaseLogicSpecs {
         opponentShouldNotHaveBattles = true,
         checkQuest = true)
 
-      rv must beEqualTo(ProfileModificationResult.CoolDown)
+      rv must beEqualTo(false)
     }
 
     "Do not allow challenging battles for solutions not in rotation" in context {

@@ -2,7 +2,6 @@ package controllers.domain.app.user
 
 import components._
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.helpers._
 import logic.BattleLogic
 import models.domain.battle.{Battle, BattleInfo, BattleSide, BattleStatus}
@@ -102,7 +101,7 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
         Logger.trace(s"    Analysing competitor solution ${other.id} - $other")
         Logger.trace(s"    ${other.info.authorId} != ${solution.info.authorId} && (${other.battleIds.isEmpty} && $exclusive)")
 
-        if (author.canAutoCreatedBattle (solution, other, exclusive, checkQuest) == ProfileModificationResult.OK) {
+        if (author.canAutoCreatedBattle (solution, other, exclusive, checkQuest)) {
 
           Logger.trace("Found fight pair for quest " + solution.info.questId + " :")
           Logger.trace("  s1.id=" + solution.id)

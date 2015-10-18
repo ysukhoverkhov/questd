@@ -2,7 +2,6 @@ package controllers.domain.app.user
 
 import controllers.domain._
 import controllers.domain.app.challenge._
-import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.challenge.ChallengeStatus
 import models.domain.user.friends.{Friendship, FriendshipStatus}
 import testhelpers.domainstubs._
@@ -94,7 +93,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
 
       val result = api.acceptChallenge(AcceptChallengeRequest(me, challengeId, mySolutionId))
 
-      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK).not
+      result.body.get.allowed must beEqualTo(AcceptChallengeCode.OK).not
     }
 
     "Do accept challenge if everything is ok" in context {

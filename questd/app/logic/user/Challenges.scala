@@ -2,7 +2,6 @@ package logic.user
 
 import com.github.nscala_time.time.Imports._
 import controllers.domain.app.challenge.{RejectChallengeCode, AcceptChallengeCode, MakeSolutionChallengeCode, MakeQuestChallengeCode}
-import controllers.domain.app.protocol.ProfileModificationResult._
 import logic._
 import models.domain.challenge.{ChallengeStatus, Challenge}
 import models.domain.common.Assets
@@ -30,23 +29,23 @@ trait Challenges { this: UserLogic =>
     mySolution: Solution,
     opponentSolution: Solution,
     opponentShouldNotHaveBattles: Boolean,
-    checkQuest: Boolean) = {
+    checkQuest: Boolean): Boolean = {
 
     lazy val battleCreationDelay = api.config(api.DefaultConfigParams.BattleCreationDelay).toInt
 
     if (mySolution.info.authorId == opponentSolution.info.authorId)
-      OutOfContent
+      false
     else if (opponentSolution.battleIds.nonEmpty && opponentShouldNotHaveBattles)
-      InvalidState
+      false
     else if (hasChallengeForQuest(mySolution.info.authorId, opponentSolution.info.authorId, mySolution.info.questId))
-      InvalidState
+      false
     else if (checkQuest && (opponentSolution.info.questId != mySolution.info.questId))
-      InvalidState
+      false
     else if (DateTime.now < (new DateTime(mySolution.info.creationDate) + battleCreationDelay.hour) ||
       DateTime.now < (new DateTime(opponentSolution.info.creationDate) + battleCreationDelay.hour))
-      CoolDown
+      false
     else
-      OK
+      true
   }
 
   def canChallengeWithSolution(opponent: User, mySolution: Solution): MakeSolutionChallengeCode.Value = {
