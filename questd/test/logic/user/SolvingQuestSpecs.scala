@@ -1,6 +1,6 @@
 package logic.user
 
-import controllers.domain.app.protocol.ProfileModificationResult
+import controllers.domain.app.user.SolveQuestCode
 import logic.BaseLogicSpecs
 import models.domain.common.{Assets, ContentType}
 import models.domain.user.profile.Rights
@@ -16,7 +16,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
 
       val rv = user.canSolveQuest(ContentType.Photo, q)
 
-      rv must beEqualTo(ProfileModificationResult.NotEnoughRights)
+      rv must beEqualTo(SolveQuestCode.NotEnoughRights)
     }
 
     "Do not allow solving of quests without money" in context {
@@ -26,7 +26,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
 
       val rv = user.canSolveQuest(ContentType.Photo, q)
 
-      rv must beEqualTo(ProfileModificationResult.NotEnoughAssets)
+      rv must beEqualTo(SolveQuestCode.NotEnoughAssets)
     }
 
     "Do not allow solving of own quests" in context {
@@ -37,7 +37,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
 
       val rv = user.canSolveQuest(ContentType.Photo, q)
 
-      rv must beEqualTo(ProfileModificationResult.InvalidState)
+      rv must beEqualTo(SolveQuestCode.CantSolveOwnQuest)
     }
 
     "Do not allow solving of quests already solved" in context {
@@ -48,7 +48,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
 
       val rv = user.canSolveQuest(ContentType.Photo, q)
 
-      rv must beEqualTo(ProfileModificationResult.InvalidState)
+      rv must beEqualTo(SolveQuestCode.QuestAlreadySolved)
     }
 
     "Allow creating of quests in normal situations" in context {
@@ -58,7 +58,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
 
       val rv = user.canSolveQuest(ContentType.Photo, q)
 
-      rv must beEqualTo(ProfileModificationResult.OK)
+      rv must beEqualTo(SolveQuestCode.OK)
     }
   }
 }

@@ -13,17 +13,22 @@ import models.domain.user.message.MessageInformation
 import models.domain.user.profile.{Functionality, Gender, Profile, Rights}
 import play.{Logger, Play}
 
+
 case class AdjustAssetsRequest(user: User, change: Assets)
 case class AdjustAssetsResult(user: User)
+
 
 case class CheckIncreaseLevelRequest(user: User)
 case class CheckIncreaseLevelResult(user: User)
 
+
 case class GetRightsAtLevelsRequest(user: User, levelFrom: Int, levelTo: Int)
 case class GetRightsAtLevelsResult(rights: List[Rights])
 
+
 case class GetLevelsForRightsRequest(user: User, functionality: List[Functionality.Value])
 case class GetLevelsForRightsResult(levels: Map[String, Int])
+
 
 object SetGenderCode extends Enumeration with CommonCode {
 }
