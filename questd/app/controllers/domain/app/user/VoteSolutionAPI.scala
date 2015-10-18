@@ -2,7 +2,7 @@ package controllers.domain.app.user
 
 import components._
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.app.solution.{VoteSolutionRequest, VoteSolutionResult}
 import controllers.domain.helpers._
 import models.domain.common.ContentVote
@@ -12,9 +12,13 @@ import models.domain.user.profile.{Profile, TaskType}
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import models.view.SolutionView
 
+object VoteSolutionByUserCode extends Enumeration with CommonCode {
+  val SolutionAlreadyVoted = Value
+  val CantVoteOwnSolution = Value
+}
 case class VoteSolutionByUserRequest(user: User, solutionId: String, vote: ContentVote.Value)
 case class VoteSolutionByUserResult(
-  allowed: ProfileModificationResult,
+  allowed: VoteSolutionByUserCode.Value,
   profile: Option[Profile] = None,
   modifiedSolutions: List[SolutionView] = List.empty)
 
@@ -25,6 +29,7 @@ private[domain] trait VoteSolutionAPI {
    * Vote for a solution.
    */
   def voteSolutionByUser(request: VoteSolutionByUserRequest): ApiResult[VoteSolutionByUserResult] = handleDbException {
+    import VoteSolutionByUserCode._
     import request._
 
     user.canVoteSolution(solutionId, vote) match {
