@@ -3,8 +3,7 @@ package controllers.domain.app.user
 import components._
 import controllers.domain._
 import controllers.domain.app.battle.SelectBattleToTimeLineRequest
-import controllers.domain.app.protocol.ProfileModificationResult
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.app.quest.SelectQuestToTimeLineRequest
 import controllers.domain.app.solution.SelectSolutionToTimeLineRequest
 import controllers.domain.helpers._
@@ -27,10 +26,16 @@ case class RemoveFromTimeLineRequest(
   objectId: String)
 case class RemoveFromTimeLineResult(user: User)
 
+
+object HideFromTimeLineCode extends Enumeration with CommonCode {
+  val EntryNotFound = Value
+}
 case class HideFromTimeLineRequest(
   user: User,
   entryId: String)
-case class HideFromTimeLineResult(allowed: ProfileModificationResult.Value, profile: Option[Profile] = None)
+case class HideFromTimeLineResult(
+  allowed: HideFromTimeLineCode.Value,
+  profile: Option[Profile] = None)
 
 case class AddToWatchersTimeLineRequest(
   user: User,
@@ -94,6 +99,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
    * Hides entry from timeline. It's still on the server but is not returned in timeline requests.
    */
   def hideFromTimeLine(request: HideFromTimeLineRequest): ApiResult[HideFromTimeLineResult] = handleDbException {
+    import HideFromTimeLineCode._
     import request._
 
     if (user.timeLine.exists(_.id == entryId)) {
@@ -106,7 +112,7 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
         OkApiResult(HideFromTimeLineResult(OK, Some(u.profile)))
       }
     } else {
-      OkApiResult(HideFromTimeLineResult(OutOfContent))
+      OkApiResult(HideFromTimeLineResult(EntryNotFound))
     }
   }
 
