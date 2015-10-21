@@ -10,7 +10,7 @@ private object AnalyticsWSImplTypes {
    * Set Gender protocol.
    */
   type WSSetUserSourceResult = SetUserSourceResult
-  case class WSSetUserSourceRequest(userSource: String)
+  case class WSSetUserSourceRequest(userSource: Map[String, String])
 }
 
 //noinspection MutatorLikeMethodIsParameterless
