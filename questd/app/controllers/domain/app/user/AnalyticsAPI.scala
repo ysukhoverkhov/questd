@@ -10,7 +10,7 @@ import models.domain.user.profile.Profile
 
 case class SetUserSourceRequest(
   user: User,
-  userSource: String)
+  userSource: Map[String, String])
 case class SetUserSourceResult(
   allowed: ProfileModificationResult,
   profile: Option[Profile] = None)
@@ -24,7 +24,7 @@ private[domain] trait AnalyticsAPI { this: DBAccessor with DomainAPIComponent#Do
   def setUserSource(request: SetUserSourceRequest): ApiResult[SetUserSourceResult] = handleDbException {
     import request._
 
-    if (user.profile.analytics.source.isDefined) {
+    if (user.profile.analytics.source.nonEmpty) {
       OkApiResult(SetUserSourceResult(InvalidState))
     } else {
       // make task to optimize existence calls.

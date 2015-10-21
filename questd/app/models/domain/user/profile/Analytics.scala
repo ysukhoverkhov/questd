@@ -7,5 +7,5 @@ import java.util.Date
  */
 case class Analytics(
   profileCreationDate: Date = new Date(),
-  source: Option[String] = None)
+  source: Map[String, String] = Map.empty)
 

@@ -24,7 +24,7 @@ trait UserDAO extends BaseDAO[User] {
    * @param id Id if user to set source to.
    * @param userSource Sourece of a user.
    */
-  def setUserSource(id: String, userSource: String): Option[User]
+  def setUserSource(id: String, userSource: Map[String, String]): Option[User]
 
   def updateSessionId(id: String, sessionId: String): Option[User]
 
