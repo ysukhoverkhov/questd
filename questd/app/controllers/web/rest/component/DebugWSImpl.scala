@@ -4,7 +4,6 @@ import java.util.Date
 
 import controllers.domain._
 import controllers.domain.admin.{AllQuestsRequest, AllSolutionsRequest, AllUsersRequest}
-import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
@@ -238,7 +237,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
           icon = None,
           description = s"Debug quest for battle between ${r.user.id} and ${peer.id}")))
     } map { rr =>
-      assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
+      assert(rr.allowed == CreateQuestCode.OK, rr.allowed)
 
       val questId = api.getUser(GetUserRequest(userId = Some(author.id))).body.get.user.get.stats.createdQuests.last
 
@@ -271,7 +270,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
               }
       } map { rr =>
         Logger.debug(s"Quest solved with result ${rr.allowed}")
-        assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
+        assert(rr.allowed == SolveQuestCode.OK, rr.allowed)
 
         api.addToTimeLine(AddToTimeLineRequest(
           user = peer,
@@ -304,7 +303,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
       }
     } map { rr =>
       Logger.debug(s"Quest solved by peer with result ${rr.allowed}")
-      assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
+      assert(rr.allowed == SolveQuestCode.OK, rr.allowed)
 
       OkApiResult(WSDebugResult("Done"))
     }

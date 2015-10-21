@@ -1,6 +1,6 @@
 package logic.user
 
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.user.VoteSolutionByUserCode
 import logic._
 import models.domain.common.ContentVote
 import models.domain.user.profile.Functionality
@@ -13,15 +13,17 @@ trait VotingSolutions { this: UserLogic =>
   /**
    *
    */
-  def canVoteSolution(solutionId: String, vote: ContentVote.Value) = {
+  def canVoteSolution(solutionId: String, vote: ContentVote.Value): VoteSolutionByUserCode.Value = {
+    import VoteSolutionByUserCode._
+
     if (!user.profile.rights.unlockedFunctionality.contains(Functionality.VoteSolutions))
       NotEnoughRights
     else if (!user.profile.rights.unlockedFunctionality.contains(Functionality.Report) && (vote != ContentVote.Cool))
       NotEnoughRights
     else if (user.stats.votedSolutions.contains(solutionId))
-      InvalidState
+      SolutionAlreadyVoted
     else if (user.stats.solvedQuests.values.exists(_ == solutionId))
-      OutOfContent
+      CantVoteOwnSolution
     else if (!bioComplete)
       IncompleteBio
     else

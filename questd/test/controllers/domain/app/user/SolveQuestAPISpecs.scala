@@ -1,11 +1,10 @@
 package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
-import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.common.Assets
 import models.domain.solution.{Solution, SolutionInfo}
-import models.domain.user.friends.{FriendshipStatus, Friendship}
-import models.domain.user.timeline.{TimeLineType, TimeLineReason}
+import models.domain.user.friends.{Friendship, FriendshipStatus}
+import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
 
@@ -69,7 +68,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
       val result = api.solveQuest(SolveQuestRequest(u, q.id, s))
 
       result must beAnInstanceOf[OkApiResult[SolveQuestResult]]
-      result.body.get.allowed must beEqualTo(ProfileModificationResult.OK)
+      result.body.get.allowed must beEqualTo(SolveQuestCode.OK)
 
       there was one(solution).create(
         Solution(

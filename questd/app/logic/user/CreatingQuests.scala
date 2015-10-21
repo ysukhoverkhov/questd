@@ -3,6 +3,7 @@ package logic.user
 import java.util.Date
 
 import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.user.CreateQuestCode
 import logic._
 import logic.constants._
 import logic.functions._
@@ -27,7 +28,9 @@ trait CreatingQuests { this: UserLogic =>
   /**
    * Is user can propose quest of given type.
    */
-  def canCreateQuest(questContent: QuestInfoContent) = {
+  def canCreateQuest(questContent: QuestInfoContent): CreateQuestCode.Value = {
+    import CreateQuestCode._
+
     val content = questContent.media.contentType match {
       case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests)
       case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoQuests)
@@ -36,9 +39,9 @@ trait CreatingQuests { this: UserLogic =>
     if (!content)
       NotEnoughRights
     else if (!canProposeQuestToday)
-      CoolDown
+      QuestCreationCoolDown
     else if (questContent.description.length > api.config(api.DefaultConfigParams.QuestMaxDescriptionLength).toInt)
-      LimitExceeded
+      DescriptionLengthLimitExceeded
     else if (!bioComplete)
       IncompleteBio
     else

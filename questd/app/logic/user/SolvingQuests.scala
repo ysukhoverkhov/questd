@@ -1,8 +1,7 @@
 package logic.user
 
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.user.SolveQuestCode
 import logic._
-import models.domain.common.ContentType
 import models.domain.common.ContentType._
 import models.domain.quest.Quest
 import models.domain.user.profile.Functionality
@@ -22,7 +21,9 @@ trait SolvingQuests { this: UserLogic =>
   /**
    * Is user can propose quest of given type.
    */
-  def canSolveQuest(contentType: ContentType, questToSolve: Quest) = {
+  def canSolveQuest(contentType: ContentType, questToSolve: Quest): SolveQuestCode.Value = {
+    import SolveQuestCode._
+
     val content = contentType match {
       case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoSolutions)
       case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoSolutions)
@@ -33,9 +34,9 @@ trait SolvingQuests { this: UserLogic =>
     else if (!(user.profile.assets canAfford questToSolve.info.solveCost))
       NotEnoughAssets
     else if (questToSolve.info.authorId == user.id)
-      InvalidState
+      CantSolveOwnQuest
     else if (user.stats.solvedQuests.contains(questToSolve.id))
-      InvalidState
+      QuestAlreadySolved
     else if (!bioComplete)
       IncompleteBio
     else

@@ -7,8 +7,8 @@ object MessageType extends Enumeration {
   // system
   val AllTasksCompleted = Value
   val TaskCompleted = Value
-  val BattleRequestAccepted = Value
-  val BattleRequestRejected = Value
+  val ChallengeAccepted = Value
+  val ChallengeRejected = Value
   val FriendshipAccepted = Value
   val FriendshipRejected = Value
   val FriendshipRemoved = Value
@@ -18,4 +18,9 @@ object MessageType extends Enumeration {
   val Information = Value
   val NewChatMessage = Value
   val FriendRegistered = Value
+
+  // TODO: remove in 0.50.02
+  // TODO: add removing of these messages to cleanup.
+  val BattleRequestAccepted = Value
+  val BattleRequestRejected = Value
 }

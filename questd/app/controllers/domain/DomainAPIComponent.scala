@@ -1,6 +1,7 @@
 package controllers.domain
 
 import components._
+import controllers.domain.app.challenge.ChallengesAPI
 import components.random.RandomComponent
 import controllers.domain.admin._
 import controllers.domain.app.battle.{BattleAPI, BattleFetchAPI}

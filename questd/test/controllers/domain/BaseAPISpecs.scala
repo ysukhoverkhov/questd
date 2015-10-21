@@ -33,6 +33,7 @@ private[domain] abstract class BaseAPISpecs
   val comment = mock[CommentDAO]
   val conversation = mock[ConversationDAO]
   val chat = mock[ChatMessageDAO]
+  val challenge = mock[ChallengeDAO]
 
   val rand = mock[Random]
 
@@ -57,10 +58,11 @@ private[domain] abstract class BaseAPISpecs
       db.comment returns comment
       db.conversation returns conversation
       db.chat returns chat
+      db.challenge returns challenge
 
       config.readConfig returns mockConfiguration
 
-      api.user2Logic(any)
+//      api.user2Logic(any)
     }
   }
 }

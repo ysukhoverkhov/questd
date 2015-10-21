@@ -1,7 +1,7 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import models.domain.battle.BattleStatus
@@ -10,52 +10,38 @@ import models.domain.solution.SolutionStatus
 import models.domain.user.User
 import models.view.{BattleView, ProfileView, QuestView, SolutionView}
 
+
+object GetQuestsCode extends Enumeration with CommonCode
 case class GetQuestsRequest(user: User, questIds: List[String])
 case class GetQuestsResult(
-  allowed: ProfileModificationResult,
+  allowed: GetQuestsCode.Value,
   quests: List[QuestView] = List.empty)
 
+
+object GetSolutionsCode extends Enumeration with CommonCode
 case class GetSolutionsRequest(user: User, solutionIds: List[String])
 case class GetSolutionsResult(
-  allowed: ProfileModificationResult,
+  allowed: GetSolutionsCode.Value,
   solutions: List[SolutionView] = List.empty)
 
+
+object GetBattlesCode extends Enumeration with CommonCode
 case class GetBattlesRequest(user: User, battleIds: List[String])
 case class GetBattlesResult(
-  allowed: ProfileModificationResult,
+  allowed: GetBattlesCode.Value,
   battles: List[BattleView] = List.empty)
 
+
+object GetPublicProfilesCode extends Enumeration with CommonCode
 case class GetPublicProfilesRequest(
   user: User,
   userIds: List[String])
 case class GetPublicProfilesResult(
-  allowed: ProfileModificationResult,
+  allowed: GetPublicProfilesCode.Value,
   publicProfiles: List[ProfileView])
 
-case class GetSolutionsForQuestRequest(
-  user: User,
-  questId: String,
-  status: List[SolutionStatus.Value],
-  pageNumber: Int,
-  pageSize: Int)
-case class GetSolutionsForQuestResult(
-  allowed: ProfileModificationResult,
-  solutions: List[SolutionView],
-  pageSize: Int,
-  hasMore: Boolean)
 
-case class GetSolutionsForUserRequest(
-  user: User,
-  userId: String,
-  status: List[SolutionStatus.Value],
-  pageNumber: Int,
-  pageSize: Int)
-case class GetSolutionsForUserResult(
-  allowed: ProfileModificationResult,
-  solutions: List[SolutionView],
-  pageSize: Int,
-  hasMore: Boolean)
-
+object GetQuestsForUserCode extends Enumeration with CommonCode
 case class GetQuestsForUserRequest(
   user: User,
   userId: String,
@@ -63,11 +49,41 @@ case class GetQuestsForUserRequest(
   pageNumber: Int,
   pageSize: Int)
 case class GetQuestsForUserResult(
-  allowed: ProfileModificationResult,
+  allowed: GetQuestsForUserCode.Value,
   quests: List[QuestView],
   pageSize: Int,
   hasMore: Boolean)
 
+
+object GetSolutionsForQuestCode extends Enumeration with CommonCode
+case class GetSolutionsForQuestRequest(
+  user: User,
+  questId: String,
+  status: List[SolutionStatus.Value],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetSolutionsForQuestResult(
+  allowed: GetSolutionsForQuestCode.Value,
+  solutions: List[SolutionView],
+  pageSize: Int,
+  hasMore: Boolean)
+
+
+object GetSolutionsForUserCode extends Enumeration with CommonCode
+case class GetSolutionsForUserRequest(
+  user: User,
+  userId: String,
+  status: List[SolutionStatus.Value],
+  pageNumber: Int,
+  pageSize: Int)
+case class GetSolutionsForUserResult(
+  allowed: GetSolutionsForUserCode.Value,
+  solutions: List[SolutionView],
+  pageSize: Int,
+  hasMore: Boolean)
+
+
+object GetBattlesForUserCode extends Enumeration with CommonCode
 case class GetBattlesForUserRequest(
   user: User,
   userId: String,
@@ -75,11 +91,13 @@ case class GetBattlesForUserRequest(
   pageNumber: Int,
   pageSize: Int)
 case class GetBattlesForUserResult(
-  allowed: ProfileModificationResult,
+  allowed: GetBattlesForUserCode.Value,
   battles: List[BattleView],
   pageSize: Int,
   hasMore: Boolean)
 
+
+object GetBattlesForSolutionCode extends Enumeration with CommonCode
 case class GetBattlesForSolutionRequest(
   user: User,
   solutionId: String,
@@ -87,11 +105,13 @@ case class GetBattlesForSolutionRequest(
   pageNumber: Int,
   pageSize: Int)
 case class GetBattlesForSolutionResult(
-  allowed: ProfileModificationResult,
+  allowed: GetBattlesForSolutionCode.Value,
   battles: List[BattleView],
   pageSize: Int,
   hasMore: Boolean)
 
+
+object GetBattlesForQuestCode extends Enumeration with CommonCode
 case class GetBattlesForQuestRequest(
   user: User,
   questId: String,
@@ -99,7 +119,7 @@ case class GetBattlesForQuestRequest(
   pageNumber: Int,
   pageSize: Int)
 case class GetBattlesForQuestResult(
-  allowed: ProfileModificationResult,
+  allowed: GetBattlesForQuestCode.Value,
   battles: List[BattleView],
   pageSize: Int,
   hasMore: Boolean)
@@ -111,7 +131,9 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get quest by its id
    */
   def getQuests(request: GetQuestsRequest): ApiResult[GetQuestsResult] = handleDbException {
+    import GetQuestsCode._
     import request._
+
     val maxPageSize = adjustedPageSize(questIds.length)
 
     OkApiResult(GetQuestsResult(
@@ -123,7 +145,9 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get solution by its id
    */
   def getSolutions(request: GetSolutionsRequest): ApiResult[GetSolutionsResult] = handleDbException {
+    import GetSolutionsCode._
     import request._
+
     val maxPageSize = adjustedPageSize(solutionIds.length)
 
     OkApiResult(GetSolutionsResult(
@@ -137,7 +161,9 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * @return
    */
   def getBattles(request: GetBattlesRequest): ApiResult[GetBattlesResult] = handleDbException {
+    import GetBattlesCode._
     import request._
+
     val maxPageSize = adjustedPageSize(battleIds.length)
 
     OkApiResult(GetBattlesResult(
@@ -154,6 +180,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get public profile
    */
   def getPublicProfiles(request: GetPublicProfilesRequest): ApiResult[GetPublicProfilesResult] = handleDbException {
+    import GetPublicProfilesCode._
+
     val maxPageSize = adjustedPageSize(request.userIds.length)
 
     OkApiResult(GetPublicProfilesResult(
@@ -165,7 +193,9 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get all quests for a user.
    */
   def getQuestsForUser(request: GetQuestsForUserRequest): ApiResult[GetQuestsForUserResult] = handleDbException {
+    import GetQuestsForUserCode._
     import request._
+
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
@@ -191,7 +221,9 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get all solutions for a user.
    */
   def getSolutionsForUser(request: GetSolutionsForUserRequest): ApiResult[GetSolutionsForUserResult] = handleDbException {
+    import GetSolutionsForUserCode._
     import request._
+
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
@@ -219,6 +251,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get solutions for a quest.
    */
   def getSolutionsForQuest(request: GetSolutionsForQuestRequest): ApiResult[GetSolutionsForQuestResult] = handleDbException {
+    import GetSolutionsForQuestCode._
+
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
@@ -241,6 +275,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Get all battle for a user.
    */
   def getBattlesForUser(request: GetBattlesForUserRequest): ApiResult[GetBattlesForUserResult] = handleDbException {
+    import GetBattlesForUserCode._
+
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
@@ -264,10 +300,13 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
       battlesForUser.hasNext))
   }
 
+
   /**
    * Get battles for a solution.
    */
   def getBattlesForSolution(request: GetBattlesForSolutionRequest): ApiResult[GetBattlesForSolutionResult] = handleDbException {
+    import GetBattlesForSolutionCode._
+
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 
@@ -296,6 +335,8 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Returns duels people made for the quest.
    */
   def getBattlesForQuest(request: GetBattlesForQuestRequest): ApiResult[GetBattlesForQuestResult] = handleDbException {
+    import GetBattlesForQuestCode._
+
     val pageSize = adjustedPageSize(request.pageSize)
     val pageNumber = adjustedPageNumber(request.pageNumber)
 

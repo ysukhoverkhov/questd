@@ -2,24 +2,33 @@ package controllers.domain.app.user
 
 import components._
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
 import models.domain.user.timeline.TimeLineReason
 
 
+object BanUserCode extends Enumeration with CommonCode {
+  val MaxBansCountReached = Value
+  val UserNotFound = Value
+}
 case class BanUserRequest(
   user: User,
   userId: String)
 case class BanUserResult(
-  allowed: ProfileModificationResult)
+  allowed: BanUserCode.Value)
 
+
+object UnbanUserCode extends Enumeration with CommonCode {
+  val UserNotBanned = Value
+}
 case class UnbanUserRequest(
   user: User,
   userId: String)
 case class UnbanUserResult(
-  allowed: ProfileModificationResult)
+  allowed: UnbanUserCode.Value)
+
 
 case class GetBannedUsersRequest(
   user: User,
@@ -29,22 +38,24 @@ case class GetBannedUsersResult(
   userIds: List[String],
   pageSize: Int)
 
+
 private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAPI =>
 
   /**
    * Bans user and removes his content for us.
    */
   def banUser(request: BanUserRequest): ApiResult[BanUserResult] = handleDbException {
+    import BanUserCode._
     import request._
 
     val maxBannedSize = api.config(api.DefaultConfigParams.BannedUsersMaxLength).toInt
 
     if (user.banned.length >= maxBannedSize) {
-      OkApiResult(BanUserResult(LimitExceeded))
+      OkApiResult(BanUserResult(MaxBansCountReached))
     } else {
       // make task to optimize existence calls.
       db.user.readById(userId).fold[ApiResult[BanUserResult]] {
-        OkApiResult(BanUserResult(OutOfContent))
+        OkApiResult(BanUserResult(UserNotFound))
       } { userToBan =>
 
         user.timeLine.filter(_.actorId == userId).foreach( e =>
@@ -74,6 +85,7 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
    * Unban user we've banned.
    */
   def unbanUser(request: UnbanUserRequest): ApiResult[UnbanUserResult] = handleDbException {
+    import UnbanUserCode._
     import request._
 
     if (user.banned.contains(userId)) {
@@ -81,7 +93,7 @@ private[domain] trait BanAPI { this: DBAccessor with DomainAPIComponent#DomainAP
         OkApiResult(UnbanUserResult(OK))
       }
     } else {
-      OkApiResult(UnbanUserResult(OutOfContent))
+      OkApiResult(UnbanUserResult(UserNotBanned))
     }
   }
 
