@@ -204,15 +204,12 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
       // OPTIMIZE: test batch call
 
       db.user.readBySNid(i.snName, i.snId)
-        }).filter(_.isDefined).map(_.get).map(_.id).filter(!request.user.friends.map(_.friendId).contains(_)).filter(!request.user.following.contains(_))
-    }).filter(_.isDefined).map(_.get).map(_.id).filter(!request.user.friends.map(_.friendId).contains(_)).filter(!request.user.following.contains(_))
-        })
-          .filter(_.isDefined)
-          .map(_.get)
-          .map(_.id)
-          .filter(!request.user.friends.map(_.friendId).contains(_))
-          .filter(!request.user.following.contains(_))
-          .filter(!request.user.banned.contains(_))
+    }).filter(_.isDefined)
+      .map(_.get)
+      .map(_.id)
+      .filter(!request.user.friends.map(_.friendId).contains(_))
+      .filter(!request.user.following.contains(_))
+      .filter(!request.user.banned.contains(_))
 
     OkApiResult(GetSNFriendsInGameResult(OK, friends))
   }

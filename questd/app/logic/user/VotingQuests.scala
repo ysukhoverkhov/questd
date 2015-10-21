@@ -1,6 +1,5 @@
 package logic.user
 
-import controllers.domain.app.protocol.ProfileModificationResult._
 import controllers.domain.app.user.VoteQuestByUserCode
 import logic._
 import models.domain.common.ContentVote

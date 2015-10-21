@@ -3,7 +3,6 @@ package controllers.domain.app.user
 import java.util.Date
 
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.quest.QuestStatus
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._

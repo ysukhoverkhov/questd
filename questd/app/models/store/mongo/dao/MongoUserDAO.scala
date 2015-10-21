@@ -18,7 +18,6 @@ private[mongo] class MongoUserDAO
   with MongoUserStatsDAO
   with MongoUserDailyResultsDAO
   with MongoUserFollowingDAO
-  def setUserSource(id: String, userSource: Map[String, String]): Option[User] = {
   with MongoUserBannedDAO
   with MongoUserTimeLineDAO
   with MongoUserTutorialDAO

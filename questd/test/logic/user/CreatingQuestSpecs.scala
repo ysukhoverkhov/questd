@@ -2,7 +2,6 @@ package logic.user
 
 import java.util.Date
 
-import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.user.CreateQuestCode
 import logic.BaseLogicSpecs
 import models.domain.user.profile.Rights

@@ -1,7 +1,6 @@
 package controllers.domain.app.quest
 
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.user.{BookmarkQuestCode, BookmarkQuestResult, BookmarkQuestRequest}
 import models.domain.common.ContentVote
 import models.domain.user.User

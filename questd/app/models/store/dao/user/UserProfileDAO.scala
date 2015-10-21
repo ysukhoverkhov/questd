@@ -33,5 +33,5 @@ trait UserProfileDAO {
    * @param id Id if user to set source to.
    * @param userSource Sourece of a user.
    */
-  def setUserSource(id: String, userSource: String): Option[User]
+  def setUserSource(id: String, userSource: Map[String, String]): Option[User]
 }

@@ -1,6 +1,5 @@
 package controllers.domain.app.user
 
-import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain.common.{ClientPlatform, Assets}
 import models.domain.user._

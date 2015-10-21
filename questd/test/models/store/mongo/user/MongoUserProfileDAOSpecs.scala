@@ -72,14 +72,14 @@ trait MongoUserProfileDAOSpecs { this: BaseDAOSpecs =>
     "setUserSource works" in new WithApplication(appWithTestDatabase) {
       db.user.clear()
 
-      val source = "source!"
+      val source = Map("source!" -> "value1", "key2" -> "value2")
 
       val userStub = createUserStub()
       db.user.create(userStub)
 
       val ou = db.user.setUserSource(userStub.id, source)
 
-      ou must beSome.which((u: User) => u.profile.analytics.source.contains(source))
+      ou must beSome.which((u: User) => u.profile.analytics.source == source)
     }
   }
 }

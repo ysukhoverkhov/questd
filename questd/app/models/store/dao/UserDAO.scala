@@ -14,7 +14,6 @@ trait UserDAO
   with UserBannedDAO
   with UserTimeLineDAO
   with UserTutorialDAO
-  def setUserSource(id: String, userSource: Map[String, String]): Option[User]
   with UserTasksDAO
   with UserFriendsDAO
   with UserMessagesDAO

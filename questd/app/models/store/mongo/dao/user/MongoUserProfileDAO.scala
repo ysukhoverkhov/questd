@@ -122,7 +122,7 @@ trait MongoUserProfileDAO extends UserProfileDAO {
   /**
    * @inheritdoc
    */
-  def setUserSource(id: String, userSource: String): Option[User] = {
+  def setUserSource(id: String, userSource: Map[String, String]): Option[User] = {
     findAndModify(
       id,
       MongoDBObject(
