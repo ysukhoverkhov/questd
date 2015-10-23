@@ -1,0 +1,33 @@
+@(menuItems: Map[String, String], battles: List[models.domain.battle.Battle])
+
+@import helper._
+
+@body("Battles")(menuItems, Map.empty) {
+
+	<table border="1">
+	    	<tr>
+	    		<!--<td>battleId</td>-->
+	    		<td>status</td>
+                <td>level</td>
+                <td>vip</td>
+	    		<td>solutionIds</td>
+	    		<td>authorIds</td>
+	    		<td>winnerIds</td>
+	    		<td>voteEndDate</td>
+	    	</tr>
+		@for(b <- battles) {
+	    	<tr>
+	    		<td>@b.info.status</td>
+                <td>@b.level</td>
+                <td>@b.vip</td>
+                <td><pre>@b.info.battleSides.map(_.solutionId).mkString("\n")</pre></td>
+                <td><pre>@b.info.battleSides.map(_.authorId).mkString("\n")</pre></td>
+                <td><pre>@b.info.battleSides.map(_.isWinner).mkString("\n")</pre></td>
+                <td>@b.info.voteEndDate</td>
+	    	</tr>
+	    }
+	</table>
+
+}
+
+

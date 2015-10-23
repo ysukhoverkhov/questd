@@ -1,0 +1,230 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           					controllers.web.rest.Application.index
+
+#######################
+# WS
+#######################
+
+# Auth
+POST	/rest/login										controllers.web.rest.LoginWS.login
+
+# Analytics
+POST    /rest/setUserSource								controllers.web.rest.AnalyticsWS.setUserSource
+
+# Profile
+POST	/rest/getProfile								controllers.web.rest.ProfileWS.getProfile
+POST    /rest/getStats                                  controllers.web.rest.ProfileWS.getStats
+POST	/rest/setGender									controllers.web.rest.ProfileWS.setGender
+POST	/rest/setDebug									controllers.web.rest.ProfileWS.setDebug
+POST    /rest/setCity                                   controllers.web.rest.ProfileWS.setCity
+POST    /rest/setCountry                                controllers.web.rest.ProfileWS.setCountry
+POST    /rest/getCountryList                            controllers.web.rest.ProfileWS.getCountryList
+
+# Generating quests
+POST	/rest/createQuest								controllers.web.rest.CreateQuestWS.createQuest
+
+# Solve quest
+POST	/rest/bookmarkQuest		    					controllers.web.rest.SolveQuestWS.bookmarkQuest
+POST	/rest/solveQuest		    					controllers.web.rest.SolveQuestWS.solveQuest
+
+# Vote quest
+POST	/rest/voteQuest     							controllers.web.rest.VoteQuestWS.voteQuest
+
+# Vote solution
+POST	/rest/voteSolution						    	controllers.web.rest.VoteSolutionWS.voteSolution
+
+# Vote battles
+POST    /rest/voteBattle						    	controllers.web.rest.VoteBattleWS.voteBattle
+
+# Time line
+POST	/rest/getTimeLine	    						controllers.web.rest.TimeLineWS.getTimeLine
+POST    /rest/hideFromTimeLine                          controllers.web.rest.TimeLineWS.hideFromTimeLine
+
+# Daily result
+POST	/rest/getDailyResult							controllers.web.rest.DailyResultWS.getDailyResult
+POST	/rest/getRightsAtLevel							controllers.web.rest.DailyResultWS.getRightsAtLevel
+POST	/rest/getLevelsForRights						controllers.web.rest.DailyResultWS.getLevelsForRights
+
+# Content requests
+POST	/rest/getQuests									controllers.web.rest.ContentWS.getQuests
+POST	/rest/getSolutions								controllers.web.rest.ContentWS.getSolutions
+POST	/rest/getBattles    							controllers.web.rest.ContentWS.getBattles
+
+POST	/rest/getPublicProfiles							controllers.web.rest.ContentWS.getPublicProfiles
+
+POST	/rest/getQuestsForUser							controllers.web.rest.ContentWS.getQuestsForUser
+
+POST	/rest/getSolutionsForUser						controllers.web.rest.ContentWS.getSolutionsForUser
+POST	/rest/getSolutionsForQuest						controllers.web.rest.ContentWS.getSolutionsForQuest
+
+POST	/rest/getBattlesForUser 						controllers.web.rest.ContentWS.getBattlesForUser
+POST	/rest/getBattlesForSolution						controllers.web.rest.ContentWS.getBattlesForSolution
+POST	/rest/getBattlesForQuest						controllers.web.rest.ContentWS.getBattlesForQuest
+
+# Following requests
+POST	/rest/getFollowing								controllers.web.rest.FollowingWS.getFollowing
+POST	/rest/getFollowers								controllers.web.rest.FollowingWS.getFollowers
+POST	/rest/costToFollow	    						controllers.web.rest.FollowingWS.costToFollow
+POST	/rest/addToFollowing							controllers.web.rest.FollowingWS.addToFollowing
+POST	/rest/removeFromFollowing						controllers.web.rest.FollowingWS.removeFromFollowing
+POST	/rest/getSuggestsForFollowing					controllers.web.rest.FollowingWS.getSuggestsForFollowing
+POST	/rest/getSNFriendsInGame      					controllers.web.rest.FollowingWS.getSNFriendsInGame
+
+# Friends requests
+POST	/rest/getFriends								controllers.web.rest.FriendsWS.getFriends
+POST	/rest/costToRequestFriendship					controllers.web.rest.FriendsWS.costToRequestFriendship
+POST	/rest/askFriendship								controllers.web.rest.FriendsWS.askFriendship
+POST	/rest/respondFriendship							controllers.web.rest.FriendsWS.respondFriendship
+POST	/rest/removeFromFriends							controllers.web.rest.FriendsWS.removeFromFriends
+
+# Banning
+POST	/rest/banUser								    controllers.web.rest.BanWS.banUser
+POST	/rest/unbanUser								    controllers.web.rest.BanWS.unbanUser
+POST    /rest/getBannedUsers                            controllers.web.rest.BanWS.getBannedUsers
+
+# Events
+POST	/rest/removeMessage								controllers.web.rest.EventsWS.removeMessage
+POST    /rest/addDeviceToken                            controllers.web.rest.EventsWS.addDeviceToken
+POST    /rest/removeDeviceToken                         controllers.web.rest.EventsWS.removeDeviceToken
+
+# Misc
+POST	/rest/getTime									controllers.web.rest.MiscWS.getTime
+
+# Tutorial
+POST	/rest/getTutorial	    						controllers.web.rest.TutorialWS.getTutorial
+POST	/rest/closeTutorialElement						controllers.web.rest.TutorialWS.closeTutorialElement
+POST	/rest/assignTutorialTask						controllers.web.rest.TutorialWS.assignTutorialTask
+POST	/rest/incTutorialTask							controllers.web.rest.TutorialWS.incTutorialTask
+POST	/rest/assignTutorialQuest						controllers.web.rest.TutorialWS.assignTutorialQuest
+
+# Comments
+POST	/rest/postComment	    						controllers.web.rest.CommentsWS.postComment
+POST	/rest/getCommentsForObject 						controllers.web.rest.CommentsWS.getCommentsForObject
+
+# Challenges
+#POST	/rest/costToChallenge							controllers.web.rest.ChallengesWS.costToChallenge
+POST    /rest/makeQuestChallenge                    	controllers.web.rest.ChallengesWS.makeQuestChallenge
+POST    /rest/makeSolutionChallenge                     controllers.web.rest.ChallengesWS.makeSolutionChallenge
+POST	/rest/getChallenge  						    controllers.web.rest.ChallengesWS.getChallenge
+POST	/rest/getMyChallenges						    controllers.web.rest.ChallengesWS.getMyChallenges
+POST	/rest/getChallengesToMe						    controllers.web.rest.ChallengesWS.getChallengesToMe
+POST    /rest/acceptChallenge    					    controllers.web.rest.ChallengesWS.acceptChallenge
+POST    /rest/rejectChallenge    					    controllers.web.rest.ChallengesWS.rejectChallenge
+
+# Chat
+POST   /rest/createConversation                         controllers.web.rest.ConversationsWS.createConversation
+POST   /rest/leaveConversation                          controllers.web.rest.ConversationsWS.leaveConversation
+POST   /rest/getMyConversations                         controllers.web.rest.ConversationsWS.getMyConversations
+POST   /rest/sendChatMessage                            controllers.web.rest.ConversationsWS.sendChatMessage
+POST   /rest/getChatMessages                            controllers.web.rest.ConversationsWS.getChatMessages
+
+
+# Upload
+POST    /cdn/upload                                     controllers.web.rest.UploadWS.upload
+POST    /cdn/getContentURLById                          controllers.web.rest.UploadWS.getContentURLById
+
+
+#######################
+# Debug (Should be removed in production)
+#######################
+POST	/rest/debug/shiftDailyResult					controllers.web.rest.DebugWS.shiftDailyResult
+POST	/rest/debug/resetProfile     					controllers.web.rest.DebugWS.resetProfile
+POST	/rest/debug/test								controllers.web.rest.DebugWS.test
+POST	/rest/debug/voteQuest							controllers.web.rest.DebugWS.voteQuestDebug
+POST	/rest/debug/voteSolution						controllers.web.rest.DebugWS.voteSolutionDebug
+POST	/rest/debug/setFriendship						controllers.web.rest.DebugWS.setFriendshipDebug
+POST	/rest/debug/makeBattle						    controllers.web.rest.DebugWS.makeBattle
+POST	/rest/debug/resetTutorial					    controllers.web.rest.DebugWS.resetTutorial
+POST	/rest/debug/setLevel					        controllers.web.rest.DebugWS.setLevel
+POST	/rest/debug/generateErrorLog			        controllers.web.rest.DebugWS.generateErrorLog
+POST	/rest/debug/resetProfile     					controllers.web.rest.DebugWS.resetProfile
+POST    /rest/debug/resolveAllBattles                   controllers.web.rest.DebugWS.resolveAllBattles
+
+
+
+#######################
+# Admin
+#######################
+GET		/admin											controllers.web.admin.AdminApp.index
+
+GET		/admin/loginJ0hETru60HiWwmEywG2q	            controllers.web.admin.AdminApp.login
+
+GET     /admin/maintains/cleanup                        controllers.web.admin.Maintains.cleanup
+GET     /admin/maintains/resetProfiles                  controllers.web.admin.Maintains.resetProfiles
+
+GET		/admin/themes									controllers.web.admin.ThemesCRUD.themes(id = "")
+GET		/admin/themes/byid/:id							controllers.web.admin.ThemesCRUD.themes(id)
+POST	/admin/themes/createTheme						controllers.web.admin.ThemesCRUD.createThemeCB
+GET		/admin/themes/deleteTheme/:id					controllers.web.admin.ThemesCRUD.deleteThemeCB(id: String)
+
+GET		/admin/cultures									controllers.web.admin.CulturesCRUD.cultures(id = "")
+GET		/admin/cultures/byid/:id						controllers.web.admin.CulturesCRUD.cultures(id)
+GET		/admin/cultures/deleteCulture/:id				controllers.web.admin.CulturesCRUD.deleteCultureCB(id: String)
+POST	/admin/cultures/createCulture					controllers.web.admin.CulturesCRUD.createCultureCB
+GET     /admin/cultures/extractCountry/:country         controllers.web.admin.CulturesCRUD.extractCountry(country: String)
+
+GET		/admin/quests									controllers.web.admin.QuestsCRUD.quests(id = "")
+GET		/admin/quests/byid/:id							controllers.web.admin.QuestsCRUD.quests(id)
+POST	/admin/quests/update							controllers.web.admin.QuestsCRUD.updateQuest
+
+GET		/admin/users									controllers.web.admin.UsersCRUD.users(id = "")
+GET		/admin/solutions								controllers.web.admin.SolutionsCRUD.solutions(id = "")
+GET		/admin/battles	    							controllers.web.admin.BattlesCRUD.battles(id = "")
+
+GET		/admin/config									controllers.web.admin.Config.config(name = "")
+GET		/admin/config/byname/:name						controllers.web.admin.Config.config(name)
+POST	/admin/config/configUpdate/:name				controllers.web.admin.Config.configUpdate(name)
+
+GET		/admin/messages         						controllers.web.admin.Messages.compose(sendResult: String)
+POST	/admin/messages/send	    					controllers.web.admin.Messages.send
+
+
+GET     /admin/tutorial                                 controllers.web.admin.TutorialScriptsCRUD.tutorial(platform: String)
+POST    /admin/tutorial/addElement                      controllers.web.admin.TutorialScriptsCRUD.addElement(platform: String, elementId: Option[String])
+POST    /admin/tutorial/deleteElement                   controllers.web.admin.TutorialScriptsCRUD.deleteElement(platform: String, elementId: String)
+POST    /admin/tutorial/upElement                       controllers.web.admin.TutorialScriptsCRUD.upElement(platform: String, elementId: String)
+POST    /admin/tutorial/downElement                     controllers.web.admin.TutorialScriptsCRUD.downElement(platform: String, elementId: String)
+
+POST    /admin/tutorial/updateAction                    controllers.web.admin.TutorialScriptsCRUD.updateAction(platform: String, elementId: String, actionIndex: Int)
+POST    /admin/tutorial/addActionToElement              controllers.web.admin.TutorialScriptsCRUD.addActionToElement(platform: String, elementId: String)
+POST    /admin/tutorial/deleteActionFromElement         controllers.web.admin.TutorialScriptsCRUD.deleteActionFromElement(platform: String, elementId: String, actionIndex: Int)
+POST    /admin/tutorial/addParamToElementAction         controllers.web.admin.TutorialScriptsCRUD.addParamToElementAction(platform: String, elementId: String, actionIndex: Int)
+POST    /admin/tutorial/deleteParamFromElementAction    controllers.web.admin.TutorialScriptsCRUD.deleteParamFromElementAction(platform: String, elementId: String, actionIndex: Int, paramKey: String)
+POST    /admin/tutorial/saveParamInElementAction        controllers.web.admin.TutorialScriptsCRUD.saveParamInElementAction(platform: String, elementId: String, actionIndex: Int, paramKey: String)
+
+POST    /admin/tutorial/updateCondition                 controllers.web.admin.TutorialScriptsCRUD.updateCondition(platform: String, elementId: String, conditionIndex: Int)
+POST    /admin/tutorial/addConditionToElement           controllers.web.admin.TutorialScriptsCRUD.addConditionToElement(platform: String, elementId: String)
+POST    /admin/tutorial/deleteConditionFromElement      controllers.web.admin.TutorialScriptsCRUD.deleteConditionFromElement(platform: String, elementId: String, conditionIndex: Int)
+POST    /admin/tutorial/addParamToElementCondition      controllers.web.admin.TutorialScriptsCRUD.addParamToElementCondition(platform: String, elementId: String, conditionIndex: Int)
+POST    /admin/tutorial/deleteParamFromElemCondition    controllers.web.admin.TutorialScriptsCRUD.deleteParamFromElemCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String)
+POST    /admin/tutorial/saveParamInElementCondition     controllers.web.admin.TutorialScriptsCRUD.saveParamInElementCondition(platform: String, elementId: String, conditionIndex: Int, paramKey: String)
+
+POST    /admin/tutorial/updateTrigger                   controllers.web.admin.TutorialScriptsCRUD.updateTrigger(platform: String, elementId: String, index: Int)
+POST    /admin/tutorial/addTriggerToElement             controllers.web.admin.TutorialScriptsCRUD.addTriggerToElement(platform: String, elementId: String)
+POST    /admin/tutorial/deleteTriggerFromElement        controllers.web.admin.TutorialScriptsCRUD.deleteTriggerFromElement(platform: String, elementId: String, index: Int)
+POST    /admin/tutorial/addParamToElementTrigger        controllers.web.admin.TutorialScriptsCRUD.addParamToElementTrigger(platform: String, elementId: String, index: Int)
+POST    /admin/tutorial/deleteParamFromElemTrigger      controllers.web.admin.TutorialScriptsCRUD.deleteParamFromElemTrigger(platform: String, elementId: String, index: Int, paramKey: String)
+POST    /admin/tutorial/saveParamInElementTrigger       controllers.web.admin.TutorialScriptsCRUD.saveParamInElementTrigger(platform: String, elementId: String, index: Int, paramKey: String)
+
+GET     /admin/tutorial/exportTutorialScript            controllers.web.admin.TutorialScriptsCRUD.exportTutorialScript(platform: String)
+POST    /admin/tutorial/importTutorialScript            controllers.web.admin.TutorialScriptsCRUD.importTutorialScript(platform: String)
+
+POST    /admin/tutorial/addSection                      controllers.web.admin.TutorialScriptsCRUD.addSection(platform: String)
+POST    /admin/tutorial/updateElementSectionName        controllers.web.admin.TutorialScriptsCRUD.updateElementSectionName(platform: String, elementId: String)
+POST    /admin/tutorial/selectElementSectionName        controllers.web.admin.TutorialScriptsCRUD.selectElementSectionName(platform: String)
+
+GET		/admin/tutorialTasks							controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id = "")
+GET		/admin/tutorialTasks/byid/:id					controllers.web.admin.TutorialTasksCRUD.tutorialTasks(id)
+POST	/admin/tutorialTasks/update						controllers.web.admin.TutorialTasksCRUD.updateTutorialTask
+
+GET     /admin/tutorial/exportTutorialTasks             controllers.web.admin.TutorialTasksCRUD.exportTutorialTasks
+POST    /admin/tutorial/importTutorialTasks             controllers.web.admin.TutorialTasksCRUD.importTutorialTasks
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               					controllers.Assets.at(path="/public", file)
+
