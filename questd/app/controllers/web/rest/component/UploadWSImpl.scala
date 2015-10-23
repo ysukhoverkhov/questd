@@ -56,6 +56,7 @@ trait UploadWSImpl extends BaseController with SecurityWSImpl { this: WSComponen
 
             file.getParentFile.mkdirs()
             content.ref.moveTo(file)
+            file.setReadable(true, false)
 
             Ok(
               Json.write(WSUploadResult(UploadCode.OK, Some(addition.toString())))).as(JSON)
