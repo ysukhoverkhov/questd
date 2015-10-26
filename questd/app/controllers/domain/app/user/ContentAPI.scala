@@ -247,7 +247,6 @@ private[domain] trait ContentAPI { this: DomainAPIComponent#DomainAPI with DBAcc
     val battlesForUser = db.battle.allWithParams(
       status = request.status,
       authorIds = List(request.userId),
-      authorIdsExclude = request.user.banned,
       skip = pageNumber * pageSize)
 
     val battles = battlesForUser.take(pageSize).toList.map( b => {
