@@ -119,11 +119,15 @@ private[domain] trait QuestAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     import ContentVote._
     import request._
 
-    def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
+    def checkInc[T](v: T, c: T, inc: Int = 1, n: Int = 0) = if (v == c) n + inc else n
 
     db.quest.updatePoints(
       id = quest.id,
-      timelinePointsChange = checkInc(vote, Cool),
+      timelinePointsChange =
+        checkInc(vote, Cool, 1) +
+        checkInc(vote, Cheating, -5) +
+        checkInc(vote, IASpam, -10) +
+        checkInc(vote, IAPorn, -10),
       likesChange = checkInc(vote, Cool),
       votersCountChange = 1,
       cheatingChange = checkInc(vote, Cheating),
