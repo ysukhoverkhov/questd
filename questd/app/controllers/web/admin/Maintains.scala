@@ -12,5 +12,7 @@ object Maintains extends Controller {
   def cleanup = admin.maintains.cleanup
 
   def resetProfiles = admin.maintains.resetProfiles
+
+  def exportAnalytics = admin.maintains.exportAnalytics
 }
 

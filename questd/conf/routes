@@ -151,6 +151,7 @@ GET		/admin/loginJ0hETru60HiWwmEywG2q	            controllers.web.admin.AdminApp
 
 GET     /admin/maintains/cleanup                        controllers.web.admin.Maintains.cleanup
 GET     /admin/maintains/resetProfiles                  controllers.web.admin.Maintains.resetProfiles
+GET     /admin/maintains/exportAnalytics                controllers.web.admin.Maintains.exportAnalytics
 
 GET		/admin/themes									controllers.web.admin.ThemesCRUD.themes(id = "")
 GET		/admin/themes/byid/:id							controllers.web.admin.ThemesCRUD.themes(id)
