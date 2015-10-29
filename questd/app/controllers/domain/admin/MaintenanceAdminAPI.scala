@@ -11,10 +11,13 @@ import models.domain.user.User
 case class CleanUpObjectsRequest()
 case class CleanUpObjectsResult()
 
+case class ExportAnalyticsRequest()
+case class ExportAnalyticsResult(data: String)
+
 private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
   /**
-   * Get config section by its name.
+   * Cleanup all database objects.
    */
   def cleanUpObjects(request: CleanUpObjectsRequest): ApiResult[CleanUpObjectsResult] = handleDbException {
 
@@ -75,6 +78,18 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       user.copy(timeLine = user.timeLine.filterNot(p => objIds.contains(p.objectId)))
     }
 
+    def updateEmptySource(user: User): User = {
+      if (user.profile.analytics.source == Map.empty) {
+        user.copy(
+          profile = user.profile.copy(
+            analytics = user.profile.analytics.copy(
+              source = Map("channel" -> "Direct")
+            )))
+      } else {
+        user
+      }
+    }
+
     db.quest.all.foreach { quest =>
       val updatedQuest = updateQuestSolutionsCount(updateQuestValues(checkBanQuest(quest)))
 
@@ -102,7 +117,7 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
 
     db.user.all.foreach { user =>
       db.user.update(
-        removeObjectsFromTimeline(user.initialized, objectsToRemove)
+        updateEmptySource(removeObjectsFromTimeline(user.initialized, objectsToRemove))
       )
     }
 
@@ -111,6 +126,58 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
     }
 
     OkApiResult(CleanUpObjectsResult())
+  }
+
+  /**
+   *
+   */
+  def exportAnalytics(request: ExportAnalyticsRequest): ApiResult[ExportAnalyticsResult] = handleDbException {
+    val data =
+
+      (List(
+        List[String](
+          "id",
+          "profile.analytics.profileCreationDate",
+          "profile.analytics.source.channel",
+          "profile.analytics.source.campaign",
+          "profile.analytics.source.tags",
+          "auth.lastLogin",
+          "demo.cultureId",
+          "profile.publicProfile.level",
+          "profile.assets.coins",
+          "profile.assets.rating",
+          "stats.createdQuests.length",
+          "stats.solvedQuests.size",
+          "stats.participatedBattles.size",
+          "following.length",
+          "followers.length",
+          "banned.length"
+        ).mkString(",")
+      ) ::: db.user.all.map[String] { u =>
+        List[String](
+          u.id,
+          u.profile.analytics.profileCreationDate.toString,
+          u.profile.analytics.source.getOrElse("channel", ""),
+          u.profile.analytics.source.getOrElse("campaign", ""),
+          u.profile.analytics.source.getOrElse("tags", ""),
+          u.auth.lastLogin.map[String](_.toString).getOrElse(""),
+          u.demo.cultureId.getOrElse(""),
+          u.profile.publicProfile.level.toString,
+          u.profile.assets.coins.toString,
+          u.profile.assets.rating.toString,
+          u.stats.createdQuests.length.toString,
+          u.stats.solvedQuests.size.toString,
+          u.stats.participatedBattles.size.toString,
+          u.following.length.toString,
+          u.followers.length.toString,
+          u.banned.length.toString
+        ).map {
+          case "" => """"""""
+          case v => v
+        }.mkString(",")
+      }.toList).mkString("\n")
+
+    OkApiResult(ExportAnalyticsResult(data))
   }
 
 }
