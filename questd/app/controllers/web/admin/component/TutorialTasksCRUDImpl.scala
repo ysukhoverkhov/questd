@@ -108,7 +108,7 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
           api.updateTutorialTaskAdmin(UpdateTutorialTaskAdminRequest(tt))
         }
 
-        Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
+        Redirect(_root_.controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
       })
   }
 
@@ -119,7 +119,7 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
    * @return Redirect
    */
   def exportTutorialTasks = Authenticated { implicit request =>
-    import controllers.web.helpers._
+    import _root_.controllers.web.helpers._
 
     val tasks = api.db.tutorialTask.all.toList
     Ok(Json.write(tasks)).withHeaders(CACHE_CONTROL -> "max-age=0", CONTENT_DISPOSITION -> s"attachment; filename=tutorialTasks.js", CONTENT_TYPE -> "application/x-download")
@@ -131,7 +131,7 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
    * @return Redirect
    */
   def importTutorialTasks = Authenticated(parse.multipartFormData) { request =>
-    import controllers.web.helpers._
+    import _root_.controllers.web.helpers._
 
     Logger.debug(s"Importing tutorial tasks")
 
@@ -144,9 +144,9 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
       api.db.tutorialTask.clear()
       tasks.foreach(api.db.tutorialTask.create)
 
-      Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
+      Redirect(_root_.controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
     }.getOrElse {
-      Redirect(controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks("")).flashing(
+      Redirect(_root_.controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks("")).flashing(
         "error" -> "Missing file")
     }
   }
