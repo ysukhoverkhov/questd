@@ -154,13 +154,18 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
               modifiedQuests = List(QuestView(myQuest, user))))
           }
 
-        case OpponentAlreadyChallenged => // TODO: test this case
+        case reason@OpponentAlreadyChallenged => // TODO: test this case
           val challenge = db.challenge.findByParticipantsAndQuest(
             (user.id, opponentId), myQuestId)
             .foldLeft[Option[Challenge]](None){(r, v) => Some(v)}
           OkApiResult(MakeQuestChallengeResult(
-            allowed = OK,
+            allowed = reason,
             challenge = challenge))
+
+        case reason@NotEnoughAssets => // TODO: test this case
+          OkApiResult(MakeQuestChallengeResult(
+            allowed = reason,
+            profile = Some(user.profile)))
 
         case reason =>
           OkApiResult(MakeQuestChallengeResult(reason))
@@ -205,13 +210,18 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
                 modifiedSolutions = List(SolutionView(mySolution, user))))
             }
 
-          case OpponentAlreadyChallenged => // TODO: test this case
+          case reason@OpponentAlreadyChallenged => // TODO: test this case
             val challenge = db.challenge.findByParticipantsAndQuest(
               (user.id, opponentId), mySolution.info.questId)
               .foldLeft[Option[Challenge]](None){(r, v) => Some(v)}
             OkApiResult(MakeSolutionChallengeResult(
-              allowed = OK,
+              allowed = reason,
               challenge = challenge))
+
+          case reason@NotEnoughAssets => // TODO: test this case
+            OkApiResult(MakeSolutionChallengeResult(
+              allowed = reason,
+              profile = Some(user.profile)))
 
           case reason =>
             OkApiResult(MakeSolutionChallengeResult(reason))

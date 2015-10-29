@@ -146,6 +146,11 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               }
             }
 
+          case result@NotEnoughAssets =>
+            OkApiResult(SolveQuestResult(
+              allowed = result,
+              profile = Some(request.user.profile)))
+
           case result => OkApiResult(SolveQuestResult(result))
         }
     }

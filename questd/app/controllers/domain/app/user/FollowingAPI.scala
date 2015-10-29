@@ -156,7 +156,14 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
             OkApiResult(AddToFollowingResult(OK, Some(r.user.profile)))
 
           }
-          case result => OkApiResult(AddToFollowingResult(result))
+
+          case result@NotEnoughAssets =>
+            OkApiResult(AddToFollowingResult(
+              allowed = result,
+              profile = Some(request.user.profile)))
+
+          case result =>
+            OkApiResult(AddToFollowingResult(result))
         }
       }
     }
