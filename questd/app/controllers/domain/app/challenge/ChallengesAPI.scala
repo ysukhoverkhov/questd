@@ -27,6 +27,7 @@ case class MakeQuestChallengeRequest(
 case class MakeQuestChallengeResult(
   allowed: MakeQuestChallengeCode.Value,
   profile: Option[Profile] = None,
+  challenge: Option[Challenge] = None,
   modifiedQuests: List[QuestView] = List.empty)
 
 
@@ -44,6 +45,7 @@ case class MakeSolutionChallengeRequest(
 case class MakeSolutionChallengeResult(
   allowed: MakeSolutionChallengeCode.Value,
   profile: Option[Profile] = None,
+  challenge: Option[Challenge] = None,
   modifiedSolutions: List[SolutionView] = List.empty)
 
 
@@ -145,8 +147,20 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
           {
             makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
           } map { r =>
-            OkApiResult(MakeQuestChallengeResult(OK, Some(r.user.profile), List(QuestView(myQuest, user))))
+            OkApiResult(MakeQuestChallengeResult(
+              allowed = OK,
+              profile = Some(r.user.profile),
+              challenge = Some(challenge),
+              modifiedQuests = List(QuestView(myQuest, user))))
           }
+
+        case OpponentAlreadyChallenged => // TODO: test this case
+          val challenge = db.challenge.findByParticipantsAndQuest(
+            (user.id, opponentId), myQuestId)
+            .foldLeft[Option[Challenge]](None){(r, v) => Some(v)}
+          OkApiResult(MakeQuestChallengeResult(
+            allowed = OK,
+            challenge = challenge))
 
         case reason =>
           OkApiResult(MakeQuestChallengeResult(reason))
@@ -184,8 +198,20 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
             {
               makeTask(MakeTaskRequest(user, Some(TaskType.ChallengeBattle)))
             } map { r =>
-              OkApiResult(MakeSolutionChallengeResult(OK, Some(r.user.profile), List(SolutionView(mySolution, user))))
+              OkApiResult(MakeSolutionChallengeResult(
+                allowed = OK,
+                profile = Some(r.user.profile),
+                challenge = Some(challenge),
+                modifiedSolutions = List(SolutionView(mySolution, user))))
             }
+
+          case OpponentAlreadyChallenged => // TODO: test this case
+            val challenge = db.challenge.findByParticipantsAndQuest(
+              (user.id, opponentId), mySolution.info.questId)
+              .foldLeft[Option[Challenge]](None){(r, v) => Some(v)}
+            OkApiResult(MakeSolutionChallengeResult(
+              allowed = OK,
+              challenge = challenge))
 
           case reason =>
             OkApiResult(MakeSolutionChallengeResult(reason))

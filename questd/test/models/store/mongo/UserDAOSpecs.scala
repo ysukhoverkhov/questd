@@ -9,7 +9,6 @@ import models.store.mongo.user._
 import org.specs2.mutable._
 import play.api.test.{WithApplication, _}
 
-// split it on several tests.
 class UserDAOSpecs
   extends BaseDAOSpecs
   with MongoUserAuthDAOSpecs
