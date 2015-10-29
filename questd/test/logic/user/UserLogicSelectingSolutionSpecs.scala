@@ -198,17 +198,6 @@ class UserLogicSelectingSolutionSpecs extends BaseLogicSpecs {
       there were two(api).getAllSolutions(any[GetAllSolutionsRequest])
     }
 
-    "Solution from must help list is returned if there is one" in context {
-      val qid = "qid"
-      val u = createUserStub(mustVoteSolutions = List(qid))
-
-      api.getHelpWantedSolutions(any[GetHelpWantedSolutionsRequest]) returns OkApiResult(GetHelpWantedSolutionsResult(List(createSolutionStub(id = qid)).iterator))
-
-      u.getRandomSolution
-
-      there was one(api).getHelpWantedSolutions(any[GetHelpWantedSolutionsRequest])
-    }
-
     "Solutions for own quests are returned" in context {
       val qid = "qid"
       val u = createUserStub()

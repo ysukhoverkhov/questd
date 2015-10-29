@@ -21,8 +21,6 @@ case class Profile(
   messages: List[Message] = List.empty,
   questCreationContext: QuestCreationContext = QuestCreationContext(),
   questSolutionContext: QuestSolutionContext = QuestSolutionContext(),
-  questVoteContext: QuestVoteContext = QuestVoteContext(),
-  solutionVoteContext: SolutionVoteContext = SolutionVoteContext(),
   tutorialStates: Map[String, TutorialState] =
     ClientPlatform.values.foldLeft[Map[String, TutorialState]](Map.empty){(r, v) => r + (v.toString -> TutorialState())},
   analytics: Analytics = Analytics(),

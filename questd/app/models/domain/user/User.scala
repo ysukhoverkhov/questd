@@ -29,5 +29,4 @@ case class User(
   banned: List[String] = List.empty,
   friends: List[Friendship] = List.empty,
   devices: List[Device] = List.empty,
-  settings: UserSettings = UserSettings(),
-  mustVoteSolutions: List[String] = List.empty) extends ID
+  settings: UserSettings = UserSettings()) extends ID

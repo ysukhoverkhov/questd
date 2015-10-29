@@ -16,7 +16,6 @@ class UserDAOSpecs
   with MongoUserBannedDAOSpecs
   with MongoUserContextsDAOSpecs
   with MongoUserDailyResultsDAOSpecs
-  with MongoUserDepreciatedDAOSpecs
   with MongoUserFetchDAOSpecs
   with MongoUserFriendsDAOSpecs
   with MongoUserMessagesDAOSpecs

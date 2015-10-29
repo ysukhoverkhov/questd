@@ -125,20 +125,6 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
       cultureId = request.user.demo.cultureId)))
   }
 
-  def getHelpWantedSolutions(request: GetHelpWantedSolutionsRequest): ApiResult[GetHelpWantedSolutionsResult] = handleDbException {
-    if (request.user.mustVoteSolutions.isEmpty) {
-      OkApiResult(GetHelpWantedSolutionsResult(List.empty.iterator))
-    } else {
-      OkApiResult(GetHelpWantedSolutionsResult(db.solution.allWithParams(
-        status = request.status,
-        authorIdsExclude = request.authorsExclude,
-        idsExclude = request.idsExclude,
-        levels = request.levels,
-        cultureId = request.user.demo.cultureId,
-        ids = request.user.mustVoteSolutions)))
-    }
-  }
-
   def getSolutionsForOwnQuests(request: GetSolutionsForOwnQuestsRequest): ApiResult[GetSolutionsForOwnQuestsResult] = handleDbException {
 
     val questIds = db.quest.allWithParams(authorIds = List(request.user.id)).toList.map(_.id)

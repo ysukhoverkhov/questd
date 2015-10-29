@@ -158,60 +158,6 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
         themeIds = List("a"))
     }
 
-    "getHelpWantedSolutions calls db correctly with empty list" in context {
-
-      val result = api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(User(), List(SolutionStatus.InRotation)))
-
-      result must beAnInstanceOf[OkApiResult[GetHelpWantedSolutionsResult]]
-
-      there was no(solution).allWithParams(
-        status = List(SolutionStatus.InRotation),
-        authorIds = null,
-        levels = null,
-        skip = 0,
-        vip = Some(true),
-        ids = null,
-        questIds = null,
-        themeIds = List("a"))
-    }
-
-    "getHelpWantedSolutions calls db correctly with not empty list" in context {
-
-      val sol = createSolutionStub()
-
-      db.solution.allWithParams(
-        status = mEq(List(SolutionStatus.InRotation)),
-        authorIds = any,
-        authorIdsExclude = mEq(List.empty),
-        levels = mEq(None),
-        skip = mEq(0),
-        vip = any,
-        ids = mEq(List("solution_id")),
-        idsExclude = mEq(List.empty),
-        questIds = any,
-        themeIds = any,
-        cultureId = mEq(None),
-        withBattles = any) returns List(sol).iterator
-
-      val result = api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(User(mustVoteSolutions = List("solution_id")), List(SolutionStatus.InRotation)))
-
-      result.body.get.solutions.toList must beEqualTo(List(sol))
-
-      there was one(solution).allWithParams(
-        status = mEq(List(SolutionStatus.InRotation)),
-        authorIds = any,
-        authorIdsExclude = mEq(List.empty),
-        levels = mEq(None),
-        skip = mEq(0),
-        vip = any,
-        ids = mEq(List("solution_id")),
-        idsExclude = mEq(List.empty),
-        questIds = any,
-        themeIds = any,
-        cultureId = mEq(None),
-        withBattles = any)
-    }
-
     "getSolutionsForOwnQuests calls db correctly" in context {
 
       val qu = createQuestStub()

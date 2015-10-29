@@ -27,7 +27,6 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   private[user] def getSolutionsWithSuperAlgorithm(implicit selected: List[Solution]): Option[Iterator[Solution]] = {
     val algorithms = List(
       () => getTutorialSolutions,
-      () => getHelpWantedSolutions,
       () => getSolutionsOfOwnQuests,
       () => getStartingSolutions,
       () => getDefaultSolutions)
@@ -38,20 +37,6 @@ trait SolutionSelectUserLogic { this: UserLogic =>
   private[user] def getTutorialSolutions(implicit selected: List[Solution]): Option[Iterator[Solution]] = {
     Logger.trace("getTutorialSolutions")
     None
-  }
-
-  private[user] def getHelpWantedSolutions(implicit selected: List[Solution]): Option[Iterator[Solution]] = {
-    Logger.trace("getHelpWantedSolutions")
-
-    if (user.mustVoteSolutions.nonEmpty) {
-      Some(api.getHelpWantedSolutions(GetHelpWantedSolutionsRequest(
-        user = user,
-        idsExclude = solutionIdsToExclude,
-        authorsExclude = solutionAuthorIdsToExclude,
-        status = List(SolutionStatus.InRotation))).body.get.solutions)
-    } else {
-      None
-    }
   }
 
   private[user] def getSolutionsOfOwnQuests(implicit selected: List[Solution]): Option[Iterator[Solution]] = {

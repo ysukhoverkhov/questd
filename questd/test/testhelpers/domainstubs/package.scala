@@ -234,7 +234,6 @@ package object domainstubs {
     followers: List[String] = List.empty,
     following: List[String] = List.empty,
     assets: Assets = Assets(100000, 100000, 100000),
-    mustVoteSolutions: List[String] = List.empty,
     level: Int = 18,
     questCreationCoolDown: Date = new Date(0),
     createdQuests: List[String] = List.empty,
@@ -284,7 +283,6 @@ package object domainstubs {
       followers = followers,
       following = following,
       banned = banned,
-      mustVoteSolutions = mustVoteSolutions,
       timeLine = timeLine,
       stats = UserStats(
         createdQuests = createdQuests,
