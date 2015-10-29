@@ -78,6 +78,18 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       user.copy(timeLine = user.timeLine.filterNot(p => objIds.contains(p.objectId)))
     }
 
+    def updateEmptySource(user: User): User = {
+      if (user.profile.analytics.source == Map.empty) {
+        user.copy(
+          profile = user.profile.copy(
+            analytics = user.profile.analytics.copy(
+              source = Map("channel" -> "Direct")
+            )))
+      } else {
+        user
+      }
+    }
+
     db.quest.all.foreach { quest =>
       val updatedQuest = updateQuestSolutionsCount(updateQuestValues(checkBanQuest(quest)))
 
@@ -105,7 +117,7 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
 
     db.user.all.foreach { user =>
       db.user.update(
-        removeObjectsFromTimeline(user.initialized, objectsToRemove)
+        updateEmptySource(removeObjectsFromTimeline(user.initialized, objectsToRemove))
       )
     }
 
