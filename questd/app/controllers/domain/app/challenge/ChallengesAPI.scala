@@ -137,7 +137,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
       user.canChallengeWithQuest(opponentId = opponentId, myQuest = myQuest) match {
         case OK =>
           val challenge = Challenge(
-            myId = user.id,
+            initiatorId = user.id,
             opponentId = opponentId,
             questId = myQuestId,
             status = ChallengeStatus.Requested)
@@ -190,10 +190,10 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
         user.canChallengeWithSolution(opponent = opponent, mySolution = mySolution) match {
           case OK =>
             val challenge = Challenge(
-              myId = user.id,
+              initiatorId = user.id,
               opponentId = opponentId,
               questId = mySolution.info.questId,
-              mySolutionId = Some(mySolutionId),
+              initiatorSolutionId = Some(mySolutionId),
               status = ChallengeStatus.Requested)
 
             db.challenge.create(challenge)
@@ -239,7 +239,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
     db.challenge.readById(request.challengeId).fold {
       OkApiResult(GetChallengeResult(ChallengeNotFound))
     } { c =>
-      if (List(c.myId, c.opponentId).contains(request.user.id)) {
+      if (List(c.initiatorId, c.opponentId).contains(request.user.id)) {
         OkApiResult(GetChallengeResult(OK, Some(c)))
       } else {
         OkApiResult(GetChallengeResult(UserNotParticipant))
@@ -301,13 +301,13 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
         user.canAcceptChallengeWithSolution(challenge, solution) match {
           case OK =>
             db.challenge.updateChallenge(challenge.id, ChallengeStatus.Accepted, Some(solution.id)) ifSome { updatedChallenge =>
-              db.user.readById(challenge.myId) ifSome { challenger =>
+              db.user.readById(challenge.initiatorId) ifSome { challenger =>
                 sendMessage(
                   SendMessageRequest(
                     challenger, MessageChallengeAccepted(challengeId = challenge.id)))
               }
 
-              updatedChallenge.mySolutionId.fold[ApiResult[AcceptChallengeResult]] {
+              updatedChallenge.initiatorSolutionId.fold[ApiResult[AcceptChallengeResult]] {
                 OkApiResult(
                   AcceptChallengeResult(
                     allowed = OK,
@@ -351,7 +351,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
       user.canRejectChallenge(challenge) match {
         case OK =>
           db.challenge.updateChallenge(challenge.id, ChallengeStatus.Rejected, None) ifSome { updatedChallenge =>
-            db.user.readById(challenge.myId) ifSome { challenger =>
+            db.user.readById(challenge.initiatorId) ifSome { challenger =>
               sendMessage(
                 SendMessageRequest(
                   challenger, MessageChallengeRejected(challengeId = challenge.id)))

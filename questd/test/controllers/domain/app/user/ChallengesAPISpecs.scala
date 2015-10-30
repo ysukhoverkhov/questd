@@ -35,7 +35,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
 
     "makeSolutionChallenge works" in context {
       val questId = "questId"
-      val mySolutionId = "mySolutionId"
+      val mySolutionId = "initiatorSolutionId"
       val sol = createSolutionStub(id = mySolutionId, questId = questId)
       val opponent = createUserStub()
       val u1 = createUserStub(solvedQuests = Map(questId -> mySolutionId), friends = List(Friendship(friendId = opponent.id, status = FriendshipStatus.Accepted)))
@@ -71,7 +71,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       val me = createUserStub()
       val challengeId = "challengeId"
       val challenge = createChallengeStub(id = challengeId)
-      val mySolutionId = "mySolutionId"
+      val mySolutionId = "initiatorSolutionId"
 
       db.challenge.readById(challengeId) returns Some(challenge)
       db.solution.readById(mySolutionId) returns None
@@ -85,7 +85,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       val me = createUserStub()
       val challengeId = "challengeId"
       val challenge = createChallengeStub(id = challengeId)
-      val mySolutionId = "mySolutionId"
+      val mySolutionId = "initiatorSolutionId"
       val mySolution = createSolutionStub(id = mySolutionId)
 
       db.challenge.readById(challengeId) returns Some(challenge)
@@ -101,7 +101,7 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       val opponent = createUserStub()
       val questId = "questId"
       val challengeId = "challengeId"
-      val mySolutionId = "mySolutionId"
+      val mySolutionId = "initiatorSolutionId"
       val mySolution = createSolutionStub(
         id = mySolutionId,
         questId = questId)
@@ -114,8 +114,8 @@ class ChallengesAPISpecs extends BaseAPISpecs {
         status = ChallengeStatus.Requested,
         opponentId = me.id,
         questId = questId,
-        myId = opponent.id,
-        mySolutionId = Some(opponentSolutionId))
+        initiatorId = opponent.id,
+        initiatorSolutionId = Some(opponentSolutionId))
 
       db.challenge.readById(challengeId) returns Some(challenge)
       db.solution.readById(mySolutionId) returns Some(mySolution)

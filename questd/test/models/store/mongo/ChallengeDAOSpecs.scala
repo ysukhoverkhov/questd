@@ -10,6 +10,7 @@ import testhelpers.domainstubs._
 class ChallengeDAOSpecs extends BaseDAOSpecs {
 
   "Mongo Challenge DAO" should {
+    // TODO: uncomment me.
 //    "Reads by solutions in any ways" in new WithApplication(appWithTestDatabase) {
 //      db.challenge.clear()
 //

@@ -9,10 +9,10 @@ import models.domain.base.ID
  */
 case class Challenge (
   id: String = ID.generate,
-  myId: String,
+  initiatorId: String,
   opponentId: String,
   questId: String,
-  mySolutionId: Option[String] = None,
+  initiatorSolutionId: Option[String] = None,
   opponentSolutionId: Option[String] = None,
   creationDate: Date = new Date(),
   status: ChallengeStatus.Value) extends ID

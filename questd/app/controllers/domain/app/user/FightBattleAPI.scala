@@ -139,10 +139,10 @@ private[domain] trait FightBattleAPI { this: DomainAPIComponent#DomainAPI with D
       val opponentId = opponentSolution.info.authorId
 
       db.challenge.create(Challenge(
-        myId = myId,
+        initiatorId = myId,
         opponentId = opponentId,
         questId = mySolution.info.questId,
-        mySolutionId = Some(mySolution.id),
+        initiatorSolutionId = Some(mySolution.id),
         opponentSolutionId = Some(opponentSolution.id),
         status = ChallengeStatus.AutoCreated))
     }

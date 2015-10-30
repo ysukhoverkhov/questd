@@ -20,11 +20,11 @@ private[mongo] class MongoChallengeDAO
 
     queryBuilder += ("$or" -> List(
       MongoDBObject("$and" -> List(
-        MongoDBObject("mySolutionId" -> solutionIds._1 ),
+        MongoDBObject("initiatorSolutionId" -> solutionIds._1 ),
         MongoDBObject("opponentSolutionId" -> solutionIds._2)
       )),
       MongoDBObject("$and" -> List(
-        MongoDBObject("mySolutionId" -> solutionIds._2 ),
+        MongoDBObject("initiatorSolutionId" -> solutionIds._2 ),
         MongoDBObject("opponentSolutionId" -> solutionIds._1)
       ))
     ))
@@ -42,11 +42,11 @@ private[mongo] class MongoChallengeDAO
 
     queryBuilder += ("$or" -> List(
       MongoDBObject("$and" -> List(
-        MongoDBObject("myId" -> participantIds._1 ),
+        MongoDBObject("initiatorId" -> participantIds._1 ),
         MongoDBObject("opponentId" -> participantIds._2)
       )),
       MongoDBObject("$and" -> List(
-        MongoDBObject("myId" -> participantIds._2 ),
+        MongoDBObject("initiatorId" -> participantIds._2 ),
         MongoDBObject("opponentId" -> participantIds._1)
       ))
     ))
@@ -62,15 +62,15 @@ private[mongo] class MongoChallengeDAO
    * @inheritdoc
    */
   def allWithParams(
-    myId: Option[String] = None,
+    initiatorId: Option[String] = None,
     opponentId: Option[String] = None,
     statuses: List[ChallengeStatus.Value] = List.empty,
     skip: Int = 0): Iterator[Challenge] = {
 
     val queryBuilder = MongoDBObject.newBuilder
 
-    if (myId.nonEmpty) {
-      queryBuilder += ("myId" -> myId)
+    if (initiatorId.nonEmpty) {
+      queryBuilder += ("initiatorId" -> initiatorId)
     }
 
     if (opponentId.nonEmpty) {

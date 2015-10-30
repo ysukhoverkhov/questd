@@ -12,7 +12,7 @@ class ChallengeAPISpecs extends BaseAPISpecs {
       val idMy = "challenge id my"
       val idOther = "challenge id other"
       val u = createUserStub()
-      val challengeStub = createChallengeStub(myId = u.id)
+      val challengeStub = createChallengeStub(initiatorId = u.id)
 
       challenge.readById(idMy) returns Some(challengeStub)
       challenge.readById(idOther) returns Some(createChallengeStub())
