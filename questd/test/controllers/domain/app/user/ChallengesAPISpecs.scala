@@ -33,6 +33,31 @@ class ChallengesAPISpecs extends BaseAPISpecs {
       there was one(api).makeTask(any)
     }
 
+    "makeQuestChallenge returns challenge if opponent was already challenged" in context {
+      val myQuestId = "mysolid"
+      val q = createQuestStub(id = myQuestId)
+      val opponent = createUserStub()
+      val u1 = createUserStub(
+        createdQuests = List(myQuestId),
+        friends = List(Friendship(friendId = opponent.id, status = FriendshipStatus.Accepted)))
+      val c = createChallengeStub()
+
+      quest.readById(myQuestId) returns Some(q)
+      challenge.findByParticipantsAndQuest((u1.id, opponent.id), myQuestId) returns List(c).iterator
+
+      val result = api.makeQuestChallenge(MakeQuestChallengeRequest(
+        user = u1,
+        opponentId = opponent.id,
+        myQuestId = myQuestId))
+
+      result must beAnInstanceOf[OkApiResult[MakeQuestChallengeResult]]
+      result.body.get.allowed must beEqualTo(MakeQuestChallengeCode.OpponentAlreadyChallenged)
+      result.body.get.challenge.get must beEqualTo(c)
+
+      there was no(challenge).create(any)
+      there was no(api).makeTask(any)
+    }
+
     "makeSolutionChallenge works" in context {
       val questId = "questId"
       val mySolutionId = "initiatorSolutionId"
@@ -53,6 +78,31 @@ class ChallengesAPISpecs extends BaseAPISpecs {
 
       there was one(challenge).create(any)
       there was one(api).makeTask(any)
+    }
+
+    "makeSolutionChallenge  returns challenge if opponent was already challenged" in context {
+      val questId = "questId"
+      val mySolutionId = "initiatorSolutionId"
+      val sol = createSolutionStub(id = mySolutionId, questId = questId)
+      val opponent = createUserStub()
+      val u1 = createUserStub(solvedQuests = Map(questId -> mySolutionId), friends = List(Friendship(friendId = opponent.id, status = FriendshipStatus.Accepted)))
+      val c = createChallengeStub()
+
+      solution.readById(mySolutionId) returns Some(sol)
+      user.readById(opponent.id) returns Some(opponent)
+      challenge.findByParticipantsAndQuest((u1.id, opponent.id), questId) returns List(c).iterator
+
+      val result = api.makeSolutionChallenge(MakeSolutionChallengeRequest(
+        user = u1,
+        opponentId = opponent.id,
+        mySolutionId = mySolutionId))
+
+      result must beAnInstanceOf[OkApiResult[MakeSolutionChallengeResult]]
+      result.body.get.allowed must beEqualTo(MakeSolutionChallengeCode.OpponentAlreadyChallenged)
+      result.body.get.challenge.get must beEqualTo(c)
+
+      there was no(challenge).create(any)
+      there was no(api).makeTask(any)
     }
 
     "Do not accept not existing challenges" in context {
