@@ -194,6 +194,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
               opponentId = opponentId,
               questId = mySolution.info.questId,
               initiatorSolutionId = Some(mySolutionId),
+              opponentSolutionId = opponent.stats.solvedQuests.get(mySolution.info.questId),
               status = ChallengeStatus.Requested)
 
             db.challenge.create(challenge)
