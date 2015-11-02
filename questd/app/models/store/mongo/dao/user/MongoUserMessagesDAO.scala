@@ -68,7 +68,7 @@ trait MongoUserMessagesDAO extends UserMessagesDAO {
     findAndModify(
       id,
       MongoDBObject(
-        "$push" -> MongoDBObject(
+        "$addToSet" -> MongoDBObject(
           "devices" -> grater[Device].asDBObject(device))))
   }
 
