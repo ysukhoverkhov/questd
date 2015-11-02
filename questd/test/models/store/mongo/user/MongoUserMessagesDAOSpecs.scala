@@ -90,6 +90,13 @@ trait MongoUserMessagesDAOSpecs { this: BaseDAOSpecs =>
       val ou1 = db.user.readById(user.id)
       ou1 must beSome[User].which(u => u.devices.size == 1 && u.devices.head == device)
 
+
+      db.user.addDevice(user.id, device)
+
+      val ou3 = db.user.readById(user.id)
+      ou3 must beSome[User].which(u => u.devices.size == 1 && u.devices.head == device)
+
+
       db.user.removeDevice(user.id, device.token)
 
       val ou2 = db.user.readById(user.id)
