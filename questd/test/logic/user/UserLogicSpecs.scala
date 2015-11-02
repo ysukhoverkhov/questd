@@ -52,13 +52,13 @@ class UserLogicSpecs extends BaseLogicSpecs {
         (1 to 10000).map(i => Friendship(friendId = fid, status = status)).toList
       }
       val friendships =
-        generateRequests(fid, FriendshipStatus.Invites) ::: generateRequests(fid, FriendshipStatus.Invited)
+        generateRequests(fid, FriendshipStatus.Invites) /*::: generateRequests(fid, FriendshipStatus.Invited)*/
 
       val u = createUserStub(id = uid, level = 10, friends = friendships)
       val f = createUserStub(id = fid, level = 10, friends = friendships)
 
       u.canAcceptFriendship(f) must beEqualTo(RespondFriendshipCode.OK)
-      u.canAddFriend(f) must beEqualTo(AskFriendshipCode.MaxFriendsCountLimitReached)
+      u.canAddFriend(f) must beEqualTo(AskFriendshipCode.OK)
     }
 
     "Take correct decision on auto rejecting friendships" in context {

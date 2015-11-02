@@ -41,10 +41,14 @@ trait Friends { this: UserLogic =>
     Assets(coins = costToFollowPerson(user.profile.publicProfile.level))
   }
 
+  private def hasSlotsForNewFriends: Boolean = {
+    user.friends.count(f => f.status == FriendshipStatus.Accepted || f.status == FriendshipStatus.Invited) < user.profile.rights.maxFriendsCount
+  }
+
   def canAddFriend(potentialFriend: User): AskFriendshipCode.Value = {
     import AskFriendshipCode._
 
-    if (user.friends.length >= user.profile.rights.maxFriendsCount)
+    if (!hasSlotsForNewFriends)
       MaxFriendsCountLimitReached
     else if (!user.profile.rights.unlockedFunctionality.contains(Functionality.InviteFriends))
       NotEnoughRights
@@ -61,7 +65,7 @@ trait Friends { this: UserLogic =>
   def canAcceptFriendship(potentialFriend: User): RespondFriendshipCode.Value = {
     import RespondFriendshipCode._
 
-    if (user.friends.count(_.status == FriendshipStatus.Accepted) >= user.profile.rights.maxFriendsCount)
+    if (!hasSlotsForNewFriends)
       MaxFriendsCountLimitReached
     else if (potentialFriend.id == user.id)
       CantFriendMyself
