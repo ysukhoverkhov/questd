@@ -157,9 +157,9 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
 
           }
 
-          case result@NotEnoughAssets =>
+          case reason if reason == NotEnoughAssets || reason == NotEnoughRights =>
             OkApiResult(AddToFollowingResult(
-              allowed = result,
+              allowed = reason,
               profile = Some(request.user.profile)))
 
           case result =>

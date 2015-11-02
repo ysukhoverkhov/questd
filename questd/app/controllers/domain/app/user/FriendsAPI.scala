@@ -148,9 +148,9 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
                 OkApiResult(AskFriendshipResult(OK, Some(r.user.profile)))
               }
 
-            case result@NotEnoughAssets =>
+            case reason if reason == NotEnoughAssets || reason == NotEnoughRights =>
               OkApiResult(AskFriendshipResult(
-                allowed = result,
+                allowed = reason,
                 profile = Some(request.user.profile)))
 
             case result => OkApiResult(AskFriendshipResult(result))

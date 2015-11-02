@@ -162,7 +162,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
             allowed = reason,
             challenge = challenge))
 
-        case reason@NotEnoughAssets =>
+        case reason if reason == NotEnoughAssets || reason == NotEnoughRights =>
           OkApiResult(MakeQuestChallengeResult(
             allowed = reason,
             profile = Some(user.profile)))
@@ -219,7 +219,7 @@ private[domain] trait ChallengesAPI { this: DomainAPIComponent#DomainAPI with DB
               allowed = reason,
               challenge = challenge))
 
-          case reason@NotEnoughAssets =>
+          case reason if reason == NotEnoughAssets || reason == NotEnoughRights =>
             OkApiResult(MakeSolutionChallengeResult(
               allowed = reason,
               profile = Some(user.profile)))

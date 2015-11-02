@@ -146,9 +146,9 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               }
             }
 
-          case result@NotEnoughAssets =>
+          case reason if reason == NotEnoughAssets || reason == NotEnoughRights =>
             OkApiResult(SolveQuestResult(
-              allowed = result,
+              allowed = reason,
               profile = Some(request.user.profile)))
 
           case result => OkApiResult(SolveQuestResult(result))
