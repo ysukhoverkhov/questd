@@ -4,11 +4,11 @@ import java.util.Date
 
 import controllers.domain._
 import controllers.domain.admin.{AllQuestsRequest, AllSolutionsRequest, AllUsersRequest}
-import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.app.quest.VoteQuestRequest
 import controllers.domain.app.solution.VoteSolutionRequest
 import controllers.domain.app.user._
-import controllers.services.devicenotifications.{DeviceNotificationsComponent, InactiveDevices}
+import controllers.services.devicenotifications.DeviceNotifications.IOSDevice
+import controllers.services.devicenotifications.{DeviceNotifications, DeviceNotificationsComponent, InactiveDevices}
 import controllers.web.helpers._
 import models.domain.common.{ContentReference, ContentType, ContentVote}
 import models.domain.quest.QuestInfoContent
@@ -78,13 +78,13 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
 
-//    c.actor ! DeviceNotifications.PushMessage(
-//      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
-//      message = "lalala",
-//      badge = None,
-//      sound = None,
-//      destinations = List(DeviceNotifications.MobileDestination)
-//    )
+    c.actor ! DeviceNotifications.PushMessage(
+      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
+      message = "lalala",
+      badge = None,
+      sound = None,
+      destinations = List(DeviceNotifications.MobileDestination)
+    )
 
   c.actor ! InactiveDevices.GetInactiveDevicesRequest
 
@@ -238,7 +238,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
           icon = None,
           description = s"Debug quest for battle between ${r.user.id} and ${peer.id}")))
     } map { rr =>
-      assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
+      assert(rr.allowed == CreateQuestCode.OK, rr.allowed)
 
       val questId = api.getUser(GetUserRequest(userId = Some(author.id))).body.get.user.get.stats.createdQuests.last
 
@@ -271,7 +271,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
               }
       } map { rr =>
         Logger.debug(s"Quest solved with result ${rr.allowed}")
-        assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
+        assert(rr.allowed == SolveQuestCode.OK, rr.allowed)
 
         api.addToTimeLine(AddToTimeLineRequest(
           user = peer,
@@ -304,7 +304,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
       }
     } map { rr =>
       Logger.debug(s"Quest solved by peer with result ${rr.allowed}")
-      assert(rr.allowed == ProfileModificationResult.OK, rr.allowed)
+      assert(rr.allowed == SolveQuestCode.OK, rr.allowed)
 
       OkApiResult(WSDebugResult("Done"))
     }

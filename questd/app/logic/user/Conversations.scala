@@ -1,6 +1,6 @@
 package logic.user
 
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.user.CreateConversationCode
 import logic._
 import models.domain.user.User
 
@@ -9,14 +9,15 @@ import models.domain.user.User
  */
 trait Conversations { this: UserLogic =>
 
-  def canConversateWith(peer: User) = {
+  def canConversateWith(peer: User): CreateConversationCode.Value = {
+    import CreateConversationCode._
+
     if (user.banned.contains(peer.id)) {
-      InvalidState
+      PeerBanned
     } else if (peer.banned.contains(user.id)) {
-      InvalidState
+      UserBanned
     } else {
       OK
     }
   }
-
 }

@@ -34,10 +34,10 @@ private[mongo] class MongoSolutionDAO
       queryBuilder += ("status" -> MongoDBObject("$in" -> status.map(_.toString)))
     }
 
+    require(!(authorIds.nonEmpty && authorIdsExclude.nonEmpty))
     if (authorIds.nonEmpty) {
       queryBuilder += ("info.authorId" -> MongoDBObject("$in" -> authorIds))
     }
-
     if (authorIdsExclude.nonEmpty) {
       queryBuilder += ("info.authorId" -> MongoDBObject("$nin" -> authorIdsExclude))
     }
@@ -52,10 +52,10 @@ private[mongo] class MongoSolutionDAO
       queryBuilder += ("info.vip" -> vip.get)
     }
 
+    require(!(ids.nonEmpty && idsExclude.nonEmpty))
     if (ids.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
     }
-
     if (idsExclude.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$nin" -> idsExclude))
     }

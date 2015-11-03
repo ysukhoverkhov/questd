@@ -1,6 +1,6 @@
 package controllers.domain.app.user
 
-import controllers.domain.{OkApiResult, BaseAPISpecs}
+import controllers.domain.{BaseAPISpecs, OkApiResult}
 import models.domain.battle.BattleStatus
 import models.domain.solution.SolutionStatus
 import models.domain.user.stats.SolutionsInBattle
@@ -51,6 +51,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         withBattles = mEq(Some(false)))
 
       there was no(battle).create(any)
+      there was no(challenge).create(any)
       there was no(solution).update(any)
     }
 
@@ -86,8 +87,8 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       user.addEntryToTimeLine(mEq(uu(1).id), any) returns Some(uu(1))
       user.recordBattleParticipation(mEq(uu(0).id), any, any) returns Some(uu(0))
       user.recordBattleParticipation(mEq(uu(1).id), any, any) returns Some(uu(1))
-      user.addBattleRequest(mEq(uu(0).id), any) returns Some(uu(0))
-      user.addBattleRequest(mEq(uu(1).id), any) returns Some(uu(1))
+      challenge.findBySolutions(any) returns Iterator.empty
+      challenge.findByParticipantsAndQuest(any, any) returns Iterator.empty
 
       val result = api.tryCreateBattle(TryCreateBattleRequest(ss(0)))
 
@@ -111,8 +112,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
       there was one(user).recordBattleParticipation(mEq(uu(1).id), any, mEq(SolutionsInBattle(ss.map(_.id))))
       there were two(user).addEntryToTimeLine(any, any)
 //      there were two(user).addEntryToTimeLineMulti(any, any)
-      there was one(user).addBattleRequest(mEq(uu(0).id), any)
-      there was one(user).addBattleRequest(mEq(uu(1).id), any)
+      there was one(challenge).create(any)
 
       result must beAnInstanceOf[OkApiResult[TryCreateBattleRequest]]
     }
@@ -161,6 +161,7 @@ class FightBattleAPISpecs extends BaseAPISpecs {
         withBattles = mEq(Some(false)))
 
       there was no(battle).create(any)
+      there was no(challenge).create(any)
       there was no(solution).addParticipatedBattle(any, any)
     }
 

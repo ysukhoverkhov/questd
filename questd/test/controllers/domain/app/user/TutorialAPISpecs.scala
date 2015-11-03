@@ -1,8 +1,7 @@
 package controllers.domain.app.user
 
-import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{BaseAPISpecs, OkApiResult}
-import models.domain.common.{ClientPlatform, Assets}
+import models.domain.common.{Assets, ClientPlatform}
 import models.domain.tutorial._
 import models.domain.tutorialtask.TutorialTask
 import models.domain.user.profile._
@@ -66,7 +65,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
       val result = api.incTutorialTask(IncTutorialTaskRequest(u, tutorialTaskId))
 
-      result must beEqualTo(OkApiResult(IncTutorialTaskResult(ProfileModificationResult.OK, Some(uc.profile))))
+      result must beEqualTo(OkApiResult(IncTutorialTaskResult(IncTutorialTaskCode.OK, Some(uc.profile))))
       there was one(db.user).incTask(u.id, taskId)
       there was one(db.user).addToAssets(u.id, r1)
       there was one(db.user).addToAssets(u.id, r2)
@@ -120,7 +119,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
       val result = api.incTutorialTask(IncTutorialTaskRequest(u, tutorialTaskId))
 
-      result must beEqualTo(OkApiResult(IncTutorialTaskResult(ProfileModificationResult.OK, Some(uc.profile))))
+      result must beEqualTo(OkApiResult(IncTutorialTaskResult(IncTutorialTaskCode.OK, Some(uc.profile))))
       there was one(db.user).incTask(u.id, taskId)
       there was one(db.user).addToAssets(u.id, r2)
       there was no(db.user).setTasksRewardReceived(any, any)
@@ -152,7 +151,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
       val result = api.incTutorialTask(IncTutorialTaskRequest(u, taskId))
 
-      result must beEqualTo(OkApiResult(IncTutorialTaskResult(ProfileModificationResult.OutOfContent, None)))
+      result must beEqualTo(OkApiResult(IncTutorialTaskResult(IncTutorialTaskCode.TaskNotFound, None)))
     }
 
     "Carry tutorial tasks to next day if all tasks are not completed" in context {
@@ -241,7 +240,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
       val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, ClientPlatform.iPhone, tutorialTaskId))
 
-      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.AlreadyAssigned)))
+      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(AssignTutorialTaskCode.TaskAlreadyAssigned)))
       there was no(db.user).setTasksCompletedFraction(any, any)
     }
 
@@ -255,7 +254,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
       val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, ClientPlatform.iPhone, s"a$tutorialTaskId"))
 
-      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.OutOfContent)))
+      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(AssignTutorialTaskCode.TaskNotFound)))
       there was one(db.tutorialTask).readById(any)
       there was no(db.user).setTasksCompletedFraction(any, any)
     }
@@ -282,7 +281,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
       val result = api.assignTutorialTask(AssignTutorialTaskRequest(u, ClientPlatform.iPhone, tutorialTaskId))
 
-      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(ProfileModificationResult.OK, Some(u.profile))))
+      result must beEqualTo(OkApiResult(AssignTutorialTaskResult(AssignTutorialTaskCode.OK, Some(u.profile))))
       there was one(db.tutorialTask).readById(tutorialTaskId)
       there was one(db.user).resetTasks(any, any, any)
       there was one(db.user).addTutorialTaskAssigned(any, any, any)
@@ -315,7 +314,7 @@ class TutorialAPISpecs extends BaseAPISpecs {
 
     val result = api.assignTutorialQuest(AssignTutorialQuestRequest(u, ClientPlatform.iPhone, tutorialQuestId))
 
-    result must beEqualTo(OkApiResult(AssignTutorialQuestResult(ProfileModificationResult.LimitExceeded)))
+    result must beEqualTo(OkApiResult(AssignTutorialQuestResult(AssignTutorialQuestCode.QuestAlreadyAssigned)))
 
     there was no(quest).readById(tutorialQuestId)
     there was no(user).addTutorialQuestAssigned(mEq(u.id), any, mEq(tutorialQuestId))

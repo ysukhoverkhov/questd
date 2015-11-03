@@ -33,7 +33,7 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
 
     Logger.debug("API - voteSolution")
 
-    def checkInc[T](v: T, c: T, n: Int = 0) = if (v == c) n + 1 else n
+    def checkInc[T](v: T, c: T, inc: Int = 1, n: Int = 0) = if (v == c) n + inc else n
 
     def solutionInBattle(solution: Solution) = {
       solution.battleIds.foldLeft(false) {
@@ -54,7 +54,11 @@ private[domain] trait SolutionAPI { this: DomainAPIComponent#DomainAPI with DBAc
           solution.id,
 
           votersCountChange = 1,
-          timelinePointsChange = checkInc(vote, Cool),
+          timelinePointsChange =
+            checkInc(vote, Cool, 2) +
+            checkInc(vote, Cheating, -5) +
+            checkInc(vote, IASpam, -10) +
+            checkInc(vote, IAPorn, -10),
           likesChange = checkInc(vote, Cool),
 
           cheatingChange = checkInc(vote, Cheating),

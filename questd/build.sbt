@@ -1,7 +1,7 @@
 
 name := """questd"""
 
-version := "0.40.14-SNAPSHOT"
+version := "0.50.01-SNAPSHOT"
 
 lazy val root = (project in file(".")).
   enablePlugins(PlayScala).
@@ -32,17 +32,17 @@ libraryDependencies ++= Seq(
   ws
 )
 
-libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
+libraryDependencies += "org.json4s" %% "json4s-native" % "3.3.0"
 
-libraryDependencies += "org.json4s" %% "json4s-ext" % "3.2.11"
+libraryDependencies += "org.json4s" %% "json4s-ext" % "3.3.0"
 
 libraryDependencies += "se.radley" %% "play-plugins-salat" % "1.5.6"
 
 libraryDependencies += "us.theatr" %% "akka-quartz" % "0.3.0-SNAPSHOT"
 
-libraryDependencies += "com.restfb" % "restfb" % "1.14.1"
+libraryDependencies += "com.restfb" % "restfb" % "1.16.0"
 
-libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.2.0"
+// libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.2.0"
 
 // libraryDependencies += "javax.mail" % "javax.mail-api" % "1.5.4"
 

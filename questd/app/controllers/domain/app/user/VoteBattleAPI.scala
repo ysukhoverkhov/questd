@@ -3,7 +3,7 @@ package controllers.domain.app.user
 import components._
 import controllers.domain._
 import controllers.domain.app.battle.VoteBattleRequest
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import models.domain.battle.BattleStatus
 import models.domain.user._
@@ -11,9 +11,16 @@ import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.{Profile, TaskType}
 import models.view.BattleView
 
+object VoteBattleByUserCode extends Enumeration with CommonCode {
+  val InvalidBattleState = Value
+  val BattleNotFound = Value
+  val BattleSideNotFound = Value
+  val BattleAlreadyVoted = Value
+  val ParticipantsCantVote = Value
+}
 case class VoteBattleByUserRequest(user: User, battleId: String, solutionId: String)
 case class VoteBattleByUserResult(
-  allowed: ProfileModificationResult,
+  allowed: VoteBattleByUserCode.Value,
   profile: Option[Profile] = None,
   modifiedBattles: List[BattleView] = List.empty)
 
@@ -24,6 +31,7 @@ private[domain] trait VoteBattleAPI {
    * Vote for a Battle.
    */
   def voteBattleByUser(request: VoteBattleByUserRequest): ApiResult[VoteBattleByUserResult] = handleDbException {
+    import VoteBattleByUserCode._
     import request._
 
     user.canVoteBattle(battleId) match {
@@ -32,7 +40,7 @@ private[domain] trait VoteBattleAPI {
         db.battle.readById(battleId) match {
           case Some(b) =>
           if (b.info.status == BattleStatus.Resolved) {
-            OkApiResult(VoteBattleByUserResult(InvalidState))
+            OkApiResult(VoteBattleByUserResult(InvalidBattleState))
           } else {
 
             b.info.battleSides.find(_.solutionId == solutionId) match {
@@ -59,15 +67,15 @@ private[domain] trait VoteBattleAPI {
 
               case None =>
                 // Battle side with given solution is not found.
-                OkApiResult(VoteBattleByUserResult(OutOfContent))
+                OkApiResult(VoteBattleByUserResult(BattleSideNotFound))
             }
           }
           case None =>
             // Battle with given id is not found.
-            OkApiResult(VoteBattleByUserResult(OutOfContent))
+            OkApiResult(VoteBattleByUserResult(BattleNotFound))
         }
 
-      case a => OkApiResult(VoteBattleByUserResult(a))
+      case result => OkApiResult(VoteBattleByUserResult(result))
     }
   }
 }

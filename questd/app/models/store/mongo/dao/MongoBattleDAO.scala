@@ -36,8 +36,12 @@ private[mongo] class MongoBattleDAO
       queryBuilder += ("info.status" -> MongoDBObject("$in" -> status.map(_.toString)))
     }
 
+    require(!(authorIds.nonEmpty && authorIdsExclude.nonEmpty))
     if (authorIds.nonEmpty) {
       queryBuilder += ("info.battleSides.authorId" -> MongoDBObject("$in" -> authorIds))
+    }
+    if (authorIdsExclude.nonEmpty) {
+      queryBuilder += ("info.battleSides.authorId" -> MongoDBObject("$nin" -> authorIdsExclude))
     }
 
     if (questId.nonEmpty) {
@@ -46,10 +50,6 @@ private[mongo] class MongoBattleDAO
 
     if (solutionIds.nonEmpty) {
       queryBuilder += ("info.battleSides.solutionId" -> MongoDBObject("$in" -> solutionIds))
-    }
-
-    if (authorIdsExclude.nonEmpty) {
-      queryBuilder += ("info.battleSides.authorId" -> MongoDBObject("$nin" -> authorIdsExclude))
     }
 
     if (levels.isDefined) {
@@ -62,10 +62,10 @@ private[mongo] class MongoBattleDAO
       queryBuilder += ("vip" -> vip.get)
     }
 
+    require(!(ids.nonEmpty && idsExclude.nonEmpty))
     if (ids.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$in" -> ids))
     }
-
     if (idsExclude.nonEmpty) {
       queryBuilder += ("id" -> MongoDBObject("$nin" -> idsExclude))
     }

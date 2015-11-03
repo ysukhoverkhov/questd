@@ -1,7 +1,7 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import models.domain.common.{Assets, ClientPlatform}
@@ -17,20 +17,45 @@ case class GetCommonTutorialResult(tutorialElements: List[TutorialElement])
 case class GetTutorialRequest(user: User, platform: ClientPlatform.Value)
 case class GetTutorialResult(tutorialElements: List[TutorialElement])
 
+object CloseTutorialElementCode extends Enumeration with CommonCode {
+}
 case class CloseTutorialElementRequest(user: User, platform: ClientPlatform.Value, elementId: String)
-case class CloseTutorialElementResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class CloseTutorialElementResult(
+  allowed: CloseTutorialElementCode.Value,
+  profile: Option[Profile] = None)
 
+object AssignTutorialTaskCode extends Enumeration with CommonCode {
+  val TaskAlreadyAssigned = Value
+  val TaskNotFound = Value
+}
 case class AssignTutorialTaskRequest(user: User, platform: ClientPlatform.Value, taskId: String)
-case class AssignTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class AssignTutorialTaskResult(
+  allowed: AssignTutorialTaskCode.Value,
+  profile: Option[Profile] = None)
 
+object IncTutorialTaskCode extends Enumeration with CommonCode {
+  val TaskNotFound = Value
+}
 case class IncTutorialTaskRequest(user: User, taskId: String)
-case class IncTutorialTaskResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class IncTutorialTaskResult(
+  allowed: IncTutorialTaskCode.Value,
+  profile: Option[Profile] = None)
 
+object AssignTutorialQuestCode extends Enumeration with CommonCode {
+  val QuestAlreadyAssigned = Value
+  val QuestNotFound = Value
+}
 case class AssignTutorialQuestRequest(user: User, platform: ClientPlatform.Value, questId: String)
-case class AssignTutorialQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class AssignTutorialQuestResult(
+  allowed: AssignTutorialQuestCode.Value,
+  profile: Option[Profile] = None)
 
+object ResetTutorialCode extends Enumeration with CommonCode {
+}
 case class ResetTutorialRequest(user: User)
-case class ResetTutorialResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class ResetTutorialResult(
+  allowed: ResetTutorialCode.Value,
+  profile: Option[Profile] = None)
 
 case class ExecuteServerTutorialActionRequest(user: User, platform: ClientPlatform.Value, serverAction: TutorialServerAction)
 case class ExecuteServerTutorialActionResult(user: User)
@@ -62,6 +87,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
    * Set state of tutorial for a specified platform.
    */
   def closeTutorialElement(request: CloseTutorialElementRequest): ApiResult[CloseTutorialElementResult] = handleDbException {
+    import CloseTutorialElementCode._
     import request._
 
     db.tutorial.readById(platform.toString) ifSome { tutorial =>
@@ -116,10 +142,12 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
    * Assign client task to user.
    */
   def assignTutorialTask(request: AssignTutorialTaskRequest): ApiResult[AssignTutorialTaskResult] = handleDbException {
+    import AssignTutorialTaskCode._
     import request._
+
     // 1. check is the task was already given.
     if (user.profile.tutorialStates(platform.toString).usedTutorialTaskIds.contains(taskId)) {
-      OkApiResult(AssignTutorialTaskResult(AlreadyAssigned))
+      OkApiResult(AssignTutorialTaskResult(TaskAlreadyAssigned))
     } else {
       db.tutorialTask.readById(taskId) match {
         case Some(t) =>
@@ -156,7 +184,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
             }
           }
         case None =>
-          OkApiResult(AssignTutorialTaskResult(OutOfContent))
+          OkApiResult(AssignTutorialTaskResult(TaskNotFound))
       }
     }
   }
@@ -165,10 +193,11 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
    * Inc by one progress of tutorial task.
    */
   def incTutorialTask(request: IncTutorialTaskRequest): ApiResult[IncTutorialTaskResult] = handleDbException {
+    import IncTutorialTaskCode._
     import request._
 
     user.profile.dailyTasks.tasks.find(t => t.tutorialTaskId.contains(taskId)).fold[ApiResult[IncTutorialTaskResult]] {
-      OkApiResult(IncTutorialTaskResult(OutOfContent))
+      OkApiResult(IncTutorialTaskResult(TaskNotFound))
     }
     { t: Task =>
       {
@@ -183,10 +212,11 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
    * Assigns new tutorial quest by client's request.
    */
   def assignTutorialQuest(request: AssignTutorialQuestRequest): ApiResult[AssignTutorialQuestResult] = handleDbException {
+    import AssignTutorialQuestCode._
     import request._
 
     if (user.profile.tutorialStates(platform.toString).usedTutorialQuestIds.contains(questId)) {
-      OkApiResult(AssignTutorialQuestResult(LimitExceeded))
+      OkApiResult(AssignTutorialQuestResult(QuestAlreadyAssigned))
     } else {
       db.quest.readById(questId) match {
         case Some(q) =>
@@ -206,7 +236,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
             }
           }
         case None =>
-          OkApiResult(AssignTutorialQuestResult(OutOfContent))
+          OkApiResult(AssignTutorialQuestResult(QuestNotFound))
       }
     }
   }
@@ -215,6 +245,7 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
    * Reset tutorial script anc completed tutorial tasks.
    */
   def resetTutorial(request: ResetTutorialRequest): ApiResult[ResetTutorialResult] = handleDbException {
+    import ResetTutorialCode._
     import request._
 
     db.user.update(

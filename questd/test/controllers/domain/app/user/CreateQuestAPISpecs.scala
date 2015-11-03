@@ -3,7 +3,6 @@ package controllers.domain.app.user
 import java.util.Date
 
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.quest.QuestStatus
 import org.mockito.Matchers.{eq => mEq}
 import testhelpers.domainstubs._
@@ -23,7 +22,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
 
       val result = api.createQuest(CreateQuestRequest(u, q.info.content))
 
-      result.body must beSome[CreateQuestResult].which(r => r.allowed == ProfileModificationResult.OK)
+      result.body must beSome[CreateQuestResult].which(r => r.allowed == CreateQuestCode.OK)
 
       there was one(user).addEntryToTimeLine(any, any)
 //      there was one(user).addEntryToTimeLineMulti(any, any)
@@ -42,7 +41,7 @@ class CreateQuestAPISpecs extends BaseAPISpecs {
 
       val result = api.createQuest(CreateQuestRequest(u, q.info.content))
 
-      result.body must beSome[CreateQuestResult].which(r => r.allowed == ProfileModificationResult.OK)
+      result.body must beSome[CreateQuestResult].which(r => r.allowed == CreateQuestCode.OK)
 
       there was one(user).addEntryToTimeLine(any, any)
 //      there was one(user).addEntryToTimeLineMulti(any, any)

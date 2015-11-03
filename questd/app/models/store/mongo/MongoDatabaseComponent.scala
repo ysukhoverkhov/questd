@@ -20,6 +20,7 @@ trait MongoDatabaseComponent extends DatabaseComponent {
     val comment = new MongoCommentDAO
     val conversation = new MongoConversationDAO
     val chat = new MongoChatMessageDAO
+    val challenge = new MongoChallengeDAO
 
     val crawlerContext = new MongoCrawlerContextDAO
   }

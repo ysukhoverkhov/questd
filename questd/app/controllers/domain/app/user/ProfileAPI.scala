@@ -1,7 +1,7 @@
 package controllers.domain.app.user
 
 import components._
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import logic.constants
@@ -13,26 +13,40 @@ import models.domain.user.message.MessageInformation
 import models.domain.user.profile.{Functionality, Gender, Profile, Rights}
 import play.{Logger, Play}
 
+
 case class AdjustAssetsRequest(user: User, change: Assets)
 case class AdjustAssetsResult(user: User)
+
 
 case class CheckIncreaseLevelRequest(user: User)
 case class CheckIncreaseLevelResult(user: User)
 
+
 case class GetRightsAtLevelsRequest(user: User, levelFrom: Int, levelTo: Int)
 case class GetRightsAtLevelsResult(rights: List[Rights])
+
 
 case class GetLevelsForRightsRequest(user: User, functionality: List[Functionality.Value])
 case class GetLevelsForRightsResult(levels: Map[String, Int])
 
+
+object SetGenderCode extends Enumeration with CommonCode {
+}
 case class SetGenderRequest(user: User, gender: Gender.Value)
-case class SetGenderResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class SetGenderResult(allowed: SetGenderCode.Value, profile: Option[Profile] = None)
 
+
+object SetCityCode extends Enumeration with CommonCode {
+}
 case class SetCityRequest(user: User, city: String)
-case class SetCityResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class SetCityResult(allowed: SetCityCode.Value, profile: Option[Profile] = None)
 
+
+object SetCountryCode extends Enumeration with CommonCode {
+  val UnknownCountryName = Value
+}
 case class SetCountryRequest(user: User, country: String)
-case class SetCountryResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class SetCountryResult(allowed: SetCountryCode.Value, profile: Option[Profile] = None)
 
 case class UpdateUserCultureRequest(user: User)
 case class UpdateUserCultureResult(user: User)
@@ -165,6 +179,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Updates user gender.
    */
   def setGender(request: SetGenderRequest): ApiResult[SetGenderResult] = handleDbException {
+    import SetGenderCode._
     import request._
 
     db.user.setGender(user.id, gender.toString) ifSome { v =>
@@ -176,6 +191,7 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Updates user city.
    */
   def setCity(request: SetCityRequest): ApiResult[SetCityResult] = handleDbException {
+    import SetCityCode._
     import request._
 
     db.user.setCity(user.id, city) ifSome { v =>
@@ -187,12 +203,13 @@ private[domain] trait ProfileAPI { this: DomainAPIComponent#DomainAPI with DBAcc
    * Updates user country.
    */
   def setCountry(request: SetCountryRequest): ApiResult[SetCountryResult] = handleDbException {
+    import SetCountryCode._
     import request._
 
     val countries = scala.io.Source.fromFile(Play.application().getFile("conf/countries.txt"), "utf-8").getLines().toList
 
     if (!countries.contains(country)) {
-      OkApiResult(SetCountryResult(OutOfContent, None))
+      OkApiResult(SetCountryResult(UnknownCountryName, None))
     } else {
       db.user.setCountry(user.id, country) ifSome { v =>
         updateUserCulture(UpdateUserCultureRequest(v)) map { r =>
