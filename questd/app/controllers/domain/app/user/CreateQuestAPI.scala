@@ -9,6 +9,7 @@ import models.domain.quest.{Quest, QuestInfo, QuestInfoContent, QuestStatus}
 import models.domain.user._
 import models.domain.user.profile.{Profile, TaskType}
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
+import models.view.QuestView
 
 object CreateQuestCode extends Enumeration with CommonCode {
   val QuestCreationCoolDown = Value
@@ -17,7 +18,8 @@ object CreateQuestCode extends Enumeration with CommonCode {
 case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List.empty)
 case class CreateQuestResult(
   allowed: CreateQuestCode.Value,
-  profile: Option[Profile] = None)
+  profile: Option[Profile] = None,
+  modifiedQuests: List[QuestView] = List.empty)
 
 case class RewardQuestAuthorRequest(quest: Quest, author: User)
 case class RewardQuestAuthorResult()
@@ -90,7 +92,8 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
           } map { r =>
             OkApiResult(CreateQuestResult(
               allowed = OK,
-              profile = Some(r.user.profile)))
+              profile = Some(r.user.profile),
+              modifiedQuests = List(QuestView(quest, r.user))))
           }
         }
 
