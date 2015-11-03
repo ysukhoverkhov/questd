@@ -3,7 +3,7 @@ package models.domain.user.message
 /**
  * All types of messages.
  */
-object MessageMetaInfo  {
+object MessageMetaInfo {
   val messagePriority: Map[MessageType.Value, Int] = Map(
     MessageType.AllTasksCompleted -> 1000,
     MessageType.TaskCompleted -> 1000,
