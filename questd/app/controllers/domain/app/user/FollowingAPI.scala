@@ -235,7 +235,7 @@ private[domain] trait FollowingAPI { this: DBAccessor with DomainAPIComponent#Do
       if (snUser.permissions.contains(Permission.Friends)) {
         snUser.friends.foreach { snFriend =>
           db.user.readBySNid(snFriend.snName, snFriend.snId).fold {
-            Logger.error(s"unable to find user for notification of friends about registration $snFriend")
+            Logger.error(s"unable to find user for notification of friends about registration $snFriend (his profile may be removed but app exists in facebook)")
           } { snFriend: User =>
             sendMessage(SendMessageRequest(snFriend, MessageFriendRegistered(user.id)))
           }
