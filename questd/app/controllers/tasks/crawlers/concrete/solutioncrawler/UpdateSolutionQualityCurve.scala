@@ -49,10 +49,10 @@ class UpdateSolutionQualityCurve(
 
   // instead of voters count use here times it was selected to timeline and we are lack of this data for now so it should be added. It'll be also helpful for debugging.
   protected def check(solution: Solution) = {
-    val ratio = if (solution.rating.votersCount == 0) {
+    val ratio: Int = if (solution.rating.votersCount == 0) {
       0
     } else {
-      (math.max(1, solution.rating.likesCount / solution.rating.votersCount.toDouble) * (FramesCount - 1)).toInt
+      (math.min(1, solution.rating.likesCount.toDouble / solution.rating.votersCount.toDouble) * (FramesCount - 1)).toInt
     }
 
     data match {
