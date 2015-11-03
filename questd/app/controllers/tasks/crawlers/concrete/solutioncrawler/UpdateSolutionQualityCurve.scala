@@ -6,7 +6,6 @@ import controllers.domain._
 import controllers.tasks.crawlers.base.BaseCrawler
 import models.domain.crawlercontext.CrawlerContext
 import models.domain.solution.Solution
-import play.api.Logger
 
 object UpdateSolutionQualityCurve {
   def props(api: DomainAPIComponent#DomainAPI, rand: RandomComponent#Random) = {
