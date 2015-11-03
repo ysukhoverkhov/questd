@@ -20,7 +20,6 @@ object MessageType extends Enumeration {
   val FriendRegistered = Value
 
   // TODO: remove in 0.50.02
-  // TODO: add removing of these messages to cleanup in 0.50.01.
   val BattleRequestAccepted = Value
   val BattleRequestRejected = Value
 }

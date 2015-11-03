@@ -7,6 +7,9 @@ import logic.QuestLogic
 import models.domain.quest.{Quest, QuestStatus}
 import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.User
+import models.domain.user.message.{Message, MessageType}
+import views.html
+import views.html.admin.messages
 
 case class CleanUpObjectsRequest()
 case class CleanUpObjectsResult()
@@ -88,6 +91,18 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       } else {
         user
       }
+    }
+
+    def removeIncorrectMessages(user: User): User = {
+      val newMessages = user.profile.messages.foldLeft[List[Message]](List.empty){ (r, v) =>
+        if (v.messageType == MessageType.BattleRequestAccepted || v.messageType == MessageType.BattleRequestRejected) {
+          r
+        } else {
+          v :: r
+        }
+      }
+
+      user.copy(profile = user.profile.copy(messages = newMessages))
     }
 
     db.quest.all.foreach { quest =>
