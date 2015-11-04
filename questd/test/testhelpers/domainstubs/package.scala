@@ -301,7 +301,8 @@ package object domainstubs {
     questId: String = "questId",
     creationDate: Date = new Date(),
     status: ChallengeStatus.Value = ChallengeStatus.Accepted,
-    initiatorSolutionId: Option[String] = None) = {
+    initiatorSolutionId: Option[String] = None,
+    opponentSolutionId: Option[String] = None) = {
 
     Challenge(
       id = id,
@@ -310,6 +311,7 @@ package object domainstubs {
       questId = questId,
       status = status,
       creationDate = creationDate,
-      initiatorSolutionId = initiatorSolutionId)
+      initiatorSolutionId = initiatorSolutionId,
+      opponentSolutionId = opponentSolutionId)
   }
 }
