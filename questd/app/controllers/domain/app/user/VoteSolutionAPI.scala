@@ -6,6 +6,7 @@ import controllers.domain.app.protocol.CommonCode
 import controllers.domain.app.solution.{VoteSolutionRequest, VoteSolutionResult}
 import controllers.domain.helpers._
 import models.domain.common.ContentVote
+import models.domain.solution.SolutionStatus
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.{Profile, TaskType}
@@ -21,6 +22,14 @@ case class VoteSolutionByUserResult(
   allowed: VoteSolutionByUserCode.Value,
   profile: Option[Profile] = None,
   modifiedSolutions: List[SolutionView] = List.empty)
+
+object HideOwnSolutionCode extends Enumeration with CommonCode {
+  val SolutionNotFound = Value
+  val NotOwnSolution = Value
+}
+case class HideOwnSolutionRequest(user: User, solutionId: String)
+case class HideOwnSolutionResult(allowed: HideOwnSolutionCode.Value)
+
 
 private[domain] trait VoteSolutionAPI {
   this: DomainAPIComponent#DomainAPI with DBAccessor =>
@@ -75,6 +84,25 @@ private[domain] trait VoteSolutionAPI {
         }
 
       case a => OkApiResult(VoteSolutionByUserResult(a))
+    }
+  }
+
+  /**
+   * Hides own player's solution.
+   */ // TODO: test me.
+  def hideOwnSolution(request: HideOwnSolutionRequest): ApiResult[HideOwnSolutionResult] = handleDbException {
+    import request._
+    import HideOwnSolutionCode._
+
+    db.solution.readById(solutionId).fold {
+      OkApiResult(HideOwnSolutionResult(SolutionNotFound))
+    } { solution =>
+      if (solution.info.authorId != user.id) {
+        OkApiResult(HideOwnSolutionResult(SolutionNotFound))
+      } else {
+        db.solution.updateStatus(solutionId, SolutionStatus.AuthorBanned)
+        OkApiResult(HideOwnSolutionResult(OK))
+      }
     }
   }
 }

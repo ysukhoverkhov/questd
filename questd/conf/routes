@@ -33,9 +33,11 @@ POST	/rest/solveQuest		    					controllers.web.rest.SolveQuestWS.solveQuest
 
 # Vote quest
 POST	/rest/voteQuest     							controllers.web.rest.VoteQuestWS.voteQuest
+POST    /rest/hideOwnQuest                              controllers.web.rest.VoteQuestWS.hideOwnQuest
 
 # Vote solution
 POST	/rest/voteSolution						    	controllers.web.rest.VoteSolutionWS.voteSolution
+POST    /rest/hideOwnSolution                           controllers.web.rest.VoteSolutionWS.hideOwnSolution
 
 # Vote battles
 POST    /rest/voteBattle						    	controllers.web.rest.VoteBattleWS.voteBattle

@@ -6,6 +6,8 @@ import controllers.domain.app.protocol.CommonCode
 import controllers.domain.app.quest._
 import controllers.domain.helpers._
 import models.domain.common.ContentVote
+import models.domain.quest.QuestStatus
+import models.domain.solution.SolutionStatus
 import models.domain.user._
 import models.domain.user.profile.{Profile, TaskType}
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
@@ -23,6 +25,13 @@ case class VoteQuestByUserResult(
   allowed: VoteQuestByUserCode.Value,
   profile: Option[Profile] = None,
   modifiedQuests: List[QuestView] = List.empty)
+
+object HideOwnQuestCode extends Enumeration with CommonCode {
+  val QuestNotFound = Value
+  val NotOwnQuest = Value
+}
+case class HideOwnQuestRequest(user: User, questId: String)
+case class HideOwnQuestResult(allowed: HideOwnQuestCode.Value)
 
 private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -72,6 +81,25 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
         }
 
       case notAllowed => OkApiResult(VoteQuestByUserResult(notAllowed))
+    }
+  }
+
+  /**
+    * Hides own player's quest.
+    */ // TODO: test me.
+  def hideOwnQuest(request: HideOwnQuestRequest): ApiResult[HideOwnQuestResult] = handleDbException {
+    import request._
+    import HideOwnQuestCode._
+
+    db.quest.readById(questId).fold {
+      OkApiResult(HideOwnQuestResult(QuestNotFound))
+    } { quest =>
+      if (quest.info.authorId != user.id) {
+        OkApiResult(HideOwnQuestResult(QuestNotFound))
+      } else {
+        db.quest.updateStatus(questId, QuestStatus.AuthorBanned)
+        OkApiResult(HideOwnQuestResult(OK))
+      }
     }
   }
 }

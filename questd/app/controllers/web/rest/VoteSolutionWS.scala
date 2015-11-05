@@ -7,5 +7,6 @@ object VoteSolutionWS extends Controller with AccessToWSInstance {
 
   def voteSolution = ws.voteSolution
 
+  def hideOwnSolution = ws.hideOwnSolution
 }
 
