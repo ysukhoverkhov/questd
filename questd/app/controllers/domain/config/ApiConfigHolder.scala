@@ -181,7 +181,7 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.TimeLineRandomQuestsDailyMin -> "4",
 
             DefaultConfigParams.TimeLineRandomSolutionsDailyMean -> "5",
-            DefaultConfigParams.TimeLineRandomSolutionsDailyMeanFirstTime -> "15",
+            DefaultConfigParams.TimeLineRandomSolutionsDailyMeanFirstTime -> "25",
             DefaultConfigParams.TimeLineRandomSolutionsDailyDeviation -> "1",
             DefaultConfigParams.TimeLineRandomSolutionsDailyMin -> "4",
 
