@@ -1,45 +1,58 @@
 package controllers.domain.app.user
 
-import controllers.domain.BaseAPISpecs
+import controllers.domain.{BaseAPISpecs, OkApiResult}
+import models.domain.solution.SolutionStatus
+import testhelpers.domainstubs._
 
 class VoteSolutionAPISpecs extends BaseAPISpecs {
 
   "Vote Solution API" should {
-    "success all the time" in {
-      success
+    "hideOwnSolution hides own solutions only" in context {
+      val u = createUserStub()
+      val s = createSolutionStub(authorId = u.id + "qe")
+
+      db.solution.readById(any) returns Some(s)
+
+      val result = api.hideOwnSolution(HideOwnSolutionRequest(u, s.id))
+
+      result must beAnInstanceOf[OkApiResult[HideOwnSolutionResult]]
+      result.body.get.allowed must beEqualTo(HideOwnSolutionCode.NotOwnSolution)
     }
 
+    "hideOwnSolution report missing solutions correctly" in context {
+      val u = createUserStub()
+      val s = createSolutionStub(authorId = u.id)
 
-    //    "Remove solution from list of mustVoteSolutions if it's selected" in context {
-//
-//      val sid = "solution id"
-//      val u = createUserStub(id = "uniqueid", mustVoteSolutions = List(sid))
-//      val s = createSolutionStub(id = sid)
-//      val q = createQuestStub()
-//
-//      db.solution.allWithParams(
-//        any,
-//        any,
-//        any,
-//        any,
-//        any,
-//        any,
-//        any,
-//        any,
-//        any) returns List(s).iterator
-//      db.user.readById(any) returns Some(createUserStub())
-//      db.quest.readById(any) returns Some(createQuestStub())
-//      db.user.selectQuestSolutionVote(
-//        any,
-//        any,
-//        any,
-//        any) returns Some(u)
-//      db.user.removeMustVoteSolution(u.id, s.id)
-//
-//      val result = api.getQuestSolutionToVote(GetQuestSolutionToVoteRequest(u))
-//
-//      result must beEqualTo(OkApiResult(GetQuestSolutionToVoteResult(ProfileModificationResult.OK, Some(u.profile))))
-//      there was one(user).removeMustVoteSolution(u.id, s.id)
-//    }
+      db.solution.readById(any) returns None
+
+      val result = api.hideOwnSolution(HideOwnSolutionRequest(u, s.id))
+
+      result must beAnInstanceOf[OkApiResult[HideOwnSolutionResult]]
+      result.body.get.allowed must beEqualTo(HideOwnSolutionCode.SolutionNotFound)
+    }
+
+    "hideOwnSolution in rotation only" in context {
+      val u = createUserStub()
+      val s = createSolutionStub(authorId = u.id, status = SolutionStatus.AdminBanned)
+
+      db.solution.readById(any) returns Some(s)
+
+      val result = api.hideOwnSolution(HideOwnSolutionRequest(u, s.id))
+
+      result must beAnInstanceOf[OkApiResult[HideOwnSolutionResult]]
+      result.body.get.allowed must beEqualTo(HideOwnSolutionCode.SolutionNotInRotation)
+    }
+
+    "hideOwnSolution works" in context {
+      val u = createUserStub()
+      val s = createSolutionStub(authorId = u.id)
+
+      db.solution.readById(any) returns Some(s)
+
+      val result = api.hideOwnSolution(HideOwnSolutionRequest(u, s.id))
+
+      result must beAnInstanceOf[OkApiResult[HideOwnSolutionResult]]
+      result.body.get.allowed must beEqualTo(HideOwnSolutionCode.OK)
+    }
   }
 }

@@ -7,7 +7,6 @@ import controllers.domain.app.quest._
 import controllers.domain.helpers._
 import models.domain.common.ContentVote
 import models.domain.quest.QuestStatus
-import models.domain.solution.SolutionStatus
 import models.domain.user._
 import models.domain.user.profile.{Profile, TaskType}
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
@@ -29,6 +28,7 @@ case class VoteQuestByUserResult(
 object HideOwnQuestCode extends Enumeration with CommonCode {
   val QuestNotFound = Value
   val NotOwnQuest = Value
+  val QuestNotInRotation = Value
 }
 case class HideOwnQuestRequest(user: User, questId: String)
 case class HideOwnQuestResult(allowed: HideOwnQuestCode.Value)
@@ -85,17 +85,19 @@ private[domain] trait VoteQuestAPI { this: DomainAPIComponent#DomainAPI with DBA
   }
 
   /**
-    * Hides own player's quest.
-    */ // TODO: test me.
+   * Hides own player's quest.
+   */
   def hideOwnQuest(request: HideOwnQuestRequest): ApiResult[HideOwnQuestResult] = handleDbException {
-    import request._
     import HideOwnQuestCode._
+    import request._
 
     db.quest.readById(questId).fold {
       OkApiResult(HideOwnQuestResult(QuestNotFound))
     } { quest =>
       if (quest.info.authorId != user.id) {
-        OkApiResult(HideOwnQuestResult(QuestNotFound))
+        OkApiResult(HideOwnQuestResult(NotOwnQuest))
+      } else if (quest.status != QuestStatus.InRotation) {
+        OkApiResult(HideOwnQuestResult(QuestNotInRotation))
       } else {
         db.quest.updateStatus(questId, QuestStatus.AuthorBanned)
         OkApiResult(HideOwnQuestResult(OK))

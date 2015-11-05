@@ -26,6 +26,7 @@ case class VoteSolutionByUserResult(
 object HideOwnSolutionCode extends Enumeration with CommonCode {
   val SolutionNotFound = Value
   val NotOwnSolution = Value
+  val SolutionNotInRotation = Value
 }
 case class HideOwnSolutionRequest(user: User, solutionId: String)
 case class HideOwnSolutionResult(allowed: HideOwnSolutionCode.Value)
@@ -89,16 +90,18 @@ private[domain] trait VoteSolutionAPI {
 
   /**
    * Hides own player's solution.
-   */ // TODO: test me.
+   */
   def hideOwnSolution(request: HideOwnSolutionRequest): ApiResult[HideOwnSolutionResult] = handleDbException {
-    import request._
     import HideOwnSolutionCode._
+    import request._
 
     db.solution.readById(solutionId).fold {
       OkApiResult(HideOwnSolutionResult(SolutionNotFound))
     } { solution =>
       if (solution.info.authorId != user.id) {
-        OkApiResult(HideOwnSolutionResult(SolutionNotFound))
+        OkApiResult(HideOwnSolutionResult(NotOwnSolution))
+      } else if (solution.status != SolutionStatus.InRotation) {
+        OkApiResult(HideOwnSolutionResult(SolutionNotInRotation))
       } else {
         db.solution.updateStatus(solutionId, SolutionStatus.AuthorBanned)
         OkApiResult(HideOwnSolutionResult(OK))
