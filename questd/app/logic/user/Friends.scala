@@ -58,6 +58,8 @@ trait Friends { this: UserLogic =>
       CantFriendHimself
     else if (potentialFriend.banned.contains(user.id))
       UserBannedByPotentialFriend
+    else if (user.friends.map(_.friendId).contains(potentialFriend.id))
+      AlreadyRequested
     else
       OK
   }

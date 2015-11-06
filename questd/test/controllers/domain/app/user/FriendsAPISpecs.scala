@@ -83,5 +83,19 @@ class FriendsAPISpecs extends BaseAPISpecs {
       result must beEqualTo(OkApiResult(AskFriendshipResult(AskFriendshipCode.UserBannedByPotentialFriend)))
     }
 
+    "Asking friendship for himself generates correct erorr code" in context {
+      val weId = "weId"
+      val friend = createUserStub(friends = List(Friendship(weId, FriendshipStatus.Invites)))
+      val we = createUserStub(id = weId, friends = List(Friendship(friend.id, FriendshipStatus.Invites)))
+
+      db.user.readById(friend.id) returns Some(friend)
+      db.user.readById(we.id) returns Some(we)
+//      doReturn(OkApiResult(AdjustAssetsResult(we))).when(api).adjustAssets(any)
+//      doReturn(OkApiResult(SendMessageResult(we))).when(api).sendMessage(any)
+
+      val result = api.askFriendship(AskFriendshipRequest(we, we.id))
+
+      result must beEqualTo(OkApiResult(AskFriendshipResult(AskFriendshipCode.CantFriendHimself)))
+    }
   }
 }

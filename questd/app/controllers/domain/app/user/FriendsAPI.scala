@@ -126,39 +126,33 @@ private[domain] trait FriendsAPI { this: DBAccessor with DomainAPIComponent#Doma
   def askFriendship(request: AskFriendshipRequest): ApiResult[AskFriendshipResult] = handleDbException {
     import AskFriendshipCode._
 
-    if (request.friendId == request.user.id ||
-      request.user.friends.map(_.friendId).contains(request.friendId)) {
-      OkApiResult(AskFriendshipResult(
-        allowed = AlreadyRequested))
-    } else {
-      db.user.readById(request.friendId) match {
-        case Some(potentialFriend) =>
-          request.user.canAddFriend(potentialFriend) match {
-            case OK =>
+    db.user.readById(request.friendId) match {
+      case Some(potentialFriend) =>
+        request.user.canAddFriend(potentialFriend) match {
+          case OK =>
 
-              val cost = request.user.costToAddFriend(potentialFriend)
-              adjustAssets(AdjustAssetsRequest(user = request.user, change = -cost)) map { r =>
+            val cost = request.user.costToAddFriend(potentialFriend)
+            adjustAssets(AdjustAssetsRequest(user = request.user, change = -cost)) map { r =>
 
-                db.user.askFriendship(
-                  r.user.id,
-                  request.friendId,
-                  Friendship(request.friendId, FriendshipStatus.Invited),
-                  Friendship(r.user.id, FriendshipStatus.Invites))
+              db.user.askFriendship(
+                r.user.id,
+                request.friendId,
+                Friendship(request.friendId, FriendshipStatus.Invited),
+                Friendship(r.user.id, FriendshipStatus.Invites))
 
-                OkApiResult(AskFriendshipResult(OK, Some(r.user.profile)))
-              }
+              OkApiResult(AskFriendshipResult(OK, Some(r.user.profile)))
+            }
 
-            case reason if reason == NotEnoughAssets || reason == NotEnoughRights =>
-              OkApiResult(AskFriendshipResult(
-                allowed = reason,
-                profile = Some(request.user.profile)))
+          case reason if reason == NotEnoughAssets || reason == NotEnoughRights =>
+            OkApiResult(AskFriendshipResult(
+              allowed = reason,
+              profile = Some(request.user.profile)))
 
-            case result => OkApiResult(AskFriendshipResult(result))
-          }
+          case result => OkApiResult(AskFriendshipResult(result))
+        }
 
-        case None =>
-          OkApiResult(AskFriendshipResult(allowed = UserNotFound))
-      }
+      case None =>
+        OkApiResult(AskFriendshipResult(allowed = UserNotFound))
     }
   }
 

@@ -58,7 +58,7 @@ class UserLogicSpecs extends BaseLogicSpecs {
       val f = createUserStub(id = fid, level = 10, friends = friendships)
 
       u.canAcceptFriendship(f) must beEqualTo(RespondFriendshipCode.OK)
-      u.canAddFriend(f) must beEqualTo(AskFriendshipCode.OK)
+      u.canAddFriend(f) must beEqualTo(AskFriendshipCode.AlreadyRequested)
     }
 
     "Take correct decision on auto rejecting friendships" in context {
