@@ -4,6 +4,7 @@ import java.util.UUID
 
 import controllers.domain.OkApiResult
 import controllers.web.helpers._
+import play.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.Future
@@ -47,11 +48,13 @@ trait UploadWSImpl extends BaseController with SecurityWSImpl { this: WSComponen
       request.request.body.asMultipartFormData match {
         case Some(data) =>
           data.file("content").map { content =>
-//            val filename = content.filename
-//            val contentType = content.contentType
+            val filename = content.filename
+            val contentType = content.contentType
+
+            Logger.error(s"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! $filename / $contentType")
 
             val baseDir = Path(config(ConfigParams.ContentUploadDir))
-            val addition = Path(s"${request.user.id}") / UUID.randomUUID().toString
+            val addition = (Path(s"${request.user.id}") / UUID.randomUUID().toString).addExtension(Path(filename).extension)
             val file = (baseDir / addition).jfile
 
             file.getParentFile.mkdirs()
