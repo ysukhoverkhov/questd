@@ -48,11 +48,9 @@ trait UploadWSImpl extends BaseController with SecurityWSImpl { this: WSComponen
       request.request.body.asMultipartFormData match {
         case Some(data) =>
           data.file("content").map { content =>
+//            val contentType = content.contentType
+
             val filename = content.filename
-            val contentType = content.contentType
-
-            Logger.error(s"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! $filename / $contentType")
-
             val baseDir = Path(config(ConfigParams.ContentUploadDir))
             val addition = (Path(s"${request.user.id}") / UUID.randomUUID().toString).addExtension(Path(filename).extension)
             val file = (baseDir / addition).jfile
