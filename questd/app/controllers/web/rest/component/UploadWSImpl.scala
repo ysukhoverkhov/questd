@@ -80,6 +80,5 @@ trait UploadWSImpl extends BaseController with SecurityWSImpl { this: WSComponen
 
     OkApiResult(WSGetContentURLByIdResult(ContentURlRequestCode.OK, Some(baseURL + v.contentId)))
   }
-
 }
 
