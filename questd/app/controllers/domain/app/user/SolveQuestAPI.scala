@@ -5,6 +5,7 @@ import controllers.domain._
 import controllers.domain.app.protocol.CommonCode
 import controllers.domain.app.quest.SolveQuestUpdateRequest
 import controllers.domain.helpers._
+import models.domain.common.ContentType
 import models.domain.solution.{Solution, SolutionInfo, SolutionInfoContent, SolutionStatus}
 import models.domain.user._
 import models.domain.user.profile.{Profile, TaskType}
@@ -100,6 +101,12 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
             } map { r =>
               makeTask(MakeTaskRequest(r.user, taskType = Some(TaskType.CreateSolution)))
+            } map { r =>
+              if (newSolution.info.content.media.contentType == ContentType.Video) {
+                makeTask(MakeTaskRequest(r.user, taskType = Some(TaskType.CreateVideoSolution)))
+              } else {
+                OkApiResult(MakeTaskResult(r.user))
+              }
             } map { r =>
               addToTimeLine(AddToTimeLineRequest(
                 user = r.user,

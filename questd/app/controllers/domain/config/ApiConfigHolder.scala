@@ -23,13 +23,15 @@ class _DefaultConfigParams {
   val SolutionVoteTaskCountMean = "30 01 Solution Vote Task Count Mean"
   val SolutionVoteTaskCountDeviation = "30 02 Solution Vote Task Count Deviation"
   val CreateSolutionTaskProbability = "30 11 Create Solution Task Probability"
+  val CreateVideoSolutionTaskProbability = "30 12 Create Video Solution Task Probability"
   val AddToFollowingTaskProbability = "30 21 Add To Following Task Probability"
   val QuestVoteTaskCountMean = "30 31 Quest Vote Task Count Mean"
   val QuestVoteTaskCountDeviation = "30 32 Quest Vote Task Count Deviation"
   val CreateQuestTaskProbability = "30 41 Create Quest Task Probability"
-  val WriteCommentTaskProbability = "30 42 Write Comment Task Probability"
-  val ChallengeBattleTaskProbability = "30 43 Challenge Battle Task Probability"
-  val BattleVoteTaskProbability = "30 51 Battle Vote Task Probability"
+  val CreateVideoQuestTaskProbability = "30 42 Create Video Quest Task Probability"
+  val WriteCommentTaskProbability = "30 51 Write Comment Task Probability"
+  val ChallengeBattleTaskProbability = "30 52 Challenge Battle Task Probability"
+  val BattleVoteTaskProbability = "30 61 Battle Vote Task Probability"
 
   val FavoriteThemesShare = "40 01 Favorite Themes Share"
   val FavoriteThemesProbability = "40 02 Favorite Themes Probability"
@@ -134,10 +136,12 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.SolutionVoteTaskCountMean -> "1",
             DefaultConfigParams.SolutionVoteTaskCountDeviation -> "0.5",
             DefaultConfigParams.CreateSolutionTaskProbability -> "0.5",
+            DefaultConfigParams.CreateVideoSolutionTaskProbability -> "0.1",
             DefaultConfigParams.AddToFollowingTaskProbability -> "0.3",
             DefaultConfigParams.QuestVoteTaskCountMean -> "2",
             DefaultConfigParams.QuestVoteTaskCountDeviation -> "0.5",
             DefaultConfigParams.CreateQuestTaskProbability -> "0.2",
+            DefaultConfigParams.CreateVideoQuestTaskProbability -> "0.05",
             DefaultConfigParams.WriteCommentTaskProbability -> "0.3",
             DefaultConfigParams.ChallengeBattleTaskProbability -> "0.2",
             DefaultConfigParams.BattleVoteTaskProbability -> "0.3",

@@ -5,6 +5,7 @@ import controllers.domain._
 import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import logic.QuestLogic
+import models.domain.common.ContentType
 import models.domain.quest.{Quest, QuestInfo, QuestInfoContent, QuestStatus}
 import models.domain.user._
 import models.domain.user.profile.{Profile, TaskType}
@@ -77,6 +78,12 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
           // Making all api calls
           {
             makeTask(MakeTaskRequest(u, taskType = Some(TaskType.CreateQuest)))
+          } map { r =>
+            if (quest.info.content.media.contentType == ContentType.Video) {
+              makeTask(MakeTaskRequest(u, taskType = Some(TaskType.CreateVideoQuest)))
+            } else {
+              OkApiResult(MakeTaskResult(r.user))
+            }
           } map { r =>
             addToTimeLine(AddToTimeLineRequest(
               user = r.user,

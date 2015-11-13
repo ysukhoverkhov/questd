@@ -6,9 +6,11 @@ package models.domain.user.profile
 object TaskType extends Enumeration {
   val LikeSolutions = Value
   val CreateSolution = Value
+  val CreateVideoSolution = Value
   val LikeQuests = Value
   val AddToFollowing = Value
   val CreateQuest = Value
+  val CreateVideoQuest = Value
   val ChallengeBattle = Value
   val PostComments = Value
   val VoteComments = Value

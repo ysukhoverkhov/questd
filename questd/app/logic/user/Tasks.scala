@@ -71,9 +71,11 @@ trait Tasks { this: UserLogic =>
     Map(
       TaskType.LikeSolutions -> createLikeSolutionsTask,
       TaskType.CreateSolution -> createCreateSolutionTask,
+      TaskType.CreateVideoSolution -> createCreateVideoSolutionTask,
       TaskType.AddToFollowing -> createAddToFollowingTask,
       TaskType.LikeQuests -> createLikeQuestsTask,
       TaskType.CreateQuest -> createCreateQuestTask,
+      TaskType.CreateVideoQuest -> createCreateVideoQuestTask,
       TaskType.ChallengeBattle -> createChallengeBattleTask,
       TaskType.VoteComments -> createVoteReviewsTask,
       TaskType.PostComments -> createPostCommentsTask,
@@ -126,6 +128,22 @@ trait Tasks { this: UserLogic =>
   }
 
   /**
+    * Algorithm for generating task for submitting quest.
+    */
+  private def createCreateVideoSolutionTask(user: User) = ifHasRightTo(Functionality.SubmitVideoSolutions) {
+    val taskProbability = api.config(api.DefaultConfigParams.CreateVideoSolutionTaskProbability).toDouble
+    if (canSolveQuestToday && rand.nextDouble() < taskProbability)
+      Some(Task(
+        taskType = TaskType.CreateVideoSolution,
+        description = "",
+        requiredCount = 1))
+    else
+      None
+  }
+
+
+
+  /**
    * Algorithm for generating tasks for following.
    */
   private def createAddToFollowingTask(user: User) = ifHasRightTo(Functionality.AddToFollowing) {
@@ -166,6 +184,21 @@ trait Tasks { this: UserLogic =>
     if (canProposeQuestToday && rand.nextDouble() < taskProbability)
       Some(Task(
         taskType = TaskType.CreateQuest,
+        description = "",
+        requiredCount = 1))
+    else
+      None
+  }
+
+  /**
+    * Algorithm for generating task for submitting quest proposal.
+    */
+  private def createCreateVideoQuestTask(user: User) = ifHasRightTo(Functionality.SubmitVideoQuests) {
+    val taskProbability = api.config(api.DefaultConfigParams.CreateVideoQuestTaskProbability).toDouble
+
+    if (canProposeQuestToday && rand.nextDouble() < taskProbability)
+      Some(Task(
+        taskType = TaskType.CreateVideoQuest,
         description = "",
         requiredCount = 1))
     else

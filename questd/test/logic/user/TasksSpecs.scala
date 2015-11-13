@@ -142,6 +142,24 @@ class TasksSpecs extends BaseLogicSpecs {
       t must beSome[Task]
       t.get.requiredCount must beEqualTo(1)
     }
+
+    "Generate tasks for video quests" in context {
+      val u = createUser(12)
+      val dailyResult = u.getTasksForTomorrow
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.CreateVideoQuest)
+      t must beSome[Task]
+      t.get.requiredCount must beEqualTo(1)
+    }
+
+    "Generate tasks for video solutions" in context {
+      val u = createUser(12)
+      val dailyResult = u.getTasksForTomorrow
+
+      val t = dailyResult.tasks.find(_.taskType == TaskType.CreateVideoSolution)
+      t must beSome[Task]
+      t.get.requiredCount must beEqualTo(1)
+    }
   }
 }
 
