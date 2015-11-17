@@ -144,7 +144,7 @@ class TimeLineAPISpecs extends BaseAPISpecs {
     "getTimeLine populates timeline if it's empty" in context {
       val u = createUserStub()
 
-      doReturn(OkApiResult(PupulateTimeLineInitiallyResult(u))).when(api).populateTimeLineInitially(any)
+      doReturn(OkApiResult(PopulateTimeLineInitiallyResult(u))).when(api).populateTimeLineInitially(any)
 
       val result = api.getTimeLine(GetTimeLineRequest(
         user = u,
@@ -166,7 +166,7 @@ class TimeLineAPISpecs extends BaseAPISpecs {
             referredWithContentId = Some(contentId)
           )))
 
-      doReturn(OkApiResult(PupulateTimeLineInitiallyResult(u))).when(api).populateTimeLineInitially(any)
+      doReturn(OkApiResult(PopulateTimeLineInitiallyResult(u))).when(api).populateTimeLineInitially(any)
 
       val result = api.getTimeLine(GetTimeLineRequest(
         user = u,

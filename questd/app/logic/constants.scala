@@ -83,7 +83,7 @@ object constants {
    * Voting quest solutions.
    */
 
-  val FriendsVoteMult = 2
+  val FriendsVoteMult = 1
 
   // TAGS: clean me up with tags.
   val NumberOfFavoriteThemesForVIPSolutions = 3

@@ -5,6 +5,7 @@ import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import models.domain.common.{Assets, ClientPlatform}
+import models.domain.tutorial.TutorialServerActionType._
 import models.domain.tutorial.{TutorialElement, TutorialServerAction, TutorialServerActionType}
 import models.domain.user._
 import models.domain.user.profile.{DailyTasks, Profile, Task, TutorialState}
@@ -134,7 +135,6 @@ private[domain] trait TutorialAPI { this: DomainAPIComponent#DomainAPI with DBAc
       case _ @ action =>
         Logger.error(s"Unknown server tutorial action $action")
         OkApiResult(ExecuteServerTutorialActionResult(user))
-
     }
   }
 
