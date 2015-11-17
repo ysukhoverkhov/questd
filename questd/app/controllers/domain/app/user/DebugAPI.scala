@@ -10,7 +10,7 @@ import controllers.domain.{DomainAPIComponent, _}
 import models.domain.battle.BattleStatus
 import models.domain.user._
 import models.domain.user.dailyresults.DailyResult
-import models.domain.user.profile.Profile
+import models.domain.user.profile.{Analytics, Profile}
 import models.domain.user.stats.UserStats
 
 object SetDebugCode extends Enumeration with CommonCode
@@ -81,7 +81,10 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         stats = UserStats(),
         following = List.empty,
         followers = List.empty,
-        friends = List.empty
+        friends = List.empty,
+        profile = user.profile.copy(
+          analytics = Analytics()
+        )
       )
     )
 
