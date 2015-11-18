@@ -11,12 +11,14 @@ private object SolveQuestWSImplTypes {
   case class WSSolveQuestRequest(
     questId: String,
     media: WSContentReference,
-    icon: Option[WSContentReference] = None)
+    icon: Option[WSContentReference] = None,
+    description: String)
   object WSSolveQuestRequest {
     implicit def toSolutionInfoContent(v: WSSolveQuestRequest): SolutionInfoContent = {
       SolutionInfoContent(
         media = v.media,
-        icon = v.icon.map(r => r))
+        icon = v.icon.map(r => r),
+        description = v.description)
     }
   }
 

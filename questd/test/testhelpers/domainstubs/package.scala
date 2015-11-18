@@ -84,7 +84,8 @@ package object domainstubs {
   def createSolutionInfoContent = {
     SolutionInfoContent(
       createContentReferenceStub,
-      None)
+      None,
+      "")
   }
 
   // TAGS: replace themeId with tags.

@@ -7,4 +7,5 @@ import models.domain.common.ContentReference
  */
 case class SolutionInfoContent(
   media: ContentReference,
-  icon: Option[ContentReference] = None)
+  icon: Option[ContentReference] = None,
+  description: String = "") // TODO: remove default value in 0.50.02 after cleaning up existing database.
