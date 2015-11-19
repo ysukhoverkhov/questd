@@ -164,10 +164,10 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.SolutionMinCheatingVotes -> "5",
             DefaultConfigParams.SolutionIACRatio -> "0.03",
             DefaultConfigParams.SolutionMinIACVotes -> "5",
-            DefaultConfigParams.SolutionMaxDescriptionLength -> "1024", // TODO: use it
+            DefaultConfigParams.SolutionMaxDescriptionLength -> "1024",
             DefaultConfigParams.BattleCreationDelay -> "24",
 
-            DefaultConfigParams.BattleMinVotesCount -> "0",
+            DefaultConfigParams.BattleMinVotesCount -> "3",
             DefaultConfigParams.BattleAdditionalVotesMean -> "2",
             DefaultConfigParams.BattleAdditionalVotesDeviation -> "2",
 

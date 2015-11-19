@@ -59,56 +59,22 @@ private[domain] trait BattleAPI { this: DomainAPIComponent#DomainAPI with DBAcce
 
     if (battle.shouldStopVoting) {
       {
-        tuneBattlePointsBeforeResolve(TuneBattlePointsBeforeResolveRequest(battle))
-      } map { r =>
-        val tunedBattle = r.battle
-          val bestBattleSide = tunedBattle.info.battleSides.sortBy(tunedBattle.votingPoints)(Ordering[Int].reverse).head
+        val bestBattleSide = battle.info.battleSides.sortBy(battle.votingPoints)(Ordering[Int].reverse).head
 
-          db.battle.updateStatus(
-            id = tunedBattle.id,
-            newStatus = BattleStatus.Resolved,
-            setWinnerSolutionIds = tunedBattle.info.battleSides.filter(tunedBattle.votingPoints(_) == tunedBattle.votingPoints(bestBattleSide)).map(_.solutionId)) ifSome { updatedBattle =>
+        db.battle.updateStatus(
+          id = battle.id,
+          newStatus = BattleStatus.Resolved,
+          setWinnerSolutionIds = battle.info.battleSides.filter(battle.votingPoints(_) == battle.votingPoints(bestBattleSide)).map(_.solutionId)) ifSome { updatedBattle =>
 
-            if (updatedBattle.info.status != tunedBattle.info.status) {
-              rewardBattleParticipants(RewardBattleParticipantsRequest(updatedBattle)) map OkApiResult(UpdateBattleStateResult(updatedBattle))
-            } else {
-              OkApiResult(UpdateBattleStateResult(updatedBattle))
-            }
+          if (updatedBattle.info.status != battle.info.status) {
+            rewardBattleParticipants(RewardBattleParticipantsRequest(updatedBattle)) map OkApiResult(UpdateBattleStateResult(updatedBattle))
+          } else {
+            OkApiResult(UpdateBattleStateResult(updatedBattle))
           }
+        }
       }
     } else {
       OkApiResult(UpdateBattleStateResult(battle))
-    }
-  }
-
-  /**
-   * Tune points for battle (cheating).
-   */
-  def tuneBattlePointsBeforeResolve(request: TuneBattlePointsBeforeResolveRequest): ApiResult[TuneBattlePointsBeforeResolveResult] = handleDbException {
-    import request._
-
-    val min = api.config(DefaultConfigParams.BattleMinVotesCount).toInt
-    val mean = api.config(DefaultConfigParams.BattleAdditionalVotesMean).toInt
-    val dev = api.config(DefaultConfigParams.BattleAdditionalVotesDeviation).toInt
-
-    val shouldAddRandomPoints = battle.info.battleSides.foldLeft(0) {
-      case (total, side) => side.pointsRandom + side.pointsFriends + total
-    } == 0
-
-    if (shouldAddRandomPoints) {
-      battle.info.battleSides.foldLeft[Option[Battle]](Some(battle)) {
-        case (None, _) => None
-        case (Some(runningBattle), side) =>
-          db.battle.updatePoints(
-            id = runningBattle.id,
-            solutionId = side.solutionId,
-            randomPointsChange = math.round(rand.nextGaussian(mean, dev, min)).toInt,
-            friendsPointsChange = 0)
-      } ifSome { b =>
-        OkApiResult(TuneBattlePointsBeforeResolveResult(b))
-      }
-    } else {
-      OkApiResult(TuneBattlePointsBeforeResolveResult(battle))
     }
   }
 
