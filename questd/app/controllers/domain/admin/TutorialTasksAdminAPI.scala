@@ -18,6 +18,10 @@ case class CreateTutorialTaskAdminResult()
 case class UpdateTutorialTaskAdminRequest(task: TutorialTask)
 case class UpdateTutorialTaskAdminResult()
 
+case class DeleteTutorialTaskAdminRequest(id: String)
+case class DeleteTutorialTaskAdminResult()
+
+
 private[domain] trait TutorialTasksAdminAPI { this: DBAccessor =>
 
   /**
@@ -62,5 +66,15 @@ private[domain] trait TutorialTasksAdminAPI { this: DBAccessor =>
     OkApiResult(UpdateTutorialTaskAdminResult())
   }
 
+  /**
+   * Delete tutorial task.
+   */
+  def deleteTutorialTaskAdmin(request: DeleteTutorialTaskAdminRequest): ApiResult[DeleteTutorialTaskAdminResult] = handleDbException {
+    Logger.debug("Admin request for delete a tutorial task" + request.id)
+
+    db.tutorialTask.delete(request.id)
+
+    OkApiResult(DeleteTutorialTaskAdminResult())
+  }
 }
 

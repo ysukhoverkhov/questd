@@ -112,6 +112,12 @@ class TutorialTasksCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Contr
       })
   }
 
+  def deleteTutorialTask(id: String) = Authenticated { implicit request =>
+
+    api.deleteTutorialTaskAdmin(DeleteTutorialTaskAdminRequest(id))
+
+    Redirect(_root_.controllers.web.admin.routes.TutorialTasksCRUD.tutorialTasks(""))
+  }
 
   /**
    * Exports tutorial tasks to file.

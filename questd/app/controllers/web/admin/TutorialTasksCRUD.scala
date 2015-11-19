@@ -12,6 +12,8 @@ object TutorialTasksCRUD extends Controller {
 
   def updateTutorialTask() = admin.tutorialTasks.updateTutorialTask()
 
+  def deleteTutorialTask(id: String) = admin.tutorialTasks.deleteTutorialTask(id)
+
   def exportTutorialTasks = admin.tutorialTasks.exportTutorialTasks
 
   def importTutorialTasks = admin.tutorialTasks.importTutorialTasks
