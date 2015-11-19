@@ -7,7 +7,6 @@ import models.domain.battle.BattleStatus
 import models.domain.solution.SolutionStatus
 import models.domain.user.dailyresults.BattleResult
 import org.mockito.Matchers.{eq => mEq}
-import org.mockito.Mockito._
 import testhelpers.domainstubs._
 
 //noinspection ZeroIndexToHead

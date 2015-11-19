@@ -3,8 +3,7 @@ package logic
 import java.util.Date
 
 import com.github.nscala_time.time.Imports._
-import controllers.domain.{ApiResult, OkApiResult, DomainAPIComponent}
-import controllers.domain.app.battle.{TuneBattlePointsBeforeResolveRequest, TuneBattlePointsBeforeResolveResult}
+import controllers.domain.DomainAPIComponent
 import models.domain.battle.{Battle, BattleSide}
 import org.joda.time.DateTime
 
@@ -22,13 +21,6 @@ class BattleLogic(
 
     new Date().after(battle.info.voteEndDate) &&
       (totalPoints >= api.config(api.DefaultConfigParams.BattleMinVotesCount).toInt)
-  }
-
-  /**
-   * Time when to stop fighting battles.
-   */
-  def solutionVoteEndDate(questLevel: Int) = {
-    BattleLogic.voteEndDate(questLevel)
   }
 
   /**
