@@ -2,7 +2,7 @@ package controllers.domain.app.user
 
 import components._
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import logic.QuestLogic
 import models.domain.quest.{Quest, QuestInfo, QuestInfoContent, QuestStatus}
@@ -10,9 +10,13 @@ import models.domain.user._
 import models.domain.user.profile.{Profile, TaskType}
 import models.domain.user.timeline.{TimeLineReason, TimeLineType}
 
+object CreateQuestCode extends Enumeration with CommonCode {
+  val QuestCreationCoolDown = Value
+  val DescriptionLengthLimitExceeded = Value
+}
 case class CreateQuestRequest(user: User, quest: QuestInfoContent, friendsToHelp: List[String] = List.empty)
 case class CreateQuestResult(
-  allowed: ProfileModificationResult,
+  allowed: CreateQuestCode.Value,
   profile: Option[Profile] = None)
 
 case class RewardQuestAuthorRequest(quest: Quest, author: User)
@@ -24,6 +28,8 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
    * Takes currently purchased theme to make a quest with it.
    */
   def createQuest(request: CreateQuestRequest): ApiResult[CreateQuestResult] = handleDbException {
+
+    import CreateQuestCode._
 
     request.user.canCreateQuest(request.quest) match {
       case OK =>
@@ -88,7 +94,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
           }
         }
 
-      case (a: ProfileModificationResult) => OkApiResult(CreateQuestResult(a))
+      case result => OkApiResult(CreateQuestResult(result))
     }
   }
 

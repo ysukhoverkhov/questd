@@ -4,7 +4,7 @@ import java.util.Date
 
 import components._
 import controllers.domain.app.battle.UpdateBattleStateRequest
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.helpers._
 import controllers.domain.{DomainAPIComponent, _}
 import models.domain.battle.BattleStatus
@@ -13,17 +13,20 @@ import models.domain.user.dailyresults.DailyResult
 import models.domain.user.profile.Profile
 import models.domain.user.stats.UserStats
 
+object SetDebugCode extends Enumeration with CommonCode
 case class SetDebugRequest(user: User, debug: String)
-case class SetDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class SetDebugResult(allowed: SetDebugCode.Value, profile: Option[Profile] = None)
 
 case class SetLevelDebugRequest(user: User, level: Int)
 case class SetLevelDebugResult(user: User)
 
+object ResetProfileDebugCode extends Enumeration with CommonCode
 case class ResetProfileDebugRequest(user: User)
-case class ResetProfileDebugResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class ResetProfileDebugResult(allowed: ResetProfileDebugCode.Value, profile: Option[Profile] = None)
 
+object ResolveAllBattlesCode extends Enumeration with CommonCode
 case class ResolveAllBattlesRequest(user: User)
-case class ResolveAllBattlesResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class ResolveAllBattlesResult(allowed: ResolveAllBattlesCode.Value, profile: Option[Profile] = None)
 
 private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -34,7 +37,7 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     import request._
 
     db.user.setDebug(user.id, debug) ifSome { v =>
-      OkApiResult(SetDebugResult(OK, Some(v.profile)))
+      OkApiResult(SetDebugResult(SetDebugCode.OK, Some(v.profile)))
     }
 
   }
@@ -89,7 +92,7 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     } map { r =>
       resetTutorial(ResetTutorialRequest(r.user))
     } map { r =>
-      OkApiResult(ResetProfileDebugResult(OK, r.profile))
+      OkApiResult(ResetProfileDebugResult(ResetProfileDebugCode.OK, r.profile))
     }
   }
 
@@ -103,7 +106,7 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
         api.updateBattleState(UpdateBattleStateRequest(battle.copy(info = battle.info.copy(voteEndDate = new Date()))))
     }
 
-    OkApiResult(ResolveAllBattlesResult(OK, Some(request.user.profile)))
+    OkApiResult(ResolveAllBattlesResult(ResolveAllBattlesCode.OK, Some(request.user.profile)))
   }
 }
 

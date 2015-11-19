@@ -1,11 +1,9 @@
 package controllers.domain.app.user
 
-import controllers.domain.app.protocol.ProfileModificationResult
 import controllers.domain.{BaseAPISpecs, OkApiResult}
-import models.domain.user.friends.{ReferralStatus, Friendship, FriendshipStatus}
+import models.domain.user.friends.{Friendship, FriendshipStatus, ReferralStatus}
 import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import org.mockito.Matchers.{eq => mockEq}
-import org.mockito.Mockito._
 import testhelpers.domainstubs._
 
 class TimeLineAPISpecs extends BaseAPISpecs {
@@ -72,7 +70,7 @@ class TimeLineAPISpecs extends BaseAPISpecs {
         user = u,
         entryId = entryId))
 
-      result must beEqualTo(OkApiResult(HideFromTimeLineResult(ProfileModificationResult.OK, Some(u.profile))))
+      result must beEqualTo(OkApiResult(HideFromTimeLineResult(HideFromTimeLineCode.OK, Some(u.profile))))
       there was one(user).updateTimeLineEntry(mockEq(u.id), mockEq(entryId), mockEq(TimeLineReason.Hidden))
     }
 
@@ -85,7 +83,7 @@ class TimeLineAPISpecs extends BaseAPISpecs {
         user = u,
         entryId = "asd"))
 
-      result must beEqualTo(OkApiResult(HideFromTimeLineResult(ProfileModificationResult.OutOfContent, None)))
+      result must beEqualTo(OkApiResult(HideFromTimeLineResult(HideFromTimeLineCode.EntryNotFound, None)))
       there was no(user).updateTimeLineEntry(any, any, any)
     }
 

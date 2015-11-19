@@ -1,8 +1,7 @@
 package controllers.domain.app.quest
 
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult
-import controllers.domain.app.user.{BookmarkQuestResult, BookmarkQuestRequest}
+import controllers.domain.app.user.{BookmarkQuestCode, BookmarkQuestResult, BookmarkQuestRequest}
 import models.domain.common.ContentVote
 import models.domain.user.User
 import org.mockito.Matchers.{eq => mEq}
@@ -73,7 +72,7 @@ class QuestAPISpecs extends BaseAPISpecs {
 
       val result = api.bookmarkQuest(BookmarkQuestRequest(u, q.id))
 
-      result must beEqualTo(OkApiResult(BookmarkQuestResult(ProfileModificationResult.OK, Some(u.profile))))
+      result must beEqualTo(OkApiResult(BookmarkQuestResult(BookmarkQuestCode.OK, Some(u.profile))))
       there was one(quest).readById(q.id)
       there was one(user).setQuestBookmark(any, any)
     }

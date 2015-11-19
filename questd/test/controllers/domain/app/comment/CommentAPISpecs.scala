@@ -1,7 +1,6 @@
 package controllers.domain.app.comment
 
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult
 import models.view.CommentView
 import testhelpers.domainstubs._
 
@@ -26,7 +25,7 @@ class CommentAPISpecs extends BaseAPISpecs {
       there was one(comment).readById(any)
       there was one(quest).readById(any)
 
-      result must beEqualTo(OkApiResult(PostCommentResult(ProfileModificationResult.OK, Some(u.profile))))
+      result must beEqualTo(OkApiResult(PostCommentResult(PostCommentCode.OK, Some(u.profile))))
     }
 
     "Long messages not allowed" in context {
@@ -45,7 +44,7 @@ class CommentAPISpecs extends BaseAPISpecs {
       there was no(comment).readById(any)
       there was no(quest).readById(any)
 
-      result must beEqualTo(OkApiResult(PostCommentResult(ProfileModificationResult.LimitExceeded, None)))
+      result must beEqualTo(OkApiResult(PostCommentResult(PostCommentCode.CommentLengthLimitExceeded, None)))
     }
 
     "Respond to should be correct" in context {
@@ -64,7 +63,7 @@ class CommentAPISpecs extends BaseAPISpecs {
       there was one(comment).readById(any)
       there was no(quest).readById(any)
 
-      result must beEqualTo(OkApiResult(PostCommentResult(ProfileModificationResult.OutOfContent, None)))
+      result must beEqualTo(OkApiResult(PostCommentResult(PostCommentCode.CommentToRespondNotFound, None)))
     }
 
     "Content should be correct" in context {
@@ -87,7 +86,7 @@ class CommentAPISpecs extends BaseAPISpecs {
       there was one(solution).readById(any)
       there was one(battle).readById(any)
 
-      result must beEqualTo(OkApiResult(PostCommentResult(ProfileModificationResult.OutOfContent, None)))
+      result must beEqualTo(OkApiResult(PostCommentResult(PostCommentCode.ObjectNotFound, None)))
     }
 
     "Comments fetching works" in context {
@@ -106,7 +105,7 @@ class CommentAPISpecs extends BaseAPISpecs {
       there was one(comment).allWithParams(any, any, any)
 
       result must beEqualTo(OkApiResult(GetCommentsForObjectResult(
-        allowed = ProfileModificationResult.OK,
+        allowed = GetCommentsForObjectCode.OK,
         comments = cs.map(c => CommentView(c.id, c.info)),
         hasMore = false)))
     }
@@ -127,7 +126,7 @@ class CommentAPISpecs extends BaseAPISpecs {
       there was one(comment).allWithParams(any, any, any)
 
       result must beEqualTo(OkApiResult(GetCommentsForObjectResult(
-        allowed = ProfileModificationResult.OK,
+        allowed = GetCommentsForObjectCode.OK,
         comments = cs.take(5).map(c => CommentView(c.id, c.info)),
         hasMore = true)))
     }

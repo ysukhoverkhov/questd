@@ -4,11 +4,9 @@ import models.domain.common.Assets
 
 class QuestLogicSpecs extends BaseLogicSpecs {
 
-  "Quest logic should" should {
+  "Quest logic" should {
 
-    "Calculate correct cost of quest to solve" in {
-      applyConfigMock()
-
+    "Calculate correct cost of quest to solve" in context {
       QuestLogic.costOfSolvingQuest(3) must beEqualTo(Assets(coins = 100))
       QuestLogic.costOfSolvingQuest(8) must beEqualTo(Assets(coins = 594))
       QuestLogic.costOfSolvingQuest(13) must beEqualTo(Assets(coins = 2060))

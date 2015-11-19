@@ -2,7 +2,7 @@ package controllers.domain.app.user
 
 import components._
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult._
+import controllers.domain.app.protocol.CommonCode
 import controllers.domain.app.quest.SolveQuestUpdateRequest
 import controllers.domain.helpers._
 import models.domain.solution.{Solution, SolutionInfo, SolutionInfoContent, SolutionStatus}
@@ -14,28 +14,40 @@ import play.Logger
 
 import scala.language.postfixOps
 
+
+object SolveQuestCode extends Enumeration with CommonCode {
+  val QuestNotFound = Value
+  val CantSolveOwnQuest = Value
+  val QuestAlreadySolved = Value
+}
 case class SolveQuestRequest(
   user: User,
   questId: String,
   solution: SolutionInfoContent)
 case class SolveQuestResult(
-  allowed: ProfileModificationResult,
+  allowed: SolveQuestCode.Value,
   profile: Option[Profile] = None,
   modifiedQuests: List[QuestView] = List.empty,
   modifiedSolutions: List[SolutionView] = List.empty)
 
+
 case class RewardSolutionAuthorRequest(solution: Solution, author: User)
 case class RewardSolutionAuthorResult()
 
+
+object BookmarkQuestCode extends Enumeration with CommonCode {
+}
 case class BookmarkQuestRequest(user: User, questId: String)
-case class BookmarkQuestResult(allowed: ProfileModificationResult, profile: Option[Profile] = None)
+case class BookmarkQuestResult(allowed: BookmarkQuestCode.Value, profile: Option[Profile] = None)
 
 
 //case class GetQuestSolutionHelpCostRequest(user: User)
 //case class GetQuestSolutionHelpCostResult(allowed: ProfileModificationResult, cost: Option[Assets] = None)
 
+
 //case class AddToMustVoteSolutionsRequest(user: User, friendIds: List[String], solutionId: String)
 //case class AddToMustVoteSolutionsResult(user: User)
+
 
 private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DBAccessor =>
 
@@ -43,10 +55,11 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    * Solve a quest.
    */
   def solveQuest(request: SolveQuestRequest): ApiResult[SolveQuestResult] = handleDbException {
+    import SolveQuestCode._
     import request._
 
     db.quest.readById(questId) match {
-      case None => OkApiResult(SolveQuestResult(OutOfContent))
+      case None => OkApiResult(SolveQuestResult(QuestNotFound))
       case Some(questToSolve) =>
         user.canSolveQuest(contentType = solution.media.contentType, questToSolve = questToSolve) match {
           case OK =>
@@ -133,7 +146,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
               }
             }
 
-          case (a: ProfileModificationResult) => OkApiResult(SolveQuestResult(a))
+          case result => OkApiResult(SolveQuestResult(result))
         }
     }
   }
@@ -192,6 +205,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
    * Bookmark a quest to solve it later.
    */
   def bookmarkQuest(request: BookmarkQuestRequest): ApiResult[BookmarkQuestResult] = handleDbException {
+    import BookmarkQuestCode._
     import request._
 
     db.quest.readById(questId) ifSome { quest =>

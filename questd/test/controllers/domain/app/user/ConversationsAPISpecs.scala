@@ -3,7 +3,6 @@ package controllers.domain.app.user
 import java.util.Date
 
 import controllers.domain._
-import controllers.domain.app.protocol.ProfileModificationResult
 import models.domain.chat.{ChatMessage, Conversation, Participant}
 import testhelpers.domainstubs._
 
@@ -40,9 +39,8 @@ class ConversationsAPISpecs extends BaseAPISpecs {
       result must beAnInstanceOf[OkApiResult[CreateConversationResult]]
     }
 
-    "createConversation does not create conversation with nonexisting user" in context {
+    "createConversation does not create conversation with not existing user" in context {
       val u = createUserStub()
-      val c = createConversationStub(pIds = List(u.id))
 
       db.conversation.findByAllParticipants(any) returns Iterator.empty
       db.user.readById(any) returns None
@@ -53,7 +51,7 @@ class ConversationsAPISpecs extends BaseAPISpecs {
       there was one(user).readById(any)
       there were no(conversation).create(any)
 
-      result must beEqualTo(OkApiResult(CreateConversationResult(ProfileModificationResult.OutOfContent)))
+      result must beEqualTo(OkApiResult(CreateConversationResult(CreateConversationCode.PeerNotFount)))
     }
 
     "createConversation creates new conversation" in context {
@@ -112,7 +110,7 @@ class ConversationsAPISpecs extends BaseAPISpecs {
         conversationId = "",
         message = (1 to 10000).toList.mkString))
 
-      result must beEqualTo(OkApiResult(SendChatMessageResult(ProfileModificationResult.LimitExceeded)))
+      result must beEqualTo(OkApiResult(SendChatMessageResult(SendChatMessageCode.MessageLengthLimitExceeded)))
     }
 
     "Do not accept message for not existing conversation" in context {
@@ -120,7 +118,7 @@ class ConversationsAPISpecs extends BaseAPISpecs {
       val u = createUserStub(id = pIds(0))
       val conv = createConversationStub(pIds = pIds)
 
-      conversation.readById(any) returns Some(conv)
+      conversation.readById(any) returns None
       user.readById(any) returns Some(u)
       doReturn(OkApiResult(SendMessageResult(u))).when(api).sendMessage(any)
 
@@ -130,11 +128,11 @@ class ConversationsAPISpecs extends BaseAPISpecs {
         message = ""))
 
       there was one (conversation).readById(any)
-      there was one (chat).create(any)
-      there was one (conversation).setUnreadMessagesFlag(conv.id, pIds(1), flag = true)
-      there was one (api).sendMessage(any)
+      there was no (chat).create(any)
+      there was no (conversation).setUnreadMessagesFlag(conv.id, pIds(1), flag = true)
+      there was no (api).sendMessage(any)
 
-      result must beEqualTo(OkApiResult(SendChatMessageResult(ProfileModificationResult.OK)))
+      result must beEqualTo(OkApiResult(SendChatMessageResult(SendChatMessageCode.ConversationNotFound)))
     }
 
     "getChatMessages does not return messages for not existing conversation" in context {
@@ -143,7 +141,7 @@ class ConversationsAPISpecs extends BaseAPISpecs {
       val result = api.getChatMessages(GetChatMessagesRequest(createUserStub(), "", new Date(0), 10))
 
       there was one (conversation).readById(any)
-      result must beEqualTo(OkApiResult(GetChatMessagesResult(ProfileModificationResult.OutOfContent)))
+      result must beEqualTo(OkApiResult(GetChatMessagesResult(GetChatMessagesCode.ConversationNotFound)))
     }
 
     "getChatMessages returns messages and resets unread flag" in context {
