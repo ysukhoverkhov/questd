@@ -51,6 +51,7 @@ class _DefaultConfigParams {
   val SolutionMinCheatingVotes = "60 11 Solution minimum votes to thing it's a cheating"
   val SolutionIACRatio = "60 15 Solution IAC to Votes Ratio"
   val SolutionMinIACVotes = "60 16 Solution min IAC Votes"
+  val SolutionMaxDescriptionLength = "60 17 Solution Max Description Length"
   val BattleCreationDelay = "60 21 Battle Creation Delay"
 
   // Battles
@@ -156,13 +157,14 @@ trait ApiConfigHolder extends ConfigHolder { this: APIAccessor =>
             DefaultConfigParams.QuestMinCheatingVotes -> "10",
             DefaultConfigParams.QuestIACRatio -> "0.03",
             DefaultConfigParams.QuestMinIACVotes -> "10",
-            DefaultConfigParams.QuestMaxDescriptionLength -> "140",
+            DefaultConfigParams.QuestMaxDescriptionLength -> "1024",
             DefaultConfigParams.QuestMaxTimeLinePointsForSolve -> "20",
 
             DefaultConfigParams.SolutionCheatingRatio -> "0.1",
             DefaultConfigParams.SolutionMinCheatingVotes -> "5",
             DefaultConfigParams.SolutionIACRatio -> "0.03",
             DefaultConfigParams.SolutionMinIACVotes -> "5",
+            DefaultConfigParams.SolutionMaxDescriptionLength -> "1024", // TODO: use it
             DefaultConfigParams.BattleCreationDelay -> "24",
 
             DefaultConfigParams.BattleMinVotesCount -> "0",

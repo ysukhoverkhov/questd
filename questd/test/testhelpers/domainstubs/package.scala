@@ -81,7 +81,7 @@ package object domainstubs {
       solutionsCount = solutionsCount)
   }
 
-  def createSolutionInfoContent = {
+  def createSolutionInfoContentStub = {
     SolutionInfoContent(
       createContentReferenceStub,
       None,
@@ -108,7 +108,7 @@ package object domainstubs {
       cultureId = cultureId,
       questLevel = level,
       info = SolutionInfo(
-        content = createSolutionInfoContent,
+        content = createSolutionInfoContentStub,
         vip = vip,
         authorId = authorId,
         questId = questId,

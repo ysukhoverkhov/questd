@@ -39,7 +39,7 @@ class SolveQuestAPISpecs extends BaseAPISpecs {
         id = q.info.authorId,
         privateDailyResults = List(createDailyResultStub(
           questsIncome = List(createQuestIncomeStub(questId = q.id)))))
-      val s = createSolutionInfoContent
+      val s = createSolutionInfoContentStub
 
       quest.readById(mEq(q.id)) returns Some(q)
       quest.updatePoints(mEq(q.id), anyInt, anyInt, anyInt, anyInt, anyInt, anyInt) returns Some(q)

@@ -20,6 +20,7 @@ object SolveQuestCode extends Enumeration with CommonCode {
   val QuestNotFound = Value
   val CantSolveOwnQuest = Value
   val QuestAlreadySolved = Value
+  val DescriptionLengthLimitExceeded = Value
 }
 case class SolveQuestRequest(
   user: User,
@@ -62,7 +63,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
     db.quest.readById(questId) match {
       case None => OkApiResult(SolveQuestResult(QuestNotFound))
       case Some(questToSolve) =>
-        user.canSolveQuest(contentType = solution.media.contentType, questToSolve = questToSolve) match {
+        user.canSolveQuest(
+          contentType = solution.media.contentType,
+          questToSolve = questToSolve,
+          solutionContent = request.solution) match {
           case OK =>
 
             import request.{user => u}

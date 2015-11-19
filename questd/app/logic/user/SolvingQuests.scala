@@ -4,6 +4,7 @@ import controllers.domain.app.user.SolveQuestCode
 import logic._
 import models.domain.common.ContentType._
 import models.domain.quest.Quest
+import models.domain.solution.SolutionInfoContent
 import models.domain.user.profile.Functionality
 
 /**
@@ -21,7 +22,7 @@ trait SolvingQuests { this: UserLogic =>
   /**
    * Is user can propose quest of given type.
    */
-  def canSolveQuest(contentType: ContentType, questToSolve: Quest): SolveQuestCode.Value = {
+  def canSolveQuest(contentType: ContentType, questToSolve: Quest, solutionContent: SolutionInfoContent): SolveQuestCode.Value = {
     import SolveQuestCode._
 
     val content = contentType match {
@@ -37,6 +38,8 @@ trait SolvingQuests { this: UserLogic =>
       CantSolveOwnQuest
     else if (user.stats.solvedQuests.contains(questToSolve.id))
       QuestAlreadySolved
+    else if (solutionContent.description.length > api.config(api.DefaultConfigParams.SolutionMaxDescriptionLength).toInt)
+      DescriptionLengthLimitExceeded
     else if (!bioComplete)
       IncompleteBio
     else

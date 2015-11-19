@@ -14,7 +14,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       val user = createUserStub(rights = Rights.none)
       val q = createQuestStub()
 
-      val rv = user.canSolveQuest(ContentType.Photo, q)
+      val rv = user.canSolveQuest(ContentType.Photo, q, createSolutionInfoContentStub)
 
       rv must beEqualTo(SolveQuestCode.NotEnoughRights)
     }
@@ -24,7 +24,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       val tl = List(createTimeLineEntryStub(objectId = q.id))
       val user = createUserStub(assets = Assets(), timeLine = tl)
 
-      val rv = user.canSolveQuest(ContentType.Photo, q)
+      val rv = user.canSolveQuest(ContentType.Photo, q, createSolutionInfoContentStub)
 
       rv must beEqualTo(SolveQuestCode.NotEnoughAssets)
     }
@@ -35,7 +35,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       val user = createUserStub(timeLine = tl)
       val q = createQuestStub(id = questId, authorId = user.id)
 
-      val rv = user.canSolveQuest(ContentType.Photo, q)
+      val rv = user.canSolveQuest(ContentType.Photo, q, createSolutionInfoContentStub)
 
       rv must beEqualTo(SolveQuestCode.CantSolveOwnQuest)
     }
@@ -46,9 +46,19 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       val user = createUserStub(timeLine = tl, solvedQuests = Map(questId -> "sid"))
       val q = createQuestStub(id = questId)
 
-      val rv = user.canSolveQuest(ContentType.Photo, q)
+      val rv = user.canSolveQuest(ContentType.Photo, q, createSolutionInfoContentStub)
 
       rv must beEqualTo(SolveQuestCode.QuestAlreadySolved)
+    }
+
+    "Do not allow solving of quests with too long description" in context {
+      val q = createQuestStub(solveCost = Assets(100, 0, 0))
+      val tl = List(createTimeLineEntryStub(objectId = q.id))
+      val user = createUserStub(assets = Assets(100, 0, 0), timeLine = tl)
+
+      val rv = user.canSolveQuest(ContentType.Photo, q, createSolutionInfoContentStub.copy(description = (1 to 400).mkString))
+
+      rv must beEqualTo(SolveQuestCode.DescriptionLengthLimitExceeded)
     }
 
     "Allow creating of quests in normal situations" in context {
@@ -56,7 +66,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       val tl = List(createTimeLineEntryStub(objectId = q.id))
       val user = createUserStub(assets = Assets(100, 0, 0), timeLine = tl)
 
-      val rv = user.canSolveQuest(ContentType.Photo, q)
+      val rv = user.canSolveQuest(ContentType.Photo, q, createSolutionInfoContentStub)
 
       rv must beEqualTo(SolveQuestCode.OK)
     }
