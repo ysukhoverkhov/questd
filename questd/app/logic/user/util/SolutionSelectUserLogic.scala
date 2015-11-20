@@ -89,7 +89,6 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user = user,
       status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
-      authorsExclude = solutionAuthorIdsToExclude,
       levels = levels)).body.get.solutions))
   }
 
@@ -99,7 +98,6 @@ trait SolutionSelectUserLogic { this: UserLogic =>
       user = user,
       status = List(SolutionStatus.InRotation),
       idsExclude = solutionIdsToExclude,
-      authorsExclude = solutionAuthorIdsToExclude,
       levels = levels)).body.get.solutions))
   }
 

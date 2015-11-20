@@ -15,7 +15,6 @@ case class GetFriendsSolutionsRequest(
   user: User,
   status: List[SolutionStatus.Value],
   idsExclude: List[String] = List.empty,
-  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetFriendsSolutionsResult(solutions: Iterator[Solution])
 
@@ -23,7 +22,6 @@ case class GetFollowingSolutionsRequest(
   user: User,
   status: List[SolutionStatus.Value],
   idsExclude: List[String] = List.empty,
-  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetFollowingSolutionsResult(solutions: Iterator[Solution])
 
@@ -84,7 +82,6 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
     OkApiResult(GetFriendsSolutionsResult(db.solution.allWithParams(
       status = request.status,
       authorIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
-      authorIdsExclude = request.authorsExclude,
       idsExclude = request.idsExclude,
       levels = request.levels,
       cultureId = request.user.demo.cultureId)))
@@ -94,7 +91,6 @@ private[domain] trait SolutionFetchAPI { this: DBAccessor =>
     OkApiResult(GetFollowingSolutionsResult(db.solution.allWithParams(
       status = request.status,
       authorIds = request.user.following,
-      authorIdsExclude = request.authorsExclude,
       idsExclude = request.idsExclude,
       levels = request.levels,
       cultureId = request.user.demo.cultureId)))

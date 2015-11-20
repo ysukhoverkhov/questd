@@ -37,8 +37,7 @@ private[mongo] class MongoSolutionDAO
     require(!(authorIds.nonEmpty && authorIdsExclude.nonEmpty))
     if (authorIds.nonEmpty) {
       queryBuilder += ("info.authorId" -> MongoDBObject("$in" -> authorIds))
-    }
-    if (authorIdsExclude.nonEmpty) {
+    } else if (authorIdsExclude.nonEmpty) {
       queryBuilder += ("info.authorId" -> MongoDBObject("$nin" -> authorIdsExclude))
     }
 
