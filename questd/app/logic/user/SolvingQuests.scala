@@ -6,6 +6,7 @@ import models.domain.common.ContentType._
 import models.domain.quest.Quest
 import models.domain.solution.SolutionInfoContent
 import models.domain.user.profile.Functionality
+import views.html.admin.config
 
 /**
  * All logic related to solving quests.
@@ -38,7 +39,7 @@ trait SolvingQuests { this: UserLogic =>
       CantSolveOwnQuest
     else if (user.stats.solvedQuests.contains(questToSolve.id))
       QuestAlreadySolved
-    else if (solutionContent.description.length > api.config(api.DefaultConfigParams.SolutionMaxDescriptionLength).toInt)
+    else if (solutionContent.description.getOrElse("").length > api.config(api.DefaultConfigParams.SolutionMaxDescriptionLength).toInt)
       DescriptionLengthLimitExceeded
     else if (!bioComplete)
       IncompleteBio

@@ -85,7 +85,7 @@ package object domainstubs {
     SolutionInfoContent(
       createContentReferenceStub,
       None,
-      "")
+      None)
   }
 
   // TAGS: replace themeId with tags.

@@ -56,7 +56,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       val tl = List(createTimeLineEntryStub(objectId = q.id))
       val user = createUserStub(assets = Assets(100, 0, 0), timeLine = tl)
 
-      val rv = user.canSolveQuest(ContentType.Photo, q, createSolutionInfoContentStub.copy(description = (1 to 400).mkString))
+      val rv = user.canSolveQuest(ContentType.Photo, q, createSolutionInfoContentStub.copy(description = Some((1 to 400).mkString)))
 
       rv must beEqualTo(SolveQuestCode.DescriptionLengthLimitExceeded)
     }

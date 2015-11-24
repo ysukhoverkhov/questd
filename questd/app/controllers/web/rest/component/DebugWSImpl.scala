@@ -264,7 +264,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
               contentType = ContentType.Photo,
               storage = "url",
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"),
-            description = ""))) map { r =>
+            description = None))) map { r =>
                 val s = api.db.solution.readById(r.modifiedSolutions.head.id).get
                 val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))
                 api.db.solution.update(s2)
@@ -294,7 +294,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
               contentType = ContentType.Photo,
               storage = "url",
               reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"),
-            description = "asd"))) map { r =>
+            description = Some("asd")))) map { r =>
                 val s = api.db.solution.readById(r.modifiedSolutions.head.id).get
                 val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))
                 api.db.solution.update(s2)

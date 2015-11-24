@@ -12,7 +12,7 @@ private object SolveQuestWSImplTypes {
     questId: String,
     media: WSContentReference,
     icon: Option[WSContentReference] = None,
-    description: String)
+    description: Option[String] = None)
   object WSSolveQuestRequest {
     implicit def toSolutionInfoContent(v: WSSolveQuestRequest): SolutionInfoContent = {
       SolutionInfoContent(
