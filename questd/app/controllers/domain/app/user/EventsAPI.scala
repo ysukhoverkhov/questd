@@ -143,7 +143,7 @@ private[domain] trait EventsAPI { this: DomainAPIComponent#DomainAPI with DBAcce
         user = user,
         message = user.profile.messages
           .dropWhile(_.generatedAt.before(user.schedules.lastNotificationSentAt))
-          .sortBy[Int]{MessageMetaInfo.messagePriority(m.messageType)}
+          .sortBy[Int]{m => MessageMetaInfo.messagePriority(m.messageType)}
           .head,
         numberOfEvents = user.profile.messages.length
       )) map { r =>
