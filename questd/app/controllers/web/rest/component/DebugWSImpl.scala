@@ -123,8 +123,6 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
 //      .filter { case (_, _, cs) => !cs.contains("d406dc6d-7a84-4ef9-9c64-5e725e8df608")}
 //      .sortBy { case (u, _, _) => u.profile.analytics.profileCreationDate }
 //
-//    Logger.error(s"${users.size}")
-//
 //    users.foreach {
 //      case (user, questCults, friendsCults) =>
 //        Logger.error(s"${user.id}, ${user.profile.publicProfile.bio.name}, ${user.profile.analytics.profileCreationDate}, ${questCults.map( m => m._1 -> m._2._1 )/* - "68349b7a-20ee-4f6e-8406-f468b30be783"*/}, $friendsCults")
@@ -185,7 +183,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
 
     def logOrGet[T](log: String)(it: Iterator[T]) = {
       if (!it.hasNext) {
-        Logger.error(log)
+        Logger.error(s"Empty itterator error: $log")
       }
 
       it.next()

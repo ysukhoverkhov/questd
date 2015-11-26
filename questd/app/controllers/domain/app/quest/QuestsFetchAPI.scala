@@ -62,7 +62,7 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
     OkApiResult(GetFriendsQuestsResult(db.quest.allWithParams(
       status = List(request.status),
       authorIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
-      authorIdsExclude = request.authorsExclude,
+//      authorIdsExclude = request.authorsExclude,
       levels = request.levels,
       idsExclude = request.idsExclude,
       cultureId = request.user.demo.cultureId,
@@ -73,7 +73,7 @@ private[domain] trait QuestsFetchAPI { this: DBAccessor =>
     OkApiResult(GetFollowingQuestsResult(db.quest.allWithParams(
       status = List(request.status),
       authorIds = request.user.following,
-      authorIdsExclude = request.authorsExclude,
+//      authorIdsExclude = request.authorsExclude,
       levels = request.levels,
       idsExclude = request.idsExclude,
       cultureId = request.user.demo.cultureId,

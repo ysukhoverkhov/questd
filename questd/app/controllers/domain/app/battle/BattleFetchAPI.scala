@@ -65,7 +65,7 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
     OkApiResult(GetFriendsBattlesResult(db.battle.allWithParams(
       status = request.statuses,
       authorIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
-      authorIdsExclude = request.authorsExclude,
+      //authorIdsExclude = request.authorsExclude,
       levels = request.levels,
       idsExclude = request.idsExclude,
       cultureId = request.user.demo.cultureId)))
@@ -75,7 +75,7 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
     OkApiResult(GetFollowingBattlesResult(db.battle.allWithParams(
       status = request.statuses,
       authorIds = request.user.following,
-      authorIdsExclude = request.authorsExclude,
+      //authorIdsExclude = request.authorsExclude,
       levels = request.levels,
       idsExclude = request.idsExclude,
       cultureId = request.user.demo.cultureId)))

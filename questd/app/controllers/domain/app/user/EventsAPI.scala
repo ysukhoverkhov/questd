@@ -138,12 +138,12 @@ private[domain] trait EventsAPI { this: DomainAPIComponent#DomainAPI with DBAcce
     } else if (user.profile.messages.isEmpty) {
       // Nothing to send.
       OkApiResult(CheckSendNotificationsResult(user))
-    } else { Logger.error(s"${user.profile.messages}"); Logger.error(s"$MessageMetaInfo")
+    } else {
       notifyWithMessage(NotifyWithMessageRequest(
         user = user,
         message = user.profile.messages
           .dropWhile(_.generatedAt.before(user.schedules.lastNotificationSentAt))
-          .sortBy[Int]{m => Logger.error(s"$m, $MessageMetaInfo"); MessageMetaInfo.messagePriority(m.messageType)}
+          .sortBy[Int]{MessageMetaInfo.messagePriority(m.messageType)}
           .head,
         numberOfEvents = user.profile.messages.length
       )) map { r =>
