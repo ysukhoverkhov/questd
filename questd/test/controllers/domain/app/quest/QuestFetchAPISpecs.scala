@@ -51,7 +51,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       there was one(quest).allWithParams(
         status = mEq(List(QuestStatus.InRotation)),
         authorIds = mEq(List(f1.id)),
-        authorIdsExclude = mEq(List.empty),
+        authorIdsExclude = any,
         levels = mEq(Some((1, 2))),
         skip = mEq(0),
         vip = any,
@@ -63,7 +63,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       there was no(quest).allWithParams(
         status = mEq(List(QuestStatus.InRotation)),
         authorIds = mEq(List.empty),
-        authorIdsExclude = mEq(List.empty),
+        authorIdsExclude = any,
         levels = mEq(Some((1, 2))),
         skip = mEq(0),
         vip = any,
@@ -75,7 +75,7 @@ class QuestFetchAPISpecs extends BaseAPISpecs {
       there was no(quest).allWithParams(
         status = mEq(List(QuestStatus.InRotation)),
         authorIds = mEq(List(f1.id, f2.id)),
-        authorIdsExclude = mEq(List.empty),
+        authorIdsExclude = any,
         levels = mEq(Some((1, 2))),
         skip = mEq(0),
         vip = any,

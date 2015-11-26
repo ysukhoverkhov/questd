@@ -61,6 +61,7 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
       status = List(BattleStatus.Fighting))))
   }
 
+  // TODO: authors should be excluded here since we may ban peers of our friends.
   def getFriendsBattles(request: GetFriendsBattlesRequest): ApiResult[GetFriendsBattlesResult] = handleDbException {
     OkApiResult(GetFriendsBattlesResult(db.battle.allWithParams(
       status = request.statuses,
@@ -71,6 +72,7 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
       cultureId = request.user.demo.cultureId)))
   }
 
+  // TODO: authors should be excluded here since we may ban peers of our following.
   def getFollowingBattles(request: GetFollowingBattlesRequest): ApiResult[GetFollowingBattlesResult] = handleDbException {
     OkApiResult(GetFollowingBattlesResult(db.battle.allWithParams(
       status = request.statuses,

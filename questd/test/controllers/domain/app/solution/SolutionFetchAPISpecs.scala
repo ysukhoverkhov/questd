@@ -53,7 +53,7 @@ class SolutionFetchAPISpecs extends BaseAPISpecs {
       there was one(solution).allWithParams(
         status = mEq(List(SolutionStatus.InRotation)),
         authorIds = mEq(List(f1.id)),
-        authorIdsExclude = mEq(List.empty),
+        authorIdsExclude = any,
         levels = mEq(Some((1, 2))),
         skip = mEq(0),
         vip = any,
