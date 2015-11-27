@@ -10,4 +10,4 @@ case class PublicProfile(
   publicProfileVersion: Int = 1,
   level: Int = 1,
   bio: Bio = Bio(),
-  vip: Boolean = false)
+  vip: Boolean = true) // TODO: switch to false at some point.
