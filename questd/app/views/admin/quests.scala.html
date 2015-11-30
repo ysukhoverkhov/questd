@@ -10,6 +10,16 @@
 
 @body("Quests")(menuItems, Map.empty) {
 
+    @form(action=controllers.web.admin.routes.QuestsCRUD.selectQuestStatus()) {
+    <select id="questStatus" name="questStatus">
+        @for(questStatus <- "All" :: questStatuses) {
+        <option value="@questStatus">@questStatus</option>
+        }
+    </select>
+    <input type='submit' value='Select' />
+    }
+
+
 	@form(action = controllers.web.admin.routes.QuestsCRUD.updateQuest()) {
 		@inputText(newQuestForm("id"), 'size -> 18, 'readonly -> "readonly") <br />
 		@select(newQuestForm("status"), options(questStatuses)) <br />
@@ -43,8 +53,8 @@
 			    	</tr>
 
 					@for(q <- quests) {
-				    	<tr>
 
+				    	<tr>
 				    		<td>@q.info.content.description</td>
 				    		<td>@q.status</td>
 				    		<td>@q.rating.timelinePoints</td>
@@ -52,9 +62,12 @@
 				    		<td>@q.rating.votersCount</td>
 				    		<td>@q.info.level</td>
                             <td>@q.cultureId</td>
-				    		<td><img style="max-width: 204px; height: auto; " src="@q.info.content.media.reference" alt="@q.info.content.media.reference" ></td>
+				    		<td><img style="max-width: 204px; height: auto; " src='@{
+                                if(q.info.content.media.reference.startsWith("http"))
+                                    q.info.content.media.reference
+                                else
+                                    "http://static-1.questmeapp.com/content_0.30/" + q.info.content.media.reference}'></td>
 							<td><a href="@controllers.web.admin.routes.QuestsCRUD.quests(q.id)">edit</a></td>
-
 	    				</tr>
 	   				}
 				</table>

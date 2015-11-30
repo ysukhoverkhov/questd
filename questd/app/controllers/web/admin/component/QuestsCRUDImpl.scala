@@ -2,6 +2,7 @@ package controllers.web.admin.component
 
 import controllers.domain.admin._
 import controllers.domain.{DomainAPIComponent, OkApiResult}
+import models.domain.quest.QuestStatus
 import play.api.Play.current
 import play.api._
 import play.api.data.Forms._
@@ -18,6 +19,9 @@ case class QuestForm(
   cheating: Int,
   votersCount: Int)
 
+case class QuestStatusForm(
+  questStatus: String)
+
 class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller with SecurityAdminImpl {
 
   private val form = Form(
@@ -29,6 +33,10 @@ class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller w
       "points" -> number,
       "cheating" -> number,
       "votersCount" -> number)(QuestForm.apply)(QuestForm.unapply))
+
+  private def selectedQuestStatus(implicit request: AuthenticatedRequest[AnyContent]): Option[String] = {
+    request.cookies.get("questStatus").map(_.value)
+  }
 
   /**
    * Get all quests
@@ -56,10 +64,17 @@ class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller w
     // Filling table.
     api.allQuests(AllQuestsRequest()) match {
 
-      case OkApiResult(a: AllQuestsResult) => Ok(
-        views.html.admin.quests(
+      case OkApiResult(a: AllQuestsResult) =>
+        val statuses = selectedQuestStatus.fold {
+          QuestStatus.values.map(_.toString).toList
+        }{
+          case "All" => QuestStatus.values.map(_.toString).toList
+          case v => List(v)
+        }
+
+        Ok(views.html.admin.quests(
           Menu(request),
-          a.quests.toList,
+          a.quests.filter(q => statuses.contains(q.status.toString)).toList,
           f))
 
       case _ => Ok("Internal server error - themes not received.")
@@ -101,6 +116,32 @@ class QuestsCRUDImpl(val api: DomainAPIComponent#DomainAPI) extends Controller w
         Redirect(controllers.web.admin.routes.QuestsCRUD.quests(questForm.id))
       })
   }
+
+
+  /**
+   * QuestStatus filter.
+   */
+  def selectQuestStatus() = Authenticated { implicit request =>
+    val form = Form(
+      mapping(
+        "questStatus" -> text)(QuestStatusForm.apply)(QuestStatusForm.unapply))
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Logger.error(s"${formWithErrors.errors}")
+        Redirect(controllers.web.admin.routes.QuestsCRUD.quests(""))
+      },
+
+      questStatusForm => {
+        if (questStatusForm.questStatus == "") {
+          Redirect(controllers.web.admin.routes.QuestsCRUD.quests("")).discardingCookies(DiscardingCookie("questStatus"))
+        } else {
+          Redirect(controllers.web.admin.routes.QuestsCRUD.quests("")).withCookies(Cookie("questStatus", questStatusForm.questStatus))
+        }
+      })
+  }
+
+
 
 }
 
