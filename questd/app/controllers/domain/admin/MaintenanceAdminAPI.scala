@@ -8,8 +8,6 @@ import models.domain.quest.{Quest, QuestStatus}
 import models.domain.solution.{Solution, SolutionStatus}
 import models.domain.user.User
 import models.domain.user.message.{Message, MessageType}
-import views.html
-import views.html.admin.messages
 
 case class CleanUpObjectsRequest()
 case class CleanUpObjectsResult()
@@ -131,8 +129,9 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
     }
 
     db.user.all.foreach { user =>
+      val f = removeIncorrectMessages _ andThen updateEmptySource
       db.user.update(
-        updateEmptySource(removeObjectsFromTimeline(user.initialized, objectsToRemove))
+        f(removeObjectsFromTimeline(user.initialized, objectsToRemove))
       )
     }
 
