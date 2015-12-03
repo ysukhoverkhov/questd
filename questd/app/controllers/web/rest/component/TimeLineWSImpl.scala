@@ -1,18 +1,22 @@
 package controllers.web.rest.component
 
+import com.vita.scala.extensions._
 import controllers.domain.app.user._
 import controllers.web.helpers._
+import models.domain.user.timeline.TimeLineType
 
 private object TimeLineWSImplTypes {
 
   /**
-   * @param pageNumber Number of page in result, zero based.
-   * @param pageSize Number of items on a page.
-   * @param untilEntryId Id of an item to stop getting results at
-   */
+    * @param pageNumber   Number of page in result, zero based.
+    * @param pageSize     Number of items on a page.
+    * @param objectType   Type of object to return (TimeLineType), all if not specified.
+    * @param untilEntryId Id of an item to stop getting results at
+    */
   case class WSGetTimeLineRequest (
     pageNumber: Int,
     pageSize: Int,
+    objectType: Option[String] = None,
     untilEntryId: Option[String] = None)
   type WSGetTimeLineResult = GetTimeLineResult
 
@@ -36,6 +40,7 @@ trait TimeLineWSImpl extends BaseController with SecurityWSImpl with CommonFunct
       r.user,
       v.pageNumber,
       v.pageSize,
+      v.objectType.map(TimeLineType.withNameEx),
       v.untilEntryId))
   }
 
