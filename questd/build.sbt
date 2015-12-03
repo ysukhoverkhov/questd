@@ -1,7 +1,7 @@
 
 name := """questd"""
 
-version := "0.50.01-SNAPSHOT"
+version := "0.50.02-SNAPSHOT"
 
 lazy val root = (project in file(".")).
   enablePlugins(PlayScala).

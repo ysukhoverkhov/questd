@@ -15,7 +15,6 @@ case class GetFriendsBattlesRequest(
   user: User,
   statuses: List[BattleStatus.Value] = List.empty,
   idsExclude: List[String] = List.empty,
-  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetFriendsBattlesResult(battles: Iterator[Battle])
 
@@ -23,7 +22,6 @@ case class GetFollowingBattlesRequest(
   user: User,
   statuses: List[BattleStatus.Value] = List.empty,
   idsExclude: List[String] = List.empty,
-  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None)
 case class GetFollowingBattlesResult(battles: Iterator[Battle])
 
@@ -61,23 +59,19 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
       status = List(BattleStatus.Fighting))))
   }
 
-  // TODO: authors should be excluded here since we may ban peers of our friends.
   def getFriendsBattles(request: GetFriendsBattlesRequest): ApiResult[GetFriendsBattlesResult] = handleDbException {
     OkApiResult(GetFriendsBattlesResult(db.battle.allWithParams(
       status = request.statuses,
       authorIds = request.user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId),
-      //authorIdsExclude = request.authorsExclude,
       levels = request.levels,
       idsExclude = request.idsExclude,
       cultureId = request.user.demo.cultureId)))
   }
 
-  // TODO: authors should be excluded here since we may ban peers of our following.
   def getFollowingBattles(request: GetFollowingBattlesRequest): ApiResult[GetFollowingBattlesResult] = handleDbException {
     OkApiResult(GetFollowingBattlesResult(db.battle.allWithParams(
       status = request.statuses,
       authorIds = request.user.following,
-      //authorIdsExclude = request.authorsExclude,
       levels = request.levels,
       idsExclude = request.idsExclude,
       cultureId = request.user.demo.cultureId)))

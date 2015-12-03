@@ -2,7 +2,6 @@ package controllers.web.rest.component
 
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import controllers.web.rest.component.VoteQuestWSImplTypes.{WSVoteQuestRequest, WSVoteQuestResult}
 import models.domain.common.ContentVote
 
 private object VoteSolutionWSImplTypes {
