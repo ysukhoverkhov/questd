@@ -1,7 +1,6 @@
 package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
-import models.domain.solution.Solution
 import models.domain.user.friends.{Friendship, FriendshipStatus, ReferralStatus}
 import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import org.mockito.Matchers.{eq => mockEq}

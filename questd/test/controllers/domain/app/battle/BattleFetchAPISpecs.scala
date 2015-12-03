@@ -15,7 +15,6 @@ class BattleFetchAPISpecs extends BaseAPISpecs {
       val f2 = createUserStub(id = "f2")
 
       val u = createUserStub(friends = List(Friendship(f1.id, FriendshipStatus.Accepted), Friendship(f2.id, FriendshipStatus.Invited)))
-      val excludeAuthors = List("aex1", "aex2")
       val levels = Some(1, 2)
       val idsExclude = List("idex1", "idex2")
 
@@ -38,13 +37,12 @@ class BattleFetchAPISpecs extends BaseAPISpecs {
           user = u,
           statuses = List(BattleStatus.Fighting),
           idsExclude = idsExclude,
-          authorsExclude = excludeAuthors,
           levels = levels))
 
       there was one(battle).allWithParams(
         status = mEq(List(BattleStatus.Fighting)),
         authorIds = mEq(List(f1.id)),
-        authorIdsExclude = mEq(excludeAuthors),
+        authorIdsExclude = any,
         questId = any,
         solutionIds = any,
         levels = mEq(levels),
@@ -60,7 +58,6 @@ class BattleFetchAPISpecs extends BaseAPISpecs {
     "getFollowingBattles return battles for following only" in context {
       val following = List("f1", "f2")
       val u = createUserStub(following = following)
-      val excludeAuthors = List("aex1", "aex2")
       val levels = Some(1, 2)
       val idsExclude = List("idex1", "idex2")
 
@@ -83,13 +80,12 @@ class BattleFetchAPISpecs extends BaseAPISpecs {
           user = u,
           statuses = List(BattleStatus.Fighting),
           idsExclude = idsExclude,
-          authorsExclude = excludeAuthors,
           levels = levels))
 
       there was one(battle).allWithParams(
         status = mEq(List(BattleStatus.Fighting)),
         authorIds = mEq(following),
-        authorIdsExclude = mEq(excludeAuthors),
+        authorIdsExclude = any,
         questId = any,
         solutionIds = any,
         levels = mEq(levels),

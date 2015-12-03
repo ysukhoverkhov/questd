@@ -18,8 +18,4 @@ object MessageType extends Enumeration {
   val Information = Value
   val NewChatMessage = Value
   val FriendRegistered = Value
-
-  // TODO: remove in 0.50.02
-  val BattleRequestAccepted = Value
-  val BattleRequestRejected = Value
 }

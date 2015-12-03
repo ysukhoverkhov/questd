@@ -2,7 +2,6 @@ package controllers.web.rest.component
 
 import controllers.domain.app.user._
 import controllers.web.helpers._
-import controllers.web.rest.component.VoteSolutionWSImplTypes.WSHideOwnSolutionRequest
 import models.domain.common.ContentVote
 
 private object VoteQuestWSImplTypes {
@@ -29,7 +28,6 @@ trait VoteQuestWSImpl extends BaseController with SecurityWSImpl with CommonFunc
     api.voteQuestByUser(VoteQuestByUserRequest(r.user, v.questId, vote))
   }
 
-  // TODO: implement me.
   def hideOwnQuest = wrapJsonApiCallReturnBody[WSHideOwnQuestsResult] { (js, r) =>
     val v = Json.read[WSHideOwnQuestRequest](js)
     api.hideOwnQuest(HideOwnQuestRequest(r.user, v.questId))
