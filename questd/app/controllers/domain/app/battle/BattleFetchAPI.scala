@@ -61,7 +61,7 @@ private[domain] trait BattleFetchAPI { this: DBAccessor =>
       status = List(BattleStatus.Fighting))))
   }
 
-  // TODO: authors should be excluded here since we may ban peers of our friends.
+  // TODO: REmove exclude authors from request here and in other places
   def getFriendsBattles(request: GetFriendsBattlesRequest): ApiResult[GetFriendsBattlesResult] = handleDbException {
     OkApiResult(GetFriendsBattlesResult(db.battle.allWithParams(
       status = request.statuses,

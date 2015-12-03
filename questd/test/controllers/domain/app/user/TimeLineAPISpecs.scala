@@ -1,6 +1,7 @@
 package controllers.domain.app.user
 
 import controllers.domain.{BaseAPISpecs, OkApiResult}
+import models.domain.solution.Solution
 import models.domain.user.friends.{Friendship, FriendshipStatus, ReferralStatus}
 import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
 import org.mockito.Matchers.{eq => mockEq}
@@ -140,6 +141,30 @@ class TimeLineAPISpecs extends BaseAPISpecs {
 
       result must beEqualTo(OkApiResult(GetTimeLineResult(entries.filter(_.reason != TimeLineReason.Hidden))))
     }
+
+    "getTimeLine returns content of specific type" in context {
+      val entries = List(
+        createTimeLineEntryStub(id = "1", objectType = TimeLineType.Quest),
+        createTimeLineEntryStub(id = "2", objectType = TimeLineType.Solution),
+        createTimeLineEntryStub(id = "3", objectType = TimeLineType.Quest),
+        createTimeLineEntryStub(id = "4", objectType = TimeLineType.Solution, reason = TimeLineReason.Hidden),
+        createTimeLineEntryStub(id = "5", objectType = TimeLineType.Solution)
+      )
+
+      val u = createUserStub(timeLine = entries)
+
+      val result = api.getTimeLine(GetTimeLineRequest(
+        user = u,
+        pageNumber = 0,
+        pageSize = 20,
+        objectType = Some(TimeLineType.Solution)))
+
+      result must beEqualTo(OkApiResult(GetTimeLineResult(entries
+        .filter(_.reason != TimeLineReason.Hidden)
+        .filter(_.objectType == TimeLineType.Solution)
+      )))
+    }
+
 
     "getTimeLine populates timeline if it's empty" in context {
       val u = createUserStub()
