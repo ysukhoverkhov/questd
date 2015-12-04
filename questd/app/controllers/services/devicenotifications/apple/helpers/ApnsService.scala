@@ -13,6 +13,6 @@ trait APNSService
   val service: ApnsService =
     APNS.newService()
       .withCert("conf/QMPushDevelop.p12", Play.application().configuration().getString("questd.devicenotifications.apple.certificatepass"))
-      .withSandboxDestination()
+      .withProductionDestination()
       .build()
 }
