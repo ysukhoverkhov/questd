@@ -89,7 +89,6 @@ trait QuestSelectUserLogic { this: UserLogic =>
       user = user,
       status = QuestStatus.InRotation,
       idsExclude = questIdsToExclude,
-      authorsExclude = questAuthorIdsToExclude,
       levels = levels,
       withSolutions = withSolutions)).body.get.quests))
   }
@@ -101,7 +100,6 @@ trait QuestSelectUserLogic { this: UserLogic =>
       status = QuestStatus.InRotation,
       levels = levels,
       idsExclude = questIdsToExclude,
-      authorsExclude = questAuthorIdsToExclude,
       withSolutions = withSolutions
     )).body.get.quests))
   }

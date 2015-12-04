@@ -173,6 +173,7 @@ GET     /admin/cultures/extractCountry/:country         controllers.web.admin.Cu
 GET		/admin/quests									controllers.web.admin.QuestsCRUD.quests(id = "")
 GET		/admin/quests/byid/:id							controllers.web.admin.QuestsCRUD.quests(id)
 POST	/admin/quests/update							controllers.web.admin.QuestsCRUD.updateQuest
+POST    /admin/quests/selectQuestStatus                 controllers.web.admin.QuestsCRUD.selectQuestStatus
 
 GET		/admin/users									controllers.web.admin.UsersCRUD.users(id = "")
 GET		/admin/solutions								controllers.web.admin.SolutionsCRUD.solutions(id = "")

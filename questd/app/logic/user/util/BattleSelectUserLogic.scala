@@ -78,7 +78,6 @@ trait BattleSelectUserLogic { this: UserLogic =>
       user,
       List(BattleStatus.Fighting),
       idsExclude = battleIdsToExclude,
-      authorsExclude = battleParticipantsIdsToExclude,
       levels)).body.get.battles))
   }
 
@@ -88,7 +87,6 @@ trait BattleSelectUserLogic { this: UserLogic =>
       user = user,
       statuses = List(BattleStatus.Fighting),
       idsExclude = battleIdsToExclude,
-      authorsExclude = battleParticipantsIdsToExclude,
       levels)).body.get.battles))
   }
 

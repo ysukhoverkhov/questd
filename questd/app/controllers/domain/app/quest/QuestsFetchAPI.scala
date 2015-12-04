@@ -16,7 +16,6 @@ case class GetFriendsQuestsRequest(
   user: User,
   status: QuestStatus.Value,
   idsExclude: List[String] = List.empty,
-  authorsExclude: List[String] = List.empty,
   levels: Option[(Int, Int)] = None,
   withSolutions: Option[Boolean] = None)
 case class GetFriendsQuestsResult(quests: Iterator[Quest])
@@ -24,7 +23,6 @@ case class GetFriendsQuestsResult(quests: Iterator[Quest])
 case class GetFollowingQuestsRequest(
   user: User,
   idsExclude: List[String] = List.empty,
-  authorsExclude: List[String] = List.empty,
   status: QuestStatus.Value,
   levels: Option[(Int, Int)] = None,
   withSolutions: Option[Boolean] = None)

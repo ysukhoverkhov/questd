@@ -10,7 +10,7 @@ import controllers.domain.helpers._
 import models.domain.user._
 import models.domain.user.friends.FriendshipStatus
 import models.domain.user.profile.Profile
-import models.domain.user.timeline.{TimeLineEntry, TimeLineReason, TimeLineType}
+import models.domain.user.timeline.{TimeLineType, TimeLineEntry, TimeLineReason}
 import play.Logger
 
 case class AddToTimeLineRequest(
@@ -48,6 +48,7 @@ case class GetTimeLineRequest(
   user: User,
   pageNumber: Int,
   pageSize: Int,
+  objectType: Option[TimeLineType.Value] = None,
   untilEntryId: Option[String] = None)
 case class GetTimeLineResult(timeLine: List[TimeLineEntry])
 
@@ -151,11 +152,13 @@ private[domain] trait TimeLineAPI { this: DomainAPIComponent#DomainAPI with DBAc
     }) map { r =>
       val pageSize = adjustedPageSize(request.pageSize)
       val pageNumber = adjustedPageNumber(request.pageNumber)
+      val typesToReturn = request.objectType.fold(TimeLineType.values.toList)(List(_))
 
       OkApiResult(
         GetTimeLineResult(
           r.user.timeLine.iterator
             .filter(_.reason != TimeLineReason.Hidden)
+            .filter(te => typesToReturn.contains(te.objectType))
             .slice(pageSize * pageNumber, pageSize * pageNumber + pageSize)
             .takeWhile(e => request.untilEntryId.fold(true)(id => e.id != id))
             .toList))
