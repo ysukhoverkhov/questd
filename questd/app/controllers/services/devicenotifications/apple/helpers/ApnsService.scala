@@ -12,7 +12,9 @@ trait APNSService
 {
   val service: ApnsService =
     APNS.newService()
-      .withCert("conf/QMPushDevelop.p12", Play.application().configuration().getString("questd.devicenotifications.apple.certificatepass"))
+      .withCert(
+        Play.application().configuration().getString("questd.devicenotifications.apple.certificatepath"),
+        Play.application().configuration().getString("questd.devicenotifications.apple.certificatepass"))
       .withProductionDestination()
       .build()
 }
