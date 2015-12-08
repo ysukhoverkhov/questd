@@ -11,10 +11,22 @@ import play.Play
 trait APNSService
 {
   val service: ApnsService =
-    APNS.newService()
-      .withCert(
-        Play.application().configuration().getString("questd.devicenotifications.apple.certificatepath"),
-        Play.application().configuration().getString("questd.devicenotifications.apple.certificatepass"))
-      .withProductionDestination()
-      .build()
+
+  {
+    if(Play.application.configuration.getBoolean("apple.use_devel", false)) {
+      APNS.newService()
+        .withCert(
+          Play.application.configuration.getString("questd.devicenotifications.apple.certificatepath"),
+          Play.application.configuration.getString("questd.devicenotifications.apple.certificatepass"))
+        .withProductionDestination()
+        .build()
+    } else {
+      APNS.newService()
+        .withCert(
+          Play.application.configuration.getString("questd.devicenotifications.apple.certificatepath_devel"),
+          Play.application.configuration.getString("questd.devicenotifications.apple.certificatepass_devel"))
+        .withSandboxDestination()
+        .build()
+    }
+  }
 }

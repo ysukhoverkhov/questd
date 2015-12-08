@@ -39,7 +39,6 @@ private[domain] trait DebugAPI { this: DomainAPIComponent#DomainAPI with DBAcces
     db.user.setDebug(user.id, debug) ifSome { v =>
       OkApiResult(SetDebugResult(SetDebugCode.OK, Some(v.profile)))
     }
-
   }
 
   /**
