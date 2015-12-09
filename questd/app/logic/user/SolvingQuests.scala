@@ -35,8 +35,6 @@ trait SolvingQuests { this: UserLogic =>
       NotEnoughRights
     else if (!(user.profile.assets canAfford questToSolve.info.solveCost))
       NotEnoughAssets
-    else if (questToSolve.info.authorId == user.id)
-      CantSolveOwnQuest
     else if (user.stats.solvedQuests.contains(questToSolve.id))
       QuestAlreadySolved
     else if (solutionContent.description.getOrElse("").length > api.config(api.DefaultConfigParams.SolutionMaxDescriptionLength).toInt)

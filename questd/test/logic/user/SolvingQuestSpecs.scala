@@ -29,7 +29,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
       rv must beEqualTo(SolveQuestCode.NotEnoughAssets)
     }
 
-    "Do not allow solving of own quests" in context {
+    "Do allow solving of own quests" in context {
       val questId = "qid"
       val tl = List(createTimeLineEntryStub(objectId = questId))
       val user = createUserStub(timeLine = tl)
@@ -37,7 +37,7 @@ class SolvingQuestSpecs extends BaseLogicSpecs {
 
       val rv = user.canSolveQuest(ContentType.Photo, q, createSolutionInfoContentStub)
 
-      rv must beEqualTo(SolveQuestCode.CantSolveOwnQuest)
+      rv must beEqualTo(SolveQuestCode.OK)
     }
 
     "Do not allow solving of quests already solved" in context {
