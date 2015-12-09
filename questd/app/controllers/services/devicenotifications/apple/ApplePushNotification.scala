@@ -5,7 +5,7 @@ import java.net.UnknownHostException
 import akka.actor.SupervisorStrategy.Restart
 import akka.actor._
 import akka.routing.RoundRobinPool
-import com.notnoop.apns.APNS
+import com.notnoop.apns.{PayloadBuilder, APNS}
 import controllers.services.devicenotifications.apple.ApplePushNotification.ScreenMessage
 import controllers.services.devicenotifications.apple.helpers.APNSService
 
@@ -30,13 +30,18 @@ class ApplePushNotification extends Actor with APNSService {
   def receive: Receive = {
     case ScreenMessage(deviceToken, message, badge, sound) =>
 
-      val payload = APNS.newPayload()
-//        .badge(3)
+      def checkAddBadge(builder: PayloadBuilder, badge: Option[Int]) = {
+        badge.fold(builder)(builder.badge)
+      }
+
+      val payload = checkAddBadge(APNS.newPayload()
 //        .customField("secret", "what do you think?")
         .localizedKey(message)
 //        .localizedArguments("Jenna", "Frank")
 //        .actionKey("Play")
-        .build()
+      , badge).build()
+
+
       service.push(deviceToken, payload)
   }
 }
