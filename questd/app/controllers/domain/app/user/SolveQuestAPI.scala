@@ -18,7 +18,6 @@ import scala.language.postfixOps
 
 object SolveQuestCode extends Enumeration with CommonCode {
   val QuestNotFound = Value
-  val CantSolveOwnQuest = Value
   val QuestAlreadySolved = Value
   val DescriptionLengthLimitExceeded = Value
 }
@@ -99,9 +98,10 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
 
               // Running API actions
               // Adjusting assets for solving quests.
+              val assetsChange = -questToSolve.info.solveCost + questToSolve.info.solveReward
               adjustAssets(AdjustAssetsRequest(
                 user = u,
-                change = -questToSolve.info.solveCost + questToSolve.info.solveReward))
+                change = assetsChange))
 
             } map { r =>
               makeTask(MakeTaskRequest(r.user, taskType = Some(TaskType.CreateSolution)))
