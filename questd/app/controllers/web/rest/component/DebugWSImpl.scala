@@ -81,7 +81,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
     c.actor ! DeviceNotifications.PushMessage(
       devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
       message = "lalala",
-      badge = Some(7),
+      badge = Some(3),
       sound = None,
       destinations = List(DeviceNotifications.MobileDestination)
     )

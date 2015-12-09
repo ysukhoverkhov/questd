@@ -30,16 +30,19 @@ class ApplePushNotification extends Actor with APNSService {
   def receive: Receive = {
     case ScreenMessage(deviceToken, message, badge, sound) =>
 
-      def checkAddBadge(builder: PayloadBuilder, badge: Option[Int]) = {
-        badge.fold(builder)(builder.badge)
+      implicit class PayloadBuilderWithOptionalBadge(builder: PayloadBuilder) {
+        def maybeBadge(badge: Option[Int]) = {
+          badge.fold(builder)(builder.badge)
+        }
       }
 
-      val payload = checkAddBadge(APNS.newPayload()
+      val payload = APNS.newPayload()
 //        .customField("secret", "what do you think?")
+        .maybeBadge(badge)
         .localizedKey(message)
 //        .localizedArguments("Jenna", "Frank")
 //        .actionKey("Play")
-      , badge).build()
+        .build()
 
 
       service.push(deviceToken, payload)
