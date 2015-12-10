@@ -6,7 +6,6 @@ import java.util.Date
 
 import models.domain.common.{ContentReference, ContentType}
 import models.domain.solution.{Solution, SolutionStatus}
-import org.specs2.mutable._
 import play.api.test._
 import testhelpers.domainstubs._
 
@@ -58,15 +57,15 @@ class SolutionDAOSpecs extends BaseDAOSpecs {
       createSolutionInDB(id)
 
       val q = db.solution.readById(id)
-      q.get.info.content.media.reference must beEqualTo("")
+      q.get.info.content.media.get.reference must beEqualTo("")
 
       db.solution.update(q.get.copy(info = q.get.info.copy(
         content = q.get.info.content.copy(
-          media = ContentReference(ContentType.Video, "2", "3")))))
+          media = Some(ContentReference(ContentType.Video, "2", "3"))))))
 
       val q2 = db.solution.readById(id)
 
-      q2 must beSome[Solution].which(_.id == id) and beSome[Solution].which(_.info.content.media.reference == "3")
+      q2 must beSome[Solution].which(_.id == id) and beSome[Solution].which(_.info.content.media.get.reference == "3")
     }
 
     "Delete quest solution" in new WithApplication(appWithTestDatabase) {

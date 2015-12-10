@@ -66,10 +66,10 @@ package object domainstubs {
         vip = vip,
         level = level,
         content = QuestInfoContent(
-          media = ContentReference(
+          media = Some(ContentReference(
             contentType = ContentType.Photo,
             storage = "la",
-            reference = "tu"),
+            reference = "tu")),
           icon = None,
           description = "desc"),
           solveCost = solveCost,
@@ -83,7 +83,7 @@ package object domainstubs {
 
   def createSolutionInfoContentStub = {
     SolutionInfoContent(
-      createContentReferenceStub,
+      Some(createContentReferenceStub),
       None,
       None)
   }

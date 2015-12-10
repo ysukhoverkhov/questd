@@ -6,7 +6,7 @@ import models.domain.common.ContentReference
  * Content of quest.
  */
 case class QuestInfoContent(
-  media: ContentReference,
+  media: Option[ContentReference],
   icon: Option[ContentReference],
   description: String)
 

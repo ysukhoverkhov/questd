@@ -30,9 +30,9 @@ trait CreatingQuests { this: UserLogic =>
   def canCreateQuest(questContent: QuestInfoContent): CreateQuestCode.Value = {
     import CreateQuestCode._
 
-    val content = questContent.media.contentType match {
-      case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoQuests)
-      case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoQuests)
+    val content = questContent.media.map(_.contentType).getOrElse(Photo) match {
+      case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoSolutions)
+      case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoSolutions)
     }
 
     if (!content)

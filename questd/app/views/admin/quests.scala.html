@@ -63,10 +63,11 @@
 				    		<td>@q.info.level</td>
                             <td>@q.cultureId</td>
 				    		<td><img style="max-width: 204px; height: auto; " src='@{
-                                if(q.info.content.media.reference.startsWith("http"))
-                                    q.info.content.media.reference
-                                else
-                                    "http://static-1.questmeapp.com/content_0.30/" + q.info.content.media.reference}'></td>
+				    		    q.info.content.media.fold("None"){ media =>
+									if(media.reference.startsWith("http"))
+										media.reference
+									else
+										"http://static-1.questmeapp.com/content_0.30/" + media.reference}}'></td>
 							<td><a href="@controllers.web.admin.routes.QuestsCRUD.quests(q.id)">edit</a></td>
 	    				</tr>
 	   				}
@@ -76,7 +77,5 @@
     		</td -->
     	</tr>
 	</table>
-
-
 }
 

@@ -229,10 +229,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
       api.createQuest(CreateQuestRequest(
         user = author,
         quest = QuestInfoContent(
-          media = ContentReference(
-            contentType = ContentType.Photo,
-            storage = "url",
-            reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"),
+          media = None,
           icon = None,
           description = s"Debug quest for battle between ${r.user.id} and ${peer.id}")))
     } map { rr =>
@@ -258,10 +255,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
           rr.user,
           questId,
           SolutionInfoContent(
-            ContentReference(
-              contentType = ContentType.Photo,
-              storage = "url",
-              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"),
+            media = None,
             description = None))) map { r =>
                 val s = api.db.solution.readById(r.modifiedSolutions.head.id).get
                 val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))
@@ -288,10 +282,7 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
           rr.user,
           questId,
           SolutionInfoContent(
-            ContentReference(
-              contentType = ContentType.Photo,
-              storage = "url",
-              reference = "http://static-1.questmeapp.com/files/6dd81da7-9992-4552-afb5-82505fdd2cb2.jpg"),
+            media = None,
             description = Some("asd")))) map { r =>
                 val s = api.db.solution.readById(r.modifiedSolutions.head.id).get
                 val s2 = s.copy(info = s.info.copy(creationDate = new Date(0)))

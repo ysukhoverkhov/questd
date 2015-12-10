@@ -11,13 +11,13 @@ private object CreateQuestWSImplTypes {
   type WSCreateQuestResult = CreateQuestResult
 
   case class WSCreateQuestRequest(
-    media: WSContentReference,
+    media: Option[WSContentReference] = None,
     icon: Option[WSContentReference] = None,
     description: String)
   object WSCreateQuestRequest {
     implicit def toQuestInfoContent(v: WSCreateQuestRequest): QuestInfoContent = {
       QuestInfoContent(
-        media = v.media,
+        media = v.media.map(r => r),
         icon = v.icon.map(r => r),
         description = v.description)
     }

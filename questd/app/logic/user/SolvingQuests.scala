@@ -6,7 +6,6 @@ import models.domain.common.ContentType._
 import models.domain.quest.Quest
 import models.domain.solution.SolutionInfoContent
 import models.domain.user.profile.Functionality
-import views.html.admin.config
 
 /**
  * All logic related to solving quests.
@@ -23,10 +22,10 @@ trait SolvingQuests { this: UserLogic =>
   /**
    * Is user can propose quest of given type.
    */
-  def canSolveQuest(contentType: ContentType, questToSolve: Quest, solutionContent: SolutionInfoContent): SolveQuestCode.Value = {
+  def canSolveQuest(questToSolve: Quest, solutionContent: SolutionInfoContent): SolveQuestCode.Value = {
     import SolveQuestCode._
 
-    val content = contentType match {
+    val content = solutionContent.media.map(_.contentType).getOrElse(Photo) match {
       case Photo => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitPhotoSolutions)
       case Video => user.profile.rights.unlockedFunctionality.contains(Functionality.SubmitVideoSolutions)
     }

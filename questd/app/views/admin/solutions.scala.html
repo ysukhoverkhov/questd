@@ -20,7 +20,12 @@
 	    		<td>@s.rating.votersCount</td>
 	    		<td>@s.rating.timelinePoints</td>
 	    		<td>@s.rating.cheating</td>
-	    		<td><img style="max-width: 204px; height: auto; " src="@s.info.content.media.reference" alt="@s.info.content.media.reference" ></td>
+	    		<td><img style="max-width: 204px; height: auto; " src='@{
+				    		    s.info.content.media.fold("None"){ media =>
+									if(media.reference.startsWith("http"))
+										media.reference
+									else
+										"http://static-1.questmeapp.com/content_0.30/" + media.reference}}'></td>
 	    	</tr>
 	    }
 	</table>

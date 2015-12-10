@@ -79,7 +79,7 @@ private[domain] trait CreateQuestAPI { this: DomainAPIComponent#DomainAPI with D
           {
             makeTask(MakeTaskRequest(u, taskType = Some(TaskType.CreateQuest)))
           } map { r =>
-            if (quest.info.content.media.contentType == ContentType.Video) {
+            if (quest.info.content.media.fold(false){m => m.contentType == ContentType.Video}) {
               makeTask(MakeTaskRequest(u, taskType = Some(TaskType.CreateVideoQuest)))
             } else {
               OkApiResult(MakeTaskResult(r.user))

@@ -40,23 +40,6 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
       )
     }
 
-
-    def checkBanQuest(quest: Quest): Quest = {
-      if (quest.info.content.media.storage == "fb" && quest.status == QuestStatus.InRotation) {
-        quest.copy(status = QuestStatus.AdminBanned)
-      } else {
-        quest
-      }
-    }
-
-    def checkBanSolution(solution: Solution): Solution = {
-      if (solution.info.content.media.storage == "fb" && solution.status == SolutionStatus.InRotation) {
-        solution.copy(status = SolutionStatus.AdminBanned)
-      } else {
-        solution
-      }
-    }
-
     def checkAddSolutionToAuthor(solution: Solution): Unit = {
       db.user.readById(solution.info.authorId).fold(){ author =>
         if (!author.stats.solvedQuests.contains(solution.info.questId)) {
@@ -91,7 +74,7 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
     }
 
     db.quest.all.foreach { quest =>
-      val updatedQuest = updateQuestSolutionsCount(updateQuestValues(checkBanQuest(quest)))
+      val updatedQuest = updateQuestSolutionsCount(updateQuestValues(quest))
 
       db.quest.update(updatedQuest)
 
@@ -101,13 +84,11 @@ private[domain] trait MaintenanceAdminAPI { this: DomainAPIComponent#DomainAPI w
     }
 
     db.solution.all.foreach { solution =>
-      val updatedSolution = checkBanSolution(solution)
+      checkAddSolutionToAuthor(solution)
+      db.solution.update(solution)
 
-      checkAddSolutionToAuthor(updatedSolution)
-      db.solution.update(updatedSolution)
-
-      if (updatedSolution.status == SolutionStatus.AdminBanned) {
-        rememberObjectToRemoveFromTimeline(updatedSolution.id)
+      if (solution.status == SolutionStatus.AdminBanned) {
+        rememberObjectToRemoveFromTimeline(solution.id)
       }
     }
 

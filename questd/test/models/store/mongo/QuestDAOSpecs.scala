@@ -39,13 +39,13 @@ class QuestDAOSpecs extends BaseDAOSpecs {
 
       db.quest.update(q.get.copy(info = q.get.info.copy(
         content = q.get.info.content.copy(
-          media = ContentReference(ContentType.Video, "2", "3")))))
+          media = Some(ContentReference(ContentType.Video, "2", "3"))))))
 
       val q2 = db.quest.readById(id)
 
       q2 must beSome[Quest]
       q2.get.id must beEqualTo(id)
-      q2.get.info.content.media.reference must beEqualTo("3")
+      q2.get.info.content.media.get.reference must beEqualTo("3")
     }
 
     "Delete quest" in new WithApplication(appWithTestDatabase) {

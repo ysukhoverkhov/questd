@@ -1,5 +1,6 @@
 package controllers.domain.app.user
 
+import com.restfb.types.Video
 import components._
 import controllers.domain._
 import controllers.domain.app.protocol.CommonCode
@@ -63,7 +64,6 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
       case None => OkApiResult(SolveQuestResult(QuestNotFound))
       case Some(questToSolve) =>
         user.canSolveQuest(
-          contentType = solution.media.contentType,
           questToSolve = questToSolve,
           solutionContent = request.solution) match {
           case OK =>
@@ -106,7 +106,7 @@ private[domain] trait SolveQuestAPI { this: DomainAPIComponent#DomainAPI with DB
             } map { r =>
               makeTask(MakeTaskRequest(r.user, taskType = Some(TaskType.CreateSolution)))
             } map { r =>
-              if (newSolution.info.content.media.contentType == ContentType.Video) {
+              if (newSolution.info.content.media.fold(false){m => m.contentType == ContentType.Video}) {
                 makeTask(MakeTaskRequest(r.user, taskType = Some(TaskType.CreateVideoSolution)))
               } else {
                 OkApiResult(MakeTaskResult(r.user))
