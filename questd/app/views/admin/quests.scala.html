@@ -1,0 +1,81 @@
+@(menuItems: Map[String, String], quests: List[models.domain.quest.Quest], newQuestForm: Form[controllers.web.admin.component.QuestForm])(implicit messages: Messages)
+
+@import helper._
+
+
+@questStatuses = @{
+    models.domain.quest.QuestStatus.values.map(_.toString).toList
+}
+
+
+@body("Quests")(menuItems, Map.empty) {
+
+    @form(action=controllers.web.admin.routes.QuestsCRUD.selectQuestStatus()) {
+    <select id="questStatus" name="questStatus">
+        @for(questStatus <- "All" :: questStatuses) {
+        <option value="@questStatus">@questStatus</option>
+        }
+    </select>
+    <input type='submit' value='Select' />
+    }
+
+
+	@form(action = controllers.web.admin.routes.QuestsCRUD.updateQuest()) {
+		@inputText(newQuestForm("id"), 'size -> 18, 'readonly -> "readonly") <br />
+		@select(newQuestForm("status"), options(questStatuses)) <br />
+		@inputText(newQuestForm("description"), 'size -> 140) <br />
+		@inputText(newQuestForm("level"), 'size -> 5) <br />
+		@inputText(newQuestForm("points"), 'size -> 5) <br />
+		@inputText(newQuestForm("cheating"), 'size -> 5) <br />
+		@inputText(newQuestForm("votersCount"), 'size -> 5) <br />
+		@if(newQuestForm("id").value == None) {
+<!-- 		<input type="submit" value="Create">  -->
+		} else {
+			<input type="submit" value="Update">
+		}
+	}
+
+	<table border="0">
+    	<tr>
+    		<td>
+				<table border="1">
+
+			    	<tr>
+			    		<td>description</td>
+			    		<td>status</td>
+			    		<td>points</td>
+			    		<td>cheating</td>
+			    		<td>votersCount</td>
+			    		<td>level</td>
+                        <td>cultureId</td>
+			    		<td>content</td>
+			    		<td>action</td>
+			    	</tr>
+
+					@for(q <- quests) {
+
+				    	<tr>
+				    		<td>@q.info.content.description</td>
+				    		<td>@q.status</td>
+				    		<td>@q.rating.timelinePoints</td>
+				    		<td>@q.rating.cheating</td>
+				    		<td>@q.rating.votersCount</td>
+				    		<td>@q.info.level</td>
+                            <td>@q.cultureId</td>
+				    		<td><img style="max-width: 204px; height: auto; " src='@{
+				    		    q.info.content.media.fold("None"){ media =>
+									if(media.reference.startsWith("http"))
+										media.reference
+									else
+										"http://static-1.questmeapp.com/content_0.30/" + media.reference}}'></td>
+							<td><a href="@controllers.web.admin.routes.QuestsCRUD.quests(q.id)">edit</a></td>
+	    				</tr>
+	   				}
+				</table>
+    		</td>
+    		<!-- td>
+    		</td -->
+    	</tr>
+	</table>
+}
+

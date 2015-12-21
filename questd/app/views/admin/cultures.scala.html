@@ -1,0 +1,58 @@
+@(menuItems: Map[String, String], cultures: List[models.domain.culture.Culture], newForm: Form[controllers.web.admin.component.CultureForm])(implicit messages: Messages)
+
+@import helper._
+
+@body("Cultures")(menuItems, Map.empty) {
+
+	<p>
+		@form(action = controllers.web.admin.routes.CulturesCRUD.createCultureCB()) {
+			@inputText(newForm("id"), 'size -> 50, 'readonly -> "readonly")
+		    <br/>
+			@inputText(newForm("name"), 'size -> 20, 'placeholder -> "Name")
+            <br/>
+            @select(newForm("cultureToMergeWith"), options(cultures.foldLeft[Map[String, String]](Map("" -> ""))((r, v) => if (newForm("name").value == None || v.name != newForm("name").value.get) r + (v.id -> v.name) else r))) <br />
+    		@if(newForm("id").value == None) {
+				<input type="submit" value="Create">
+			} else {
+				<input type="submit" value="Update">
+			}
+   		}
+	</p>
+
+    <p>
+    @if(newForm("id").value != None) {
+        <table border="1">
+            <tr>
+                <td colspan="2">Countries</td>
+            </tr>
+            @for(country <- cultures.find(_.id == newForm("id").value.get ).get.countries) {
+            <tr>
+                <td>@country</td>
+                <td><a href = "@controllers.web.admin.routes.CulturesCRUD.extractCountry(country)">Extract</a></td>
+            </tr>
+            }
+        </table>
+    }
+    </p>
+
+	<table border="1">
+    	<tr>
+    		<td>id</td>
+    		<td>name</td>
+    		<td>countries</td>
+    	</tr>
+
+		@for(t <- cultures) {
+	    	<tr>
+	    		<td>@t.id</td>
+	    		<td>@t.name</td>
+	    		<td>@t.countries.size</td>
+
+				<td><a href="@controllers.web.admin.routes.CulturesCRUD.cultures(t.id)">edit</a></td>
+				<!-- td><a onClick='deleteFun("@controllers.web.admin.routes.CulturesCRUD.deleteCultureCB(t.id)")' >delete</a></td -->
+	    	</tr>
+	    }
+
+	</table>
+}
+

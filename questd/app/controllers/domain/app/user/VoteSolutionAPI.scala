@@ -1,0 +1,112 @@
+package controllers.domain.app.user
+
+import components._
+import controllers.domain._
+import controllers.domain.app.protocol.CommonCode
+import controllers.domain.app.solution.{VoteSolutionRequest, VoteSolutionResult}
+import controllers.domain.helpers._
+import models.domain.common.ContentVote
+import models.domain.solution.SolutionStatus
+import models.domain.user._
+import models.domain.user.friends.FriendshipStatus
+import models.domain.user.profile.{Profile, TaskType}
+import models.domain.user.timeline.{TimeLineReason, TimeLineType}
+import models.view.SolutionView
+
+object VoteSolutionByUserCode extends Enumeration with CommonCode {
+  val SolutionAlreadyVoted = Value
+  val CantVoteOwnSolution = Value
+}
+case class VoteSolutionByUserRequest(user: User, solutionId: String, vote: ContentVote.Value)
+case class VoteSolutionByUserResult(
+  allowed: VoteSolutionByUserCode.Value,
+  profile: Option[Profile] = None,
+  modifiedSolutions: List[SolutionView] = List.empty)
+
+object HideOwnSolutionCode extends Enumeration with CommonCode {
+  val SolutionNotFound = Value
+  val NotOwnSolution = Value
+  val SolutionNotInRotation = Value
+}
+case class HideOwnSolutionRequest(user: User, solutionId: String)
+case class HideOwnSolutionResult(allowed: HideOwnSolutionCode.Value)
+
+
+private[domain] trait VoteSolutionAPI {
+  this: DomainAPIComponent#DomainAPI with DBAccessor =>
+
+  /**
+   * Vote for a solution.
+   */
+  def voteSolutionByUser(request: VoteSolutionByUserRequest): ApiResult[VoteSolutionByUserResult] = handleDbException {
+    import VoteSolutionByUserCode._
+    import request._
+
+    user.canVoteSolution(solutionId, vote) match {
+      case OK =>
+
+        db.solution.readById(solutionId) ifSome { s =>
+          {
+            val isFriend = user.friends.filter(_.status == FriendshipStatus.Accepted).map(_.friendId).contains(s.info.authorId)
+            voteSolution(VoteSolutionRequest(s, isFriend, request.vote))
+          } map { voteResult => voteResult match {
+            case VoteSolutionResult(votedSolution) => {
+              if (request.vote == ContentVote.Cool)
+                makeTask(MakeTaskRequest(request.user, taskType = Some(TaskType.LikeSolutions)))
+              else
+                OkApiResult(MakeTaskResult(request.user))
+            } map { r =>
+              db.user.recordSolutionVote(r.user.id, votedSolution.id, request.vote) ifSome { u =>
+
+                (if (request.vote == ContentVote.Cool) {
+                  addToWatchersTimeLine(
+                    AddToWatchersTimeLineRequest(
+                      user = u,
+                      reason = TimeLineReason.Liked,
+                      objectType = TimeLineType.Solution,
+                      objectId = votedSolution.id
+                    )) map { r =>
+                    OkApiResult(UserInternalResult(r.user))
+                  }
+                } else {
+                  removeFromTimeLine(RemoveFromTimeLineRequest(user = u, objectId = votedSolution.id)) map { r =>
+                    OkApiResult(UserInternalResult(r.user))
+                  }
+                }) map { r =>
+                  OkApiResult(
+                    VoteSolutionByUserResult(
+                      allowed = OK,
+                      profile = Some(r.user.profile),
+                      modifiedSolutions = List(SolutionView(votedSolution, r.user))))
+                }
+              }
+            }
+          }}
+        }
+
+      case a => OkApiResult(VoteSolutionByUserResult(a))
+    }
+  }
+
+  /**
+   * Hides own player's solution.
+   */
+  def hideOwnSolution(request: HideOwnSolutionRequest): ApiResult[HideOwnSolutionResult] = handleDbException {
+    import HideOwnSolutionCode._
+    import request._
+
+    db.solution.readById(solutionId).fold {
+      OkApiResult(HideOwnSolutionResult(SolutionNotFound))
+    } { solution =>
+      if (solution.info.authorId != user.id) {
+        OkApiResult(HideOwnSolutionResult(NotOwnSolution))
+      } else if (solution.status != SolutionStatus.InRotation) {
+        OkApiResult(HideOwnSolutionResult(SolutionNotInRotation))
+      } else {
+        db.solution.updateStatus(solutionId, SolutionStatus.AuthorBanned)
+        OkApiResult(HideOwnSolutionResult(OK))
+      }
+    }
+  }
+}
+

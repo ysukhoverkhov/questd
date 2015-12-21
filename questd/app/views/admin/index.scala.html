@@ -1,0 +1,20 @@
+@(menuItems: Map[String, String])(implicit messages: Messages)
+
+@body("Home")(menuItems, Map.empty) {
+    <p>
+        @{misc.BuildInfo}
+    </p>
+
+    <p>
+        <a href="@controllers.web.admin.routes.Maintains.cleanup">Cleanup everything</a>
+    </p>
+
+    <p>
+        <a href="@controllers.web.admin.routes.Maintains.exportAnalytics">Export Analytics</a>
+    </p>
+
+    <p>
+        <!--a href="@controllers.web.admin.routes.Maintains.resetProfiles">Reset all profiles</a-->
+    </p>
+}
+
