@@ -17,3 +17,14 @@ questd/.idea_modules
 questd/project/.sbtserver.lock
 questd/.sbtserver
 questd/project/.sbtserver
+.idea/.name
+.idea/QuestMeServer.iml
+.idea/compiler.xml
+.idea/copyright/profiles_settings.xml
+.idea/encodings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/scala_settings.xml
+.idea/scopes/scope_settings.xml
+.idea/vcs.xml
+.idea/workspace.xml
