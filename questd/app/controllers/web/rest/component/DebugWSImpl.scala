@@ -78,6 +78,9 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
 
+    // 7f5a41d9 ba369f80 c64b6e65 d19fe85e 227f44a9 6d2e200c 9363fa7a 9972bf08
+    // 250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207
+
     c.actor ! DeviceNotifications.PushMessage(
       devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
       message = "lalala",
