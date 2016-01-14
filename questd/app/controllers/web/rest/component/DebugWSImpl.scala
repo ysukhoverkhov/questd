@@ -10,7 +10,7 @@ import controllers.domain.app.user._
 import controllers.services.devicenotifications.DeviceNotifications.IOSDevice
 import controllers.services.devicenotifications.{DeviceNotifications, DeviceNotificationsComponent, InactiveDevices}
 import controllers.web.helpers._
-import models.domain.common.{ContentReference, ContentType, ContentVote}
+import models.domain.common.ContentVote
 import models.domain.quest.QuestInfoContent
 import models.domain.solution.SolutionInfoContent
 import models.domain.user._
@@ -78,11 +78,12 @@ trait DebugWSImpl extends BaseController with SecurityWSImpl with CommonFunction
 
   def test = wrapApiCallReturnBody[WSDebugResult] { r =>
 
-    // 7f5a41d9 ba369f80 c64b6e65 d19fe85e 227f44a9 6d2e200c 9363fa7a 9972bf08
-    // 250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207
+    // 7f5a41d9 ba369f80 c64b6e65 d19fe85e 227f44a9 6d2e200c 9363fa7a 9972bf08 - Yury iPad sandbox
+    // 250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207 - Yury iPhone sandbox
+    // 79a8eeb7f18a0331a9b4d420e1e2a9853c7e9e0cc13492028126f75f3f0b07fd - Yury iPhone Production
 
     c.actor ! DeviceNotifications.PushMessage(
-      devices = DeviceNotifications.Devices(Set(IOSDevice("250bad8f be421ebf 716da622 7680bbc3 3cf333e9 ec11a625 487176f6 895bd207"))),
+      devices = DeviceNotifications.Devices(Set(IOSDevice("79a8eeb7f18a0331a9b4d420e1e2a9853c7e9e0cc13492028126f75f3f0b07fd"))),
       message = "lalala",
       badge = Some(3),
       sound = None,

@@ -13,7 +13,7 @@ trait APNSService
   val service: ApnsService =
 
   {
-    if(Play.application.configuration.getBoolean("apple.use_devel", false)) {
+    if(!Play.application.configuration.getBoolean("questd.devicenotifications.apple.use_devel", false)) {
       APNS.newService()
         .withCert(
           Play.application.configuration.getString("questd.devicenotifications.apple.certificatepath"),
