@@ -20,7 +20,7 @@ object constants {
     Functionality.InviteFriends -> 5,
     Functionality.AssignQuests -> 5,
     Functionality.SubmitPhotoQuests -> 6,
-    Functionality.SubmitVideoSolutions -> 7,
+    Functionality.SubmitVideoSolutions -> 2, // 7
     Functionality.SubmitVideoQuests -> 8,
 
     Functionality.GiveRewards -> 20)
