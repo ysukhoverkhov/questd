@@ -1,8 +1,6 @@
 package models.store.mongo.dao
 
 import models.domain.user._
-import models.domain.user.timeline.{TimeLineEntry, TimeLineReason}
-import models.domain.user.timeline.{TimeLineReason, TimeLineEntry}
 import models.store.dao._
 import models.store.mongo.dao.user._
 import models.store.mongo.helpers._
